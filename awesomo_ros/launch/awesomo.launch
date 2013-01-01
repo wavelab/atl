@@ -5,7 +5,7 @@
   <include file="$(find mavros)/launch/px4.launch" />
 
 <!-- controller node -->
-  <param name="control_config_dir" value="$(find awesomo_configs)/configs/quadrotor_gazebosim" />
+  <param name="control_config_dir" value="$(find awesomo_configs)/configs/quadrotor_anastasia" />
   <node pkg="awesomo_ros" name="awesomo_control" type="control_node" output="screen" />
 
   <!-- apriltag node -->
