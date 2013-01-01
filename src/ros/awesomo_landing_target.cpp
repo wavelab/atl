@@ -10,6 +10,7 @@
 #include "awesomo/camera.hpp"
 
 #define ATIM_POSE_TOPIC "/atim/pose"
+#define ATIM_REDIVERT_POSE_TOPIC "/atim/pose/standard"
 #define LANDING_TARGET_TOPIC "/awesomo/landing_target/pose"
 #define MAVROS_LOCAL_POSITION_TOPIC "/mavros/local_position/pose"
 
@@ -31,6 +32,7 @@ public:
     ros::Subscriber atimPoseSubscriber;
     ros::Subscriber localPositionPoseSubscriber;
     ros::Publisher correction_publisher;
+    ros::Publisher redivert_publisher;
 };
 
 LandingTarget::LandingTarget(CameraMountRBT &cam_rbt)
@@ -45,6 +47,10 @@ LandingTarget::LandingTarget(CameraMountRBT &cam_rbt)
     this->position.detected = false;
     this->correction_publisher = n.advertise<atim::AtimPoseStamped>(
         LANDING_TARGET_TOPIC,
+        50
+    );
+    this->redivert_publisher = n.advertise<geometry_msgs::PoseStamped>(
+        ATIM_REDIVERT_POSE_TOPIC,
         50
     );
 }
@@ -130,6 +136,7 @@ void LandingTarget::subscribeToLocalPositionPose(void)
 void LandingTarget::publishRotatedValues(int seq, ros::Time time)
 {
     atim::AtimPoseStamped correctedPose;
+    geometry_msgs::PoseStamped correctedPose2;
 
     correctedPose.header.seq = seq;
     correctedPose.header.stamp = time;
@@ -138,7 +145,15 @@ void LandingTarget::publishRotatedValues(int seq, ros::Time time)
     correctedPose.pose.position.y = this->position.y;
     correctedPose.pose.position.z = this->position.z;
     correctedPose.tag_detected = this->position.detected;
+
+    correctedPose2.header.seq = seq;
+    correctedPose2.header.stamp = time;
+    correctedPose2.pose.position.x = this->position.x;
+    correctedPose2.pose.position.y = this->position.y;
+    correctedPose2.pose.position.z = this->position.z;
+
     this->correction_publisher.publish(correctedPose);
+    this->redivert_publisher.publish(correctedPose2);
 }
 
 int main(int argc, char **argv)

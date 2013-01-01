@@ -41,7 +41,6 @@
 #define GPS_TOPIC "/mavros/global_position/local"
 
 
-
 class Awesomo
 {
 public:

@@ -155,7 +155,7 @@ void Quadrotor::runIdleMode(Pose robot_pose)
     }
 }
 
-Position Quadrotor::runHoverMode(Pose robot_pose)
+Position Quadrotor::runHoverMode(Pose robot_pose, float dt)
 {
     Position cmd;
 
@@ -171,6 +171,8 @@ Position Quadrotor::runHoverMode(Pose robot_pose)
     cmd.x = this->hover_point->x;
     cmd.y = this->hover_point->y;
     cmd.z = this->hover_point->z;
+
+    this->positionControllerCalculate(cmd, robot_pose, dt);
 
     return cmd;
 }
@@ -218,7 +220,7 @@ void Quadrotor::initializeCarrotController(void)
     std::cout << "Transitioning to Carrot Controller Mode!" << std::endl;
 }
 
-Position Quadrotor::runCarrotMode(Pose robot_pose)
+Position Quadrotor::runCarrotMode(Pose robot_pose, float dt)
 {
     Position cmd;
     Eigen::Vector3d position;
@@ -241,7 +243,7 @@ Position Quadrotor::runCarrotMode(Pose robot_pose)
 
 
     } else {
-        cmd = this->runHoverMode(robot_pose);
+        cmd = this->runHoverMode(robot_pose, dt);
         return cmd;
     }
 
@@ -316,12 +318,12 @@ Position Quadrotor::runTrackingMode(
     }
 
     // transition to landing?
-    elasped = difftime(time(NULL), this->tracking_start);
-    if (elasped > 5 && landing_zone.detected && landing_zone.x < 2.0 && landing_zone.y < 2.0) {
-        this->mission_state = LANDING_MODE;
-        this->height_last_updated = time(NULL);
-        std::cout << "Transitioning to Landing Mode!" << std::endl;
-    }
+    // elasped = difftime(time(NULL), this->tracking_start);
+    // if (elasped > 5 && landing_zone.detected && landing_zone.x < 2.0 && landing_zone.y < 2.0) {
+    //     this->mission_state = LANDING_MODE;
+    //     this->height_last_updated = time(NULL);
+    //     std::cout << "Transitioning to Landing Mode!" << std::endl;
+    // }
 
     return tag;
 }
@@ -357,6 +359,13 @@ Position Quadrotor::runLandingMode(
     estimation.x = this->apriltag_estimator.mu(0);
     estimation.y = this->apriltag_estimator.mu(1);
     estimation.z = this->apriltag_estimator.mu(2);
+
+    // printf(
+    //     "estimation: %f %f %f\n",
+    //     this->apriltag_estimator.mu(0),
+    //     this->apriltag_estimator.mu(1),
+    //     this->apriltag_estimator.mu(2)
+    // );
 
     // keep track of target position
     if (landing_zone.detected == true) {
@@ -413,20 +422,20 @@ int Quadrotor::followWaypoints(
     switch (this->mission_state) {
     case IDLE_MODE:
         this->runIdleMode(robot_pose);
-        setpoint = this->runHoverMode(robot_pose);
+        setpoint = this->runHoverMode(robot_pose, dt);
         break;
 
     case HOVER_MODE:
-        setpoint = this->runHoverMode(robot_pose);
+        setpoint = this->runHoverMode(robot_pose, dt);
         break;
 
     case CARROT_INITIALIZE_MODE:
         this->initializeCarrotController();
-        setpoint = this->runHoverMode(robot_pose);
+        setpoint = this->runHoverMode(robot_pose, dt);
         break;
 
     case CARROT_MODE:
-        setpoint = this->runCarrotMode(robot_pose);
+        setpoint = this->runCarrotMode(robot_pose, dt);
         break;
 
     case MISSION_ACCOMPLISHED:
@@ -462,13 +471,13 @@ int Quadrotor::runMission(
     switch (this->mission_state) {
     case IDLE_MODE:
         this->runIdleMode(robot_pose);
-        this->runHoverMode(robot_pose);
+        this->runHoverMode(robot_pose, dt);
         return 1;
         break;
 
     case DISCOVER_MODE:
         this->runDiscoverMode(robot_pose, landing_zone);
-        this->runHoverMode(robot_pose);
+        this->runHoverMode(robot_pose, dt);
         return 1;
         break;
 
@@ -498,13 +507,11 @@ int Quadrotor::runMission(
     tag_origin.y = 0.0f;
     tag_origin.z = tag_position.z;
 
-    std::cout << landing_zone.detected << std::endl;
     if (landing_zone.detected) {
         this->positionControllerCalculate(tag_origin, fake_robot_pose, dt);
 
     } else {
-        std::cout << "Hovering!" << std::endl;
-        this->runHoverMode(robot_pose);
+        this->runHoverMode(robot_pose, dt);
 
     }
 

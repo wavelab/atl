@@ -210,7 +210,7 @@ int testQuadrotorRunHoverMode(void)
 	robot_pose.z = 3.0;
 
 	// test hover point intialized
-	cmd = quad->runHoverMode(robot_pose);
+	cmd = quad->runHoverMode(robot_pose, 0.1);
 
     mu_check(quad->hover_point->initialized == true);
     mu_check(fltcmp(quad->hover_point->x, 1) == 0);
@@ -223,7 +223,7 @@ int testQuadrotorRunHoverMode(void)
 
 	// test hover point when it is not intialized
     quad->hover_point->initialized = false;
-	cmd = quad->runHoverMode(robot_pose);
+	cmd = quad->runHoverMode(robot_pose, 0.1);
 
     mu_check(quad->hover_point->initialized == true);
     mu_check(fltcmp(quad->hover_point->x, robot_pose.x) == 0);
@@ -299,7 +299,7 @@ int testQuadrotorRunCarrotMode(void)
         robot_pose.x = x_waypoints[i];
         robot_pose.y = y_waypoints[i];
         robot_pose.z = 6.0;
-        cmd = quad->runCarrotMode(robot_pose);
+        cmd = quad->runCarrotMode(robot_pose, 0.1);
 
         if (i < 3) {
             // check waypoint 2 to 4

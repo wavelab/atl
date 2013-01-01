@@ -113,9 +113,9 @@ public:
     void updatePose(Pose p);
     void resetPositionController(void);
     void runIdleMode(Pose robot_pose);
-    Position runHoverMode(Pose robot_pose);
+    Position runHoverMode(Pose robot_pose, float dt);
     void initializeCarrotController(void);
-    Position runCarrotMode(Pose robot_pose);
+    Position runCarrotMode(Pose robot_pose, float dt);
     Position runDiscoverMode(
         Pose robot_pose,
         LandingTargetPosition landing_zone
