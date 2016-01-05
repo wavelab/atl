@@ -4,3 +4,8 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+Introduction	/home/chutsu/Dropbox/proj/awesomo/docs/proposal/proposal.tex	/^\\maketitle$/;"	s
+Methods	/home/chutsu/Dropbox/proj/awesomo/docs/proposal/proposal.tex	/^\\section*{Previoius and Related Work}$/;"	s
+Milestones	/home/chutsu/Dropbox/proj/awesomo/docs/proposal/proposal.tex	/^\\section*{Methods}$/;"	s
+Potential Problems	/home/chutsu/Dropbox/proj/awesomo/docs/proposal/proposal.tex	/^\\end{enumerate}$/;"	s
+Previoius and Related Work	/home/chutsu/Dropbox/proj/awesomo/docs/proposal/proposal.tex	/^Landing a quadrotor on a moving platform.$/;"	s

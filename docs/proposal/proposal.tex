@@ -1,0 +1,71 @@
+\documentclass{article}
+
+% GRAPHICS
+\usepackage{graphicx}
+
+% HYPERLINKS
+\usepackage{hyperref}
+
+% DOCUMENT PADDING AND MARGINS
+\usepackage{titlesec}
+\usepackage[margin=1.5in]{geometry}
+\setlength{\parskip}{\baselineskip}%
+\setlength{\parindent}{0pt}
+\titlespacing*{\section}{0pt}{2ex}{0ex}
+\titlespacing*{\subsection}{0pt}{2ex}{-2ex}
+\titlespacing*{\subsubsection}{0pt}{2ex}{-2ex}
+
+
+
+\begin{document}
+
+% TITLE
+\title{Autonomous Quadrotor Landing on a Moving Platform}
+\author{Stan Brown \& Chris Choi}
+\maketitle
+
+
+
+\section*{Introduction}
+Landing a quadrotor on a moving platform.
+
+
+
+\section*{Previoius and Related Work}
+
+
+
+
+\section*{Methods}
+
+
+
+
+
+\section*{Milestones}
+\begin{enumerate}
+	\item{Identify hardware (camera, extra sensors...)}
+	\item{Identify potential algorithmic solutions}
+	\item{Implement solutions in softwaree}
+	\item{Implement solutions in hardware}
+	\item{Calibration of sensors}
+	\item{Computer vision ID landing zone}
+	\item{Motion Planning to land}
+	\item{Perform the above successfully in simulation}
+	\item{Perform the above successfully in real life}
+\end{enumerate}
+
+
+\section*{Potential Problems}
+\begin{itemize}
+	\item{Gazebo may have poor wind simulations}
+	\item{Quadrotor ground effects (GP calcuting the error term?)}
+\end{itemize}
+
+
+
+
+\bibliography{proposal}{}
+\bibliographystyle{plain}
+
+\end{document}
