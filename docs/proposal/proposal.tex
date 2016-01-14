@@ -27,41 +27,45 @@
 
 
 \section*{Introduction}
-Landing a quadrotor on a moving platform.
+Landing a quadrotor on a moving platform has been explored by a number of researchers \cite{Lee2012, Kim2014, Voos2010, Friis2009, Ling2014, Herisse2012}, there exists a wide range of approaches to the problem, however to the best of our knowledge we are not aware of any solution that demonstrates a quadrotor capable of landing on a moving platform outdoors. It is our goal to replicate one of the successful solutions with the aim of extending the solution to land outdoors.
 
 
+\section*{Related Work} 
+The problem of autonous landing on a moving platform can be divded into three parts, perception, control and planning.
 
-\section*{Previoius and Related Work}
-
-
-
+From the literature we reviewed planning is the least concern, perception and control seems to be the main factor to sucess. For perception existing solutions could be as simple as using basic color detection techniques to identify the landing target\cite{Kim2014}, to sophisticated techniques such as \cite{Herisse2012} where they used the optical flow in images captured onboard the quadrotor to obtain necessary relative information for control.
 
 \section*{Methods}
 
+\begin{itemize}
+	\vspace{-0.2cm}
+	\setlength{\itemsep}{5pt}
+	\setlength{\parskip}{0pt}
+	\setlength{\parsep}{0pt}
+
+	\item{\textbf{Perception}: To simplify the problem we plan to use common image processing techniques and AprilTag to identify the landing target. This is similar to \cite{Ling2014} where the solution used AprilTag and AprilTag Detection Algorithm to return the 6 dof pose of the landing target.}]
+	
+	\item{\textbf{Control}: For our first approach we plan implementing using a set of PID Controller to minimize distance, altitude, heading difference, with the state controller overseeing the transition between tracking, approach and landing phase of the quadrotor.}
+	
+	\item{\textbf{Planing}: At this stage we will omit planning because we are assuming that the quadrotor is within visual proximity to landing target, and we assume that the landing control implemented on the PX4 firmware \cite{px4} running on the Pixhawk flight controller \cite{pixhawk} will be adequate for our project.}
+	
+	\vspace{-0.2cm}
+\end{itemize}
 
 
 
 
 \section*{Milestones}
 \begin{enumerate}
-	\item{Identify hardware (camera, extra sensors...)}
-	\item{Identify potential algorithmic solutions}
-	\item{Implement solutions in softwaree}
-	\item{Implement solutions in hardware}
-	\item{Calibration of sensors}
-	\item{Computer vision ID landing zone}
-	\item{Motion Planning to land}
-	\item{Perform the above successfully in simulation}
+	\item{Perform tracking and follow in simulation}
+	\item{Perform automated landing in simulation}
 	\item{Perform the above successfully in real life}
 \end{enumerate}
 
 
-\section*{Potential Problems}
-\begin{itemize}
-	\item{Gazebo may have poor wind simulations}
-	\item{Quadrotor ground effects (GP calcuting the error term?)}
-\end{itemize}
+\section*{Possible Expansion}
 
+Trajectory Planning for high wind or fast moving platform.
 
 
 
