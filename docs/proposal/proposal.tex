@@ -27,15 +27,20 @@
 
 
 \section*{Introduction}
-Landing a quadrotor on a moving platform has been explored by a number of researchers \cite{Lee2012, Kim2014, Voos2010, Friis2009, Ling2014, Herisse2012}, there exists a wide range of approaches to the problem, however to the best of our knowledge we are not aware of any solution that demonstrates a quadrotor capable of landing on a moving platform outdoors. It is our goal to replicate one of the successful solutions with the aim of extending the solution to land outdoors.
+Landing a quadrotor on a moving platform has been explored by a number of researchers \cite{Lee2012, Kim2014, Voos2010, Friis2009, Ling2014, Herisse2012}, and there exists a wide range of approaches to the problem. However, to the best of our knowledge, we are not aware of any solution that demonstrates an algorithm that is capable of landing a quadrotor on a moving platform outdoors. It is our goal to replicate one of the successful solutions with the aim of extending the solution to land outdoors.
+
+\subsection*{Applications}
+Possible applications for this work include autonomous landing on a boat in high wind conditions, landing on a charging platform, landing in high wind conditions.
 
 
 \section*{Related Work} 
-The problem of autonous landing on a moving platform can be divded into three parts, perception, control and planning.
+The problem of autonomous landing on a moving platform seems to be divided into three separate parts in literature. First the quadrotor must plan to rendezvous with its target, next it must detect or sense its target and finally apply a set of controllers to approach the platform, match speed and heading and finally land when safe to do so. 
+
+In the majority of the literature reviewed, rendezvous planning was neglected and it was assumed that quadrotor has a clear view of its landing location.
 
 From the literature we reviewed planning is the least concern, perception and control seems to be the main factor to sucess. For perception existing solutions could be as simple as using basic color detection techniques to identify the landing target\cite{Kim2014}, to sophisticated techniques such as \cite{Herisse2012} where they used the optical flow in images captured onboard the quadrotor to obtain necessary relative information for control.
 
-\section*{Methods}
+\section*{Proposed Methodology}
 
 \begin{itemize}
 	\vspace{-0.2cm}
