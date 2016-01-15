@@ -9,3 +9,5 @@ lib
 bin
 obj
 tags
+
+run.sh
