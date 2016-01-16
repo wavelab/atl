@@ -4,7 +4,7 @@
 
 
 #include "munit.h"
-#include "webcam.h"
+#include "webcam.hpp"
 
 
 void test_suite()

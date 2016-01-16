@@ -1,4 +1,4 @@
-#include "webcam.h"
+#include "webcam.hpp"
 
 
 static double tic()
