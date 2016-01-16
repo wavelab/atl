@@ -2,12 +2,6 @@
 HECTOR_PATH=$HOME
 
 
-install_dependencies()
-{
-    apt-get install -y \
-        ros-indigo-desktop-full
-}
-
 install_hector_sim()
 {
     cd $HECTOR_PATH
@@ -20,5 +14,4 @@ install_hector_sim()
 
 
 #RUN
-install_dependencies
 install_hector_sim
