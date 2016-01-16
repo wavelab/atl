@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentclass{article}[12pt]
 
 % GRAPHICS
 \usepackage{graphicx}
@@ -8,13 +8,15 @@
 
 % DOCUMENT PADDING AND MARGINS
 \usepackage{titlesec}
-\usepackage[margin=1.5in]{geometry}
+\usepackage[margin=1.2in]{geometry}
 \setlength{\parskip}{\baselineskip}%
 \setlength{\parindent}{0pt}
 \titlespacing*{\section}{0pt}{2ex}{0ex}
-\titlespacing*{\subsection}{0pt}{2ex}{-2ex}
+\titlespacing*{\subsection}{0pt}{1ex}{-2ex}
 \titlespacing*{\subsubsection}{0pt}{2ex}{-2ex}
 
+%COMMENTING
+\usepackage{comment}
 
 
 \begin{document}
@@ -22,26 +24,58 @@
 % TITLE
 \title{Autonomous Quadrotor Landing on a Moving Platform}
 \author{Stan Brown \& Chris Choi}
+\date{}
 \maketitle
 
 
 
-\section*{Introduction}
-Landing a quadrotor on a moving platform has been explored by a number of researchers \cite{Lee2012, Kim2014, Voos2010, Friis2009, Ling2014, Herisse2012}, and there exists a wide range of approaches to the problem. However, to the best of our knowledge, we are not aware of any solution that demonstrates an algorithm that is capable of landing a quadrotor on a moving platform outdoors. It is our goal to replicate one of the successful solutions with the aim of extending the solution to land outdoors.
 
-\subsection*{Applications}
-Possible applications for this work include autonomous landing on a boat in high wind conditions, landing on a charging platform, landing in high wind conditions.
+\section*{Project Outline}
+Landing a quadrotor on a moving platform has been explored by a number of researchers \cite{Lee2012, Kim2014, Voos2010, Friis2009, Ling2014, Herisse2012}, and there exists a wide range of approaches to the problem. However, to the best of our knowledge, we are not aware of any solution that demonstrates an algorithm that is capable of landing a quadrotor on a moving platform outdoors. It is our goal to replicate one of the successful solutions with the aim of extending the solution to land outdoors. Possible applications for this work include autonomous landing on a boat in high wind conditions, landing on a charging platform.
 
-
-\section*{Related Work} 
 The problem of autonomous landing on a moving platform seems to be divided into three separate parts in literature. First the quadrotor must plan to rendezvous with its target, next it must detect or sense its target and finally apply a set of controllers to approach the platform, match speed and heading and finally land when safe to do so. 
 
-In the majority of the literature reviewed, rendezvous planning was neglected and it was assumed that quadrotor has a clear view of its landing location.
+\subsubsection*{Planning}
+In the majority of the literature reviewed, rendezvous planning was neglected and it was assumed that quadrotor has a clear view of its landing target. Most authors tend to focus on the detection and estimation of the quadrotor's pose relative to the target and maintaining an accurate estimation throughout the landing procedure which is mostly handled by a series of control loops.
 
-From the literature we reviewed planning is the least concern, perception and control seems to be the main factor to sucess. For perception existing solutions could be as simple as using basic color detection techniques to identify the landing target\cite{Kim2014}, to sophisticated techniques such as \cite{Herisse2012} where they used the optical flow in images captured onboard the quadrotor to obtain necessary relative information for control.
+\subsubsection*{Perception and State Estimation}
+For perception existing solutions use a variety of simple to complex techniques. In  \cite{Kim2014} a basic color threshold technique was to identify the landing target, while \cite{Herisse2012} used optical flow in images captured on board the quadrotor to obtain necessary relative information for control. 
+
+\subsubsection*{Control}
+A comparison between a PID and Linear Quadratic Control (LQC) was explored in \cite{Friis2009}. However the authors admit, even though LQC performed slightly better than the PID controller the difference was minor and may be attributed to the additional time spent tuning the LQC. In \cite{Herisse2012} a PID controller was developed to land on a oscillating platform in the vertical direction with no lateral movement. While interesting, the solution took over 1 minute to transition from hovering over the landing pad to landing. Additionally the experiments did not seem to account for pitch or roll of the platform.  
+
+
 
 \section*{Proposed Methodology}
 
+In reviewing the prior work, a reoccurring problem lies in the difficulty in maintaining an accurate pose estimation between the quadrotor and the landing pad throughout the entire manoeuvre. As the quadrotor approaches the landing pad, visible targets used to guide the quadrotor becomes difficult to locate, causing camera based navigation techniques to fail. Furthermore, in certain conditions the tilt angle of the quadrotor could cause difficulty in maintaining a visual on the landing pad for a downward facing or fixed camera. 
+
+To address both of these issues, we propose a novel solution utilizing two cameras and two gimbals. In the proposed set up the quadrotor will have a gimballed camera and so will the moving landing platform. Both of the cameras will have an AprilTag attached allow cameras to track each other and provide two estimations of the quadrotor's current pose relative to the landing platform. 
+
+We will replicate the experiment performed by \cite{Ling2014}, where we assume the quadrotor already has a visual of the landing platform. We aim to implement a series of controllers for the approach and landing of the quadrotor to the moving landing platform.
+
+\section*{Hardware and Software Status}
+
+For this project we will be using a DJI F450 Flamewheel quadrotor using the Pixhawk flight controller \cite{pixhawk} running the PX4 firmware \cite{px4}. The gimbal design and camera specifications have yet to be decided, for the prototyping and testing phase we will be using fixed USB cameras. For the AprilTag detection and pose estimation we will use the AprilTag Library implemented by \cite{apriltags}. OpenCV will be used for image analysis tasks and the controllers will be implemented using ROS. 
+
+
+\section*{Milestones and Goals for the Semester}
+Over the term we have set a series of goals and deadlines in order to evaluate progress throughout the term. Later on additional goals will be added as the requirements change depending on test results.
+\begin{enumerate}
+	\item{Evaluate AprilTag detection algorithms and libraries - Jan 15}
+	\item{Set the simulation environment in Gazebo - Jan 15} 
+	\item{Perform automated landing in simulation - Feb 1}
+	\item{Acquire gimbals and cameras and test the tracking code - Feb 7}
+	\item{Attempt landing indoors and duplicate the work of \cite{Ling2014} - Feb 19}
+	\item{Add the gimbals to the quadrotor and landing pad  - Feb 27}
+	\item{Implement the proposed methods outlined above - April 15}
+	\item{Attempt to land in outdoor conditions 	- April 20}
+	
+\end{enumerate}
+
+
+\begin{comment}
+CHRIS IS A LITTLE BITCH
 \begin{itemize}
 	\vspace{-0.2cm}
 	\setlength{\itemsep}{5pt}
@@ -56,25 +90,14 @@ From the literature we reviewed planning is the least concern, perception and co
 	
 	\vspace{-0.2cm}
 \end{itemize}
+\end{comment}
 
 
 
-
-\section*{Milestones}
-\begin{enumerate}
-	\item{Perform tracking and follow in simulation}
-	\item{Perform automated landing in simulation}
-	\item{Perform the above successfully in real life}
-\end{enumerate}
-
-
-\section*{Possible Expansion}
-
-Trajectory Planning for high wind or fast moving platform.
-
+\newpage
 
 
 \bibliography{proposal}{}
-\bibliographystyle{plain}
+\bibliographystyle{ieeetr}
 
 \end{document}
