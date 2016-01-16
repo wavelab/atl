@@ -5,6 +5,8 @@
 *.out
 *.synctex.gz
 
+*~
+
 lib
 bin
 obj
