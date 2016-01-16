@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e  # exit on first error
+
 ROS_VERSION="indigo"
 ROS_BASH="/opt/ros/$ROS_VERSION/setup.bash"
 ROS_PACKAGES_URL='http://packages.ros.org/ros/ubuntu'

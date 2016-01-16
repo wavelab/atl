@@ -2,23 +2,19 @@ dist: trusty
 sudo: required
 
 language:
-  - python
   - c++
-  
+
 cache:
   - apt
 
-virtualenv:
-  system_site_packages: true
-
 before_install:
-  - bash scripts/ros_install.bash
-  - bash scripts/hector_quad_simulator.bash
+  - bash scripts/ros_install.sh
+  - bash scripts/hector_quad_simulator_install.sh
 
 notifications:
     recipients:
         - stan.j.brown@gmail.com
-        - chutsu@gmail.com 
+        - chutsu@gmail.com
     email:
         on_success: change
         on_failure: always

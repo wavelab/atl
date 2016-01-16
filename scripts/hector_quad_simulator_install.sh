@@ -1,6 +1,7 @@
 #!/bin/sh
 HECTOR_PATH=$HOME
 
+
 install_dependencies()
 {
     apt-get install -y \
