@@ -2,3 +2,6 @@
 
 # Reference
 - [TODO](#docs/reference/TODO)
+
+# API
+- [camera](#docs/api/camera)

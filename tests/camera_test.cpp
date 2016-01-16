@@ -4,13 +4,22 @@
 
 
 #include "munit.h"
-#include "webcam.hpp"
+#include "camera.hpp"
+
+
+int test_camera_run(void)
+{
+    Camera cam;
+
+    cam.run();
+
+    return 0;
+}
 
 
 void test_suite()
 {
-    Camera cam;
-    cam.run();
+    mu_add_test(test_camera_run);
 }
 
 mu_run_tests(test_suite)
