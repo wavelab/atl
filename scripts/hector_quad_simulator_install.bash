@@ -7,8 +7,9 @@ install_dependencies()
     apt-get install -y python-wstool \
         ros-indigo-cv-bridge \
         libeigen3-dev \
-        ros-indigo-tf* 
-
+        ros-indigo-tf \
+        build-essential \
+        
 }
 
 
