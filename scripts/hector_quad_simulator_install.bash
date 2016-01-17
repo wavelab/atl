@@ -10,7 +10,8 @@ install_dependencies()
         libeigen3-dev \
         ros-indigo-tf \
         ros-indigo-hardware-interface \
-        build-essential 
+        build-essential \
+        ros-indigo-controller-interface
 }
 
 
