@@ -1,7 +1,7 @@
-# awesomo ![travis][travis]
+# awesomo  [![Build Status](https://travis-ci.org/chutsu/awesomo.png)][1]
 
 Landing a quadrotor on a moving platform.
 
 
 
-[travis]: https://travis-ci.org/chutsu/awesomo.svg?branch=master
+[1]: https://travis-ci.org/chutsu/awesomo
