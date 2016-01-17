@@ -8,8 +8,8 @@ cache:
   - apt
 
 before_install:
-  - sudo sh scripts/ros_install.sh
-  - sudo sh scripts/hector_quad_simulator_install.sh
+  - sudo bash scripts/ros_install.bash
+  - sudo bash scripts/hector_quad_simulator_install.bash
 
 notifications:
     recipients:

@@ -1,11 +1,18 @@
-#!/bin/sh
+#!/bin/bash
 HECTOR_PATH=$HOME
+ROS_VERSION="indigo"
+
+install_dependencies()
+{
+    apt-get install -y python-wstool
+}
 
 
 install_hector_sim()
 {
+    source /opt/ros/$ROS_VERSION/setup.bash
     cd $HECTOR_PATH
-    mkdir $HECTOR_PATH/hector_quadrotor_tutorial
+    mkdir -p $HECTOR_PATH/hector_quadrotor_tutorial
     cd $HECTOR_PATH/hector_quadrotor_tutorial
     wstool init src https://raw.github.com/tu-darmstadt-ros-pkg/hector_quadrotor/hydro-devel/tutorials.rosinstall
     catkin_make -j2
@@ -14,4 +21,5 @@ install_hector_sim()
 
 
 #RUN
+install_dependencies
 install_hector_sim
