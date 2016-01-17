@@ -5,6 +5,7 @@ ROS_VERSION="indigo"
 install_dependencies()
 {
     apt-get install -y python-wstool \
+        libcv2.4 \
         ros-indigo-cv-bridge \
         libeigen3-dev \
         ros-indigo-tf \
@@ -21,7 +22,7 @@ install_hector_sim()
     mkdir -p $HECTOR_PATH/hector_quadrotor_tutorial
     cd $HECTOR_PATH/hector_quadrotor_tutorial
     wstool init src https://raw.github.com/tu-darmstadt-ros-pkg/hector_quadrotor/$ROS_VERSION-devel/tutorials.rosinstall
-    catkin_make -j2
+    catkin_make -j4
     source devel/setup.bash
 }
 
