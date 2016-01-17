@@ -12,6 +12,7 @@ install_dependencies()
         ros-indigo-hardware-interface \
         build-essential \
         ros-indigo-controller-interface
+        ros-indigo-ros-gazebo-ros*
 }
 
 
