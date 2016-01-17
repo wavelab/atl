@@ -11,7 +11,6 @@ install_dependencies()
         ros-indigo-tf \
         ros-indigo-hardware_interface \
         build-essential 
-        
 }
 
 
