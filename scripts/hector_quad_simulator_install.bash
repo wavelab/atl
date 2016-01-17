@@ -14,7 +14,7 @@ install_hector_sim()
     cd $HECTOR_PATH
     mkdir -p $HECTOR_PATH/hector_quadrotor_tutorial
     cd $HECTOR_PATH/hector_quadrotor_tutorial
-    wstool init src https://raw.github.com/tu-darmstadt-ros-pkg/hector_quadrotor/hydro-devel/tutorials.rosinstall
+    wstool init src https://raw.github.com/tu-darmstadt-ros-pkg/hector_quadrotor/$ROS_VERSION-devel/tutorials.rosinstall
     catkin_make -j2
     source devel/setup.bash
 }
