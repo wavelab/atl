@@ -5,7 +5,8 @@ ROS_VERSION="indigo"
 install_dependencies()
 {
     apt-get install -y python-wstool \
-        ros-indigo-cv-bridge
+        ros-indigo-cv-bridge \
+        libeigen3-dev
 }
 
 
