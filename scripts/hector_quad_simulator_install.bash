@@ -2,8 +2,8 @@
 HECTOR_PATH=$HOME
 ROS_VERSION="indigo"
 
-install_dependencies()
-{
+#install_dependencies()
+#{
    # apt-get install -y python-wstool \
    #     libcv2.4 \
    #     ros-indigo-cv-bridge \
@@ -17,12 +17,12 @@ install_dependencies()
 #
  #   rosdep update
  #   source /opt/ros/indigo/setup.bash
-}
+#}
 
 
 install_hector_sim()
 {
-    apt-get install ros-indigo-hector-*
+    apt-get install ros-indigo-hector-quadrotor-*
   #  source /opt/ros/$ROS_VERSION/setup.bash
   #  cd $HECTOR_PATH
   #  mkdir -p $HECTOR_PATH/hector_quadrotor_tutorial
@@ -34,5 +34,5 @@ install_hector_sim()
 
 
 #RUN
-install_dependencies
+#install_dependencies
 install_hector_sim
