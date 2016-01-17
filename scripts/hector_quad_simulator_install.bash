@@ -14,6 +14,9 @@ install_dependencies()
         ros-indigo-controller-interface \
         ros-indigo-gazebo-ros-control \
         ros-indido-geographic-msgs
+
+    rosdep update
+    source /opt/ros/indigo/setup.bash
 }
 
 
