@@ -2,22 +2,22 @@
 HECTOR_PATH=$HOME
 ROS_VERSION="indigo"
 
-#install_dependencies()
-# {
-   # apt-get install -y python-wstool \
+install_dependencies()
+ {
+   apt-get install -y python-wstool \
    #     libcv2.4 \
    #     ros-indigo-cv-bridge \
    #     libeigen3-dev \
    #     ros-indigo-tf \
    #     ros-indigo-hardware-interface \
-   #     build-essential \
+         build-essential \
    #     ros-indigo-controller-interface \
    #     ros-indigo-gazebo-ros-control \
    #     ros-indido-geographic-msgs
 #
  #   rosdep update
  #   source /opt/ros/indigo/setup.bash
- #}
+ }
 
 
 install_hector_sim()
