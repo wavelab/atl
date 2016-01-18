@@ -11,12 +11,13 @@ install_dependencies()
    #     ros-indigo-tf \
    #     ros-indigo-hardware-interface \
          build-essential \
+         cmake \
    #     ros-indigo-controller-interface \
    #     ros-indigo-gazebo-ros-control \
    #     ros-indido-geographic-msgs
 #
  #   rosdep update
- #   source /opt/ros/indigo/setup.bash
+	 source $HOME/.bashrc
  }
 
 
@@ -34,5 +35,5 @@ install_hector_sim()
 
 
 #RUN
-#install_dependencies
+install_dependencies
 install_hector_sim
