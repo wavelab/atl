@@ -22,7 +22,7 @@ ROS_VERSION="indigo"
 
 install_hector_sim()
 {
-    apt-get install ros-indigo-hector-quadrotor-*
+    apt-get install -y ros-indigo-hector-quadrotor-*
   #  source /opt/ros/$ROS_VERSION/setup.bash
   #  cd $HECTOR_PATH
   #  mkdir -p $HECTOR_PATH/hector_quadrotor_tutorial
