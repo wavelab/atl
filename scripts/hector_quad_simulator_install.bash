@@ -4,6 +4,7 @@ ROS_VERSION="indigo"
 
 install_dependencies()
  {
+   apt-get update 
    apt-get install -y python-wstool \
    #     libcv2.4 \
    #     ros-indigo-cv-bridge \
