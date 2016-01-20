@@ -10,7 +10,8 @@ cache:
 before_install:
   - sudo bash scripts/ros_install.bash
   - sudo bash scripts/hector_quad_simulator_install.bash
-  - sudo bash scripts/husky_simulator_install.bash 
+  - sudo bash scripts/husky_simulator_install.bash
+  - sudo bash scripts/quadsim_install.bash
 script:
   - echo "Done :)"
 
