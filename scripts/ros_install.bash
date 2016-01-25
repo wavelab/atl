@@ -17,7 +17,7 @@ install()
 
 	# update apt and install ros
 	apt-get update
-	apt-get install -y ros-$ROS_VERSION-ros-base
+	apt-get install -y ros-$ROS_VERSION-desktop-full
 
 	# initialize rosdep
 	rosdep init

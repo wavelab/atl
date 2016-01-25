@@ -11,8 +11,8 @@ static double tic(void)
 Camera::Camera(void)
 {
     this->camera_index = 1;
-    this->image_width = 200;
-    this->image_height = 200;
+    this->image_width = 400;
+    this->image_height = 400;
     this->tag_detector = new AprilTags::TagDetector(AprilTags::tagCodes16h5);
 }
 
