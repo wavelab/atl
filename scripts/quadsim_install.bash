@@ -1,31 +1,32 @@
 #!/bin/bash
 
+
 install_dependencies()
 {
-    #base
+    # base
     apt-get install -y \
-    gawk \
-    make \
-    git \
-    curl
+        gawk \
+        make \
+        git \
+        curl
 
-    #mavlink
+    # mavlink
     apt-get install -y \
-    g++ \
-    python-pip \
-    python-matplotlib \
-    python-serial \
-    python-wxgtk2.8 \
-    python-scipy \
-    python-opencv \
-    python-numpy \
-    python-pyparsing \
-    ccache \
-    realpath
+        g++ \
+        python-pip \
+        python-matplotlib \
+        python-serial \
+        python-wxgtk2.8 \
+        python-scipy \
+        python-opencv \
+        python-numpy \
+        python-pyparsing \
+        ccache \
+        realpath
 
 }
-#MAVPROXY
-install_MavProxy()
+
+install_mavproxy()
 {
     sudo pip2 install pymavlink \
         MAVProxy \
@@ -33,7 +34,6 @@ install_MavProxy()
         -- upgrade
 }
 
-#ARUDUPILOT
 install_ardupilot()
 {
     mkdir -p ~/ardupilot_simulation
@@ -43,8 +43,7 @@ install_ardupilot()
     git checkout gazebo
 }
 
-#JSBSim
-install_JSBSim()
+install_jsbsim()
 {
     cd ~/ardupilot_simulation
     git clone git://github.com/tridge/jsbsim.git
@@ -56,8 +55,7 @@ install_JSBSim()
     sudo make install
 }
 
-#ROS depenencies
-install_ROSDeps()
+install_rosdeps()
 {
     apt-get install -y \
         ros-indigo-octomap-msgs \
@@ -67,10 +65,9 @@ install_ROSDeps()
         unzip
 }
 
-#add OSRF repo and install drcsim?
-
 install_drcsim()
 {
+    # add OSRF repo and install drcsim?
     sh -c 'echo "deb http://packages.osrfoundation.org/drc/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/drc-latest.list'
     wget http://packages.osrfoundation.org/drc.key -O - |  apt-key add -
     apt-get update
@@ -78,7 +75,6 @@ install_drcsim()
 
 }
 
-#set up the ros workspace
 ros_setup()
 {
     mkdir -p ~/ardupilot_simulation/ros_catkin_ws/src
@@ -89,47 +85,45 @@ ros_setup()
     source /devel/setup.bash
 
     cd src/
-     git clone https://github.com/erlerobot/ardupilot_sitl_gazebo_plugin
-     git clone https://github.com/tu-darmstadt-ros-pkg/hector_gazebo/
+    git clone https://github.com/erlerobot/ardupilot_sitl_gazebo_plugin
+    git clone https://github.com/tu-darmstadt-ros-pkg/hector_gazebo/
 
     # Rotors simulation
-     git clone https://github.com/erlerobot/rotors_simulator -b sonar_plugin
-     ## mav comm
-     git clone https://github.com/PX4/mav_comm.git
+    git clone https://github.com/erlerobot/rotors_simulator -b sonar_plugin
 
-     ## glog catkin
-     git clone https://github.com/ethz-asl/glog_catkin.git
+    ## mav comm
+    git clone https://github.com/PX4/mav_comm.git
 
-     ## catkin simple
-     git clone https://github.com/catkin/catkin_simple.git
+    ## glog catkin
+    git clone https://github.com/ethz-asl/glog_catkin.git
 
-     # Installation of `mavros` from its source code:
-     cd ~/ardupilot_simulation/ros_catkin_ws
-     wstool init src     # (if not already initialized)
-     wstool set -t src mavros --git https://github.com/erlerobot/mavros.git
-     wstool update -t src
+    ## catkin simple
+    git clone https://github.com/catkin/catkin_simple.git
 
-     ## compile.
+    # installation of `mavros` from its source code:
+    cd ~/ardupilot_simulation/ros_catkin_ws
+    wstool init src     # (if not already initialized)
+    wstool set -t src mavros --git https://github.com/erlerobot/mavros.git
+    wstool update -t src
 
-     cd ~/ardupilot_simulation/ros_catkin_ws
-     catkin_make
+    ## compile.
+    cd ~/ardupilot_simulation/ros_catkin_ws
+    catkin_make
+}
 
- }
-
- #install gazebo models
- install_gazebo_models()
- {
-     git clone https://github.com/erlerobot/erle_gazebo_models
-     mv erle_gazebo_models ~/.gazebo/models
- }
+install_gazebo_models()
+{
+    git clone https://github.com/erlerobot/erle_gazebo_models
+    mv erle_gazebo_models ~/.gazebo/models
+}
 
 
-
+# RUN
 install_dependencies
-install_MavProxy
+install_mavproxy
 install_ardupilot
-install_JSBSim
-install_ROSDeps
+install_jsbsim
+install_rosdeps
 install_drcsim
 ros_setup
 install_gazebo_models

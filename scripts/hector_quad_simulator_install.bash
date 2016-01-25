@@ -3,7 +3,7 @@ HECTOR_PATH=$HOME
 ROS_VERSION="indigo"
 
 install_dependencies()
- {
+{
    apt-get update 
    apt-get install -y python-wstool \
    #     libcv2.4 \
@@ -19,7 +19,7 @@ install_dependencies()
 #
  #   rosdep update
 	 source $HOME/.bashrc
- }
+}
 
 
 install_hector_sim()
