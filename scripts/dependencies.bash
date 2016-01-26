@@ -1,28 +1,8 @@
 #!/bin/bash
+set -e  # halt on first error
 
-install_dependencies()
-{
-    # install dependencies
-    apt-get install -y \
-        subversion \
-        cmake \
-        libopencv-dev \
-        libeigen3-dev \
-        libv4l-dev
-}
-
-install_apriltags()
-{
-    cd $HOME
-    svn co https://svn.csail.mit.edu/apriltags
-    cd apriltags && make
-    cp -R build/include/AprilTags /usr/include/
-    cp -R build/lib/libapriltags.a /usr/lib/
-    cd $HOME
-    rm -rf apriltags
-}
-
-
-# RUN
-install_dependencies
-install_apriltags
+bash ros_install.bash
+bash apriltag_install.bash
+bash hector_quad_simulator_install.bash
+bash husky_simulator_install.bash
+bash quadsim_install.bash
