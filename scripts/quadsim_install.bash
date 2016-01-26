@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e  # halt on first error
 
 
 install_dependencies()
@@ -47,7 +48,8 @@ install_jsbsim()
 {
     cd ~/ardupilot_simulation
     git clone git://github.com/tridge/jsbsim.git
-    # Additional dependencies required
+    
+    # additional dependencies required
     sudo apt-get install libtool automake autoconf libexpat1-dev -y
     cd jsbsim
     ./autogen.sh --enable-libraries
@@ -77,6 +79,8 @@ install_drcsim()
 
 ros_setup()
 {
+    # build catkin workspace
+    source /opt/ros/indigo/setup.bash
     mkdir -p ~/ardupilot_simulation/ros_catkin_ws/src
     cd ~/ardupilot_simulation/ros_catkin_ws/src
     catkin_init_workspace
@@ -84,20 +88,21 @@ ros_setup()
     catkin_make
     source /devel/setup.bash
 
+    # downlaod required plugins
     cd src/
     git clone https://github.com/erlerobot/ardupilot_sitl_gazebo_plugin
     git clone https://github.com/tu-darmstadt-ros-pkg/hector_gazebo/
 
-    # Rotors simulation
+    # rotors simulation
     git clone https://github.com/erlerobot/rotors_simulator -b sonar_plugin
 
-    ## mav comm
+    # mav comm
     git clone https://github.com/PX4/mav_comm.git
 
-    ## glog catkin
+    # glog catkin
     git clone https://github.com/ethz-asl/glog_catkin.git
 
-    ## catkin simple
+    # catkin simple
     git clone https://github.com/catkin/catkin_simple.git
 
     # installation of `mavros` from its source code:
@@ -106,7 +111,7 @@ ros_setup()
     wstool set -t src mavros --git https://github.com/erlerobot/mavros.git
     wstool update -t src
 
-    ## compile.
+    # compile
     cd ~/ardupilot_simulation/ros_catkin_ws
     catkin_make
 }
