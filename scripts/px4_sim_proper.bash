@@ -2,6 +2,7 @@
 
 set -e #half on the first mistake
 PX4_FIRMWARE_INSTALL_LOCATION = "$HOME/px4_firmware"
+ROS_VERSION = "indigo"
 
 
 #instructions are taken from here:
@@ -79,4 +80,29 @@ install_gazebo6_bindings()
 
     #add a symlink to the catkin_ws
     ln -fs $PWD $HOME/catkin_ws/src/PixhawkFirmware
+}
+
+
+install_rotors_simulator()
+{
+    cd $PX4_FIRMWARE_INSTALL_LOCATION
+    cd ..
+    git clone https://github.com/ethz-asl/rotors_simulator
+
+    #add a symlink to catkin ws
+    ln -fs $PWD/rotors_simulator $HOME/catkin_ws/src/rotors_simulator
+
+    #get octomap_ros
+    sudo apt-get install ros-$ROS_VERSION-octomap_ros
+}
+
+install_mav_com()
+{
+    cd $PX4_FIRMWARE_INSTALL_LOCATION
+    cd ..
+
+    git clone https:://github.com/ethz-asl/mav_comm
+
+    #add a symlink to catkin ws
+    ln -fs $PWD/mav_com $HOME/catkin_ws/src/mav_com
 }
