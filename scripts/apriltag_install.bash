@@ -20,7 +20,7 @@ install_apriltags()
     mkdir -p $BUILD_PATH
 
     cd $BUILD_PATH
-    svn co https://svn.csail.mit.edu/apriltags
+    svn --trust-server-cert --non-interactive co https://svn.csail.mit.edu/apriltags
     cd apriltags && make
     cp -R build/include/AprilTags /usr/include/
     cp -R build/lib/libapriltags.a /usr/lib/
