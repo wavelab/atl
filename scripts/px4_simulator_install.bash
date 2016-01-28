@@ -30,25 +30,25 @@ setup_env()
 
 install_dependencies()
 {
-    # build essentials
+    sudo add-apt-repository -y ppa:george-edison55/cmake-3.x
     sudo apt-get update
-    sudo apt-get install -y \
+
+    # build essentials
+    sudo apt-get -y install \
         python-argparse \
         git-core \
         wget zip \
         python-empy \
         qtcreator \
-        cmake \
         build-essential \
         genromfs
 
     # simulation tools
-    sudo add-apt-repository -y ppa:george-edison55/cmake-3.x
-    sudo apt-get update
-    sudo apt-get install -y \
+    sudo apt-get -y install \
         ant \
         protobuf-compiler\
         libeigen3-dev \
+        cmake \
         libopencv-dev\
         openjdk-7-jdk \
         openjdk-7-jre \
@@ -56,7 +56,7 @@ install_dependencies()
         lldb-3.5
 
     # ros dependencies
-    sudo apt-get install -y \
+    sudo apt-get -y install \
         ros-indigo-mav-msgs \
         ros-indigo-libmavconn \
         ros-$ROS_VERSION-octomap-ros
@@ -110,7 +110,7 @@ install_gazebo6_bindings()
 
     # install gazebo 6
     sudo apt-get update
-    sudo apt-get install ros-indigo-gazebo6-ros-pkgs
+    sudo apt-get install -y ros-indigo-gazebo6-ros-pkgs
 }
 
 install_rotors_simulator()

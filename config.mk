@@ -4,11 +4,27 @@ BIN_DIR = $(PWD)/bin
 LIB_DIR = $(PWD)/lib
 
 # INCLUDE AND LIBRARY PATHS
-INCLUDES = -I/usr/include -I/usr/local/include -I/usr/include/eigen3 -I$(PWD)/include
-LIBS = -L/usr/lib -L/usr/local/lib -L$(LIB_DIR) \
-	   -lawesomo \
-	   -lapriltags \
-	   `pkg-config --libs --cflags opencv`
+INCLUDES = \
+	-I/usr/include \
+	-I/usr/include/eigen3 \
+	-I/usr/local/include \
+	-I/opt/ros/indigo/include \
+	-I$(PWD)/include
+
+LIBS = \
+	-L/usr/lib \
+	-L/usr/local/lib \
+	-L/opt/ros/indigo/lib \
+	-L$(LIB_DIR) \
+	-lawesomo \
+	-lapriltags \
+	`pkg-config --libs --cflags opencv` \
+	-lroscpp \
+	-lrosconsole \
+	-lrostime \
+	-lroscpp_serialization \
+	-Wl,-rpath,/opt/ros/hydro/lib
+
 
 # C COMPILER
 CC = g++
