@@ -6,7 +6,7 @@ BUILD_PATH="$HOME/awesomo_build"
 install_dependencies()
 {
     # install dependencies
-    apt-get install -y \
+    sudo apt-get install -y \
         subversion \
         cmake \
         libopencv-dev \
@@ -21,7 +21,11 @@ install_apriltags()
 
     cd $BUILD_PATH
     svn --trust-server-cert --non-interactive co https://svn.csail.mit.edu/apriltags
-    cd apriltags && make
+    cd apriltags
+    export BUILD_PREFIX=$BUILD_PATH/apriltags/build
+    echo $BUILD_PREFIX
+    mkdir -p $BUILD_PREFIX
+    make
     cp -r ./build/include/AprilTags /usr/include/
     cp -r ./build/lib/libapriltags.a /usr/lib/
 
