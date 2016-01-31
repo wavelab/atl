@@ -1,33 +1,34 @@
-cmake_minimum_required(VERSION 2.8.3)
-project(awesomo)
-
-# INCLUDES
-include_directories(
-    ${catkin_INCLUDE_DIRS}
-    /usr/local/include
-    /usr/include/eigen3
-    ./include
-)
-
-# LIBS
-link_directories(
-    /usr/local/lib
-    /usr/lib
-)
-
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.3)
+PROJECT(awesomo)
 
 # DEPENDENCIES
-find_package(
+FIND_PACKAGE(
     catkin
     REQUIRED COMPONENTS
     roscpp
     rospy
     std_msgs
 )
-find_package(OpenCV)
+FIND_PACKAGE(OpenCV)
+FIND_PACKAGE(Boost)
+
+# LIBS
+LINK_DIRECTORIES(
+    /usr/local/lib
+    /usr/lib
+)
+
+# INCLUDES
+INCLUDE_DIRECTORIES(
+    ${catkin_INCLUDE_DIRS}
+    /usr/local/include
+    /usr/include/eigen3
+    $(Boost_INCLUDE_DIR)
+    ./include
+)
 
 # BUILD AS CATKIN PACKAGE
-catkin_package(
+CATKIN_PACKAGE(
     INCLUDE_DIRS include
     LIBRARIES awesomo
     CATKIN_DEPENDS roscpp rospy std_msgs
@@ -35,21 +36,21 @@ catkin_package(
 )
 
 # EXECUTABLES
-add_executable(core src/core.cpp)
-target_link_libraries(core ${catkin_LIBRARIES})
-install(
-    TARGETS core
+ADD_EXECUTABLE(quadrotor src/quadrotor.cpp)
+TARGET_LINK_LIBRARIES(quadrotor ${catkin_LIBRARIES})
+INSTALL(
+    TARGETS quadrotor
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-add_executable(camera src/camera.cpp)
-target_link_libraries(
+ADD_EXECUTABLE(camera src/camera.cpp)
+TARGET_LINK_LIBRARIES(
     camera
     ${catkin_LIBRARIES}
     ${OpenCV_LIBS}
     apriltags
 )
-install(
+INSTALL(
     TARGETS camera
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
