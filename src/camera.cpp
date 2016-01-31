@@ -1,4 +1,4 @@
-#include "camera.hpp"
+#include "awesomo/camera.hpp"
 
 
 static double tic(void)
@@ -88,4 +88,10 @@ int Camera::processImage(cv::Mat &image, cv::Mat &image_gray)
     std::cout << this->apriltags.size() << " tags detected:" << endl;
 
     return this->apriltags.size();
+}
+
+int main(int argc, char **argv)
+{
+    Camera cam;
+    cam.run();
 }
