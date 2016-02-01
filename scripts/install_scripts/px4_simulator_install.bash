@@ -34,7 +34,7 @@ install_dependencies()
     sudo apt-get update
 
     # build essentials
-    sudo apt-get -y install \
+    sudo apt-get -y --force-yes install \
         python-argparse \
         git-core \
         wget zip \
@@ -44,7 +44,7 @@ install_dependencies()
         genromfs
 
     # simulation tools
-    sudo apt-get -y install \
+    sudo apt-get -y --force-yes install \
         ant \
         protobuf-compiler\
         libeigen3-dev \
@@ -56,7 +56,7 @@ install_dependencies()
         lldb-3.5
 
     # ros dependencies
-    sudo apt-get -y install \
+    sudo apt-get -y --force-yes install \
         ros-indigo-mav-msgs \
         ros-indigo-libmavconn \
         ros-$ROS_VERSION-octomap-ros
@@ -69,9 +69,9 @@ px4_install()
     # acctaully nanhhhh i try it first
     # sudo apt-get remove modemmanager
 
-    sudo add-apt-repository -y ppa:terry.guo/gcc-arm-embedded
+    sudo add-apt-repository -y --force-yes ppa:terry.guo/gcc-arm-embedded
     sudo apt-get update
-    sudo apt-get install -y \
+    sudo apt-get install -y --force-yes \
         python-serial\
         openocd \
         flex \
@@ -110,7 +110,7 @@ install_gazebo6_bindings()
 
     # install gazebo 6
     sudo apt-get update
-    sudo apt-get install -y ros-indigo-gazebo6-ros-pkgs
+    sudo apt-get install -y --force-yes ros-indigo-gazebo6-ros-pkgs
 }
 
 install_rotors_simulator()
