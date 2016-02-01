@@ -3,10 +3,18 @@
 
 Quadrotor::Quadrotor(void)
 {
-    ros::NodeHandle nh;
+    // publish rate
+    ros::Rate rate(20.0);
 
+    // wait till connected to FCU
+    this->waitForConnection();
+
+    // subscribe to topics
     this->subscribeToIMU();
-    this->arm_client = nh.serviceClient<mavros_msgs::CommandBool>(ARM_SERVICE);
+
+    // initialize clients to services
+    this->set_mode_client = this->node_handle.serviceClient<mavros_msgs::SetMode>(SET_MODE_SERVICE);
+    this->arming_client = this->node_handle.serviceClient<mavros_msgs::CommandBool>(ARM_SERVICE);
 }
 
 void Quadrotor::imuCallback(const sensor_msgs::Imu::ConstPtr &msg)
@@ -28,15 +36,26 @@ void Quadrotor::imuCallback(const sensor_msgs::Imu::ConstPtr &msg)
 
 void Quadrotor::subscribeToIMU(void)
 {
-    ros::NodeHandle nh;
-
     ROS_INFO("subcribing to [IMU_DATA]");
-    this->imu_orientation_sub = nh.subscribe(
+    this->imu_orientation_sub = this->node_handle.subscribe(
         IMU_DATA,
         1000,
         &Quadrotor::imuCallback,
         this
     );
+}
+
+void Quadrotor::stateCallback(const mavros_msgs::State::ConstPtr &msg)
+{
+    state = *msg;
+}
+
+void Quadrotor::waitForConnection(void)
+{
+    while (ros::ok() && this->state.connected) {
+        ros::spinOnce();
+        sleep(1);
+    }
 }
 
 int Quadrotor::arm(void)
@@ -48,7 +67,7 @@ int Quadrotor::arm(void)
     arm_req.request.value = true;
 
     // arm
-    if (this->arm_client.call(arm_req)) {
+    if (this->arming_client.call(arm_req)) {
         ROS_INFO("awesomo armed!");
     } else {
         ROS_ERROR("failed to arm awesomo!");
@@ -66,7 +85,7 @@ int Quadrotor::disarm(void)
     arm_req.request.value = false;
 
     // arm
-    if (this->arm_client.call(arm_req)) {
+    if (this->arming_client.call(arm_req)) {
         ROS_INFO("awesomo disarmed!");
     } else {
         ROS_ERROR("failed to disarm awesomo!");
@@ -79,10 +98,14 @@ int main(int argc, char **argv)
 {
     // setup
     ros::init(argc, argv, "awesomo");
+
+    // run quadcopter
     Quadrotor quad;
     quad.arm();
     sleep(2);
     quad.disarm();
+
+    // loop
     ros::spin();
 
     return 0;
