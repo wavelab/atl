@@ -69,7 +69,7 @@ px4_install()
     # acctaully nanhhhh i try it first
     # sudo apt-get remove modemmanager
 
-    sudo add-apt-repository -y --force-yes ppa:terry.guo/gcc-arm-embedded
+    sudo add-apt-repository -y ppa:terry.guo/gcc-arm-embedded
     sudo apt-get update
     sudo apt-get install -y --force-yes \
         python-serial\
