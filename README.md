@@ -30,4 +30,4 @@ You should have received a copy of the GNU General Public License along with
 this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-[1]: https://travis-ci.com/chutsu/awesomo.svg?token=rBkanLVcBxG4QLrq8ybE&branch=master
+[1]: https://travis-ci.com/chutsu/awesomo
