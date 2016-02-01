@@ -15,7 +15,10 @@ In short the above navigates to your catkin workspace's `src`, clones `awesomo`
 and finally runs `catkin_build`.
 
 
-## Licence LGPL License Copyright (C) <2013> Chris Choi
+
+## Licence
+
+Licence LGPL License Copyright (C) <2016> Chris Choi, Stan Brown
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the Lesser GNU General Public License as published by the Free
