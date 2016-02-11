@@ -1,0 +1,36 @@
+\begin{tikzpicture}
+	% co-ordinate axes
+	\draw[thick, ->] (0, 0) -- (6, 0) node[anchor=north west] {$X_{R}$};
+	\draw[thick, ->] (0, 0) -- (0, 6) node[anchor=south east] {$Y_{R}$};
+
+	% omni-directional robot
+	% body
+	\draw (0, 0) circle(3);
+	% wheel 1
+	\draw[rotate=0, shift={(3, 0)}] 
+		(0, 1.5) -- (0.3, 1.5) -- (0.3, -1.5) -- (0, -1.5) -- (0, 1.5);
+	
+	% wheel 2
+	\draw[rotate=60, shift={(-3, 0)}] 
+		(0, 1.5) -- (-0.3, 1.5) -- (-0.3, -1.5) -- (0, -1.5) -- (0, 
+		1.5);
+		
+	% wheel 3
+	\draw[rotate=-60, shift={(-3, 0)}] 
+		(0, 1.5) -- (-0.3, 1.5) -- (-0.3, -1.5) -- (0, -1.5) -- (0, 
+		1.5);
+		
+	% mechanical annotation
+	\draw[rotate=0, shift={(3.8, 0.5)}, ->]
+		(0, 0) -- node[right] {$\omega_{1}$} (0, 2);
+	\draw[rotate=-60, shift={(-3.8, -0.5)}, ->] 
+		(0, 0) -- node[above] {$\omega_{2}$} (0, -2);
+	\draw[rotate=60, shift={(-3.8, -0.5)}, ->] 
+		(0, 0) -- node[below] {$\omega_{3}$} (0, -2);
+
+	% angle line
+	\draw[rotate=30, shift={(0, 0)}] (0, 0) -- node[left] {$l$} (0, 3);
+	\draw (1, 0) 
+		arc (0:120:1) 
+		node[right, shift={(0.5, 0.4)}] {$120^{\circ}$};
+\end{tikzpicture}
