@@ -486,11 +486,11 @@ Given the above information, our measurement noise covariance matrix $Q$ is:
 	\begin{bmatrix}
 		0.5 & 0 & 0 \\
 		0 & 0.5 & 0 \\
-		0 & 0 & 10		
+		0 & 0 & 0.1745		
 	\end{bmatrix}
 \end{equation}
 
-With a mean $\mu$ of:
+Note that 10 degrees is 0.1745 radians. With a mean $\mu$ of:
 
 \begin{equation}
 	\mu = 
@@ -555,31 +555,62 @@ motion model $g(x_{t-1}, u_{t})$ using 1st order Taylor Series Expansion:
 	& = g(\mu_{t - 1}, u_{t}) + G_{t} \cdot (x_{t - 1} - \mu_{t - 1})
 \end{align}
 
-Where $G_{t}$ is the first order differential of the non-linear motion model. 
-We have, however, omitted the differentiation because we already know what 
-$G_{t}$ is, since we have already derived the differential of $g(x_{t-1}, 
-u_{t})$ in Section~\ref{sec:motion_model_derivation}.
+Where $G_{t}$ is the first order differential of the non-linear motion model, 
+a.k.a the Jacobian of $g(x_{t-1}, u_{t})$.
 
 \begin{equation}
-	G_{t} = \dot{g}(\theta, \omega) = R(\theta)^{-1} J_{1}^{-1} J_{2} \omega
+	G_{t} = \begin{bmatrix}
+		\dfrac{\partial g_{1}}{\partial x_{1}}
+		& \dfrac{\partial g_{1}}{\partial x_{2}} 
+		& \dfrac{\partial g_{1}}{\partial x_{3}} \\ \\
+		\dfrac{\partial g_{2}}{\partial x_{1}}
+		& \dfrac{\partial g_{2}}{\partial x_{2}} 
+		& \dfrac{\partial g_{2}}{\partial x_{3}} \\ \\
+		\dfrac{\partial g_{3}}{\partial x_{1}}
+		& \dfrac{\partial g_{3}}{\partial x_{2}} 
+		& \dfrac{\partial g_{3}}{\partial x_{3}}
+	\end{bmatrix}
 \end{equation}
+
+Since we only know $\dot{g}(\theta, \omega)$ we need to convert it to 
+$g(x_{t-1}, u_{t})$, it is simply:
+
+\begin{align}
+	g(x_{t-1}, u_{t}) 
+		&= x_{t - 1} + \dot{g}(\theta, \omega) dt \\
+		&= \begin{bmatrix}
+			x_{1, t - 1} + \dot{g_{1}}(\theta, \omega) dt \\ \\
+			x_{2, t - 1} + \dot{g_{2}}(\theta, \omega) dt \\ \\
+			x_{3, t - 1} + \dot{g_{3}}(\theta, \omega) dt \\
+		\end{bmatrix}
+\end{align}
+
+Now that we have $g(x_{t-1}, u_{t})$ we can work out the Jacobian. One 
+important note, the partial derivate of $x_{3}$ in our case is the bearing  
+$\theta$ of the robot, the only term affected in $\dot{g}(\theta, \omega)$ is 
+the rotation matrix $R(\theta)$, since $\dot{g}(\theta, \omega)$ is:
+
+\begin{equation}
+    \dot{g}(\theta, \omega) = R(\theta)^{-1} J_{1}^{-1} J_{2} \omega
+\end{equation}
+
 
 Where $R(\theta)$, $J_{1}$, $J_{2}$ and $\omega$ are (derived in 
 Section~\ref{sec:motion_model_derivation}): 
 
 \begin{align}
-	R(\theta) &= 
+	R(\theta)^{-1} &= 
  	\begin{bmatrix}
-	    \cos{(\theta)} & -\sin{(\theta)} & 0 \\
-	    \sin{(\theta)} & \cos{(\theta)} & 0 \\
+	    \cos{(\theta)} & \sin{(\theta)} & 0 \\
+	    -\sin{(\theta)} & \cos{(\theta)} & 0 \\
 	    0 & 0 & 1
     \end{bmatrix} \\
-	J_{1} &= 
+	J_{1}^{-1} &= 
 	\begin{bmatrix}
-			0 & 1 & l \\
-  	    	-\cos(\frac{\pi}{6}) & -\sin(\frac{\pi}{6}) & l \\
-   	    	\cos(\frac{\pi}{6}) & -\sin(\frac{\pi}{6}) & l
-    \end{bmatrix} \\
+		0 & -\frac{1}{\sqrt{3}} & \frac{1}{\sqrt{3}} \\ \\
+		\frac{2}{3} & -\frac{1}{3} & -\frac{1}{3} \\ \\
+		\frac{1}{3l} & \frac{1}{3l} & \frac{1}{3l}
+	\end{bmatrix} \\
     J_{2} &=
     \begin{bmatrix}
         r & 0 & 0 \\
@@ -594,24 +625,56 @@ Section~\ref{sec:motion_model_derivation}):
 	    \end{bmatrix}
 \end{align}
 
+Therefore to differentiate rotation matrix $R(\theta)$ with respect to $x_{3}$ 
+(or $\theta$), we can treat $J_{1}$ $J_{2}$ and $\omega$ as constant vector 
+$A$. The partial derivative of $R(\theta)$ then becomes:
+
 \begin{equation}
-	G_{t} = \dot{g}(\theta, \omega) =
+	\dfrac{\partial R(\theta)^{-1}}{\partial x_{3}} = 
 	\begin{bmatrix}
-		\frac{2}{3} \sin(\theta) r \omega_{1}
-			- \frac{1}{\sqrt{3}} \cos(\theta) r \omega_{2}
-				- \frac{1}{3} \sin(\theta) r \omega_{2}
-			+ \frac{1}{\sqrt{3}} \cos(\theta) r \omega_{3}
-				- \frac{1}{3} \sin(\theta) r \omega_{3} \\ \\
-		\frac{2}{3} \cos(\theta) r \omega_{1}
-			+ \frac{1}{\sqrt{3}} \sin(\theta) r \omega_{2}
-				-\frac{1}{3} \cos(\theta)r \omega_{2}
-			- \frac{1}{\sqrt{3}} \sin(\theta) r \omega_{3}
-				-\frac{1}{3} \cos(\theta) r \omega_{3} \\ \\
-		\frac{1}{3l} r \omega_{1}
-			+ \frac{1}{3l} r \omega_{2}
-			+ \frac{1}{3l} r \omega_{3}
+		-\sin(x_{3}) & \cos(x_{3}) & 0 \\ \\
+		-\cos(x_{3}) & -\sin(x_{3}) & 0 \\ \\
+		0 & 0 & 0
 	\end{bmatrix}
 \end{equation}
+
+\begin{equation}
+	A = J_{1}^{-1} J_{2} \omega
+\end{equation}
+
+Or in terms of $g$ and $x$.
+
+\begin{align}
+	\dfrac{\partial g}{\partial x_{3}} 
+	&= \dfrac{\partial R(\theta)^{-1}}{\partial x_{3}} A \\
+	&= \begin{bmatrix}
+		-\sin(x_{3}) & \cos(x_{3}) & 0 \\
+		-\cos(x_{3}) & -\sin(x_{3}) & 0 \\
+		0 & 0 & 0
+	\end{bmatrix}
+	\begin{bmatrix}
+		A_{1} \\
+		A_{2} \\
+		A_{3}
+	\end{bmatrix} \\
+	&= \begin{bmatrix}
+		-A_{1} sin(x_{3}) + A_{2} cos(x_{3}) \\
+		-A_{1} cos(x_{3}) - A_{2} sin(x_{3}) \\
+		0
+	\end{bmatrix}
+\end{align}
+
+Completing our Jacobian $G_{t}$ we get:
+
+\begin{equation}
+	G_{t} = \begin{bmatrix}
+		1 & 0 & -A_{1} sin(x_{3}) + A_{2} cos(x_{3})  \\
+		0 & 1 & -A_{1} cos(x_{3}) - A_{2} sin(x_{3}) \\
+		0 & 0 & 1
+	\end{bmatrix}
+\end{equation}
+
+
 
 
 
@@ -667,13 +730,12 @@ In the EKF we have used the following values:
 		0 & 1 & 0 \\
 		0 & 0 & 1
 	\end{bmatrix} \\
-	G_{t} &= \dot{g}(\theta, \omega) \\
-		&= R(\theta)^{-1} J_{1}^{-1} J_{2} \omega
-	    \begin{bmatrix}
-	        \dot{x} \\
-	        \dot{y} \\
-	        \dot{\theta}
-	    \end{bmatrix} \\
+	G_{t} 
+		&= \begin{bmatrix}
+			1 & 0 & -A_{1} sin(x_{3}) - A_{2} cos(x_{3})  \\
+			0 & 1 & A_{1} cos(x_{3}) - A_{2} sin(x_{3}) \\
+			0 & 0 & 1
+		\end{bmatrix} \\
 	    &= 
 	        \begin{bmatrix}
 		        \cos{(\theta)} & -\sin{(\theta)} & 0 \\
