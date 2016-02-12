@@ -34,9 +34,6 @@ classdef OmniRobot
             0, 0.5^2, 0;
             0, 0, deg2rad(10^2);
         ];
-        
-       
-    
     end
     
     % SIMULATION PROPERTIES
@@ -80,7 +77,7 @@ classdef OmniRobot
             G(1:2, 3) = dRot_A(1:2);
         end
         
-        function x = g(this, theta, omega)
+        function x = g_dot(this, theta, omega)
             Rot = [
                 cos(theta), -sin(theta), 0;
                 sin(theta), cos(theta), 0; 
@@ -131,7 +128,7 @@ classdef OmniRobot
                 omega = [omega_1; omega_2; omega_3];
                 e = RE * sqrt(Re) * randn(n,1);
                 G = this.G(mu(3), omega);
-                x(:,t) = x(:,t-1) + this.g(x(3, t - 1), omega) * this.dt + e;
+                x(:,t) = x(:,t-1) + this.g_dot(x(3, t - 1), omega) * this.dt + e;
                 
                 % update measurement
                 if mod(T(t),1) == 0 % every 1 second use gps correction
@@ -152,14 +149,13 @@ classdef OmniRobot
 
                 % EKF
                 % prediction update
-                mup = mu + this.g(mu(3), omega) * this.dt;
+                mup = mu + this.g_dot(mu(3), omega) * this.dt;
                 Sp = G * S * G' + this.R;
 
                 % measurement update
                 Ht = eye(3);                
                 K = Sp * Ht' * inv(Ht * Sp * transpose(Ht) + Q_t);
                 mu = mup + K * (y(:,t) - Ht * mup);
-
                 S = (eye(n) - K * Ht) * Sp;
                 
 
@@ -189,7 +185,7 @@ classdef OmniRobot
             ylabel('Displacement in y-direction (m)')
             legend('True State', 'Belief', 'Measurement')
             axis equal
-            axis([-1 8 -6 3])
+            axis([-1.5 10 -8 4])
             
             
             figure(2)
@@ -275,4 +271,3 @@ classdef OmniRobot
    end
    
 end
-
