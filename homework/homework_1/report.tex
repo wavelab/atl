@@ -50,7 +50,9 @@
 \maketitle
 
 
+
 \section{Derivation of the Omni-directional Robot}
+\label{sec:motion_model_derivation}
 
 \begin{figure}[H]
 	\centering
@@ -264,9 +266,19 @@ Where:
 	}
 \end{itemize}
 
+
+
+
+
+
 \newpage
 \section{Applying the Derived Robot Model}
+\label{sec:applying_motion_model}
+
+
+
 \subsection{Predefined Rotation Inputs}
+\label{subsec:traverse_inputs}
 Applying the following rotation inputs to the wheel for 15 seconds:
 
 \begin{itemize}
@@ -298,6 +310,7 @@ We obtain the following motion.
 
 
 \subsection{Traversing East, West, North East, South East and Inplace}
+\label{subsec:traverse_directions}
 
 \begin{figure}[H]
 	\centering
@@ -364,6 +377,7 @@ Fig~\ref{fig:omni_robot_traverse} for 15 seconds  are as follows:
 
 \newpage
 \subsection{Moving in a Circle}
+\label{subsec:traverse_circle}
 
 To traverse in a circle of diameter of $2$m, we had to be a little creative
 with the rotation inputs of the wheels. To do this we applied the following 
@@ -434,6 +448,7 @@ Using the above equation we found the $\omega$ inputs required to traverse a
 
 \newpage
 \subsection{Traversing in a Spiral}
+\label{subsec:traverse_spiral}
 
 For traversing in a spiral we used a similar approach as traversing in a 
 circle. We constrained the robot so that it was only traversing in the $x$ 
@@ -456,6 +471,7 @@ traversing in a spiral pattern for 50 seconds.
 
 \newpage
 \section{Measurement Model}
+\label{sec:measurement_model}
 
 Lets suppose the robot has a GPS and magnometer sensor. It is given that ``The
 GPS output is in true North, East (and Down, not used here) and the
@@ -516,94 +532,170 @@ To complete the measurement model it becomes:
 
 \newpage
 \section{Defining the Extended Kalman Filter for the Omni-directional Robot}
+\label{sec:ekf_defintion}
 
+The Extended Kalman filter (EKF) has two stages, the prediction and measurement 
+updates. To complete the EKF we need to linearize the motion and measurement 
+model, we detail that in the following sections.
+
+\subsection{Linearizing the Motion Model}
+\label{subsec:ekf_motion_model_linearization}
 Normally if our motion model and/or measurement model is linear we can simply 
 use the Kalman Filter, however in the non-linear case we have to use the 
 Extended Kalman Filter (EKF). In our case we have to linearize the non-linear 
-motion model $g(x_{t-1}, u_{t})$, where:
+motion model $g(x_{t-1}, u_{t})$ using 1st order Taylor Series Expansion:
 
+\begin{align}
+	g(x_{t-1}, u_{t}) 
+	& \approx 	
+		g(\mu_{t - 1}, u_{t}) 
+			+ \dfrac{\partial g(x_{t-1}, u_{t})}{x_{t - 1}} 
+				\bigg|_{x_{t - 1} = \mu_{t - 1}}
+			(x_{t - 1} - \mu_{t - 1}) \\
+	& = g(\mu_{t - 1}, u_{t}) + G_{t} \cdot (x_{t - 1} - \mu_{t - 1})
+\end{align}
+
+Where $G_{t}$ is the first order differential of the non-linear motion model. 
+We have, however, omitted the differentiation because we already know what 
+$G_{t}$ is, since we have already derived the differential of $g(x_{t-1}, 
+u_{t})$ in Section~\ref{sec:motion_model_derivation}.
 
 \begin{equation}
-	\dot{g}(\theta, \omega) =
+	G_{t} = \dot{g}(\theta, \omega) = R(\theta)^{-1} J_{1}^{-1} J_{2} \omega
+\end{equation}
+
+Where $R(\theta)$, $J_{1}$, $J_{2}$ and $\omega$ are (derived in 
+Section~\ref{sec:motion_model_derivation}): 
+
+\begin{align}
+	R(\theta) &= 
+ 	\begin{bmatrix}
+	    \cos{(\theta)} & -\sin{(\theta)} & 0 \\
+	    \sin{(\theta)} & \cos{(\theta)} & 0 \\
+	    0 & 0 & 1
+    \end{bmatrix} \\
+	J_{1} &= 
+	\begin{bmatrix}
+			0 & 1 & l \\
+  	    	-\cos(\frac{\pi}{6}) & -\sin(\frac{\pi}{6}) & l \\
+   	    	\cos(\frac{\pi}{6}) & -\sin(\frac{\pi}{6}) & l
+    \end{bmatrix} \\
+    J_{2} &=
+    \begin{bmatrix}
+        r & 0 & 0 \\
+        0 & r & 0 \\
+        0 & 0 & r
+    \end{bmatrix} \\
+    \omega &= 
+	    \begin{bmatrix}
+	       \omega_{1} \\
+	       \omega_{2} \\
+	       \omega_{3} \\
+	    \end{bmatrix}
+\end{align}
+
+\begin{equation}
+	G_{t} = \dot{g}(\theta, \omega) =
 	\begin{bmatrix}
 		\frac{2}{3} \sin(\theta) r \omega_{1}
 			- \frac{1}{\sqrt{3}} \cos(\theta) r \omega_{2}
 				- \frac{1}{3} \sin(\theta) r \omega_{2}
 			+ \frac{1}{\sqrt{3}} \cos(\theta) r \omega_{3}
-				- \frac{1}{3} \sin(\theta) r \omega_{3} \\
+				- \frac{1}{3} \sin(\theta) r \omega_{3} \\ \\
 		\frac{2}{3} \cos(\theta) r \omega_{1}
 			+ \frac{1}{\sqrt{3}} \sin(\theta) r \omega_{2}
 				-\frac{1}{3} \cos(\theta)r \omega_{2}
 			- \frac{1}{\sqrt{3}} \sin(\theta) r \omega_{3}
-				-\frac{1}{3} \cos(\theta) r \omega_{3} \\
+				-\frac{1}{3} \cos(\theta) r \omega_{3} \\ \\
 		\frac{1}{3l} r \omega_{1}
 			+ \frac{1}{3l} r \omega_{2}
 			+ \frac{1}{3l} r \omega_{3}
 	\end{bmatrix}
 \end{equation}
 
-Rewriting the above in terms of state $x_{1}, x_{2}, x_{3}$, and inputs $u_{1}, u_{2}, u_{3}$, where $S$ and $C$ short hand for $sin$ and $cos$ functions.
 
-\begin{align*}
-	& g(x_{t-1}, u_{t}) = \\
-	& \begin{bmatrix}
-		x_{1, t - 1} + \left(
-			\dfrac{2 r u_{1, t} S(x_{3, t-1})}{3}
-			- \dfrac{r u_{2, t} C(x_{3, t-1})}{\sqrt{3}}
-				- \dfrac{r u_{2, t} S(x_{3, t-1})}{3}
-			+ \dfrac{r u_{3, t} C(x_{3, t-1})}{\sqrt{3}} 
-				- \dfrac{r u_{3, t} S(x_{3, t-1})}{3}
-			\right) dt \\\
-		x_{2, t - 1} + \left( 
-			\dfrac{2 r u_{1, t} C(x_{3, t-1})}{3}
-			+ \dfrac{r u_{2, t} S(x_{3, t-1})}{\sqrt{3}}
-				-\dfrac{r u_{2, t} C(x_{3, t-1})}{3}
-			- \dfrac{r u_{3, t} S(x_{3, t-1})}{\sqrt{3}}
-				-\dfrac{r u_{3, t} C(x_{3, t-1})}{3} 
-			\right) dt \\
-		x_{3, t - 1} + (\dfrac{u_{1, t} + u_{2, t} + u_{3, t}}{3l}) r dt
+
+\newpage
+\subsection{Linearizing the Measurement Model}
+\label{subsec:ekf_measurement_model_linearization}
+
+As for the measurement model, it does not require linearization since in 
+Section~\ref{sec:measurement_model} we derived a linear measurement model. 
+Therefore $H_{t} = C_{t}$.
+
+\begin{equation}
+	H_{t} = C_{t} = 
+	\begin{bmatrix}
+		1 & 0 & 0 \\
+		0 & 1 & 0 \\
+		0 & 0 & 1
 	\end{bmatrix}
-\end{align*}
+\end{equation}
 
-If we linearize the above w.r.t $x_{1}, x_{2}, x_{3}$ we get:
 
-\begin{align}
-	% w.r.t x_1
-	\frac{\delta{g}}{\delta{x_{1}}} &=
-	\begin{bmatrix}
-			1 \\ 
-			0 \\ 
-			0
-	\end{bmatrix} \\
-	% w.r.t x_2
-	\frac{\delta{g}}{\delta{x_{2}}} &=
-		\begin{bmatrix} 
-			0 \\ 
-			1 \\ 
-			0
-		\end{bmatrix} \\
-	% w.r.t x_3
-	\frac{\delta{g}}{\delta{x_{3}}} &=
-	\begin{bmatrix}
-			0 \\ 
-			0 \\ 
-			1
-	\end{bmatrix} \\
-	% putting it back together
-%	\frac{\delta{g}}{\delta{x}} &=
-%		\begin{bmatrix}
-%			
-%		\end{bmatrix} \\
-\end{align}
 
-As for the measurement model, because it is linear we do not need to linearize 
-it.
+\subsection{Summary}
+\label{subsec:ekf_def_summary}
 
+Now that we have defined what $g(x_{t - 1})$, $G_{t}$ and $H_{t}$ (along with
+ intial values for the states) we have enough information to incorporate them
+  into the EKF model.
 
 
 
 \newpage
 \section{Implementing the Extended Kalman Filter}
+
+In the EKF we have used the following values:
+
+\begin{align*}
+	\mu_{0} &= 
+		\begin{bmatrix}
+			0 \\
+			0 \\
+			0
+		\end{bmatrix} \\
+	u_{0} &= 
+	\begin{bmatrix}
+		-15.5 \\
+		-10.5 \\
+		1.5
+	\end{bmatrix} \\
+	H_{t} &=
+	\begin{bmatrix}
+		1 & 0 & 0 \\
+		0 & 1 & 0 \\
+		0 & 0 & 1
+	\end{bmatrix} \\
+	G_{t} &= \dot{g}(\theta, \omega) \\
+		&= R(\theta)^{-1} J_{1}^{-1} J_{2} \omega
+	    \begin{bmatrix}
+	        \dot{x} \\
+	        \dot{y} \\
+	        \dot{\theta}
+	    \end{bmatrix} \\
+	    &= 
+	        \begin{bmatrix}
+		        \cos{(\theta)} & -\sin{(\theta)} & 0 \\
+		        \sin{(\theta)} & \cos{(\theta)} & 0 \\
+		        0 & 0 & 1
+	        \end{bmatrix}^{-1}
+	        \begin{bmatrix}
+	            0 & 1 & l \\
+	          	-\cos(\frac{\pi}{6}) & -\sin(\frac{\pi}{6}) & l \\
+	        	\cos(\frac{\pi}{6}) & -\sin(\frac{\pi}{6}) & l
+	        \end{bmatrix}^{-1}
+	        \begin{bmatrix}
+	            r & 0 & 0 \\
+	            0 & r & 0 \\
+	            0 & 0 & r
+	        \end{bmatrix}
+		    \begin{bmatrix}
+		       \omega_{1} \\
+		       \omega_{2} \\
+		       \omega_{3} \\
+		    \end{bmatrix} \\
+\end{align*}
 
 
 \end{document}
