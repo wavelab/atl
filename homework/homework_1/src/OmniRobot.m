@@ -23,16 +23,16 @@ classdef OmniRobot
     
         % motion disturbance
         R = [
-            0 0 0; 
-            0 0 0; 
-            0 0 0;
+            0.05^2 0 0; 
+            0 0.05^2 0; 
+            0 0 deg2rad(0.5)^2;
         ];
     
         % measurement disturbance
         Q = [
-            0.5, 0, 0;
-            0, 0.5, 0;
-            0, 0, deg2rad(10);
+            0.5^2, 0, 0;
+            0, 0.5^2, 0;
+            0, 0, deg2rad(10^2);
         ];
         
        
@@ -115,6 +115,7 @@ classdef OmniRobot
             % save states
             mup_S = zeros(n, length(T));
             mu_S = zeros(n, length(T));
+            St = zeros(n,n,length(T));
           
             % create AVI thisect
             makemovie = 0;
@@ -131,14 +132,14 @@ classdef OmniRobot
                 e = RE * sqrt(Re) * randn(n,1);
                 G = this.G(mu(3), omega);
                 x(:,t) = x(:,t-1) + this.g(x(3, t - 1), omega) * this.dt + e;
-
+                
                 % update measurement
                 d = DE * sqrt(De) * randn(m, 1);
-                y(:,t) = x(:,t) + d;
+                y(:,t) = x(:,t) + d + [0; 0; deg2rad(-9.7)];
 
                 % EKF
                 % prediction update
-                mup = x(:,t);
+                mup = mu + this.g(mu(3), omega) * this.dt;
                 Sp = G * S * G' + this.R;
 
                 % measurement update
@@ -147,10 +148,12 @@ classdef OmniRobot
                 mu = mup + K * (y(:,t) - Ht * mup);
 
                 S = (eye(n) - K * Ht) * Sp;
+                
 
                 % store results
                 mup_S(:,t) = mup;
                 mu_S(:,t) = mu;
+                St(:,:,t) = S; 
                 
                 % plot results
 %                 figure(1);
@@ -177,17 +180,17 @@ classdef OmniRobot
             end
             plot_results = true;
             if plot_results == true
-                this.plot_results(mu_S, x, T, S)
+                this.plot_results(mu_S, x, T, St)
             end
             
         end
         
-        function plot_results(~,mu_S, x, T, S)
+        function plot_results(~,mu_S, x, T, St)
             % plot the true state and belief for x, y, heading
             figure(1);
             clf; 
             
-            subplot(3, 1, 1)
+            subplot(4, 1, 1)
             plot(x(1,:), x(2,:), 'ro--', mu_S(1,:), mu_S(2,:), 'bx--')
             title('True state and belief (Top Down View)');
             xlabel('Displacement in x-direction (m)')
@@ -195,40 +198,48 @@ classdef OmniRobot
             axis equal
             axis([-1 8 -6 3])
             
-            subplot(3, 1, 2)
+            subplot(4, 1, 2)
             plot(T, x(1,:), 'ro--', T, mu_S(1,:), 'bx--');
             title('True state and belief (x-axis)');
             xlabel('Time (s)')
             ylabel('Displacement (m)')
 
-            subplot(3, 1, 3)
+            subplot(4, 1, 3)
             plot(T, x(2,:), 'ro--', T, mu_S(2,:), 'bx--');
             title('True state and belief (y-axis)');
             xlabel('Time (s)')
             ylabel('Displacement (m)')
             
+            subplot(4, 1, 4)
+            %heading_plot = mod(x(3,:),2*pi());
+            %mu_S_heading_plot = mod(mu_S(3,:),2*pi());
+            plot(T, rad2deg(x(3,:)), 'ro--', T, rad2deg(mu_S(3,:)), 'bx--');
+            title('True state and belief (y-axis)');
+            xlabel('Time (s)')
+            ylabel('Heading (degrees)')
             
             %plot error elipse over time
             for t = 2:length(T)
                 figure(2);
                 %clf;
                 hold on;
-                pause(0.1);
+                pause(0.01);
                 %mup = mup_S(:,t);
                 mu = mu_S(:,t);
+                S = St(:,:,t);
                 
 
                 plot(x(1, 2:t), x(2, 2:t), 'ro--')
                 plot(mu_S(1, 2:t), mu_S(2, 2:t), 'bx--')
 
                 mu_pos = [mu(1) mu(2)];
-                S_pos = [S(1,1) S(1,3); S(3,1) S(3,3)];
+                S_pos = [S(1,1) S(1,2); S(2,1) S(2,2)];
                 error_ellipse(S_pos, mu_pos, 0.75);
                 error_ellipse(S_pos, mu_pos, 0.95);
 
                 title('True state and belief')
                 axis equal
-                axis([-1 8 -6 3])
+                %axis([-1 8 -6 3])
             end
 
             

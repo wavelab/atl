@@ -1,6 +1,7 @@
 % clear environment
 clear;
 clc;
+close all;
 
 robot = OmniRobot();
 robot.simulateEKF();
