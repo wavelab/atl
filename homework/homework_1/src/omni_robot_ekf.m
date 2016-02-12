@@ -9,33 +9,9 @@ omega_1 = -15.5;
 omega_2 = 10.5;
 omega_3 = 1.5;
 
-% syms theta r w_1 w_2 w_3 x_1 x_2 x_3;
-% R = [
-%     cos(theta), -sin(theta), 0;
-%     sin(theta), cos(theta), 0;
-%     0, 0, 1;
-% ];
-% J_1 = [
-%     0, 1, l;
-%     -cos(pi / 6), -sin(pi / 6), l;
-%     cos(pi / 6), -sin(pi / 6), l;
-% ];
-% v = [
-%     x_1;
-%     x_2;
-%     x_3
-% ];
-% g = inv(R) * inv(J_1) * v;
 
 
-% video object
-% makemovie = 1;
-% if(makemovie)
-%     vidObj = VideoWriter('ekf.avi');
-%     vidObj.Quality = 100;
-%     vidObj.FrameRate = 8;
-%     open(vidObj);
-% end
+
 
 % discrete time step
 dt = 0.1;
@@ -87,16 +63,9 @@ for t = 2:length(T)
     x_1 = mu(1);
     x_2 = mu(2);
     x_3 = mu(3);
-    g = [
-        (2*x_1*sin(theta))/3 - (x_2*sin(theta))/3 - (x_3*sin(theta))/3 - (3^(1/2)*x_2*cos(theta))/3 + (3^(1/2)*x_3*cos(theta))/3;
-        (2*x_1*cos(theta))/3 - (x_2*cos(theta))/3 - (x_3*cos(theta))/3 + (3^(1/2)*x_2*sin(theta))/3 - (3^(1/2)*x_3*sin(theta))/3;
-        (x_1 + x_2 + x_3)/(3*l)
-    ];
-    G = [
-        2/3 * sin(theta), 2/3 * cos(theta), 1/(3 * l);
-        -cos(theta)/sqrt(3) - cos(theta)/3, -sin(theta)/sqrt(3) - cos(theta)/3, 1/(3 * l);
-        cos(theta)/sqrt(3) - sin(theta)/3, -sin(theta)/sqrt(3) - cos(theta)/3, 1/(3 * l);
-    ];
+    
+    g = x(:,t - 1) + Gt(mu(3), omega_1, omega_2, omgega_3) * (x(:, t - 1) - mu(:));
+    
     x(:,t) = g + G + e;
 
     % update measurement
@@ -118,6 +87,27 @@ for t = 2:length(T)
     mup_S(:,t) = mup;
     mu_S(:,t) = mu;
     K_S(:,t) = K;
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
     % Plot results
     figure(1);
