@@ -1,6 +1,6 @@
 % clear environment
 clear;
-clc;
+%clc;
 close all;
 
 robot = OmniRobot();
