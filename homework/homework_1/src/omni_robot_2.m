@@ -57,18 +57,18 @@ endfunction
 
 
 % apply pre-defined rotation inputs
-% n = length(t);
-% omega_1 = -15.5;
-% omega_2 = 10.5;
-% omega_3 = 1.5;
-% omega_inputs = [
-%     omega_1 * ones(1, n);
-%     omega_2 * ones(1, n);
-%     omega_3 * ones(1, n);
-% ];
-% x_t = simulate(J_1, J_2, omega_inputs, t, dt);
-% plot_animation(t, x_t)
-% print -djpg -color traverse_predefined.jpg
+n = length(t);
+omega_1 = -15.5;
+omega_2 = 10.5;
+omega_3 = 1.5;
+omega_inputs = [
+    omega_1 * ones(1, n);
+    omega_2 * ones(1, n);
+    omega_3 * ones(1, n);
+];
+x_t = simulate(J_1, J_2, omega_inputs, t, dt);
+plot_animation(t, x_t)
+print -djpg -color traverse_predefined.jpg
 
 
 
