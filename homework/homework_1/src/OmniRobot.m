@@ -34,6 +34,8 @@ classdef OmniRobot
             0, 0.5, 0;
             0, 0, deg2rad(10);
         ];
+        
+       
     
     end
     
@@ -59,7 +61,7 @@ classdef OmniRobot
             0;
         ];  % mean (mu)  
     end
-
+   
     methods
         function [G] = G(this, theta, omega)
             % constant terms
@@ -148,7 +150,7 @@ classdef OmniRobot
 
                 % store results
                 mup_S(:,t) = mup;
-                mu_S(:,t) = mu;                
+                mu_S(:,t) = mu;
                 
                 % plot results
 %                 figure(1);
@@ -173,7 +175,15 @@ classdef OmniRobot
                     writeVideo(vidthis, getframe(gca)); 
                 end
             end
+            plot_results = true;
+            if plot_results == true
+                this.plot_results(mu_S, x, T, S)
+            end
             
+        end
+        
+        function plot_results(~,mu_S, x, T, S)
+            % plot the true state and belief for x, y, heading
             figure(1);
             clf; 
             
@@ -195,13 +205,42 @@ classdef OmniRobot
             plot(T, x(2,:), 'ro--', T, mu_S(2,:), 'bx--');
             title('True state and belief (y-axis)');
             xlabel('Time (s)')
-            ylabel('Displacement (m)')            
+            ylabel('Displacement (m)')
+            
+            
+            %plot error elipse over time
+            for t = 2:length(T)
+                figure(2);
+                %clf;
+                hold on;
+                pause(0.1);
+                %mup = mup_S(:,t);
+                mu = mu_S(:,t);
+                
+
+                plot(x(1, 2:t), x(2, 2:t), 'ro--')
+                plot(mu_S(1, 2:t), mu_S(2, 2:t), 'bx--')
+
+                mu_pos = [mu(1) mu(2)];
+                S_pos = [S(1,1) S(1,3); S(3,1) S(3,3)];
+                error_ellipse(S_pos, mu_pos, 0.75);
+                error_ellipse(S_pos, mu_pos, 0.95);
+
+                title('True state and belief')
+                axis equal
+                axis([-1 8 -6 3])
+            end
+
             
             % close movie thisect
-            if (makemovie) 
-                close(vidthis); 
-            end
+%            if (makemovie) 
+%                close(vidthis); 
+ %           end
+            
         end
-    end
+            
+            
+   end
+   
 end
 
