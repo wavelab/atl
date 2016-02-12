@@ -307,6 +307,14 @@ We obtain the following motion.
 	\label{fig:omni_robot_predefined}
 \end{figure}
 
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.65\textwidth]{images/traverse_predefined_with_noise.jpg}
+	\caption{Same as Fig~\ref{fig:omni_robot_predefined} but with Additive 
+	Gaussian Noise}
+	\label{fig:omni_robot_predefined_with_noise}
+\end{figure}
+
 
 
 \subsection{Traversing East, West, North East, South East and Inplace}
@@ -341,8 +349,40 @@ We obtain the following motion.
 	\label{fig:omni_robot_traverse}
 \end{figure}
 
+\begin{figure}[H]
+	\centering
+	
+	\begin{subfigure}[b]{0.32\linewidth}
+		\includegraphics[width=\textwidth]{images/traverse_east_with_noise.jpg}
+		\caption{Traverse East}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.32\linewidth}
+		\includegraphics[width=\textwidth]{images/traverse_west_with_noise.jpg}
+		\caption{Traverse West}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.32\linewidth}
+		\includegraphics[width=\textwidth]{images/traverse_north_east_with_noise.jpg}
+		\caption{Traverse North East}
+	\end{subfigure}
+	
+	\begin{subfigure}[b]{0.32\linewidth}
+		\includegraphics[width=\textwidth]{images/traverse_south_east_with_noise.jpg}
+		\caption{Traverse South East}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.32\linewidth}
+		\includegraphics[width=\textwidth]{images/traverse_inplace_with_noise.jpg}
+		\caption{Traverse Inplace}
+	\end{subfigure}
+	
+	\caption{Same as Fig~\ref{fig:omni_robot_traverse} but with Additive 
+	Gaussian Noise}
+	\label{fig:omni_robot_traverse_with_noise}
+\end{figure}
+
 The inputs that drove the robot to traverse in the directions shown in 
-Fig~\ref{fig:omni_robot_traverse} for 15 seconds  are as follows:
+Fig~\ref{fig:omni_robot_traverse} and 
+Fig~\ref{fig:omni_robot_traverse_with_noise}  for 15 
+seconds  are as follows:
 
 
 \begin{itemize}
@@ -439,7 +479,16 @@ Using the above equation we found the $\omega$ inputs required to traverse a
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.5\textwidth]{images/traverse_circle.jpg}
+	\begin{subfigure}[b]{0.45\linewidth}
+		\centering
+		\includegraphics[width=\textwidth]{images/traverse_circle.jpg}
+		\caption{Without Noise}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.45\linewidth}
+		\centering
+		\includegraphics[width=\textwidth]{images/traverse_circle_with_noise.jpg}
+		\caption{With Noise}
+	\end{subfigure}
 	\caption{Omni-Robot Traversing a Circle}
 	\label{fig:omni_robot_circle}
 \end{figure}
@@ -459,7 +508,15 @@ traversing in a spiral pattern for 50 seconds.
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.5\textwidth]{images/traverse_spiral.jpg}
+	\begin{subfigure}[b]{0.45\linewidth}
+		\includegraphics[width=\textwidth]{images/traverse_spiral.jpg}
+		\caption{Without Noise}
+	\end{subfigure}
+	
+	\begin{subfigure}[b]{0.45\linewidth}
+		\includegraphics[width=\textwidth]{images/traverse_spiral_with_noise.jpg}
+		\caption{With Noise}
+	\end{subfigure}
 	\caption{Omni-Robot Traversing a Spiral}
 	\label{fig:omni_robot_spiral}
 \end{figure}

@@ -128,7 +128,7 @@ classdef OmniRobot
                 omega = [omega_1; omega_2; omega_3];
                 e = RE * sqrt(Re) * randn(n,1);
                 G = this.G(mu(3), omega);
-                x(:,t) = x(:,t-1) + this.g(x(3, t - 1), omega) * this.dt + e;
+                x(:,t) = x(:,t-1) + this.g_dot(x(3, t - 1), omega) * this.dt + e;
                 
                 % update measurement
                 d = DE * sqrt(De) * randn(m, 1);
@@ -136,7 +136,7 @@ classdef OmniRobot
 
                 % EKF
                 % prediction update
-                mup = mu + this.g(mu(3), omega) * this.dt;
+                mup = mu + this.g_dot(mu(3), omega) * this.dt;
                 Sp = G * S * G' + this.R;
 
                 % measurement update
