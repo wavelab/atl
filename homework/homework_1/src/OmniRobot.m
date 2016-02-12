@@ -23,20 +23,17 @@ classdef OmniRobot
     
         % motion disturbance
         R = [
-            0 0 0; 
-            0 0 0; 
-            0 0 0;
+            0.00000001^2 0 0; 
+            0 0.00000001^2 0; 
+            0 0 0.00000001^2;
         ];
     
         % measurement disturbance
         Q = [
-            0.5, 0, 0;
-            0, 0.5, 0;
-            0, 0, deg2rad(10);
+            1.1^2, 0, 0;
+            0, 10, 0;
+            0, 0, 0.00000001^2;
         ];
-        
-       
-    
     end
     
     % SIMULATION PROPERTIES
@@ -80,7 +77,7 @@ classdef OmniRobot
             G(1:2, 3) = dRot_A(1:2);
         end
         
-        function x = g(this, theta, omega)
+        function x = g_dot(this, theta, omega)
             Rot = [
                 cos(theta), -sin(theta), 0;
                 sin(theta), cos(theta), 0; 
@@ -130,22 +127,22 @@ classdef OmniRobot
                 omega = [omega_1; omega_2; omega_3];
                 e = RE * sqrt(Re) * randn(n,1);
                 G = this.G(mu(3), omega);
-                x(:,t) = x(:,t-1) + this.g(x(3, t - 1), omega) * this.dt + e;
+                x(:,t) = x(:,t-1) + this.g_dot(x(3, t - 1), omega) * this.dt + e;
 
                 % update measurement
                 d = DE * sqrt(De) * randn(m, 1);
+                d
                 y(:,t) = x(:,t) + d;
 
                 % EKF
                 % prediction update
-                mup = x(:,t);
-                Sp = G * S * G' + this.R;
+                mup = mu + this.g_dot(mu(3), omega) * this.dt;
+                Sp = G * S * transpose(G) + this.R;
 
                 % measurement update
                 Ht = eye(3);
                 K = Sp * Ht' * inv(Ht * Sp * transpose(Ht) + this.Q);
                 mu = mup + K * (y(:,t) - Ht * mup);
-
                 S = (eye(n) - K * Ht) * Sp;
 
                 % store results
@@ -193,7 +190,7 @@ classdef OmniRobot
             xlabel('Displacement in x-direction (m)')
             ylabel('Displacement in y-direction (m)')
             axis equal
-            axis([-1 8 -6 3])
+            axis([-1.5 10 -8 4])
             
             subplot(3, 1, 2)
             plot(T, x(1,:), 'ro--', T, mu_S(1,:), 'bx--');
@@ -222,13 +219,14 @@ classdef OmniRobot
                 plot(mu_S(1, 2:t), mu_S(2, 2:t), 'bx--')
 
                 mu_pos = [mu(1) mu(2)];
-                S_pos = [S(1,1) S(1,3); S(3,1) S(3,3)];
+                S_pos = [S(1,1) S(1,3); S(2,1) S(2,3)];
                 error_ellipse(S_pos, mu_pos, 0.75);
                 error_ellipse(S_pos, mu_pos, 0.95);
 
                 title('True state and belief')
                 axis equal
-                axis([-1 8 -6 3])
+%                 axis([-1 8 -6 3])
+                axis([-5 10 -10 5])
             end
 
             

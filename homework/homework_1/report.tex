@@ -738,26 +738,63 @@ In the EKF we have used the following values:
 		\end{bmatrix} \\
 	    &= 
 	        \begin{bmatrix}
-		        \cos{(\theta)} & -\sin{(\theta)} & 0 \\
-		        \sin{(\theta)} & \cos{(\theta)} & 0 \\
-		        0 & 0 & 1
+       			1 & 0 & -A_{1} sin(x_{3}) - A_{2} cos(x_{3})  \\
+       			0 & 1 & A_{1} cos(x_{3}) - A_{2} sin(x_{3}) \\
+       			0 & 0 & 1
 	        \end{bmatrix}^{-1}
-	        \begin{bmatrix}
-	            0 & 1 & l \\
-	          	-\cos(\frac{\pi}{6}) & -\sin(\frac{\pi}{6}) & l \\
-	        	\cos(\frac{\pi}{6}) & -\sin(\frac{\pi}{6}) & l
-	        \end{bmatrix}^{-1}
-	        \begin{bmatrix}
-	            r & 0 & 0 \\
-	            0 & r & 0 \\
-	            0 & 0 & r
-	        \end{bmatrix}
-		    \begin{bmatrix}
-		       \omega_{1} \\
-		       \omega_{2} \\
-		       \omega_{3} \\
-		    \end{bmatrix} \\
+	        A \\
+	A_{t}
+		&= J_{1}^{-1} J_{2} \omega \\		
+		&=
+			\begin{bmatrix}
+				0 & 1 & l \\
+				-\cos(\frac{\pi}{6}) & -\sin(\frac{\pi}{6}) & l \\
+				\cos(\frac{\pi}{6}) & -\sin(\frac{\pi}{6}) & l
+			\end{bmatrix}^{-1}
+			\begin{bmatrix}
+				r & 0 & 0 \\
+				0 & r & 0 \\
+				0 & 0 & r
+			\end{bmatrix}
+			\begin{bmatrix}
+				\omega_{1} \\
+				\omega_{2} \\
+				\omega_{3} \\
+			\end{bmatrix} \\
 \end{align*}
+
+
+
+\newpage
+\section{Adding GPS corrections to the EKF}
+
+Previously it was assumed that the GPS and Magnetometer both work at a rate of 
+10hz, however it is given that "corrections are sent for the x, y positions of 
+the vechicle at an update rate of 1Hz. These corections improve the GPS 
+measurements at that instance only, with an improved standard deviation of 
+0.01m". This means that the measurement disturbance $Q$ changes over time (i.e. 
+every 1Hz) from:
+
+\begin{equation}
+	Q = 
+	\begin{bmatrix}
+		0.5 & 0 & 0 \\
+		0 & 0.5 & 0 \\
+		0 & 0 & 0.1745		
+	\end{bmatrix}
+\end{equation}
+
+to (at every 1Hz):
+
+\begin{equation}
+	Q = 
+	\begin{bmatrix}
+		0.1 & 0 & 0 \\
+		0 & 0.1 & 0 \\
+		0 & 0 & 0.1745		
+	\end{bmatrix}
+\end{equation}
+
 
 
 \end{document}
