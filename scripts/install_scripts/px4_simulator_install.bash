@@ -92,6 +92,7 @@ install_firmware_stack()
     cd $BUILD_PATH
     git clone https://github.com/PX4/Firmware.git
     cd Firmware
+    make px4fmu-v2_default
     # make posix_sitl_default jmavsim
     make -j2 posix_sitl_default
     cd ..
