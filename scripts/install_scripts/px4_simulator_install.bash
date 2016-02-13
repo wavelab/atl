@@ -139,7 +139,7 @@ install_mav_com()
 build_catkin_ws()
 {
     cd $CATKIN_WS_PATH
-    catkin_make --cmake-args -DCONFIG=ros_sitl_simple
+    catkin_make -j2 --cmake-args -DCONFIG=ros_sitl_simple
 }
 
 # RUN
