@@ -40,10 +40,6 @@ class Camera
         int image_width;
         int image_height;
 
-        float focal_length;
-        float field_of_view;
-        float ccd_width;
-
         vector<AprilTags::TagDetection> apriltags;
 
         Camera(void);
