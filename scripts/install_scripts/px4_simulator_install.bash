@@ -92,6 +92,7 @@ install_firmware_stack()
     cd $BUILD_PATH
     git clone https://github.com/PX4/Firmware.git
     cd Firmware
+    git checkout tags/v1.1.3
     # make posix_sitl_default jmavsim
     make -j2 posix_sitl_default
     cd ..
@@ -138,7 +139,7 @@ install_mav_com()
 build_catkin_ws()
 {
     cd $CATKIN_WS_PATH
-    catkin_make --cmake-args -DCONFIG=ros_sitl_simple
+    catkin_make -j2 --cmake-args -DCONFIG=ros_sitl_simple
 }
 
 # RUN
