@@ -17,12 +17,24 @@
 #include <AprilTags/TagDetector.h>
 #include <AprilTags/Tag16h5.h>
 
+#include <yaml-cpp/yaml.h>
+
 
 class Camera
 {
     private:
         AprilTags::TagDetector* tag_detector;
 
+        int camera_index;
+        int image_width;
+        int image_height;
+
+        cv::Mat camera_matrix;
+        cv::Mat rectification_matrix;
+        cv::Mat distortion_coefficients;
+        cv::Mat projection_matrix;
+
+        void loadCalibrationFile(const std::string calibration_fp);
         void printFPS(double &last_tic, int &frame);
         float calculateFocalLength(void);
         double standardRad(double t);
@@ -36,13 +48,9 @@ class Camera
         int processImage(cv::Mat &image, cv::Mat &image_gray);
 
     public:
-        int camera_index;
-        int image_width;
-        int image_height;
-
         vector<AprilTags::TagDetection> apriltags;
 
-        Camera(void);
+        Camera(int camera_index, const std::string calibration_fp);
         int run(void);
 };
 

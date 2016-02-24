@@ -53,6 +53,7 @@ TARGET_LINK_LIBRARIES(
     ${catkin_LIBRARIES}
     ${OpenCV_LIBS}
     apriltags
+    yaml-cpp
 )
 INSTALL(
     TARGETS camera
