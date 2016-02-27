@@ -223,14 +223,17 @@ int Camera::processImage(cv::Mat &image, cv::Mat &image_gray)
 {
     // detect april tags (requires a gray scale image)
     cv::cvtColor(image, image_gray, CV_BGR2GRAY);
-    cv::imshow("camera", image_gray);
     this->apriltags = this->tag_detector->extractTags(image_gray);
 
     // print out each apriltags
-    std::cout << "TAGS:" << this->apriltags.size() << std::endl;
+    // std::cout << "TAGS:" << this->apriltags.size() << std::endl;
     for (int i = 0; i < this->apriltags.size(); i++) {
         this->printDetection(this->apriltags[i]);
+        // this->apriltags[i].draw(image);
     }
+
+    // cv::imshow("camera", image);
+    // cv::imshow("gray scale", image_gray);
 
     return this->apriltags.size();
 }
