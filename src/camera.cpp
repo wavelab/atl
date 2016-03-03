@@ -103,42 +103,6 @@ void Camera::printFPS(double &last_tic, int &frame)
     }
 }
 
-int Camera::run(void)
-{
-    int frame_index;
-    double last_tic;
-    cv::Mat image;
-    cv::Mat image_gray;
-    cv::VideoCapture capture(this->camera_index);
-
-    // setup
-    frame_index = 0;
-    last_tic = tic();
-
-    // open capture device
-    if (capture.isOpened() == 0) {
-        std::cout << "Failed to open webcam!";
-        return -1;
-    } else {
-        capture.set(CV_CAP_PROP_FRAME_WIDTH, this->image_width);
-        capture.set(CV_CAP_PROP_FRAME_HEIGHT, this->image_height);
-    }
-
-    // read capture device
-    while (true) {
-        capture.read(image);
-
-        this->processImage(image, image_gray);
-        this->printFPS(last_tic, frame_index);
-
-        if (cv::waitKey(30) >= 0) {
-            break;
-        }
-    }
-
-    return 0;
-}
-
 double Camera::standardRad(double t)
 {
     // normalize angle to be within the interval [-pi,pi].
@@ -165,16 +129,13 @@ void Camera::convertToEuler(
     roll  = this->standardRad(atan2(wRo(0,2)*s - wRo(1,2)*c, -wRo(0,1)*s + wRo(1,1)*c));
 }
 
-void Camera::printDetection(AprilTags::TagDetection& detection)
+PoseEstimate Camera::obtainPoseEstimate(AprilTags::TagDetection& detection)
 {
-    double yaw;
-    double pitch;
-    double roll;
+    PoseEstimate pose;
     double m_tag_size;
 
-    Eigen::Vector3d translation;
-    Eigen::Matrix3d rotation;
     Eigen::Matrix3d F;
+    Eigen::Matrix3d rotation;
     Eigen::Matrix3d fixed_rot;
 
     // setup
@@ -182,6 +143,7 @@ void Camera::printDetection(AprilTags::TagDetection& detection)
          0, -1, 0,
          0, 0, 1;
 
+    // change tag size according to tag id
     if (detection.id == 0) {
         m_tag_size = 0.048;
     } else {
@@ -195,22 +157,30 @@ void Camera::printDetection(AprilTags::TagDetection& detection)
         this->camera_matrix.at<double>(1, 1),
         this->camera_matrix.at<double>(0, 2),
         this->camera_matrix.at<double>(1, 2),
-        translation,
+        pose.translation,
         rotation
     );
-
     fixed_rot = F * rotation;
-    this->convertToEuler(fixed_rot, yaw, pitch, roll);
+    pose.distance = pose.translation.norm();
+    this->convertToEuler(fixed_rot, pose.yaw, pose.pitch, pose.roll);
 
+    return pose;
+}
+
+void Camera::printDetection(AprilTags::TagDetection& detection)
+{
+    PoseEstimate pose;
+
+    pose = this->obtainPoseEstimate(detection);
     std::cout << "id: " << detection.id << " ";
     std::cout << "Hamming: " << detection.hammingDistance << ")";
-    std::cout << "  distance=" << translation.norm() << "m ";
-    std::cout << "x=" << translation(0) << ", ";
-    std::cout << "y=" << translation(1) << ", ";
-    std::cout << "z=" << translation(2);
-    std::cout << "yaw=" << yaw << ", ";
-    std::cout << "pitch=" << pitch << ", ";
-    std::cout << "roll=" << roll << ", ";
+    std::cout << "  distance=" << pose.translation.norm() << "m ";
+    std::cout << "x=" << pose.translation(0) << ", ";
+    std::cout << "y=" << pose.translation(1) << ", ";
+    std::cout << "z=" << pose.translation(2);
+    std::cout << "yaw=" << pose.yaw << ", ";
+    std::cout << "pitch=" << pose.pitch << ", ";
+    std::cout << "roll=" << pose.roll << ", ";
     std::cout << endl;
 
     // also note that for SLAM/multi-view application it is better to
@@ -219,8 +189,11 @@ void Camera::printDetection(AprilTags::TagDetection& detection)
     // for suitable factors.
 }
 
-int Camera::processImage(cv::Mat &image, cv::Mat &image_gray)
+std::vector<PoseEstimate> Camera::processImage(cv::Mat &image, cv::Mat &image_gray)
 {
+    PoseEstimate pose;
+    std::vector<PoseEstimate> pose_estimates;
+
     // detect april tags (requires a gray scale image)
     cv::cvtColor(image, image_gray, CV_BGR2GRAY);
     this->apriltags = this->tag_detector->extractTags(image_gray);
@@ -228,14 +201,112 @@ int Camera::processImage(cv::Mat &image, cv::Mat &image_gray)
     // print out each apriltags
     // std::cout << "TAGS:" << this->apriltags.size() << std::endl;
     for (int i = 0; i < this->apriltags.size(); i++) {
-        this->printDetection(this->apriltags[i]);
-        // this->apriltags[i].draw(image);
+        // this->printDetection(this->apriltags[i]);
+        pose = this->obtainPoseEstimate(this->apriltags[i]);
+        pose_estimates.push_back(pose);
+        this->apriltags[i].draw(image);
     }
 
-    // cv::imshow("camera", image);
+    cv::imshow("camera", image);
     // cv::imshow("gray scale", image_gray);
+    // return this->apriltags.size();
 
-    return this->apriltags.size();
+    return pose_estimates;
+}
+
+int Camera::run(void)
+{
+    int c;
+    int frame_index;
+    double last_tic;
+    cv::Mat image;
+    cv::Mat image_gray;
+    cv::VideoCapture capture(this->camera_index);
+    std::vector<PoseEstimate> pose_estimates;
+
+    // setup
+    frame_index = 0;
+    last_tic = tic();
+
+    // open capture device
+    if (capture.isOpened() == 0) {
+        std::cout << "Failed to open webcam!";
+        return -1;
+    } else {
+        capture.set(CV_CAP_PROP_FRAME_WIDTH, this->image_width);
+        capture.set(CV_CAP_PROP_FRAME_HEIGHT, this->image_height);
+    }
+
+    // read capture device
+    while (true) {
+        c = cv::waitKey(100);
+        capture.read(image);
+
+        pose_estimates = this->processImage(image, image_gray);
+        // this->printFPS(last_tic, frame_index);
+
+        if (c == 113) {
+            std::cout << "exiting..." << std::endl;
+            break;
+        } else if (c == 'c') {
+            if (pose_estimates.size()) {
+                std::cout << "record pose estimate!" << std::endl;
+                this->outputPoseEstimate("pose_estimate.dat", pose_estimates[0]);
+            } else {
+                std::cout << "no apriltags detected!" << std::endl;
+            }
+        }
+    }
+
+    return 0;
+}
+
+bool Camera::file_is_empty(const std::string file_path)
+{
+    std::ifstream f(file_path);
+    if (f && f.peek() == std::ifstream::traits_type::eof()) {
+        f.close();
+        return true;
+    } else if (!f) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+int Camera::outputPoseEstimate(const std::string output_fp, PoseEstimate &pose)
+{
+    bool empty_file;
+    std::ofstream output_file;
+
+    // setup
+    empty_file = this->file_is_empty(output_fp);
+    output_file.open(output_fp, ios::out | ios::app);
+
+    if (output_file.is_open()) {
+        if (empty_file) {
+            output_file << "distance" << ", ";
+            output_file << "yaw" << ", ";
+            output_file << "pitch" << ", ";
+            output_file << "roll" << ", ";
+            output_file << "x" << ", ";
+            output_file << "y" << ", ";
+            output_file << "z" << std::endl;
+        }
+
+        output_file << pose.translation.norm() << ", ";
+        output_file << pose.yaw << ", ";
+        output_file << pose.pitch << ", ";
+        output_file << pose.roll << ", ";
+        output_file << pose.translation(0) << ", ";
+        output_file << pose.translation(1) << ", ";
+        output_file << pose.translation(2) << std::endl;
+        output_file.close();
+    } else {
+        return -1;
+    }
+
+    return 0;
 }
 
 int main(int argc, char **argv)
