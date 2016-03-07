@@ -8,6 +8,7 @@
   #define TWOPI 2.0*3.1415926535897932384626433832795
 #endif
 
+#include <fstream>
 #include <iostream>
 #include <math.h>
 #include <sys/time.h>
@@ -19,6 +20,16 @@
 
 #include <yaml-cpp/yaml.h>
 
+
+class PoseEstimate
+{
+    public:
+        double distance;
+        double yaw;
+        double pitch;
+        double roll;
+        Eigen::Vector3d translation;
+};
 
 class Camera
 {
@@ -44,14 +55,17 @@ class Camera
             double &pitch,
             double &roll
         );
+        PoseEstimate obtainPoseEstimate(AprilTags::TagDetection& detection);
         void printDetection(AprilTags::TagDetection& detection);
-        int processImage(cv::Mat &image, cv::Mat &image_gray);
+        std::vector<PoseEstimate> processImage(cv::Mat &image, cv::Mat &image_gray);
+        bool file_is_empty(const std::string file_path);
 
     public:
         vector<AprilTags::TagDetection> apriltags;
 
         Camera(int camera_index, const std::string calibration_fp);
         int run(void);
+        int outputPoseEstimate(const std::string output_fp, PoseEstimate &pose);
 };
 
 #endif
