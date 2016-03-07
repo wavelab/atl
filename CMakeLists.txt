@@ -39,7 +39,15 @@ CATKIN_PACKAGE(
     DEPENDS system_lib
 )
 
+# LIBRARY
+ADD_LIBRARY(
+    sim
+    STATIC
+    src/sim.cpp
+)
+
 # EXECUTABLES
+# quadrotor
 ADD_EXECUTABLE(quadrotor src/quadrotor.cpp)
 TARGET_LINK_LIBRARIES(quadrotor ${catkin_LIBRARIES})
 INSTALL(
@@ -47,6 +55,7 @@ INSTALL(
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
+# camera
 ADD_EXECUTABLE(camera src/camera.cpp)
 TARGET_LINK_LIBRARIES(
     camera
@@ -57,5 +66,16 @@ TARGET_LINK_LIBRARIES(
 )
 INSTALL(
     TARGETS camera
+    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+# sim_test
+ADD_EXECUTABLE(sim_test tests/sim_test.cpp)
+TARGET_LINK_LIBRARIES(
+    sim_test
+	sim
+)
+INSTALL(
+    TARGETS sim_test
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
