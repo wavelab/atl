@@ -106,7 +106,7 @@ int main(int argc, char **argv)
     quad.disarm();
 
     // loop
-    ros::spin();
+    // ros::spin();
 
     return 0;
 }
