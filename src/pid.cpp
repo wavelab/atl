@@ -42,7 +42,7 @@ int pid_calculate(struct pid *p, float input)
     float error;
     struct timeb now;
 
-    /* calculate dt - in miliseconds */
+    // calculate dt - in miliseconds
     ftime(&now);
     dt = (float) (
         1000.0 *
@@ -50,27 +50,27 @@ int pid_calculate(struct pid *p, float input)
         (now.millitm - p->last_updated.millitm)
     );
 
-    /* calculate output */
+    // calculate output
     if (dt >= p->sample_rate) {
-        /* calculate errors */
+        // calculate errors
         error = p->setpoint - input;
         if (fabs(error) > p->dead_zone) {
             p->sum_error += error * (float) (dt / 1000.0);
         }
 
-        /* calculate output */
+        // calculate output
         p->output = (p->k_p * error);
         p->output += (p->k_i * p->sum_error);
         p->output -= (p->k_d * (input - p->prev_error));
 
-        /* limit boundaries */
+        // limit boundaries
         if (p->output > p->max) {
             p->output = p->max;
         } else if (p->output < p->min) {
             p->output = p->min;
         }
 
-        /* update error and last_updated */
+        // update error and last_updated
         p->prev_error = error;
         ftime(&p->last_updated);
     }

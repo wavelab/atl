@@ -4,7 +4,7 @@
 #include "awesomo/pid.hpp"
 
 
-/* TESTS */
+// TESTS
 int test_pid_setup_and_destroy(void);
 int test_pid_calculate(void);
 void test_suite(void);
@@ -15,7 +15,7 @@ int test_pid_setup_and_destroy(void)
     struct pid *p;
     struct pid_config c;
 
-    /* setup piq config */
+    // setup piq config
     c.sample_rate = 100;
     c.setpoint = 0.0f;
     c.k_p = 0.0f;
@@ -25,7 +25,7 @@ int test_pid_setup_and_destroy(void)
     c.min = 0.0f;
     c.max = 0.0f;
 
-    /* setup piq */
+    // setup piq
     p = pid_setup(&c);
     mu_check(fltcmp(p->setpoint, 0.0f) == 0);
     mu_check(fltcmp(p->k_p, 0.0f) == 0);
@@ -46,7 +46,7 @@ int test_pid_calculate(void)
     struct pid *p;
     struct pid_config c;
 
-    /* setup piq config */
+    // setup piq config
     c.sample_rate = 100;
     c.setpoint = 0.0f;
     c.k_p = 0.1f;
@@ -56,7 +56,7 @@ int test_pid_calculate(void)
     c.min = -1.0f;
     c.max = 1.0f;
 
-    /* test */
+    // test
     p = pid_setup(&c);
     p->output = 1.0f;
     for (i = 0; i < 10; i++) {

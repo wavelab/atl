@@ -3,10 +3,12 @@
 
 #include <iostream>
 #include <cmath>
+
+#include <stdlib.h>
 #include <sys/timeb.h>
 
 
-/* STRUCTURES */
+// STRUCTURES
 struct pid_config
 {
     int sample_rate;
@@ -42,7 +44,7 @@ struct pid
 };
 
 
-/* FUNCTIONS */
+// FUNCTIONS
 struct pid *pid_setup(struct pid_config *c);
 void pid_destroy(void *target);
 int pid_calculate(struct pid *p, float actual);

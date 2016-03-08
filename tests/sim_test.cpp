@@ -2,7 +2,7 @@
 #include "awesomo/sim.hpp"
 
 
-/* TESTS */
+// TESTS
 int test_qsim_rotation_matrix(void);
 int test_qsim_inertia_matrix(void);
 int test_qsim_calculate_thrust(void);
@@ -20,10 +20,10 @@ int test_qsim_rotation_matrix(void)
     struct qsim q;
     Eigen::Matrix3d m;
 
-    /* setup */
+    // setup
     q.orientation << 1.0f, 1.0f, 1.0f;
 
-    /* test and assert */
+    // test and assert
     qsim_rotation_matrix(&q, m);
     mu_check(fltcmp(m(0), 0.291927) == 0);
     mu_check(fltcmp(m(1), 0.454649) == 0);
@@ -65,11 +65,11 @@ int test_qsim_calculate_thrust(void)
 {
     struct qsim q;
 
-    /* setup */
+    // setup
     q.orientation << 0.0f, 0.0f, 0.0f;
     q.rotors << 10.0f, 10.0f, 10.0f, 10.0f;
 
-    /* test and assert */
+    // test and assert
     qsim_calculate_thrust(&q);
     mu_check(fltcmp(q.thrust(0), 0.0f) == 0);
     mu_check(fltcmp(q.thrust(1), 0.0f) == 0);
@@ -82,11 +82,11 @@ int test_qsim_calculate_drag(void)
 {
     struct qsim q;
 
-    /* setup */
+    // setup
     q.kd = 1.0f;
     q.velocity << 10.0f, 20.0f, 30.0f;
 
-    /* test and assert */
+    // test and assert
     qsim_calculate_drag(&q);
     mu_check(fltcmp(q.drag(0), -10.0f) == 0);
     mu_check(fltcmp(q.drag(1), -20.0f) == 0);
@@ -99,13 +99,13 @@ int test_qsim_calculate_torque(void)
 {
     struct qsim q;
 
-    /* setup */
+    // setup
     q.L = 1.0f;
     q.k = 1.0f;
     q.b = 1.0f;
     q.rotors << 1.0f, 2.0f, 3.0f, 4.0f;
 
-    /* test and assert */
+    // test and assert
     qsim_calculate_torque(&q);
     mu_check(fltcmp(q.torque(0), -8.0f) == 0);
     mu_check(fltcmp(q.torque(1), -12.0f) == 0);
@@ -119,7 +119,7 @@ int test_qsim_calculate_acceleration(void)
     struct qsim q;
     struct world w;
 
-    /* setup */
+    // setup
     w.dt = 0.1;
     w.gravity << 0.0f, 0.0f, 10.0f;
 
@@ -132,7 +132,7 @@ int test_qsim_calculate_acceleration(void)
     q.rotors << 10.0f, 10.0f, 10.0f, 10.0f;
     q.velocity << 10.0f, 10.0f, 10.0f;
 
-    /* test and assert */
+    // test and assert
     qsim_calculate_acceleration(&q, &w);
 
     return 0;
@@ -142,7 +142,7 @@ int test_qsim_convert_angular_velocity_to_body_frame(void)
 {
     struct qsim q;
 
-    /* setup */
+    // setup
     q.orientation(0) = deg2rad(10);
     q.orientation(1) = deg2rad(20);
     q.orientation(2) = deg2rad(30);
@@ -151,7 +151,7 @@ int test_qsim_convert_angular_velocity_to_body_frame(void)
     q.angular_velocity(1) = 1.0f;
     q.angular_velocity(2) = 1.0f;
 
-    /* test and assert */
+    // test and assert
     qsim_convert_angular_velocity_to_body_frame(&q);
     mu_check(fltcmp(q.angular_velocity_body_frame(0), 1.0) == 0);
     mu_check(fltcmp(q.angular_velocity_body_frame(1), 0.36603) == 0);
@@ -164,7 +164,7 @@ int test_qsim_convert_angular_velocity_to_inertial_frame(void)
 {
     struct qsim q;
 
-    /* setup */
+    // setup
     q.orientation(0) = deg2rad(10);
     q.orientation(1) = deg2rad(20);
     q.orientation(2) = deg2rad(30);
@@ -173,7 +173,7 @@ int test_qsim_convert_angular_velocity_to_inertial_frame(void)
     q.angular_velocity_body_frame(1) = 0.36603;
     q.angular_velocity_body_frame(2) = 0.94162;
 
-    /* test and assert */
+    // test and assert
     qsim_convert_angular_velocity_to_inertial_frame(&q);
     mu_check(fltcmp(q.angular_velocity(0), 1.0f) == 0);
     mu_check(fltcmp(q.angular_velocity(1), 1.0f) == 0);
@@ -186,7 +186,7 @@ int test_qsim_calculate_angular_acceleration(void)
 {
     struct qsim q;
 
-    /* setup */
+    // setup
     q.L = 1.0f;
     q.k = 1.0f;
     q.b = 1.0f;
@@ -194,7 +194,7 @@ int test_qsim_calculate_angular_acceleration(void)
     qsim_inertia_matrix(&q, 1.0f, 1.0f, 1.0f);
     q.angular_velocity_body_frame << 1.0f, 1.0f, 1.0f;
 
-    /* test and assert */
+    // test and assert
     qsim_calculate_angular_acceleration(&q);
     mu_check(fltcmp(q.torque(0), -8.0f) == 0);
     mu_check(fltcmp(q.torque(1), -12.0f) == 0);

@@ -8,12 +8,12 @@ double deg2rad(double degrees)
 
 void qsim_setup(struct qsim *q)
 {
-    /* parameters */
-    q->m = 0.0f;    /* mass */
-    q->L = 1.0f;    /* length of motor arm */
-    q->kd = 0.0f;   /* global drag coefficient */
-    q->b = 0.0f;    /* propeller drag coefficient */
-    q->k = 0.0f;    /* thrust coefficient */
+    // parameters
+    q->m = 0.0f;    // mass
+    q->L = 1.0f;    // length of motor arm
+    q->kd = 0.0f;   // global drag coefficient
+    q->b = 0.0f;    // propeller drag coefficient
+    q->k = 0.0f;    // thrust coefficient
 }
 
 void qsim_rotation_matrix(struct qsim *q, Eigen::Matrix3d &m)
@@ -22,12 +22,12 @@ void qsim_rotation_matrix(struct qsim *q, Eigen::Matrix3d &m)
     double theta;
     double psi;
 
-    /* setup */
+    // setup
     phi = q->orientation(2);
     theta = q->orientation(1);
     psi = q->orientation(0);
 
-    /* rotation matrix - RzRyRx */
+    // rotation matrix - RzRyRx
     m(0) = cos(phi) * cos(theta);
     m(1) = sin(phi) * cos(theta);
     m(2) = -1 * sin(theta);
@@ -62,7 +62,7 @@ void qsim_calculate_thrust(struct qsim *q)
     Eigen::Matrix3d rot_mat;
     Eigen::Vector3d thrust_body_frame;
 
-    /* calculate thrust in body frame */
+    // calculate thrust in body frame
     sum = 0;
     sum += pow(q->rotors(0), 2);
     sum += pow(q->rotors(1), 2);
@@ -70,7 +70,7 @@ void qsim_calculate_thrust(struct qsim *q)
     sum += pow(q->rotors(3), 2);
     thrust_body_frame << 0.0f, 0.0f, sum;
 
-    /* convert thrust to inertia frame */
+    // convert thrust to inertia frame
     qsim_rotation_matrix(q, rot_mat);
     q->thrust = rot_mat * thrust_body_frame;
 }
@@ -82,7 +82,7 @@ void qsim_calculate_drag(struct qsim *q)
 
 void qsim_calculate_torque(struct qsim *q)
 {
-    /* torque */
+    // torque
     q->torque(0) = q->L * q->k * (pow(q->rotors(0), 2) - pow(q->rotors(2), 2));
     q->torque(1) = q->L * q->k * (pow(q->rotors(1), 2) - pow(q->rotors(3), 2));
     q->torque(2) = q->b * (
@@ -96,7 +96,7 @@ int qsim_calculate_acceleration(struct qsim *q, struct world *w)
     double mass_inv;
 	double world_force_z;
 
-    /* calculate acceleration */
+    // calculate acceleration
     qsim_calculate_thrust(q);
     qsim_calculate_drag(q);
 
@@ -113,7 +113,7 @@ void qsim_convert_angular_velocity_to_body_frame(struct qsim *q)
 {
     Eigen::Matrix3d m;
 
-    /* convert angular velocity in inertia frame to body frame */
+    // convert angular velocity in inertia frame to body frame
     qsim_rotation_matrix(q, m);
     q->angular_velocity_body_frame = m * q->angular_velocity;
 }
@@ -122,7 +122,7 @@ void qsim_convert_angular_velocity_to_inertial_frame(struct qsim *q)
 {
     Eigen::Matrix3d m;
 
-    /* convert angular velocity in body frame to inertial frame */
+    // convert angular velocity in body frame to inertial frame
     qsim_rotation_matrix(q, m);
     q->angular_velocity = m.inverse() * q->angular_velocity_body_frame;
 }
@@ -134,7 +134,7 @@ int qsim_calculate_angular_acceleration(struct qsim *q)
     Eigen::Vector3d c;
     Eigen::Matrix3d inertia_inv;
 
-    /* torque */
+    // torque
     qsim_calculate_torque(q);
 
     a = q->inertia * q->angular_velocity_body_frame;
@@ -149,20 +149,20 @@ void qsim_record_step(FILE *out_file, struct qsim *q)
 {
     char buf[9046];
 
-    /* setup */
+    // setup
     memset(buf, '\0', 9046);
 
-    /* build string */
-    /* position */
+    // build string
+    // position
     sprintf(buf, "%f,", q->position(0));
     sprintf(strlen(buf) + buf, "%f,", q->position(1));
     sprintf(strlen(buf) + buf, "%f,", q->position(2));
-    /* orientation */
+    // orientation
     sprintf(strlen(buf) + buf, "%f,", q->orientation(0));
     sprintf(strlen(buf) + buf, "%f,", q->orientation(1));
     sprintf(strlen(buf) + buf, "%f", q->orientation(2));
 
-    /* write to file */
+    // write to file
     fprintf(out_file, "%s\n", buf);
 }
 
@@ -173,11 +173,11 @@ void loop(void)
     struct world w;
     FILE *output;
 
-    /* setup world */
+    // setup world
     w.dt = 0.1f;
     w.gravity << 0.0f, 0.0f, 10.0f;
 
-    /* setup quadcopter */
+    // setup quadcopter
     qsim_setup(&q);
 
     q.orientation << deg2rad(0.0f), deg2rad(0.0f), deg2rad(0.0f);
@@ -193,17 +193,17 @@ void loop(void)
     q.kd = 0.2f;
     qsim_inertia_matrix(&q, 2.0f, 2.0f, 2.0f);
 
-    /* open output file */
+    // open output file
     output = fopen("/tmp/sim.out", "w");
 
-    /* loop */
+    // loop
     for (i = 0; i < 500; i++) {
-        /* compute forces, toques and accelerations */
+        // compute forces, toques and accelerations
         qsim_calculate_acceleration(&q, &w);
         qsim_convert_angular_velocity_to_body_frame(&q);
         qsim_calculate_angular_acceleration(&q);
 
-        /* update - using euler approximation (todo: need to do rk4 at least) */
+        // update - using euler approximation (todo: need to do rk4 at least)
         q.angular_velocity_body_frame(0) += w.dt * q.angular_acceleration_body_frame(0);
         q.angular_velocity_body_frame(1) += w.dt * q.angular_acceleration_body_frame(1);
         q.angular_velocity_body_frame(2) += w.dt * q.angular_acceleration_body_frame(2);
@@ -221,10 +221,10 @@ void loop(void)
         q.position(1) += w.dt * q.velocity(1);
         q.position(2) += w.dt * q.velocity(2);
 
-        /* record */
+        // record
         qsim_record_step(output, &q);
 
-        /* terminator */
+        // terminator
         if (q.position(2) < -1.0f) {
             break;
         } else if (q.position(2) > 20.0f) {
@@ -232,6 +232,6 @@ void loop(void)
         }
     }
 
-    /* clean up */
+    // clean up
     fclose(output);
 }
