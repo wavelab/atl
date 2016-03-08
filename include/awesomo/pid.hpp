@@ -1,5 +1,5 @@
-#ifndef __PID_H__
-#define __PID_H__
+#ifndef __PID_HPP__
+#define __PID_HPP__
 
 #include <iostream>
 #include <cmath>

@@ -1,5 +1,5 @@
-#ifndef __WEBCAM_H__
-#define __WEBCAM_H__
+#ifndef __CAMERA_HPP__
+#define __CAMERA_HPP__
 
 #define _USE_MATH_DEFINES
 #ifdef M_PI

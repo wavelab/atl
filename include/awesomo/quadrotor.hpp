@@ -1,5 +1,5 @@
-#ifndef __QUADROTOR_H__
-#define __QUADROTOR_H__
+#ifndef __QUADROTOR_HPP__
+#define __QUADROTOR_HPP__
 
 #include <iostream>
 #include <unistd.h>

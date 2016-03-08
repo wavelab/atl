@@ -1,14 +1,16 @@
-#ifndef __SIM_H__
-#define __SIM_H__
+#ifndef __SIM_HPP__
+#define __SIM_HPP__
 
 #include <iostream>
 
 #include <Eigen/Dense>
 
+
+// CONSTANTS
 #define MATH_PI 3.14159265358979323846
 
 
-/* STRUCTURES */
+// STRUCTURES
 struct world
 {
     double dt;
@@ -17,7 +19,7 @@ struct world
 
 struct qsim
 {
-    /* kinematics info */
+    // kinematics info
     Eigen::Vector3d position;
     Eigen::Vector3d velocity;
     Eigen::Vector3d acceleration;
@@ -35,16 +37,16 @@ struct qsim
     Eigen::Vector4d rotors;
     Eigen::Vector3d thrust;
 
-    /* parameters */
-    double m;    /* mass */
-    double L;    /* length of motor arm */
-    double kd;   /* global drag coefficient */
-    double b;    /* propeller drag coefficient */
-    double k;    /* thrust coefficient */
+    // parameters
+    double m;    // mass
+    double L;    // length of motor arm
+    double kd;   // global drag coefficient
+    double b;    // propeller drag coefficient
+    double k;    // thrust coefficient
 };
 
 
-/* FUNCTIONS */
+// FUNCTIONS
 double deg2rad(double degrees);
 void qsim_setup(struct qsim *q);
 void qsim_rotation_matrix(struct qsim *q, Eigen::Matrix3d &m);
