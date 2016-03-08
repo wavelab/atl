@@ -46,9 +46,9 @@ struct qsim
 
 /* FUNCTIONS */
 double deg2rad(double degrees);
+void qsim_setup(struct qsim *q);
 void qsim_rotation_matrix(struct qsim *q, Eigen::Matrix3d &m);
 void qsim_inertia_matrix(struct qsim *q, double x, double y, double z);
-void qsim_setup(struct qsim *q);
 void qsim_calculate_thrust(struct qsim *q);
 void qsim_calculate_drag(struct qsim *q);
 void qsim_calculate_torque(struct qsim *q);

@@ -2,6 +2,52 @@
 #include "awesomo/sim.hpp"
 
 
+static int test_qsim_rotation_matrix(void)
+{
+    struct qsim q;
+    Eigen::Matrix3d m;
+
+    /* setup */
+    q.orientation << 1.0f, 1.0f, 1.0f;
+
+    /* test and assert */
+    qsim_rotation_matrix(&q, m);
+    mu_check(fltcmp(m(0), 0.291927) == 0);
+    mu_check(fltcmp(m(1), 0.454649) == 0);
+    mu_check(fltcmp(m(2), -0.841471) == 0);
+
+    mu_check(fltcmp(m(3), -0.072075) == 0);
+    mu_check(fltcmp(m(4), 0.887750) == 0);
+    mu_check(fltcmp(m(5), 0.454649) == 0);
+
+    mu_check(fltcmp(m(6), 0.953721) == 0);
+    mu_check(fltcmp(m(7), -0.072075) == 0);
+    mu_check(fltcmp(m(8), 0.291927) == 0);
+
+    return 0;
+}
+
+static int test_qsim_inertia_matrix(void)
+{
+    struct qsim q;
+
+    qsim_inertia_matrix(&q, 1.0, 2.0, 3.0);
+
+    mu_check(fltcmp(q.inertia(0), 1.0) == 0);
+    mu_check(fltcmp(q.inertia(1), 0.0) == 0);
+    mu_check(fltcmp(q.inertia(2), 0.0) == 0);
+
+    mu_check(fltcmp(q.inertia(3), 0.0) == 0);
+    mu_check(fltcmp(q.inertia(4), 2.0) == 0);
+    mu_check(fltcmp(q.inertia(5), 0.0) == 0);
+
+    mu_check(fltcmp(q.inertia(6), 0.0) == 0);
+    mu_check(fltcmp(q.inertia(7), 0.0) == 0);
+    mu_check(fltcmp(q.inertia(8), 3.0) == 0);
+
+    return 0;
+}
+
 static int test_qsim_calculate_thrust(void)
 {
     struct qsim q;
@@ -25,13 +71,13 @@ static int test_qsim_calculate_drag(void)
 
     /* setup */
     q.kd = 1.0f;
-    q.velocity << 10.0f, 10.0f, 10.0f;
+    q.velocity << 10.0f, 20.0f, 30.0f;
 
     /* test and assert */
     qsim_calculate_drag(&q);
     mu_check(fltcmp(q.drag(0), -10.0f) == 0);
-    mu_check(fltcmp(q.drag(1), -10.0f) == 0);
-    mu_check(fltcmp(q.drag(2), -10.0f) == 0);
+    mu_check(fltcmp(q.drag(1), -20.0f) == 0);
+    mu_check(fltcmp(q.drag(2), -30.0f) == 0);
 
     return 0;
 }
@@ -75,7 +121,6 @@ static int test_qsim_calculate_acceleration(void)
 
     /* test and assert */
     qsim_calculate_acceleration(&q, &w);
-    std::cout <<q.acceleration << std::endl;
 
     return 0;
 }
@@ -153,14 +198,16 @@ static int test_loop(void)
 
 void test_suite(void)
 {
+    mu_add_test(test_qsim_rotation_matrix);
+    mu_add_test(test_qsim_inertia_matrix);
     mu_add_test(test_qsim_calculate_thrust);
     mu_add_test(test_qsim_calculate_drag);
     mu_add_test(test_qsim_calculate_torque);
     mu_add_test(test_qsim_calculate_acceleration);
     // mu_add_test(test_qsim_convert_angular_velocity_to_body_frame);
     // mu_add_test(test_qsim_convert_angular_velocity_to_inertial_frame);
-    // mu_add_test(test_qsim_calculate_angular_acceleration);
-    // mu_add_test(test_loop);
+    mu_add_test(test_qsim_calculate_angular_acceleration);
+    mu_add_test(test_loop);
 }
 
 mu_run_tests(test_suite)
