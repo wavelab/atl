@@ -2,7 +2,20 @@
 #include "awesomo/sim.hpp"
 
 
-static int test_qsim_rotation_matrix(void)
+/* TESTS */
+int test_qsim_rotation_matrix(void);
+int test_qsim_inertia_matrix(void);
+int test_qsim_calculate_thrust(void);
+int test_qsim_calculate_drag(void);
+int test_qsim_calculate_torque(void);
+int test_qsim_calculate_acceleration(void);
+int test_qsim_convert_angular_velocity_to_body_frame(void);
+int test_qsim_convert_angular_velocity_to_inertial_frame(void);
+int test_qsim_calculate_angular_acceleration(void);
+int test_loop(void);
+
+
+int test_qsim_rotation_matrix(void)
 {
     struct qsim q;
     Eigen::Matrix3d m;
@@ -27,7 +40,7 @@ static int test_qsim_rotation_matrix(void)
     return 0;
 }
 
-static int test_qsim_inertia_matrix(void)
+int test_qsim_inertia_matrix(void)
 {
     struct qsim q;
 
@@ -48,7 +61,7 @@ static int test_qsim_inertia_matrix(void)
     return 0;
 }
 
-static int test_qsim_calculate_thrust(void)
+int test_qsim_calculate_thrust(void)
 {
     struct qsim q;
 
@@ -65,7 +78,7 @@ static int test_qsim_calculate_thrust(void)
     return 0;
 }
 
-static int test_qsim_calculate_drag(void)
+int test_qsim_calculate_drag(void)
 {
     struct qsim q;
 
@@ -82,7 +95,7 @@ static int test_qsim_calculate_drag(void)
     return 0;
 }
 
-static int test_qsim_calculate_torque(void)
+int test_qsim_calculate_torque(void)
 {
     struct qsim q;
 
@@ -101,7 +114,7 @@ static int test_qsim_calculate_torque(void)
     return 0;
 }
 
-static int test_qsim_calculate_acceleration(void)
+int test_qsim_calculate_acceleration(void)
 {
     struct qsim q;
     struct world w;
@@ -125,7 +138,7 @@ static int test_qsim_calculate_acceleration(void)
     return 0;
 }
 
-static int test_qsim_convert_angular_velocity_to_body_frame(void)
+int test_qsim_convert_angular_velocity_to_body_frame(void)
 {
     struct qsim q;
 
@@ -147,7 +160,7 @@ static int test_qsim_convert_angular_velocity_to_body_frame(void)
     return 0;
 }
 
-static int test_qsim_convert_angular_velocity_to_inertial_frame(void)
+int test_qsim_convert_angular_velocity_to_inertial_frame(void)
 {
     struct qsim q;
 
@@ -169,7 +182,7 @@ static int test_qsim_convert_angular_velocity_to_inertial_frame(void)
     return 0;
 }
 
-static int test_qsim_calculate_angular_acceleration(void)
+int test_qsim_calculate_angular_acceleration(void)
 {
     struct qsim q;
 
@@ -190,7 +203,7 @@ static int test_qsim_calculate_angular_acceleration(void)
     return 0;
 }
 
-static int test_loop(void)
+int test_loop(void)
 {
     loop();
     return 0;
