@@ -3,9 +3,6 @@
 
 Quadrotor::Quadrotor(void)
 {
-    // publish rate
-    ros::Rate rate(20.0);
-
     // wait till connected to FCU
     this->waitForConnection();
 
@@ -15,6 +12,7 @@ Quadrotor::Quadrotor(void)
     // initialize clients to services
     this->set_mode_client = this->node_handle.serviceClient<mavros_msgs::SetMode>(SET_MODE_SERVICE);
     this->arming_client = this->node_handle.serviceClient<mavros_msgs::CommandBool>(ARM_SERVICE);
+    // this->motor_client = this->node_handle.serviceClient<mavros_msgs::RCIn>(RC_SERVICE);
 }
 
 void Quadrotor::imuCallback(const sensor_msgs::Imu::ConstPtr &msg)
@@ -94,19 +92,102 @@ int Quadrotor::disarm(void)
     return 0;
 }
 
+
+mavros_msgs::State current_state;
+void state_cb(const mavros_msgs::State::ConstPtr& msg)
+{
+    current_state = *msg;
+}
+
 int main(int argc, char **argv)
 {
     // setup
     ros::init(argc, argv, "awesomo");
+    // ros::Rate rate(20.0);  // publish rate
+	ros::NodeHandle nh;
 
     // run quadcopter
-    Quadrotor quad;
-    quad.arm();
-    sleep(2);
-    quad.disarm();
+    // Quadrotor quad;
+    // quad.arm();
+    // sleep(2);
+    // quad.disarm();
 
     // loop
     // ros::spin();
+	ROS_INFO("running...");
+
+	ros::Subscriber state_sub = nh.subscribe<mavros_msgs::State>("/mavros/state", 100, state_cb);
+	ros::Publisher local_pos_pub = nh.advertise<geometry_msgs::PoseStamped>("/mavros/setpoint_attitude/attitude", 100);
+	ros::Publisher throttle_pub = nh.advertise<std_msgs::Float64>("/mavros/setpoint_attitude/att_throttle", 100);
+	ros::ServiceClient arming_client = nh.serviceClient<mavros_msgs::CommandBool>("/mavros/cmd/arming");
+	ros::ServiceClient set_mode_client = nh.serviceClient<mavros_msgs::SetMode>("/mavros/set_mode");
+
+    // the setpoint publishing rate MUST be faster than 2Hz
+    ros::Rate rate(100.0);
+
+    // wait for FCU connection
+	ROS_INFO("waiting for FCU connection...");
+    while (ros::ok() && current_state.connected){
+        ros::spinOnce();
+        rate.sleep();
+    }
+
+    geometry_msgs::PoseStamped pose;
+    pose.pose.position.x = 0;
+    pose.pose.position.y = 0;
+    pose.pose.position.z = 0;
+    pose.pose.orientation.x = 0;
+    pose.pose.orientation.y = 0;
+    pose.pose.orientation.z = 0;
+    pose.pose.orientation.w = 0;
+
+	std_msgs::Float64 cmd_thr;
+	cmd_thr.data = 0.2;
+
+	// ROS_INFO("sending setpoints ...");
+    //send a few setpoints before starting
+    // for(int i = 100; ros::ok() && i > 0; --i){
+    //     local_pos_pub.publish(pose);
+    //     ros::spinOnce();
+    //     rate.sleep();
+    // }
+
+    mavros_msgs::SetMode offb_set_mode;
+    offb_set_mode.request.custom_mode = "OFFBOARD";
+
+    mavros_msgs::CommandBool arm_cmd;
+    arm_cmd.request.value = true;
+
+    ros::Time last_request = ros::Time::now();
+
+	ROS_INFO("looping ...");
+    while(ros::ok()){
+        if (current_state.mode != "OFFBOARD" &&
+            (ros::Time::now() - last_request > ros::Duration(5.0))){
+            if( set_mode_client.call(offb_set_mode) &&
+                offb_set_mode.response.success){
+                ROS_INFO("Offboard enabled");
+            }
+            last_request = ros::Time::now();
+        } else {
+            if( !current_state.armed &&
+                (ros::Time::now() - last_request > ros::Duration(5.0))){
+                if( arming_client.call(arm_cmd) &&
+                    arm_cmd.response.success){
+                    ROS_INFO("Vehicle armed");
+                }
+                last_request = ros::Time::now();
+            }
+        }
+
+		ROS_INFO("publishing pose and throttle");
+
+        local_pos_pub.publish(pose);
+        throttle_pub.publish(cmd_thr);
+
+        ros::spinOnce();
+        rate.sleep();
+    }
 
     return 0;
 }

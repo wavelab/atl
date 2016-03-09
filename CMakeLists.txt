@@ -48,6 +48,17 @@ ADD_LIBRARY(
 )
 
 # EXECUTABLES
+# camera
+ADD_EXECUTABLE(camera_node src/ros/camera_node.cpp)
+TARGET_LINK_LIBRARIES(
+    camera_node
+    ${catkin_LIBRARIES}
+)
+INSTALL(
+    TARGETS camera_node
+    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
 # quadrotor
 ADD_EXECUTABLE(quadrotor src/quadrotor.cpp)
 TARGET_LINK_LIBRARIES(quadrotor ${catkin_LIBRARIES})
