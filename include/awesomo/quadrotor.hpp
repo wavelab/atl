@@ -44,10 +44,10 @@ class Quadrotor
         void waitForConnection(void);
 
     public:
-        float roll;
-        float pitch;
-        float yaw;
-        float omega;
+        double roll;
+        double pitch;
+        double yaw;
+        double omega;
 
         Quadrotor(void);
         int arm(void);

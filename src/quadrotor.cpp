@@ -6,6 +6,11 @@ static inline double deg2rad(double d)
     return d * (M_PI / 180);
 }
 
+static inline double rad2deg(double d)
+{
+    return d * (180 / M_PI);
+}
+
 Quadrotor::Quadrotor(void)
 {
     // wait till connected to FCU
@@ -22,18 +27,26 @@ Quadrotor::Quadrotor(void)
 
 void Quadrotor::imuCallback(const sensor_msgs::Imu::ConstPtr &msg)
 {
+    double x;
+    double y;
+    double z;
+    double w;
+
     // TODO MUST CHECK XYZ
-    this->roll = msg->orientation.x;
-    this->pitch = msg->orientation.y;
-    this->yaw = msg->orientation.z;
-    this->omega = msg->orientation.w;
+    x = msg->orientation.x;
+    y = msg->orientation.y;
+    z = msg->orientation.z;
+    w = msg->orientation.w;
+
+    tf::Quaternion q(x, y, z, w);
+    tf::Matrix3x3 m(q);
+    m.getRPY(this->roll, this->pitch, this->yaw);
 
     ROS_INFO(
-        "GOT: [%f, %f, %f, %f]",
-        this->roll,
-        this->pitch,
-        this->yaw,
-        this->omega
+        "GOT: [%f, %f, %f]",
+        rad2deg(this->roll),
+        rad2deg(this->pitch),
+        rad2deg(this->yaw)
     );
 }
 
@@ -112,7 +125,7 @@ int main(int argc, char **argv)
 	ros::NodeHandle nh;
 
     // run quadcopter
-    // Quadrotor quad;
+    Quadrotor quad;
 	ROS_INFO("running...");
 
 	ros::Subscriber state_sub = nh.subscribe<mavros_msgs::State>("/mavros/state", 10, state_cb);
@@ -136,41 +149,26 @@ int main(int argc, char **argv)
     // double roll, pitch, yaw;
     // m.getRPY(roll, pitch, yaw);
 
-    tf::Quaternion quat = tf::createQuaternionFromRPY(
-        deg2rad(0),
-        deg2rad(0),
-        deg2rad(0)
-    );
-
-    geometry_msgs::PoseStamped pose;
-    pose.pose.position.x = 10;
-    pose.pose.position.y = 0;
-    pose.pose.position.z = 200;
-    // send a few setpoints before starting
-    pose.pose.orientation.x = quat.x();
-    pose.pose.orientation.y = quat.y();
-    pose.pose.orientation.z = quat.z();
-    pose.pose.orientation.w = quat.w();
 
     // std::cout << quat.x() << quat.y() << quat.z() << quat.w() << std::endl;
 
 	std_msgs::Float64 cmd_thr;
-	cmd_thr.data = 0.6;
+	cmd_thr.data = 0.4;
 
-	ROS_INFO("sending setpoints ...");
-    // send a few setpoints before starting
-    for(int i = 100; ros::ok() && i > 0; --i){
-        local_pos_pub.publish(pose);
-        ros::spinOnce();
-        rate.sleep();
-    }
+	// ROS_INFO("sending setpoints ...");
+    // // send a few setpoints before starting
+    // for(int i = 100; ros::ok() && i > 0; --i){
+    //     local_pos_pub.publish(pose);
+    //     ros::spinOnce();
+    //     rate.sleep();
+    // }
 
-    mavros_msgs::SetMode offb_set_mode;
-    offb_set_mode.request.custom_mode = "OFFBOARD";
-    if (set_mode_client.call(offb_set_mode) &&
-        offb_set_mode.response.success){
-        ROS_INFO("Offboard enabled");
-    }
+    // mavros_msgs::SetMode offb_set_mode;
+    // offb_set_mode.request.custom_mode = "OFFBOARD";
+    // if (set_mode_client.call(offb_set_mode) &&
+    //     offb_set_mode.response.success){
+    //     ROS_INFO("Offboard enabled");
+    // }
 
     // mavros_msgs::CommandBool arm_cmd;
     // arm_cmd.request.value = true;
@@ -195,9 +193,26 @@ int main(int argc, char **argv)
     // //     }
     // // }
 
+    geometry_msgs::PoseStamped pose;
+    pose.pose.position.x = 0;
+    pose.pose.position.y = 0;
+    pose.pose.position.z = 0;
+
 	ROS_INFO("looping ...");
     while(ros::ok()){
 		ROS_INFO("publishing pose and throttle");
+
+	    tf::Quaternion quat = tf::createQuaternionFromRPY(
+            deg2rad(10),
+            quad.pitch,
+            quad.yaw
+	    );
+
+	    // send a few setpoints before starting
+	    pose.pose.orientation.x = quat.x();
+	    pose.pose.orientation.y = quat.y();
+	    pose.pose.orientation.z = quat.z();
+	    pose.pose.orientation.w = quat.w();
 
         local_pos_pub.publish(pose);
         throttle_pub.publish(cmd_thr);
