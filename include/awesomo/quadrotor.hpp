@@ -2,9 +2,12 @@
 #define __QUADROTOR_HPP__
 
 #include <iostream>
+#include <cmath>
+
 #include <unistd.h>
 
 #include <ros/ros.h>
+#include <tf/transform_datatypes.h>
 
 #include <std_msgs/Float64.h>
 #include <sensor_msgs/Imu.h>
@@ -17,12 +20,11 @@
 #include <mavros_msgs/CommandBool.h>
 
 
+// CONSTANTS
 #define IMU_DATA "/mavros/imu/data"
-
 #define RC_SERVICE "/mavros/rc/override"
 #define ARM_SERVICE "/mavros/cmd/arming"
 #define SET_MODE_SERVICE "/mavros/set_mode"
-
 
 
 class Quadrotor
