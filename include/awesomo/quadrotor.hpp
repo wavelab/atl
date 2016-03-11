@@ -21,22 +21,22 @@
 
 
 // CONSTANTS
-#define IMU_DATA "/mavros/imu/data"
-#define RC_SERVICE "/mavros/rc/override"
-#define ARM_SERVICE "/mavros/cmd/arming"
-#define SET_MODE_SERVICE "/mavros/set_mode"
+#define IMU_TOPIC "/mavros/imu/data"
+#define ARM_TOPIC "/mavros/cmd/arming"
+#define MODE_TOPIC "/mavros/set_mode"
+#define POSE_TOPIC "/mavros/setpoint_attitude/attitude"
+#define THROTTLE_TOPIC "/mavros/setpoint_attitude/att_throttle"
 
 
 class Quadrotor
 {
     private:
         mavros_msgs::State state;
-        ros::NodeHandle node_handle;
+        ros::NodeHandle node;
         ros::Subscriber imu_orientation_sub;
 
-        ros::ServiceClient set_mode_client;
+        ros::ServiceClient mode_client;
         ros::ServiceClient arming_client;
-        ros::ServiceClient motor_client;
 
         void imuCallback(const sensor_msgs::Imu::ConstPtr &msg);
         void subscribeToIMU(void);
@@ -47,11 +47,14 @@ class Quadrotor
         double roll;
         double pitch;
         double yaw;
-        double omega;
+
+        ros::Publisher throttle_publisher;
+        ros::Publisher pose_publisher;
 
         Quadrotor(void);
         int arm(void);
         int disarm(void);
+        int setOffboardModeOn(void);
 };
 
 #endif
