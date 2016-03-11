@@ -15,5 +15,7 @@
 		<arg name="tgt_system" value="$(arg tgt_system)" />
 		<arg name="tgt_component" value="$(arg tgt_component)" />
 		<arg name="log_output" value="$(arg log_output)" />
+
+        <param name="mocap/use_pose" value="true"/>
 	</include>
 </launch>
