@@ -45,6 +45,7 @@ ADD_LIBRARY(
     STATIC
     src/sim.cpp
     src/pid.cpp
+    src/util.cpp
 )
 
 # EXECUTABLES
@@ -61,7 +62,7 @@ INSTALL(
 
 # quadrotor
 ADD_EXECUTABLE(quadrotor src/quadrotor.cpp)
-TARGET_LINK_LIBRARIES(quadrotor ${catkin_LIBRARIES})
+TARGET_LINK_LIBRARIES(quadrotor ${catkin_LIBRARIES} awesomo)
 INSTALL(
     TARGETS quadrotor
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -90,3 +91,8 @@ INSTALL(TARGETS sim_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 ADD_EXECUTABLE(pid_test tests/pid_test.cpp)
 TARGET_LINK_LIBRARIES(pid_test awesomo)
 INSTALL(TARGETS pid_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+# util_test
+ADD_EXECUTABLE(util_test tests/util_test.cpp)
+TARGET_LINK_LIBRARIES(util_test awesomo)
+INSTALL(TARGETS util_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})

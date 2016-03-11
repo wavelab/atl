@@ -1,11 +1,6 @@
 #include "awesomo/sim.hpp"
 
 
-double deg2rad(double degrees)
-{
-    return degrees * MATH_PI / 180.0;
-}
-
 void qsim_setup(struct qsim *q)
 {
     // parameters

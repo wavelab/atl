@@ -5,6 +5,8 @@
 
 #include <Eigen/Dense>
 
+#include "awesomo/util.hpp"
+
 
 // CONSTANTS
 #define MATH_PI 3.14159265358979323846

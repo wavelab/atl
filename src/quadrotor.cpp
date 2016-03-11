@@ -1,23 +1,14 @@
 #include "awesomo/quadrotor.hpp"
 
 
-static inline double deg2rad(double d)
-{
-    return d * (M_PI / 180);
-}
-
-static inline double rad2deg(double d)
-{
-    return d * (180 / M_PI);
-}
-
 Quadrotor::Quadrotor(void)
 {
     // wait till connected to FCU
     this->waitForConnection();
 
     // subscribe to topics
-    this->subscribeToIMU();
+    this->subscribeToMocap();
+    // this->subscribeToIMU();
 
     // initialize clients to services
     this->mode_client = this->node.serviceClient<mavros_msgs::SetMode>(MODE_TOPIC);
@@ -28,34 +19,52 @@ Quadrotor::Quadrotor(void)
     this->throttle_publisher = this->node.advertise<std_msgs::Float64>(THROTTLE_TOPIC, 10);
 }
 
+void Quadrotor::mocapCallback(const geometry_msgs::PoseStamped &msg)
+{
+    // mocap position
+    this->mocap_x = msg.pose.position.x;
+    this->mocap_y = msg.pose.position.y;
+    this->mocap_z = msg.pose.position.z;
+
+    // mocap orientation
+    quat2euler(msg.pose.orientation, &this->mocap_roll, &this->mocap_pitch, &this->mocap_yaw);
+
+    // print
+    ROS_INFO(
+        "GOT MOCAP: [%f, %f, %f]",
+        rad2deg(this->mocap_roll),
+        rad2deg(this->mocap_pitch),
+        rad2deg(this->mocap_yaw)
+    );
+}
+
 void Quadrotor::imuCallback(const sensor_msgs::Imu::ConstPtr &msg)
 {
-    double x;
-    double y;
-    double z;
-    double w;
-
-    x = msg->orientation.x;
-    y = msg->orientation.y;
-    z = msg->orientation.z;
-    w = msg->orientation.w;
-
-    tf::Quaternion q(x, y, z, w);
-    tf::Matrix3x3 m(q);
-    m.getRPY(this->roll, this->pitch, this->yaw);
+    quat2euler(msg->orientation, &this->roll, &this->pitch, &this->yaw);
 
     ROS_INFO(
-        "GOT: [%f, %f, %f]",
+        "GOT MOCAP: [%f, %f, %f]",
         rad2deg(this->roll),
         rad2deg(this->pitch),
         rad2deg(this->yaw)
     );
 }
 
+void Quadrotor::subscribeToMocap(void)
+{
+    ROS_INFO("subcribing to [MOCAP]");
+    this->mocap_subscriber = this->node.subscribe(
+        MOCAP_TOPIC,
+        100,
+        &Quadrotor::mocapCallback,
+        this
+    );
+}
+
 void Quadrotor::subscribeToIMU(void)
 {
     ROS_INFO("subcribing to [IMU_DATA]");
-    this->imu_orientation_sub = this->node.subscribe(
+    this->imu_subscriber = this->node.subscribe(
         IMU_TOPIC,
         1000,
         &Quadrotor::imuCallback,
@@ -149,11 +158,7 @@ int main(int argc, char **argv)
 	ROS_INFO("running ...");
     while (ros::ok()){
         // create quaternion from roll pitch yaw
-	    tf::Quaternion quat = tf::createQuaternionFromRPY(
-            deg2rad(10),
-            quad.pitch,
-            quad.yaw
-	    );
+	    tf::Quaternion quat = euler2quat(deg2rad(10), quad.pitch, quad.yaw);
 
 	    // sending orientation in quaternions
 	    pose.pose.orientation.x = quat.x();
