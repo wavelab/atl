@@ -4,7 +4,6 @@
 *.log
 *.bcf
 *.out
-*.xml
 *.synctex.gz
 
 *~
