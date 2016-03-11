@@ -1,0 +1,10 @@
+#
+# Definition of all trackable objects
+# Identifier corresponds to Trackable ID set in Tracking Tools
+#
+rigid_bodies:
+    '1':
+        pose: awesomo/mocap/pose
+        pose2d: awesomo/mocap/ground_pose
+        child_frame_id: Robot_1/base_link
+        parent_frame_id: world
