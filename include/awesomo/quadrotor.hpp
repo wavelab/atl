@@ -27,7 +27,9 @@
 #define ARM_TOPIC "/mavros/cmd/arming"
 #define MOCAP_TOPIC "/awesomo/mocap/pose"
 #define MODE_TOPIC "/mavros/set_mode"
-#define POSE_TOPIC "/mavros/setpoint_attitude/attitude"
+#define POSE_TOPIC "/mavros/local_position/pose"
+#define POSITION_TOPIC "/mavros/setpoint_position/local"
+#define ATTITUDE_TOPIC "/mavros/setpoint_attitude/attitude"
 #define THROTTLE_TOPIC "/mavros/setpoint_attitude/att_throttle"
 
 
@@ -38,15 +40,19 @@ class Quadrotor
     private:
         mavros_msgs::State state;
         ros::NodeHandle node;
+
         ros::Subscriber mocap_subscriber;
+        ros::Subscriber pose_subscriber;
         ros::Subscriber imu_subscriber;
 
         ros::ServiceClient mode_client;
         ros::ServiceClient arming_client;
 
+        void poseCallback(const geometry_msgs::PoseStamped &msg);
+        void subscribeToPose(void);
         void mocapCallback(const geometry_msgs::PoseStamped &msg);
-        void imuCallback(const sensor_msgs::Imu::ConstPtr &msg);
         void subscribeToMocap(void);
+        void imuCallback(const sensor_msgs::Imu::ConstPtr &msg);
         void subscribeToIMU(void);
         void stateCallback(const mavros_msgs::State::ConstPtr &msg);
         void waitForConnection(void);
@@ -56,6 +62,14 @@ class Quadrotor
         double pitch;
         double yaw;
 
+        double pose_x;
+        double pose_y;
+        double pose_z;
+
+        double pose_roll;
+        double pose_pitch;
+        double pose_yaw;
+
         double mocap_x;
         double mocap_y;
         double mocap_z;
@@ -64,8 +78,9 @@ class Quadrotor
         double mocap_pitch;
         double mocap_yaw;
 
+        ros::Publisher position_publisher;
+        ros::Publisher attitude_publisher;
         ros::Publisher throttle_publisher;
-        ros::Publisher pose_publisher;
 
         Quadrotor(void);
         int arm(void);

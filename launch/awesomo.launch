@@ -1,0 +1,4 @@
+<launch>
+	<include file="$(find awesomo)/launch/px4.launch" />
+	<include file="$(find mocap_optitrack)/launch/mocap_awesomo.launch" />
+</launch>

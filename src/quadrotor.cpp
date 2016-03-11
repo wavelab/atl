@@ -1,13 +1,25 @@
 #include "awesomo/quadrotor.hpp"
 
 
+static int fltcmp(double f1, double f2)
+{
+	if (fabs(f1 - f2) <= 0.0001) {
+		return 0;
+	} else if (f1 > f2) {
+		return 1;
+	} else {
+		return -1;
+	}
+}
+
 Quadrotor::Quadrotor(void)
 {
     // wait till connected to FCU
     this->waitForConnection();
 
     // subscribe to topics
-    this->subscribeToMocap();
+    this->subscribeToPose();
+    // this->subscribeToMocap();
     // this->subscribeToIMU();
 
     // initialize clients to services
@@ -15,8 +27,42 @@ Quadrotor::Quadrotor(void)
     this->arming_client = this->node.serviceClient<mavros_msgs::CommandBool>(ARM_TOPIC);
 
     // initialize publishers
-    this->pose_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSE_TOPIC, 10);
+    this->position_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_TOPIC, 10);
+    this->attitude_publisher = this->node.advertise<geometry_msgs::PoseStamped>(ATTITUDE_TOPIC, 10);
     this->throttle_publisher = this->node.advertise<std_msgs::Float64>(THROTTLE_TOPIC, 10);
+}
+
+void Quadrotor::poseCallback(const geometry_msgs::PoseStamped &msg)
+{
+    //  mocapposition
+    this->pose_x = msg.pose.position.x;
+    this->pose_y = msg.pose.position.y;
+    this->pose_z = msg.pose.position.z;
+
+    //  mocaporientation
+    quat2euler(msg.pose.orientation, &this->pose_roll, &this->pose_pitch, &this->pose_yaw);
+
+    // print
+    ROS_INFO(
+        "GOT POSE: [roll: %f, pitch: %f, yaw: %f, x: %f, y: %f, z: %f]",
+        rad2deg(this->pose_roll),
+        rad2deg(this->pose_pitch),
+        rad2deg(this->pose_yaw),
+        pose_x,
+        pose_y,
+        pose_z
+    );
+}
+
+void Quadrotor::subscribeToPose(void)
+{
+    ROS_INFO("subcribing to [POSE]");
+    this->pose_subscriber = this->node.subscribe(
+        POSE_TOPIC,
+        100,
+        &Quadrotor::poseCallback,
+        this
+    );
 }
 
 void Quadrotor::mocapCallback(const geometry_msgs::PoseStamped &msg)
@@ -38,6 +84,17 @@ void Quadrotor::mocapCallback(const geometry_msgs::PoseStamped &msg)
     );
 }
 
+void Quadrotor::subscribeToMocap(void)
+{
+    ROS_INFO("subcribing to [MOCAP]");
+    this->mocap_subscriber = this->node.subscribe(
+        MOCAP_TOPIC,
+        100,
+        &Quadrotor::mocapCallback,
+        this
+    );
+}
+
 void Quadrotor::imuCallback(const sensor_msgs::Imu::ConstPtr &msg)
 {
     quat2euler(msg->orientation, &this->roll, &this->pitch, &this->yaw);
@@ -47,17 +104,6 @@ void Quadrotor::imuCallback(const sensor_msgs::Imu::ConstPtr &msg)
         rad2deg(this->roll),
         rad2deg(this->pitch),
         rad2deg(this->yaw)
-    );
-}
-
-void Quadrotor::subscribeToMocap(void)
-{
-    ROS_INFO("subcribing to [MOCAP]");
-    this->mocap_subscriber = this->node.subscribe(
-        MOCAP_TOPIC,
-        100,
-        &Quadrotor::mocapCallback,
-        this
     );
 }
 
@@ -142,36 +188,48 @@ int main(int argc, char **argv)
 {
     // setup
     ros::init(argc, argv, "awesomo");
-	ros::NodeHandle nh;
+    ros::NodeHandle nh;
+    ros::Time last_request;
 
     ros::Rate rate(10.0);  // publishing rate MUST be faster than 2Hz
     Quadrotor quad;
+	geometry_msgs::PoseStamped pose;
 
-	std_msgs::Float64 cmd_thr;
-	cmd_thr.data = 0.4;
-
-    geometry_msgs::PoseStamped pose;
     pose.pose.position.x = 0;
     pose.pose.position.y = 0;
-    pose.pose.position.z = 0;
+    pose.pose.position.z = 1;
 
-	ROS_INFO("running ...");
-    while (ros::ok()){
-        // create quaternion from roll pitch yaw
-	    tf::Quaternion quat = euler2quat(deg2rad(10), quad.pitch, quad.yaw);
-
-	    // sending orientation in quaternions
-	    pose.pose.orientation.x = quat.x();
-	    pose.pose.orientation.y = quat.y();
-	    pose.pose.orientation.z = quat.z();
-	    pose.pose.orientation.w = quat.w();
-
-        // publish pose and throttle
-        quad.pose_publisher.publish(pose);
-        quad.throttle_publisher.publish(cmd_thr);
-
+    // send a few setpoints before starting
+    for(int i = 100; ros::ok() && i > 0; --i){
+        quad.position_publisher.publish(pose);
         ros::spinOnce();
         rate.sleep();
+    }
+
+	// quad.setOffboardModeOn();
+
+    ROS_INFO("running ...");
+	last_request = ros::Time::now();
+
+    while (ros::ok()){
+		pose.pose.position.x = 0;
+		pose.pose.position.y = 0;
+
+		// alternative between 1 and 1.5 for altitude
+		if (ros::Time::now() - last_request > ros::Duration(5.0)) {
+			if (fltcmp(pose.pose.position.z, 1) == 0) {
+				pose.pose.position.z = 1.5;
+			} else {
+				pose.pose.position.z = 1.0;
+			}
+			last_request = ros::Time::now();
+		}
+
+		// publish
+		quad.position_publisher.publish(pose);
+
+		ros::spinOnce();
+		rate.sleep();
     }
 
     return 0;
