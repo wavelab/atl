@@ -27,9 +27,9 @@ Quadrotor::Quadrotor(void)
     this->arming_client = this->node.serviceClient<mavros_msgs::CommandBool>(ARM_TOPIC);
 
     // initialize publishers
-    this->position_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_TOPIC, 10);
-    this->attitude_publisher = this->node.advertise<geometry_msgs::PoseStamped>(ATTITUDE_TOPIC, 10);
-    this->throttle_publisher = this->node.advertise<std_msgs::Float64>(THROTTLE_TOPIC, 10);
+    this->position_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_TOPIC, 50);
+    // this->attitude_publisher = this->node.advertise<geometry_msgs::PoseStamped>(ATTITUDE_TOPIC, 50);
+    // this->throttle_publisher = this->node.advertise<std_msgs::Float64>(THROTTLE_TOPIC, 50);
 }
 
 void Quadrotor::poseCallback(const geometry_msgs::PoseStamped &msg)
@@ -59,7 +59,7 @@ void Quadrotor::subscribeToPose(void)
     ROS_INFO("subcribing to [POSE]");
     this->pose_subscriber = this->node.subscribe(
         POSE_TOPIC,
-        100,
+        50,
         &Quadrotor::poseCallback,
         this
     );
@@ -89,7 +89,7 @@ void Quadrotor::subscribeToMocap(void)
     ROS_INFO("subcribing to [MOCAP]");
     this->mocap_subscriber = this->node.subscribe(
         MOCAP_TOPIC,
-        100,
+        50,
         &Quadrotor::mocapCallback,
         this
     );
@@ -112,7 +112,7 @@ void Quadrotor::subscribeToIMU(void)
     ROS_INFO("subcribing to [IMU_DATA]");
     this->imu_subscriber = this->node.subscribe(
         IMU_TOPIC,
-        1000,
+        50,
         &Quadrotor::imuCallback,
         this
     );
@@ -191,33 +191,25 @@ int main(int argc, char **argv)
     ros::NodeHandle nh;
     ros::Time last_request;
 
-    ros::Rate rate(10.0);  // publishing rate MUST be faster than 2Hz
+    ros::Rate rate(50.0);  // publishing rate MUST be faster than 2Hz
     Quadrotor quad;
 	geometry_msgs::PoseStamped pose;
 
-    pose.pose.position.x = 0;
-    pose.pose.position.y = 0;
-    pose.pose.position.z = 1;
-
-    // send a few setpoints before starting
-    for(int i = 100; ros::ok() && i > 0; --i){
-        quad.position_publisher.publish(pose);
-        ros::spinOnce();
-        rate.sleep();
-    }
-
-	// quad.setOffboardModeOn();
-
     ROS_INFO("running ...");
 	last_request = ros::Time::now();
+	int count = 1;
 
     while (ros::ok()){
+        pose.header.stamp = ros::Time::now();
+        pose.header.seq = count;
+        pose.header.frame_id = 1;
 		pose.pose.position.x = 0;
 		pose.pose.position.y = 0;
+		count++;
 
 		// alternative between 1 and 1.5 for altitude
-		if (ros::Time::now() - last_request > ros::Duration(5.0)) {
-			if (fltcmp(pose.pose.position.z, 1) == 0) {
+		if (ros::Time::now() - last_request > ros::Duration(10.0)) {
+			if (fltcmp(pose.pose.position.z, 1.0) == 0) {
 				pose.pose.position.z = 1.5;
 			} else {
 				pose.pose.position.z = 1.0;
