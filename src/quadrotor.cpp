@@ -18,7 +18,7 @@ Quadrotor::Quadrotor(void)
     this->waitForConnection();
 
     // subscribe to topics
-    this->subscribeToPose();
+    // this->subscribeToPose();
     // this->subscribeToMocap();
     // this->subscribeToIMU();
 
@@ -100,7 +100,7 @@ void Quadrotor::imuCallback(const sensor_msgs::Imu::ConstPtr &msg)
     quat2euler(msg->orientation, &this->roll, &this->pitch, &this->yaw);
 
     ROS_INFO(
-        "GOT MOCAP: [%f, %f, %f]",
+        "GOT IMU: [%f, %f, %f]",
         rad2deg(this->roll),
         rad2deg(this->pitch),
         rad2deg(this->yaw)
@@ -210,8 +210,10 @@ int main(int argc, char **argv)
 		// alternative between 1 and 1.5 for altitude
 		if (ros::Time::now() - last_request > ros::Duration(10.0)) {
 			if (fltcmp(pose.pose.position.z, 1.0) == 0) {
-				pose.pose.position.z = 1.5;
+			    ROS_INFO("ALTITUDE SET @ 1.2");
+				pose.pose.position.z = 1.2;
 			} else {
+			    ROS_INFO("ALTITUDE SET @ 1.0");
 				pose.pose.position.z = 1.0;
 			}
 			last_request = ros::Time::now();
