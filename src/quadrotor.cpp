@@ -235,18 +235,6 @@ int main(int argc, char **argv)
 			last_request = ros::Time::now();
 		}
 
-		// alternative between 1 and 1.5 for altitude
-		// if (ros::Time::now() - last_request > ros::Duration(10.0)) {
-		// 	if (fltcmp(pose.pose.position.z, 1.0) == 0) {
-		// 	    ROS_INFO("ALTITUDE SET @ 1.2");
-		// 		pose.pose.position.z = 1.2;
-		// 	} else {
-		// 	    ROS_INFO("ALTITUDE SET @ 1.0");
-		// 		pose.pose.position.z = 1.0;
-		// 	}
-		// 	last_request = ros::Time::now();
-		// }
-
 		// publish
 		quad.position_publisher.publish(pose);
 
