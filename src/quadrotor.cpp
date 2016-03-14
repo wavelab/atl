@@ -196,28 +196,56 @@ int main(int argc, char **argv)
 	geometry_msgs::PoseStamped pose;
 
     ROS_INFO("running ...");
+    // quad.arm();
+    // quad.setOffboardModeOn();
 	last_request = ros::Time::now();
 	int count = 1;
+	int index = 0;
 
     while (ros::ok()){
         pose.header.stamp = ros::Time::now();
         pose.header.seq = count;
         pose.header.frame_id = 1;
-		pose.pose.position.x = 0;
-		pose.pose.position.y = 0;
+		pose.pose.position.z = 1.0;
 		count++;
 
-		// alternative between 1 and 1.5 for altitude
 		if (ros::Time::now() - last_request > ros::Duration(10.0)) {
-			if (fltcmp(pose.pose.position.z, 1.0) == 0) {
-			    ROS_INFO("ALTITUDE SET @ 1.2");
-				pose.pose.position.z = 1.2;
-			} else {
-			    ROS_INFO("ALTITUDE SET @ 1.0");
-				pose.pose.position.z = 1.0;
-			}
+            if (index == 0) {
+                pose.pose.position.x = 0.5;
+                pose.pose.position.y = 0.5;
+                index++;
+                ROS_INFO("x: 0.5\ty: 0.5");
+            } else if (index == 1) {
+                pose.pose.position.x = 0.5;
+                pose.pose.position.y = -0.5;
+                ROS_INFO("x: 0.5\ty: -0.5");
+                index++;
+            } else if (index == 2) {
+                pose.pose.position.x = -0.5;
+                pose.pose.position.y = -0.5;
+                ROS_INFO("x: -0.5\ty: -0.5");
+                index++;
+            } else if (index == 3) {
+                pose.pose.position.x = -0.5;
+                pose.pose.position.y = 0.5;
+                ROS_INFO("x: -0.5\ty: 0.5");
+                index = 0;
+            }
+
 			last_request = ros::Time::now();
 		}
+
+		// alternative between 1 and 1.5 for altitude
+		// if (ros::Time::now() - last_request > ros::Duration(10.0)) {
+		// 	if (fltcmp(pose.pose.position.z, 1.0) == 0) {
+		// 	    ROS_INFO("ALTITUDE SET @ 1.2");
+		// 		pose.pose.position.z = 1.2;
+		// 	} else {
+		// 	    ROS_INFO("ALTITUDE SET @ 1.0");
+		// 		pose.pose.position.z = 1.0;
+		// 	}
+		// 	last_request = ros::Time::now();
+		// }
 
 		// publish
 		quad.position_publisher.publish(pose);
