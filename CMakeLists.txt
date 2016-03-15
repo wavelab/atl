@@ -46,13 +46,19 @@ ADD_LIBRARY(
     src/sim.cpp
     src/pid.cpp
     src/util.cpp
+    src/camera.cpp
 )
 
-# EXECUTABLES
-# camera
+
+## ROS NODE EXECUTABLES
+# camera_node
 ADD_EXECUTABLE(camera_node src/ros/camera_node.cpp)
 TARGET_LINK_LIBRARIES(
     camera_node
+    awesomo
+    apriltags
+    yaml-cpp
+    ${OpenCV_LIBS}
     ${catkin_LIBRARIES}
 )
 INSTALL(
@@ -60,27 +66,27 @@ INSTALL(
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-# quadrotor
-ADD_EXECUTABLE(quadrotor src/quadrotor.cpp)
-TARGET_LINK_LIBRARIES(quadrotor ${catkin_LIBRARIES} awesomo)
+# quadrotor_node
+ADD_EXECUTABLE(quadrotor_node src/ros/quadrotor_node.cpp)
+TARGET_LINK_LIBRARIES(quadrotor_node ${catkin_LIBRARIES} awesomo)
 INSTALL(
-    TARGETS quadrotor
+    TARGETS quadrotor_node
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-# camera
-ADD_EXECUTABLE(camera src/camera.cpp)
+
+## UNIT TESTS
+# camera_test
+ADD_EXECUTABLE(camera_test tests/camera_test.cpp)
 TARGET_LINK_LIBRARIES(
-    camera
-    ${catkin_LIBRARIES}
-    ${OpenCV_LIBS}
+    camera_test
+    awesomo
     apriltags
     yaml-cpp
+    ${OpenCV_LIBS}
+    ${catkin_LIBRARIES}
 )
-INSTALL(
-    TARGETS camera
-    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+INSTALL(TARGETS camera_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 # sim_test
 ADD_EXECUTABLE(sim_test tests/sim_test.cpp)

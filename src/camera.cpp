@@ -12,7 +12,9 @@ static double tic(void)
 Camera::Camera(int camera_index, const std::string calibration_fp)
 {
     this->tag_detector = new AprilTags::TagDetector(AprilTags::tagCodes16h5);
+    this->capture = new cv::VideoCapture(camera_index);
     this->camera_index = camera_index;
+    this->initVideoCapture();
     this->loadCalibrationFile(calibration_fp);
 }
 
@@ -60,37 +62,62 @@ static cv::Mat loadMatrixFromYaml(YAML::Node matrix_yaml)
 
 void Camera::loadCalibrationFile(const std::string calibration_fp)
 {
-    YAML::Node config = YAML::LoadFile(calibration_fp);
+    try {
+        YAML::Node config = YAML::LoadFile(calibration_fp);
 
-    // image width
-    if (config["image_width"]) {
-        this->image_width = config["image_width"].as<int>();
+        // image width
+        if (config["image_width"]) {
+            this->image_width = config["image_width"].as<int>();
+        }
+
+        // image height
+        if (config["image_height"]) {
+            this->image_height = config["image_height"].as<int>();
+        }
+
+        // camera matrix
+        if (config["camera_matrix"]) {
+            this->camera_matrix = loadMatrixFromYaml(
+                config["camera_matrix"]
+            );
+        }
+
+        // distortion coefficients
+        if (config["distortion_coefficients"]) {
+            this->distortion_coefficients = loadMatrixFromYaml(
+                config["distortion_coefficients"]
+            );
+        }
+
+        // rectification matrix
+        if (config["rectification_matrix"]) {
+            this->rectification_matrix = loadMatrixFromYaml(
+                config["rectification_matrix"]
+            );
+        }
+
+        // projection matrix
+        if (config["projection_matrix"]) {
+            this->projection_matrix = loadMatrixFromYaml(
+                config["projection_matrix"]
+            );
+        }
+    } catch (YAML::BadFile &ex) {
+        throw;
+    }
+}
+
+int Camera::initVideoCapture(void)
+{
+    if (this->capture->isOpened() == 0) {
+        std::cout << "Failed to open webcam!";
+        return -1;
+    } else {
+        this->capture->set(CV_CAP_PROP_FRAME_WIDTH, this->image_width);
+        this->capture->set(CV_CAP_PROP_FRAME_HEIGHT, this->image_height);
     }
 
-    // image height
-    if (config["image_height"]) {
-        this->image_height = config["image_height"].as<int>();
-    }
-
-    // camera matrix
-    if (config["camera_matrix"]) {
-        this->camera_matrix = loadMatrixFromYaml(config["camera_matrix"]);
-    }
-
-    // distortion coefficients
-    if (config["distortion_coefficients"]) {
-        this->distortion_coefficients = loadMatrixFromYaml(config["distortion_coefficients"]);
-    }
-
-    // rectification matrix
-    if (config["rectification_matrix"]) {
-        this->rectification_matrix = loadMatrixFromYaml(config["rectification_matrix"]);
-    }
-
-    // projection matrix
-    if (config["projection_matrix"]) {
-        this->projection_matrix = loadMatrixFromYaml(config["projection_matrix"]);
-    }
+    return 0;
 }
 
 void Camera::printFPS(double &last_tic, int &frame)
@@ -214,54 +241,7 @@ std::vector<PoseEstimate> Camera::processImage(cv::Mat &image, cv::Mat &image_gr
     return pose_estimates;
 }
 
-int Camera::run(void)
-{
-    int c;
-    int frame_index;
-    double last_tic;
-    cv::Mat image;
-    cv::Mat image_gray;
-    cv::VideoCapture capture(this->camera_index);
-    std::vector<PoseEstimate> pose_estimates;
-
-    // setup
-    frame_index = 0;
-    last_tic = tic();
-
-    // open capture device
-    if (capture.isOpened() == 0) {
-        std::cout << "Failed to open webcam!";
-        return -1;
-    } else {
-        capture.set(CV_CAP_PROP_FRAME_WIDTH, this->image_width);
-        capture.set(CV_CAP_PROP_FRAME_HEIGHT, this->image_height);
-    }
-
-    // read capture device
-    while (true) {
-        c = cv::waitKey(100);
-        capture.read(image);
-
-        pose_estimates = this->processImage(image, image_gray);
-        // this->printFPS(last_tic, frame_index);
-
-        if (c == 113) {
-            std::cout << "exiting..." << std::endl;
-            break;
-        } else if (c == 'c') {
-            if (pose_estimates.size()) {
-                std::cout << "record pose estimate!" << std::endl;
-                this->outputPoseEstimate("pose_estimate.dat", pose_estimates[0]);
-            } else {
-                std::cout << "no apriltags detected!" << std::endl;
-            }
-        }
-    }
-
-    return 0;
-}
-
-bool Camera::file_is_empty(const std::string file_path)
+bool Camera::isFileEmpty(const std::string file_path)
 {
     std::ifstream f(file_path);
     if (f && f.peek() == std::ifstream::traits_type::eof()) {
@@ -280,7 +260,7 @@ int Camera::outputPoseEstimate(const std::string output_fp, PoseEstimate &pose)
     std::ofstream output_file;
 
     // setup
-    empty_file = this->file_is_empty(output_fp);
+    empty_file = this->isFileEmpty(output_fp);
     output_file.open(output_fp, ios::out | ios::app);
 
     if (output_file.is_open()) {
@@ -309,8 +289,72 @@ int Camera::outputPoseEstimate(const std::string output_fp, PoseEstimate &pose)
     return 0;
 }
 
-int main(int argc, char **argv)
+int Camera::run(void)
 {
-    Camera cam(1, "/home/chutsu/ost.yml");
-    cam.run();
+    int c;
+    int frame_index;
+    double last_tic;
+    cv::Mat image;
+    cv::Mat image_gray;
+    std::vector<PoseEstimate> pose_estimates;
+
+    // setup
+    last_tic = tic();
+    Camera::initVideoCapture();
+
+    // read capture device
+    while (true) {
+        this->capture->read(image);
+        pose_estimates = this->processImage(image, image_gray);
+        this->printFPS(last_tic, frame_index);
+    }
+
+    return 0;
+}
+
+std::vector<PoseEstimate> Camera::step(void)
+{
+    cv::Mat image;
+    cv::Mat image_gray;
+
+    this->capture->read(image);
+
+    return this->processImage(image, image_gray);
+}
+
+int Camera::runCalibration(void)
+{
+    int c;
+    int frame_index;
+    double last_tic;
+    cv::Mat image;
+    cv::Mat image_gray;
+    std::vector<PoseEstimate> pose_estimates;
+
+    // setup
+    frame_index = 0;
+    last_tic = tic();
+
+    // read capture device
+    while (true) {
+        c = cv::waitKey(100);
+        this->capture->read(image);
+
+        pose_estimates = this->processImage(image, image_gray);
+        this->printFPS(last_tic, frame_index);
+
+        if (c == 113) {
+            std::cout << "exiting..." << std::endl;
+            break;
+        } else if (c == 'c') {
+            if (pose_estimates.size()) {
+                std::cout << "record pose estimate!" << std::endl;
+                this->outputPoseEstimate("pose_estimate.dat", pose_estimates[0]);
+            } else {
+                std::cout << "no apriltags detected!" << std::endl;
+            }
+        }
+    }
+
+    return 0;
 }

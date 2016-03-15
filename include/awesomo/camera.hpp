@@ -34,8 +34,9 @@ class PoseEstimate
 class Camera
 {
     private:
-        AprilTags::TagDetector* tag_detector;
+        AprilTags::TagDetector *tag_detector;
 
+        cv::VideoCapture *capture;
         int camera_index;
         int image_width;
         int image_height;
@@ -46,6 +47,7 @@ class Camera
         cv::Mat projection_matrix;
 
         void loadCalibrationFile(const std::string calibration_fp);
+        int initVideoCapture(void);
         void printFPS(double &last_tic, int &frame);
         float calculateFocalLength(void);
         double standardRad(double t);
@@ -58,14 +60,17 @@ class Camera
         PoseEstimate obtainPoseEstimate(AprilTags::TagDetection& detection);
         void printDetection(AprilTags::TagDetection& detection);
         std::vector<PoseEstimate> processImage(cv::Mat &image, cv::Mat &image_gray);
-        bool file_is_empty(const std::string file_path);
+        bool isFileEmpty(const std::string file_path);
+        int outputPoseEstimate(const std::string output_fp, PoseEstimate &pose);
 
     public:
         vector<AprilTags::TagDetection> apriltags;
+        std::vector<PoseEstimate> pose_estimates;
 
         Camera(int camera_index, const std::string calibration_fp);
         int run(void);
-        int outputPoseEstimate(const std::string output_fp, PoseEstimate &pose);
+        std::vector<PoseEstimate> step(void);
+        int runCalibration(void);
 };
 
 #endif
