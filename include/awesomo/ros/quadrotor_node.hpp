@@ -1,5 +1,5 @@
-#ifndef __QUADROTOR_HPP__
-#define __QUADROTOR_HPP__
+#ifndef __QUADROTOR_NODE_HPP__
+#define __QUADROTOR_NODE_HPP__
 
 #include <iostream>
 #include <cmath>
@@ -33,7 +33,16 @@
 #define THROTTLE_TOPIC "/mavros/setpoint_attitude/att_throttle"
 
 
+struct pose
+{
+    double x;
+    double y;
+    double z;
 
+    double roll;
+    double pitch;
+    double yaw;
+};
 
 class Quadrotor
 {
