@@ -13,4 +13,5 @@ bin
 obj
 tags
 
+# scripts and folders
 run.sh
