@@ -57,7 +57,6 @@ class Camera
 
         void loadCalibrationFile(const std::string calibration_fp);
         void getFrame(cv::Mat &image);
-        // cv::Mat getFrame(void);
         void printFPS(double &last_tic, int &frame);
         float calculateFocalLength(void);
         double standardRad(double t);

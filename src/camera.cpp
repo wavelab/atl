@@ -34,21 +34,21 @@ Camera::Camera(int camera_index, int camera_type, const std::string calibration_
         ROS_INFO("Camera initialized!");
 
     } else if (this->camera_type == CAMERA_FIREFLY) {
-        // this->capture_firefly = new FlyCapture2::Camera();
-        //
-        // error = this->capture_firefly->Connect(0);
-        // if (error != FlyCapture2::PGRERROR_OK) {
-        //     ROS_INFO("Failed to connect to camera!");
-        // } else {
-        //     ROS_INFO("Firefly camera connected!");
-        // }
-        //
-        // error = this->capture_firefly->StartCapture();
-        // if (error != FlyCapture2::PGRERROR_OK) {
-        //     ROS_INFO("Failed start camera!");
-        // } else {
-        //     ROS_INFO("Firefly initialized!");
-        // }
+        this->capture_firefly = new FlyCapture2::Camera();
+
+        error = this->capture_firefly->Connect(0);
+        if (error != FlyCapture2::PGRERROR_OK) {
+            ROS_INFO("Failed to connect to camera!");
+        } else {
+            ROS_INFO("Firefly camera connected!");
+        }
+
+        error = this->capture_firefly->StartCapture();
+        if (error != FlyCapture2::PGRERROR_OK) {
+            ROS_INFO("Failed start camera!");
+        } else {
+            ROS_INFO("Firefly initialized!");
+        }
 
     } else {
         ROS_INFO("Invalid Camera Type: %d!", camera_type);
@@ -355,52 +355,18 @@ int Camera::run(void)
     std::vector<PoseEstimate> pose_estimates;
 
     // setup
+    frame_index = 0;
     last_tic = tic();
 
-    FlyCapture2::Camera camera;
-    FlyCapture2::Image raw_img;
-    FlyCapture2::Image rgb_img;
-    camera.Connect(0);
-    camera.StartCapture();
-
-    unsigned int row_bytes;
-    // FlyCapture2::Image raw_img;
-    // FlyCapture2::Image rgb_img;
-    FlyCapture2::Error error;
-
     // read capture device
-    char key = 0;
-    while (key != 'q') {
+    while (true) {
+        this->getFrame(image);
+        // pose_estimates = this->processImage(image, image_gray);
 
-        // get the image
-        error = camera.RetrieveBuffer(&raw_img);
-        if (error != FlyCapture2::PGRERROR_OK) {
-            ROS_INFO("Video capture error!");
-        }
-
-        // convert to rgb
-        raw_img.Convert(FlyCapture2::PIXEL_FORMAT_BGR, &rgb_img);
-
-        // convert to opencv mat
-        row_bytes = (double) rgb_img.GetReceivedDataSize() / (double) rgb_img.GetRows();
-        // image = cv::Mat(
-        cv::Mat image = cv::Mat(
-            rgb_img.GetRows(),
-            rgb_img.GetCols(),
-            CV_8UC3,
-            rgb_img.GetData(),
-            row_bytes
-        );
-
-        // this->getFrame(image);
-        pose_estimates = this->processImage(image, image_gray);
         this->printFPS(last_tic, frame_index);
-        cv::imshow("camera", image);
-        key = cv::waitKey(1);
+        // cv::imshow("camera", image);
+        // cv::waitKey(1);
     }
-
-    // camera.StopCapture();
-    // camera.Disconnect();
 
     return 0;
 }
