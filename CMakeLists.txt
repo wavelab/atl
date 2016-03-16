@@ -27,6 +27,7 @@ INCLUDE_DIRECTORIES(
     ${catkin_INCLUDE_DIRS}
     /usr/local/include
     /usr/include/eigen3
+    /usr/include/flycapture
     $(Boost_INCLUDE_DIR)
     ./include
 )
@@ -58,6 +59,7 @@ TARGET_LINK_LIBRARIES(
     awesomo
     apriltags
     yaml-cpp
+    flycapture
     ${OpenCV_LIBS}
     ${catkin_LIBRARIES}
 )
@@ -83,6 +85,7 @@ TARGET_LINK_LIBRARIES(
     awesomo
     apriltags
     yaml-cpp
+    flycapture
     ${OpenCV_LIBS}
     ${catkin_LIBRARIES}
 )

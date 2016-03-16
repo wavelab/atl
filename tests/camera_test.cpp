@@ -10,7 +10,11 @@ void test_suite(void);
 int test_run(void)
 {
 
-    Camera cam(0, "/home/chutsu/Dropbox/proj/awesomo/configs/ost.yml");
+    Camera cam(
+        0,
+        CAMERA_FIREFLY,
+        "/home/chutsu/Dropbox/proj/awesomo/configs/ost.yml"
+    );
     cam.run();
 
     return 0;
