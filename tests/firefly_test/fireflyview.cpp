@@ -26,7 +26,7 @@ void printFPS(double &last_tic, int &frame)
 int main()
 {
     FlyCapture2::Error error;
-   FlyCapture2::Camera camera;
+    FlyCapture2::Camera camera;
     FlyCapture2::CameraInfo camInfo;
 
     // Connect the camera

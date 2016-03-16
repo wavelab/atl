@@ -13,12 +13,18 @@
 #include <math.h>
 #include <sys/time.h>
 
+#include <ros/console.h>
+
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <AprilTags/TagDetector.h>
 #include <AprilTags/Tag16h5.h>
-
 #include <yaml-cpp/yaml.h>
+#include <FlyCapture2.h>
+
+// CONSTANTS
+#define CAMERA_NORMAL 0
+#define CAMERA_FIREFLY 1
 
 
 class PoseEstimate
@@ -36,10 +42,13 @@ class Camera
     private:
         AprilTags::TagDetector *tag_detector;
 
-        cv::VideoCapture *capture;
         int camera_index;
+        int camera_type;
         int image_width;
         int image_height;
+
+        cv::VideoCapture *capture;
+        FlyCapture2::Camera *capture_firefly;
 
         cv::Mat camera_matrix;
         cv::Mat rectification_matrix;
@@ -47,7 +56,7 @@ class Camera
         cv::Mat projection_matrix;
 
         void loadCalibrationFile(const std::string calibration_fp);
-        int initVideoCapture(void);
+        void getFrame(cv::Mat &image);
         void printFPS(double &last_tic, int &frame);
         float calculateFocalLength(void);
         double standardRad(double t);
@@ -67,7 +76,7 @@ class Camera
         vector<AprilTags::TagDetection> apriltags;
         std::vector<PoseEstimate> pose_estimates;
 
-        Camera(int camera_index, const std::string calibration_fp);
+        Camera(int camera_index, int camera_type, const std::string calibration_fp);
         int run(void);
         std::vector<PoseEstimate> step(void);
         int runCalibration(void);

@@ -1,6 +1,7 @@
 #include "awesomo/camera.hpp"
 
 
+
 static double tic(void)
 {
     struct timeval t;
@@ -9,13 +10,49 @@ static double tic(void)
 }
 
 
-Camera::Camera(int camera_index, const std::string calibration_fp)
+Camera::Camera(int camera_index, int camera_type, const std::string calibration_fp)
 {
+    FlyCapture2::Error error;
+
+    // initlize apriltag detector
     this->tag_detector = new AprilTags::TagDetector(AprilTags::tagCodes16h5);
-    this->capture = new cv::VideoCapture(camera_index);
+
+    // intialize camera
     this->camera_index = camera_index;
-    this->initVideoCapture();
-    this->loadCalibrationFile(calibration_fp);
+    this->camera_type = camera_type;
+
+    if (this->camera_type == CAMERA_NORMAL) {
+        this->loadCalibrationFile(calibration_fp);
+        this->capture = new cv::VideoCapture(camera_index);
+
+        if (this->capture->isOpened() == 0) {
+            ROS_INFO("Failed to open webcam!");
+        } else {
+            this->capture->set(CV_CAP_PROP_FRAME_WIDTH, this->image_width);
+            this->capture->set(CV_CAP_PROP_FRAME_HEIGHT, this->image_height);
+        }
+        ROS_INFO("Camera initialized!");
+
+    } else if (this->camera_type == CAMERA_FIREFLY) {
+        this->capture_firefly = new FlyCapture2::Camera();
+
+        error = this->capture_firefly->Connect(0);
+        if (error != FlyCapture2::PGRERROR_OK) {
+            ROS_INFO("Failed to connect to camera!");
+        } else {
+            ROS_INFO("Firefly camera connected!");
+        }
+
+        error = this->capture_firefly->StartCapture();
+        if (error != FlyCapture2::PGRERROR_OK) {
+            ROS_INFO("Failed start camera!");
+        } else {
+            ROS_INFO("Firefly initialized!");
+        }
+
+    } else {
+        ROS_INFO("Invalid Camera Type: %d!", camera_type);
+    }
 }
 
 static int checkMatrixYaml(YAML::Node matrix_yaml)
@@ -107,17 +144,41 @@ void Camera::loadCalibrationFile(const std::string calibration_fp)
     }
 }
 
-int Camera::initVideoCapture(void)
+void Camera::getFrame(cv::Mat &image)
 {
-    if (this->capture->isOpened() == 0) {
-        std::cout << "Failed to open webcam!";
-        return -1;
-    } else {
-        this->capture->set(CV_CAP_PROP_FRAME_WIDTH, this->image_width);
-        this->capture->set(CV_CAP_PROP_FRAME_HEIGHT, this->image_height);
-    }
 
-    return 0;
+    if (this->camera_type == CAMERA_NORMAL) {
+        // this->capture->read(image);
+
+    } else if (this->camera_type == CAMERA_FIREFLY) {
+        unsigned int row_bytes;
+        FlyCapture2::Image raw_img;
+        FlyCapture2::Image rgb_img;
+        FlyCapture2::Error error;
+
+        // get the image
+        error = this->capture_firefly->RetrieveBuffer(&raw_img);
+        if (error != FlyCapture2::PGRERROR_OK) {
+            ROS_INFO("Video capture error!");
+        }
+
+        // convert to rgb
+        raw_img.Convert(FlyCapture2::PIXEL_FORMAT_BGR, &rgb_img);
+
+        // convert to opencv mat
+        row_bytes = (double) rgb_img.GetReceivedDataSize() / (double) rgb_img.GetRows();
+        cv::Mat(
+            rgb_img.GetRows(),
+            rgb_img.GetCols(),
+            CV_8UC3,
+            rgb_img.GetData(),
+            row_bytes
+        ).copyTo(image);
+
+    } else {
+        ROS_INFO("Invalid Camera Type: %d!", camera_type);
+
+    }
 }
 
 void Camera::printFPS(double &last_tic, int &frame)
@@ -199,16 +260,15 @@ void Camera::printDetection(AprilTags::TagDetection& detection)
     PoseEstimate pose;
 
     pose = this->obtainPoseEstimate(detection);
-    std::cout << "id: " << detection.id << " ";
-    std::cout << "Hamming: " << detection.hammingDistance << ")";
-    std::cout << "  distance=" << pose.translation.norm() << "m ";
-    std::cout << "x=" << pose.translation(0) << ", ";
-    std::cout << "y=" << pose.translation(1) << ", ";
-    std::cout << "z=" << pose.translation(2);
-    std::cout << "yaw=" << pose.yaw << ", ";
-    std::cout << "pitch=" << pose.pitch << ", ";
-    std::cout << "roll=" << pose.roll << ", ";
-    std::cout << endl;
+    ROS_INFO("id: %d ", detection.id);
+    ROS_INFO("Hamming: %d ", detection.hammingDistance);
+    ROS_INFO("distance= %fm ", pose.translation.norm());
+    ROS_INFO("x=%f ", pose.translation(0));
+    ROS_INFO("y=%f ", pose.translation(1));
+    ROS_INFO("z=%f ", pose.translation(2));
+    ROS_INFO("yaw=%f ", pose.yaw);
+    ROS_INFO("pitch=%f ", pose.pitch);
+    ROS_INFO("roll=%f \n", pose.roll);
 
     // also note that for SLAM/multi-view application it is better to
     // use reprojection error of corner points, because the noise in
@@ -226,17 +286,12 @@ std::vector<PoseEstimate> Camera::processImage(cv::Mat &image, cv::Mat &image_gr
     this->apriltags = this->tag_detector->extractTags(image_gray);
 
     // print out each apriltags
-    // std::cout << "TAGS:" << this->apriltags.size() << std::endl;
     for (int i = 0; i < this->apriltags.size(); i++) {
-        // this->printDetection(this->apriltags[i]);
+        this->printDetection(this->apriltags[i]);
         pose = this->obtainPoseEstimate(this->apriltags[i]);
         pose_estimates.push_back(pose);
         this->apriltags[i].draw(image);
     }
-
-    cv::imshow("camera", image);
-    // cv::imshow("gray scale", image_gray);
-    // return this->apriltags.size();
 
     return pose_estimates;
 }
@@ -244,6 +299,7 @@ std::vector<PoseEstimate> Camera::processImage(cv::Mat &image, cv::Mat &image_gr
 bool Camera::isFileEmpty(const std::string file_path)
 {
     std::ifstream f(file_path);
+
     if (f && f.peek() == std::ifstream::traits_type::eof()) {
         f.close();
         return true;
@@ -299,62 +355,64 @@ int Camera::run(void)
     std::vector<PoseEstimate> pose_estimates;
 
     // setup
-    last_tic = tic();
-    Camera::initVideoCapture();
-
-    // read capture device
-    while (true) {
-        this->capture->read(image);
-        pose_estimates = this->processImage(image, image_gray);
-        this->printFPS(last_tic, frame_index);
-    }
-
-    return 0;
-}
-
-std::vector<PoseEstimate> Camera::step(void)
-{
-    cv::Mat image;
-    cv::Mat image_gray;
-
-    this->capture->read(image);
-
-    return this->processImage(image, image_gray);
-}
-
-int Camera::runCalibration(void)
-{
-    int c;
-    int frame_index;
-    double last_tic;
-    cv::Mat image;
-    cv::Mat image_gray;
-    std::vector<PoseEstimate> pose_estimates;
-
-    // setup
     frame_index = 0;
     last_tic = tic();
 
     // read capture device
     while (true) {
-        c = cv::waitKey(100);
-        this->capture->read(image);
+        this->getFrame(image);
+        // pose_estimates = this->processImage(image, image_gray);
 
-        pose_estimates = this->processImage(image, image_gray);
         this->printFPS(last_tic, frame_index);
-
-        if (c == 113) {
-            std::cout << "exiting..." << std::endl;
-            break;
-        } else if (c == 'c') {
-            if (pose_estimates.size()) {
-                std::cout << "record pose estimate!" << std::endl;
-                this->outputPoseEstimate("pose_estimate.dat", pose_estimates[0]);
-            } else {
-                std::cout << "no apriltags detected!" << std::endl;
-            }
-        }
+        // cv::imshow("camera", image);
+        // cv::waitKey(1);
     }
 
     return 0;
 }
+
+// std::vector<PoseEstimate> Camera::step(void)
+// {
+//     cv::Mat image;
+//     cv::Mat image_gray;
+//
+//     this->getFrame(image);
+//     return this->processImage(image, image_gray);
+// }
+//
+// int Camera::runCalibration(void)
+// {
+//     int c;
+//     int frame_index;
+//     double last_tic;
+//     cv::Mat image;
+//     cv::Mat image_gray;
+//     std::vector<PoseEstimate> pose_estimates;
+//
+//     // setup
+//     frame_index = 0;
+//     last_tic = tic();
+//
+//     while (true) {
+//         c = cv::waitKey(100);
+//         this->getFrame(image);
+//
+//         pose_estimates = this->processImage(image, image_gray);
+//         this->printFPS(last_tic, frame_index);
+//
+//         if (c == 113) {
+//             ROS_INFO("exiting...");
+//             break;
+//
+//         } else if (c == 'c') {
+//             if (pose_estimates.size()) {
+//                 ROS_INFO("record pose estimate!");
+//                 this->outputPoseEstimate("pose_estimate.dat", pose_estimates[0]);
+//             } else {
+//                 ROS_INFO("no apriltags detected!");
+//             }
+//         }
+//     }
+//
+//     return 0;
+// }
