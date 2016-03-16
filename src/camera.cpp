@@ -20,9 +20,9 @@ Camera::Camera(int camera_index, int camera_type, const std::string calibration_
     // intialize camera
     this->camera_index = camera_index;
     this->camera_type = camera_type;
+    this->loadCalibrationFile(calibration_fp);
 
     if (this->camera_type == CAMERA_NORMAL) {
-        this->loadCalibrationFile(calibration_fp);
         this->capture = new cv::VideoCapture(camera_index);
 
         if (this->capture->isOpened() == 0) {
@@ -105,11 +105,17 @@ void Camera::loadCalibrationFile(const std::string calibration_fp)
         // image width
         if (config["image_width"]) {
             this->image_width = config["image_width"].as<int>();
+            std::cout << "image_width: " << this->image_width << std::endl;
+        } else {
+            ROS_ERROR("Failed to load image_width");
         }
 
         // image height
         if (config["image_height"]) {
             this->image_height = config["image_height"].as<int>();
+            std::cout << "image_height: " << this->image_height << std::endl;
+        } else {
+            ROS_ERROR("Failed to load image_height");
         }
 
         // camera matrix
@@ -117,6 +123,10 @@ void Camera::loadCalibrationFile(const std::string calibration_fp)
             this->camera_matrix = loadMatrixFromYaml(
                 config["camera_matrix"]
             );
+            std::cout << "camera_matrix: " << std::endl;
+            std::cout << this->camera_matrix << std::endl;
+        } else {
+            ROS_ERROR("Failed to load camera_matrix");
         }
 
         // distortion coefficients
@@ -124,6 +134,10 @@ void Camera::loadCalibrationFile(const std::string calibration_fp)
             this->distortion_coefficients = loadMatrixFromYaml(
                 config["distortion_coefficients"]
             );
+            std::cout << "distortion_coefficients: " << std::endl;
+            std::cout << this->distortion_coefficients << std::endl;
+        } else {
+            ROS_ERROR("Failed to load distortion_coefficients");
         }
 
         // rectification matrix
@@ -131,6 +145,10 @@ void Camera::loadCalibrationFile(const std::string calibration_fp)
             this->rectification_matrix = loadMatrixFromYaml(
                 config["rectification_matrix"]
             );
+            std::cout << "rectification_matrix: " << std::endl;
+            std::cout << this->rectification_matrix << std::endl;
+        } else {
+            ROS_ERROR("Failed to load rectification_matrix");
         }
 
         // projection matrix
@@ -138,6 +156,10 @@ void Camera::loadCalibrationFile(const std::string calibration_fp)
             this->projection_matrix = loadMatrixFromYaml(
                 config["projection_matrix"]
             );
+            std::cout << "projection_matrix: " << std::endl;
+            std::cout << this->projection_matrix << std::endl;
+        } else {
+            ROS_ERROR("Failed to load proejection_matrix");
         }
     } catch (YAML::BadFile &ex) {
         throw;
@@ -287,7 +309,7 @@ std::vector<PoseEstimate> Camera::processImage(cv::Mat &image, cv::Mat &image_gr
 
     // print out each apriltags
     for (int i = 0; i < this->apriltags.size(); i++) {
-        this->printDetection(this->apriltags[i]);
+        // this->printDetection(this->apriltags[i]);
         pose = this->obtainPoseEstimate(this->apriltags[i]);
         pose_estimates.push_back(pose);
         this->apriltags[i].draw(image);
@@ -347,7 +369,6 @@ int Camera::outputPoseEstimate(const std::string output_fp, PoseEstimate &pose)
 
 int Camera::run(void)
 {
-    int c;
     int frame_index;
     double last_tic;
     cv::Mat image;
@@ -361,7 +382,7 @@ int Camera::run(void)
     // read capture device
     while (true) {
         this->getFrame(image);
-        // pose_estimates = this->processImage(image, image_gray);
+        pose_estimates = this->processImage(image, image_gray);
 
         this->printFPS(last_tic, frame_index);
         // cv::imshow("camera", image);
@@ -371,48 +392,48 @@ int Camera::run(void)
     return 0;
 }
 
-// std::vector<PoseEstimate> Camera::step(void)
-// {
-//     cv::Mat image;
-//     cv::Mat image_gray;
-//
-//     this->getFrame(image);
-//     return this->processImage(image, image_gray);
-// }
-//
-// int Camera::runCalibration(void)
-// {
-//     int c;
-//     int frame_index;
-//     double last_tic;
-//     cv::Mat image;
-//     cv::Mat image_gray;
-//     std::vector<PoseEstimate> pose_estimates;
-//
-//     // setup
-//     frame_index = 0;
-//     last_tic = tic();
-//
-//     while (true) {
-//         c = cv::waitKey(100);
-//         this->getFrame(image);
-//
-//         pose_estimates = this->processImage(image, image_gray);
-//         this->printFPS(last_tic, frame_index);
-//
-//         if (c == 113) {
-//             ROS_INFO("exiting...");
-//             break;
-//
-//         } else if (c == 'c') {
-//             if (pose_estimates.size()) {
-//                 ROS_INFO("record pose estimate!");
-//                 this->outputPoseEstimate("pose_estimate.dat", pose_estimates[0]);
-//             } else {
-//                 ROS_INFO("no apriltags detected!");
-//             }
-//         }
-//     }
-//
-//     return 0;
-// }
+std::vector<PoseEstimate> Camera::step(void)
+{
+    cv::Mat image;
+    cv::Mat image_gray;
+
+    this->getFrame(image);
+    return this->processImage(image, image_gray);
+}
+
+int Camera::runCalibration(void)
+{
+    int c;
+    int frame_index;
+    double last_tic;
+    cv::Mat image;
+    cv::Mat image_gray;
+    std::vector<PoseEstimate> pose_estimates;
+
+    // setup
+    frame_index = 0;
+    last_tic = tic();
+
+    while (true) {
+        c = cv::waitKey(100);
+        this->getFrame(image);
+
+        pose_estimates = this->processImage(image, image_gray);
+        this->printFPS(last_tic, frame_index);
+
+        if (c == 113) {
+            ROS_INFO("exiting...");
+            break;
+
+        } else if (c == 'c') {
+            if (pose_estimates.size()) {
+                ROS_INFO("record pose estimate!");
+                this->outputPoseEstimate("pose_estimate.dat", pose_estimates[0]);
+            } else {
+                ROS_INFO("no apriltags detected!");
+            }
+        }
+    }
+
+    return 0;
+}

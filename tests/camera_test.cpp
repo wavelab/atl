@@ -13,7 +13,7 @@ int test_run(void)
     Camera cam(
         0,
         CAMERA_FIREFLY,
-        "/home/chutsu/Dropbox/proj/awesomo/configs/ost.yml"
+        "/home/chutsu/Dropbox/proj/awesomo/configs/firefly_calib/ost.yaml"
     );
     cam.run();
 
