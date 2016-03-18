@@ -12,7 +12,7 @@ int main(int argc, char **argv)
     ros::Rate rate(100);
     ros::Publisher publisher;
 	geometry_msgs::PoseStamped pose;
-	std::vector<PoseEstimate> pose_estimates;
+	std::vector<AprilTagPose> pose_estimates;
 
     // setup
     seq = 0;

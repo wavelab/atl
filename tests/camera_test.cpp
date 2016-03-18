@@ -9,12 +9,16 @@ void test_suite(void);
 
 int test_run(void)
 {
-
     Camera cam(
         0,
         CAMERA_FIREFLY,
         "/home/chutsu/Dropbox/proj/awesomo/configs/firefly_calib/ost.yaml"
     );
+    // Camera cam(
+    //     0,
+    //     CAMERA_NORMAL,
+    //     "/home/chutsu/Dropbox/proj/awesomo/configs/ost.yml"
+    // );
     cam.run();
 
     return 0;

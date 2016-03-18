@@ -27,9 +27,10 @@
 #define CAMERA_FIREFLY 1
 
 
-class PoseEstimate
+class AprilTagPose
 {
     public:
+        int id;
         double distance;
         double yaw;
         double pitch;
@@ -56,7 +57,9 @@ class Camera
         cv::Mat projection_matrix;
 
         void loadCalibrationFile(const std::string calibration_fp);
-        void getFrame(cv::Mat &image);
+        int initializeNormalCamera();
+        int initializeFireflyCamera();
+        int getFrame(cv::Mat &image);
         void printFPS(double &last_tic, int &frame);
         float calculateFocalLength(void);
         double standardRad(double t);
@@ -66,19 +69,19 @@ class Camera
             double &pitch,
             double &roll
         );
-        PoseEstimate obtainPoseEstimate(AprilTags::TagDetection& detection);
+        AprilTagPose obtainAprilTagPose(AprilTags::TagDetection& detection);
         void printDetection(AprilTags::TagDetection& detection);
-        std::vector<PoseEstimate> processImage(cv::Mat &image, cv::Mat &image_gray);
+        std::vector<AprilTagPose> processImage(cv::Mat &image, cv::Mat &image_gray);
         bool isFileEmpty(const std::string file_path);
-        int outputPoseEstimate(const std::string output_fp, PoseEstimate &pose);
+        int outputAprilTagPose(const std::string output_fp, AprilTagPose &pose);
 
     public:
         vector<AprilTags::TagDetection> apriltags;
-        std::vector<PoseEstimate> pose_estimates;
+        std::vector<AprilTagPose> pose_estimates;
 
         Camera(int camera_index, int camera_type, const std::string calibration_fp);
         int run(void);
-        std::vector<PoseEstimate> step(void);
+        std::vector<AprilTagPose> step(void);
         int runCalibration(void);
 };
 
