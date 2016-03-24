@@ -62,7 +62,7 @@ Camera::Camera(int camera_index, int camera_type, const std::string calibration_
     this->tag_detector = new AprilTags::TagDetector(AprilTags::tagCodes16h5);
 
     // intialize camera
-    this->roi_rect = cv::Rect(0, 0, 639, 479);
+    this->roi_rect = cv::Rect(0, 0, 640/2, 480/2);
     this->camera_index = camera_index;
     this->camera_type = camera_type;
     this->loadCalibrationFile(calibration_fp);
@@ -354,33 +354,35 @@ std::vector<AprilTagPose> Camera::processImage(cv::Mat &image, cv::Mat &image_gr
     //     this->distortion_coefficients
     // );
     cv::cvtColor(image, image_gray, CV_BGR2GRAY);
-    // image_gray.setTo(cv::Scalar(0));
-    // cv::adaptiveThreshold(
-    //     image_gray,
-    //     image_gray,
-    //     200,
-    //     CV_ADAPTIVE_THRESH_GAUSSIAN_C,
-    //     CV_THRESH_BINARY,
-    //     11,
-    //     0
-    // );
-     cv::resize(image_gray, image_gray, cv::Size(640/2, 480/2));
+    cv::resize(image_gray, image_gray, cv::Size(640/3, 480/3));
 
+    //create a draw a mask
     cv::Mat mask(image_gray.rows, image_gray.cols, CV_8UC1, cv::Scalar(0));
     cv::rectangle(mask, this->roi_rect, 255, -1);
     cv::Mat result(image_gray.rows, image_gray.cols, CV_8UC1, cv::Scalar(0));
     image_gray.copyTo(result, mask);
 
+    // cv::Mat hack = image_gray(this->roi_rect);
+
     imshow("test", result);
     cv::waitKey(1);
+    std::pair<float, float> top_left_roi;
+    float x1 = this->roi_rect.x;
+    float y1 = this->roi_rect.y;
     this->apriltags = this->tag_detector->extractTags(result);
 
+
     // // print out each apriltags
-    for (int i = 0; i < this->apriltags.size(); i++) {
+    // for (int i = 0; i < this->apriltags.size(); i++) {
+    if (this->apriltags.size()) {
+        int i = 0;
+
+        // this->apriltags[i].cxy.first += x1;
+        // this->apriltags[i].cxy.second += y1;
         pose = this->obtainAprilTagPose(this->apriltags[i]);
         pose_estimates.push_back(pose);
 
-        this->apriltags[i].draw(image_gray);
+        // this->apriltags[i].draw(image_gray);
         p1 = cv::Point2f(this->apriltags[i].p[1].first, this->apriltags[i].p[1].second);
         p2 = cv::Point2f(this->apriltags[i].p[3].first, this->apriltags[i].p[3].second);
         float x = this->apriltags[i].cxy.first;
@@ -389,8 +391,8 @@ std::vector<AprilTagPose> Camera::processImage(cv::Mat &image, cv::Mat &image_gr
         float normdist = cv::norm(p2 - p1);
         this->roi_rect = cv::Rect(x-normdist/2, y-normdist/2, normdist, normdist);
 
-        this->roi_rect = enlargeROI(image_gray, this->roi_rect, 10);
-        this->printDetection(this->apriltags[i]);
+        this->roi_rect = enlargeROI(image_gray, this->roi_rect, 5);
+        // this->printDetection(this->apriltags[i]);
     }
 
     if (this->apriltags.size() == 0) {
@@ -398,8 +400,6 @@ std::vector<AprilTagPose> Camera::processImage(cv::Mat &image, cv::Mat &image_gr
         this->roi_rect = cv::Rect(0, 0, 639, 479);
     }
 
-    // cv::imshow("camera undistort ", image_gray(this->roi_rect));
-    // cv::waitKey(1);
     return pose_estimates;
 }
 
