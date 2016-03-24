@@ -383,9 +383,13 @@ std::vector<AprilTagPose> Camera::processImage(cv::Mat &image, cv::Mat &image_gr
         this->apriltags[i].draw(image_gray);
         p1 = cv::Point2f(this->apriltags[i].p[1].first, this->apriltags[i].p[1].second);
         p2 = cv::Point2f(this->apriltags[i].p[3].first, this->apriltags[i].p[3].second);
-        this->roi_rect = cv::Rect(p1, p2);
+        float x = this->apriltags[i].cxy.first;
+        float y = this->apriltags[i].cxy.second;
 
-        this->roi_rect = enlargeROI(image_gray, this->roi_rect, 25);
+        float normdist = cv::norm(p2 - p1);
+        this->roi_rect = cv::Rect(x-normdist/2, y-normdist/2, normdist, normdist);
+
+        this->roi_rect = enlargeROI(image_gray, this->roi_rect, 10);
         this->printDetection(this->apriltags[i]);
     }
 
