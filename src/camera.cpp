@@ -67,16 +67,15 @@ Camera::Camera(int camera_index, int camera_type, const std::string calibration_
     this->camera_type = camera_type;
     this->loadCalibrationFile(calibration_fp);
 
-    this->initializeNormalCamera();
-    // if (this->camera_type == CAMERA_NORMAL) {
-    //     this->initializeNormalCamera();
-    //
-    // } else if (this->camera_type == CAMERA_FIREFLY) {
-    //     this->initializeFireflyCamera();
-    //
-    // } else {
-    //     ROS_INFO("Invalid Camera Type: %d!", camera_type);
-    // }
+    if (this->camera_type == CAMERA_NORMAL) {
+        this->initializeNormalCamera();
+
+    } else if (this->camera_type == CAMERA_FIREFLY) {
+        this->initializeFireflyCamera();
+
+    } else {
+        ROS_INFO("Invalid Camera Type: %d!", camera_type);
+    }
 }
 
 static int checkMatrixYaml(YAML::Node matrix_yaml)
@@ -365,16 +364,16 @@ std::vector<AprilTagPose> Camera::processImage(cv::Mat &image, cv::Mat &image_gr
     //     11,
     //     0
     // );
-    // cv::resize(image_gray, image_gray, cv::Size(640, 480));
+     cv::resize(image_gray, image_gray, cv::Size(640/2, 480/2));
 
-    // cv::Mat hack = image_gray(this->roi_rect);
-    cv::Mat mask = image_gray;
-    mask.setTo(0);
-    cv::Mat hack = mask;
+    cv::Mat mask(image_gray.rows, image_gray.cols, CV_8UC1, cv::Scalar(0));
     cv::rectangle(mask, this->roi_rect, 255, -1);
-    hack.copyTo(image_gray, mask);
+    cv::Mat result(image_gray.rows, image_gray.cols, CV_8UC1, cv::Scalar(0));
+    image_gray.copyTo(result, mask);
 
-    this->apriltags = this->tag_detector->extractTags(image_gray);
+    imshow("test", result);
+    cv::waitKey(1);
+    this->apriltags = this->tag_detector->extractTags(result);
 
     // // print out each apriltags
     for (int i = 0; i < this->apriltags.size(); i++) {
@@ -385,6 +384,8 @@ std::vector<AprilTagPose> Camera::processImage(cv::Mat &image, cv::Mat &image_gr
         p1 = cv::Point2f(this->apriltags[i].p[1].first, this->apriltags[i].p[1].second);
         p2 = cv::Point2f(this->apriltags[i].p[3].first, this->apriltags[i].p[3].second);
         this->roi_rect = cv::Rect(p1, p2);
+
+        this->roi_rect = enlargeROI(image_gray, this->roi_rect, 25);
         this->printDetection(this->apriltags[i]);
     }
 
@@ -393,14 +394,8 @@ std::vector<AprilTagPose> Camera::processImage(cv::Mat &image, cv::Mat &image_gr
         this->roi_rect = cv::Rect(0, 0, 639, 479);
     }
 
-    if (this->roi_rect.width != 0){
-        this->roi_rect = enlargeROI(image_gray, this->roi_rect, 100);
-    } else {
-        this->roi_rect = enlargeROI(image_gray, this->roi_rect, 100);
-    }
-    std::cout << "roi_rect:" << this->roi_rect << std::endl;
-    cv::imshow("camera undistort ", image_gray(this->roi_rect));
-    cv::waitKey(1);
+    // cv::imshow("camera undistort ", image_gray(this->roi_rect));
+    // cv::waitKey(1);
     return pose_estimates;
 }
 
