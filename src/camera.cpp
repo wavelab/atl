@@ -62,19 +62,21 @@ Camera::Camera(int camera_index, int camera_type, const std::string calibration_
     this->tag_detector = new AprilTags::TagDetector(AprilTags::tagCodes16h5);
 
     // intialize camera
+    this->roi_rect = cv::Rect(0, 0, 639, 479);
     this->camera_index = camera_index;
     this->camera_type = camera_type;
     this->loadCalibrationFile(calibration_fp);
 
-    if (this->camera_type == CAMERA_NORMAL) {
-        this->initializeNormalCamera();
-
-    } else if (this->camera_type == CAMERA_FIREFLY) {
-        this->initializeFireflyCamera();
-
-    } else {
-        ROS_INFO("Invalid Camera Type: %d!", camera_type);
-    }
+    this->initializeNormalCamera();
+    // if (this->camera_type == CAMERA_NORMAL) {
+    //     this->initializeNormalCamera();
+    //
+    // } else if (this->camera_type == CAMERA_FIREFLY) {
+    //     this->initializeFireflyCamera();
+    //
+    // } else {
+    //     ROS_INFO("Invalid Camera Type: %d!", camera_type);
+    // }
 }
 
 static int checkMatrixYaml(YAML::Node matrix_yaml)
@@ -317,41 +319,88 @@ void Camera::printDetection(AprilTags::TagDetection& detection)
     // for suitable factors.
 }
 
+
+cv::Rect enlargeROI(cv::Mat& frm, cv::Rect boundingBox, int padding)
+{
+    cv::Rect returnRect = cv::Rect(boundingBox.x - padding, boundingBox.y - padding,
+                                   boundingBox.width + (padding * 2),
+                                   boundingBox.height + (padding * 2)
+            );
+    if (returnRect.x < 0) returnRect.x = 0;
+    if (returnRect.y < 0) returnRect.y = 0;
+    if (returnRect.x + returnRect.width >= frm.cols){
+        returnRect.width = frm.cols-returnRect.x;
+    }
+    if (returnRect.y + returnRect.height >= frm.rows){
+        returnRect.height = frm.rows - returnRect.y;
+    }
+
+    return returnRect;
+}
+
 std::vector<AprilTagPose> Camera::processImage(cv::Mat &image, cv::Mat &image_gray)
 {
     AprilTagPose pose;
     std::vector<AprilTagPose> pose_estimates;
     cv::Mat image_undistort;
     cv::Mat empty;
+    cv::Point2f p1;
+    cv::Point2f p2;
 
     // detect april tags (requires a gray scale image)
-    cv::undistort(
-        image,
-        image_undistort,
-        this->camera_matrix,
-        this->distortion_coefficients
-    );
-    cv::cvtColor(image_undistort, image_gray, CV_BGR2GRAY);
+    // cv::undistort(
+    //     image,
+    //     image_undistort,
+    //     this->camera_matrix,
+    //     this->distortion_coefficients
+    // );
+    cv::cvtColor(image, image_gray, CV_BGR2GRAY);
+    // image_gray.setTo(cv::Scalar(0));
     // cv::adaptiveThreshold(
     //     image_gray,
     //     image_gray,
-    //     255,
+    //     200,
     //     CV_ADAPTIVE_THRESH_GAUSSIAN_C,
     //     CV_THRESH_BINARY,
     //     11,
     //     0
     // );
-    // cv::resize(image_gray, image_gray, cv::Size(300, 300));
+    // cv::resize(image_gray, image_gray, cv::Size(640, 480));
+
+    // cv::Mat hack = image_gray(this->roi_rect);
+    cv::Mat mask = image_gray;
+    mask.setTo(0);
+    cv::Mat hack = mask;
+    cv::rectangle(mask, this->roi_rect, 255, -1);
+    hack.copyTo(image_gray, mask);
+
     this->apriltags = this->tag_detector->extractTags(image_gray);
 
-    // print out each apriltags
+    // // print out each apriltags
     for (int i = 0; i < this->apriltags.size(); i++) {
         pose = this->obtainAprilTagPose(this->apriltags[i]);
         pose_estimates.push_back(pose);
-        this->apriltags[i].draw(image);
-    }
-    // cv::imshow("camera undistort ", image_gray);
 
+        this->apriltags[i].draw(image_gray);
+        p1 = cv::Point2f(this->apriltags[i].p[1].first, this->apriltags[i].p[1].second);
+        p2 = cv::Point2f(this->apriltags[i].p[3].first, this->apriltags[i].p[3].second);
+        this->roi_rect = cv::Rect(p1, p2);
+        this->printDetection(this->apriltags[i]);
+    }
+
+    if (this->apriltags.size() == 0) {
+        std::cout << "nothing detected" << std::endl;
+        this->roi_rect = cv::Rect(0, 0, 639, 479);
+    }
+
+    if (this->roi_rect.width != 0){
+        this->roi_rect = enlargeROI(image_gray, this->roi_rect, 100);
+    } else {
+        this->roi_rect = enlargeROI(image_gray, this->roi_rect, 100);
+    }
+    std::cout << "roi_rect:" << this->roi_rect << std::endl;
+    cv::imshow("camera undistort ", image_gray(this->roi_rect));
+    cv::waitKey(1);
     return pose_estimates;
 }
 
@@ -420,10 +469,9 @@ int Camera::run(void)
     while (true) {
         this->getFrame(image);
         pose_estimates = this->processImage(image, image_gray);
-
         this->printFPS(last_tic, frame_index);
-        cv::imshow("camera", image);
-        cv::waitKey(1);
+        // cv::imshow("camera", image);
+        // cv::waitKey(1);
     }
 
     return 0;

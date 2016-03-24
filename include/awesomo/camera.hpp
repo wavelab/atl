@@ -56,6 +56,8 @@ class Camera
         cv::Mat distortion_coefficients;
         cv::Mat projection_matrix;
 
+        cv::Rect roi_rect;
+
         void loadCalibrationFile(const std::string calibration_fp);
         int initializeNormalCamera();
         int initializeFireflyCamera();

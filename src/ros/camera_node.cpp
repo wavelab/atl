@@ -19,8 +19,9 @@ int main(int argc, char **argv)
     publisher = n.advertise<geometry_msgs::PoseStamped>("awesomo/camera", 100);
     Camera cam(
         0,
-        CAMERA_FIREFLY,
-        "/home/chutsu/Dropbox/proj/awesomo/configs/ost.yml"
+        CAMERA_NORMAL,
+        "/home/stan/Projects/awesomo/configs/ost.yml"
+     //   "/home/chutsu/Dropbox/proj/awesomo/configs/ost.yml"
     );
 
     while (ros::ok()) {
