@@ -354,7 +354,7 @@ std::vector<AprilTagPose> Camera::processImage(cv::Mat &image, cv::Mat &image_gr
     //     this->distortion_coefficients
     // );
     cv::cvtColor(image, image_gray, CV_BGR2GRAY);
-    cv::resize(image_gray, image_gray, cv::Size(640/3, 480/3));
+    cv::resize(image_gray, image_gray, cv::Size(640/4, 480/4));
 
     //create a draw a mask
     cv::Mat mask(image_gray.rows, image_gray.cols, CV_8UC1, cv::Scalar(0));
@@ -392,7 +392,7 @@ std::vector<AprilTagPose> Camera::processImage(cv::Mat &image, cv::Mat &image_gr
         this->roi_rect = cv::Rect(x-normdist/2, y-normdist/2, normdist, normdist);
 
         this->roi_rect = enlargeROI(image_gray, this->roi_rect, 5);
-        // this->printDetection(this->apriltags[i]);
+        this->printDetection(this->apriltags[i]);
     }
 
     if (this->apriltags.size() == 0) {
