@@ -61,7 +61,6 @@ class Camera
         void loadCalibrationFile(const std::string calibration_fp);
         int initializeNormalCamera();
         int initializeFireflyCamera();
-        int getFrame(cv::Mat &image);
         void printFPS(double &last_tic, int &frame);
         float calculateFocalLength(void);
         double standardRad(double t);
@@ -83,6 +82,7 @@ class Camera
 
         Camera(int camera_index, int camera_type, const std::string calibration_fp);
         int run(void);
+        int getFrame(cv::Mat &image);
         std::vector<AprilTagPose> step(void);
         int runCalibration(void);
 };

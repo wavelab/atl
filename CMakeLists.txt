@@ -21,6 +21,8 @@ FIND_PACKAGE(
     roscpp
     rospy
     std_msgs
+    image_transport
+    cv_bridge
 )
 FIND_PACKAGE(OpenCV)
 FIND_PACKAGE(Boost)
@@ -62,20 +64,20 @@ ADD_LIBRARY(
 
 ## ROS NODE EXECUTABLES
 # camera_node
-ADD_EXECUTABLE(camera_node src/ros/camera_node.cpp)
-TARGET_LINK_LIBRARIES(
-    camera_node
-    awesomo
-    apriltags
-    yaml-cpp
-    flycapture
-    ${OpenCV_LIBS}
-    ${catkin_LIBRARIES}
-)
-INSTALL(
-    TARGETS camera_node
-    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+# ADD_EXECUTABLE(camera_node src/ros/camera_node.cpp)
+# target_link_libraries(
+#     camera_node
+#     awesomo
+#     apriltags
+#     yaml-cpp
+#     flycapture
+#     ${opencv_libs}
+#     ${catkin_libraries}
+# )
+# INSTALL(
+#     TARGETS camera_node
+#     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+# )
 
 # quadrotor_node
 ADD_EXECUTABLE(quadrotor_node src/ros/quadrotor_node.cpp)
@@ -114,3 +116,15 @@ INSTALL(TARGETS pid_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 ADD_EXECUTABLE(util_test tests/util_test.cpp)
 TARGET_LINK_LIBRARIES(util_test awesomo)
 INSTALL(TARGETS util_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+# calibration images
+ADD_EXECUTABLE(camera_calibration src/ros/camera_calibration_node.cpp)
+TARGET_LINK_LIBRARIES( 
+    camera_calibration
+    awesomo
+    apriltags
+    yaml-cpp
+    flycapture
+    ${OpenCV_LIBS}
+    ${catkin_LIBRARIES}
+)
