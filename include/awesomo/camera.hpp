@@ -80,9 +80,13 @@ class Camera
         );
         AprilTagPose obtainAprilTagPose(AprilTags::TagDetection& detection);
         void printDetection(AprilTags::TagDetection& detection);
-        std::vector<AprilTagPose> processImage(cv::Mat &image);
+        std::vector<AprilTagPose> processImage(cv::Mat &image, int &timeout);
         bool isFileEmpty(const std::string file_path);
         int outputAprilTagPose(const std::string output_fp, AprilTagPose &pose);
+        void adjustCameraMode(
+            std::vector<AprilTagPose> &pose_estimates,
+            int &timeout
+        );
 
     public:
         vector<AprilTags::TagDetection> apriltags;
@@ -94,8 +98,7 @@ class Camera
         int loadConfig(std::string camera_mode);
         int run(void);
         int getFrame(cv::Mat &image);
-        std::vector<AprilTagPose> step(void);
-        int runCalibration(void);
+        std::vector<AprilTagPose> step(int &timeout);
 };
 
 #endif

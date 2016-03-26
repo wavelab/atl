@@ -219,6 +219,8 @@ int Camera::loadConfig(std::string camera_mode)
 int Camera::getFrame(cv::Mat &image)
 {
     unsigned int row_bytes;
+    double data_size;
+    double data_rows;
     FlyCapture2::Image raw_img;
     FlyCapture2::Image rgb_img;
     FlyCapture2::Error error;
@@ -238,7 +240,9 @@ int Camera::getFrame(cv::Mat &image)
         raw_img.Convert(FlyCapture2::PIXEL_FORMAT_BGR, &rgb_img);
 
         // convert to opencv mat
-        row_bytes = (double) rgb_img.GetReceivedDataSize() / (double) rgb_img.GetRows();
+        data_size = rgb_img.GetReceivedDataSize();
+        data_rows = rgb_img.GetRows();
+        row_bytes = data_size / data_rows;
         cv::Mat(
             rgb_img.GetRows(),
             rgb_img.GetCols(),
@@ -291,7 +295,7 @@ void Camera::convertToEuler(
     roll  = this->standardRad(atan2(wRo(0,2)*s - wRo(1,2)*c, -wRo(0,1)*s + wRo(1,1)*c));
 }
 
-AprilTagPose Camera::obtainAprilTagPose(AprilTags::TagDetection& detection)
+AprilTagPose Camera::obtainAprilTagPose(AprilTags::TagDetection &detection)
 {
     AprilTagPose pose;
     double m_tag_size;
@@ -308,7 +312,7 @@ AprilTagPose Camera::obtainAprilTagPose(AprilTags::TagDetection& detection)
     // change tag size according to tag id
     if (detection.id == 0) {
         m_tag_size = 0.048;
-    } else {
+    } else if (detection.id == 5) {
         m_tag_size = 0.343;
     }
 
@@ -370,7 +374,35 @@ cv::Rect enlargeROI(cv::Mat& frm, cv::Rect boundingBox, int padding)
     return returnRect;
 }
 
-std::vector<AprilTagPose> Camera::processImage(cv::Mat &image)
+void Camera::adjustCameraMode(
+    std::vector<AprilTagPose> &pose_estimates,
+    int &timeout
+)
+{
+    AprilTagPose pose;
+
+    // pre-check
+    if (timeout > 5 && this->camera_mode == "160") {
+        ROS_INFO("timeout!!");
+        this->loadConfig("320");
+        timeout = 0;
+        return;
+    }
+
+    // adjust
+    if (pose_estimates.size() == 0) {
+        timeout++;
+    } else {
+        pose = pose_estimates[0];
+        if (this->camera_mode == "320" && pose.translation[0] <= 1.5) {
+            this->loadConfig("160");
+        } else if (this->camera_mode == "160" && pose.translation[0] >= 1.8) {
+            this->loadConfig("320");
+        }
+    }
+}
+
+std::vector<AprilTagPose> Camera::processImage(cv::Mat &image, int &timeout)
 {
     cv::Point2f p1;
     cv::Point2f p2;
@@ -397,23 +429,32 @@ std::vector<AprilTagPose> Camera::processImage(cv::Mat &image)
     // extract apriltags and estimate pose
     this->apriltags = this->tag_detector->extractTags(masked);
     for (int i = 0; i < this->apriltags.size(); i++) {
-        pose = this->obtainAprilTagPose(this->apriltags[i]);
-        pose_estimates.push_back(pose);
+        if (this->apriltags[i].id == 5 || this->apriltags[i].id == 0) {
+            pose = this->obtainAprilTagPose(this->apriltags[i]);
+            pose_estimates.push_back(pose);
 
-        // calc the roi rect
-        p1 = cv::Point2f(this->apriltags[i].p[1].first, this->apriltags[i].p[1].second);
-        p2 = cv::Point2f(this->apriltags[i].p[3].first, this->apriltags[i].p[3].second);
-        float x = this->apriltags[i].cxy.first;
-        float y = this->apriltags[i].cxy.second;
-        float normdist = cv::norm(p2 - p1);
-        this->roi_rect = cv::Rect(x-normdist/2, y-normdist/2, normdist, normdist);
-        this->roi_rect = enlargeROI(image_gray, this->roi_rect, 5);
+            // calc the roi rect
+            p1 = cv::Point2f(this->apriltags[i].p[1].first, this->apriltags[i].p[1].second);
+            p2 = cv::Point2f(this->apriltags[i].p[3].first, this->apriltags[i].p[3].second);
+            float x = this->apriltags[i].cxy.first;
+            float y = this->apriltags[i].cxy.second;
+            float normdist = cv::norm(p2 - p1);
+            this->roi_rect = cv::Rect(x-normdist/2, y-normdist/2, normdist, normdist);
+            this->roi_rect = enlargeROI(image_gray, this->roi_rect, 5);
+
+            // only need 1 tag
+            timeout = 0;
+            break;
+        }
     }
 
     // enlarge the roi rect so to be the size of the image
     if (this->apriltags.size() == 0) {
         this->roi_rect = enlargeROI(image_gray, this->roi_rect, 1000);
     }
+
+    // adjust camera mode
+    this->adjustCameraMode(pose_estimates, timeout);
 
     // display result
     cv::imshow("camera", masked);
@@ -474,18 +515,20 @@ int Camera::outputAprilTagPose(const std::string output_fp, AprilTagPose &pose)
 int Camera::run(void)
 {
     int frame_index;
+    int timeout;
     double last_tic;
     cv::Mat image;
     std::vector<AprilTagPose> pose_estimates;
 
     // setup
+    timeout = 0;
     frame_index = 0;
     last_tic = tic();
 
     // read capture device
     while (true) {
         this->getFrame(image);
-        pose_estimates = this->processImage(image);
+        pose_estimates = this->processImage(image, timeout);
         this->printFPS(last_tic, frame_index);
         // cv::imshow("camera", image);
         // cv::waitKey(1);
@@ -494,46 +537,10 @@ int Camera::run(void)
     return 0;
 }
 
-std::vector<AprilTagPose> Camera::step(void)
+std::vector<AprilTagPose> Camera::step(int &timeout)
 {
     cv::Mat image;
 
     this->getFrame(image);
-    return this->processImage(image);
-}
-
-int Camera::runCalibration(void)
-{
-    int c;
-    int frame_index;
-    double last_tic;
-    cv::Mat image;
-    std::vector<AprilTagPose> pose_estimates;
-
-    // setup
-    frame_index = 0;
-    last_tic = tic();
-
-    while (true) {
-        c = cv::waitKey(1);
-        this->getFrame(image);
-
-        pose_estimates = this->processImage(image);
-        this->printFPS(last_tic, frame_index);
-
-        if (c == 113) {
-            ROS_INFO("exiting...");
-            break;
-
-        } else if (c == 'c') {
-            if (pose_estimates.size()) {
-                ROS_INFO("record pose estimate!");
-                this->outputAprilTagPose("pose_estimate.dat", pose_estimates[0]);
-            } else {
-                ROS_INFO("no apriltags detected!");
-            }
-        }
-    }
-
-    return 0;
+    return this->processImage(image, timeout);
 }
