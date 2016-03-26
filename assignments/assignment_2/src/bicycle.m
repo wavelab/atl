@@ -34,6 +34,18 @@ function x = g(x_prev, v_t, L, delta_t, dt)
     ];
 end
 
+function plot_animation(fig_index, x_store, t)
+    % plot animation
+    figure(fig_index);
+    clf;
+
+    for i = 1:2:length(t)
+        plot(x_store(1, 1:i), x_store(2, 1:i), 'bx');
+        axis equal;
+        drawnow;
+    end
+end
+
 
 % simulation
 for i = 1:length(t)
@@ -48,14 +60,5 @@ for i = 1:length(t)
     x_store(:, i + 1) = x_t;
 end
 
-
-% plot animation
-figure(1);
-clf;
-
-for i = 1:2:length(t)
-    plot(x_store(1, 1:i), x_store(2, 1:i), 'bx');
-    axis equal;
-    drawnow;
-end
+plot_animation(1, x_store, t);
 print -djpg -color bicycle_motion_20s.jpg

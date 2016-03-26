@@ -12,8 +12,8 @@ int test_run(void)
     Camera cam(
         0,
         CAMERA_FIREFLY,
-        "/home/stan/Projects/awesomo/configs/firefly_calib/ost.yaml"
-        // "/home/chutsu/Dropbox/proj/awesomo/configs/firefly_calib/ost.yaml"
+        // "/home/stan/Projects/awesomo/configs/firefly_calib/ost.yaml"
+        "/home/chutsu/Dropbox/proj/awesomo/configs/firefly_calib/ost.yaml"
     );
     // Camera cam(
     //     0,
