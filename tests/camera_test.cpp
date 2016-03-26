@@ -12,9 +12,19 @@ int test_run(void)
     Camera cam(0, CAMERA_FIREFLY);
     cam.loadConfig(
         "default",
-        "/home/chutsu/Dropbox/proj/awesomo/configs/pointgrey_firefly/ost.yaml"
+        "/home/chutsu/Dropbox/proj/awesomo/configs/pointgrey_firefly/ost_640.yaml"
     );
-    cam.initCamera("default");
+    cam.loadConfig(
+        "320",
+        "/home/chutsu/Dropbox/proj/awesomo/configs/pointgrey_firefly/ost_320.yaml"
+    );
+    cam.loadConfig(
+        "160",
+        "/home/chutsu/Dropbox/proj/awesomo/configs/pointgrey_firefly/ost_160.yaml"
+    );
+    // cam.initCamera("default");
+    // cam.initCamera("320");
+    cam.initCamera("160");
     cam.run();
 
     return 0;

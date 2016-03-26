@@ -416,8 +416,8 @@ std::vector<AprilTagPose> Camera::processImage(cv::Mat &image)
     }
 
     // display result
-    // cv::imshow("camera", result);
-    // cv::waitKey(1);
+    cv::imshow("camera", masked);
+    cv::waitKey(1);
 
     return pose_estimates;
 }
