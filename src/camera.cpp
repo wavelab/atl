@@ -8,7 +8,7 @@ static double tic(void)
     return ((double) t.tv_sec + ((double) t.tv_usec) / 1000000.0);
 }
 
-int Camera::initializeNormalCamera()
+int Camera::initWebcam(int image_width, int image_height)
 {
     // setup
     this->capture = new cv::VideoCapture(this->camera_index);
@@ -19,8 +19,8 @@ int Camera::initializeNormalCamera()
         return -1;
 
     } else {
-        this->capture->set(CV_CAP_PROP_FRAME_WIDTH, this->image_width);
-        this->capture->set(CV_CAP_PROP_FRAME_HEIGHT, this->image_height);
+        this->capture->set(CV_CAP_PROP_FRAME_WIDTH, image_width);
+        this->capture->set(CV_CAP_PROP_FRAME_HEIGHT, image_height);
 
     }
     ROS_INFO("Camera initialized!");
@@ -28,7 +28,7 @@ int Camera::initializeNormalCamera()
     return 0;
 }
 
-int Camera::initializeFireflyCamera()
+int Camera::initFirefly()
 {
     FlyCapture2::Error error;
 
@@ -56,26 +56,32 @@ int Camera::initializeFireflyCamera()
     return 0;
 }
 
-Camera::Camera(int camera_index, int camera_type, const std::string calibration_fp)
+int Camera::initCamera(std::string camera_mode)
 {
-    // initlize apriltag detector
-    this->tag_detector = new AprilTags::TagDetector(AprilTags::tagCodes16h5);
+    // load calibration file
+    if (loadConfig(camera_mode) == -1) {
+        ROS_INFO("Failed to initialize camera!");
+        return -1;
+    }
 
     // intialize camera
-    this->roi_rect = cv::Rect(0, 0, 640/2, 480/2);
+    if (this->camera_type == CAMERA_NORMAL) {
+        this->initWebcam(this->config->image_width, this->config->image_height);
+    } else if (this->camera_type == CAMERA_FIREFLY) {
+        this->initFirefly();
+    } else {
+        ROS_INFO("Invalid Camera Type: %d!", this->camera_type);
+        ROS_INFO("Failed to initialize camera!");
+    }
+
+    return 0;
+}
+
+Camera::Camera(int camera_index, int camera_type)
+{
     this->camera_index = camera_index;
     this->camera_type = camera_type;
-    this->loadCalibrationFile(calibration_fp);
-
-    if (this->camera_type == CAMERA_NORMAL) {
-        this->initializeNormalCamera();
-
-    } else if (this->camera_type == CAMERA_FIREFLY) {
-        this->initializeFireflyCamera();
-
-    } else {
-        ROS_INFO("Invalid Camera Type: %d!", camera_type);
-    }
+    this->tag_detector = new AprilTags::TagDetector(AprilTags::tagCodes16h5);
 }
 
 static int checkMatrixYaml(YAML::Node matrix_yaml)
@@ -120,28 +126,30 @@ static cv::Mat loadMatrixFromYaml(YAML::Node matrix_yaml)
     return mat;
 }
 
-void Camera::loadCalibrationFile(const std::string calibration_fp)
+CameraConfig *Camera::loadConfig(std::string mode, const std::string calib_file)
 {
+    CameraConfig *camera_config = new CameraConfig();
+
     try {
-        YAML::Node config = YAML::LoadFile(calibration_fp);
+        YAML::Node config = YAML::LoadFile(calib_file);
 
         // image width
         if (config["image_width"]) {
-            this->image_width = config["image_width"].as<int>();
+            camera_config->image_width = config["image_width"].as<int>();
         } else {
             ROS_ERROR("Failed to load image_width");
         }
 
         // image height
         if (config["image_height"]) {
-            this->image_height = config["image_height"].as<int>();
+            camera_config->image_height = config["image_height"].as<int>();
         } else {
             ROS_ERROR("Failed to load image_height");
         }
 
         // camera matrix
         if (config["camera_matrix"]) {
-            this->camera_matrix = loadMatrixFromYaml(
+            camera_config->camera_matrix = loadMatrixFromYaml(
                 config["camera_matrix"]
             );
         } else {
@@ -150,7 +158,7 @@ void Camera::loadCalibrationFile(const std::string calibration_fp)
 
         // distortion coefficients
         if (config["distortion_coefficients"]) {
-            this->distortion_coefficients = loadMatrixFromYaml(
+            camera_config->distortion_coefficients = loadMatrixFromYaml(
                 config["distortion_coefficients"]
             );
         } else {
@@ -159,7 +167,7 @@ void Camera::loadCalibrationFile(const std::string calibration_fp)
 
         // rectification matrix
         if (config["rectification_matrix"]) {
-            this->rectification_matrix = loadMatrixFromYaml(
+            camera_config->rectification_matrix = loadMatrixFromYaml(
                 config["rectification_matrix"]
             );
         } else {
@@ -168,7 +176,7 @@ void Camera::loadCalibrationFile(const std::string calibration_fp)
 
         // projection matrix
         if (config["projection_matrix"]) {
-            this->projection_matrix = loadMatrixFromYaml(
+            camera_config->projection_matrix = loadMatrixFromYaml(
                 config["projection_matrix"]
             );
         } else {
@@ -178,10 +186,34 @@ void Camera::loadCalibrationFile(const std::string calibration_fp)
     } catch (YAML::BadFile &ex) {
         ROS_ERROR(
             "Failed to load calibration file: %s",
-            calibration_fp.c_str()
+            calib_file.c_str()
         );
         throw;
     }
+
+    // add to configs
+    this->configs[mode] = camera_config;
+
+    return camera_config;
+}
+
+int Camera::loadConfig(std::string camera_mode)
+{
+    if (this->configs.find(camera_mode) != this->configs.end()) {
+        this->camera_mode = camera_mode;
+        this->config = this->configs.find(camera_mode)->second;
+        this->roi_rect = cv::Rect(
+            0,
+            0,
+            config->image_width,
+            config->image_height
+        );
+    } else {
+        ROS_INFO("Config file for mode [%s] not found!", camera_mode.c_str());
+        return -1;
+    }
+
+    return 0;
 }
 
 int Camera::getFrame(cv::Mat &image)
@@ -283,10 +315,10 @@ AprilTagPose Camera::obtainAprilTagPose(AprilTags::TagDetection& detection)
     // recovering the relative pose of a tag:
     detection.getRelativeTranslationRotation(
         m_tag_size,
-        this->camera_matrix.at<double>(0, 0),
-        this->camera_matrix.at<double>(1, 1),
-        this->camera_matrix.at<double>(0, 2),
-        this->camera_matrix.at<double>(1, 2),
+        this->config->camera_matrix.at<double>(0, 0),
+        this->config->camera_matrix.at<double>(1, 1),
+        this->config->camera_matrix.at<double>(0, 2),
+        this->config->camera_matrix.at<double>(1, 2),
         pose.translation,
         rotation
     );
@@ -338,39 +370,33 @@ cv::Rect enlargeROI(cv::Mat& frm, cv::Rect boundingBox, int padding)
     return returnRect;
 }
 
-std::vector<AprilTagPose> Camera::processImage(cv::Mat &image, cv::Mat &image_gray)
+std::vector<AprilTagPose> Camera::processImage(cv::Mat &image)
 {
-    AprilTagPose pose;
-    std::vector<AprilTagPose> pose_estimates;
-    cv::Mat image_undistort;
-    cv::Mat empty;
     cv::Point2f p1;
     cv::Point2f p2;
+    cv::Mat image_undistort;
+    cv::Mat image_gray;
 
-    // detect april tags (requires a gray scale image)
-    // cv::undistort(
-    //     image,
-    //     image_undistort,
-    //     this->camera_matrix,
-    //     this->distortion_coefficients
-    // );
+    AprilTagPose pose;
+    std::vector<AprilTagPose> pose_estimates;
+
+    // apriltags detector (requires a gray scale image)
     cv::cvtColor(image, image_gray, CV_BGR2GRAY);
-    cv::resize(image_gray, image_gray, cv::Size(640/4, 480/4));
+    cv::resize(
+        image_gray,
+        image_gray,
+        cv::Size(this->config->image_width, this->config->image_height)
+    );
 
-    //create a mask and draw the roi_rect
+    // create a mask and draw the roi_rect
     cv::Mat mask(image_gray.rows, image_gray.cols, CV_8UC1, cv::Scalar(0));
+    cv::Mat masked(image_gray.rows, image_gray.cols, CV_8UC1, cv::Scalar(0));
     cv::rectangle(mask, this->roi_rect, 255, -1);
-    cv::Mat result(image_gray.rows, image_gray.cols, CV_8UC1, cv::Scalar(0));
-    image_gray.copyTo(result, mask);
+    image_gray.copyTo(masked, mask);
 
-    imshow("mask result", result);
-    cv::waitKey(1);
-
-    this->apriltags = this->tag_detector->extractTags(result);
-    // // print out each apriltags
-    // for (int i = 0; i < this->apriltags.size(); i++) {
-    if (this->apriltags.size()) {
-        int i = 0;
+    // extract apriltags and estimate pose
+    this->apriltags = this->tag_detector->extractTags(masked);
+    for (int i = 0; i < this->apriltags.size(); i++) {
         pose = this->obtainAprilTagPose(this->apriltags[i]);
         pose_estimates.push_back(pose);
 
@@ -381,16 +407,17 @@ std::vector<AprilTagPose> Camera::processImage(cv::Mat &image, cv::Mat &image_gr
         float y = this->apriltags[i].cxy.second;
         float normdist = cv::norm(p2 - p1);
         this->roi_rect = cv::Rect(x-normdist/2, y-normdist/2, normdist, normdist);
-
         this->roi_rect = enlargeROI(image_gray, this->roi_rect, 5);
-        this->printDetection(this->apriltags[i]);
     }
 
+    // enlarge the roi rect so to be the size of the image
     if (this->apriltags.size() == 0) {
-        std::cout << "nothing detected" << std::endl;
-        // enlarge the roi rect so to be the size of the image
         this->roi_rect = enlargeROI(image_gray, this->roi_rect, 1000);
     }
+
+    // display result
+    // cv::imshow("camera", result);
+    // cv::waitKey(1);
 
     return pose_estimates;
 }
@@ -449,7 +476,6 @@ int Camera::run(void)
     int frame_index;
     double last_tic;
     cv::Mat image;
-    cv::Mat image_gray;
     std::vector<AprilTagPose> pose_estimates;
 
     // setup
@@ -459,7 +485,7 @@ int Camera::run(void)
     // read capture device
     while (true) {
         this->getFrame(image);
-        pose_estimates = this->processImage(image, image_gray);
+        pose_estimates = this->processImage(image);
         this->printFPS(last_tic, frame_index);
         // cv::imshow("camera", image);
         // cv::waitKey(1);
@@ -471,10 +497,9 @@ int Camera::run(void)
 std::vector<AprilTagPose> Camera::step(void)
 {
     cv::Mat image;
-    cv::Mat image_gray;
 
     this->getFrame(image);
-    return this->processImage(image, image_gray);
+    return this->processImage(image);
 }
 
 int Camera::runCalibration(void)
@@ -483,7 +508,6 @@ int Camera::runCalibration(void)
     int frame_index;
     double last_tic;
     cv::Mat image;
-    cv::Mat image_gray;
     std::vector<AprilTagPose> pose_estimates;
 
     // setup
@@ -494,7 +518,7 @@ int Camera::runCalibration(void)
         c = cv::waitKey(1);
         this->getFrame(image);
 
-        pose_estimates = this->processImage(image, image_gray);
+        pose_estimates = this->processImage(image);
         this->printFPS(last_tic, frame_index);
 
         if (c == 113) {

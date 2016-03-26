@@ -38,6 +38,19 @@ class AprilTagPose
         Eigen::Vector3d translation;
 };
 
+class CameraConfig
+{
+    public:
+        int camera_mode;
+        int image_width;
+        int image_height;
+
+        cv::Mat camera_matrix;
+        cv::Mat rectification_matrix;
+        cv::Mat distortion_coefficients;
+        cv::Mat projection_matrix;
+};
+
 class Camera
 {
     private:
@@ -45,22 +58,17 @@ class Camera
 
         int camera_index;
         int camera_type;
-        int image_width;
-        int image_height;
+        std::string camera_mode;
+
+        cv::Rect roi_rect;
+        CameraConfig *config;
+        std::map<std::string, CameraConfig *> configs;
 
         cv::VideoCapture *capture;
         FlyCapture2::Camera *capture_firefly;
 
-        cv::Mat camera_matrix;
-        cv::Mat rectification_matrix;
-        cv::Mat distortion_coefficients;
-        cv::Mat projection_matrix;
-
-        cv::Rect roi_rect;
-
-        void loadCalibrationFile(const std::string calibration_fp);
-        int initializeNormalCamera();
-        int initializeFireflyCamera();
+        int initWebcam(int image_width, int image_height);
+        int initFirefly();
         void printFPS(double &last_tic, int &frame);
         float calculateFocalLength(void);
         double standardRad(double t);
@@ -72,7 +80,7 @@ class Camera
         );
         AprilTagPose obtainAprilTagPose(AprilTags::TagDetection& detection);
         void printDetection(AprilTags::TagDetection& detection);
-        std::vector<AprilTagPose> processImage(cv::Mat &image, cv::Mat &image_gray);
+        std::vector<AprilTagPose> processImage(cv::Mat &image);
         bool isFileEmpty(const std::string file_path);
         int outputAprilTagPose(const std::string output_fp, AprilTagPose &pose);
 
@@ -80,7 +88,10 @@ class Camera
         vector<AprilTags::TagDetection> apriltags;
         std::vector<AprilTagPose> pose_estimates;
 
-        Camera(int camera_index, int camera_type, const std::string calibration_fp);
+        Camera(int camera_index, int camera_type);
+        int initCamera(std::string camera_mode);
+        CameraConfig *loadConfig(std::string mode, const std::string calib_file);
+        int loadConfig(std::string camera_mode);
         int run(void);
         int getFrame(cv::Mat &image);
         std::vector<AprilTagPose> step(void);
