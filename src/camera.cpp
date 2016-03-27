@@ -59,7 +59,7 @@ int Camera::initFirefly()
 int Camera::initCamera(std::string camera_mode)
 {
     // load calibration file
-    if (loadConfig(camera_mode) == -1) {
+    if (this->loadConfig(camera_mode) == -1) {
         ROS_INFO("Failed to initialize camera!");
         return -1;
     }
@@ -81,7 +81,7 @@ Camera::Camera(int camera_index, int camera_type)
 {
     this->camera_index = camera_index;
     this->camera_type = camera_type;
-    this->tag_detector = new AprilTags::TagDetector(AprilTags::tagCodes16h5);
+    this->tag_detector =  new TagDetector();
 }
 
 static int checkMatrixYaml(YAML::Node matrix_yaml)
@@ -254,6 +254,7 @@ int Camera::getFrame(cv::Mat &image)
     } else {
         ROS_INFO("Invalid Camera Type: %d!", camera_type);
         return -2;
+
     }
 
     return 0;
@@ -269,117 +270,9 @@ void Camera::printFPS(double &last_tic, int &frame)
     }
 }
 
-double Camera::standardRad(double t)
+void Camera::adjustMode(std::vector<TagPose> &pose_estimates, int &timeout)
 {
-    // normalize angle to be within the interval [-pi,pi].
-    if (t >= 0.) {
-        t = fmod(t + M_PI, TWOPI) - M_PI;
-    } else {
-        t = fmod(t - M_PI, -TWOPI) + M_PI;
-    }
-
-    return t;
-}
-
-void Camera::convertToEuler(
-    const Eigen::Matrix3d &wRo,
-    double &yaw,
-    double &pitch,
-    double &roll
-)
-{
-    yaw = this->standardRad(atan2(wRo(1,0), wRo(0,0)));
-    double c = cos(yaw);
-    double s = sin(yaw);
-    pitch = this->standardRad(atan2(-wRo(2,0), wRo(0,0)*c + wRo(1,0)*s));
-    roll  = this->standardRad(atan2(wRo(0,2)*s - wRo(1,2)*c, -wRo(0,1)*s + wRo(1,1)*c));
-}
-
-AprilTagPose Camera::obtainAprilTagPose(AprilTags::TagDetection &detection)
-{
-    AprilTagPose pose;
-    double m_tag_size;
-
-    Eigen::Matrix3d F;
-    Eigen::Matrix3d rotation;
-    Eigen::Matrix3d fixed_rot;
-
-    // setup
-    F << 1, 0, 0,
-         0, -1, 0,
-         0, 0, 1;
-
-    // change tag size according to tag id
-    if (detection.id == 0) {
-        m_tag_size = 0.048;
-    } else if (detection.id == 5) {
-        m_tag_size = 0.343;
-    }
-
-    // recovering the relative pose of a tag:
-    detection.getRelativeTranslationRotation(
-        m_tag_size,
-        this->config->camera_matrix.at<double>(0, 0),
-        this->config->camera_matrix.at<double>(1, 1),
-        this->config->camera_matrix.at<double>(0, 2),
-        this->config->camera_matrix.at<double>(1, 2),
-        pose.translation,
-        rotation
-    );
-    fixed_rot = F * rotation;
-    pose.distance = pose.translation.norm();
-    this->convertToEuler(fixed_rot, pose.yaw, pose.pitch, pose.roll);
-
-    return pose;
-}
-
-void Camera::printDetection(AprilTags::TagDetection& detection)
-{
-    AprilTagPose pose;
-
-    pose = this->obtainAprilTagPose(detection);
-    ROS_INFO("id: %d ", detection.id);
-    ROS_INFO("Hamming: %d ", detection.hammingDistance);
-    ROS_INFO("distance= %fm ", pose.translation.norm());
-    ROS_INFO("x=%f ", pose.translation(0));
-    ROS_INFO("y=%f ", pose.translation(1));
-    ROS_INFO("z=%f ", pose.translation(2));
-    ROS_INFO("yaw=%f ", rad2deg(pose.yaw));
-    ROS_INFO("pitch=%f ", rad2deg(pose.pitch));
-    ROS_INFO("roll=%f \n", rad2deg(pose.roll));
-
-    // also note that for SLAM/multi-view application it is better to
-    // use reprojection error of corner points, because the noise in
-    // this relative pose is very non-Gaussian; see iSAM source code
-    // for suitable factors.
-}
-
-
-cv::Rect enlargeROI(cv::Mat& frm, cv::Rect boundingBox, int padding)
-{
-    cv::Rect returnRect = cv::Rect(boundingBox.x - padding, boundingBox.y - padding,
-                                   boundingBox.width + (padding * 2),
-                                   boundingBox.height + (padding * 2)
-                          );
-    // check the size of the roi
-    if (returnRect.x < 0) returnRect.x = 0;
-    if (returnRect.y < 0) returnRect.y = 0;
-    if (returnRect.x + returnRect.width >= frm.cols){
-        returnRect.width = frm.cols-returnRect.x;
-    }
-    if (returnRect.y + returnRect.height >= frm.rows){
-        returnRect.height = frm.rows - returnRect.y;
-    }
-
-    return returnRect;
-}
-
-void Camera::adjustCameraMode(
-    std::vector<AprilTagPose> &pose_estimates,
-    int &timeout
-)
-{
-    AprilTagPose pose;
+    TagPose pose;
 
     // pre-check
     if (timeout > 5 && this->camera_mode == "160") {
@@ -402,126 +295,13 @@ void Camera::adjustCameraMode(
     }
 }
 
-std::vector<AprilTagPose> Camera::processImage(cv::Mat &image, int &timeout)
-{
-    cv::Point2f p1;
-    cv::Point2f p2;
-    cv::Mat image_undistort;
-    cv::Mat image_gray;
-
-    AprilTagPose pose;
-    std::vector<AprilTagPose> pose_estimates;
-
-    // apriltags detector (requires a gray scale image)
-    cv::cvtColor(image, image_gray, CV_BGR2GRAY);
-    cv::resize(
-        image_gray,
-        image_gray,
-        cv::Size(this->config->image_width, this->config->image_height)
-    );
-
-    // create a mask and draw the roi_rect
-    cv::Mat mask(image_gray.rows, image_gray.cols, CV_8UC1, cv::Scalar(0));
-    cv::Mat masked(image_gray.rows, image_gray.cols, CV_8UC1, cv::Scalar(0));
-    cv::rectangle(mask, this->roi_rect, 255, -1);
-    image_gray.copyTo(masked, mask);
-
-    // extract apriltags and estimate pose
-    this->apriltags = this->tag_detector->extractTags(masked);
-    // this->apriltags = this->tag_detector->extractTags(image_gray);
-    for (int i = 0; i < this->apriltags.size(); i++) {
-        if (this->apriltags[i].id == 5 || this->apriltags[i].id == 0) {
-            // this->printDetection(this->apriltags[i]);
-            pose = this->obtainAprilTagPose(this->apriltags[i]);
-            pose_estimates.push_back(pose);
-
-            // calc the roi rect
-            p1 = cv::Point2f(this->apriltags[i].p[1].first, this->apriltags[i].p[1].second);
-            p2 = cv::Point2f(this->apriltags[i].p[3].first, this->apriltags[i].p[3].second);
-            float x = this->apriltags[i].cxy.first;
-            float y = this->apriltags[i].cxy.second;
-            float normdist = cv::norm(p2 - p1);
-            this->roi_rect = cv::Rect(x-normdist/2, y-normdist/2, normdist, normdist);
-            this->roi_rect = enlargeROI(image_gray, this->roi_rect, 5);
-
-            // only need 1 tag
-            timeout = 0;
-            break;
-        }
-    }
-
-    // enlarge the roi rect so to be the size of the image
-    if (this->apriltags.size() == 0) {
-        this->roi_rect = enlargeROI(image_gray, this->roi_rect, 1000);
-    }
-
-    // adjust camera mode
-    this->adjustCameraMode(pose_estimates, timeout);
-
-    // display result
-    // cv::imshow("camera", masked);
-    // cv::imshow("camera", image_gray);
-    // cv::waitKey(1);
-
-    return pose_estimates;
-}
-
-bool Camera::isFileEmpty(const std::string file_path)
-{
-    std::ifstream f(file_path);
-
-    if (f && f.peek() == std::ifstream::traits_type::eof()) {
-        f.close();
-        return true;
-    } else if (!f) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-int Camera::outputAprilTagPose(const std::string output_fp, AprilTagPose &pose)
-{
-    bool empty_file;
-    std::ofstream output_file;
-
-    // setup
-    empty_file = this->isFileEmpty(output_fp);
-    output_file.open(output_fp, ios::out | ios::app);
-
-    if (output_file.is_open()) {
-        if (empty_file) {
-            output_file << "distance" << ", ";
-            output_file << "yaw" << ", ";
-            output_file << "pitch" << ", ";
-            output_file << "roll" << ", ";
-            output_file << "x" << ", ";
-            output_file << "y" << ", ";
-            output_file << "z" << std::endl;
-        }
-
-        output_file << pose.translation.norm() << ", ";
-        output_file << pose.yaw << ", ";
-        output_file << pose.pitch << ", ";
-        output_file << pose.roll << ", ";
-        output_file << pose.translation(0) << ", ";
-        output_file << pose.translation(1) << ", ";
-        output_file << pose.translation(2) << std::endl;
-        output_file.close();
-    } else {
-        return -1;
-    }
-
-    return 0;
-}
-
 int Camera::run(void)
 {
     int frame_index;
     int timeout;
     double last_tic;
     cv::Mat image;
-    std::vector<AprilTagPose> pose_estimates;
+    std::vector<TagPose> pose_estimates;
 
     // setup
     timeout = 0;
@@ -531,7 +311,11 @@ int Camera::run(void)
     // read capture device
     while (true) {
         this->getFrame(image);
-        pose_estimates = this->processImage(image, timeout);
+        this->tag_detector->processImage(
+            this->config->camera_matrix,
+            image,
+            timeout
+        );
         // this->printFPS(last_tic, frame_index);
         // cv::imshow("camera", image);
         // cv::waitKey(1);
@@ -540,10 +324,14 @@ int Camera::run(void)
     return 0;
 }
 
-std::vector<AprilTagPose> Camera::step(int &timeout)
+std::vector<TagPose> Camera::step(int &timeout)
 {
     cv::Mat image;
 
     this->getFrame(image);
-    return this->processImage(image, timeout);
+    return this->tag_detector->processImage(
+        this->config->camera_matrix,
+        image,
+        timeout
+    );
 }

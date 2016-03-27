@@ -40,8 +40,8 @@ int main(int argc, char **argv)
     ros::Rate rate(100);
     ros::Publisher publisher;
 	geometry_msgs::PoseStamped pose_msg;
-	std::vector<AprilTagPose> pose_estimates;
-	AprilTagPose pose;
+	std::vector<TagPose> pose_estimates;
+	TagPose pose;
 	double rot_mat[9];
 	double vec_pos[3];
 	double pos[3];

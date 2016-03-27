@@ -1,13 +1,6 @@
 #ifndef __CAMERA_HPP__
 #define __CAMERA_HPP__
 
-#define _USE_MATH_DEFINES
-#ifdef M_PI
-  #define TWOPI 2*M_PI
-#else
-  #define TWOPI 2.0*3.1415926535897932384626433832795
-#endif
-
 #include <fstream>
 #include <iostream>
 #include <math.h>
@@ -23,22 +16,12 @@
 #include <FlyCapture2.h>
 
 #include "awesomo/util.hpp"
+#include "awesomo/apriltag.hpp"
 
 // CONSTANTS
 #define CAMERA_NORMAL 0
 #define CAMERA_FIREFLY 1
 
-
-class AprilTagPose
-{
-    public:
-        int id;
-        double distance;
-        double yaw;
-        double pitch;
-        double roll;
-        Eigen::Vector3d translation;
-};
 
 class CameraConfig
 {
@@ -56,7 +39,7 @@ class CameraConfig
 class Camera
 {
     private:
-        AprilTags::TagDetector *tag_detector;
+        TagDetector *tag_detector;
 
         int camera_index;
         int camera_type;
@@ -72,27 +55,11 @@ class Camera
         int initWebcam(int image_width, int image_height);
         int initFirefly();
         void printFPS(double &last_tic, int &frame);
-        float calculateFocalLength(void);
-        double standardRad(double t);
-        void convertToEuler(
-            const Eigen::Matrix3d &wRo,
-            double &yaw,
-            double &pitch,
-            double &roll
-        );
-        AprilTagPose obtainAprilTagPose(AprilTags::TagDetection& detection);
-        void printDetection(AprilTags::TagDetection& detection);
-        std::vector<AprilTagPose> processImage(cv::Mat &image, int &timeout);
-        bool isFileEmpty(const std::string file_path);
-        int outputAprilTagPose(const std::string output_fp, AprilTagPose &pose);
-        void adjustCameraMode(
-            std::vector<AprilTagPose> &pose_estimates,
-            int &timeout
-        );
+        void adjustMode(std::vector<TagPose> &pose_estimates, int &timeout);
 
     public:
         vector<AprilTags::TagDetection> apriltags;
-        std::vector<AprilTagPose> pose_estimates;
+        std::vector<TagPose> pose_estimates;
 
         Camera(int camera_index, int camera_type);
         int initCamera(std::string camera_mode);
@@ -100,7 +67,7 @@ class Camera
         int loadConfig(std::string camera_mode);
         int run(void);
         int getFrame(cv::Mat &image);
-        std::vector<AprilTagPose> step(int &timeout);
+        std::vector<TagPose> step(int &timeout);
 };
 
 #endif

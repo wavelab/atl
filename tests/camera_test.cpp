@@ -3,11 +3,21 @@
 
 
 // TESTS
-int test_run(void);
-void test_suite(void);
+int testRun(void);
+int testCameraloadConfig(void);
+void testSuite(void);
 
 
-int test_run(void)
+int testCameraloadConfig(void)
+{
+    Camera cam(0, CAMERA_FIREFLY);
+    cam.loadConfig("test", "tests/config/ost.yaml");
+
+
+    return 0;
+}
+
+int testRun(void)
 {
     Camera cam(0, CAMERA_FIREFLY);
     cam.loadConfig(
@@ -30,9 +40,10 @@ int test_run(void)
     return 0;
 }
 
-void test_suite(void)
+void testSuite(void)
 {
-    mu_add_test(test_run);
+    // mu_add_test(testCameraloadConfig);
+    // mu_add_test(testRun);
 }
 
-mu_run_tests(test_suite)
+mu_run_tests(testSuite)
