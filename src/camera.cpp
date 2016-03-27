@@ -344,9 +344,9 @@ void Camera::printDetection(AprilTags::TagDetection& detection)
     ROS_INFO("x=%f ", pose.translation(0));
     ROS_INFO("y=%f ", pose.translation(1));
     ROS_INFO("z=%f ", pose.translation(2));
-    ROS_INFO("yaw=%f ", pose.yaw);
-    ROS_INFO("pitch=%f ", pose.pitch);
-    ROS_INFO("roll=%f \n", pose.roll);
+    ROS_INFO("yaw=%f ", rad2deg(pose.yaw));
+    ROS_INFO("pitch=%f ", rad2deg(pose.pitch));
+    ROS_INFO("roll=%f \n", rad2deg(pose.roll));
 
     // also note that for SLAM/multi-view application it is better to
     // use reprojection error of corner points, because the noise in
@@ -428,6 +428,7 @@ std::vector<AprilTagPose> Camera::processImage(cv::Mat &image, int &timeout)
 
     // extract apriltags and estimate pose
     this->apriltags = this->tag_detector->extractTags(masked);
+    // this->apriltags = this->tag_detector->extractTags(image_gray);
     for (int i = 0; i < this->apriltags.size(); i++) {
         if (this->apriltags[i].id == 5 || this->apriltags[i].id == 0) {
             // this->printDetection(this->apriltags[i]);
@@ -459,6 +460,7 @@ std::vector<AprilTagPose> Camera::processImage(cv::Mat &image, int &timeout)
 
     // display result
     // cv::imshow("camera", masked);
+    // cv::imshow("camera", image_gray);
     // cv::waitKey(1);
 
     return pose_estimates;

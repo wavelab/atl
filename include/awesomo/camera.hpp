@@ -22,6 +22,8 @@
 #include <yaml-cpp/yaml.h>
 #include <FlyCapture2.h>
 
+#include "awesomo/util.hpp"
+
 // CONSTANTS
 #define CAMERA_NORMAL 0
 #define CAMERA_FIREFLY 1

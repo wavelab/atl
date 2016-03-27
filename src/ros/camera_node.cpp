@@ -4,6 +4,7 @@
 #include <geometry_msgs/PoseStamped.h>
 
 #include "awesomo/camera.hpp"
+#include "awesomo/util.hpp"
 
 
 // YPR
@@ -38,19 +39,22 @@ int main(int argc, char **argv)
     ros::NodeHandle n;
     ros::Rate rate(100);
     ros::Publisher publisher;
-	geometry_msgs::PoseStamped pose;
+	geometry_msgs::PoseStamped pose_msg;
 	std::vector<AprilTagPose> pose_estimates;
+	AprilTagPose pose;
 	double rot_mat[9];
 	double vec_pos[3];
 	double pos[3];
+	tf::Quaternion quat;
 
     // setup
     seq = 0;
     timeout = 0;
     // create rotation matrix - YAW (90) and PITCH (-90)
     rotation_matrix(M_PI_2, -M_PI_2, 0.0, rot_mat);
+    // rotation_matrix(0.0, -M_PI_2, 0.0, rot_mat);
     // publisher = n.advertise<geometry_msgs::PoseStamped>("mavros/vision_pose/pose", 100);
-    publisher = n.advertise<geometry_msgs::PoseStamped>("mavros/mocap/pose", 100);
+    publisher = n.advertise<geometry_msgs::PoseStamped>("mavros/vision_pose/pose", 100);
     Camera cam(0, CAMERA_FIREFLY);
     cam.loadConfig(
         "default",
@@ -77,31 +81,55 @@ int main(int argc, char **argv)
 
         // publish poses
         for (int i = 0; i < pose_estimates.size(); i++) {
-            // pose header
-            pose.header.stamp = ros::Time::now();
-            pose.header.seq = seq;
-            pose.header.frame_id = 1;
+            pose = pose_estimates[i];
 
-            vec_pos[0] = pose_estimates[i].translation[0];
-            vec_pos[1] = pose_estimates[i].translation[1];
-            vec_pos[2] = pose_estimates[i].translation[2];
+            // pose header
+            pose_msg.header.stamp = ros::Time::now();
+            pose_msg.header.seq = seq;
+            pose_msg.header.frame_id = 1;
+
+            vec_pos[0] = pose.translation[0];
+            vec_pos[1] = pose.translation[1];
+            vec_pos[2] = pose.translation[2];
             mat3_dot_vec3(rot_mat, vec_pos, pos);
 
             // pose position
             // x is times by -1 because april tag was in left-hand
             // co-ordinate frame commonly used by cameras
-            pose.pose.position.x = -1 * pos[0];
-            pose.pose.position.y = pos[1];
-            pose.pose.position.z = pos[2];
+            pose_msg.pose.position.x = -1 * pos[0];
+            pose_msg.pose.position.y = pos[1];
+            pose_msg.pose.position.z = pos[2];
 
             // pose orientation
-            pose.pose.orientation.x = 0.0;
-            pose.pose.orientation.y = 0.0;
-            pose.pose.orientation.z = 0.0;
-            pose.pose.orientation.w = 0.0;
+            quat = euler2quat(
+                pose.pitch,
+                pose.roll,
+                pose.yaw
+            );
+
+            pose_msg.pose.orientation.x = quat.x();
+            pose_msg.pose.orientation.y = quat.y();
+            pose_msg.pose.orientation.z = quat.z();
+            pose_msg.pose.orientation.w = quat.w();
+
+            // ROS_INFO("x=%f ", pose_msg.pose.position.x);
+            // ROS_INFO("y=%f ", pose_msg.pose.position.y);
+            // ROS_INFO("z=%f ", pose_msg.pose.position.z);
+            // ROS_INFO("roll=%f ", rad2deg(pose.roll));
+            // ROS_INFO("pitch=%f ", rad2deg(pose.pitch));
+            // ROS_INFO("yaw=%f \n", rad2deg(pose.yaw));
+
+            // double roll;
+            // double pitch;
+            // double yaw;
+            //
+            // quat2euler(pose_msg.pose.orientation, &roll, &pitch, &yaw);
+            // ROS_INFO("roll=%f ", rad2deg(roll));
+            // ROS_INFO("pitch=%f ", rad2deg(pitch));
+            // ROS_INFO("yaw=%f \n", rad2deg(yaw));
 
             // publish and spin
-            publisher.publish(pose);
+            publisher.publish(pose_msg);
         }
 
         // update
