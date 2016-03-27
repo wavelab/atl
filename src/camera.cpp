@@ -430,7 +430,7 @@ std::vector<AprilTagPose> Camera::processImage(cv::Mat &image, int &timeout)
     this->apriltags = this->tag_detector->extractTags(masked);
     for (int i = 0; i < this->apriltags.size(); i++) {
         if (this->apriltags[i].id == 5 || this->apriltags[i].id == 0) {
-            this->printDetection(this->apriltags[i]);
+            // this->printDetection(this->apriltags[i]);
             pose = this->obtainAprilTagPose(this->apriltags[i]);
             pose_estimates.push_back(pose);
 
@@ -458,8 +458,8 @@ std::vector<AprilTagPose> Camera::processImage(cv::Mat &image, int &timeout)
     this->adjustCameraMode(pose_estimates, timeout);
 
     // display result
-    cv::imshow("camera", masked);
-    cv::waitKey(1);
+    // cv::imshow("camera", masked);
+    // cv::waitKey(1);
 
     return pose_estimates;
 }
@@ -530,7 +530,7 @@ int Camera::run(void)
     while (true) {
         this->getFrame(image);
         pose_estimates = this->processImage(image, timeout);
-        this->printFPS(last_tic, frame_index);
+        // this->printFPS(last_tic, frame_index);
         // cv::imshow("camera", image);
         // cv::waitKey(1);
     }

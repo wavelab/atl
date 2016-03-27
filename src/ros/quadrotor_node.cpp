@@ -206,34 +206,37 @@ int main(int argc, char **argv)
         pose.header.stamp = ros::Time::now();
         pose.header.seq = count;
         pose.header.frame_id = 1;
+        ROS_INFO("x: 0.0\ty: 0.0\tz: 1.0");
 		pose.pose.position.z = 1.0;
+        pose.pose.position.x = 0.0;
+        pose.pose.position.y = 0.0;
 		count++;
 
-		if (ros::Time::now() - last_request > ros::Duration(10.0)) {
-            if (index == 0) {
-                pose.pose.position.x = 0.5;
-                pose.pose.position.y = 0.5;
-                index++;
-                ROS_INFO("x: 0.5\ty: 0.5");
-            } else if (index == 1) {
-                pose.pose.position.x = 0.5;
-                pose.pose.position.y = -0.5;
-                ROS_INFO("x: 0.5\ty: -0.5");
-                index++;
-            } else if (index == 2) {
-                pose.pose.position.x = -0.5;
-                pose.pose.position.y = -0.5;
-                ROS_INFO("x: -0.5\ty: -0.5");
-                index++;
-            } else if (index == 3) {
-                pose.pose.position.x = -0.5;
-                pose.pose.position.y = 0.5;
-                ROS_INFO("x: -0.5\ty: 0.5");
-                index = 0;
-            }
-
-			last_request = ros::Time::now();
-		}
+		// if (ros::Time::now() - last_request > ros::Duration(10.0)) {
+        //     if (index == 0) {
+        //         pose.pose.position.x = 0.5;
+        //         pose.pose.position.y = 0.5;
+        //         index++;
+        //         ROS_INFO("x: 0.5\ty: 0.5");
+        //     } else if (index == 1) {
+        //         pose.pose.position.x = 0.5;
+        //         pose.pose.position.y = -0.5;
+        //         ROS_INFO("x: 0.5\ty: -0.5");
+        //         index++;
+        //     } else if (index == 2) {
+        //         pose.pose.position.x = -0.5;
+        //         pose.pose.position.y = -0.5;
+        //         ROS_INFO("x: -0.5\ty: -0.5");
+        //         index++;
+        //     } else if (index == 3) {
+        //         pose.pose.position.x = -0.5;
+        //         pose.pose.position.y = 0.5;
+        //         ROS_INFO("x: -0.5\ty: 0.5");
+        //         index = 0;
+        //     }
+        //
+		// 	last_request = ros::Time::now();
+		// }
 
 		// publish
 		quad.position_publisher.publish(pose);

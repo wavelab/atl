@@ -49,7 +49,8 @@ int main(int argc, char **argv)
     timeout = 0;
     // create rotation matrix - YAW (90) and PITCH (-90)
     rotation_matrix(M_PI_2, -M_PI_2, 0.0, rot_mat);
-    publisher = n.advertise<geometry_msgs::PoseStamped>("awesomo/camera", 100);
+    // publisher = n.advertise<geometry_msgs::PoseStamped>("mavros/vision_pose/pose", 100);
+    publisher = n.advertise<geometry_msgs::PoseStamped>("mavros/mocap/pose", 100);
     Camera cam(0, CAMERA_FIREFLY);
     cam.loadConfig(
         "default",
