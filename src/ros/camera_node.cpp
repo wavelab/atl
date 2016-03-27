@@ -6,9 +6,10 @@
 #include "awesomo/camera.hpp"
 
 
+// YPR
 void rotation_matrix(double phi, double theta, double psi, double *rot_mat)
 {
-    /* rotation matrix */
+    //  rotation matrix
     rot_mat[0] = cos(phi) * cos(theta);
     rot_mat[1] = sin(phi) * cos(theta);
     rot_mat[2] = -1 * sin(theta);
@@ -29,7 +30,6 @@ void mat3_dot_vec3(double *m, double *v, double *out)
     out[2] = m[2] * v[0] + m[5] * v[1] + m[8] * v[2];
 }
 
-
 int main(int argc, char **argv)
 {
     int seq;
@@ -47,7 +47,8 @@ int main(int argc, char **argv)
     // setup
     seq = 0;
     timeout = 0;
-    // rotation_matrix(0.0, -M_PI_2, 0.0, rot_mat);
+    // create rotation matrix - YAW (90) and PITCH (-90)
+    rotation_matrix(M_PI_2, -M_PI_2, 0.0, rot_mat);
     publisher = n.advertise<geometry_msgs::PoseStamped>("awesomo/camera", 100);
     Camera cam(0, CAMERA_FIREFLY);
     cam.loadConfig(
@@ -80,18 +81,17 @@ int main(int argc, char **argv)
             pose.header.seq = seq;
             pose.header.frame_id = 1;
 
-            // vec_pos[0] = pose_estimates[i].translation[0];
-            // vec_pos[1] = pose_estimates[i].translation[1];
-            // vec_pos[2] = pose_estimates[i].translation[2];
-            // mat3_dot_vec3(rot_mat, vec_pos, pos);
+            vec_pos[0] = pose_estimates[i].translation[0];
+            vec_pos[1] = pose_estimates[i].translation[1];
+            vec_pos[2] = pose_estimates[i].translation[2];
+            mat3_dot_vec3(rot_mat, vec_pos, pos);
 
             // pose position
-            // pose.pose.position.x = pos[0];
-            // pose.pose.position.y = pos[1];
-            // pose.pose.position.z = pos[2];
-            pose.pose.position.x = pose_estimates[i].translation[0];
-            pose.pose.position.y = pose_estimates[i].translation[1];
-            pose.pose.position.z = pose_estimates[i].translation[2];
+            // x is times by -1 because april tag was in left-hand
+            // co-ordinate frame commonly used by cameras
+            pose.pose.position.x = -1 * pos[0];
+            pose.pose.position.y = pos[1];
+            pose.pose.position.z = pos[2];
 
             // pose orientation
             pose.pose.orientation.x = 0.0;

@@ -430,6 +430,7 @@ std::vector<AprilTagPose> Camera::processImage(cv::Mat &image, int &timeout)
     this->apriltags = this->tag_detector->extractTags(masked);
     for (int i = 0; i < this->apriltags.size(); i++) {
         if (this->apriltags[i].id == 5 || this->apriltags[i].id == 0) {
+            this->printDetection(this->apriltags[i]);
             pose = this->obtainAprilTagPose(this->apriltags[i]);
             pose_estimates.push_back(pose);
 
