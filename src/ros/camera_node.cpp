@@ -1,7 +1,11 @@
 #include <cmath>
 
 #include <ros/ros.h>
+#include <std_msgs/Float64.h>
+#include <geometry_msgs/Pose.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/PoseWithCovariance.h>
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
 
 #include "awesomo/camera.hpp"
 #include "awesomo/util.hpp"
@@ -9,14 +13,15 @@
 #define ROS_TOPIC "awesomo/camera"
 // #define ROS_TOPIC "mavros/vision_pose/pose"
 // #define ROS_TOPIC "mavros/mocap/pose"
+// #define ROS_TOPIC "mavros/vision_pose/pose_cov"
 
-#define FIREFLY_640 "/home/chutsu/Dropbox/proj/awesomo/configs/pointgrey_firefly/ost_640.yaml"
-#define FIREFLY_320 "/home/chutsu/Dropbox/proj/awesomo/configs/pointgrey_firefly/ost_320.yaml"
-#define FIREFLY_160 "/home/chutsu/Dropbox/proj/awesomo/configs/pointgrey_firefly/ost_160.yaml"
+// #define FIREFLY_640 "/home/chutsu/Dropbox/proj/awesomo/configs/pointgrey_firefly/ost_640.yaml"
+// #define FIREFLY_320 "/home/chutsu/Dropbox/proj/awesomo/configs/pointgrey_firefly/ost_320.yaml"
+// #define FIREFLY_160 "/home/chutsu/Dropbox/proj/awesomo/configs/pointgrey_firefly/ost_160.yaml"
 
-// #define FIREFLY_640 "/home/odroid/awesomo/configs/pointgrey_firefly/ost_640.yaml"
-// #define FIREFLY_320 "/home/odroid/awesomo/configs/pointgrey_firefly/ost_320.yaml"
-// #define FIREFLY_160 "/home/odroid/awesomo/configs/pointgrey_firefly/ost_160.yaml"
+#define FIREFLY_640 "/home/odroid/awesomo/configs/pointgrey_firefly/ost_640.yaml"
+#define FIREFLY_320 "/home/odroid/awesomo/configs/pointgrey_firefly/ost_320.yaml"
+#define FIREFLY_160 "/home/odroid/awesomo/configs/pointgrey_firefly/ost_160.yaml"
 
 
 // YPR
@@ -86,15 +91,61 @@ static void build_pose_msg(
     pose_msg.pose.orientation.w = quat.w();
 }
 
+// static void build_pose_msg(
+//     int seq,
+//     TagPose &pose,
+// 	double *rot_mat,
+//     geometry_msgs::Pose &pose_msg
+// )
+// {
+// 	double pos[3];
+// 	double vec_pos[3];
+// 	tf::Quaternion quat;
+//
+//     // translate from camera frame to ENU
+//     vec_pos[0] = pose.translation[0];
+//     vec_pos[1] = pose.translation[1];
+//     vec_pos[2] = pose.translation[2];
+//     mat3_dot_vec3(rot_mat, vec_pos, pos);
+//
+//     // convert euler angles to quaternions
+//     quat = euler2quat(
+//         pose.pitch,
+//         pose.roll,
+//         pose.yaw
+//     );
+//
+//     // pose header
+//     // pose_msg.header.seq = seq;
+//     // pose_msg.header.stamp = ros::Time::now();
+//     // pose_msg.header.frame_id = "pose_estimate";
+//
+//     // pose position
+//     // x is times by -1 because april tag was in left-hand
+//     // co-ordinate frame commonly used by cameras
+//     pose_msg.position.x = -1 * pos[0];
+//     pose_msg.position.y = pos[1];
+//     pose_msg.position.z = pos[2];
+//
+//     // pose orientation
+//     // pose_msg.pose.orientation.x = quat.x();
+//     // pose_msg.pose.orientation.y = quat.y();
+//     // pose_msg.pose.orientation.z = quat.z();
+//     // pose_msg.pose.orientation.w = quat.w();
+// }
+
 int main(int argc, char **argv)
 {
     int seq;
     int timeout;
 	double rot_mat[9];
-
+    std_msgs::Float64 cov_mtx[36];
 	TagPose pose;
 	std::vector<TagPose> pose_estimates;
 	geometry_msgs::PoseStamped pose_msg;
+	// geometry_msgs::Pose pose_msg;
+    // geometry_msgs::PoseWithCovariance pose_cov;
+    // geometry_msgs::PoseWithCovarianceStamped pose_cov_stamped;
 
     ros::init(argc, argv, "awesomo_camera");
     ros::NodeHandle n;
@@ -106,8 +157,11 @@ int main(int argc, char **argv)
     timeout = 0;
     rotation_matrix(M_PI_2, -M_PI_2, 0.0, rot_mat);
 
+    memset(cov_mtx, 0, sizeof(float) * 36);
+
     // ROS specifics
     publisher = n.advertise<geometry_msgs::PoseStamped>(ROS_TOPIC, 100);
+    // publisher = n.advertise<geometry_msgs::PoseWithCovarianceStamped>(ROS_TOPIC, 100);
     Camera cam(0, CAMERA_FIREFLY);
     cam.loadConfig("default", FIREFLY_640);
     cam.loadConfig("320", FIREFLY_320);
@@ -124,15 +178,46 @@ int main(int argc, char **argv)
         for (int i = 0; i < pose_estimates.size(); i++) {
             // build pose message
             pose = pose_estimates[i];
+
             build_pose_msg(seq, pose, rot_mat, pose_msg);
 
+            // pose_cov.pose = pose_msg;
+            // // pose_cov.covariance = cov_mtx;
+            // pose_cov.covariance[0] = 1;
+            // pose_cov.covariance[7] = 1;
+            // pose_cov.covariance[14] = 1;
+            //
+            // pose_cov_stamped.header.seq = seq;
+            // pose_cov_stamped.header.stamp = ros::Time::now();
+            // pose_cov_stamped.header.frame_id = "pose_estimate";
+            // pose_cov_stamped.pose = pose_cov;
+
+
+            // ROS_INFO("x=%f ", pose_msg.pose.position.x);
+            // ROS_INFO("y=%f ", pose_msg.pose.position.y);
+            // ROS_INFO("z=%f ", pose_msg.pose.position.z);
+            // ROS_INFO("roll=%f ", rad2deg(pose.roll));
+            // ROS_INFO("pitch=%f ", rad2deg(pose.pitch));
+            // ROS_INFO("yaw=%f", rad2deg(pose.yaw));
+            //
+            // double roll;
+            // double pitch;
+            // double yaw;
+            //
+            // quat2euler(pose_msg.pose.orientation, &roll, &pitch, &yaw);
+            // ROS_INFO("roll=%f ", rad2deg(roll));
+            // ROS_INFO("pitch=%f ", rad2deg(pitch));
+            // ROS_INFO("yaw=%f \n", rad2deg(yaw));
+
             // publish and spin
+            // publisher.publish(pose_cov_stamped);
             publisher.publish(pose_msg);
 
             // update
             seq++;
         }
 
+        // send last known estimate if tag not detected
         if (pose_estimates.size() == 0) {
             ROS_INFO("still publishing!");
 
@@ -151,20 +236,3 @@ int main(int argc, char **argv)
 
     return 0;
 }
-
-
-// ROS_INFO("x=%f ", pose_msg.pose.position.x);
-// ROS_INFO("y=%f ", pose_msg.pose.position.y);
-// ROS_INFO("z=%f ", pose_msg.pose.position.z);
-// ROS_INFO("roll=%f ", rad2deg(pose.roll));
-// ROS_INFO("pitch=%f ", rad2deg(pose.pitch));
-// ROS_INFO("yaw=%f \n", rad2deg(pose.yaw));
-
-// double roll;
-// double pitch;
-// double yaw;
-
-// quat2euler(pose_msg.pose.orientation, &roll, &pitch, &yaw);
-// ROS_INFO("roll=%f ", rad2deg(roll));
-// ROS_INFO("pitch=%f ", rad2deg(pitch));
-// ROS_INFO("yaw=%f \n", rad2deg(yaw));
