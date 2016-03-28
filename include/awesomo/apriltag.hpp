@@ -35,12 +35,12 @@ class TagPose
 class TagDetector
 {
     private:
-        AprilTags::TagDetector *tag_detector;
+        AprilTags::TagDetector *detector;
         cv::Rect roi_rect;
 
     public:
         TagDetector(void);
-        void calculateROI(cv::Mat &image_gray, AprilTags::TagDetection &tag);
+        void adjustROI(cv::Mat &image_gray, AprilTags::TagDetection &tag);
         std::vector<TagPose> processImage(
             cv::Mat &camera_matrix,
             cv::Mat &image,

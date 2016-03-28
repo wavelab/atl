@@ -73,6 +73,7 @@ int Camera::initCamera(std::string camera_mode)
         ROS_INFO("Invalid Camera Type: %d!", this->camera_type);
         ROS_INFO("Failed to initialize camera!");
     }
+    ROS_INFO("Camera is running...");
 
     return 0;
 }
@@ -251,6 +252,16 @@ int Camera::getFrame(cv::Mat &image)
             row_bytes
         ).copyTo(image);
 
+        // resize the image to reflect camera mode
+        cv::resize(
+            image,
+            image,
+            cv::Size(
+                this->config->image_width,
+                this->config->image_height
+            )
+        );
+
     } else {
         ROS_INFO("Invalid Camera Type: %d!", camera_type);
         return -2;
@@ -289,8 +300,10 @@ void Camera::adjustMode(std::vector<TagPose> &pose_estimates, int &timeout)
         pose = pose_estimates[0];
         if (this->camera_mode == "320" && pose.translation[0] <= 1.5) {
             this->loadConfig("160");
+            timeout = 0;
         } else if (this->camera_mode == "160" && pose.translation[0] >= 1.8) {
             this->loadConfig("320");
+            timeout = 0;
         }
     }
 }
@@ -311,11 +324,12 @@ int Camera::run(void)
     // read capture device
     while (true) {
         this->getFrame(image);
-        this->tag_detector->processImage(
+        pose_estimates = this->tag_detector->processImage(
             this->config->camera_matrix,
             image,
             timeout
         );
+        this->adjustMode(pose_estimates, timeout);
         // this->printFPS(last_tic, frame_index);
         // cv::imshow("camera", image);
         // cv::waitKey(1);
@@ -327,11 +341,14 @@ int Camera::run(void)
 std::vector<TagPose> Camera::step(int &timeout)
 {
     cv::Mat image;
+    std::vector<TagPose> pose_estimates;
 
     this->getFrame(image);
-    return this->tag_detector->processImage(
+    pose_estimates = this->tag_detector->processImage(
         this->config->camera_matrix,
         image,
         timeout
     );
+    this->adjustMode(pose_estimates, timeout);
+    return pose_estimates;
 }

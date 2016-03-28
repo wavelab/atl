@@ -74,6 +74,7 @@ std::vector<TagPose> TagDetector::processImage(
     cv::Mat masked(image_gray.rows, image_gray.cols, CV_8UC1, cv::Scalar(0));
     cv::rectangle(mask, this->roi_rect, 255, -1);
     image_gray.copyTo(masked, mask);
+    masked.convertTo(masked, -1, 1, -100);
 
     // extract apriltags and estimate pose
     apriltags = this->detector->extractTags(masked);
@@ -96,8 +97,8 @@ std::vector<TagPose> TagDetector::processImage(
     }
 
     // display result
-    // cv::imshow("camera", masked);
-    // cv::imshow("camera", image_gray);
+    // cv::imshow("camera - masked", masked);
+    // cv::imshow("camera - grayscale", masked);
     // cv::waitKey(1);
 
     return pose_estimates;
