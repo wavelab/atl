@@ -68,38 +68,25 @@ end
 function angle = atan3(y, x)
     angle = atan2(y, x);
 
-    if x < 0 && y < 0
+    if y < 0
         angle = angle + 2 * pi;
-    elseif x > 0 && y < 0
-        angle = angle + pi;
     end
 end
 
-function wp_reached = waypoint_reached(carrot_t, wp_start, wp_end, r)
+function dist = dist_between_points(x, y)
+    diff = x - y;
+    dist = norm(diff, 2);
+end
+
+function wp_reached = waypoint_reached(position, waypoint, threshold)
     wp_reached = 0;
 
-    % check x-axis
-    if carrot_t(1) < min(wp_start(1), wp_end(1))
-        carrot_t(1) = min(wp_start(1), wp_end(1));
+    if dist_between_points(position, waypoint) < threshold
         wp_reached = 1;
-    elseif carrot_t(1) > max(wp_start(1), wp_end(1))
-        carrot_t(1) = max(wp_start(1), wp_end(1));
-        wp_reached = 1;
-    end
-
-    % check y-axis
-    if carrot_t(2) < min(wp_start(2), wp_end(2))
-        carrot_t(2) = min(wp_start(2), wp_end(2));
-        wp_reached = 1;
-    elseif carrot_t(2) > max(wp_start(2), wp_end(2))
-        carrot_t(2) = max(wp_start(2), wp_end(2));
-        wp_reached = 1;
-    end
-
-    % check distance to waypoint end
-    dist = norm(wp_end - carrot_t, 2);
-    if (wp_reached == 1) && (dist > r)
+        return;
+    else
         wp_reached = 0;
+        return;
     end
 end
 
@@ -128,29 +115,30 @@ function plot_trajectory(fig_index, x_store, carrot_store, t)
     xlabel('x-position (meters)');
     ylabel('y-position (meters)');
     % axis([4 32 4 12]);
-    axis([24 26 6 12]);
-    % axis equal;
+    % axis([20 30 5 15]);
+    axis equal;
+end
 
+function plot_animation(fig_index, x_store, carrot_store, t)
+    figure(fig_index);
+    hold on;
 
-    % for i = 1:length(t)
-    %     % plot trajectory
-    %     plot(x_store(1, i), x_store(2, i), 'bo');
-    %
-    %     % plot carrot
-    %     plot(carrot_store(1, i), carrot_store(2, i), 'go');
-    %
-    %     % draw box
-    %     % if (mod(i, 5) == 0)
-    %     %     drawbox(x_store(1, i), x_store(2, i), x_store(3, i), 0.3, fig_index);
-    %     % end
-    %
-    %     % plot parameters
-    %     % axis([4 32 4 12]);
-    %     axis([20 28 6 14]);
-    %     % axis equal;
-    %     drawnow;
-    %     pause(2);
-    % end
+    for i = 1:length(t)
+        % plot trajectory
+        plot(x_store(1, i), x_store(2, i), 'bo');
+
+        % plot carrot
+        plot(carrot_store(1, i), carrot_store(2, i), 'go');
+
+        % draw box
+        if (mod(i, 5) == 0)
+            drawbox(x_store(1, i), x_store(2, i), x_store(3, i), 0.3, fig_index);
+        end
+
+        % plot parameters
+        axis equal;
+        drawnow;
+    end
 end
 
 function plot_controller(fig_index, c_store, t)
@@ -158,12 +146,6 @@ function plot_controller(fig_index, c_store, t)
     hold on;
 
     subplot(3, 1, 2);
-    plot(t, c_store(1, :), 'ro-');
-    title('Crosstrack Error');
-    xlabel('t (seconds)');
-    ylabel('error (meters)');
-
-    subplot(3, 1, 3);
     head_err_deg = zeros(1, length(t));
     for i = 1:length(t)
         err = rad2deg(c_store(2, i));

@@ -22,15 +22,11 @@ x_t = [0; 0; 0];
 x_store = zeros(3, length(t));
 
 
-function r = deg2rad(degrees)
-    r = degrees * pi / 180;
-end
-
 function x = g(x_prev, v_t, L, delta_t, dt)
     x = [
-        x_prev(1) + v_t * cos(deg2rad(x_prev(3))) * dt;
-        x_prev(2) + v_t * sin(deg2rad(x_prev(3))) * dt;
-        x_prev(3) + (v_t * tan(deg2rad(delta_t)) / L) * dt;
+        x_prev(1) + v_t * cos(x_prev(3)) * dt;
+        x_prev(2) + v_t * sin(x_prev(3)) * dt;
+        x_prev(3) + ((v_t * tan(delta_t)) / L) * dt;
     ];
 end
 
@@ -49,7 +45,7 @@ end
 
 % simulation
 for i = 1:length(t)
-    delta_t = 10 - t(i);
+    delta_t = deg2rad(10 - t(i));
     additive_noise = [
         normrnd(0, stddev_x);
         normrnd(0, stddev_y);
@@ -62,3 +58,4 @@ end
 
 plot_animation(1, x_store, t);
 print -djpg -color bicycle_motion_20s.jpg
+pause
