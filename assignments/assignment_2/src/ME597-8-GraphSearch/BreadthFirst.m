@@ -1,17 +1,12 @@
-%% Breadth-First/Depth-First search algorithm
 % Needs to be changed to unit length links, otherwise useless.
-clear; clc; 
+clear; clc;
 
-breadthfirst = 0; % 1 - breadth first, 0 - depth first
-
-%% Create AVI object
-vidObj = VideoWriter('breadthfirst.avi');
-vidObj.Quality = 100;
-vidObj.FrameRate = 5;
-open(vidObj);
+breadthfirst = 0;
+% 1 - breadth first
+% 0 - depth first
 
 % Get same problem every time (fix random number generator start point)
-rng('default')
+% rng('default')
 
 %% Generate a graph
 n = 30; % Nodes
@@ -59,12 +54,13 @@ for i = 1:n
     for j = i:n
         if (e(i,j)==1)
             plot([nodes(i,1) nodes(j,1)],[nodes(i,2) nodes(j,2)],'k');
+            drawnow;
         end
     end
 end
 plot(nodes(start,1),nodes(start,2),'bo','MarkerSize',6,'LineWidth',2);
 plot(nodes(finish,1),nodes(finish,2),'ro','MarkerSize',6,'LineWidth',2);
-writeVideo(vidObj, getframe(gcf));
+drawnow;
 
 %% Find shortest path
 
@@ -85,14 +81,14 @@ while (~done)
 
     % Grab next node in open set
     curnode = O(1,:);
-    
+
     % Move to closed set, remove from open set
     C = [C; curnode];
     O = O([2:end],:);
 
     % Get all neighbours of current node
     neigh = find(e(curnode(1),:)==1);
-    
+
     % Process each neighbour
     for i=1:length(neigh)
         % If in closed set, skip
@@ -105,11 +101,11 @@ while (~done)
         % If not in open set, add it
         if (length(found)==0)
             if (breadthfirst) % breadthfirst
-                O = [O; neigh(i) curnode(1) dcur]; 
+                O = [O; neigh(i) curnode(1) dcur];
             else % depth first
                 O = [neigh(i) curnode(1) dcur; O];
             end
-        % If in open set, update cost if better    
+        % If in open set, update cost if better
         else
             if (dcur < O(found,3))
                 O(found,:) = [neigh(i) curnode(1) dcur];
@@ -124,8 +120,9 @@ while (~done)
     for i=1:length(neigh)
         plot(nodes(neigh(i),1),nodes(neigh(i),2), 'mo');
         plot([nodes(curnode(1),1) nodes(neigh(i),1)],[nodes(curnode(1),2) nodes(neigh(i),2)], 'm');
+        drawnow;
     end
-    writeVideo(vidObj, getframe(gcf));
+    drawnow;
 end
 
 % Find and plot final path through back tracing
@@ -133,19 +130,18 @@ done = 0;
 cur = finish
 curC = find(C(:,1)==finish);
 prev =  C(curC,2);
-i=2;
+i = 2;
 pathlength = 0;
 while (~done)
     if (prev == start)
         done = 1;
     end
-    figure(1);hold on;
+    figure(1);
+    hold on;
     plot([nodes(prev,1) nodes(cur,1)], [nodes(prev,2) nodes(cur,2)],'g','LineWidth',2)
     cur = prev;
     curC = find(C(:,1)==cur);
     prev = C(curC,2);
-    writeVideo(vidObj, getframe(gcf));
     pathlength = pathlength+1;
 end
 pathlength
-close(vidObj);
