@@ -3,7 +3,7 @@ source('src/util.m');
 
 
 % simulation parameters
-t_end = 1;
+t_end = 20;
 dt = 0.1;  % 10 Hz
 t = 0:dt:t_end;
 
@@ -19,6 +19,7 @@ wp_3 = [rect_x + rect_w, rect_y - rect_h];
 wp_4 = [rect_x, rect_y - rect_h];
 
 waypoints = [wp_1; wp_2; wp_3; wp_4; wp_1];
+waypoints = [wp_1; wp_2; wp_3; wp_4; wp_1];
 
 % model parameters
 L = 0.3;
@@ -30,7 +31,7 @@ v_t = 3;
 % bicycle states
 delta_max = deg2rad(25); % max steering angle
 x_t = [
-    24;  % x
+    22;  % x
     10;  % y
     deg2rad(0);  % theta
 ];
@@ -49,34 +50,10 @@ carrot_store(:, 1) = carrot_t;
 k = 2.0;
 
 % controller states
-c_t = [
-    % 10;  % crosstrack error
-    % x_t(3);  % heading error
-    0;
-    0;
-];
+c_t = [0;];  % heading error
 c_store = zeros(length(c_t), length(t));
 c_store(:, 1) = c_t;
 
-
-function delta_t = calculate_steering_angle(c_t, k, v_t, delta_max)
-   delta_t = c_t(2) + atan2(k * c_t(1), v_t);
-
-    % make sure steering angle does not exceed allowed
-    if (delta_t > delta_max)
-        delta_t = delta_max;
-    elseif (delta_t < -delta_max)
-        delta_t = -delta_max;
-    end
-end
-
-function x = bicycle_update(x_prev, v_t, L, psi_t, delta_t, dt)
-    x = [
-        x_prev(1) + v_t * cos(psi_t - delta_t) * dt;
-        x_prev(2) + v_t * sin(psi_t - delta_t) * dt;
-        psi_t - delta_t;
-    ];
-end
 
 function new_carrot = calculate_new_carrot(x_t, r, wp_start, wp_end)
     % cross-track point on trajectory
@@ -89,26 +66,20 @@ function new_carrot = calculate_new_carrot(x_t, r, wp_start, wp_end)
 
     % update carrot position
     new_carrot = pt_on_line + r * u;
-end
-
-function dist = dist_between_points(x, y)
-    diff = x - y;
-    dist = norm(diff, 2);
+    new_carrot = [new_carrot(1); new_carrot(2)];
 end
 
 function [carrot_t, wp_index] = carrot_update(x_t, carrot_prev, r, waypoints, wp_index)
     wp_start = waypoints(wp_index, :);
     wp_end = waypoints(wp_index + 1, :);
-    dist_from_wp_start = dist_between_points(wp_start', x_t(1:2));
+    dist_from_wp_start = dist_between_points(transpose(wp_start), x_t(1:2));
 
     % calculate new carrot
     carrot_t = calculate_new_carrot(x_t, r, wp_start, wp_end);
 
-    % check if carrot has reached waypoint
-    wp_reached = waypoint_reached(carrot_t, wp_start, wp_end, r);
-    if wp_reached == 1
-        disp('new waypoint');
-
+    % update waypoint if reached waypoint
+    if waypoint_reached(x_t(1:2), transpose(wp_end), 0.2) == 1
+    % if waypoint_reached(carrot_t(1:2), transpose(wp_end), 0.2) == 1
         % update waypoint index
         wp_index += 1;
         if wp_index == length(waypoints)
@@ -118,17 +89,7 @@ function [carrot_t, wp_index] = carrot_update(x_t, carrot_prev, r, waypoints, wp
         % recalculate carrot
         new_wp_start = waypoints(wp_index, :);
         new_wp_end = waypoints(wp_index + 1, :);
-        diff = transpose(new_wp_start) - x_t(1:2);
-        adj_r = r - norm(diff, 2);
-        adj_r
-        carrot_t = calculate_new_carrot(x_t, adj_r, new_wp_start, new_wp_end);
-
-    % adjust carrot if cornering
-    elseif dist_from_wp_start <= r
-        adj_r = r - dist_from_wp_start;
-        adj_r
-        carrot_t = calculate_new_carrot(x_t, adj_r, wp_start, wp_end);
-
+        carrot_t = calculate_new_carrot(x_t, r, new_wp_start, new_wp_end);
     end
 
     % limit carrot x component
@@ -144,67 +105,56 @@ function [carrot_t, wp_index] = carrot_update(x_t, carrot_prev, r, waypoints, wp
     elseif carrot_t(2) > max(wp_start(2), wp_end(2))
         carrot_t(2) = max(wp_start(2), wp_end(2));
     end
-    carrot_t
 end
 
-function c_t = controller_update(c_prev, L, v_t, delta_t, dt)
-    % controller state derivatives
-    c_deriv = [
-        v_t * sin(c_prev(2) - delta_t);
-        (-v_t * sin(delta_t)) / L;
-    ];
+function delta_t = calculate_delta(x_t, carrot_t, delta_max)
+    theta = x_t(3);
 
-    % controller state update
-    c_t = [
-        c_prev(1) + c_deriv(1) * dt;
-        c_prev(2) + c_deriv(2) * dt;
+    % calculate angle between carrot and bicycle
+    x = (carrot_t(1) - x_t(1));
+    y = (carrot_t(2) - x_t(2));
+    angle_of_vec = atan3(y, x);  % returns only +ve angle
+
+    % limit delta_t to pi and -pi only
+    delta_t = -(theta - angle_of_vec);
+    delta_t = mod(delta_t + pi, 2 * pi) - pi;
+
+    % limit delta_t to steering angle max
+    if (delta_t > delta_max)
+        delta_t = delta_max;
+    elseif (delta_t < -delta_max)
+        delta_t = -delta_max;
+    end
+end
+
+function x = bicycle_update(x_prev, v_t, L, delta_t, dt)
+    x = [
+        x_prev(1) + v_t * cos(x_prev(3)) * dt;
+        x_prev(2) + v_t * sin(x_prev(3)) * dt;
+        x_prev(3) + ((v_t * tan(delta_t)) / L) * dt;
     ];
 end
 
 % simulation
 wp_index = 1;
-for i = 2:length(t)
-    % control heading
-    delta_t = calculate_steering_angle(c_t, k, v_t, delta_max);
+delta_t = 0;
 
-    % update bicycle
-    noise = [
-        normrnd(0, stddev_x);
-        normrnd(0, stddev_y);
-        normrnd(0, stddev_theta);
-    ];
-    % x_t = bicycle_update(x_t, v_t, L, c_t(2), delta_t, dt) + noise;
-    x_t = bicycle_update(x_t, v_t, L, c_t(2), delta_t, dt);
-    x_store(:, i) = x_t;
-
+for i = 1:length(t)
     % update carrot
-    [carrot_t, wp_index] = carrot_update(x_t, carrot_t, 1, waypoints, wp_index);
+    [carrot_t, wp_index] = carrot_update(x_t, carrot_t, 2, waypoints, wp_index);
     carrot_store(:, i) = carrot_t;
 
-    % update controller
-    wp_start = waypoints(wp_index, :);
-    wp_end = waypoints(wp_index + 1, :);
-    %% adjust crosstrack error
-    c_t(1) = point_edge_dist(x_t, [wp_start, wp_end]);
-    %% adjust heading error
-    pt_on_line = closest_point(x_t, [wp_start, wp_end]);
-    v = [
-        carrot_t(1) - pt_on_line(1);
-        carrot_t(2) - pt_on_line(2);
-        0
-    ];
-    u = [
-        carrot_t(1) - x_t(1);
-        carrot_t(2) - x_t(2);
-        0
-    ];
-    c_t(2) = -atan3(norm(cross(u,v)), dot(u,v));
-    % c_t = controller_update(c_t, L, v_t, delta_t, dt);
-    c_store(:, i) = c_t;
+    % update steering
+    delta_t = calculate_delta(x_t, carrot_t, delta_max);
+
+    % update bicycle
+    x_t = bicycle_update(x_t, v_t, L, delta_t, dt);
+    x_store(:, i + 1) = x_t;
 end
 
 % plot animation
-plot_waypoints(1, waypoints);
-plot_trajectory(1, x_store, carrot_store, t);
-plot_controller(1, c_store, t);
+% plot_waypoints(1, waypoints);
+% plot_trajectory(1, x_store, carrot_store, t);
+plot_animation(1, x_store, carrot_store, t);
+% plot_controller(1, c_store, t);
 pause
