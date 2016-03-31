@@ -1,6 +1,4 @@
-source('src/drawbox.m');
 source('src/util.m');
-
 
 % simulation parameters
 t_end = 20;

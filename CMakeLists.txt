@@ -59,6 +59,7 @@ ADD_LIBRARY(
     src/pid.cpp
     src/util.cpp
     src/camera.cpp
+    src/quadrotor.cpp
     src/apriltag.cpp
 )
 

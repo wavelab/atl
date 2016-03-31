@@ -90,6 +90,32 @@ function wp_reached = waypoint_reached(position, waypoint, threshold)
     end
 end
 
+function drawbox(fig_index, x, y, h, scale)
+    % function drawbox(x,y,h,scale,fig)
+    % This function plots a box at position x,y heading h and size scale on
+    % figure number fig.
+
+
+    % car outline
+    box = [-1 -0.5; 1 -0.5; 1 0.5; -1 0.5; -1 -0.5];
+
+    % size scaling
+    box = scale*box;
+
+    % rotation matrix
+    R = [cos(h) -sin(h); sin(h) cos(h)];
+    box = (R*box')';
+
+    % centre
+    box(:,1) = box(:,1)+x;
+    box(:,2) = box(:,2)+y;
+
+    % plot
+    figure(fig);
+    plot(box(:,1), box(:,2), 'b','LineWidth', 2);
+    axis equal
+end
+
 function plot_waypoints(fig_index, waypoints)
     figure(fig_index);
     hold on;
@@ -132,7 +158,7 @@ function plot_animation(fig_index, x_store, carrot_store, t)
 
         % draw box
         if (mod(i, 5) == 0)
-            drawbox(x_store(1, i), x_store(2, i), x_store(3, i), 0.3, fig_index);
+            drawbox(fig_index, x_store(1, i), x_store(2, i), x_store(3, i), 0.3);
         end
 
         % plot parameters
@@ -157,3 +183,26 @@ function plot_controller(fig_index, c_store, t)
     ylabel('error (degrees)');
 end
 
+function plot_samples(fig_index, samples, milestones)
+    figure(fig_index);
+    hold on;
+
+    % plot(samples(:, 1), samples(:, 2), 'r.');
+    plot(milestones(:, 1), milestones(:, 2), 'bo');
+end
+
+function plot_map(fig_index, map, pos_start, pos_end, dxy)
+    figure(fig_index);
+    hold on;
+
+    colormap('gray');
+    imagesc(1 - map');
+
+    % plot
+    plot(pos_start(1) / dxy, pos_start(2) / dxy, 'ro', 'MarkerSize',10, 'LineWidth', 3);
+    plot(pos_end(1) / dxy, pos_end(2) / dxy, 'gx', 'MarkerSize',10, 'LineWidth', 3 );
+
+    % plot parameters
+    axis equal
+    pause
+end
