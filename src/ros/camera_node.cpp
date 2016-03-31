@@ -60,10 +60,15 @@ void fix_coordinate_frames(
     // translate from camera frame to ENU
     // x is times by -1 because april tag was in left-hand
     // co-ordinate frame commonly used by cameras
-    pos[0] = -1 * pose.translation[0];
-    pos[1] = pose.translation[1];
-    pos[2] = pose.translation[2];
-    mat3_dot_vec3(rot_mat, vec_pos, pos);
+    pos[0] = pose.translation[1];
+    pos[1] = -1 * pose.translation[2];
+    pos[2] = pose.translation[0];
+    // mat3_dot_vec3(rot_mat, pos, vec_pos);
+    // pos[0] = vec_pos[0];
+    // pos[1] = vec_pos[1];
+    // pos[2] = vec_pos[2];
+    // ROS_INFO("POSE X HERE IS %f", pose.translation[0]);
+    // ROS_INFO("returned POSE X HERE IS %f", pos[0]);
 
     // convert euler angles to quaternions
     quat = euler2quat(pose.pitch, pose.roll, pose.yaw);
@@ -103,7 +108,7 @@ static void build_pose_stamped_cov_msg(
     int seq,
     TagPose &pose,
 	double *rot_mat,
-    geometry_msgs::PoseWithCovarianceStamped pose_msg
+    geometry_msgs::PoseWithCovarianceStamped &pose_msg
 )
 {
 	double pos[3];
@@ -123,15 +128,18 @@ static void build_pose_stamped_cov_msg(
     pose_msg.pose.pose.position.z = pos[2];
 
     // pose orientation
-    pose_msg.pose.pose.orientation.x = 0;
-    pose_msg.pose.pose.orientation.y = 0;
-    pose_msg.pose.pose.orientation.z = 0;
-    pose_msg.pose.pose.orientation.w = 0;
+    pose_msg.pose.pose.orientation.x = quat.x();
+    pose_msg.pose.pose.orientation.y = quat.y();
+    pose_msg.pose.pose.orientation.z = quat.z();
+    pose_msg.pose.pose.orientation.w = quat.w();
 
     // pose covariance
-    pose_msg.pose.covariance[0] = 1;
-    pose_msg.pose.covariance[7] = 1;
-    pose_msg.pose.covariance[14] = 1;
+    pose_msg.pose.covariance[0] = 0.01;
+    pose_msg.pose.covariance[7] = 0.01;
+    pose_msg.pose.covariance[14] =0.01;
+    pose_msg.pose.covariance[21] = 2000;
+    pose_msg.pose.covariance[28] = 2000;
+    pose_msg.pose.covariance[35] = 2000;
 }
 
 
@@ -146,6 +154,22 @@ void print_pose_stamped_msg(geometry_msgs::PoseStamped &pose_msg)
     ROS_INFO("x=%f ", pose_msg.pose.position.x);
     ROS_INFO("y=%f ", pose_msg.pose.position.y);
     ROS_INFO("z=%f ", pose_msg.pose.position.z);
+    ROS_INFO("roll=%f ", rad2deg(roll));
+    ROS_INFO("pitch=%f ", rad2deg(pitch));
+    ROS_INFO("yaw=%f \n", rad2deg(yaw));
+}
+
+void print_pose_cov_stamped_msg(geometry_msgs::PoseWithCovarianceStamped &pose_msg)
+{
+    double roll;
+    double pitch;
+    double yaw;
+
+    quat2euler(pose_msg.pose.pose.orientation, &roll, &pitch, &yaw);
+
+    ROS_INFO("x=%f ", pose_msg.pose.pose.position.x);
+    ROS_INFO("y=%f ", pose_msg.pose.pose.position.y);
+    ROS_INFO("z=%f ", pose_msg.pose.pose.position.z);
     ROS_INFO("roll=%f ", rad2deg(roll));
     ROS_INFO("pitch=%f ", rad2deg(pitch));
     ROS_INFO("yaw=%f \n", rad2deg(yaw));
@@ -196,17 +220,18 @@ int main(int argc, char **argv)
             // publish and spin
             publisher.publish(pose_msg);
             seq++;
+
+            print_pose_cov_stamped_msg(pose_msg);
         }
 
         // send last known estimate if tag not detected
         if (pose_estimates.size() == 0) {
-            // ROS_INFO("Still publishing!");
+             // ROS_INFO("Still publishing!");
 
             // publish and spin
             pose_msg.header.seq = seq;
             pose_msg.header.stamp = ros::Time::now();
             publisher.publish(pose_msg);
-
             // update
             seq++;
         }

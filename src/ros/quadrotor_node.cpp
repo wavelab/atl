@@ -206,7 +206,7 @@ int main(int argc, char **argv)
         pose.header.stamp = ros::Time::now();
         pose.header.seq = count;
         pose.header.frame_id = 1;
-        ROS_INFO("x: 0.0\ty: 0.0\tz: 1.0");
+        // ROS_INFO("x: 0.0\ty: 0.0\tz: 1.0");
 		pose.pose.position.z = 1.0;
         pose.pose.position.x = 0.0;
         pose.pose.position.y = 0.0;
