@@ -41,12 +41,29 @@ void rotation_matrix(double phi, double theta, double psi, double *rot_mat)
     rot_mat[8] = cos(theta) * cos(psi);
 }
 
+void single_rotation_matrix(double psi, double *rot_mat)
+{
+    //  rotation matrix
+    rot_mat[0] = cos(psi);
+    rot_mat[1] = -sin(psi);
+    rot_mat[2] = 0;
+
+    rot_mat[3] = sin(psi);
+    rot_mat[4] = cos(psi);
+    rot_mat[5] = 0;
+
+    rot_mat[6] = 0;
+    rot_mat[7] = 0;
+    rot_mat[8] = 1;
+}
+
 void mat3_dot_vec3(double *m, double *v, double *out)
 {
     out[0] = m[0] * v[0] + m[3] * v[1] + m[6] * v[2];
     out[1] = m[1] * v[0] + m[4] * v[1] + m[7] * v[2];
     out[2] = m[2] * v[0] + m[5] * v[1] + m[8] * v[2];
 }
+
 
 void fix_coordinate_frames(
     TagPose &pose,
@@ -55,6 +72,8 @@ void fix_coordinate_frames(
     tf::Quaternion &quat
 )
 {
+    double rot_out[9];
+    single_rotation_matrix(pose.yaw, rot_out);
 	double vec_pos[3];
 
     // translate from camera frame to ENU
@@ -63,10 +82,10 @@ void fix_coordinate_frames(
     pos[0] = pose.translation[1];
     pos[1] = -1 * pose.translation[2];
     pos[2] = pose.translation[0];
-    // mat3_dot_vec3(rot_mat, pos, vec_pos);
-    // pos[0] = vec_pos[0];
-    // pos[1] = vec_pos[1];
-    // pos[2] = vec_pos[2];
+    mat3_dot_vec3(rot_out, pos, vec_pos);
+    pos[0] = vec_pos[0];
+    pos[1] = vec_pos[1];
+    pos[2] = vec_pos[2];
     // ROS_INFO("POSE X HERE IS %f", pose.translation[0]);
     // ROS_INFO("returned POSE X HERE IS %f", pos[0]);
 
