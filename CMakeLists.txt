@@ -59,7 +59,7 @@ ADD_LIBRARY(
     src/pid.cpp
     src/util.cpp
     src/camera.cpp
-    src/quadrotor.cpp
+    # src/quadrotor.cpp
     src/apriltag.cpp
 )
 
@@ -105,9 +105,9 @@ TARGET_LINK_LIBRARIES(
 INSTALL(TARGETS camera_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 # sim_test
-ADD_EXECUTABLE(sim_test tests/sim_test.cpp)
-TARGET_LINK_LIBRARIES(sim_test awesomo)
-INSTALL(TARGETS sim_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+# ADD_EXECUTABLE(sim_test tests/sim_test.cpp)
+# TARGET_LINK_LIBRARIES(sim_test awesomo)
+# INSTALL(TARGETS sim_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 # pid_test
 ADD_EXECUTABLE(pid_test tests/pid_test.cpp)
