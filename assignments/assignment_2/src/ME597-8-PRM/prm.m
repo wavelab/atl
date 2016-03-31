@@ -49,55 +49,55 @@ drawnow();
 disp('Time to create environment');
 % toc;
 
-% %% Multi-query PRM, created in batch
-% tic;
-%
-% % Get milestones
-% nS = 500;
-% samples = [xR(1)*rand(nS,1)+xMin(1) xR(2)*rand(nS,1)+xMin(2)];
-% keep = inpolygon(samples(:,1),samples(:,2), env(:,1),env(:,2));
-% milestones = [x0; xF; samples(find(keep==1),:)];
-% figure(1); hold on;
-% plot(samples(:,1),samples(:,2),'k.');
-% plot(milestones(:,1),milestones(:,2),'m.');
-% nM = length(milestones(:,1));
-% disp('Time to generate milestones');
-% nM
-% toc;
+%% Multi-query PRM, created in batch
+tic;
 
-% % Attempt to add closest p edges
-% tic;
-% p = 20;
-% e = zeros(nM,nM);
-% D = zeros*ones(nM,nM);
-% for i = 1:nM
-%     % Find closest neighbours
-%     for j = 1:nM
-%         d(j) = norm(milestones(i,:)-milestones(j,:));
-%     end
-%     [d2,ind] = sort(d);
-%     % Check for edge collisions (no need to check if entire edge is
-%     % contained in obstacles as both endpoints are in free space)
-%     for j=1:p
-%         cur = ind(j);
-%         if (i<cur)
-%             if (~CheckCollision(milestones(i,:),milestones(cur,:), obsEdges))
-%                 e(i,cur) = 1;
-%                 e(cur,i) = 1;
-%                 plot([milestones(i,1) milestones(cur,1)],[milestones(i,2) milestones(cur,2)],'m');
-%             end
-%         end
-%     end
-% end
-% disp('Time to connect roadmap');
-% toc;
+% Get milestones
+nS = 500;
+samples = [xR(1)*rand(nS,1)+xMin(1) xR(2)*rand(nS,1)+xMin(2)];
+keep = inpolygon(samples(:,1),samples(:,2), env(:,1),env(:,2));
+milestones = [x0; xF; samples(find(keep==1),:)];
+figure(1); hold on;
+plot(samples(:,1),samples(:,2),'k.');
+plot(milestones(:,1),milestones(:,2),'m.');
+nM = length(milestones(:,1));
+disp('Time to generate milestones');
+nM
+toc;
+
+% Attempt to add closest p edges
+tic;
+p = 20;
+e = zeros(nM,nM);
+D = zeros*ones(nM,nM);
+for i = 1:nM
+    % Find closest neighbours
+    for j = 1:nM
+        d(j) = norm(milestones(i,:)-milestones(j,:));
+    end
+    [d2,ind] = sort(d);
+    % Check for edge collisions (no need to check if entire edge is
+    % contained in obstacles as both endpoints are in free space)
+    for j=1:p
+        cur = ind(j);
+        if (i<cur)
+            if (~CheckCollision(milestones(i,:),milestones(cur,:), obsEdges))
+                e(i,cur) = 1;
+                e(cur,i) = 1;
+                plot([milestones(i,1) milestones(cur,1)],[milestones(i,2) milestones(cur,2)],'m');
+            end
+        end
+    end
+end
+disp('Time to connect roadmap');
+toc;
 %
 % % Find shortest path
 % tic;
 % [sp, sd] = shortestpath(milestones, e, 1, 2);
-% for i=1:length(sp)-1
-%     plot(milestones(sp(i:i+1),1),milestones(sp(i:i+1),2), 'go-', 'LineWidth',3);
-% end
+for i=1:length(sp)-1
+    plot(milestones(sp(i:i+1),1),milestones(sp(i:i+1),2), 'go-', 'LineWidth',3);
+end
 % disp('Time to find shortest path');
 % toc;
 pause

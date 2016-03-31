@@ -16,7 +16,7 @@ xF = [6 1];
 
 % Set up the obstacles
 rand('state', 1);
-nO = 30; % number of obstacles
+nO = 10; % number of obstacles
 nE = 4; % number of edges per obstacle (not changeable).
 minLen.a = 1; % Obstacle size bounds
 maxLen.a = 4;
@@ -53,7 +53,7 @@ milestones = [x0; xF];
 e = zeros(2,2);
 % Number of edges to add
 p = 8;
-t= 0;
+t = 0;
 tm = 0;
 te = 0;
 ts = 0;
@@ -92,6 +92,7 @@ while ((~done) && (t < 100))
             e(ind(j),cur) = 1;
             e(cur,ind(j)) = 1;
             plot([milestones(ind(j),1) milestones(cur,1)],[milestones(ind(j),2) milestones(cur,2)],'m');
+            drawnow;
         else 
             e(ind(j),cur) = 0;
             e(cur,ind(j)) = 0;
@@ -101,7 +102,10 @@ while ((~done) && (t < 100))
     te = te + t3 - t2;
     % Check if a path from start to end is found
     t4 = cputime;
+    e
+    milestones
     [sp, sd] = shortestpath(milestones, e, 1, 2);
+
     if (sd>0)
         done = 1;
         for i=1:length(sp)-1
@@ -117,3 +121,4 @@ ts
 ec
 disp('Time to find shortest path');
 toc;
+pause;

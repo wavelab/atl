@@ -39,7 +39,7 @@ for i=1:nO
     obsEdges = [obsEdges; obsPtsStore(1:nE,2*(i-1)+1:2*i) obsPtsStore([2:nE 1],2*(i-1)+1:2*i)];
 end
 
-% Plot obstacles
+% plot obstacles
 figure(1); clf; hold on;
 plotEnvironment(obsPtsStore,xMin, xMax, x0, xF);
 drawnow();
@@ -47,48 +47,44 @@ figure(1); hold on;
 disp('Time to create environment');
 toc;
 
-%# create AVI object
-vidObj = VideoWriter('traj_rollout4.avi');
-vidObj.Quality = 100;
-vidObj.FrameRate = 5;
-open(vidObj);
-
-
-%% Vehicle
+% vehicle
 dt = 0.01;
 uMin = [2 -2]; % bounds on inputs, [velocity, rotation rate]
 uMax = [2 2]; % bounds on inputs, [velocity, rotation rate]
 uR = uMax-uMin; % range of inputs
 sMin = 20; % steps to move
 sMax = 100; % steps to compute for rollout
-n_traj = 15; % number of trajectories to roll out
+n_traj = 5; % number of trajectories to roll out
 
 %% Trajectory rollout, created until solution found
 tic;
 done = 0;
 x_cur = x0; %current position
 t= 0;
-T = 100;
+T = 120;
 f = 1;
 
 
 while ((~done) && (t < T))
     score_step = inf;
-    for i = 1:n_traj
-        % Constant speed, linear distribution of turn rates
-        input = [uR(1)/2+uMin(1) uR(2)*(i-1)/(n_traj-1)+uMin(2)];
-        steps = sMax; 
 
-        % Propagate Dynamics
+    % roll out trajectory
+    for i = 1:n_traj
+        % constant speed, linear distribution of turn rates
+        input = [uR(1)/2+uMin(1) uR(2)*(i-1)/(n_traj-1)+uMin(2)];
+        steps = sMax;
+
+        % propagate dynamics
         x = x_cur;
-        for j=2:steps
-            x(j,:) = x(j-1,:)+[input(1)*cos(x(j-1,3))*dt input(1)*sin(x(j-1,3))*dt input(2)*dt]; 
+        for j = 2:steps
+            x(j, :) = x(j - 1, :) + [input(1)*cos(x(j-1,3))*dt input(1)*sin(x(j-1,3))*dt input(2)*dt];
         end
         keep = inpolygon(x(:,1), x(:,2), env(:,1),env(:,2));
-        
-        if (sum(keep)==steps)
-            plot(x(:,1),x(:,2),'g');
-            % Score the trajectory
+
+        if (sum(keep) == steps)
+            plot(x(:,1), x(:,2), 'g');
+
+            % score the trajectory
             togo_cur = norm(x(end,1:2)-xF);
             obs_dist = inf;
             for k = 1:nO
@@ -101,27 +97,27 @@ while ((~done) && (t < T))
                 x_new = x(sMin,:);
                 x_plot = x;
             end
+
         else
             plot(x(:,1),x(:,2),'r');
+
         end
     end
 
-    % Check if no progress is made
-    if (x_new==x_cur)
-        x_new(3)=x_new(3)-0.1;
+    % check if no progress is made
+    if (x_new == x_cur)
+        x_new(3) = x_new(3) - 0.1;
     else
-        plot(x_plot(:,1),x_plot(:,2),'b');
-        plot(x_plot(end,1),x_plot(end,2),'bo');
+        plot(x_plot(:, 1), x_plot(:, 2), 'b');
+        plot(x_plot(end, 1), x_plot(end, 2), 'bo');
     end
     drawnow;
-    writeVideo(vidObj, getframe(gcf));
 
-    % Check if a path from start to end is found
+    % check if a path from start to end is found
     if (norm(x_cur(1:2)-xF)<1)
         done = 1;
     end
     x_cur = x_new;
-    t=t+1;
+    t = t + 1;
 end
-close(vidObj);
-
+pause;

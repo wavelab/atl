@@ -173,8 +173,25 @@ Just looking at Fig~\ref{fig:bicycle_20s} we can roughly validate the motion as 
 	\label{fig:carrot_controller}
 \end{figure}
 
-A carrot controller is a controller that has a carrot point with a fixed distance $r$ on the trajectory line ahead of the closest point on the line to the current robot position.
+A carrot controller is a controller that has a carrot point with a fixed distance $r$ on the trajectory line, ahead of the closest point on the trajectory line to the current robot position.
 
+
+\subsection{Closest Point on the Trajectory Line to the Robot}
+The closest point between the robot's position and the trajectory line can be calculated, . Let $A$ and $B$ be the start and end of a trajectory line, the first step is to find the gradient $m_{1}$ of trajectory line $AB$.
+
+
+\begin{align}
+
+	
+	
+\end{align}
+
+
+The closest point $Q$ on the trajectory line $AB$ relative to the robot at point $P$ is then:
+
+m_{2} = -1 / m_{1};
+x = (m_{1} * x_{1} - m_{2} * a + b - y_{1}) / (m_{1} - m_{2});
+y = m_{2} * (x - a) + b;
 
 \newpage
 \section{Planner}

@@ -187,7 +187,7 @@ function plot_samples(fig_index, samples, milestones)
     figure(fig_index);
     hold on;
 
-    % plot(samples(:, 1), samples(:, 2), 'r.');
+    % plot(samples(:, 1), samples(:, 2), 'go');
     plot(milestones(:, 1), milestones(:, 2), 'bo');
 end
 
@@ -204,5 +204,4 @@ function plot_map(fig_index, map, pos_start, pos_end, dxy)
 
     % plot parameters
     axis equal
-    pause
 end
