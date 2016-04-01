@@ -18,3 +18,4 @@ run.sh
 
 # matlab
 *.mat
+octave-workspace
