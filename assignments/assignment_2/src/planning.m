@@ -38,6 +38,27 @@ function [dmax, start, finish] = calculate_furthest_distance_betweeen_nodes(node
     end
 end
 
+function dmax = calculate_max_edge_distance(nodes)
+    dmax = 0;
+    start = 0;
+    finish = 0;
+    n = length(nodes);
+
+    for i = 1:n
+        for j = i:n
+            dx = nodes(i, 1) - nodes(j, 1);
+            dy = nodes(i, 2) - nodes(j, 2);
+            d = sqrt(dx^2 + dy^2);
+
+            if (d > dmax)
+                dmax = d;
+                start = i;
+                finish = j;
+            end
+        end
+    end
+end
+
 function [node, index] = closest_node(nodes, x, y)
     index = 0;
     i = length(nodes);
@@ -61,13 +82,12 @@ function [node, index] = closest_node(nodes, x, y)
     index = index;
 end
 
-function [edges, dists] = create_closest_edges(map, nodes, nb_edges)
+function edges = connect_edges(nodes, nb_edges)
     n = length(nodes);
     edges = zeros(n, n);
     dists = zeros*ones(n, n);
 
     for i = 1:n
-
         % calculate distances between nodes
         for j = 1:n
             dx = nodes(j, 1) - nodes(i, 1);
@@ -80,36 +100,52 @@ function [edges, dists] = create_closest_edges(map, nodes, nb_edges)
 
         % create edges to p closest nodes
         for j = 1:min(nb_edges, length(indicies))
+            if (i ~= indicies(j))
+                edges(i, indicies(j)) = 1;
+                edges(indicies(j), i) = 1;
+            end
+        end
+    end
+end
+
+function edges = connect_edges_omap(map, nodes, nb_edges)
+    n = length(nodes);
+    edges = zeros(n, n);
+    dists = zeros*ones(n, n);
+
+    for i = 1:n
+        % calculate distances between nodes
+        for j = 1:n
+            dx = nodes(j, 1) - nodes(i, 1);
+            dy = nodes(j, 2) - nodes(i, 2);
+            d(j) = sqrt(dx^2 + dy^2);
+        end
+
+        % sort calculated distances between nodes
+        [d2, indicies] = sort(d);
+        length(indicies)
+
+        % create edges to p closest nodes
+        for j = 1:min(nb_edges, length(indicies))
             x0 = nodes(i, 1);
             y0 = nodes(i, 2);
             x1 = nodes(indicies(j), 1);
             y1 = nodes(indicies(j), 2);
             collide = omap_collision(map, x0, y0, x1, y1);
-            % node_start = nodes(i, :)
-            % node_finish = nodes(indicies(j), :)
-            % collide
-            % disp(' ')
-            % disp(' ')
 
             if collide == 0
                 edges(i, indicies(j)) = 1;
                 edges(indicies(j), i) = 1;
-                % plot(
-                %     [nodes(indicies(j), 1) nodes(i, 1)],
-                %     [nodes(indicies(j), 2) nodes(i, 2)],
-                %     'r-'
-                % );
+                % plot([x0, x1], [y0, y1], 'g-');
                 % drawnow;
             else
                 edges(i, indicies(j)) = 0;
                 edges(indicies(j), i) = 0;
+                % plot([x0, x1], [y0, y1], 'r-');
+                % drawnow;
             end
-            % edges(indicies(j), i) = 1;
-            % edges(i, indicies(j)) = 1;
         end
     end
-
-    % edges
 end
 
 function collide = omap_collision(map, x0, y0, x1, y1)
@@ -148,47 +184,46 @@ function collide = omap_collision(map, x0, y0, x1, y1)
     end
 end
 
-function plot_nodes(fig_index, nodes, start, finish)
-    figure(fig_index);
-    hold on;
+function dists = calculate_edge_distances(nodes, edges)
     n = length(nodes);
+    dists= zeros(n,n);
 
-    plot(nodes(:, 1), nodes(:, 2), 'ko');
     for i = 1:n
         for j = i:n
-            if (e(i, j)==1)
-                plot([nodes(i, 1) nodes(j, 1)], [nodes(i, 2) nodes(j, 2)], 'k');
+            if (edges(i, j))
+                dx = nodes(i, 1) - nodes(j, 1);
+                dy = nodes(i, 2) - nodes(j, 2);
+                dists(i, j) = sqrt(dx^2 + dy^2);
+                dists(j, i) = dists(i, j);
             end
         end
     end
-    plot(nodes(start, 1), nodes(start, 2), 'bo', 'MarkerSize', 6, 'LineWidth', 2);
-    plot(nodes(finish, 1), nodes(finish, 2), 'ro', 'MarkerSize', 6, 'LineWidth', 2);
 end
 
-function plot_active_nodes(fig_index, nodes, best_node, neigh, C)
-    figure(1);
-    hold on;
-    plot(nodes(C(:,1), 1), nodes(C(:,1), 2), 'ko','MarkerSize',6,'LineWidth',2);
-    plot(nodes(best_node(1), 1), nodes(best_node(1), 2), 'go','MarkerSize',6,'LineWidth',2);
+function [spath, sdist] = backtrack_path(nodes, closed_set, dists, start, finish)
+    done = 0;
+    cur = finish;
+    curC = find(closed_set(:, 1) == finish);
+    prev =  closed_set(curC, 2);
+    spath = [cur];
+    sdist = 0;
 
-    for i = 1:length(neigh)
-        plot(nodes(neigh(i), 1), nodes(neigh(i), 2), 'mo');
-        plot(
-            [nodes(best_node(1), 1) nodes(neigh(i), 1)],
-            [nodes(best_node(1), 2) nodes(neigh(i), 2)],
-            'm'
-        );
+    while (~done)
+        if (prev == start)
+            done = 1;
+        end
+
+        cur = prev;
+        curC = find(closed_set(:,1) == cur);
+        prev = closed_set(curC,2);
+        spath = [cur, spath];
+        sdist = sdist + dists(spath(1), spath(2));
     end
-    drawnow;
+
+    spath = [nodes(spath, :)];
 end
 
-function path = shortest_path(mode, nodes, start, finish, dmax, e, D)
-    % open set (node, backtrack, lower bound cost, current cost)
-    O = [start 0 dmax 0];
-
-    % closed set (node, backtrack, lower bound cost, current cost)
-    C = [];
-
+function [spath, sdist] = shortest_path(mode, nodes, edges, start, finish)
     % check mode
     if (mode == 1)
         % A-star
@@ -198,123 +233,98 @@ function path = shortest_path(mode, nodes, start, finish, dmax, e, D)
         disp('Running Dijkstra mode');
     else
         disp('Invalid mode!');
+        return;
     end
 
-    % find shortest path
-    t = 0;
+    % setup
     done = 0;
+    dists = calculate_edge_distances(nodes, edges);
+    dmax = calculate_max_edge_distance(nodes);
+    open_set = [start 0 dmax 0];  % (node, backtrack, lbound cost, curr cost)
+    closed_set = [];  % (node, backtrack, lbound cost, curr cost)
 
     while (!done)
-        t = t + 1;
         % Find best node in open set
-        [val, best] = min(O(:,3));
-        bestnode = O(best,:);
+        [val, best] = min(open_set(:,3));
+        bestnode = open_set(best,:);
 
         % Move best to closed set
-        C = [C; bestnode];
+        closed_set = [closed_set; bestnode];
 
         % Check end condition
-        if (bestnode(1)==finish)
+        if (length(open_set) == 0)
+            disp('No solution!');
+            return;
+        elseif (bestnode(1) == finish)
             done = 1;
             continue;
         end
 
         % Get all neighbours of best node
-        neigh = find(e(bestnode(1),:) == 1);
+        neigh = find(edges(bestnode(1),:) == 1);
 
         % Process each neighbour
         for i = 1:length(neigh)
             % if neighbour is in closed set, skip
-            found = find(C(:,1) == neigh(i), 1);
+            found = find(closed_set(:,1) == neigh(i), 1);
             if (length(found) == 1)
                 continue;
             end
             dx = nodes(neigh(i), 1) - nodes(finish, 1);
             dy = nodes(neigh(i), 2) - nodes(finish, 2);
             dtogo = sqrt(dx^2 + dy^2);
-            dcur = bestnode(4) + D(bestnode(1), neigh(i));
-            found = find(O(:,1) == neigh(i),1);
-            % dtogo = norm(nodes(neigh(i),:)-nodes(finish,:));
-            % dcur = bestnode(4)+D(bestnode(1),neigh(i));
-            % found = find(O(:,1)==neigh(i),1);
+            dcur = bestnode(4) + dists(bestnode(1), neigh(i));
+            found = find(open_set(:,1) == neigh(i),1);
 
             % if neighbour is not in open set, add it
             if (length(found) == 0)
                 if (mode == 1)
                     % Astar
-                    O = [O; neigh(i) bestnode(1) dtogo+dcur dcur];
+                    open_set = [open_set; neigh(i) bestnode(1) dtogo+dcur dcur];
                 elseif (mode == 2)
                     % Dijkstra
-                    O = [O; neigh(i) bestnode(1) dcur dcur];
+                    open_set = [open_set; neigh(i) bestnode(1) dcur dcur];
                 end
 
             % if neighbour is in open set, check if new route is better
             else
-                if (dcur < O(found, 4))
+                if (dcur < open_set(found, 4))
                     if (mode == 1)
                         % Astar
-                        O(found, :) = [neigh(i) bestnode(1) dtogo+dcur dcur];
+                        open_set(found, :) = [neigh(i) bestnode(1) dtogo+dcur dcur];
                     elseif (mode == 2)
                         % Dijkstra
-                        O(found, :) = [neigh(i) bestnode(1) dcur dcur];
+                        open_set(found, :) = [neigh(i) bestnode(1) dcur dcur];
                     end
                 end
             end
         end
-        finish = finish
 
         % remove best node from open set
-        O = O([1:best-1 best+1:end],:);
+        open_set = open_set([1:best-1 best+1:end], :);
 
         % plot active nodes for this step
-        plot_active_nodes(1, nodes, bestnode, neigh, C);
+        % plot_active_nodes(1, nodes, bestnode, neigh, closed_set);
     end
 
     % find and plot final path through back tracing
-    done = 0;
-    cur = finish;
-    curC = find(C(:,1) == finish);
-    prev =  C(curC,2);
-    i = 2;
-
-    path = [];
-    while (!done)
-        if (prev == start)
-            done = 1;
-        end
-
-        if (cur ~= start && cur ~= finish)
-            path = [path; nodes(cur, :)];
-        end
-
-        figure(1);
-        hold on;
-        plot([nodes(prev,1) nodes(cur,1)], [nodes(prev,2) nodes(cur,2)], 'g', 'LineWidth', 2)
-        cur = prev;
-        curC = find(C(:, 1) == cur);
-        prev = C(curC, 2);
-    end
-    Cend = find(C(:,1) == finish);
-    plen = C(Cend,4);
-
-    % return shortest path
-    node_start = nodes(start, :);
-    node_finish = nodes(finish, :);
-    path = [node_start; path; node_finish];
+    [spath, sdist] = backtrack_path(nodes, closed_set, dists, start, finish);
 end
 
-function path = astar(nodes, start, finish, dmax, e, D)
-    path = shortest_path(1, nodes, start, finish, dmax, e, D);
+function [spath, sdist] = astar(nodes, edges, start, finish)
+    [spath, sdist] = shortest_path(1, nodes, edges, start, finish);
 end
 
-function path = dijkstra(nodes, start, finish, dmax, e, D)
-    path = shortest_path(2, nodes, start, finish, dmax, e, D);
+function path = dijkstra(nodes, edges, start, finish)
+    [spath, sdist] = shortest_path(2, nodes, edges, start, finish);
 end
 
 function bline = bresenham_line_setup(x0, y0, x1, y1)
+    % diff in x and y
     dx = abs(x1 - x0);
     dy = abs(y1 - y0);
 
+    % how to increment in x and y based on (x0, y0) and (x1, y1)
     sx = 0;
     if x0 < x1
         sx = 1;
@@ -329,10 +339,12 @@ function bline = bresenham_line_setup(x0, y0, x1, y1)
         sy = -1;
     end
 
+    % error and incrementers
+    err = 2 * dy - dx;
     inc1 =  2 * dy;
     inc2 =  2 * dy - 2 * dx;
-    err = 2 * dy - dx;
 
+    % struct holding all variables
     bline = struct(
         'x0', x0,
         'y0', y0,
@@ -373,4 +385,38 @@ function bresenham_line(x0, y0, x1, y1)
             return;
         end
     end
+end
+
+function plot_nodes(fig_index, nodes, start, finish)
+    figure(fig_index);
+    hold on;
+    n = length(nodes);
+
+    plot(nodes(:, 1), nodes(:, 2), 'ko');
+    for i = 1:n
+        for j = i:n
+            if (e(i, j)==1)
+                plot([nodes(i, 1) nodes(j, 1)], [nodes(i, 2) nodes(j, 2)], 'k');
+            end
+        end
+    end
+    plot(nodes(start, 1), nodes(start, 2), 'bo', 'MarkerSize', 6, 'LineWidth', 2);
+    plot(nodes(finish, 1), nodes(finish, 2), 'ro', 'MarkerSize', 6, 'LineWidth', 2);
+end
+
+function plot_active_nodes(fig_index, nodes, best_node, neigh, C)
+    figure(1);
+    hold on;
+    plot(nodes(C(:,1), 1), nodes(C(:,1), 2), 'ko','MarkerSize',6,'LineWidth',2);
+    plot(nodes(best_node(1), 1), nodes(best_node(1), 2), 'go','MarkerSize',6,'LineWidth',2);
+
+    for i = 1:length(neigh)
+        plot(nodes(neigh(i), 1), nodes(neigh(i), 2), 'mo');
+        plot(
+            [nodes(best_node(1), 1) nodes(neigh(i), 1)],
+            [nodes(best_node(1), 2) nodes(neigh(i), 2)],
+            'm'
+        );
+    end
+    drawnow;
 end

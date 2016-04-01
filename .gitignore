@@ -15,3 +15,6 @@ tags
 
 # scripts and folders
 run.sh
+
+# matlab
+.mat
