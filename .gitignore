@@ -17,4 +17,4 @@ tags
 run.sh
 
 # matlab
-.mat
+*.mat

@@ -28,21 +28,22 @@ nb_samples = 1000;
     pos_start(1:2),
     pos_end
 );
-plot_samples(1, samples, milestones);
 plot_map(1, map, pos_start, pos_end, 0.1);
+plot_samples(1, samples, milestones);
 drawnow;
 toc;
 disp('');
 
+
 % create graph, find furthest distance between nodes and search
 disp('Create edges');
 tic;
-edges = connect_edges_omap(map, milestones, 10);
+edges = connect_edges_omap(map, milestones, 50);
 toc;
 disp('');
 
-% save milestones.mat milestones
-% save edges.mat edges
+save milestones.mat milestones
+save edges.mat edges
 % load milestones.mat
 % load edges.mat
 
@@ -50,6 +51,14 @@ disp('');
 disp('Search graph');
 tic;
 [spath, sdist] = astar(milestones, edges, 1, 2);
+toc;
+disp('');
+
+save spath.mat spath
+save sdist.mat sdist
+% load spath.mat
+% load sdist.mat
+
 for i = 1:length(spath) - 1
     plot(
         [spath(i, 1), spath(i + 1, 1)],
@@ -59,11 +68,7 @@ for i = 1:length(spath) - 1
         3
     );
 end
-toc;
-disp('');
-save spath.mat spath
-save sdist.mat sdist
-% print -djpg -color planning.jpg
 
+% print -djpg -color planning.jpg
 drawnow;
 pause;

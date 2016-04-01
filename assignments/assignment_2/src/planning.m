@@ -82,6 +82,46 @@ function [node, index] = closest_node(nodes, x, y)
     index = index;
 end
 
+function [x y] = bresenham(x1,y1,x2,y2)
+	% Matlab optmized version of Bresenham line algorithm. No loops.
+	% Format:
+	%               [x y]=bham(x1,y1,x2,y2)
+	%
+	% Input:
+	%               (x1,y1): Start position
+	%               (x2,y2): End position
+	%
+	% Output:
+	%               x y: the line coordinates from (x1,y1) to (x2,y2)
+	%
+	% Usage example:
+	%               [x y]=bham(1,1, 10,-5);
+	%               plot(x,y,'or');
+
+	x1=round(x1); x2=round(x2);
+	y1=round(y1); y2=round(y2);
+	dx=abs(x2-x1);
+	dy=abs(y2-y1);
+	steep=abs(dy)>abs(dx);
+
+	if steep t=dx;dx=dy;dy=t; end
+
+	%The main algorithm goes here.
+	if dy == 0
+		q=zeros(dx+1,1);
+	else
+		q=[0;diff(mod([floor(dx/2):-dy:-dy*dx+floor(dx/2)]',dx))>=0];
+	end
+
+	if steep
+		if y1<=y2 y=[y1:y2]'; else y=[y1:-1:y2]'; end
+		if x1<=x2 x=x1+cumsum(q);else x=x1-cumsum(q); end
+	else
+		if x1<=x2 x=[x1:x2]'; else x=[x1:-1:x2]'; end
+		if y1<=y2 y=y1+cumsum(q);else y=y1-cumsum(q); end
+	end
+end
+
 function edges = connect_edges(nodes, nb_edges)
     n = length(nodes);
     edges = zeros(n, n);
@@ -90,9 +130,11 @@ function edges = connect_edges(nodes, nb_edges)
     for i = 1:n
         % calculate distances between nodes
         for j = 1:n
-            dx = nodes(j, 1) - nodes(i, 1);
-            dy = nodes(j, 2) - nodes(i, 2);
-            d(j) = sqrt(dx^2 + dy^2);
+            if (i ~= j)
+                dx = nodes(j, 1) - nodes(i, 1);
+                dy = nodes(j, 2) - nodes(i, 2);
+                d(j) = sqrt(dx^2 + dy^2);
+            end
         end
 
         % sort calculated distances between nodes
@@ -108,6 +150,19 @@ function edges = connect_edges(nodes, nb_edges)
     end
 end
 
+function collision = omap_collision(map, x0, y0, x1, y1)
+    loop = 1;
+    collision = 0;
+	[x y] = bresenham(x0, y0, x1, y1);
+
+	line = [x, y];
+	for i = 1:length(line)
+		if map(line(i, 1), line(i, 2)) == 1
+			collision = 1;
+		end
+	end
+end
+
 function edges = connect_edges_omap(map, nodes, nb_edges)
     n = length(nodes);
     edges = zeros(n, n);
@@ -116,27 +171,35 @@ function edges = connect_edges_omap(map, nodes, nb_edges)
     for i = 1:n
         % calculate distances between nodes
         for j = 1:n
-            dx = nodes(j, 1) - nodes(i, 1);
-            dy = nodes(j, 2) - nodes(i, 2);
-            d(j) = sqrt(dx^2 + dy^2);
+            if (i ~= j)
+                dx = nodes(j, 1) - nodes(i, 1);
+                dy = nodes(j, 2) - nodes(i, 2);
+                d(j) = sqrt(dx^2 + dy^2);
+            end
         end
 
         % sort calculated distances between nodes
         [d2, indicies] = sort(d);
-        length(indicies)
 
         % create edges to p closest nodes
-        for j = 1:min(nb_edges, length(indicies))
+        for j = 1:min(nb_edges, length(nodes))
             x0 = nodes(i, 1);
             y0 = nodes(i, 2);
             x1 = nodes(indicies(j), 1);
             y1 = nodes(indicies(j), 2);
-            collide = omap_collision(map, x0, y0, x1, y1);
 
+            if i == indicies(j)
+                continue;
+			elseif (edges(i, indicies(j)) == 1 || edges(indicies(j), i) == 1)
+                continue;
+            end
+
+
+            collide = omap_collision(map, x0, y0, x1, y1);
             if collide == 0
                 edges(i, indicies(j)) = 1;
                 edges(indicies(j), i) = 1;
-                % plot([x0, x1], [y0, y1], 'g-');
+                % plot([x0, x1], [y0, y1], 'y.-');
                 % drawnow;
             else
                 edges(i, indicies(j)) = 0;
@@ -148,41 +211,6 @@ function edges = connect_edges_omap(map, nodes, nb_edges)
     end
 end
 
-function collide = omap_collision(map, x0, y0, x1, y1)
-    loop = 1;
-    collide = 0;
-    bline = bresenham_line_setup(x0, y0, x1, y1);
-    [x_max, y_max] = size(map);
-
-    if (x0 == x1 && y0 == y1)
-        collide = 0;
-        return;
-    end
-
-    while (loop)
-        % bline.x0
-        % bline.y0
-        % disp(' ');
-        % disp(' ');
-        [bline, loop] = bresenham_line_step(bline);
-
-        if bline.x0 > x_max || bline.x0 < 0
-            collide = 0;
-            return;
-
-        elseif bline.y0 > y_max || bline.y0 < 0
-            collide = 0;
-            return;
-
-        elseif map(bline.x0, bline.y0) == 1
-            collide = 1;
-            loop = 0;
-            return;
-        end
-        % plot(bline.x0, bline.y0, 'r.--');
-        % drawnow;
-    end
-end
 
 function dists = calculate_edge_distances(nodes, edges)
     n = length(nodes);
@@ -317,74 +345,6 @@ end
 
 function path = dijkstra(nodes, edges, start, finish)
     [spath, sdist] = shortest_path(2, nodes, edges, start, finish);
-end
-
-function bline = bresenham_line_setup(x0, y0, x1, y1)
-    % diff in x and y
-    dx = abs(x1 - x0);
-    dy = abs(y1 - y0);
-
-    % how to increment in x and y based on (x0, y0) and (x1, y1)
-    sx = 0;
-    if x0 < x1
-        sx = 1;
-    else
-        sx = -1;
-    end
-
-    sy = 0;
-    if y0 < y1
-        sy = 1;
-    else
-        sy = -1;
-    end
-
-    % error and incrementers
-    err = 2 * dy - dx;
-    inc1 =  2 * dy;
-    inc2 =  2 * dy - 2 * dx;
-
-    % struct holding all variables
-    bline = struct(
-        'x0', x0,
-        'y0', y0,
-        'x1', x1,
-        'y1', y1,
-        'dx', dx,
-        'dy', dy,
-        'sx', sx,
-        'sy', sy,
-        'inc1', inc1,
-        'inc2', inc2,
-        'err', err
-    );
-end
-
-function [bline, ok] = bresenham_line_step(bline)
-    if bline.x0 == bline.x1 && bline.y0 == bline.y1
-        ok = 0;
-        return;
-    end
-
-    bline.x0 = bline.x0 + bline.sx;
-    if bline.err < 0
-        bline.err = bline.err + bline.inc1;
-    else
-        bline.err = bline.err + bline.inc2;
-        bline.y0 = bline.y0 + bline.sy;
-    end
-    ok = 1;
-end
-
-function bresenham_line(x0, y0, x1, y1)
-    bline = bresenham_line_setup(x0, y0, x1, y1);
-
-    while (1)
-        [bline, ok] = bresenham_line_step(bline);
-        if ok == 0
-            return;
-        end
-    end
 end
 
 function plot_nodes(fig_index, nodes, start, finish)
