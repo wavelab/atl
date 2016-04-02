@@ -1,5 +1,13 @@
 \documentclass{article}
 
+% GRAPHICS
+\usepackage{float}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usepackage{tikzscale}
+\usetikzlibrary{calc}
+\usepackage{graphicx}
+
 % MATHS
 \usepackage{amsmath}
 \usepackage{gensymb}
@@ -177,24 +185,193 @@ A carrot controller is a controller that has a carrot point with a fixed distanc
 
 
 \subsection{Closest Point on the Trajectory Line to the Robot}
-The closest point between the robot's position and the trajectory line can be calculated, . Let $A$ and $B$ be the start and end of a trajectory line, the first step is to find the gradient $m_{1}$ of trajectory line $AB$.
+The closest point between the robot's position and the trajectory line can be calculated. 
 
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/dot_product_projection.png}
+	\caption{Dot Product Projection)}
+	\label{fig:dot_product_projection}
+\end{figure}
 
-\begin{align}
+Let the vector $a$ denote the vector from the start of the trajectory line to the position of the robot, and vector $b$ denote the start and end of the trajectory line. To calculate the closest point on vector $b$ to the robot position one simply has to project vector $a$ onto vector $b$, this can be calculated via:
 
-	
-	
-\end{align}
+\begin{equation}
+	\text{proj}_{\vec{a}\vec{b}} 
+		= \dfrac{\vec{a} \cdot \vec{b}}{|\vec{a}|}
+			\dfrac{\vec{a}}{|\vec{a}|} 
+		= \dfrac{\vec{a} \cdot \vec{b}}{|\vec{a}|^{2}}
+			\vec{a}
+\end{equation}
 
-
-The closest point $Q$ on the trajectory line $AB$ relative to the robot at point $P$ is then:
-
-m_{2} = -1 / m_{1};
-x = (m_{1} * x_{1} - m_{2} * a + b - y_{1}) / (m_{1} - m_{2});
-y = m_{2} * (x - a) + b;
 
 \newpage
-\section{Planner}
+\subsection{Calculation of the Carrot Point}
+Once the closest point on the trajectory line to the robot is found, calculating a carrot point along the trajectory line is the closest point on the trajectory line $p_{\text{closest}}$ plus the product of look ahead distance $r$ times the unit vector of the trajectory line $b$.
+
+\begin{equation}
+	\text{carrot} = p_{\text{closest}} + r \dfrac{\vec{b}}{|\vec{b}|}
+\end{equation}
+
+
+
+\subsection{Carrot Controller}
+We implemented a proportional carrot controller and traced a rectangle of $20m$ by $5m$ at $3ms^{-1}$. This is the resulting motion of the bicycle (See Fig~\ref{fig:bicycle_carrot}), we used a proportional gain $k_{p} = 2$ and look ahead distance $r$ at $2$, $0.2$ and $5$. 
+
+From Fig~\ref{fig:bicycle_carrot} we can see that different look ahead distance $r$ impacts the way the robot traces a rectangle. If the look ahead distance is too low (i.e. Fig~\ref{fig:bicycle_carrot_bad} where $r = 0.2$), the carrot will be a very small distance ahead of the robot, making small adjustments unlikely thereby the angle of the steering oscillates between $-30$ degrees to $30$ degrees (the max steering angle).
+
+If the carrot is at a medium look ahead distance away from the robot  (i.e. Fig~\ref{fig:bicycle_carrot_ok} where $r = 2$), the robot tends to be quite agreessive in compensating for overshooting the trajectory. As we increase the look ahead distance $r$ however, the correction angle is dampened, causing a less agreessive correction, but longer time to return to the trajectory line.
+
+\begin{figure}[H]
+	\centering
+	
+	\begin{subfigure}[b]{\linewidth}
+		\centering
+		\includegraphics[width=0.5\textwidth]{images/bicycle_carrot_bad.jpg}
+		\caption{$k_{p} = 2$, $r = 0.2$}
+		\label{fig:bicycle_carrot_bad}
+	\end{subfigure}
+		
+	\begin{subfigure}[b]{\linewidth}
+		\centering
+		\includegraphics[width=0.5\textwidth]{images/bicycle_carrot.jpg}
+		\caption{$k_{p} = 2$ and $r = 2$}
+		\label{fig:bicycle_carrot_ok}
+	\end{subfigure}
+	
+	\begin{subfigure}[b]{\linewidth}
+		\centering
+		\includegraphics[width=0.5\textwidth]{images/bicycle_carrot_better.jpg}
+		\caption{$k_{p} = 2$, $r = 5$}
+		\label{fig:bicycle_carrot_better}
+	\end{subfigure}
+	
+	\caption{Bicycle motion using carrot controller starting at (23, 10)}
+	\label{fig:bicycle_carrot}
+\end{figure}
+
+
+
+\newpage
+\section{IGVC Planner}
+\label{sec:igvc_planner}
+We were given a map of the Intelligent Ground Vehicle Competition in the form of a $926 \times 716$ element grid, where each cell
+represents a 10 cm X 10 cm area of the course, creating a 92.6 m X 71.6 m environment. 
+
+Our goal is to implement a planner and present a combined motion planning solution that finds a straight-line path through the environment, then uses the carrot planner to locally drive the vehicle to the goal location. Where the start and end locations are ($4.0m$, $0.5m$, $3.14159 rad$) and ($5.0 m$, $1.0 m$, not defined) for $x$, $y$ and $θ$.
+
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{images/IGVCmap.jpg}
+	\caption{IGVC Map}
+	\label{fig:igvc_map}
+\end{figure}
+
+
+
+\newpage
+\subsection{Wavefront Planner}
+\label{subsec:wavefront}
+Since the map given represents an occupancy grid of free space and obstacles, our intial approach was to use the breadth first search based planner, by using the wavefront method to calculate the cost distance to traverse from start to goal point, and finding the lowest cost path. In Fig~\ref{fig:wavefront} you can see the result of one wavefront plan and the lowest cost path leading from the start to goal point.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.9\textwidth]{images/wavefront_igvc.eps}
+	\caption{Wavefront IGVC Map}
+	\label{fig:wavefront}
+\end{figure}
+
+The problem with wavefront is as follows:
+
+\begin{itemize}
+	\item{\textbf{Manhattan Distance}: Due to the nature of how the wavefront traverses the map, the paths found have inherently right angle turns, using a carrot controller following paths with right angles can be problematic.}
+	
+	\item{\textbf{Difficult to represent robot}: This is not limited to the wavefront method, but for any occupancy grid planner methods, the grid size should be smaller than the robot.}
+	
+	\item{\textbf{Exploits holes in map}: Holes between objects can be a problem such as Fig~\ref{fig:wavefront}, near the start point wavefront finds a small gap between the circular obstacles, however, in reality the physical robot will not be able to fit through the gap.}
+\end{itemize}
+
+In conclusion, we gave up on the wavefront planner because the paths produced were not suitable for the carrot controller.
+
+
+
+\newpage
+\subsection{Probablistic Roadmap Planner}
+\label{subsec:prm}
+In our next approach we used the Probablistic Roadmap (PRM) planner, purely out of curiosity and it seemed like an intuitive alternative to wavefront planner. 
+
+For the implementation we had to make modifications to the PRM example code given, as the code given assumes the obstacles are in the form of polygon points, the example code makes use of Matlab's `inpolygon()` function to detect whether a sample point is within a polygon. However the map given represents an occupancy grid instead of the obstacle polygons as points, we therefore had to replace the collision checking to use a ray tracing algorithm such as Bresenham's line algorthm, so that we can traverse between the PRM sample points and create collision free edges.
+
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[b]{0.49\linewidth}
+		\centering
+		\includegraphics[width=\textwidth]{images/prm_200.jpg}
+		\caption{200 Samples}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\linewidth}
+		\centering
+		\includegraphics[width=\textwidth]{images/prm_500.jpg}
+		\caption{500 Samples}
+	\end{subfigure}
+	
+	\begin{subfigure}[b]{0.49\linewidth}
+		\centering
+		\includegraphics[width=\textwidth]{images/prm_1000.jpg}
+		\caption{1000 Samples}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\linewidth}
+		\centering
+		\includegraphics[width=\textwidth]{images/prm_5000.jpg}
+		\caption{5000 Samples}
+	\end{subfigure}
+	\caption{PRM Planner and Carrot Controller}
+	\label{fig:prm}
+\end{figure}
+
+\newpage
+From Fig~\ref{fig:prm} we show the combination of PRM and carrot controller through the IGVC map with varying number of samples (200, 500, 1000, 5000). While 200 sample points was sufficient, it is easy to recognize the path as sub-optimal compared to the paths generated with 500 sample points and beyond, we can observe that the path gets more and more optimal as we increase the number of sample points in the map.
+
+
+\subsubsection{PRM Planner with Sample Points Padded}
+\label{subsec:prm_padding}
+We attempted to make improvements with the PRM approach so that the bicycle forward motion does not collide with the obstacles, we improved the PRM planner by ensuring the sample points are a set distance away from the obstacles, this is done by performing a line search on 8 directions (N, NE, E, SE, S, SW, W, NW), if collision is detected the sample point is dropped.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\linewidth]{images/prm_resampling.jpg}
+	\caption{PRM Resampling}
+	\label{fig:prm_resampling}
+\end{figure}
+
+
+\section{Limitations and Future Improvements to the PRM Planner}
+\subsection{Limitations}
+Previously in Section~\ref{sec:igvc_planner} we have explored both wavefront and PRM path planning methods, both methods alone are not satifactory in planning a path for the bicycle through the IGVC course, we will discuss three limitations below:
+
+
+\begin{itemize}
+	\item{\textbf{Path is not smooth}: The paths generated by both wavefront and PRM while optimal it does not take into account the motion model of the bicycle. Some of the planned paths particularly nearer towards the middle of the course where the bicycle has to make a U-turn, the angle change is very sharp and sudden, improvement in either the controller or path planned should take the motion model into account and create a smooth path or motion through the turn.}
+	
+	\item{\textbf{No collision detection}: The above two methods does not perform collision dection of the robot with regards to the obstacles in the map, there are methods such as trajectory rollout that iterates at every timestep performing collision check at every possible motion change to make sure the path is valid.}
+	
+	\item{\textbf{Wasted Computation Around Non-Optimal Areas}:}
+	
+\end{itemize}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\linewidth]{images/collision_example.jpg}
+	\caption{Collision Example}
+	\label{fig:collision_example}
+\end{figure}
+
+
+\subsection{Future Improvements}
+While padding was useful, it suffers around the choke points in the map (figure example...).
+
+Trajectory roll out please...
 
 
 
