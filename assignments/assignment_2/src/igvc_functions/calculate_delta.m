@@ -7,7 +7,7 @@ function delta_t = calculate_delta(x_t, carrot_t, delta_max)
     angle_of_vec = atan3(y, x);  % returns only +ve angle
 
     % limit delta_t to pi and -pi only
-    delta_t = (theta - angle_of_vec);
+    delta_t = -(theta - angle_of_vec);
     delta_t = mod(delta_t + pi, 2 * pi) - pi;
 
     % limit delta_t to steering angle max

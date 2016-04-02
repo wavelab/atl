@@ -1,4 +1,4 @@
-function p = closest_point(point, edge)
+function pt = closest_point(point, edge)
 	edge = double(edge);
     x1 = edge(1);
     y1 = edge(2);
@@ -7,10 +7,10 @@ function p = closest_point(point, edge)
 
     % pre-check
     if x1 == x2
-        p = [x1, point(2)];
+        pt = [x1; point(2)];
         return;
     elseif y1 == y2
-        p = [point(1), y1];
+        pt = [point(1); y1];
         return;
     end
 
@@ -31,4 +31,5 @@ function p = closest_point(point, edge)
 	end
 
 	pt = a + t * v2;
+    
 end

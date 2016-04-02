@@ -10,6 +10,13 @@ function plot_trajectory(fig_index, x_store, carrot_store, t)
 
     % plot carrot
     plot(carrot_store(1, :), carrot_store(2, :), 'go');
+    
+    for i = 1:length(t)
+        % draw box
+        if (mod(i, 50) == 0)
+            drawbox(fig_index, x_store(1, i), x_store(2, i), x_store(3, i), 0.3);
+        end
+    end
 
     % plot parameters
     title('Trajectory');
@@ -18,4 +25,5 @@ function plot_trajectory(fig_index, x_store, carrot_store, t)
     % axis([4 32 4 12]);
     % axis([20 30 5 15]);
     axis equal;
+    
 end

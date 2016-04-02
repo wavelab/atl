@@ -1,6 +1,5 @@
 addpath('igvc_functions')
-close all;
-clear all;
+close all
 % parameters
 nb_samples = 15000;
 dxy = 0.1;
@@ -37,12 +36,12 @@ for i = 1:length(spath) - 1
 end
 
 % simulation parameters
-t_end = 20;
-dt = 0.1;  % 10 Hz
+t_end = 200;
+dt = 0.01;  % 10 Hz
 t = 0:dt:t_end;
 
 % waypoints
-waypoints = spath
+waypoints = double(spath);
 
 % model parameters
 L = 0.3;
@@ -77,16 +76,13 @@ c_t = [0;];  % heading error
 c_store = zeros(length(c_t), length(t));
 c_store(:, 1) = c_t;
 
-
-
-
 % simulation
-chris_is_a_tard2 = 1;
+wp_index = 1;
 delta_t = 0;
 
 for i = 1:length(t)
     % update carrot
-    [carrot_t, chris_is_a_tard2] = carrot_update(x_t, carrot_t, 2, waypoints, chris_is_a_tard2);
+    [carrot_t, wp_index] = carrot_update(x_t, carrot_t, .5/dxy, waypoints, wp_index);
     carrot_store(:, i) = carrot_t;
 
     % update steering
@@ -98,8 +94,7 @@ for i = 1:length(t)
 end
 
 % plot animation
-% plot_waypoints(1, waypoints);
-% plot_trajectory(1, x_store, carrot_store, t);
-plot_animation(1, x_store, carrot_store, t);
+ plot_waypoints(1, waypoints);
+ plot_trajectory(1, x_store, carrot_store, t);
+%plot_animation(1, x_store, carrot_store, t);
 % plot_controller(1, c_store, t);
-pause
