@@ -1,6 +1,5 @@
 function p = closest_point(point, edge)
-    x0 = point(1);
-    y0 = point(2);
+	edge = double(edge);
     x1 = edge(1);
     y1 = edge(2);
     x2 = edge(3);
@@ -8,33 +7,30 @@ function p = closest_point(point, edge)
 
     % pre-check
     if x1 == x2
-        p = [x1, y0];
+        p = [x1, point(2)];
         return;
     elseif y1 == y2
-        p = [x0, y1];
+        p = [point(1), y1];
         return;
     end
 
-    % find closest point
-    m1 = (y2 - y1) / (x2 - x1);
-    m2 = -1 / m1;
-    x = (m1 * x1 - m2 * a + b - y1) / (m1 - m2);
-    y = m2 * (x - a) + b;
+	% calculate closest point
+    p = [point(1); point(2)];
+    a = [edge(1); edge(2)];
+    b = [edge(3); edge(4)];
+	v1 = p - a;
+	v2 = b - a;
+	t = dot(v1, v2) / (norm(v2))^2;
 
-    % check results
-    if x < min(x1, x2)
-        x = min(x1, x2);
-    elseif x > max(x1, x2)
-        x = max(x1, x2);
-    end
-    if y < min(y1, y2)
-        y = min(y1, y2);
-    elseif y > max(y1, y2)
-        y = max(y1, y2);
-    end
+	if t < 0
+		pt = a;
+		return;
+	elseif t > 1
+		pt = b;
+		return;
+	end
 
-    % answer
-    p = [x, y];
+	pt = a + t * v2;
 end
 
 function dist = point_edge_dist(p, edge)
@@ -74,8 +70,11 @@ function angle = atan3(y, x)
 end
 
 function dist = dist_between_points(x, y)
-    diff = x - y;
-    dist = norm(diff, 2);
+	dx = x(1) - y(1);
+	dy = x(2) - y(2);
+	dist = sqrt(dx^2 + dy^2);
+    % diff = x - y;
+    % dist = norm(diff, 2);
 end
 
 function wp_reached = waypoint_reached(position, waypoint, threshold)
@@ -111,7 +110,7 @@ function drawbox(fig_index, x, y, h, scale)
     box(:,2) = box(:,2)+y;
 
     % plot
-    figure(fig);
+    figure(fig_index);
     plot(box(:,1), box(:,2), 'b','LineWidth', 2);
     axis equal
 end
@@ -183,15 +182,13 @@ function plot_controller(fig_index, c_store, t)
     ylabel('error (degrees)');
 end
 
-function plot_samples(fig_index, samples, milestones)
+function plot_milestones(fig_index, milestones)
     figure(fig_index);
     hold on;
-
-    % plot(samples(:, 1), samples(:, 2), 'go');
     plot(milestones(:, 1), milestones(:, 2), 'bo');
 end
 
-function plot_map(fig_index, map, pos_start, pos_end, dxy)
+function plot_omap(fig_index, map, pos_start, pos_end, dxy)
     figure(fig_index);
     hold on;
 
@@ -199,8 +196,8 @@ function plot_map(fig_index, map, pos_start, pos_end, dxy)
     imagesc(1 - map');
 
     % plot
-    plot(pos_start(1) / dxy, pos_start(2) / dxy, 'ro', 'MarkerSize',10, 'LineWidth', 3);
-    plot(pos_end(1) / dxy, pos_end(2) / dxy, 'gx', 'MarkerSize',10, 'LineWidth', 3 );
+    plot(pos_start(1), pos_start(2), 'ro', 'MarkerSize',10, 'LineWidth', 3);
+    plot(pos_end(1), pos_end(2), 'gx', 'MarkerSize',10, 'LineWidth', 3 );
 
     % plot parameters
     axis equal

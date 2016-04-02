@@ -1,4 +1,43 @@
 source('util.m');
+source('planning.m');
+
+% parameters
+nb_samples = 1000;
+dxy = 0.1;
+pos_start = [40/dxy 5/dxy pi];
+pos_end = [50/dxy 10/dxy];
+
+% % prm
+[map, map_min, map_max] = load_omap('IGVCmap.jpg');
+% milestones = prm_sample(
+% 	nb_samples,
+% 	map,
+% 	pos_start,
+% 	pos_end,
+% 	map_min,
+% 	map_max
+% );
+% [spath, sdist] = prm_search(map, milestones);
+%
+% save milestones.mat milestones
+% save spath.mat spath
+% save sdist.mat sdist
+
+load milestones.mat
+load spath.mat
+% load sdist.mat
+
+plot_omap(1, map, pos_start, pos_end, 0.1);
+plot_milestones(1, milestones, 0.1);
+for i = 1:length(spath) - 1
+    plot(
+        [spath(i, 1), spath(i + 1, 1)],
+        [spath(i, 2), spath(i + 1, 2)],
+        'g-',
+        'LineWidth',
+        3
+    );
+end
 
 % simulation parameters
 t_end = 20;
@@ -6,33 +45,21 @@ dt = 0.1;  % 10 Hz
 t = 0:dt:t_end;
 
 % waypoints
-rect_x = 5;
-rect_y = 10;
-rect_w = 20;
-rect_h = 5;
-
-wp_1 = [rect_x, rect_y];
-wp_2 = [rect_x + rect_w, rect_y];
-wp_3 = [rect_x + rect_w, rect_y - rect_h];
-wp_4 = [rect_x, rect_y - rect_h];
-
-wp_2 = [50.0, 100.0];
-waypoints = [wp_1; wp_2; wp_1];
-% waypoints = [wp_1; wp_2; wp_3; wp_4; wp_1];
+waypoints = spath
 
 % model parameters
 L = 0.3;
 stddev_x = 0.02;
 stddev_y = 0.02;
 stddev_theta = deg2rad(1.0);
-v_t = 3;
+v_t = 3 / 0.1;
 
 % bicycle states
 delta_max = deg2rad(25); % max steering angle
 x_t = [
-    22;  % x
-    10;  % y
-    deg2rad(0);  % theta
+    pos_start(1);  % x
+    pos_start(2);  % y
+    pos_start(3);  % theta
 ];
 x_store = zeros(length(x_t), length(t));
 x_store(:, 1) = x_t;
@@ -60,7 +87,7 @@ function new_carrot = calculate_new_carrot(x_t, r, wp_start, wp_end)
 
     % calculate unit vector of trajectory
     % allows us to traverse distance r along the trajectory
-    v = wp_end - wp_start;
+    v = double(wp_end - wp_start);
     u = v / norm(v);
 
     % update carrot position
@@ -91,19 +118,19 @@ function [carrot_t, wp_index] = carrot_update(x_t, carrot_prev, r, waypoints, wp
         carrot_t = calculate_new_carrot(x_t, r, new_wp_start, new_wp_end);
     end
 
-    % limit carrot x component
-    if carrot_t(1) < min(wp_start(1), wp_end(1))
-        carrot_t(1) = min(wp_start(1), wp_end(1));
-    elseif carrot_t(1) > max(wp_start(1), wp_end(1))
-        carrot_t(1) = max(wp_start(1), wp_end(1));
-    end
-
-    % limit carrot y component
-    if carrot_t(2) < min(wp_start(2), wp_end(2))
-        carrot_t(2) = min(wp_start(2), wp_end(2));
-    elseif carrot_t(2) > max(wp_start(2), wp_end(2))
-        carrot_t(2) = max(wp_start(2), wp_end(2));
-    end
+    % % limit carrot x component
+    % if carrot_t(1) < min(wp_start(1), wp_end(1))
+    %     carrot_t(1) = min(wp_start(1), wp_end(1));
+    % elseif carrot_t(1) > max(wp_start(1), wp_end(1))
+    %     carrot_t(1) = max(wp_start(1), wp_end(1));
+    % end
+    %
+    % % limit carrot y component
+    % if carrot_t(2) < min(wp_start(2), wp_end(2))
+    %     carrot_t(2) = min(wp_start(2), wp_end(2));
+    % elseif carrot_t(2) > max(wp_start(2), wp_end(2))
+    %     carrot_t(2) = max(wp_start(2), wp_end(2));
+    % end
 end
 
 function delta_t = calculate_delta(x_t, carrot_t, delta_max)

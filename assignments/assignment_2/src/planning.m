@@ -1,12 +1,12 @@
-function [samples, milestones] = sample_map(nb_samples, map, map_min, map_max, pos_start, pos_end)
+function milestones = sample_map(nb_samples, map, map_min, map_max, pos_start, pos_end)
     map_range = map_max - map_min;
     samples_x = int32(map_range(1) * rand(nb_samples, 1) + map_min(1));
     samples_y = int32(map_range(2) * rand(nb_samples, 1) + map_min(2));
     samples = [samples_x, samples_y];
 
     milestones = [
-        pos_start(1:2) / 0.1;
-        pos_end / 0.1
+        pos_start(1:2);
+        pos_end
     ];
     for i = 1:length(samples)
         sample = samples(i, :);
@@ -379,4 +379,44 @@ function plot_active_nodes(fig_index, nodes, best_node, neigh, C)
         );
     end
     drawnow;
+end
+
+function [map, map_min, map_max] = load_omap(image_path)
+	I = imread(image_path);
+	map = im2bw(I, 0.7);  % Convert to 0 - 1 image
+	map = 1 - flipud(map)'; % Convert to 0 free, 1 occupied and flip.
+	[M, N] = size(map);  % Map size
+	% map = imresize(map, [M * 0.1, N * 0.1]);
+	map = im2bw(map, 0.2);  % Convert to 0 - 1 image
+
+	[M, N] = size(map);  % Map size
+	map_min = [1 1];
+	map_max = [M N];
+end
+
+function milestones = prm_sample(nb_samples, map, pos_start, pos_end, map_min, map_max)
+	disp('Sample map');
+	tic;
+	milestones = sample_map(
+		nb_samples,
+		map,
+		map_min,
+		map_max,
+		pos_start(1:2),
+		pos_end
+	);
+	plot_omap(1, map, pos_start, pos_end, 0.1);
+	plot_milestones(1, milestones, 0.1);
+	drawnow;
+	toc;
+	disp('');
+end
+
+function [spath, sdist] = prm_search(map, milestones)
+	disp('Search graph');
+	tic;
+	edges = connect_edges_omap(map, milestones, 20);
+	[spath, sdist] = astar(milestones, edges, 1, 2);
+	toc;
+	disp('');
 end

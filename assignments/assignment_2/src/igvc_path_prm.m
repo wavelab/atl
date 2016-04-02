@@ -1,61 +1,32 @@
 source('util.m');
 source('planning.m');
 
-I = imread('IGVCmap.jpg');
-map = im2bw(I, 0.7);  % Convert to 0 - 1 image
-map = 1 - flipud(map)'; % Convert to 0 free, 1 occupied and flip.
-% map = zeros(100, 100);
-[M, N] = size(map);  % Map size
-map_min = [1 1];
-map_max = [M N];
 
-% robot start position
-dxy = 0.1;
-pos_start = [40 5 pi];
-pos_end = [50 10];
-
-
-% plot
-% sample map
-disp('Sample map');
-tic;
+% parameters
 nb_samples = 1000;
-[samples, milestones] = sample_map(
-    nb_samples,
-    map,
-    map_min,
-    map_max,
-    pos_start(1:2),
-    pos_end
+dxy = 0.1;
+pos_start = [40/dxy 5/dxy pi];
+pos_end = [50/dxy 10/dxy];
+
+% prm
+[map, map_min, map_max] = load_omap('IGVCmap.jpg');
+milestones = prm_sample(
+	nb_samples,
+	map,
+	pos_start,
+	pos_end,
+	map_min,
+	map_max
 );
-plot_map(1, map, pos_start, pos_end, 0.1);
-plot_samples(1, samples, milestones);
-drawnow;
-toc;
-disp('');
+[spath, sdist] = prm_search(map, milestones);
 
+% save milestones.mat milestones
+% save edges.mat edges
+% save spath.mat spath
+% save sdist.mat sdist
 
-% create graph, find furthest distance between nodes and search
-disp('Create edges');
-tic;
-edges = connect_edges_omap(map, milestones, 50);
-toc;
-disp('');
-
-save milestones.mat milestones
-save edges.mat edges
 % load milestones.mat
 % load edges.mat
-
-% search graph
-disp('Search graph');
-tic;
-[spath, sdist] = astar(milestones, edges, 1, 2);
-toc;
-disp('');
-
-save spath.mat spath
-save sdist.mat sdist
 % load spath.mat
 % load sdist.mat
 
