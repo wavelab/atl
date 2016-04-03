@@ -96,7 +96,7 @@ Motion of rear wheel:
     \end{bmatrix}
 \end{align}
 
-At current we have a motion model for both the front and the rear wheel of the bicycle, however we can simplify it using the Instantaneous Center of Rotation to combine both the front and rear wheel together.
+At current we have a motion model for both the front and the rear wheel of the bicycle, however we can simplify it using the Instantaneous Center of Rotation (ICR) to combine both the front and rear wheel together.
 
 \begin{figure}[H]
 	\centering
@@ -141,7 +141,8 @@ For the complete motion model of the bicycle we have:
     \end{bmatrix}
 \end{align}
 
-Implementing the bicycle motion model in Matlab and simulating the motion for 20 seconds with the following parameters, we obtain a motion that resembles Fig~\ref{fig:bicycle_20s}.
+Implementing the bicycle motion model in Matlab and simulating the motion for 20 seconds with the following parameters, we obtain the trajectory observed in Fig~\ref{fig:bicycle_20s}. From the inputs outlined below, the observed trajectory appears to be valid as the heading starts at 10 degrees and then decreases at a rate of -1 degree per second. This means during the first half of the run the steering angle is positive, causing it to steer to the left, straighten out for a portion and then begin starting to turn to the right as the steering angle becomes negative. 
+
 
 \begin{itemize}	
 	\vspace{-0.4cm}
@@ -165,11 +166,6 @@ Implementing the bicycle motion model in Matlab and simulating the motion for 20
 	\label{fig:bicycle_20s}
 \end{figure}
 
-Just looking at Fig~\ref{fig:bicycle_20s} we can roughly validate the motion as valid, since the angle starts from +10 and ends at -10 degrees over time (20 seconds).
-
-
-
-
 
 \newpage
 \section{Carrot Controller for Bicycle}
@@ -185,7 +181,7 @@ A carrot controller is a controller that has a carrot point with a fixed distanc
 
 
 \subsection{Closest Point on the Trajectory Line to the Robot}
-The closest point between the robot's position and the trajectory line can be calculated. 
+The closest point between the robot's position and the trajectory line can be calculated by first calculating the projection of the vector formed by the current location and the desired 
 
 \begin{figure}[H]
 	\centering
@@ -256,9 +252,9 @@ If the carrot is at a medium look ahead distance away from the robot  (i.e. Fig~
 \section{IGVC Planner}
 \label{sec:igvc_planner}
 We were given a map of the Intelligent Ground Vehicle Competition in the form of a $926 \times 716$ element grid, where each cell
-represents a 10 cm X 10 cm area of the course, creating a 92.6 m X 71.6 m environment. 
+represents a 10 cm X 10 cm area of the course, resulting in a 92.6 m X 71.6 m environment. 
 
-Our goal is to implement a planner and present a combined motion planning solution that finds a straight-line path through the environment, then uses the carrot planner to locally drive the vehicle to the goal location. Where the start and end locations are ($4.0m$, $0.5m$, $3.14159 rad$) and ($5.0 m$, $1.0 m$, not defined) for $x$, $y$ and $θ$.
+Our goal is to implement a planner and present a combined motion planning solution that finds a straight-line path through the environment, then uses the carrot controller to provide the inputs required to drive the robot to the start and end locations which are ocated at ($x = 4.0m$, $y = 0.5m$, $\theta = 3.14159 rad$) and ($x = 5.0 m$, $y = 1.0 m$, $theta =$ not defined) respectively. 
 
 
 \begin{figure}[H]
@@ -273,8 +269,7 @@ Our goal is to implement a planner and present a combined motion planning soluti
 \newpage
 \subsection{Wavefront Planner}
 \label{subsec:wavefront}
-Since the map given represents an occupancy grid of free space and obstacles, our intial approach was to use the breadth first search based planner, by using the wavefront method to calculate the cost distance to traverse from start to goal point, and finding the lowest cost path. In Fig~\ref{fig:wavefront} you can see the result of one wavefront plan and the lowest cost path leading from the start to goal point.
-
+Since the map given represents an occupancy grid of free space and obstacles, our initial approach to the planning portion was to apply the wavefront a path that finds an optional path between start to goal point. Fig~\ref{fig:wavefront} highlights the results of the wavefront planner and highlights the resulting path found by gradient decent. 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.9\textwidth]{images/wavefront_igvc.eps}
@@ -282,26 +277,23 @@ Since the map given represents an occupancy grid of free space and obstacles, ou
 	\label{fig:wavefront}
 \end{figure}
 
-The problem with wavefront is as follows:
+While the wavefront method found a solution optimal on the grid based environment, it is far from optimal then a path generated in the continuous space. The first problem stems from the fact that wavefront method is a grid based method based on a breadth first search that starts and the end goal and calculates a distance between the end goal and all points in the map. Because the distance is based on the number of grids between the start and end point the distance calculated actually reflects the Manhattan Distance between the start and end goals rather than the Euclidian Distance. This means that driving at a $45^o $ angle has the same distance as two paths that first travel horizontal and then upward. Furthermore the robots trajectory is restricted to the exploration directions used to generate the wavefront which in this case were a set 4 moves, mainly move up, move right, move left and move down. 
 
-\begin{itemize}
-	\item{\textbf{Manhattan Distance}: Due to the nature of how the wavefront traverses the map, the paths found have inherently right angle turns, using a carrot controller following paths with right angles can be problematic.}
-	
-	\item{\textbf{Difficult to represent robot}: This is not limited to the wavefront method, but for any occupancy grid planner methods, the grid size should be smaller than the robot.}
-	
-	\item{\textbf{Exploits holes in map}: Holes between objects can be a problem such as Fig~\ref{fig:wavefront}, near the start point wavefront finds a small gap between the circular obstacles, however, in reality the physical robot will not be able to fit through the gap.}
-\end{itemize}
+Additional problems are realized when one takes into account that the fact that robot is likely larger than the grid cells which makes collision avoidance and detection difficult. In many cases the grid cells are assumed to be the size of the robot but this has the additional drawback of causing obstacles to become very course and poorly represented. In Fig~\ref{fig:wavefront} it can be noted that the wavefront planner slips between a very small gap between two pylons on the course, which unless the robot is 10cm by 10cm, would be an impossible path for the robot to follow. Additionally the robot also tends to hug obstacles very closely which means that any errors in possession or heading are likely to result in collisions. 
 
-In conclusion, we gave up on the wavefront planner because the paths produced were not suitable for the carrot controller.
+Lastly, for this large map, the run time was over 40 seconds without any collision checking procedures and therefore this approach was abandoned in favour of a Probabilistic Roadmap Planner (PRM). 
 
 
-
-\newpage
-\subsection{Probablistic Roadmap Planner}
+\subsection{Probabilistic Roadmap Planner}
 \label{subsec:prm}
-In our next approach we used the Probablistic Roadmap (PRM) planner, purely out of curiosity and it seemed like an intuitive alternative to wavefront planner. 
+In our next approach we used the Probabilistic Roadmap (PRM) planner, purely out of curiosity and it seemed like an intuitive alternative to wavefront planner. 
 
-For the implementation we had to make modifications to the PRM example code given, as the code given assumes the obstacles are in the form of polygon points, the example code makes use of Matlab's `inpolygon()` function to detect whether a sample point is within a polygon. However the map given represents an occupancy grid instead of the obstacle polygons as points, we therefore had to replace the collision checking to use a ray tracing algorithm such as Bresenham's line algorthm, so that we can traverse between the PRM sample points and create collision free edges.
+For the PRM implementation on a grid based environment, we had to make modifications to the PRM example code given, which assumes the obstacles are in the form of set of polygon points and exploits Matlab's inpolygon function to detect whether a sample point located within a polygon. However the map given represents an occupancy grid instead of the obstacle polygons as points, and therefore had the collision checking to be replaced by a ray tracing algorithm. In our implementation we utilized a modified version of Bresenham's line algorithm, to find create collision free edges between sample points.
+
+We implemented a PRM planner and then applied the carrot controller outlined in Question 2 to the resulting paths which are shown in  Fig~\ref{fig:prm} which also highlights the effect of using varying sample sizes in the PRM. From testing it appears that a sample size of 200 will yield a valid solution in about 50 percent of the time, a sample size of 500 will yield a solution is 90 percent of cases and a sample size of over 1000 always resulted in a solution in all of our tests. 
+
+Higher sample sizes also tend to lead to smoother and more optimal paths which can be observed by comparing  the 200 sample case to the 5000 sample case highlighted in Fig~\ref{fig:collision_example}. The run time of the PRM when using 5000 points less than 3 seconds compared to the wavefront planner which took approximately a minute to find a solution.  
+
 
 \begin{figure}[H]
 	\centering
@@ -330,35 +322,12 @@ For the implementation we had to make modifications to the PRM example code give
 	\label{fig:prm}
 \end{figure}
 
-\newpage
-From Fig~\ref{fig:prm} we show the combination of PRM and carrot controller through the IGVC map with varying number of samples (200, 500, 1000, 5000). While 200 sample points was sufficient, it is easy to recognize the path as sub-optimal compared to the paths generated with 500 sample points and beyond, we can observe that the path gets more and more optimal as we increase the number of sample points in the map.
 
 
 \subsubsection{PRM Planner with Sample Points Padded}
 \label{subsec:prm_padding}
-We attempted to make improvements with the PRM approach so that the bicycle forward motion does not collide with the obstacles, we improved the PRM planner by ensuring the sample points are a set distance away from the obstacles, this is done by performing a line search on 8 directions (N, NE, E, SE, S, SW, W, NW), if collision is detected the sample point is dropped.
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=\linewidth]{images/prm_resampling.jpg}
-	\caption{PRM Resampling}
-	\label{fig:prm_resampling}
-\end{figure}
-
-
-\section{Limitations and Future Improvements to the PRM Planner}
-\subsection{Limitations}
-Previously in Section~\ref{sec:igvc_planner} we have explored both wavefront and PRM path planning methods, both methods alone are not satifactory in planning a path for the bicycle through the IGVC course, we will discuss three limitations below:
-
-
-\begin{itemize}
-	\item{\textbf{Path is not smooth}: The paths generated by both wavefront and PRM while optimal it does not take into account the motion model of the bicycle. Some of the planned paths particularly nearer towards the middle of the course where the bicycle has to make a U-turn, the angle change is very sharp and sudden, improvement in either the controller or path planned should take the motion model into account and create a smooth path or motion through the turn.}
-	
-	\item{\textbf{No collision detection}: The above two methods does not perform collision dection of the robot with regards to the obstacles in the map, there are methods such as trajectory rollout that iterates at every timestep performing collision check at every possible motion change to make sure the path is valid.}
-	
-	\item{\textbf{Wasted Computation Around Non-Optimal Areas}:}
-	
-\end{itemize}
+While the PRM all yielded valid solutions, it was noted that at some locations along the path the robot comes either very close to an obstacle cuts the corners extremely tightly due to a lack of particles in locations near choke points. An example of the PRM cutting a corner to tightly is highlighted in  Fig~\ref{fig:prm}. 
 
 \begin{figure}[H]
 	\centering
@@ -368,10 +337,36 @@ Previously in Section~\ref{sec:igvc_planner} we have explored both wavefront and
 \end{figure}
 
 
-\subsection{Future Improvements}
-While padding was useful, it suffers around the choke points in the map (figure example...).
+We attempted to address this issue by adjusting the way that sample points were created in the PRM planner by checking for any obstacles within that are within 0.5 m  of each sample point. If an obstacle is detected with 1 m of a point, the point is deleted and a set of 5 additional points are created and randomly distributed within a circle centred at the deleted sample point with a radius of 1.5 m. These points are again checked for proximity to obstacles and pruned in a the same manner described as above. 
 
-Trajectory roll out please...
+This approach resulted in areas near walls and obstacles to be sampled much more heavily compared to open spaces and also resulted in smoother paths near obstacles and are higlighted in Fig~\ref{fig:prm_resampling}
+
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\linewidth]{images/prm_resampling.jpg}
+	\caption{PRM Resampling with 1000 points and a collision check raduis of 0.5 m}
+	\label{fig:prm_resampling}
+\end{figure}
+
+
+\section{Limitations and Future Improvements to the PRM Planner}
+\subsection{Limitations}
+
+Previously in Section~\ref{sec:igvc_planner}  explored both wavefront and PRM path planning methods, both methods alone are not satisfactory in planning a path for the bicycle through the IGVC course, we will discuss three limitations below:
+
+\begin{itemize}
+	\item{\textbf{Path is not smooth}: The paths generated by both wavefront and PRM do not account motion model of the bicycle. Some portions of the planned paths have very sharp edges or corners, particularly in locations near very sharp obstacles such as the wall located in the middle of the course. Such an angle is to sharp for the controller and therefore results in a non optimal turn around the obstacle that could be avoided if the planner could take into account the robots turning radius. 	
+}
+	
+\item{\textbf{No collision detection}: None of the explored methods explicitly perform collision detection of a robot with an actual size. We approximated some collision checking using our re-sampling approach which did eliminate a significant portion of collisions but not all of them. One possible way to perform collision checking in the PRM approach would be to modify the A* search algorithm to check for collisions with obstacles when selecting an edge to transverse. One option for collision checking would be to check parallel line segments located at a distance 0.5 robot widths above and below the line segment formed by a selected edge for collision. If one of these lines was to found to interest an obstacle the edge should not be added to the final path.  
+}
+
+\item{\textbf{Map is assumed to be known, accurate and static}: Probably the largest limitation to our approach is the assumption that the map is accurate and static. A local planner such as trajectory roll-out combined with some kind of range sensor, such as lidar, would allow the robot to determine paths that avoid uncounted for obstacles. In the case of non-static obstacles, such as other robots (since it is a race) a real time object tracker could be implemented and used to make predictions as to where moving obstacles will be in future which could then be used by the local planner to come up with a collision free trajectory. 
+}
+	
+\end{itemize}
+
 
 
 
