@@ -58,7 +58,7 @@
 \maketitle
 
 \section{Motion Model of a Bicycle}
-
+Define the bicycle motion model for an Ackermann steered robot as shown in the configuration below(and presented in the motion modelling lecture notes). 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.6\textwidth]{images/bicycle_model.png}
@@ -66,7 +66,7 @@
 	\label{fig:bicycle}
 \end{figure}
 
-Motion of front wheel:
+From the lecture notes, the motion of front wheel can be written as follows:
 
 \begin{align}
 	x_{f} &= x + L \cos(\theta) \\
@@ -82,7 +82,7 @@ Motion of front wheel:
     \end{bmatrix}
 \end{align}
 
-Motion of rear wheel:
+Similarly the motion of the rear wheel is as follows: 
 
 \begin{align}
  	\begin{bmatrix}
@@ -96,7 +96,7 @@ Motion of rear wheel:
     \end{bmatrix}
 \end{align}
 
-At current we have a motion model for both the front and the rear wheel of the bicycle, however we can simplify it using the Instantaneous Center of Rotation (ICR) to combine both the front and rear wheel together.
+These two equations can be linked and simplified by using the Instantaneous Center of Rotation (ICR) to combine equations of motion for the front and rear wheels as follows.
 
 \begin{figure}[H]
 	\centering
@@ -105,14 +105,14 @@ At current we have a motion model for both the front and the rear wheel of the b
 	\label{fig:bicycle_icr}
 \end{figure}
 
-From Fig~\ref{fig:bicycle_icr} we can derive the relationship between the steering angle $\delta$ relative to the bicycle's heading:
+From Fig~\ref{fig:bicycle_icr} the relationship between the steering angle $\delta$ relative to the bicycle's heading can be written as:
 
 \begin{equation}
 	\label{eq:icr_steering_angle}
 	\tan(\delta) = \dfrac{L}{R}
 \end{equation}
 
-Further, we know that the angular velocity $\omega$ from the point ICR of both the front and rear wheel is:
+Moreover, we know that the angular velocity $\omega$ from the point ICR of both the front and rear wheel is:
 
 \begin{equation}
 	\label{eq:icr_angluar_velocity}
@@ -141,8 +141,7 @@ For the complete motion model of the bicycle we have:
     \end{bmatrix}
 \end{align}
 
-Implementing the bicycle motion model in Matlab and simulating the motion for 20 seconds with the following parameters, we obtain the trajectory observed in Fig~\ref{fig:bicycle_20s}. From the inputs outlined below, the observed trajectory appears to be valid as the heading starts at 10 degrees and then decreases at a rate of -1 degree per second. This means during the first half of the run the steering angle is positive, causing it to steer to the left, straighten out for a portion and then begin starting to turn to the right as the steering angle becomes negative. 
-
+Using Equation 8, the bicycle motion model was simulated in Matlab over a period of 20 seconds with the following parameters:
 
 \begin{itemize}	
 	\vspace{-0.4cm}
@@ -159,6 +158,11 @@ Implementing the bicycle motion model in Matlab and simulating the motion for 20
 	\item{Standard deviation on $\theta$: 1 degree}
 \end{itemize}
 
+The resulting trajectory from the simulation inputs is shown in Fig~\ref{fig:bicycle_20s}. Based on the simulation inputs the the observed trajectory appears to be valid as the heading starts at 10 degrees and then decreases at a rate of -1 degree per second. This means during the first half of the run the steering angle is positive, causing it to steer to the left, straighten out for a portion and then begin starting to turn to the right as the steering angle becomes negative. These motions result in the "S" shape that is depicted in  Fig~\ref{fig:bicycle_20s}
+
+
+
+
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.7\textwidth]{images/bicycle_motion_20s.jpg}
@@ -169,6 +173,8 @@ Implementing the bicycle motion model in Matlab and simulating the motion for 20
 
 \newpage
 \section{Carrot Controller for Bicycle}
+
+Develop a carrot following controller.  The way this controller works is you define a carrot, or point on the desired trajectory line a fixed distance, $r$, ahead of the closest point on the line to the current robot position.
 
 \begin{figure}[H]
 	\centering
@@ -212,7 +218,7 @@ Once the closest point on the trajectory line to the robot is found, calculating
 
 
 \subsection{Carrot Controller}
-We implemented a proportional carrot controller and traced a rectangle of $20m$ by $5m$ at $3ms^{-1}$. This is the resulting motion of the bicycle (See Fig~\ref{fig:bicycle_carrot}), we used a proportional gain $k_{p} = 2$ and look ahead distance $r$ at $2$, $0.2$ and $5$. 
+We implemented a proportional (P) carrot controller and traced a rectangle of $20m$ by $5m$ at $3ms^{-1}$. This is the resulting motion of the bicycle (See Fig~\ref{fig:bicycle_carrot}), we used a proportional gain $k_{p} = 2$ and look ahead distance $r$ at $2$, $0.2$ and $5$. 
 
 From Fig~\ref{fig:bicycle_carrot} we can see that different look ahead distance $r$ impacts the way the robot traces a rectangle. If the look ahead distance is too low (i.e. Fig~\ref{fig:bicycle_carrot_bad} where $r = 0.2$), the carrot will be a very small distance ahead of the robot, making small adjustments unlikely thereby the angle of the steering oscillates between $-30$ degrees to $30$ degrees (the max steering angle).
 
@@ -277,7 +283,7 @@ Since the map given represents an occupancy grid of free space and obstacles, ou
 	\label{fig:wavefront}
 \end{figure}
 
-While the wavefront method found a solution optimal on the grid based environment, it is far from optimal then a path generated in the continuous space. The first problem stems from the fact that wavefront method is a grid based method based on a breadth first search that starts and the end goal and calculates a distance between the end goal and all points in the map. Because the distance is based on the number of grids between the start and end point the distance calculated actually reflects the Manhattan Distance between the start and end goals rather than the Euclidian Distance. This means that driving at a $45^o $ angle has the same distance as two paths that first travel horizontal and then upward. Furthermore the robots trajectory is restricted to the exploration directions used to generate the wavefront which in this case were a set 4 moves, mainly move up, move right, move left and move down. 
+While the wavefront method successfully found an optimal solution on the grid based environment, it is far from optimal then a path generated in the continuous space. This problem stems from the fact that wavefront method is a grid based method based on a breadth first search that starts and the end goal and calculates a distance between the end goal and all points in the map. Because the distance is based on the number of grids between the start and end point the distance calculated actually reflects the Manhattan Distance between the start and end goals rather than the Euclidean Distance. This means that driving at a $45^o $ angle has the same distance as two paths that first travel horizontal and then upward. Furthermore the robots trajectory is restricted to the exploration directions used to generate the wavefront which in this case were a set 4 moves, mainly move up, move right, move left and move down. 
 
 Additional problems are realized when one takes into account that the fact that robot is likely larger than the grid cells which makes collision avoidance and detection difficult. In many cases the grid cells are assumed to be the size of the robot but this has the additional drawback of causing obstacles to become very course and poorly represented. In Fig~\ref{fig:wavefront} it can be noted that the wavefront planner slips between a very small gap between two pylons on the course, which unless the robot is 10cm by 10cm, would be an impossible path for the robot to follow. Additionally the robot also tends to hug obstacles very closely which means that any errors in possession or heading are likely to result in collisions. 
 
@@ -288,11 +294,13 @@ Lastly, for this large map, the run time was over 40 seconds without any collisi
 \label{subsec:prm}
 In our next approach we used the Probabilistic Roadmap (PRM) planner, purely out of curiosity and it seemed like an intuitive alternative to wavefront planner. 
 
-For the PRM implementation on a grid based environment, we had to make modifications to the PRM example code given, which assumes the obstacles are in the form of set of polygon points and exploits Matlab's inpolygon function to detect whether a sample point located within a polygon. However the map given represents an occupancy grid instead of the obstacle polygons as points, and therefore had the collision checking to be replaced by a ray tracing algorithm. In our implementation we utilized a modified version of Bresenham's line algorithm, to find create collision free edges between sample points.
+For the PRM implementation on a grid based environment, we had to make modifications to the provided PRM example, which assumes the obstacles are in the form of set of polygon points. This allows the PRM planner implemented in the ME 597 example code to exploit Matlab's \textit{inpolygon }function to detect whether a sample point located within a polygon. 
 
-We implemented a PRM planner and then applied the carrot controller outlined in Question 2 to the resulting paths which are shown in  Fig~\ref{fig:prm} which also highlights the effect of using varying sample sizes in the PRM. From testing it appears that a sample size of 200 will yield a valid solution in about 50 percent of the time, a sample size of 500 will yield a solution is 90 percent of cases and a sample size of over 1000 always resulted in a solution in all of our tests. 
+However the map given in this assignment is represented an occupancy grid instead of set of polygons, and therefore the collision checking portion of the PRM code to be replaced by a ray tracing algorithm. In our implementation we utilized a modified version of Bresenham's line algorithm, to find create collision free edges between sample points.
 
-Higher sample sizes also tend to lead to smoother and more optimal paths which can be observed by comparing  the 200 sample case to the 5000 sample case highlighted in Fig~\ref{fig:collision_example}. The run time of the PRM when using 5000 points less than 3 seconds compared to the wavefront planner which took approximately a minute to find a solution.  
+We implemented a PRM planner and then applied the carrot controller outlined in Question 2 to the resulting paths which are shown in  Fig~\ref{fig:prm} which also highlights the effect of using varying sample sizes in the PRM. From testing it appears that a sample size of 200 will yield a valid solution in about 50 percent of the time, a sample size of 500 will yield a solution is 90 percent of cases and a sample sizes with more than 1000 sample points always resulted in a solution. 
+
+Higher sample sizes also tended to lead to smoother and more optimal paths which can be observed by comparing  the 200 sample case to the 5000 sample case highlighted in Fig~\ref{fig:collision_example}. The run time of the PRM when using 5000 points less than 3 seconds which is a significant improvement over the wavefront planner which took over a minute to find a solution.  
 
 
 \begin{figure}[H]
@@ -327,7 +335,7 @@ Higher sample sizes also tend to lead to smoother and more optimal paths which c
 \subsubsection{PRM Planner with Sample Points Padded}
 \label{subsec:prm_padding}
 
-While the PRM all yielded valid solutions, it was noted that at some locations along the path the robot comes either very close to an obstacle cuts the corners extremely tightly due to a lack of particles in locations near choke points. An example of the PRM cutting a corner to tightly is highlighted in  Fig~\ref{fig:prm}. 
+While the PRM yielded a complete path between teh start and end goals, it was noted that at some locations along the path the robot will pass extremely close to obstacles due to the PRM cutting the corners extremely tightly. This behaviour is due to a lack of particles in locations near choke points. An example of the PRM cutting a corner to tightly is highlighted in  Fig~\ref{fig:prm}. 
 
 \begin{figure}[H]
 	\centering
@@ -337,9 +345,9 @@ While the PRM all yielded valid solutions, it was noted that at some locations a
 \end{figure}
 
 
-We attempted to address this issue by adjusting the way that sample points were created in the PRM planner by checking for any obstacles within that are within 0.5 m  of each sample point. If an obstacle is detected with 1 m of a point, the point is deleted and a set of 5 additional points are created and randomly distributed within a circle centred at the deleted sample point with a radius of 1.5 m. These points are again checked for proximity to obstacles and pruned in a the same manner described as above. 
+We attempted to address this issue by adjusting the way that sample points were created in the PRM planner by checking for any obstacles within that are within 0.5 m circle  of each sample point. If an obstacle is detected with 0.5 m of a point, the point is deleted and a set of 5 additional points are created and randomly distributed within a circle centred at the deleted sample point with a radius of 1.5 m. These points are again checked for proximity to obstacles and pruned in a the same manner described as above. 
 
-This approach resulted in areas near walls and obstacles to be sampled much more heavily compared to open spaces and also resulted in smoother paths near obstacles and are higlighted in Fig~\ref{fig:prm_resampling}
+This approach resulted in areas near walls and obstacles to be sampled much more heavily compared to open spaces and also resulted in smoother paths near obstacles and are highlighted in Fig~\ref{fig:prm_resampling}
 
 
 \begin{figure}[H]
@@ -353,9 +361,10 @@ This approach resulted in areas near walls and obstacles to be sampled much more
 \section{Limitations and Future Improvements to the PRM Planner}
 \subsection{Limitations}
 
-Previously in Section~\ref{sec:igvc_planner}  explored both wavefront and PRM path planning methods, both methods alone are not satisfactory in planning a path for the bicycle through the IGVC course, we will discuss three limitations below:
+Previously in Section~\ref{sec:igvc_planner}  explored both wavefront and PRM path planning methods, both methods alone are not satisfactory in planning a path for the bicycle through the IGVC course, we will discuss three limitations below along with possible solutions:
 
 \begin{itemize}
+
 	\item{\textbf{Path is not smooth}: The paths generated by both wavefront and PRM do not account motion model of the bicycle. Some portions of the planned paths have very sharp edges or corners, particularly in locations near very sharp obstacles such as the wall located in the middle of the course. Such an angle is to sharp for the controller and therefore results in a non optimal turn around the obstacle that could be avoided if the planner could take into account the robots turning radius. 	
 }
 	
