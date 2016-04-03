@@ -9,5 +9,5 @@ function x = bicycle_update(x_prev, v_t, L, delta_t, dt)
     end
     
     x(3) = mod(x(3), 2*pi());
-    x = x
+   
 end

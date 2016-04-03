@@ -1,32 +1,33 @@
 addpath('igvc_functions')
 close all
 % parameters
-nb_samples = 15000;
+nb_samples = 4000;
 dxy = 0.1;
 pos_start = [40/dxy 5/dxy pi];
 pos_end = [50/dxy 10/dxy];
 % 
 % % prm
 [map, map_min, map_max] = load_omap('IGVCmap.jpg');
-% milestones = prm_sample(nb_samples,...
-% 	map,...
-% 	pos_start,...
-% 	pos_end,...
-% 	map_min,...
-% 	map_max);
-% 
-% [spath, sdist] = prm_search(map, milestones, 50);
-% 
+milestones = prm_sample(nb_samples,...
+	map,...
+	pos_start,...
+	pos_end,...
+	map_min,...
+	map_max);
+
+[spath, sdist] = prm_search(map, milestones, 50);
+
 % save milestones.mat milestones
 % save spath.mat spath
 % save sdist.mat sdist
 
-load milestones.mat
-load spath.mat
-load sdist.mat
+% load milestones.mat
+% load spath.mat
+% load sdist.mat
 
 plot_omap(1, map, pos_start, pos_end, 0.1);
-%plot_milestones(1, milestones);
+hold on
+plot_milestones(1, milestones);
 for i = 1:length(spath) - 1
     plot([spath(i, 1), spath(i + 1, 1)],...
         [spath(i, 2), spath(i + 1, 2)],...
@@ -48,8 +49,9 @@ L = 0.3;
 stddev_x = 0.02;
 stddev_y = 0.02;
 stddev_theta = deg2rad(1.0);
-v_t = 3 / 0.1;
-
+ v_t = 3 / 0.1 ;
+% v_t = 3*1;
+ 
 % bicycle states
 delta_max = deg2rad(25); % max steering angle
 x_t = [
@@ -82,9 +84,12 @@ delta_t = 0;
 
 for i = 1:length(t)
     % update carrot
+   
     [carrot_t, wp_index] = carrot_update(x_t, carrot_t, .5/dxy, waypoints, wp_index);
     carrot_store(:, i) = carrot_t;
-
+    if wp_index == length(waypoints);
+        break
+    end
     % update steering
     delta_t = calculate_delta(x_t, carrot_t, delta_max);
 
@@ -96,5 +101,5 @@ end
 % plot animation
  plot_waypoints(1, waypoints);
  plot_trajectory(1, x_store, carrot_store, t);
-%plot_animation(1, x_store, carrot_store, t);
+% plot_animation(1, x_store, carrot_store, t);
 % plot_controller(1, c_store, t);

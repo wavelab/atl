@@ -1,4 +1,5 @@
 function [carrot_t, wp_index] = carrot_update(x_t, carrot_prev, r, waypoints, wp_index)
+
     wp_start = waypoints(wp_index, :);
     wp_end = waypoints(wp_index + 1, :);
     dist_from_wp_start = dist_between_points(transpose(wp_start), x_t(1:2));
@@ -7,12 +8,14 @@ function [carrot_t, wp_index] = carrot_update(x_t, carrot_prev, r, waypoints, wp
     carrot_t = calculate_new_carrot(x_t, r, wp_start, wp_end);
 
     % update waypoint if reached waypoint
-    if waypoint_reached(x_t(1:2), transpose(wp_end), .2) == 1
+    if waypoint_reached(x_t(1:2), transpose(wp_end), 2) == 1
     % if waypoint_reached(carrot_t(1:2), transpose(wp_end), 0.2) == 1
         % update waypoint index
         wp_index = wp_index + 1;
-        if wp_index == length(waypoints)
-            wp_index = 1;
+        if wp_index  == length(waypoints)
+            wp_index = length(waypoints);
+            return;
+%             wp_index = 1;
         end
 
         % recalculate carrot
