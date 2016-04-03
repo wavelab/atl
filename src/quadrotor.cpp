@@ -146,22 +146,22 @@ int quadrotor_update(struct quadrotor *q, double gravity, double dt)
     quadrotor_calculate_angular_acceleration(q);
 
     // update - using euler approximation (todo: need to do rk4 at least)
-    q.angular_velocity_body_frame(0) += q.angular_acceleration_body_frame(0) * dt;
-    q.angular_velocity_body_frame(1) += q.angular_acceleration_body_frame(1) * dt;
-    q.angular_velocity_body_frame(2) += q.angular_acceleration_body_frame(2) * dt;
+    q->angular_velocity_body_frame(0) += q->angular_acceleration_body_frame(0) * dt;
+    q->angular_velocity_body_frame(1) += q->angular_acceleration_body_frame(1) * dt;
+    q->angular_velocity_body_frame(2) += q->angular_acceleration_body_frame(2) * dt;
     quadrotor_convert_angular_velocity_to_inertial_frame(q);
 
-    q.orientation(0) += q.angular_velocity(0) * dt;
-    q.orientation(1) += q.angular_velocity(1) * dt;
-    q.orientation(2) += q.angular_velocity(2) * dt;
+    q->orientation(0) += q->angular_velocity(0) * dt;
+    q->orientation(1) += q->angular_velocity(1) * dt;
+    q->orientation(2) += q->angular_velocity(2) * dt;
 
-    q.velocity(0) += q.acceleration(0) * dt;
-    q.velocity(1) += q.acceleration(1) * dt;
-    q.velocity(2) += q.acceleration(2) * dt;
+    q->velocity(0) += q->acceleration(0) * dt;
+    q->velocity(1) += q->acceleration(1) * dt;
+    q->velocity(2) += q->acceleration(2) * dt;
 
-    q.position(0) += q.velocity(0) * dt;
-    q.position(1) += q.velocity(1) * dt;
-    q.position(2) += q.velocity(2) * dt;
+    q->position(0) += q->velocity(0) * dt;
+    q->position(1) += q->velocity(1) * dt;
+    q->position(2) += q->velocity(2) * dt;
 
     return 0;
 }

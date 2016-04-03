@@ -185,7 +185,7 @@ The resulting trajectory from the simulation inputs is shown in Fig~\ref{fig:bic
 
 
 \subsection{Closest Point on the Trajectory Line to the Robot}
-The first step in implementing the the carrot controller for the outlined problem is to first determine a way to calculate the correct location of the carrot point given the robot's current position. To do we can use the projection equation between two vectors. 
+The first step in implementing the the carrot controller for the outlined problem is to first determine a way to calculate the correct location of the carrot point given the robot's current position. To do this we can use the projection equation between two vectors. 
 
 \begin{figure}[H]
 	\centering
@@ -214,11 +214,11 @@ Next we need to determine where to place the carrot point. Having already found 
 \subsection{Carrot Controller Implementation}
 We implemented a proportional (P) carrot controller and traced a rectangle of $20m$ by $5m$ at $3ms^{-1}$. This is the resulting motion of the bicycle (See Fig~\ref{fig:bicycle_carrot}), we used a proportional gain $k_{p} = 2$ and tested look ahead distances $r$ at $2$, $0.2$ and $5$. 
 
-From Fig~\ref{fig:bicycle_carrot} we can see that different look ahead distance $r$ greatly impact the way the robot traces a rectangle. If the look ahead distance is too low (i.e. Fig~\ref{fig:bicycle_carrot_bad} where $r = 0.2$), the carrot is always very small distance ahead to the robot which in turn causes the angle between the carrot's location and the robot to be relatively large. This combined with the course time step of $dt = 0.1s$ cause the robot to overshoot and cross over the desired path line at each time step, causing a large error in the heading which then causes it to overshoot again, leading to the oscillatory motion observed in Fig~\ref{fig:bicycle_carrot_bad}. This problem may be avoided if one was to use a PD controller, reduce the P gains or decrease the time step. 
+From Fig~\ref{fig:bicycle_carrot} we can see that different look ahead distance $r$ greatly impact the way the robot traces a rectangle. If the look ahead distance is too low (i.e. Fig~\ref{fig:bicycle_carrot_bad} where $r = 0.2$), the carrot is always very small distance ahead to the robot which in turn causes the angle between the carrot's location and the robot to be relatively large. This combined with the coarse time step of $dt = 0.1s$ causes the robot to overshoot and cross over the desired path line at each time step, inducing a large error in the heading which then causes it to overshoot again, leading to the oscillatory motion observed in Fig~\ref{fig:bicycle_carrot_bad}. This problem can be avoided if one was to use a PD controller, reduce the P gains or decrease the time step. 
 
-When the carrot was set to a look ahead distance of $r = 5m$ we found that robot had trouble hitting a way point and we had to increase the way point reached threshold from $0.2 m $ to $0.5m$ to compensate for this problem. The way point reached threshold represented the circle that the robot must enter in order for the carrot controller to consider the way point to have been reached. This difficulty of hitting way points, along with larger overshoots compared to the carrot distances were $r= 0.2$ and $r = 2m$ are caused by the large distance between the carrot and the robot which reduces the calculated angle between the robot and the carrot at each time step, making it less sensitive to heading errors and in turn dampening the turning rate of the robot. 
+When the carrot was set to a look ahead distance of $r = 5m$ we found that robot had trouble hitting way points and we had to increase the way point reached threshold from $0.2 m $ to $0.5m$ to compensate for this problem. The way point reached threshold represents a virtual circle that the robot must enter in order for the carrot controller to consider the way point has been reached. This difficulty of hitting way points, along with larger overshoots compared to the carrot distances were $r= 0.2$ and $r = 2m$ are caused by the large distance between the carrot and the robot which reduces the calculated angle between the robot and the carrot at each time step, making it less sensitive to heading errors and in turn dampening the turning rate of the robot. 
 
-Overall we found that a lookahead distance of $r = 2m$ provided the best results for the time steps and proportional gains provided. We were able to use a detection radius of 0.2 at each way point to detect if the robot had reached the way point goal. Moreover, after passing a way point and slightly overshooting, the robot's trajectory matched the on the next path segment within approximately $5m$ of last way point compared to the runs where $r = 5m$ in which case the robot took over $10m$ to pass directly on the path segments. 
+Overall we found that a lookahead distance of $r = 2m$ provided the best results for the time steps and proportional gains provided. We were able to use a detection radius of $0.2m$ at each way point to detect if the robot had reached the way point goal. Moreover, after passing a way point and slightly overshooting, the robot's trajectory matched the on the next path segment within approximately $5m$ of last way point compared to the runs where $r = 5m$ in which case the robot took over $10m$ to pass directly on the path segments. 
 
 
 
@@ -260,7 +260,7 @@ Overall we found that a lookahead distance of $r = 2m$ provided the best results
 The provided map of the Intelligent Ground Vehicle Competition in the form of a $926 \times 716$ element grid, where each cell
 represents a 10 cm X 10 cm area of the course, resulting in a 92.6 m X 71.6 m environment. 
 
-Our goal is to implement a planner and present a combined motion planning solution that finds a straight-line path through the environment, then uses the carrot controller to provide the inputs required to drive the robot to the start and end locations which are ocated at ($x = 4.0m$, $y = 0.5m$, $\theta = 3.14159 rad$) and ($x = 5.0 m$, $y = 1.0 m$, $theta =$ not defined) respectively. 
+Our goal is to implement a planner and present a combined motion planning solution that finds a straight-line path through the environment, then uses the carrot controller to provide the inputs required to drive the robot to the start and end locations which are ocated at ($x = 4.0m$, $y = 0.5m$, $\theta = 3.14159 rad$) and ($x = 5.0 m$, $y = 1.0 m$, $\theta =$ not defined) respectively. 
 
 
 \begin{figure}[H]
@@ -333,7 +333,7 @@ Higher sample sizes also tended to lead to smoother and more optimal paths which
 \subsubsection{PRM Planner with Sample Points Padded}
 \label{subsec:prm_padding}
 
-While the PRM yielded a complete path between teh start and end goals, it was noted that at some locations along the path the robot will pass extremely close to obstacles due to the PRM cutting the corners extremely tightly. This behaviour is due to a lack of particles in locations near choke points. An example of the PRM cutting a corner to tightly is highlighted in  Fig~\ref{fig:prm}. 
+While the PRM yielded a complete path between teh start and end goals, it was noted that at some locations along the path the robot will pass extremely close to obstacles due to the PRM cutting the corners extremely tightly. This behaviour is due to a lack of particles in locations near choke points. An example of the PRM cutting a corner too tightly is highlighted in  Fig~\ref{fig:prm}. 
 
 \begin{figure}[H]
 	\centering

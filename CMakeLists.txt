@@ -59,8 +59,9 @@ ADD_LIBRARY(
     src/pid.cpp
     src/util.cpp
     src/camera.cpp
-    # src/quadrotor.cpp
+    src/quadrotor.cpp
     src/apriltag.cpp
+    src/ros/ros_util.cpp
 )
 
 
@@ -81,6 +82,18 @@ INSTALL(
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
+# calibration node
+ADD_EXECUTABLE(camera_calibration src/ros/camera_calibration_node.cpp)
+TARGET_LINK_LIBRARIES(
+    camera_calibration
+    awesomo
+    apriltags
+    yaml-cpp
+    flycapture
+    ${OpenCV_LIBS}
+    ${catkin_LIBRARIES}
+)
+
 # quadrotor_node
 ADD_EXECUTABLE(quadrotor_node src/ros/quadrotor_node.cpp)
 TARGET_LINK_LIBRARIES(quadrotor_node ${catkin_LIBRARIES} awesomo)
@@ -90,8 +103,11 @@ INSTALL(
 )
 
 
+
+
+
 ## UNIT TESTS
-# camera_test
+# tests/camera_test
 ADD_EXECUTABLE(camera_test tests/camera_test.cpp)
 TARGET_LINK_LIBRARIES(
     camera_test
@@ -104,25 +120,25 @@ TARGET_LINK_LIBRARIES(
 )
 INSTALL(TARGETS camera_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
-# sim_test
-# ADD_EXECUTABLE(sim_test tests/sim_test.cpp)
-# TARGET_LINK_LIBRARIES(sim_test awesomo)
-# INSTALL(TARGETS sim_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+# tests/sim_test
+ADD_EXECUTABLE(sim_test tests/sim_test.cpp)
+TARGET_LINK_LIBRARIES(sim_test awesomo)
+INSTALL(TARGETS sim_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
-# pid_test
+# tests/pid_test
 ADD_EXECUTABLE(pid_test tests/pid_test.cpp)
 TARGET_LINK_LIBRARIES(pid_test awesomo)
 INSTALL(TARGETS pid_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
-# util_test
+# tests/util_test
 ADD_EXECUTABLE(util_test tests/util_test.cpp)
 TARGET_LINK_LIBRARIES(util_test awesomo)
 INSTALL(TARGETS util_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
-# calibration images
-ADD_EXECUTABLE(camera_calibration src/ros/camera_calibration_node.cpp)
-TARGET_LINK_LIBRARIES( 
-    camera_calibration
+# tests/ros/ros_util
+ADD_EXECUTABLE(ros_util_test tests/ros/ros_util_test.cpp)
+TARGET_LINK_LIBRARIES(
+    ros_util_test
     awesomo
     apriltags
     yaml-cpp
@@ -130,3 +146,4 @@ TARGET_LINK_LIBRARIES(
     ${OpenCV_LIBS}
     ${catkin_LIBRARIES}
 )
+INSTALL(TARGETS ros_util_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})

@@ -143,6 +143,8 @@ TagPose TagDetector::obtainPose(
     Eigen::Matrix3d F;
     Eigen::Matrix3d rotation;
     Eigen::Matrix3d fixed_rot;
+    Eigen::Matrix4d transform;
+    Eigen::Vector3d translation;
 
     // setup
     F << 1, 0, 0,
@@ -154,21 +156,40 @@ TagPose TagDetector::obtainPose(
         tag_size = 0.048;
     } else if (detection.id == 5) {
         tag_size = 0.343;
+    } else {
+        tag_size = 1;
     }
 
-    // recovering the relative pose of a tag:
-    detection.getRelativeTranslationRotation(
+    transform = detection.getRelativeTransform(
         tag_size,
-        camera_matrix.at<double>(0, 0),
-        camera_matrix.at<double>(1, 1),
-        camera_matrix.at<double>(0, 2),
-        camera_matrix.at<double>(1, 2),
-        pose.translation,
-        rotation
+        camera_matrix.at<double>(0, 0),  // fx
+        camera_matrix.at<double>(1, 1),  // fy
+        camera_matrix.at<double>(0, 2),  // px
+        camera_matrix.at<double>(1, 2)  // py
     );
-    fixed_rot = F * rotation;
-    pose.distance = pose.translation.norm();
-    convertToEuler(fixed_rot, pose.yaw, pose.pitch, pose.roll);
+
+    translation = transform.col(3).head(3);
+    pose.translation[0] = translation[1];
+    pose.translation[1] = translation[2];
+    pose.translation[2] = translation[0];
+    pose.distance = 0;
+    pose.yaw = 0;
+    pose.pitch = 0;
+    pose.roll = 0;
+
+    // recovering the relative pose of a tag:
+    // detection.getRelativeTranslationRotation(
+    //     tag_size,
+    //     camera_matrix.at<double>(0, 0),
+    //     camera_matrix.at<double>(1, 1),
+    //     camera_matrix.at<double>(0, 2),
+    //     camera_matrix.at<double>(1, 2),
+    //     pose.translation,
+    //     rotation
+    // );
+    // fixed_rot = F * rotation;
+    // pose.distance = pose.translation.norm();
+    // convertToEuler(fixed_rot, pose.yaw, pose.pitch, pose.roll);
 
     return pose;
 }
