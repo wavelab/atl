@@ -58,7 +58,7 @@
 \maketitle
 
 \section{Motion Model of a Bicycle}
-Define the bicycle motion model for an Ackermann steered robot as shown in the configuration below(and presented in the motion modelling lecture notes). 
+\textit{Define the bicycle motion model for an Ackermann steered robot as shown in the configuration below(and presented in the motion modelling lecture notes). }
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.6\textwidth]{images/bicycle_model.png}
@@ -174,7 +174,7 @@ The resulting trajectory from the simulation inputs is shown in Fig~\ref{fig:bic
 \newpage
 \section{Carrot Controller for Bicycle}
 
-Develop a carrot following controller.  The way this controller works is you define a carrot, or point on the desired trajectory line a fixed distance, $r$, ahead of the closest point on the line to the current robot position.
+\textit{Develop a carrot following controller.  The way this controller works is you define a carrot, or point on the desired trajectory line a fixed distance, $r$, ahead of the closest point on the line to the current robot position.}
 
 \begin{figure}[H]
 	\centering
@@ -183,11 +183,9 @@ Develop a carrot following controller.  The way this controller works is you def
 	\label{fig:carrot_controller}
 \end{figure}
 
-A carrot controller is a controller that has a carrot point with a fixed distance $r$ on the trajectory line, ahead of the closest point on the trajectory line to the current robot position.
-
 
 \subsection{Closest Point on the Trajectory Line to the Robot}
-The closest point between the robot's position and the trajectory line can be calculated by first calculating the projection of the vector formed by the current location and the desired 
+The first step in implementing the the carrot controller for the outlined problem is to first determine a way to calculate the correct location of the carrot point given the robot's current position. To do we can use the projection equation between two vectors. 
 
 \begin{figure}[H]
 	\centering
@@ -206,23 +204,23 @@ Let the vector $a$ denote the vector from the start of the trajectory line to th
 			\vec{a}
 \end{equation}
 
-
-\newpage
-\subsection{Calculation of the Carrot Point}
-Once the closest point on the trajectory line to the robot is found, calculating a carrot point along the trajectory line is the closest point on the trajectory line $p_{\text{closest}}$ plus the product of look ahead distance $r$ times the unit vector of the trajectory line $b$.
-
+Next we need to determine where to place the carrot point. Having already found the closest point on the trajectory line $p_{\text{closest}}$, the carrot is simply calculated by adding the look ahead distance $r$ times the unit vector of the trajectory line $b$ to the value of $p_{\text{closest}}$.
 \begin{equation}
 	\text{carrot} = p_{\text{closest}} + r \dfrac{\vec{b}}{|\vec{b}|}
 \end{equation}
 
 
 
-\subsection{Carrot Controller}
-We implemented a proportional (P) carrot controller and traced a rectangle of $20m$ by $5m$ at $3ms^{-1}$. This is the resulting motion of the bicycle (See Fig~\ref{fig:bicycle_carrot}), we used a proportional gain $k_{p} = 2$ and look ahead distance $r$ at $2$, $0.2$ and $5$. 
+\subsection{Carrot Controller Implementation}
+We implemented a proportional (P) carrot controller and traced a rectangle of $20m$ by $5m$ at $3ms^{-1}$. This is the resulting motion of the bicycle (See Fig~\ref{fig:bicycle_carrot}), we used a proportional gain $k_{p} = 2$ and tested look ahead distances $r$ at $2$, $0.2$ and $5$. 
 
-From Fig~\ref{fig:bicycle_carrot} we can see that different look ahead distance $r$ impacts the way the robot traces a rectangle. If the look ahead distance is too low (i.e. Fig~\ref{fig:bicycle_carrot_bad} where $r = 0.2$), the carrot will be a very small distance ahead of the robot, making small adjustments unlikely thereby the angle of the steering oscillates between $-30$ degrees to $30$ degrees (the max steering angle).
+From Fig~\ref{fig:bicycle_carrot} we can see that different look ahead distance $r$ greatly impact the way the robot traces a rectangle. If the look ahead distance is too low (i.e. Fig~\ref{fig:bicycle_carrot_bad} where $r = 0.2$), the carrot is always very small distance ahead to the robot which in turn causes the angle between the carrot's location and the robot to be relatively large. This combined with the course time step of $dt = 0.1s$ cause the robot to overshoot and cross over the desired path line at each time step, causing a large error in the heading which then causes it to overshoot again, leading to the oscillatory motion observed in Fig~\ref{fig:bicycle_carrot_bad}. This problem may be avoided if one was to use a PD controller, reduce the P gains or decrease the time step. 
 
-If the carrot is at a medium look ahead distance away from the robot  (i.e. Fig~\ref{fig:bicycle_carrot_ok} where $r = 2$), the robot tends to be quite agreessive in compensating for overshooting the trajectory. As we increase the look ahead distance $r$ however, the correction angle is dampened, causing a less agreessive correction, but longer time to return to the trajectory line.
+When the carrot was set to a look ahead distance of $r = 5m$ we found that robot had trouble hitting a way point and we had to increase the way point reached threshold from $0.2 m $ to $0.5m$ to compensate for this problem. The way point reached threshold represented the circle that the robot must enter in order for the carrot controller to consider the way point to have been reached. This difficulty of hitting way points, along with larger overshoots compared to the carrot distances were $r= 0.2$ and $r = 2m$ are caused by the large distance between the carrot and the robot which reduces the calculated angle between the robot and the carrot at each time step, making it less sensitive to heading errors and in turn dampening the turning rate of the robot. 
+
+Overall we found that a lookahead distance of $r = 2m$ provided the best results for the time steps and proportional gains provided. We were able to use a detection radius of 0.2 at each way point to detect if the robot had reached the way point goal. Moreover, after passing a way point and slightly overshooting, the robot's trajectory matched the on the next path segment within approximately $5m$ of last way point compared to the runs where $r = 5m$ in which case the robot took over $10m$ to pass directly on the path segments. 
+
+
 
 \begin{figure}[H]
 	\centering
@@ -257,7 +255,9 @@ If the carrot is at a medium look ahead distance away from the robot  (i.e. Fig~
 \newpage
 \section{IGVC Planner}
 \label{sec:igvc_planner}
-We were given a map of the Intelligent Ground Vehicle Competition in the form of a $926 \times 716$ element grid, where each cell
+\textit{Using the map provided with the homework (IGVCmap.mand IGVCmap.jpg), identify a planning strategy that can be used in conjunction with the carrot planner of part 2)to navigate the Intelligent Ground Vehicle Competition auto-navigation course.}
+
+The provided map of the Intelligent Ground Vehicle Competition in the form of a $926 \times 716$ element grid, where each cell
 represents a 10 cm X 10 cm area of the course, resulting in a 92.6 m X 71.6 m environment. 
 
 Our goal is to implement a planner and present a combined motion planning solution that finds a straight-line path through the environment, then uses the carrot controller to provide the inputs required to drive the robot to the start and end locations which are ocated at ($x = 4.0m$, $y = 0.5m$, $\theta = 3.14159 rad$) and ($x = 5.0 m$, $y = 1.0 m$, $theta =$ not defined) respectively. 
@@ -271,8 +271,6 @@ Our goal is to implement a planner and present a combined motion planning soluti
 \end{figure}
 
 
-
-\newpage
 \subsection{Wavefront Planner}
 \label{subsec:wavefront}
 Since the map given represents an occupancy grid of free space and obstacles, our initial approach to the planning portion was to apply the wavefront a path that finds an optional path between start to goal point. Fig~\ref{fig:wavefront} highlights the results of the wavefront planner and highlights the resulting path found by gradient decent. 
@@ -287,7 +285,7 @@ While the wavefront method successfully found an optimal solution on the grid ba
 
 Additional problems are realized when one takes into account that the fact that robot is likely larger than the grid cells which makes collision avoidance and detection difficult. In many cases the grid cells are assumed to be the size of the robot but this has the additional drawback of causing obstacles to become very course and poorly represented. In Fig~\ref{fig:wavefront} it can be noted that the wavefront planner slips between a very small gap between two pylons on the course, which unless the robot is 10cm by 10cm, would be an impossible path for the robot to follow. Additionally the robot also tends to hug obstacles very closely which means that any errors in possession or heading are likely to result in collisions. 
 
-Lastly, for this large map, the run time was over 40 seconds without any collision checking procedures and therefore this approach was abandoned in favour of a Probabilistic Roadmap Planner (PRM). 
+Lastly, for this large map, the run time was over 1 minute without any collision checking procedures and therefore this approach was abandoned in favour of a Probabilistic Roadmap Planner (PRM). 
 
 
 \subsection{Probabilistic Roadmap Planner}
@@ -359,7 +357,6 @@ This approach resulted in areas near walls and obstacles to be sampled much more
 
 
 \section{Limitations and Future Improvements to the PRM Planner}
-\subsection{Limitations}
 
 Previously in Section~\ref{sec:igvc_planner}  explored both wavefront and PRM path planning methods, both methods alone are not satisfactory in planning a path for the bicycle through the IGVC course, we will discuss three limitations below along with possible solutions:
 
@@ -375,9 +372,6 @@ Previously in Section~\ref{sec:igvc_planner}  explored both wavefront and PRM pa
 }
 	
 \end{itemize}
-
-
-
 
 
 \end{document}
