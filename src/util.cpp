@@ -1,9 +1,9 @@
 #include "awesomo/util.hpp"
 
-int euler2Quaternion( const double roll,
-                  const double pitch,
-                  const double yaw,
-                  Eigen::Quaterniond &q)
+int euler2Quaternion(const double roll,
+                     const double pitch,
+                     const double yaw,
+                     Eigen::Quaterniond &q)
 {
     Eigen::AngleAxisd rollAngle(roll, Eigen::Vector3d::UnitX());
     Eigen::AngleAxisd pitchAngle(pitch, Eigen::Vector3d::UnitY());
@@ -14,17 +14,16 @@ int euler2Quaternion( const double roll,
     return 0;
 }
 
-int euler2RotationMatrix( const double roll,
-                        const double pitch,
-                        const double yaw,
-                        Eigen::Matrix3d &rot)
+int euler2RotationMatrix(const double roll,
+                         const double pitch,
+                         const double yaw,
+                         Eigen::Matrix3d &rot)
 {
     Eigen::Quaterniond q_normalized;
     euler2Quaternion(roll, pitch, yaw, q_normalized);
     rot = q_normalized.toRotationMatrix();
     return 0;
 }
-
 
 double deg2rad(double d)
 {

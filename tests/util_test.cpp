@@ -156,17 +156,17 @@ int test_euler2RotationMatrix(void)
     r22 = 0;
     r23 = -1;
 
-    mu_check(fltcmp(r01,rot(0,0)) == 0);
-    mu_check(fltcmp(r02,rot(0,1)) == 0);
-    mu_check(fltcmp(r03,rot(0,2)) == 0);
+    mu_check(fltcmp(r01, rot(0, 0)) == 0);
+    mu_check(fltcmp(r02, rot(0, 1)) == 0);
+    mu_check(fltcmp(r03, rot(0, 2)) == 0);
 
-    mu_check(fltcmp(r11,rot(1,0)) == 0);
-    mu_check(fltcmp(r12,rot(1,1)) == 0);
-    mu_check(fltcmp(r13,rot(1,2)) == 0);
+    mu_check(fltcmp(r11, rot(1, 0)) == 0);
+    mu_check(fltcmp(r12, rot(1, 1)) == 0);
+    mu_check(fltcmp(r13, rot(1, 2)) == 0);
 
-    mu_check(fltcmp(r21,rot(2,0)) == 0);
-    mu_check(fltcmp(r22,rot(2,1)) == 0);
-    mu_check(fltcmp(r23,rot(2,2)) == 0);
+    mu_check(fltcmp(r21, rot(2, 0)) == 0);
+    mu_check(fltcmp(r22, rot(2, 1)) == 0);
+    mu_check(fltcmp(r23, rot(2, 2)) == 0);
 
     roll = M_PI;
     pitch = M_PI/2;
@@ -184,17 +184,17 @@ int test_euler2RotationMatrix(void)
     r22 = 0;
     r23 = 0;
 
-    mu_check(fltcmp(r01,rot(0,0)) == 0);
-    mu_check(fltcmp(r02,rot(0,1)) == 0);
-    mu_check(fltcmp(r03,rot(0,2)) == 0);
+    mu_check(fltcmp(r01, rot(0, 0)) == 0);
+    mu_check(fltcmp(r02, rot(0, 1)) == 0);
+    mu_check(fltcmp(r03, rot(0, 2)) == 0);
 
-    mu_check(fltcmp(r11,rot(1,0)) == 0);
-    mu_check(fltcmp(r12,rot(1,1)) == 0);
-    mu_check(fltcmp(r13,rot(1,2)) == 0);
+    mu_check(fltcmp(r11, rot(1, 0)) == 0);
+    mu_check(fltcmp(r12, rot(1, 1)) == 0);
+    mu_check(fltcmp(r13, rot(1, 2)) == 0);
 
-    mu_check(fltcmp(r21,rot(2,0)) == 0);
-    mu_check(fltcmp(r22,rot(2,1)) == 0);
-    mu_check(fltcmp(r23,rot(2,2)) == 0);
+    mu_check(fltcmp(r21, rot(2, 0)) == 0);
+    mu_check(fltcmp(r22, rot(2, 1)) == 0);
+    mu_check(fltcmp(r23, rot(2, 2)) == 0);
 
 
     roll = M_PI;
@@ -213,24 +213,21 @@ int test_euler2RotationMatrix(void)
     r22 = 0;
     r23 = 0;
 
-    mu_check(fltcmp(r01,rot(0,0)) == 0);
-    mu_check(fltcmp(r02,rot(0,1)) == 0);
-    mu_check(fltcmp(r03,rot(0,2)) == 0);
+    mu_check(fltcmp(r01, rot(0, 0)) == 0);
+    mu_check(fltcmp(r02, rot(0, 1)) == 0);
+    mu_check(fltcmp(r03, rot(0, 2)) == 0);
 
-    mu_check(fltcmp(r11,rot(1,0)) == 0);
-    mu_check(fltcmp(r12,rot(1,1)) == 0);
-    mu_check(fltcmp(r13,rot(1,2)) == 0);
+    mu_check(fltcmp(r11, rot(1, 0)) == 0);
+    mu_check(fltcmp(r12, rot(1, 1)) == 0);
+    mu_check(fltcmp(r13, rot(1, 2)) == 0);
 
-    mu_check(fltcmp(r21,rot(2,0)) == 0);
-    mu_check(fltcmp(r22,rot(2,1)) == 0);
-    mu_check(fltcmp(r23,rot(2,2)) == 0);
+    mu_check(fltcmp(r21, rot(2, 0)) == 0);
+    mu_check(fltcmp(r22, rot(2, 1)) == 0);
+    mu_check(fltcmp(r23, rot(2, 2)) == 0);
     return 0;
 
 
 }
-
-
-
 
 int test_deg2rad_and_rad2deg(void)
 {
@@ -269,7 +266,6 @@ int test_euler2quat_and_quat2euler(void)
 
     return 0;
 }
-
 
 void test_suite(void)
 {
