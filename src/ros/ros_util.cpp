@@ -48,25 +48,50 @@ void fix_coordinate_frames(
     tf::Quaternion &quat
 )
 {
-    double rot_out[9];
-    single_rotation_matrix(pose.yaw, rot_out);
+	double rot[9];
 	double vec_pos[3];
+	double x_adjusted;
+	double y_adjusted;
 
-    // translate from camera frame to ENU
-    // x is times by -1 because april tag was in left-hand
-    // co-ordinate frame commonly used by cameras
-    pos[0] = pose.translation[1];
-    pos[1] = -1 * pose.translation[2];
-    pos[2] = pose.translation[0];
-    mat3_dot_vec3(rot_out, pos, vec_pos);
-    pos[0] = vec_pos[0];
-    pos[1] = vec_pos[1];
-    pos[2] = vec_pos[2];
-    // ROS_INFO("POSE X HERE IS %f", pose.translation[0]);
-    // ROS_INFO("returned POSE X HERE IS %f", pos[0]);
+    // tag
+	// pos[0] = pose.translation[0];
+	// pos[1] = pose.translation[1];
+	// pos[2] = pose.translation[2];
+
+    // [ENU camera]  [tag (forward, left, up)]
+	pos[0] = -1 * pose.translation[1];
+	pos[1] = pose.translation[2];
+	pos[2] = pose.translation[0];
+
+    // [ENU WORLD] [ENU camera]
+	pos[0] = -pos[0];
+	pos[1] = -pos[1];
+	pos[2] = pos[2];
+
+    // Eigen::AngleAxisd roll_angle(pose.roll, Eigen::Vector3d::UnitZ());
+    // Eigen::AngleAxisd yaw_angle(pose.yaw, Eigen::Vector3d::UnitY());
+    // Eigen::AngleAxisd pitch_angle(pose.pitch, Eigen::Vector3d::UnitX());
+    // Eigen::Quaternion<double> q = roll_angle * yaw_angle * pitch_angle;
+    // Eigen::Matrix3d rotation_matrix = q.matrix();
+    // Eigen::Vector3d pos_vector(pos[0], pos[1], pos[2]);
+    // Eigen::Vector3d position;
+    // position = rotation_matrix * pos_vector;
+    //
+    // pos[0] = position(0);
+    // pos[1] = position(1);
+    // pos[2] = position(2);
+
+	// // adjust according to roll, pitch
+	// pos[0] = pos[0] * cos(pose.roll);
+	// pos[1] = pos[1] * cos(pose.pitch);
+    // rotation_matrix(pose.roll, pose.pitch, pose.yaw, rot);
+    // mat3_dot_vec3(rot, pos, vec_pos);
+	// pos[0] = vec_pos[0];
+	// pos[1] = vec_pos[1];
+	// pos[2] = vec_pos[2];
 
     // convert euler angles to quaternions
-    quat = euler2quat(pose.pitch, pose.roll, pose.yaw);
+    quat = euler2quat(pose.roll, pose.pitch, pose.yaw);
 }
 
 void build_pose_stamped_msg(

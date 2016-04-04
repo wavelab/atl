@@ -131,6 +131,11 @@ int test_stupid(void)
     Eigen::Matrix4d M;
     Eigen::Matrix4d MT;
 
+    T << 0, 0, 1, 0,
+         -1, 0, 0, 0,
+         0, -1, 0, 0,
+         0, 0, 0, 1;
+
     M << 0, 0, 1, 0,
          -1, 0, 0, 0,
          0, -1, 0, 0,
