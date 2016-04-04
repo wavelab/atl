@@ -68,28 +68,6 @@ void fix_coordinate_frames(
 	pos[1] = -pos[1];
 	pos[2] = pos[2];
 
-    // Eigen::AngleAxisd roll_angle(pose.roll, Eigen::Vector3d::UnitZ());
-    // Eigen::AngleAxisd yaw_angle(pose.yaw, Eigen::Vector3d::UnitY());
-    // Eigen::AngleAxisd pitch_angle(pose.pitch, Eigen::Vector3d::UnitX());
-    // Eigen::Quaternion<double> q = roll_angle * yaw_angle * pitch_angle;
-    // Eigen::Matrix3d rotation_matrix = q.matrix();
-    // Eigen::Vector3d pos_vector(pos[0], pos[1], pos[2]);
-    // Eigen::Vector3d position;
-    // position = rotation_matrix * pos_vector;
-    //
-    // pos[0] = position(0);
-    // pos[1] = position(1);
-    // pos[2] = position(2);
-
-	// // adjust according to roll, pitch
-	// pos[0] = pos[0] * cos(pose.roll);
-	// pos[1] = pos[1] * cos(pose.pitch);
-    // rotation_matrix(pose.roll, pose.pitch, pose.yaw, rot);
-    // mat3_dot_vec3(rot, pos, vec_pos);
-	// pos[0] = vec_pos[0];
-	// pos[1] = vec_pos[1];
-	// pos[2] = vec_pos[2];
-
     // convert euler angles to quaternions
     quat = euler2quat(pose.roll, pose.pitch, pose.yaw);
 }
