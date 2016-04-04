@@ -27,6 +27,7 @@ int test_rotation_matrix(void)
 
     // test and assert
     rotation_matrix(phi, theta, psi, rot_mat);
+    std::cout << rot_mat[0] << std::endl;
     mu_check(fltcmp(rot_mat[0], 0.0) == 0);
     mu_check(fltcmp(rot_mat[1], 0.0) == 0);
     mu_check(fltcmp(rot_mat[2], 0.0) == 0);
@@ -125,32 +126,10 @@ int test_build_pose_cov_stamped_msg(void)
     return 0;
 }
 
-int test_stupid(void)
-{
-    Eigen::Matrix4d T;
-    Eigen::Matrix4d M;
-    Eigen::Matrix4d MT;
-
-    T << 0, 0, 1, 0,
-         -1, 0, 0, 0,
-         0, -1, 0, 0,
-         0, 0, 0, 1;
-
-    M << 0, 0, 1, 0,
-         -1, 0, 0, 0,
-         0, -1, 0, 0,
-         0, 0, 0, 1;
-
-    MT = M * T;
-
-    std::cout << MT << std::endl;
-
-    return 0;
-}
 
 void test_suite(void)
 {
-    // mu_add_test(test_rotation_matrix);
+    mu_add_test(test_rotation_matrix);
     // mu_add_test(test_rotation_matrix);
     // mu_add_test(test_single_rotation_matrx);
     // mu_add_test(test_mat3_dot_vec3);
@@ -158,8 +137,7 @@ void test_suite(void)
     // mu_add_test(test_build_pose_stamped_msg);
     // mu_add_test(test_build_pose_cov_stamped_msg);
     // mu_add_test(test_print_pose_stamped_msg);
-    // mu_add_test(test_print_pose_cov_stamped_msg);
-    mu_add_test(test_stupid);
+    //mu_add_test(test_print_pose_cov_stamped_msg);
 }
 
 mu_run_tests(test_suite)
