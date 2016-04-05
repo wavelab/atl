@@ -94,7 +94,7 @@ int CarrotController::update(Eigen::Vector3d position, Eigen::Vector3d &carrot)
     }
 
     // waypoint reached? get new wp_start and wp_end
-    if (this->waypointReached(position, wp_end, 1)) {
+    if (this->waypointReached(position, wp_end, this->wp_threshold)) {
         if (this->waypoints.size() > 2) {
             this->waypoints.pop_front();
             this->wp_start = this->waypoints.at(0);

@@ -30,6 +30,10 @@ Quadrotor::Quadrotor(void)
     this->position_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_TOPIC, 50);
     // this->attitude_publisher = this->node.advertise<geometry_msgs::PoseStamped>(ATTITUDE_TOPIC, 50);
     // this->throttle_publisher = this->node.advertise<std_msgs::Float64>(THROTTLE_TOPIC, 50);
+    //
+
+    // state
+    this->mission_state = HOVER_MODE;
 
     // initialize camera
     this->tag_timeout = 0;
@@ -41,7 +45,7 @@ Quadrotor::Quadrotor(void)
 
     // intialize controller
     double look_ahead_dist = 0.5;
-    double wp_threshold = 0.1;
+    double wp_threshold = 0.2;
     std::deque<Eigen::Vector3d> waypoints;
 
     this->controller = new CarrotController(
@@ -63,15 +67,15 @@ void Quadrotor::poseCallback(const geometry_msgs::PoseStamped &msg)
     quat2euler(msg.pose.orientation, &this->pose_roll, &this->pose_pitch, &this->pose_yaw);
 
     // print
-    ROS_INFO(
-        "GOT POSE: [roll: %f, pitch: %f, yaw: %f, x: %f, y: %f, z: %f]",
-        rad2deg(this->pose_roll),
-        rad2deg(this->pose_pitch),
-        rad2deg(this->pose_yaw),
-        pose_x,
-        pose_y,
-        pose_z
-    );
+    // ROS_INFO(
+    //     "GOT POSE: [roll: %f, pitch: %f, yaw: %f, x: %f, y: %f, z: %f]",
+    //     rad2deg(this->pose_roll),
+    //     rad2deg(this->pose_pitch),
+    //     rad2deg(this->pose_yaw),
+    //     pose_x,
+    //     pose_y,
+    //     pose_z
+    // );
 }
 
 void Quadrotor::subscribeToPose(void)
@@ -96,12 +100,12 @@ void Quadrotor::mocapCallback(const geometry_msgs::PoseStamped &msg)
     quat2euler(msg.pose.orientation, &this->mocap_roll, &this->mocap_pitch, &this->mocap_yaw);
 
     // print
-    ROS_INFO(
-        "GOT MOCAP: [%f, %f, %f]",
-        rad2deg(this->mocap_roll),
-        rad2deg(this->mocap_pitch),
-        rad2deg(this->mocap_yaw)
-    );
+    // ROS_INFO(
+    //     "GOT MOCAP: [%f, %f, %f]",
+    //     rad2deg(this->mocap_roll),
+    //     rad2deg(this->mocap_pitch),
+    //     rad2deg(this->mocap_yaw)
+    // );
 }
 
 void Quadrotor::subscribeToMocap(void)
@@ -118,13 +122,12 @@ void Quadrotor::subscribeToMocap(void)
 void Quadrotor::imuCallback(const sensor_msgs::Imu::ConstPtr &msg)
 {
     quat2euler(msg->orientation, &this->roll, &this->pitch, &this->yaw);
-
-    ROS_INFO(
-        "GOT IMU: [%f, %f, %f]",
-        rad2deg(this->roll),
-        rad2deg(this->pitch),
-        rad2deg(this->yaw)
-    );
+    // ROS_INFO(
+    //     "GOT IMU: [%f, %f, %f]",
+    //     rad2deg(this->roll),
+    //     rad2deg(this->pitch),
+    //     rad2deg(this->yaw)
+    // );
 }
 
 void Quadrotor::subscribeToIMU(void)
@@ -216,17 +219,17 @@ void Quadrotor::runMission(geometry_msgs::PoseStamped &pose)
     switch (this->mission_state) {
     case HOVER_MODE:
         // set hover coordinates
-		pose.pose.position.z = 1.2;
         pose.pose.position.x = -0.5;
         pose.pose.position.y = -0.5;
+		pose.pose.position.z = 0.9;
 
         // check current position against hover coordinates
-        dest << 1.2, -0.5, -0.5;
+        dest << -0.5, -0.5, 0.9;
         pos << this->pose_x, this->pose_y, this->pose_z;
         dist = (dest - pos).norm();
 
         // check if waypoint reached
-        if (dist < 0.1) {
+        if (dist < 1) {
             ROS_INFO("Hover state reached!");
             ROS_INFO("Transitioning to discover mode!");
             this->mission_state = DISCOVER_MODE;
@@ -234,25 +237,39 @@ void Quadrotor::runMission(geometry_msgs::PoseStamped &pose)
         break;
 
     case DISCOVER_MODE:
+        // set hover coordinates
+		pose.pose.position.z = 1.2;
+        pose.pose.position.x = -0.5;
+        pose.pose.position.y = -0.5;
+
         // find apriltag
         pose_estimates = cam->step(this->tag_timeout);
-        tag_poses.push_back(pose_estimates.at(0));
+        if (pose_estimates.size()) {
+            this->tag_poses.push_back(pose_estimates.at(0));
+        }
 
         // average estimates
-        if (tag_poses.size() == 10) {
+        if (tag_poses.size() == 20) {
             double x = 0;
             double y = 0;
             double z = 0;
 
-            for (int i; i < tag_poses.size(); i++) {
-                x += tag_poses[i].translation(0);
-                y += tag_poses[i].translation(1);
-                z += tag_poses[i].translation(2);
+            for (int i = 0; i < tag_poses.size(); i++) {
+                x = x + tag_poses[i].translation(0);
+                y = y + tag_poses[i].translation(1);
+                z = z + tag_poses[i].translation(2);
             }
-            this->tag_position << (x / 10.0), (y / 10.0), (z / 10.0);
+
+            // quad position
+            pos << this->pose_x, this->pose_y, this->pose_z;
+            // tag position relative to quad (ENU)
+            this->tag_position << -y / 20.0 , z / 20.0, x / 20.0;
+            // tag positiona in world (ENU)
+            this->tag_position(0) += pos(0);
+            this->tag_position(1) += pos(1);
+            this->tag_position(2) -= pos(2);
 
             ROS_INFO("Collected enough tag estimations!");
-            ROS_INFO("Tag is at (%f, %f, %f)", (x / 10.0), (y / 10.0), (z / 10.0));
             ROS_INFO("Transitioning to planning mode!");
             this->mission_state = PLANNING_MODE;
         }
@@ -260,40 +277,45 @@ void Quadrotor::runMission(geometry_msgs::PoseStamped &pose)
         break;
 
     case PLANNING_MODE:
-        if (this->controller->initialized == 0) {
-            // tag position
-            this->controller->waypoints.push_back(this->tag_position);
-            ROS_INFO(
-                "WAYPOINT 3 [Tag Position]: (%f, %f, %f)",
-                this->tag_position(0),
-                this->tag_position(1),
-                this->tag_position(2)
-            );
+        // set hover coordinates
+		pose.pose.position.z = 1.2;
+        pose.pose.position.x = -0.5;
+        pose.pose.position.y = -0.5;
 
-            // above tag position
-            wp << this->tag_position(0), this->tag_position(1), 1.2;
-            this->controller->waypoints.push_back(wp);
-            ROS_INFO(
-                "WAYPOINT 2 [Above Tag]: (%f, %f, %f)",
-                wp(0),
-                wp(1),
-                wp(2)
-            );
+        // tag position
+        this->controller->waypoints.push_back(this->tag_position);
+        ROS_INFO(
+            "WAYPOINT 3 [Tag Position]: (%f, %f, %f)",
+            this->tag_position(0),
+            this->tag_position(1),
+            this->tag_position(2)
+        );
 
-            // quad position
-            pos << this->pose_x, this->pose_y, this->pose_z;
-            this->controller->waypoints.push_back(pos);
-            ROS_INFO(
-                "WAYPOINT 1 [Quad Position]: (%f, %f, %f)",
-                pos(0),
-                pos(1),
-                pos(2)
-            );
-        } else {
-            ROS_INFO("Planning complete");
-            ROS_INFO("Transitioning to carrot mode!");
-            this->mission_state = CARROT_MODE;
-        }
+        // above tag position
+        wp << this->tag_position(0), this->tag_position(1), 1.2;
+        this->controller->waypoints.push_back(wp);
+        ROS_INFO(
+            "WAYPOINT 2 [Above Tag]: (%f, %f, %f)",
+            wp(0),
+            wp(1),
+            wp(2)
+        );
+        this->controller->wp_end << wp;
+
+        // quad position
+        pos << this->pose_x, this->pose_y, this->pose_z;
+        this->controller->waypoints.push_back(pos);
+        ROS_INFO(
+            "WAYPOINT 1 [Quad Position]: (%f, %f, %f)",
+            pos(0),
+            pos(1),
+            pos(2)
+        );
+        ROS_INFO("Planning complete");
+        ROS_INFO("Transitioning to carrot mode!");
+        this->controller->wp_start << pos(0), pos(1), pos(2);
+        this->controller->initialized = 1;
+        this->mission_state = CARROT_MODE;
 
         break;
 
@@ -301,22 +323,41 @@ void Quadrotor::runMission(geometry_msgs::PoseStamped &pose)
         pos << this->pose_x, this->pose_y, this->pose_z;
 
         if (this->controller->initialized == 0) {
-            this->mission_state = MODE;
-            ROS_INFO("Final Waypoint reached");
+            this->mission_state = HOVER_MODE;
+            ROS_INFO("Controller not initialized");
 
         } else if (this->controller->update(pos, carrot)) {
             pose.pose.position.x = carrot(0);
             pose.pose.position.y = carrot(1);
             pose.pose.position.z = carrot(2);
             ROS_INFO(
+                "Waypoint Start (%f, %f, %f)",
+                this->controller->wp_start(0),
+                this->controller->wp_start(1),
+                this->controller->wp_start(2)
+            );
+            ROS_INFO(
+                "Waypoint End (%f, %f, %f)",
+                this->controller->wp_end(0),
+                this->controller->wp_end(1),
+                this->controller->wp_end(2)
+            );
+            ROS_INFO(
                 "Carrot Point (%f, %f, %f)",
                 carrot(0),
                 carrot(1),
                 carrot(2)
             );
+        } else {
+            // set hover coordinates
+            pose.pose.position.z = 0;
+            pose.pose.position.x = 0;
+            pose.pose.position.y = 0;
+
+            ROS_INFO("Final Waypoint reached");
+            ROS_INFO("MISSION ACCOMPLISHED!");
+            this->mission_state = MISSION_ACCOMPLISHED;
         }
-        ROS_INFO("Final Waypoint reached");
-        ROS_INFO("MISSION ACCOMPLISHED!");
         break;
     }
 }
@@ -328,7 +369,7 @@ int main(int argc, char **argv)
     ros::NodeHandle nh;
     ros::Time last_request;
 
-    ros::Rate rate(50.0);  // publishing rate MUST be faster than 2Hz
+    ros::Rate rate(10.0);  // publishing rate MUST be faster than 2Hz
     Quadrotor quad;
 	geometry_msgs::PoseStamped pose;
 
@@ -348,12 +389,12 @@ int main(int argc, char **argv)
         // pose.pose.position.x = 0.0;
         // pose.pose.position.y = 0.0;
         quad.runMission(pose);
-        ROS_INFO(
-            "Waypoint (%f, %f, %f)",
-            pose.pose.position.z,
-            pose.pose.position.x,
-            pose.pose.position.y
-        );
+        // ROS_INFO(
+        //     "Waypoint (%f, %f, %f)",
+        //     pose.pose.position.z,
+        //     pose.pose.position.x,
+        //     pose.pose.position.y
+        // );
 
 		// if (ros::Time::now() - last_request > ros::Duration(10.0)) {
         //     if (index == 0) {

@@ -38,6 +38,7 @@
 #define DISCOVER_MODE 1
 #define PLANNING_MODE 2
 #define CARROT_MODE 3
+#define MISSION_ACCOMPLISHED 4
 
 
 struct pose
