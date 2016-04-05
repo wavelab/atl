@@ -224,14 +224,30 @@ void Quadrotor::runMission(geometry_msgs::PoseStamped &pose)
         pose_estimates = cam->step(this->tag_timeout);
         tag_poses.push_back(pose_estimates.at(0));
 
+        // average estimates
         if (tag_poses.size() == 10) {
+            double x = 0;
+            double y = 0;
+            double z = 0;
+
+            for (int i; i < tag_poses.size(); i++) {
+                x += tag_poses[i].translation(0);
+                y += tag_poses[i].translation(1);
+                z += tag_poses[i].translation(2);
+            }
+            this->tag_position << (x / 10.0), (y / 10.0), (z / 10.0);
+
             ROS_INFO("Collected enough tag estimations!");
+            ROS_INFO("Tag is at (%f, %f, %f)", (x / 10.0), (y / 10.0), (z / 10.0));
             ROS_INFO("Transitioning to carrot mode!");
+            this->mission_state = PLANNING_MODE;
         }
 
         break;
 
     case PLANNING_MODE:
+
+
         break;
 
     case CARROT_MODE:
@@ -259,18 +275,15 @@ int main(int argc, char **argv)
 	int count = 1;
 	int index = 0;
 
-
-
-
     while (ros::ok()){
         pose.header.stamp = ros::Time::now();
         pose.header.seq = count;
-        pose.header.frame_id = 1;
+        pose.header.frame_id = "awesomo_quad_offboard";
         // ROS_INFO("x: 0.0\ty: 0.0\tz: 1.0");
-		pose.pose.position.z = 1.0;
-        pose.pose.position.x = 0.0;
-        pose.pose.position.y = 0.0;
-		count++;
+		// pose.pose.position.z = 1.0;
+        // pose.pose.position.x = 0.0;
+        // pose.pose.position.y = 0.0;
+        quad.runMission(pose);
 
 		// if (ros::Time::now() - last_request > ros::Duration(10.0)) {
         //     if (index == 0) {
@@ -301,6 +314,10 @@ int main(int argc, char **argv)
 		// publish
 		quad.position_publisher.publish(pose);
 
+		// update
+		count++;
+
+		// end
 		ros::spinOnce();
 		rate.sleep();
     }

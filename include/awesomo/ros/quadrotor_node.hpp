@@ -65,8 +65,9 @@ class Quadrotor
         ros::ServiceClient arming_client;
 
         Camera *cam;
-        std::vector<TagPose> tag_poses;
         int tag_timeout;
+        std::vector<TagPose> tag_poses;
+        Eigen::Vector3d tag_position;
 
         void poseCallback(const geometry_msgs::PoseStamped &msg);
         void subscribeToPose(void);
