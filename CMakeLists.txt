@@ -65,6 +65,18 @@ ADD_LIBRARY(
     src/ros/ros_util.cpp
 )
 
+# EXECUTABLES
+#camera in capture mode
+ADD_EXECUTABLE(camera_photo_mode src/camera_photobooth.cpp)
+target_link_libraries(
+    camera_photo_mode
+    awesomo
+    apriltags
+    yaml-cpp
+    flycapture
+    ${OpenCV_LIBS}
+    ${catkin_LIBRARIES}
+)
 
 ## ROS NODE EXECUTABLES
 # camera_node
