@@ -67,6 +67,7 @@ class Camera
         int loadConfig(std::string camera_mode);
         int run(void);
         int getFrame(cv::Mat &image);
+        int photoMode(void);
         std::vector<TagPose> step(int &timeout);
 };
 

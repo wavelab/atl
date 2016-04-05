@@ -1,15 +1,48 @@
 \documentclass{beamer}
+
+\usepackage{media9}
 \usetheme{Warsaw}
 
 \begin{document}
+\title{Quadrotor landing on a moving platform}
+\subtitle{}
+\author[]{Stan Brown \and Chris Choi}
+
+\frame{\titlepage}
+
   \begin{frame}
-    \frametitle{This is the first slide}
-    %Content goes here
+    \frametitle{Introduction}
+     \textbf{Presentation Outline}
+     \begin{itemize}     
+        \item Project Overview and Goals       
+        \item Hardware used in the project
+        \item System overview
+        \item Approaches used to simplify the problem
+        \item Milestones and Progress through the term       
+    \end{itemize}
   \end{frame}
-  \begin{frame}
-    \frametitle{This is the second slide}
-    \framesubtitle{A bit more information about this}
-    %More content goes here
-  \end{frame}
+ 
+   \begin{frame}
+    \frametitle{Project Overview and Goals}
+     The goal of this work was to design and implement a set of methods that could be used 			to land a quadrotor on a moving platform. In our approach we broke the problem down 		in to a series of steps and goals along with the requirements for each step.
+     \begin{itemize}     
+        \item Develop a way to land on a stationary location on the ground
+        \item Expand the methods employed in the first step to work on a moving platform 						operating in a planar, disturbance free environment
+        \item Further expand the methods to be able to account for wind, non planar motion 					of the platform (ie identify and handle cases were the landing pad is 						located on a sloped surface).  
+    \end{itemize}     
+\end{frame}
+
+ \begin{frame}
+    \frametitle{Hardware}
+     The hardware used in this project was selected from a set of parts that we had laying 			around the WAVELAB. 
+     \begin{itemize}    
+        \item Develop a way to land on a stationary location on the ground
+        \item Expand the methods employed in the first step to work on a moving platform 						operating in a planar, disturbance free environment
+        \item Further expand the methods to be able to account for wind, non planar motion 					of the platform (ie identify and handle cases were the landing pad is 						located on a sloped surface).  
+    \end{itemize}     
+\end{frame}
+  
+
+
 % etc
 \end{document}

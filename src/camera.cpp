@@ -330,6 +330,7 @@ int Camera::run(void)
             timeout
         );
         this->adjustMode(pose_estimates, timeout);
+
         // this->printFPS(last_tic, frame_index);
         // cv::imshow("camera", image);
         // cv::waitKey(1);
@@ -343,7 +344,9 @@ std::vector<TagPose> Camera::step(int &timeout)
     cv::Mat image;
     std::vector<TagPose> pose_estimates;
 
+
     this->getFrame(image);
+
     pose_estimates = this->tag_detector->processImage(
         this->config->camera_matrix,
         image,
@@ -351,4 +354,48 @@ std::vector<TagPose> Camera::step(int &timeout)
     );
     this->adjustMode(pose_estimates, timeout);
     return pose_estimates;
+}
+
+
+int Camera::photoMode(void)
+{
+    int frame_index;
+    int timeout;
+    double last_tic;
+    cv::Mat image;
+    std::vector<TagPose> pose_estimates;
+
+    int key_input;
+    cv::Mat image_cap;
+    int image_number;
+
+    // setup
+    timeout = 0;
+    frame_index = 0;
+    last_tic = tic();
+
+    image_number = 1;
+
+    // read capture device
+    while (true) {
+        this->getFrame(image);
+        pose_estimates = this->tag_detector->processImage(
+            this->config->camera_matrix,
+            image,
+            timeout
+        );
+        this->adjustMode(pose_estimates, timeout);
+
+        // cv::imshow("camera", image);
+        // cv::waitKey(1);
+
+        key_input = cvWaitKey(100);
+        if((char) key_input == 49){
+            std::cout << "Saving a new image" << std::endl;
+            image.copyTo(image_cap);
+            imshow("image capture", image_cap);
+        }
+    }
+
+    return 0;
 }
