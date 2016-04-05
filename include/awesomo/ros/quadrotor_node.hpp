@@ -21,6 +21,7 @@
 
 #include "awesomo/util.hpp"
 #include "awesomo/camera.hpp"
+#include "awesomo/controller.hpp"
 
 
 // CONSTANTS
@@ -68,6 +69,8 @@ class Quadrotor
         int tag_timeout;
         std::vector<TagPose> tag_poses;
         Eigen::Vector3d tag_position;
+
+        CarrotController *controller;
 
         void poseCallback(const geometry_msgs::PoseStamped &msg);
         void subscribeToPose(void);

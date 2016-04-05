@@ -38,7 +38,19 @@ Quadrotor::Quadrotor(void)
     cam->loadConfig("320", FIREFLY_320);
     cam->loadConfig("160", FIREFLY_160);
     cam->initCamera("320");
+
+    // intialize controller
+    double look_ahead_dist = 0.5;
+    double wp_threshold = 0.1;
+    std::deque<Eigen::Vector3d> waypoints;
+
+    this->controller = new CarrotController(
+        waypoints,
+        look_ahead_dist,
+        wp_threshold
+    );
 }
+
 
 void Quadrotor::poseCallback(const geometry_msgs::PoseStamped &msg)
 {
@@ -196,7 +208,9 @@ void Quadrotor::runMission(geometry_msgs::PoseStamped &pose)
 {
     double dist;
     Eigen::Vector3d pos;
+    Eigen::Vector3d wp;
     Eigen::Vector3d dest;
+    Eigen::Vector3d carrot;
 	std::vector<TagPose> pose_estimates;
 
     switch (this->mission_state) {
@@ -239,18 +253,68 @@ void Quadrotor::runMission(geometry_msgs::PoseStamped &pose)
 
             ROS_INFO("Collected enough tag estimations!");
             ROS_INFO("Tag is at (%f, %f, %f)", (x / 10.0), (y / 10.0), (z / 10.0));
-            ROS_INFO("Transitioning to carrot mode!");
+            ROS_INFO("Transitioning to planning mode!");
             this->mission_state = PLANNING_MODE;
         }
 
         break;
 
     case PLANNING_MODE:
+        if (this->controller->initialized == 0) {
+            // tag position
+            this->controller->waypoints.push_back(this->tag_position);
+            ROS_INFO(
+                "WAYPOINT 3 [Tag Position]: (%f, %f, %f)",
+                this->tag_position(0),
+                this->tag_position(1),
+                this->tag_position(2)
+            );
 
+            // above tag position
+            wp << this->tag_position(0), this->tag_position(1), 1.2;
+            this->controller->waypoints.push_back(wp);
+            ROS_INFO(
+                "WAYPOINT 2 [Above Tag]: (%f, %f, %f)",
+                wp(0),
+                wp(1),
+                wp(2)
+            );
+
+            // quad position
+            pos << this->pose_x, this->pose_y, this->pose_z;
+            this->controller->waypoints.push_back(pos);
+            ROS_INFO(
+                "WAYPOINT 1 [Quad Position]: (%f, %f, %f)",
+                pos(0),
+                pos(1),
+                pos(2)
+            );
+        } else {
+            ROS_INFO("Planning complete");
+            ROS_INFO("Transitioning to carrot mode!");
+            this->mission_state = CARROT_MODE;
+        }
 
         break;
 
     case CARROT_MODE:
+        pos << this->pose_x, this->pose_y, this->pose_z;
+
+        if (this->controller->initialized == 0) {
+            this->mission_state = MODE;
+            ROS_INFO("Final Waypoint reached");
+
+        } else if (this->controller->update(pos, carrot)) {
+            pose.pose.position.x = carrot(0);
+            pose.pose.position.y = carrot(1);
+            pose.pose.position.z = carrot(2);
+            ROS_INFO(
+                "Carrot Point (%f, %f, %f)",
+                carrot(0),
+                carrot(1),
+                carrot(2)
+            );
+        }
         ROS_INFO("Final Waypoint reached");
         ROS_INFO("MISSION ACCOMPLISHED!");
         break;
@@ -284,6 +348,12 @@ int main(int argc, char **argv)
         // pose.pose.position.x = 0.0;
         // pose.pose.position.y = 0.0;
         quad.runMission(pose);
+        ROS_INFO(
+            "Waypoint (%f, %f, %f)",
+            pose.pose.position.z,
+            pose.pose.position.x,
+            pose.pose.position.y
+        );
 
 		// if (ros::Time::now() - last_request > ros::Duration(10.0)) {
         //     if (index == 0) {

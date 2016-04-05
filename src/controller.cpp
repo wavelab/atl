@@ -9,7 +9,9 @@ CarrotController::CarrotController(
     double wp_threshold
 )
 {
-    this->initialized = 1;
+    if (waypoints.size() > 0) {
+        this->initialized = 1;
+    }
     this->waypoints = waypoints;
     this->look_ahead_dist = look_ahead_dist;
     this->wp_threshold = wp_threshold;
