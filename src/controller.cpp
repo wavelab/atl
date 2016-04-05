@@ -1,13 +1,16 @@
 #include "awesomo/controller.hpp"
 
 
-CarrotController::CarrotController() : initialized(0)
-{
+CarrotController::CarrotController() : initialized(0) { }
 
-}
-
-CarrotController::CarrotController(double look_ahead_dist, double wp_threshold)
+CarrotController::CarrotController(
+    std::deque<Eigen::Vector3d> waypoints,
+    double look_ahead_dist,
+    double wp_threshold
+)
 {
+    this->initialized = 1;
+    this->waypoints = waypoints;
     this->look_ahead_dist = look_ahead_dist;
     this->wp_threshold = wp_threshold;
 }
@@ -85,7 +88,7 @@ int CarrotController::update(Eigen::Vector3d position, Eigen::Vector3d &carrot)
 
     // pre-check
     if (this->initialized == 0) {
-        return -1;
+        return -2;
     }
 
     // waypoint reached? get new wp_start and wp_end
@@ -95,7 +98,7 @@ int CarrotController::update(Eigen::Vector3d position, Eigen::Vector3d &carrot)
             this->wp_start = this->waypoints.at(0);
             this->wp_end = this->waypoints.at(1);
         } else {
-            return -1;
+            return 0;
         }
     }
 
@@ -107,5 +110,5 @@ int CarrotController::update(Eigen::Vector3d position, Eigen::Vector3d &carrot)
         this->wp_end
     );
 
-    return 0;
+    return 1;
 }

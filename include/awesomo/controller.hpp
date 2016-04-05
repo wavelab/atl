@@ -18,7 +18,11 @@ class CarrotController
         Eigen::Vector3d wp_end;
 
         CarrotController();
-        CarrotController(double look_ahead_dist, double wp_threshold);
+        CarrotController(
+            std::deque<Eigen::Vector3d> waypoints,
+            double look_ahead_dist,
+            double wp_threshold
+        );
         Eigen::Vector3d closestPoint(
             Eigen::Vector3d position,
             Eigen::Vector3d wp_start,

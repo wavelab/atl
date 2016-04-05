@@ -2,6 +2,7 @@
 #define __MUNIT_H__
 
 #include <iostream>
+#include <fstream>
 #include <cmath>
 #include <stdio.h>
 

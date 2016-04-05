@@ -102,15 +102,50 @@ int testUpdate(void)
     // setup
     position << 2, 2, 0;
     wp << 0, 0, 0;
+    controller.wp_start = wp;
     controller.waypoints.push_back(wp);
     wp << 10, 10, 0;
+    controller.wp_end = wp;
     controller.waypoints.push_back(wp);
+    wp << 15, 10, 0;
+    controller.waypoints.push_back(wp);
+    controller.look_ahead_dist = 1;
+    controller.wp_threshold = 0.1;
+    controller.initialized = 1;
 
     // test and assert
-    retval = controller.update(position, carrot);
+    std::ofstream outfile;
+    outfile.open("update.dat");
 
-    std::cout << retval << std::endl;
-    std::cout << carrot << std::endl;
+    for (int i = 0; i < 40; i++) {
+        // carrot update
+        retval = controller.update(position, carrot);
+        mu_check(retval == 1);
+
+        // record
+        outfile << controller.wp_start(0) << ", ";
+        outfile << controller.wp_start(1) << ", ";
+        outfile << controller.wp_start(2) << std::endl;
+
+        outfile << controller.wp_end(0) << ", ";
+        outfile << controller.wp_end(1) << ", ";
+        outfile << controller.wp_end(2) << std::endl;
+
+        outfile << position(0) << ", ";
+        outfile << position(1) << ", ";
+        outfile << position(2) << std::endl;
+
+        outfile << carrot(0) << ", ";
+        outfile << carrot(1) << ", ";
+        outfile << carrot(2) << std::endl;
+        outfile << std::endl;
+
+        // update position
+        position(0) = position(0) + 0.5;
+        position(1) = position(1) + 0.5;
+    }
+
+    outfile.close();
 }
 
 void testSuite(void)
