@@ -97,7 +97,15 @@ TARGET_LINK_LIBRARIES(
 
 # quadrotor_node
 ADD_EXECUTABLE(quadrotor_node src/ros/quadrotor_node.cpp)
-TARGET_LINK_LIBRARIES(quadrotor_node ${catkin_LIBRARIES} awesomo)
+TARGET_LINK_LIBRARIES(
+    quadrotor_node
+    awesomo
+    apriltags
+    yaml-cpp
+    flycapture
+    ${OpenCV_LIBS}
+    ${catkin_LIBRARIES}
+)
 INSTALL(
     TARGETS quadrotor_node
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
