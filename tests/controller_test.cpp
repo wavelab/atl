@@ -107,8 +107,8 @@ int testUpdate(void)
     wp << 10, 10, 0;
     controller.wp_end = wp;
     controller.waypoints.push_back(wp);
-    wp << 15, 10, 0;
-    controller.waypoints.push_back(wp);
+    // wp << 15, 10, 0;
+    // controller.waypoints.push_back(wp);
     controller.look_ahead_dist = 1;
     controller.wp_threshold = 0.1;
     controller.initialized = 1;

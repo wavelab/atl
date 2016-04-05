@@ -18,9 +18,9 @@ Quadrotor::Quadrotor(void)
     this->waitForConnection();
 
     // subscribe to topics
-    // this->subscribeToPose();
-    // this->subscribeToMocap();
-    // this->subscribeToIMU();
+    this->subscribeToPose();
+    this->subscribeToMocap();
+    this->subscribeToIMU();
 
     // initialize clients to services
     this->mode_client = this->node.serviceClient<mavros_msgs::SetMode>(MODE_TOPIC);
@@ -30,6 +30,14 @@ Quadrotor::Quadrotor(void)
     this->position_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_TOPIC, 50);
     // this->attitude_publisher = this->node.advertise<geometry_msgs::PoseStamped>(ATTITUDE_TOPIC, 50);
     // this->throttle_publisher = this->node.advertise<std_msgs::Float64>(THROTTLE_TOPIC, 50);
+
+    // initialize camera
+    this->tag_timeout = 0;
+    this->cam = new Camera(0, CAMERA_FIREFLY);
+    cam->loadConfig("default", FIREFLY_640);
+    cam->loadConfig("320", FIREFLY_320);
+    cam->loadConfig("160", FIREFLY_160);
+    cam->initCamera("320");
 }
 
 void Quadrotor::poseCallback(const geometry_msgs::PoseStamped &msg)
@@ -184,6 +192,55 @@ int Quadrotor::setOffboardModeOn(void)
     }
 }
 
+void Quadrotor::runMission(geometry_msgs::PoseStamped &pose)
+{
+    double dist;
+    Eigen::Vector3d pos;
+    Eigen::Vector3d dest;
+	std::vector<TagPose> pose_estimates;
+
+    switch (this->mission_state) {
+    case HOVER_MODE:
+        // set hover coordinates
+		pose.pose.position.z = 1.2;
+        pose.pose.position.x = -0.5;
+        pose.pose.position.y = -0.5;
+
+        // check current position against hover coordinates
+        dest << 1.2, -0.5, -0.5;
+        pos << this->pose_x, this->pose_y, this->pose_z;
+        dist = (dest - pos).norm();
+
+        // check if waypoint reached
+        if (dist < 0.1) {
+            ROS_INFO("Hover state reached!");
+            ROS_INFO("Transitioning to discover mode!");
+            this->mission_state = DISCOVER_MODE;
+        }
+        break;
+
+    case DISCOVER_MODE:
+        // find apriltag
+        pose_estimates = cam->step(this->tag_timeout);
+        tag_poses.push_back(pose_estimates.at(0));
+
+        if (tag_poses.size() == 10) {
+            ROS_INFO("Collected enough tag estimations!");
+            ROS_INFO("Transitioning to carrot mode!");
+        }
+
+        break;
+
+    case PLANNING_MODE:
+        break;
+
+    case CARROT_MODE:
+        ROS_INFO("Final Waypoint reached");
+        ROS_INFO("MISSION ACCOMPLISHED!");
+        break;
+    }
+}
+
 int main(int argc, char **argv)
 {
     // setup
@@ -201,6 +258,9 @@ int main(int argc, char **argv)
 	last_request = ros::Time::now();
 	int count = 1;
 	int index = 0;
+
+
+
 
     while (ros::ok()){
         pose.header.stamp = ros::Time::now();

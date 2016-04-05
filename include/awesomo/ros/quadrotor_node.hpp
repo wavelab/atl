@@ -20,6 +20,7 @@
 #include <mavros_msgs/CommandBool.h>
 
 #include "awesomo/util.hpp"
+#include "awesomo/camera.hpp"
 
 
 // CONSTANTS
@@ -31,6 +32,11 @@
 #define POSITION_TOPIC "/mavros/setpoint_position/local"
 #define ATTITUDE_TOPIC "/mavros/setpoint_attitude/attitude"
 #define THROTTLE_TOPIC "/mavros/setpoint_attitude/att_throttle"
+
+#define HOVER_MODE 0
+#define DISCOVER_MODE 1
+#define PLANNING_MODE 2
+#define CARROT_MODE 3
 
 
 struct pose
@@ -47,6 +53,7 @@ struct pose
 class Quadrotor
 {
     private:
+        int mission_state;
         mavros_msgs::State state;
         ros::NodeHandle node;
 
@@ -56,6 +63,10 @@ class Quadrotor
 
         ros::ServiceClient mode_client;
         ros::ServiceClient arming_client;
+
+        Camera *cam;
+        std::vector<TagPose> tag_poses;
+        int tag_timeout;
 
         void poseCallback(const geometry_msgs::PoseStamped &msg);
         void subscribeToPose(void);
@@ -95,6 +106,7 @@ class Quadrotor
         int arm(void);
         int disarm(void);
         int setOffboardModeOn(void);
+        void runMission(geometry_msgs::PoseStamped &pose);
 };
 
 #endif
