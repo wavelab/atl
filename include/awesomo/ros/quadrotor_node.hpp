@@ -22,6 +22,7 @@
 #include "awesomo/util.hpp"
 #include "awesomo/camera.hpp"
 #include "awesomo/controller.hpp"
+#include "awesomo/pid.hpp"
 
 
 // CONSTANTS
@@ -112,6 +113,12 @@ class Quadrotor
         int disarm(void);
         int setOffboardModeOn(void);
         void runMission(geometry_msgs::PoseStamped &pose);
+        void runMission2(geometry_msgs::PoseStamped &pose);
+        void traceSquare(
+            geometry_msgs::PoseStamped &pose,
+            int *index,
+            ros::Time &last_request
+        );
 };
 
 #endif

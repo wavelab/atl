@@ -36,44 +36,30 @@ void pid_destroy(void *target)
     p = NULL;
 }
 
-int pid_calculate(struct pid *p, float input)
+int pid_calculate(struct pid *p, float input, ros::Duration dt)
 {
-    int dt;
     float error;
-    struct timeb now;
 
-    // calculate dt - in miliseconds
-    ftime(&now);
-    dt = (float) (
-        1000.0 *
-        (now.time - p->last_updated.time) +
-        (now.millitm - p->last_updated.millitm)
-    );
+    // calculate errors
+    error = p->setpoint - input;
+    if (fabs(error) > p->dead_zone) {
+        p->sum_error += error * dt.toSec();
+    }
 
     // calculate output
-    if (dt >= p->sample_rate) {
-        // calculate errors
-        error = p->setpoint - input;
-        if (fabs(error) > p->dead_zone) {
-            p->sum_error += error * (float) (dt / 1000.0);
-        }
+    p->output = (p->k_p * error);
+    p->output += (p->k_i * p->sum_error);
+    p->output += (p->k_d * (input - p->prev_error));
 
-        // calculate output
-        p->output = (p->k_p * error);
-        p->output += (p->k_i * p->sum_error);
-        p->output -= (p->k_d * (input - p->prev_error));
-
-        // limit boundaries
-        if (p->output > p->max) {
-            p->output = p->max;
-        } else if (p->output < p->min) {
-            p->output = p->min;
-        }
-
-        // update error and last_updated
-        p->prev_error = error;
-        ftime(&p->last_updated);
+    // limit boundaries
+    if (p->output > p->max) {
+        p->output = p->max;
+    } else if (p->output < p->min) {
+        p->output = p->min;
     }
+
+    // update error
+    p->prev_error = error;
 
     return 0;
 }

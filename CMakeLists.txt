@@ -146,10 +146,10 @@ ADD_EXECUTABLE(sim_test tests/sim_test.cpp)
 TARGET_LINK_LIBRARIES(sim_test awesomo)
 INSTALL(TARGETS sim_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
-# tests/pid_test
-ADD_EXECUTABLE(pid_test tests/pid_test.cpp)
-TARGET_LINK_LIBRARIES(pid_test awesomo)
-INSTALL(TARGETS pid_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+# # tests/pid_test
+# ADD_EXECUTABLE(pid_test tests/pid_test.cpp)
+# TARGET_LINK_LIBRARIES(pid_test awesomo)
+# INSTALL(TARGETS pid_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 # tests/controller_test
 ADD_EXECUTABLE(controller_test tests/controller_test.cpp)

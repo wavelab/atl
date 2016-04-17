@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <sys/timeb.h>
 
+#include <ros/ros.h>
+
 
 // STRUCTURES
 struct pid_config
@@ -47,7 +49,7 @@ struct pid
 // FUNCTIONS
 struct pid *pid_setup(struct pid_config *c);
 void pid_destroy(void *target);
-int pid_calculate(struct pid *p, float actual);
+int pid_calculate(struct pid *p, float input, ros::Duration dt);
 
 
 #endif

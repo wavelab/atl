@@ -27,10 +27,9 @@ Quadrotor::Quadrotor(void)
     this->arming_client = this->node.serviceClient<mavros_msgs::CommandBool>(ARM_TOPIC);
 
     // initialize publishers
-    this->position_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_TOPIC, 50);
-    // this->attitude_publisher = this->node.advertise<geometry_msgs::PoseStamped>(ATTITUDE_TOPIC, 50);
-    // this->throttle_publisher = this->node.advertise<std_msgs::Float64>(THROTTLE_TOPIC, 50);
-    //
+    this->position_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_TOPIC, 100);
+    this->attitude_publisher = this->node.advertise<geometry_msgs::PoseStamped>(ATTITUDE_TOPIC, 100);
+    this->throttle_publisher = this->node.advertise<std_msgs::Float64>(THROTTLE_TOPIC, 100);
 
     // state
     this->mission_state = HOVER_MODE;
@@ -365,9 +364,9 @@ void Quadrotor::runMission(geometry_msgs::PoseStamped &pose)
             );
         } else {
             // set hover coordinates
-            pose.pose.position.z = 0;
             pose.pose.position.x = 0;
             pose.pose.position.y = 0;
+            pose.pose.position.z = 0;
 
             ROS_INFO("Final Waypoint reached");
             ROS_INFO("MISSION ACCOMPLISHED!");
@@ -377,16 +376,53 @@ void Quadrotor::runMission(geometry_msgs::PoseStamped &pose)
     }
 }
 
+void Quadrotor::traceSquare(
+    geometry_msgs::PoseStamped &pose,
+    int *index,
+    ros::Time &last_request
+)
+{
+    if ((ros::Time::now() - last_request) > ros::Duration(10.0)) {
+        if (*index == 0) {
+            pose.pose.position.x = 0.5;
+            pose.pose.position.y = 0.5;
+            *index++;
+            ROS_INFO("x: 0.5\ty: 0.5");
+        } else if (*index == 1) {
+            pose.pose.position.x = 0.5;
+            pose.pose.position.y = -0.5;
+            ROS_INFO("x: 0.5\ty: -0.5");
+            *index++;
+        } else if (*index == 2) {
+            pose.pose.position.x = -0.5;
+            pose.pose.position.y = -0.5;
+            ROS_INFO("x: -0.5\ty: -0.5");
+            *index++;
+        } else if (*index == 3) {
+            pose.pose.position.x = -0.5;
+            pose.pose.position.y = 0.5;
+            ROS_INFO("x: -0.5\ty: 0.5");
+            *index = 0;
+        }
+
+        last_request = ros::Time::now();
+    }
+}
+
 int main(int argc, char **argv)
 {
     // setup
     ros::init(argc, argv, "awesomo");
     ros::NodeHandle nh;
+    ros::Duration dt;
     ros::Time last_request;
 
-    ros::Rate rate(10.0);  // publishing rate MUST be faster than 2Hz
+    ros::Rate rate(100.0);  // publishing rate MUST be faster than 2Hz
     Quadrotor quad;
 	geometry_msgs::PoseStamped pose;
+	geometry_msgs::PoseStamped attitude;
+    std_msgs::Float64 throttle;
+    tf::Quaternion q;
 
     ROS_INFO("running ...");
     // quad.arm();
@@ -395,50 +431,81 @@ int main(int argc, char **argv)
 	int count = 1;
 	int index = 0;
 
+
+    struct pid x_controller;
+    struct pid y_controller;
+
+    // x controller
+    x_controller.setpoint = 0.0;
+    x_controller.dead_zone = 1.0;
+    x_controller.min = deg2rad(-10);
+    x_controller.max = deg2rad(10);
+    x_controller.k_p = 0.0;
+    x_controller.k_i = 0.0;
+    x_controller.k_d = 0.0;
+
+    // y controller
+    y_controller.setpoint = 0.0;
+    y_controller.dead_zone = 1.0;
+    y_controller.min = deg2rad(-10);
+    y_controller.max = deg2rad(10);
+    y_controller.k_p = 0.0;
+    y_controller.k_i = 0.0;
+    y_controller.k_d = 0.0;
+
+    float roll_input;
+    float pitch_input;
+
     while (ros::ok()){
-        pose.header.stamp = ros::Time::now();
-        pose.header.seq = count;
-        pose.header.frame_id = "awesomo_quad_offboard";
-        // ROS_INFO("x: 0.0\ty: 0.0\tz: 1.5");
-        pose.pose.position.x = 0.0;
-        pose.pose.position.y = 0.0;
-		pose.pose.position.z = 1.5;
+        // pose.header.stamp = ros::Time::now();
+        // pose.header.seq = count;
+        // pose.header.frame_id = "awesomo_quad_offboard";
+        //
+        // // hover
+        // pose.pose.position.x = 0.0;
+        // pose.pose.position.y = 0.0;
+        // pose.pose.position.z = 1.2;
+
         // quad.runMission(pose);
-        // ROS_INFO(
-        //     "Waypoint (%f, %f, %f)",
-        //     pose.pose.position.z,
-        //     pose.pose.position.x,
-        //     pose.pose.position.y
-        // );
-
-		if (ros::Time::now() - last_request > ros::Duration(10.0)) {
-            if (index == 0) {
-                pose.pose.position.x = 0.5;
-                pose.pose.position.y = 0.5;
-                index++;
-                ROS_INFO("x: 0.5\ty: 0.5");
-            } else if (index == 1) {
-                pose.pose.position.x = 0.5;
-                pose.pose.position.y = -0.5;
-                ROS_INFO("x: 0.5\ty: -0.5");
-                index++;
-            } else if (index == 2) {
-                pose.pose.position.x = -0.5;
-                pose.pose.position.y = -0.5;
-                ROS_INFO("x: -0.5\ty: -0.5");
-                index++;
-            } else if (index == 3) {
-                pose.pose.position.x = -0.5;
-                pose.pose.position.y = 0.5;
-                ROS_INFO("x: -0.5\ty: 0.5");
-                index = 0;
-            }
-
-			last_request = ros::Time::now();
-		}
+        // quad.runMission2(pose);
 
 		// publish
-		quad.position_publisher.publish(pose);
+		// quad.position_publisher.publish(pose);
+
+
+        x_controller.setpoint = 0.0;
+        y_controller.setpoint = 0.0;
+
+        dt = ros::Time::now() - last_request;
+        roll_input = pid_calculate(&x_controller, quad.roll, dt);
+        pitch_input = pid_calculate(&y_controller, quad.pitch, dt);
+        last_request = ros::Time::now();
+
+        q = euler2quat(roll_input, pitch_input, 0);
+
+        attitude.header.stamp = ros::Time::now();
+        attitude.header.seq = count;
+        attitude.header.frame_id = "awesomo_quad_offboard_attitude_cmd";
+        attitude.pose.position.x = 0.0;
+        attitude.pose.position.y = 0.0;
+        attitude.pose.position.z = 0.0;
+        attitude.pose.orientation.x = q.x();
+        attitude.pose.orientation.y = q.y();
+        attitude.pose.orientation.z = q.z();
+        attitude.pose.orientation.w = q.w();
+
+        throttle.data = 0.5;
+
+        quad.attitude_publisher.publish(attitude);
+        quad.throttle_publisher.publish(throttle);
+
+        ROS_INFO("dt %f", dt.toSec());
+        ROS_INFO("quadrotor.roll %f", quad.roll);
+        ROS_INFO("quadrotor.pitch %f", quad.pitch);
+        ROS_INFO("roll.controller %f", roll_input);
+        ROS_INFO("pitch.controller %f", pitch_input);
+
+
 
 		// update
 		count++;
