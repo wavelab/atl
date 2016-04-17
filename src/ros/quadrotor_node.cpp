@@ -44,8 +44,8 @@ Quadrotor::Quadrotor(void)
     cam->initCamera("320");
 
     // intialize controller
-    double look_ahead_dist = 0.5;
-    double wp_threshold = 0.2;
+    double look_ahead_dist = 0.2;
+    double wp_threshold = 0.3;
     std::deque<Eigen::Vector3d> waypoints;
 
     this->controller = new CarrotController(
@@ -219,12 +219,12 @@ void Quadrotor::runMission(geometry_msgs::PoseStamped &pose)
     switch (this->mission_state) {
     case HOVER_MODE:
         // set hover coordinates
-        pose.pose.position.x = -0.5;
-        pose.pose.position.y = -0.5;
-		pose.pose.position.z = 0.9;
+        pose.pose.position.x = -0.75;
+        pose.pose.position.y = -0.75;
+		pose.pose.position.z = 1.6;
 
         // check current position against hover coordinates
-        dest << -0.5, -0.5, 0.9;
+        dest << -0.75, -0.75, 1.6;
         pos << this->pose_x, this->pose_y, this->pose_z;
         dist = (dest - pos).norm();
 
@@ -238,9 +238,9 @@ void Quadrotor::runMission(geometry_msgs::PoseStamped &pose)
 
     case DISCOVER_MODE:
         // set hover coordinates
-		pose.pose.position.z = 1.2;
-        pose.pose.position.x = -0.5;
-        pose.pose.position.y = -0.5;
+        pose.pose.position.x = -0.75;
+        pose.pose.position.y = -0.75;
+		pose.pose.position.z = 1.6;
 
         // find apriltag
         pose_estimates = cam->step(this->tag_timeout);
@@ -263,7 +263,7 @@ void Quadrotor::runMission(geometry_msgs::PoseStamped &pose)
             // quad position
             pos << this->pose_x, this->pose_y, this->pose_z;
             // tag position relative to quad (ENU)
-            this->tag_position << -y / 20.0 , z / 20.0, x / 20.0;
+            this->tag_position << y / 20.0 , z / 20.0, x / 20.0;
             // tag positiona in world (ENU)
             this->tag_position(0) += pos(0);
             this->tag_position(1) += pos(1);
@@ -278,29 +278,9 @@ void Quadrotor::runMission(geometry_msgs::PoseStamped &pose)
 
     case PLANNING_MODE:
         // set hover coordinates
-		pose.pose.position.z = 1.2;
-        pose.pose.position.x = -0.5;
-        pose.pose.position.y = -0.5;
-
-        // tag position
-        this->controller->waypoints.push_back(this->tag_position);
-        ROS_INFO(
-            "WAYPOINT 3 [Tag Position]: (%f, %f, %f)",
-            this->tag_position(0),
-            this->tag_position(1),
-            this->tag_position(2)
-        );
-
-        // above tag position
-        wp << this->tag_position(0), this->tag_position(1), 1.2;
-        this->controller->waypoints.push_back(wp);
-        ROS_INFO(
-            "WAYPOINT 2 [Above Tag]: (%f, %f, %f)",
-            wp(0),
-            wp(1),
-            wp(2)
-        );
-        this->controller->wp_end << wp;
+        pose.pose.position.x = -0.75;
+        pose.pose.position.y = -0.75;
+		pose.pose.position.z = 1.6;
 
         // quad position
         pos << this->pose_x, this->pose_y, this->pose_z;
@@ -311,11 +291,46 @@ void Quadrotor::runMission(geometry_msgs::PoseStamped &pose)
             pos(1),
             pos(2)
         );
-        ROS_INFO("Planning complete");
-        ROS_INFO("Transitioning to carrot mode!");
         this->controller->wp_start << pos(0), pos(1), pos(2);
+
+        // top right
+        wp << -0.75, 0.75, 1.6;
+        this->controller->wp_end << wp;
+        this->controller->waypoints.push_back(wp);
+
+        wp << 0.75, 0.75, 1.6;
+        this->controller->waypoints.push_back(wp);
+
+        wp << 0.75, -0.75, 1.6;
+        this->controller->waypoints.push_back(wp);
+
+        wp << 0, -0.75, 1.6;
+        this->controller->waypoints.push_back(wp);
+
+        // above tag position
+        wp << this->tag_position(0), this->tag_position(1), 1.6;
+        this->controller->waypoints.push_back(wp);
+        ROS_INFO(
+            "WAYPOINT 2 [Above Tag]: (%f, %f, %f)",
+            wp(0),
+            wp(1),
+            wp(2)
+        );
+
+        // tag position
+        this->controller->waypoints.push_back(this->tag_position);
+        ROS_INFO(
+            "WAYPOINT 3 [Tag Position]: (%f, %f, %f)",
+            this->tag_position(0),
+            this->tag_position(1),
+            this->tag_position(2) + 0.3
+        );
+
+        // complete planning
         this->controller->initialized = 1;
         this->mission_state = CARROT_MODE;
+        ROS_INFO("Planning complete");
+        ROS_INFO("Transitioning to carrot mode!");
 
         break;
 
@@ -384,11 +399,11 @@ int main(int argc, char **argv)
         pose.header.stamp = ros::Time::now();
         pose.header.seq = count;
         pose.header.frame_id = "awesomo_quad_offboard";
-        // ROS_INFO("x: 0.0\ty: 0.0\tz: 1.0");
-		// pose.pose.position.z = 1.0;
-        // pose.pose.position.x = 0.0;
-        // pose.pose.position.y = 0.0;
-        quad.runMission(pose);
+        // ROS_INFO("x: 0.0\ty: 0.0\tz: 1.5");
+        pose.pose.position.x = 0.0;
+        pose.pose.position.y = 0.0;
+		pose.pose.position.z = 1.5;
+        // quad.runMission(pose);
         // ROS_INFO(
         //     "Waypoint (%f, %f, %f)",
         //     pose.pose.position.z,
@@ -396,31 +411,31 @@ int main(int argc, char **argv)
         //     pose.pose.position.y
         // );
 
-		// if (ros::Time::now() - last_request > ros::Duration(10.0)) {
-        //     if (index == 0) {
-        //         pose.pose.position.x = 0.5;
-        //         pose.pose.position.y = 0.5;
-        //         index++;
-        //         ROS_INFO("x: 0.5\ty: 0.5");
-        //     } else if (index == 1) {
-        //         pose.pose.position.x = 0.5;
-        //         pose.pose.position.y = -0.5;
-        //         ROS_INFO("x: 0.5\ty: -0.5");
-        //         index++;
-        //     } else if (index == 2) {
-        //         pose.pose.position.x = -0.5;
-        //         pose.pose.position.y = -0.5;
-        //         ROS_INFO("x: -0.5\ty: -0.5");
-        //         index++;
-        //     } else if (index == 3) {
-        //         pose.pose.position.x = -0.5;
-        //         pose.pose.position.y = 0.5;
-        //         ROS_INFO("x: -0.5\ty: 0.5");
-        //         index = 0;
-        //     }
-        //
-		// 	last_request = ros::Time::now();
-		// }
+		if (ros::Time::now() - last_request > ros::Duration(10.0)) {
+            if (index == 0) {
+                pose.pose.position.x = 0.5;
+                pose.pose.position.y = 0.5;
+                index++;
+                ROS_INFO("x: 0.5\ty: 0.5");
+            } else if (index == 1) {
+                pose.pose.position.x = 0.5;
+                pose.pose.position.y = -0.5;
+                ROS_INFO("x: 0.5\ty: -0.5");
+                index++;
+            } else if (index == 2) {
+                pose.pose.position.x = -0.5;
+                pose.pose.position.y = -0.5;
+                ROS_INFO("x: -0.5\ty: -0.5");
+                index++;
+            } else if (index == 3) {
+                pose.pose.position.x = -0.5;
+                pose.pose.position.y = 0.5;
+                ROS_INFO("x: -0.5\ty: 0.5");
+                index = 0;
+            }
+
+			last_request = ros::Time::now();
+		}
 
 		// publish
 		quad.position_publisher.publish(pose);

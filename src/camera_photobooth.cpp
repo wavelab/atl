@@ -1,12 +1,8 @@
 #include "awesomo/camera.hpp"
 
-// #define FIREFLY_640 "/home/stan/Projects/awesomo/configs/pointgrey_firefly/ost_640.yaml"
-// #define FIREFLY_320 "/home/stan/Projects/awesomo/configs/pointgrey_firefly/ost_320.yaml"
-// #define FIREFLY_160 "/home/stan/Projects/awesomo/configs/pointgrey_firefly/ost_160.yaml"
 
 int main(int argc, char **argv)
 {
-
     // camera specifics
     Camera cam(0, CAMERA_FIREFLY);
     cam.loadConfig("default", FIREFLY_640);

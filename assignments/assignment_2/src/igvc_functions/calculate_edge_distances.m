@@ -1,6 +1,6 @@
 function dists = calculate_edge_distances(nodes, edges)
     n = length(nodes);
-    dists= zeros(n,n);
+    dists= zeros(n, n);
 
     for i = 1:n
         for j = i:n
