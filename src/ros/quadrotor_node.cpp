@@ -440,7 +440,7 @@ int main(int argc, char **argv)
     x_controller.dead_zone = 1.0;
     x_controller.min = deg2rad(-10);
     x_controller.max = deg2rad(10);
-    x_controller.k_p = 0.0;
+    x_controller.k_p = 1.0;
     x_controller.k_i = 0.0;
     x_controller.k_d = 0.0;
 
@@ -449,7 +449,7 @@ int main(int argc, char **argv)
     y_controller.dead_zone = 1.0;
     y_controller.min = deg2rad(-10);
     y_controller.max = deg2rad(10);
-    y_controller.k_p = 0.0;
+    y_controller.k_p = 1.0;
     y_controller.k_i = 0.0;
     y_controller.k_d = 0.0;
 
@@ -477,8 +477,10 @@ int main(int argc, char **argv)
         y_controller.setpoint = 0.0;
 
         dt = ros::Time::now() - last_request;
-        roll_input = pid_calculate(&x_controller, quad.roll, dt);
-        pitch_input = pid_calculate(&y_controller, quad.pitch, dt);
+        pid_calculate(&x_controller, quad.pose_x, dt);
+        pid_calculate(&y_controller, quad.pose_y, dt);
+        roll_input = x_controller.output;
+        pitch_input = y_controller.output;
         last_request = ros::Time::now();
 
         q = euler2quat(roll_input, pitch_input, 0);
@@ -499,13 +501,15 @@ int main(int argc, char **argv)
         quad.attitude_publisher.publish(attitude);
         quad.throttle_publisher.publish(throttle);
 
+        ROS_INFO("---");
         ROS_INFO("dt %f", dt.toSec());
-        ROS_INFO("quadrotor.roll %f", quad.roll);
-        ROS_INFO("quadrotor.pitch %f", quad.pitch);
+        ROS_INFO("quadrotor.pose_x %f", quad.pose_x);
+        ROS_INFO("quadrotor.pose_y %f", quad.pose_y);
+        ROS_INFO("quadrotor.roll %f", rad2deg(quad.roll));
+        ROS_INFO("quadrotor.pitch %f", rad2deg(quad.pitch));
         ROS_INFO("roll.controller %f", roll_input);
         ROS_INFO("pitch.controller %f", pitch_input);
-
-
+        ROS_INFO("---");
 
 		// update
 		count++;
