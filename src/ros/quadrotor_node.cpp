@@ -434,6 +434,7 @@ int main(int argc, char **argv)
 
     struct pid x_controller;
     struct pid y_controller;
+    struct pid z_controller;
 
     // x controller
     x_controller.setpoint = 0.0;
@@ -453,8 +454,17 @@ int main(int argc, char **argv)
     y_controller.k_i = 0.0;
     y_controller.k_d = 0.0;
 
+    // z controller
+    z_controller.setpoint = 1.0;
+    z_controller.min = 0.0;
+    z_controller.max = 0.1;
+    z_controller.k_p = 0.05;
+    z_controller.k_i = 0.0;
+    z_controller.k_d = 0.0;
+
     float roll_input;
     float pitch_input;
+    float throttle_input;
     float roll_input_adjusted;
     float pitch_input_adjusted;
 
@@ -477,12 +487,15 @@ int main(int argc, char **argv)
 
         x_controller.setpoint = 0.0;
         y_controller.setpoint = 0.0;
+        z_controller.setpoint = 1.0;
 
         dt = ros::Time::now() - last_request;
         pid_calculate(&x_controller, quad.pose_x, dt);
         pid_calculate(&y_controller, quad.pose_y, dt);
+        pid_calculate(&z_controller, quad.pose_z, dt);
         pitch_input = x_controller.output;
         roll_input = -y_controller.output;
+        throttle_input = z_controller.output;
         last_request = ros::Time::now();
 
         if (quad.pose_yaw < 0) {
@@ -504,7 +517,9 @@ int main(int argc, char **argv)
         attitude.pose.orientation.z = q.z();
         attitude.pose.orientation.w = q.w();
 
-        throttle.data = 0.55;
+        // throttle.data = 0.55;
+        throttle_input = 0.55 + throttle_input;
+        throttle.data = throttle_input;
 
         quad.attitude_publisher.publish(attitude);
         quad.throttle_publisher.publish(throttle);
@@ -513,11 +528,13 @@ int main(int argc, char **argv)
         ROS_INFO("dt %f", dt.toSec());
         ROS_INFO("quadrotor.pose_x %f", quad.pose_x);
         ROS_INFO("quadrotor.pose_y %f", quad.pose_y);
+        ROS_INFO("quadrotor.pose_z %f", quad.pose_z);
         ROS_INFO("quadrotor.pose_yaw %f", rad2deg(quad.pose_yaw));
         ROS_INFO("quadrotor.roll %f", rad2deg(quad.roll));
         ROS_INFO("quadrotor.pitch %f", rad2deg(quad.pitch));
         ROS_INFO("roll.controller %f", rad2deg(roll_input_adjusted));
         ROS_INFO("pitch.controller %f", rad2deg(pitch_input_adjusted));
+        ROS_INFO("throttle.controller %f", throttle_input);
         ROS_INFO("---");
 
 		// update
