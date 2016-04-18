@@ -6,6 +6,10 @@
 
 #include <Eigen/Dense>
 
+#include <tf/transform_datatypes.h>
+
+#include "awesomo/pid.hpp"
+
 
 class CarrotController
 {
@@ -40,6 +44,22 @@ class CarrotController
             double threshold
         );
         int update(Eigen::Vector3d position, Eigen::Vector3d &carrot);
+};
+
+class PositionController
+{
+    public:
+        struct pid x;
+        struct pid y;
+        struct pid z;
+
+        float throttle;
+        float roll;
+        float pitch;
+
+        tf::Quaternion rpy_quat;
+
+        ros::Duration dt;
 };
 
 #endif

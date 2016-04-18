@@ -45,7 +45,6 @@ struct pid
     struct timeb last_updated;
 };
 
-
 // FUNCTIONS
 struct pid *pid_setup(struct pid_config *c);
 void pid_destroy(void *target);

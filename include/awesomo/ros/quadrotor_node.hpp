@@ -72,7 +72,8 @@ class Quadrotor
         std::vector<TagPose> tag_poses;
         Eigen::Vector3d tag_position;
 
-        CarrotController *controller;
+        CarrotController *carrot_controller;
+        PositionController *position_controller;
 
         void poseCallback(const geometry_msgs::PoseStamped &msg);
         void subscribeToPose(void);
@@ -114,6 +115,9 @@ class Quadrotor
         int setOffboardModeOn(void);
         void runMission(geometry_msgs::PoseStamped &pose);
         void runMission2(geometry_msgs::PoseStamped &pose);
+        void initPositionController(void);
+        void positionControllerCalculate(float x, float y, float z, ros::Time last_request);
+        void printPositionController(void);
         void traceSquare(
             geometry_msgs::PoseStamped &pose,
             int *index,

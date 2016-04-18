@@ -42,18 +42,19 @@ Quadrotor::Quadrotor(void)
     cam->loadConfig("160", FIREFLY_160);
     cam->initCamera("320");
 
-    // intialize controller
+    // intialize carrot controller
     double look_ahead_dist = 0.2;
     double wp_threshold = 0.3;
     std::deque<Eigen::Vector3d> waypoints;
-
-    this->controller = new CarrotController(
+    this->carrot_controller = new CarrotController(
         waypoints,
         look_ahead_dist,
         wp_threshold
     );
-}
 
+    // initialize position controller
+    this->position_controller = new PositionController();
+}
 
 void Quadrotor::poseCallback(const geometry_msgs::PoseStamped &msg)
 {
@@ -283,32 +284,32 @@ void Quadrotor::runMission(geometry_msgs::PoseStamped &pose)
 
         // quad position
         pos << this->pose_x, this->pose_y, this->pose_z;
-        this->controller->waypoints.push_back(pos);
+        this->carrot_controller->waypoints.push_back(pos);
         ROS_INFO(
             "WAYPOINT 1 [Quad Position]: (%f, %f, %f)",
             pos(0),
             pos(1),
             pos(2)
         );
-        this->controller->wp_start << pos(0), pos(1), pos(2);
+        this->carrot_controller->wp_start << pos(0), pos(1), pos(2);
 
         // top right
         wp << -0.75, 0.75, 1.6;
-        this->controller->wp_end << wp;
-        this->controller->waypoints.push_back(wp);
+        this->carrot_controller->wp_end << wp;
+        this->carrot_controller->waypoints.push_back(wp);
 
         wp << 0.75, 0.75, 1.6;
-        this->controller->waypoints.push_back(wp);
+        this->carrot_controller->waypoints.push_back(wp);
 
         wp << 0.75, -0.75, 1.6;
-        this->controller->waypoints.push_back(wp);
+        this->carrot_controller->waypoints.push_back(wp);
 
         wp << 0, -0.75, 1.6;
-        this->controller->waypoints.push_back(wp);
+        this->carrot_controller->waypoints.push_back(wp);
 
         // above tag position
         wp << this->tag_position(0), this->tag_position(1), 1.6;
-        this->controller->waypoints.push_back(wp);
+        this->carrot_controller->waypoints.push_back(wp);
         ROS_INFO(
             "WAYPOINT 2 [Above Tag]: (%f, %f, %f)",
             wp(0),
@@ -317,7 +318,7 @@ void Quadrotor::runMission(geometry_msgs::PoseStamped &pose)
         );
 
         // tag position
-        this->controller->waypoints.push_back(this->tag_position);
+        this->carrot_controller->waypoints.push_back(this->tag_position);
         ROS_INFO(
             "WAYPOINT 3 [Tag Position]: (%f, %f, %f)",
             this->tag_position(0),
@@ -326,7 +327,7 @@ void Quadrotor::runMission(geometry_msgs::PoseStamped &pose)
         );
 
         // complete planning
-        this->controller->initialized = 1;
+        this->carrot_controller->initialized = 1;
         this->mission_state = CARROT_MODE;
         ROS_INFO("Planning complete");
         ROS_INFO("Transitioning to carrot mode!");
@@ -336,25 +337,25 @@ void Quadrotor::runMission(geometry_msgs::PoseStamped &pose)
     case CARROT_MODE:
         pos << this->pose_x, this->pose_y, this->pose_z;
 
-        if (this->controller->initialized == 0) {
+        if (this->carrot_controller->initialized == 0) {
             this->mission_state = HOVER_MODE;
             ROS_INFO("Controller not initialized");
 
-        } else if (this->controller->update(pos, carrot)) {
+        } else if (this->carrot_controller->update(pos, carrot)) {
             pose.pose.position.x = carrot(0);
             pose.pose.position.y = carrot(1);
             pose.pose.position.z = carrot(2);
             ROS_INFO(
                 "Waypoint Start (%f, %f, %f)",
-                this->controller->wp_start(0),
-                this->controller->wp_start(1),
-                this->controller->wp_start(2)
+                this->carrot_controller->wp_start(0),
+                this->carrot_controller->wp_start(1),
+                this->carrot_controller->wp_start(2)
             );
             ROS_INFO(
                 "Waypoint End (%f, %f, %f)",
-                this->controller->wp_end(0),
-                this->controller->wp_end(1),
-                this->controller->wp_end(2)
+                this->carrot_controller->wp_end(0),
+                this->carrot_controller->wp_end(1),
+                this->carrot_controller->wp_end(2)
             );
             ROS_INFO(
                 "Carrot Point (%f, %f, %f)",
@@ -374,6 +375,93 @@ void Quadrotor::runMission(geometry_msgs::PoseStamped &pose)
         }
         break;
     }
+}
+
+void Quadrotor::initPositionController(void)
+{
+    // x controller (roll)
+    this->position_controller->x.setpoint = 0.0;
+    this->position_controller->x.dead_zone = 1.0;
+    this->position_controller->x.min = deg2rad(-10);
+    this->position_controller->x.max = deg2rad(10);
+    this->position_controller->x.k_p = 0.1 * 0.5;
+    this->position_controller->x.k_i = 0.1 * 0;
+    this->position_controller->x.k_d = 0.1 * 0;
+
+    // y controller (pitch)
+    this->position_controller->y.setpoint = 0.0;
+    this->position_controller->y.dead_zone = 1.0;
+    this->position_controller->y.min = deg2rad(-10);
+    this->position_controller->y.max = deg2rad(10);
+    this->position_controller->y.k_p = 0.1 * 0.5;
+    this->position_controller->y.k_i = 0.1 * 0;
+    this->position_controller->y.k_d = 0.1 * 0;
+
+    // z controller (altitude)
+    this->position_controller->z.setpoint = 1.0;
+    this->position_controller->z.min = -0.1;
+    this->position_controller->z.max = 0.1;
+    this->position_controller->z.k_p = 0.07;
+    this->position_controller->z.k_i = 0.0;
+    this->position_controller->z.k_d = 0.0;
+}
+
+void Quadrotor::positionControllerCalculate(float x, float y, float z, ros::Time last_request)
+{
+    float roll;
+    float pitch;
+    float throttle;
+    float roll_adjusted;
+    float pitch_adjusted;
+    float throttle_adjusted;
+    ros::Duration dt;
+
+    // configure x, y, z setpoint
+    this->position_controller->x.setpoint = x;
+    this->position_controller->y.setpoint = y;
+    this->position_controller->z.setpoint = z;
+
+    // position controller - calculate
+    this->position_controller->dt = ros::Time::now() - last_request;
+    dt = this->position_controller->dt;
+    pid_calculate(&this->position_controller->x, this->pose_x, dt);
+    pid_calculate(&this->position_controller->y, this->pose_y, dt);
+    pid_calculate(&this->position_controller->z, this->pose_z, dt);
+    pitch = this->position_controller->x.output;
+    roll = this->position_controller->y.output;
+    throttle = this->position_controller->z.output;
+
+    // adjust roll and pitch according to yaw
+    if (this->pose_yaw < 0) {
+        this->pose_yaw += 2 * M_PI;
+    }
+    roll_adjusted = cos(this->pose_yaw) * roll - sin(this->pose_yaw) * pitch;
+    pitch_adjusted = sin(this->pose_yaw) * roll + cos(this->pose_yaw) * pitch;
+
+    // throttle
+    throttle_adjusted = 0.55 + throttle;
+
+    // update position controller
+    this->position_controller->roll = roll_adjusted;
+    this->position_controller->pitch = pitch_adjusted;
+    this->position_controller->rpy_quat = euler2quat(roll_adjusted, pitch_adjusted, 0);
+    this->position_controller->throttle = throttle_adjusted;
+}
+
+void Quadrotor::printPositionController(void)
+{
+    // ROS_INFO("---");
+    // ROS_INFO("dt %f", dt.toSec());
+    // ROS_INFO("quadrotor.pose_x %f", this->pose_x);
+    // ROS_INFO("quadrotor.pose_y %f", this->pose_y);
+    // ROS_INFO("quadrotor.pose_z %f", this->pose_z);
+    // ROS_INFO("quadrotor.pose_yaw %f", rad2deg(this->pose_yaw));
+    // ROS_INFO("quadrotor.roll %f", rad2deg(this->roll));
+    // ROS_INFO("quadrotor.pitch %f", rad2deg(this->pitch));
+    // ROS_INFO("roll.controller %f", rad2deg(roll_input_adjusted));
+    // ROS_INFO("pitch.controller %f", rad2deg(pitch_input_adjusted));
+    // ROS_INFO("throttle.controller %f", throttle_input);
+    // ROS_INFO("---");
 }
 
 void Quadrotor::traceSquare(
@@ -414,7 +502,6 @@ int main(int argc, char **argv)
     // setup
     ros::init(argc, argv, "awesomo");
     ros::NodeHandle nh;
-    ros::Duration dt;
     ros::Time last_request;
 
     ros::Rate rate(100.0);  // publishing rate MUST be faster than 2Hz
@@ -422,7 +509,6 @@ int main(int argc, char **argv)
 	geometry_msgs::PoseStamped pose;
 	geometry_msgs::PoseStamped attitude;
     std_msgs::Float64 throttle;
-    tf::Quaternion q;
 
     ROS_INFO("running ...");
     // quad.arm();
@@ -430,51 +516,6 @@ int main(int argc, char **argv)
 	last_request = ros::Time::now();
 	int count = 1;
 	int index = 0;
-
-
-    struct pid x_controller;
-    struct pid y_controller;
-    struct pid z_controller;
-
-    // x controller
-    x_controller.setpoint = 0.0;
-    x_controller.dead_zone = 1.0;
-    x_controller.min = deg2rad(-10);
-    x_controller.max = deg2rad(10);
-    // x_controller.k_p = 0.18;
-    // x_controller.k_p = 0.288 * 1.8;
-    // x_controller.k_i = 0.0;
-    // x_controller.k_d = 0.08 * 2;
-    x_controller.k_p = 0.1 * 0.5;
-    x_controller.k_i = 0.1 * 0;
-    x_controller.k_d = 0.1 * 0;
-
-    // y controller
-    y_controller.setpoint = 0.0;
-    y_controller.dead_zone = 1.0;
-    y_controller.min = deg2rad(-10);
-    y_controller.max = deg2rad(10);
-    // y_controller.k_p = 0.18;
-    // y_controller.k_p = 0.288 * 2;
-    // y_controller.k_i = 0.1 * 1.2;
-    // y_controller.k_d = 0.08 * 3;
-    y_controller.k_p = 0.1 * 0.5;
-    y_controller.k_i = 0.1 * 0;
-    y_controller.k_d = 0.1 * 0;
-
-    // z controller
-    z_controller.setpoint = 1.0;
-    z_controller.min = -0.1;
-    z_controller.max = 0.1;
-    z_controller.k_p = 0.07;
-    z_controller.k_i = 0.0;
-    z_controller.k_d = 0.0;
-
-    float roll_input;
-    float pitch_input;
-    float throttle_input;
-    float roll_input_adjusted;
-    float pitch_input_adjusted;
 
     while (ros::ok()){
         // pose.header.stamp = ros::Time::now();
@@ -489,63 +530,30 @@ int main(int argc, char **argv)
         // quad.runMission(pose);
         // quad.runMission2(pose);
 
+        // position controller
+        quad.positionControllerCalculate(0, 0, 0, last_request);
+        last_request = ros::Time::now();
+
 		// publish
 		// quad.position_publisher.publish(pose);
 
+        // // build atitude command message
+        // attitude.header.stamp = ros::Time::now();
+        // attitude.header.seq = count;
+        // attitude.header.frame_id = "awesomo_quad_offboard_attitude_cmd";
+        // attitude.pose.position.x = 0.0;
+        // attitude.pose.position.y = 0.0;
+        // attitude.pose.position.z = 0.0;
+        // attitude.pose.orientation.x = q.x();
+        // attitude.pose.orientation.y = q.y();
+        // attitude.pose.orientation.z = q.z();
+        // attitude.pose.orientation.w = q.w();
 
-        x_controller.setpoint = 0.0;
-        y_controller.setpoint = 0.0;
-        z_controller.setpoint = 1.0;
+        // // build throttle command message
+        // throttle.data = throttle_input;
 
-        // position controller - calculate
-        dt = ros::Time::now() - last_request;
-        pid_calculate(&x_controller, quad.pose_x, dt);
-        pid_calculate(&y_controller, quad.pose_y, dt);
-        pid_calculate(&z_controller, quad.pose_z, dt);
-        pitch_input = x_controller.output;
-        roll_input = -y_controller.output;
-        throttle_input = z_controller.output;
-        last_request = ros::Time::now();
-
-        // throttle.data = 0.55;
-        throttle_input = 0.55 + throttle_input;
-        throttle.data = throttle_input;
-
-        // adjust roll and pitch
-        if (quad.pose_yaw < 0) {
-            quad.pose_yaw += 2 * M_PI;
-        }
-        roll_input_adjusted = cos(quad.pose_yaw) * roll_input - sin(quad.pose_yaw) * pitch_input;
-        pitch_input_adjusted = sin(quad.pose_yaw) * roll_input + cos(quad.pose_yaw) * pitch_input;
-        q = euler2quat(roll_input_adjusted, pitch_input_adjusted, 0);
-
-        // build atitude command message
-        attitude.header.stamp = ros::Time::now();
-        attitude.header.seq = count;
-        attitude.header.frame_id = "awesomo_quad_offboard_attitude_cmd";
-        attitude.pose.position.x = 0.0;
-        attitude.pose.position.y = 0.0;
-        attitude.pose.position.z = 0.0;
-        attitude.pose.orientation.x = q.x();
-        attitude.pose.orientation.y = q.y();
-        attitude.pose.orientation.z = q.z();
-        attitude.pose.orientation.w = q.w();
-
-        quad.attitude_publisher.publish(attitude);
-        quad.throttle_publisher.publish(throttle);
-
-        ROS_INFO("---");
-        ROS_INFO("dt %f", dt.toSec());
-        ROS_INFO("quadrotor.pose_x %f", quad.pose_x);
-        ROS_INFO("quadrotor.pose_y %f", quad.pose_y);
-        ROS_INFO("quadrotor.pose_z %f", quad.pose_z);
-        ROS_INFO("quadrotor.pose_yaw %f", rad2deg(quad.pose_yaw));
-        ROS_INFO("quadrotor.roll %f", rad2deg(quad.roll));
-        ROS_INFO("quadrotor.pitch %f", rad2deg(quad.pitch));
-        ROS_INFO("roll.controller %f", rad2deg(roll_input_adjusted));
-        ROS_INFO("pitch.controller %f", rad2deg(pitch_input_adjusted));
-        ROS_INFO("throttle.controller %f", throttle_input);
-        ROS_INFO("---");
+        // quad.attitude_publisher.publish(attitude);
+        // quad.throttle_publisher.publish(throttle);
 
 		// update
 		count++;
