@@ -32,9 +32,29 @@
 \date{}
 \maketitle
 
+\section{Layout for Report}
+\begin{itemize}
+	\item Introduction
+	\item Related work
+	\item Hardware
+	\item Software libraries used
+	\item Methods
+	\begin{itemize}
+		\item camera methods (image processing)
+		\item PID controllers
+	\end{itemize}
+	\item Results and Discussion
+	\begin{itemize}
+		\item Image Processing Results
+		\item PID Results and Testing
+		\item Hardware difficulties? 
+	\end{itemize}
+	\item Future work 
+	\item Conclusion
+\end{itemize}
+
 
 \section{Introduction}
-
 The idea of quadrotor has been explored by several companies and researchers since quadrotors became a popular alternative to fixed wing and single rotor aircraft (DJI auto landing, Pixhawk, make a reference). However most of these methods usually assume that the landing zone is static and that there is very little wind or disturbances. In cases of high wind or a rapidly moving platform, which from the quadrotor's reference frame can be be though of as nearly equivalent cases, normal autonomous landing procedures will likely fail. 
 
 Over the years there has been been at least some interest in the problem of landing a quadrotor on a moving platform and there have been at least 5 academic publications on the topic \cite{Lee2012, Kim2014, Voos2010, Friis2009, Ling2014, Herisse2012}. The problem has been explored from a fairly wide range of approaches. 
@@ -130,9 +150,7 @@ To address both the decreasing state update rate as a function of proximity and 
 \subsubsection{Adaptive Image Down-sampling}
 It was also noted that the image could be greatly down sampled as well if the quadrotor approaches the landing pad as not as many pixels are required to calculated the location and state of the AprilTag in the image. Therefore 3 image sampling sizes were also introduced into the code which sub-sample the image to 160 by 140 pixels and 320 by 280 (half and quarter resolution) when the distance between the camera and the AprilTag is less than 1.5 and 3 meters respectively. If the camera is further than 3 meters from the AprilTag the native resolution of 640 by 480 is used. This change only affected the image processing time when the quadrotor is within 3 meters of the quad and has the desired effect of increasing the rate of AprilTag process.
 
-In order to use this down sampling effectively without corrupting the AprilTag estimations, 3 camera calibration files were also computed at the normal, half and quarter camera resolutions. The calibration file passed to the AprilTag library during the state estimation proccedure is selected based on what the current camera resolution is set at. 
-
-
+In order to use this down sampling effectively without corrupting the AprilTag estimations, 3 camera calibration files were also computed at the normal, half and quarter camera resolutions. The calibration file passed to the AprilTag library during the state estimation procedure is selected based on what the current camera resolution is set at. 
 
 \section{Results}
 
@@ -145,5 +163,10 @@ In order to use this down sampling effectively without corrupting the AprilTag e
 
 \bibliography{report}{}
 \bibliographystyle{ieeetr}
+
+
+
+
+
 
 \end{document}
