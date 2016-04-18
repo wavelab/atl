@@ -377,35 +377,6 @@ void Quadrotor::runMission(geometry_msgs::PoseStamped &pose)
     }
 }
 
-void Quadrotor::initPositionController(void)
-{
-    // x controller (roll)
-    this->position_controller->x.setpoint = 0.0;
-    this->position_controller->x.dead_zone = 1.0;
-    this->position_controller->x.min = deg2rad(-10);
-    this->position_controller->x.max = deg2rad(10);
-    this->position_controller->x.k_p = 0.1 * 0.5;
-    this->position_controller->x.k_i = 0.1 * 0;
-    this->position_controller->x.k_d = 0.1 * 0;
-
-    // y controller (pitch)
-    this->position_controller->y.setpoint = 0.0;
-    this->position_controller->y.dead_zone = 1.0;
-    this->position_controller->y.min = deg2rad(-10);
-    this->position_controller->y.max = deg2rad(10);
-    this->position_controller->y.k_p = 0.1 * 0.5;
-    this->position_controller->y.k_i = 0.1 * 0;
-    this->position_controller->y.k_d = 0.1 * 0;
-
-    // z controller (altitude)
-    this->position_controller->T.setpoint = 1.0;
-    this->position_controller->T.min = -0.1;
-    this->position_controller->T.max = 0.1;
-    this->position_controller->T.k_p = 0.07;
-    this->position_controller->T.k_i = 0.0;
-    this->position_controller->T.k_d = 0.0;
-}
-
 void Quadrotor::positionControllerCalculate(float x, float y, float z, ros::Time last_request)
 {
     float roll;
@@ -424,11 +395,11 @@ void Quadrotor::positionControllerCalculate(float x, float y, float z, ros::Time
     // position controller - calculate
     this->position_controller->dt = ros::Time::now() - last_request;
     dt = this->position_controller->dt;
-    pid_calculate(&this->position_controller->x, this->pose_x, dt);
-    pid_calculate(&this->position_controller->y, this->pose_y, dt);
+    pid_calculate(&this->position_controller->x, this->pose_y, dt);
+    pid_calculate(&this->position_controller->y, this->pose_x, dt);
     pid_calculate(&this->position_controller->T, this->pose_z, dt);
-    pitch = this->position_controller->x.output;
-    roll = this->position_controller->y.output;
+    roll = -this->position_controller->x.output;
+    pitch = this->position_controller->y.output;
     throttle = this->position_controller->T.output;
 
     // adjust roll and pitch according to yaw
@@ -555,7 +526,8 @@ int main(int argc, char **argv)
         // quad.runMission2(position);
 
         // position controller
-        quad.positionControllerCalculate(0, 0, 0, last_request);
+        quad.positionControllerCalculate(0, 0, 1.0, last_request);
+        quad.printPositionController();
         last_request = ros::Time::now();
         now = last_request;
 

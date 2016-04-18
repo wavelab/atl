@@ -1,21 +1,21 @@
 roll_controller:
     setpoint: 0.0
-    min: -1.0
-    max: 1
-    k_p: 0.0
+    min: -0.174533
+    max: 0.174533
+    k_p: 0.205
     k_i: 0.0
-    k_d: 1.0
+    k_d: 6
 pitch_controller:
     setpoint: 0.0
-    min: -1.0
-    max: 1.0
-    k_p: 0.0
+    min: -0.174533
+    max: 0.174533
+    k_p: 0.205
     k_i: 0.0
-    k_d: 1.0
+    k_d: 6
 throttle_controller:
     setpoint: 1.0
     min: -0.1
     max: 0.1
-    k_p: 0.2
+    k_p: 0.1
     k_i: 0.0
     k_d: 0.50

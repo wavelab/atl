@@ -115,7 +115,6 @@ class Quadrotor
         int setOffboardModeOn(void);
         void runMission(geometry_msgs::PoseStamped &pose);
         void runMission2(geometry_msgs::PoseStamped &pose);
-        void initPositionController(void);
         void positionControllerCalculate(float x, float y, float z, ros::Time last_request);
         void printPositionController(void);
         // void buildPositionMessage(

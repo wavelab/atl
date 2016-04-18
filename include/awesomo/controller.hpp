@@ -13,7 +13,9 @@
 
 
 // CONSTANTS
-#define PID_CONFIG "/home/chutsu/Dropbox/proj/awesomo/configs/position_controller/pid.yaml"
+// #define PID_CONFIG "/home/chutsu/Dropbox/proj/awesomo/configs/position_controller/pid.yaml"
+// #define PID_CONFIG "/home/odroid/catkin_ws/src/awesomo/configs/position_controller/pid.yaml"
+#define PID_CONFIG "/home/odroid/catkin_ws/src/awesomo/configs/position_controller/pid_semi_ok.yaml"
 
 
 class CarrotController
