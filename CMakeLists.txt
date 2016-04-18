@@ -153,7 +153,7 @@ INSTALL(TARGETS sim_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 # tests/controller_test
 ADD_EXECUTABLE(controller_test tests/controller_test.cpp)
-TARGET_LINK_LIBRARIES(controller_test awesomo)
+TARGET_LINK_LIBRARIES(controller_test awesomo yaml-cpp)
 INSTALL(TARGETS controller_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 # tests/util_test

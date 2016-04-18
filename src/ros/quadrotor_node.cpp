@@ -53,7 +53,7 @@ Quadrotor::Quadrotor(void)
     );
 
     // initialize position controller
-    this->position_controller = new PositionController();
+    this->position_controller = new PositionController(PID_CONFIG);
 }
 
 void Quadrotor::poseCallback(const geometry_msgs::PoseStamped &msg)
@@ -398,12 +398,12 @@ void Quadrotor::initPositionController(void)
     this->position_controller->y.k_d = 0.1 * 0;
 
     // z controller (altitude)
-    this->position_controller->z.setpoint = 1.0;
-    this->position_controller->z.min = -0.1;
-    this->position_controller->z.max = 0.1;
-    this->position_controller->z.k_p = 0.07;
-    this->position_controller->z.k_i = 0.0;
-    this->position_controller->z.k_d = 0.0;
+    this->position_controller->T.setpoint = 1.0;
+    this->position_controller->T.min = -0.1;
+    this->position_controller->T.max = 0.1;
+    this->position_controller->T.k_p = 0.07;
+    this->position_controller->T.k_i = 0.0;
+    this->position_controller->T.k_d = 0.0;
 }
 
 void Quadrotor::positionControllerCalculate(float x, float y, float z, ros::Time last_request)
@@ -419,17 +419,17 @@ void Quadrotor::positionControllerCalculate(float x, float y, float z, ros::Time
     // configure x, y, z setpoint
     this->position_controller->x.setpoint = x;
     this->position_controller->y.setpoint = y;
-    this->position_controller->z.setpoint = z;
+    this->position_controller->T.setpoint = z;
 
     // position controller - calculate
     this->position_controller->dt = ros::Time::now() - last_request;
     dt = this->position_controller->dt;
     pid_calculate(&this->position_controller->x, this->pose_x, dt);
     pid_calculate(&this->position_controller->y, this->pose_y, dt);
-    pid_calculate(&this->position_controller->z, this->pose_z, dt);
+    pid_calculate(&this->position_controller->T, this->pose_z, dt);
     pitch = this->position_controller->x.output;
     roll = this->position_controller->y.output;
-    throttle = this->position_controller->z.output;
+    throttle = this->position_controller->T.output;
 
     // adjust roll and pitch according to yaw
     if (this->pose_yaw < 0) {
@@ -450,18 +450,41 @@ void Quadrotor::positionControllerCalculate(float x, float y, float z, ros::Time
 
 void Quadrotor::printPositionController(void)
 {
-    // ROS_INFO("---");
-    // ROS_INFO("dt %f", dt.toSec());
-    // ROS_INFO("quadrotor.pose_x %f", this->pose_x);
-    // ROS_INFO("quadrotor.pose_y %f", this->pose_y);
-    // ROS_INFO("quadrotor.pose_z %f", this->pose_z);
-    // ROS_INFO("quadrotor.pose_yaw %f", rad2deg(this->pose_yaw));
-    // ROS_INFO("quadrotor.roll %f", rad2deg(this->roll));
-    // ROS_INFO("quadrotor.pitch %f", rad2deg(this->pitch));
-    // ROS_INFO("roll.controller %f", rad2deg(roll_input_adjusted));
-    // ROS_INFO("pitch.controller %f", rad2deg(pitch_input_adjusted));
-    // ROS_INFO("throttle.controller %f", throttle_input);
-    // ROS_INFO("---");
+    ROS_INFO("---");
+    ROS_INFO("dt %f", this->position_controller->dt.toSec());
+    ROS_INFO("quadrotor.pose_x %f", this->pose_x);
+    ROS_INFO("quadrotor.pose_y %f", this->pose_y);
+    ROS_INFO("quadrotor.pose_z %f", this->pose_z);
+    ROS_INFO("quadrotor.pose_yaw %f", rad2deg(this->pose_yaw));
+    ROS_INFO("quadrotor.roll %f", rad2deg(this->roll));
+    ROS_INFO("quadrotor.pitch %f", rad2deg(this->pitch));
+    ROS_INFO("roll.controller %f", rad2deg(this->position_controller->roll));
+    ROS_INFO("pitch.controller %f", rad2deg(this->position_controller->pitch));
+    ROS_INFO("throttle.controller %f", this->position_controller->throttle);
+    ROS_INFO("---");
+}
+
+void Quadrotor::buildAtitudeMessage(
+    geometry_msgs::PoseStamped &msg,
+    int seq,
+    ros::Time time
+)
+{
+    msg.header.stamp = time;
+    msg.header.seq = seq;
+    msg.header.frame_id = "awesomo_quad_offboard_attitude_cmd";
+    msg.pose.position.x = 0.0;
+    msg.pose.position.y = 0.0;
+    msg.pose.position.z = 0.0;
+    msg.pose.orientation.x = this->position_controller->rpy_quat.x();
+    msg.pose.orientation.y = this->position_controller->rpy_quat.y();
+    msg.pose.orientation.z = this->position_controller->rpy_quat.z();
+    msg.pose.orientation.w = this->position_controller->rpy_quat.w();
+}
+
+void Quadrotor::buildThrottleMessage(std_msgs::Float64 &msg)
+{
+    msg.data = this->position_controller->throttle;
 }
 
 void Quadrotor::traceSquare(
@@ -503,10 +526,11 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "awesomo");
     ros::NodeHandle nh;
     ros::Time last_request;
+    ros::Time now;
 
     ros::Rate rate(100.0);  // publishing rate MUST be faster than 2Hz
     Quadrotor quad;
-	geometry_msgs::PoseStamped pose;
+	geometry_msgs::PoseStamped position;
 	geometry_msgs::PoseStamped attitude;
     std_msgs::Float64 throttle;
 
@@ -514,49 +538,38 @@ int main(int argc, char **argv)
     // quad.arm();
     // quad.setOffboardModeOn();
 	last_request = ros::Time::now();
-	int count = 1;
+	int seq = 1;
 	int index = 0;
 
     while (ros::ok()){
-        // pose.header.stamp = ros::Time::now();
-        // pose.header.seq = count;
-        // pose.header.frame_id = "awesomo_quad_offboard";
+        // position.header.stamp = ros::Time::now();
+        // position.header.seq = seq;
+        // position.header.frame_id = "awesomo_quad_offboard";
         //
         // // hover
-        // pose.pose.position.x = 0.0;
-        // pose.pose.position.y = 0.0;
-        // pose.pose.position.z = 1.2;
+        // position.pose.position.x = 0.0;
+        // position.pose.position.y = 0.0;
+        // position.pose.position.z = 1.2;
 
-        // quad.runMission(pose);
-        // quad.runMission2(pose);
+        // quad.runMission(position);
+        // quad.runMission2(position);
 
         // position controller
         quad.positionControllerCalculate(0, 0, 0, last_request);
         last_request = ros::Time::now();
+        now = last_request;
 
 		// publish
-		// quad.position_publisher.publish(pose);
+		// quad.position_publisher.publish(position);
 
-        // // build atitude command message
-        // attitude.header.stamp = ros::Time::now();
-        // attitude.header.seq = count;
-        // attitude.header.frame_id = "awesomo_quad_offboard_attitude_cmd";
-        // attitude.pose.position.x = 0.0;
-        // attitude.pose.position.y = 0.0;
-        // attitude.pose.position.z = 0.0;
-        // attitude.pose.orientation.x = q.x();
-        // attitude.pose.orientation.y = q.y();
-        // attitude.pose.orientation.z = q.z();
-        // attitude.pose.orientation.w = q.w();
+		quad.buildAtitudeMessage(attitude, seq, now);
+        quad.attitude_publisher.publish(attitude);
 
-        // // build throttle command message
-        // throttle.data = throttle_input;
-
-        // quad.attitude_publisher.publish(attitude);
-        // quad.throttle_publisher.publish(throttle);
+		quad.buildThrottleMessage(throttle);
+        quad.throttle_publisher.publish(throttle);
 
 		// update
-		count++;
+		seq++;
 
 		// end
 		ros::spinOnce();

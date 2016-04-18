@@ -9,6 +9,11 @@
 #include <tf/transform_datatypes.h>
 
 #include "awesomo/pid.hpp"
+#include <yaml-cpp/yaml.h>
+
+
+// CONSTANTS
+#define PID_CONFIG "/home/chutsu/Dropbox/proj/awesomo/configs/position_controller/pid.yaml"
 
 
 class CarrotController
@@ -51,15 +56,16 @@ class PositionController
     public:
         struct pid x;
         struct pid y;
-        struct pid z;
+        struct pid T;
 
-        float throttle;
         float roll;
         float pitch;
-
+        float throttle;
         tf::Quaternion rpy_quat;
-
         ros::Duration dt;
+
+        PositionController(const std::string config_file);
+        void loadConfig(const std::string config_file);
 };
 
 #endif

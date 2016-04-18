@@ -3,13 +3,14 @@
 
 
 // TESTS
-int testClosestPoint(void);
-int testCalculateCarrotPoint(void);
-int testWaypointReached(void);
-int testUpdate(void);
+int testCarrotControllerClosestPoint(void);
+int testCarrotControllerCalculateCarrotPoint(void);
+int testCarrotControllerWaypointReached(void);
+int testCarrotControllerUpdate(void);
+int testPositionControllerLoadConfig(void);
 
 
-int testClosestPoint(void)
+int testCarrotControllerClosestPoint(void)
 {
     CarrotController controller;
     Eigen::Vector3d wp_start;
@@ -33,7 +34,7 @@ int testClosestPoint(void)
     return 0;
 }
 
-int testCalculateCarrotPoint(void)
+int testCarrotControllerCalculateCarrotPoint(void)
 {
     CarrotController controller;
 
@@ -67,7 +68,7 @@ int testCalculateCarrotPoint(void)
     return 0;
 }
 
-int testWaypointReached(void)
+int testCarrotControllerWaypointReached(void)
 {
     CarrotController controller;
     int retval;
@@ -91,7 +92,7 @@ int testWaypointReached(void)
     return 0;
 }
 
-int testUpdate(void)
+int testCarrotControllerUpdate(void)
 {
     CarrotController controller;
     int retval;
@@ -148,12 +149,46 @@ int testUpdate(void)
     outfile.close();
 }
 
+int testPositionControllerLoadConfig(void)
+{
+    PositionController *controller;
+    controller = new PositionController(PID_CONFIG);
+
+    mu_check(controller->roll == 0);
+    mu_check(controller->pitch == 0);
+    mu_check(controller->throttle == 0);
+
+    mu_print("x.setpoint: %f\n", controller->x.setpoint);
+    mu_print("x.min: %f\n", controller->x.min);
+    mu_print("x.max: %f\n", controller->x.max);
+    mu_print("x.k_p: %f\n", controller->x.k_p);
+    mu_print("x.k_i: %f\n", controller->x.k_i);
+    mu_print("x.k_d: %f\n\n", controller->x.k_d);
+
+    mu_print("y.setpoint: %f\n", controller->y.setpoint);
+    mu_print("y.min: %f\n", controller->y.min);
+    mu_print("y.max: %f\n", controller->y.max);
+    mu_print("y.k_p: %f\n", controller->y.k_p);
+    mu_print("y.k_i: %f\n", controller->y.k_i);
+    mu_print("y.k_d: %f\n\n", controller->y.k_d);
+
+    mu_print("T.setpoint: %f\n", controller->T.setpoint);
+    mu_print("T.min: %f\n", controller->T.min);
+    mu_print("T.max: %f\n", controller->T.max);
+    mu_print("T.k_p: %f\n", controller->T.k_p);
+    mu_print("T.k_i: %f\n", controller->T.k_i);
+    mu_print("T.k_d: %f\n\n", controller->T.k_d);
+
+    return 0;
+}
+
 void testSuite(void)
 {
-    mu_add_test(testClosestPoint);
-    mu_add_test(testCalculateCarrotPoint);
-    mu_add_test(testWaypointReached);
-    mu_add_test(testUpdate);
+    mu_add_test(testCarrotControllerClosestPoint);
+    mu_add_test(testCarrotControllerCalculateCarrotPoint);
+    mu_add_test(testCarrotControllerWaypointReached);
+    // mu_add_test(testCarrotControllerUpdate);
+    mu_add_test(testPositionControllerLoadConfig);
 }
 
 mu_run_tests(testSuite)

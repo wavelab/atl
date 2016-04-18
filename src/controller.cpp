@@ -1,6 +1,7 @@
 #include "awesomo/controller.hpp"
 
 
+// CARROT CONTROLLER
 CarrotController::CarrotController() : initialized(0) { }
 
 CarrotController::CarrotController(
@@ -113,4 +114,49 @@ int CarrotController::update(Eigen::Vector3d position, Eigen::Vector3d &carrot)
     );
 
     return 1;
+}
+
+
+
+// POSITION CONTROLLER
+PositionController::PositionController(const std::string config_file)
+{
+    this->roll = 0;
+    this->pitch = 0;
+    this->throttle = 0;
+    this->loadConfig(config_file);
+}
+
+void PositionController::loadConfig(const std::string config_file)
+{
+    try {
+        YAML::Node config = YAML::LoadFile(config_file);
+
+        // roll controller
+        this->x.setpoint = config["roll_controller"]["setpoint"].as<float>();
+        this->x.min = config["roll_controller"]["min"].as<float>();
+        this->x.max = config["roll_controller"]["max"].as<float>();
+        this->x.k_p = config["roll_controller"]["k_p"].as<float>();
+        this->x.k_i = config["roll_controller"]["k_i"].as<float>();
+        this->x.k_d = config["roll_controller"]["k_d"].as<float>();
+
+        // pitch controller
+        this->y.setpoint = config["pitch_controller"]["setpoint"].as<float>();
+        this->y.min = config["pitch_controller"]["min"].as<float>();
+        this->y.max = config["pitch_controller"]["max"].as<float>();
+        this->y.k_p = config["pitch_controller"]["k_p"].as<float>();
+        this->y.k_i = config["pitch_controller"]["k_i"].as<float>();
+        this->y.k_d = config["pitch_controller"]["k_d"].as<float>();
+
+        // throttle_controller
+        this->T.setpoint = config["throttle_controller"]["setpoint"].as<float>();
+        this->T.min = config["throttle_controller"]["min"].as<float>();
+        this->T.max = config["throttle_controller"]["max"].as<float>();
+        this->T.k_p = config["throttle_controller"]["k_p"].as<float>();
+        this->T.k_i = config["throttle_controller"]["k_i"].as<float>();
+        this->T.k_d = config["throttle_controller"]["k_d"].as<float>();
+
+    } catch (YAML::BadFile &ex) {
+        throw;
+    }
 }

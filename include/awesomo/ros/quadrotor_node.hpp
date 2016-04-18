@@ -118,6 +118,17 @@ class Quadrotor
         void initPositionController(void);
         void positionControllerCalculate(float x, float y, float z, ros::Time last_request);
         void printPositionController(void);
+        // void buildPositionMessage(
+        //     geometry_msgs::PoseStamped &msg,
+        //     int seq,
+        //     ros::time time
+        // );
+        void buildAtitudeMessage(
+            geometry_msgs::PoseStamped &msg,
+            int seq,
+            ros::Time time
+        );
+        void buildThrottleMessage(std_msgs::Float64 &msg);
         void traceSquare(
             geometry_msgs::PoseStamped &pose,
             int *index,
