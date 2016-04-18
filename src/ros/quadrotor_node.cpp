@@ -441,24 +441,32 @@ int main(int argc, char **argv)
     x_controller.dead_zone = 1.0;
     x_controller.min = deg2rad(-10);
     x_controller.max = deg2rad(10);
-    x_controller.k_p = 0.2;
-    x_controller.k_i = 0.0;
-    x_controller.k_d = 0.0;
+    // x_controller.k_p = 0.18;
+    // x_controller.k_p = 0.288 * 1.8;
+    // x_controller.k_i = 0.0;
+    // x_controller.k_d = 0.08 * 2;
+    x_controller.k_p = 0.1 * 0.5;
+    x_controller.k_i = 0.1 * 0;
+    x_controller.k_d = 0.1 * 0;
 
     // y controller
     y_controller.setpoint = 0.0;
     y_controller.dead_zone = 1.0;
     y_controller.min = deg2rad(-10);
     y_controller.max = deg2rad(10);
-    y_controller.k_p = 0.2;
-    y_controller.k_i = 0.0;
-    y_controller.k_d = 0.0;
+    // y_controller.k_p = 0.18;
+    // y_controller.k_p = 0.288 * 2;
+    // y_controller.k_i = 0.1 * 1.2;
+    // y_controller.k_d = 0.08 * 3;
+    y_controller.k_p = 0.1 * 0.5;
+    y_controller.k_i = 0.1 * 0;
+    y_controller.k_d = 0.1 * 0;
 
     // z controller
     z_controller.setpoint = 1.0;
-    z_controller.min = 0.0;
+    z_controller.min = -0.1;
     z_controller.max = 0.1;
-    z_controller.k_p = 0.05;
+    z_controller.k_p = 0.07;
     z_controller.k_i = 0.0;
     z_controller.k_d = 0.0;
 
@@ -489,6 +497,7 @@ int main(int argc, char **argv)
         y_controller.setpoint = 0.0;
         z_controller.setpoint = 1.0;
 
+        // position controller - calculate
         dt = ros::Time::now() - last_request;
         pid_calculate(&x_controller, quad.pose_x, dt);
         pid_calculate(&y_controller, quad.pose_y, dt);
@@ -498,14 +507,19 @@ int main(int argc, char **argv)
         throttle_input = z_controller.output;
         last_request = ros::Time::now();
 
+        // throttle.data = 0.55;
+        throttle_input = 0.55 + throttle_input;
+        throttle.data = throttle_input;
+
+        // adjust roll and pitch
         if (quad.pose_yaw < 0) {
             quad.pose_yaw += 2 * M_PI;
         }
         roll_input_adjusted = cos(quad.pose_yaw) * roll_input - sin(quad.pose_yaw) * pitch_input;
         pitch_input_adjusted = sin(quad.pose_yaw) * roll_input + cos(quad.pose_yaw) * pitch_input;
-
         q = euler2quat(roll_input_adjusted, pitch_input_adjusted, 0);
 
+        // build atitude command message
         attitude.header.stamp = ros::Time::now();
         attitude.header.seq = count;
         attitude.header.frame_id = "awesomo_quad_offboard_attitude_cmd";
@@ -516,10 +530,6 @@ int main(int argc, char **argv)
         attitude.pose.orientation.y = q.y();
         attitude.pose.orientation.z = q.z();
         attitude.pose.orientation.w = q.w();
-
-        // throttle.data = 0.55;
-        throttle_input = 0.55 + throttle_input;
-        throttle.data = throttle_input;
 
         quad.attitude_publisher.publish(attitude);
         quad.throttle_publisher.publish(throttle);
