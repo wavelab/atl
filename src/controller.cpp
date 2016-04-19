@@ -149,6 +149,7 @@ void PositionController::loadConfig(const std::string config_file)
         this->y.k_d = config["pitch_controller"]["k_d"].as<float>();
 
         // throttle_controller
+        this->hover_throttle = config["throttle_controller"]["hover_throttle"].as<float>();
         this->T.setpoint = config["throttle_controller"]["setpoint"].as<float>();
         this->T.min = config["throttle_controller"]["min"].as<float>();
         this->T.max = config["throttle_controller"]["max"].as<float>();

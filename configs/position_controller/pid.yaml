@@ -15,6 +15,7 @@ pitch_controller:
     k_i: 0.05
     k_d: 20
 throttle_controller:
+    hover_throttle: 0.5
     setpoint: 1.0
     deadzone: 0.0
     min: -0.1

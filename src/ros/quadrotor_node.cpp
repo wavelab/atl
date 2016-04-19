@@ -410,7 +410,7 @@ void Quadrotor::positionControllerCalculate(float x, float y, float z, ros::Time
     pitch_adjusted = sin(this->pose_yaw) * roll + cos(this->pose_yaw) * pitch;
 
     // throttle
-    throttle_adjusted = 0.55 + throttle;
+    throttle_adjusted = this->position_controller->hover_throttle + throttle;
     throttle_adjusted = throttle_adjusted / (cos(roll_adjusted) * cos(pitch_adjusted));
 
     // update position controller

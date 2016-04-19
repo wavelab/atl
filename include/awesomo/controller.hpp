@@ -63,6 +63,8 @@ class PositionController
         float roll;
         float pitch;
         float throttle;
+        float hover_throttle;
+
         tf::Quaternion rpy_quat;
         ros::Duration dt;
 
