@@ -35,6 +35,10 @@ struct pid
     float prev_error;
     float sum_error;
 
+    float p_error;
+    float i_error;
+    float d_error;
+
     float k_p;
     float k_i;
     float k_d;

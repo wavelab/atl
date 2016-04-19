@@ -30,6 +30,10 @@ Quadrotor::Quadrotor(void)
     this->position_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_TOPIC, 100);
     this->attitude_publisher = this->node.advertise<geometry_msgs::PoseStamped>(ATTITUDE_TOPIC, 100);
     this->throttle_publisher = this->node.advertise<std_msgs::Float64>(THROTTLE_TOPIC, 100);
+    this->position_controller_x_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_X_CONTROLLER_TOPIC, 100);
+    this->position_controller_y_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_X_CONTROLLER_TOPIC, 100);
+    this->position_controller_z_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_Z_CONTROLLER_TOPIC, 100);
+
 
     // state
     this->mission_state = HOVER_MODE;
@@ -207,7 +211,7 @@ int Quadrotor::setOffboardModeOn(void)
     }
 }
 
-void Quadrotor::runMission(geometry_msgs::PoseStamped &pose)
+void Quadrotor::runMission(geometry_msgs::PoseStamped &msg)
 {
     double dist;
     Eigen::Vector3d pos;
@@ -216,12 +220,16 @@ void Quadrotor::runMission(geometry_msgs::PoseStamped &pose)
     Eigen::Vector3d carrot;
 	std::vector<TagPose> pose_estimates;
 
+    // msg.header.stamp = ros::Time::now();
+    // msg.header.seq = seq;
+    // msg.header.frame_id = "awesomo_quad_offboard";
+
     switch (this->mission_state) {
     case HOVER_MODE:
         // set hover coordinates
-        pose.pose.position.x = -0.75;
-        pose.pose.position.y = -0.75;
-		pose.pose.position.z = 1.6;
+        msg.pose.position.x = -0.75;
+        msg.pose.position.y = -0.75;
+		msg.pose.position.z = 1.6;
 
         // check current position against hover coordinates
         dest << -0.75, -0.75, 1.6;
@@ -238,9 +246,9 @@ void Quadrotor::runMission(geometry_msgs::PoseStamped &pose)
 
     case DISCOVER_MODE:
         // set hover coordinates
-        pose.pose.position.x = -0.75;
-        pose.pose.position.y = -0.75;
-		pose.pose.position.z = 1.6;
+        msg.pose.position.x = -0.75;
+        msg.pose.position.y = -0.75;
+		msg.pose.position.z = 1.6;
 
         // find apriltag
         pose_estimates = cam->step(this->tag_timeout);
@@ -278,9 +286,9 @@ void Quadrotor::runMission(geometry_msgs::PoseStamped &pose)
 
     case PLANNING_MODE:
         // set hover coordinates
-        pose.pose.position.x = -0.75;
-        pose.pose.position.y = -0.75;
-		pose.pose.position.z = 1.6;
+        msg.pose.position.x = -0.75;
+        msg.pose.position.y = -0.75;
+		msg.pose.position.z = 1.6;
 
         // quad position
         pos << this->pose_x, this->pose_y, this->pose_z;
@@ -342,9 +350,9 @@ void Quadrotor::runMission(geometry_msgs::PoseStamped &pose)
             ROS_INFO("Controller not initialized");
 
         } else if (this->carrot_controller->update(pos, carrot)) {
-            pose.pose.position.x = carrot(0);
-            pose.pose.position.y = carrot(1);
-            pose.pose.position.z = carrot(2);
+            msg.pose.position.x = carrot(0);
+            msg.pose.position.y = carrot(1);
+            msg.pose.position.z = carrot(2);
             ROS_INFO(
                 "Waypoint Start (%f, %f, %f)",
                 this->carrot_controller->wp_start(0),
@@ -365,9 +373,9 @@ void Quadrotor::runMission(geometry_msgs::PoseStamped &pose)
             );
         } else {
             // set hover coordinates
-            pose.pose.position.x = 0;
-            pose.pose.position.y = 0;
-            pose.pose.position.z = 0;
+            msg.pose.position.x = 0;
+            msg.pose.position.y = 0;
+            msg.pose.position.z = 0;
 
             ROS_INFO("Final Waypoint reached");
             ROS_INFO("MISSION ACCOMPLISHED!");
@@ -459,6 +467,24 @@ void Quadrotor::buildThrottleMessage(std_msgs::Float64 &msg)
     msg.data = this->position_controller->throttle;
 }
 
+void Quadrotor::buildPositionControllerMessage(
+    geometry_msgs::PoseStamped &msg,
+    int seq,
+    ros::Time time
+)
+{
+    msg.header.stamp = time;
+    msg.header.seq = seq;
+    msg.header.frame_id = "awesomo_quad_offboard_position_controller";
+    msg.pose.position.x = 0.0;
+    msg.pose.position.y = 0.0;
+    msg.pose.position.z = 0.0;
+    msg.pose.orientation.x = this->position_controller->rpy_quat.x();
+    msg.pose.orientation.y = this->position_controller->rpy_quat.y();
+    msg.pose.orientation.z = this->position_controller->rpy_quat.z();
+    msg.pose.orientation.w = this->position_controller->rpy_quat.w();
+}
+
 void Quadrotor::traceSquare(
     geometry_msgs::PoseStamped &pose,
     int *index,
@@ -506,6 +532,7 @@ int main(int argc, char **argv)
 	geometry_msgs::PoseStamped position;
 	geometry_msgs::PoseStamped attitude;
     std_msgs::Float64 throttle;
+	geometry_msgs::PoseStamped pid_stats;
 
     ROS_INFO("running ...");
     // quad.arm();
@@ -519,17 +546,7 @@ int main(int argc, char **argv)
 	float y = quad.pose_y;
 
     while (ros::ok()){
-        // position.header.stamp = ros::Time::now();
-        // position.header.seq = seq;
-        // position.header.frame_id = "awesomo_quad_offboard";
-        //
-        // // hover
-        // position.pose.position.x = 0.0;
-        // position.pose.position.y = 0.0;
-        // position.pose.position.z = 1.2;
-
         // quad.runMission(position);
-        // quad.runMission2(position);
 
         if (index == 0) {
             if ((1.0 - quad.pose_z) < 0.2 && hover_timer_start == 1 && ((ros::Time::now() - hover_time) > ros::Duration(0.5))) {
@@ -561,6 +578,30 @@ int main(int argc, char **argv)
 
 		quad.buildThrottleMessage(throttle);
         quad.throttle_publisher.publish(throttle);
+
+        pid_stats.header.stamp = now;
+        pid_stats.header.seq = seq;
+        pid_stats.header.frame_id = "awesomo_position_controller_x";
+        pid_stats.pose.position.x = quad.position_controller->x.p_error;
+        pid_stats.pose.position.y = quad.position_controller->x.i_error;
+        pid_stats.pose.position.z = quad.position_controller->x.d_error;
+        quad.position_controller_x_publisher.publish(pid_stats);
+
+        pid_stats.header.stamp = now;
+        pid_stats.header.seq = seq;
+        pid_stats.header.frame_id = "awesomo_position_controller_y";
+        pid_stats.pose.position.x = quad.position_controller->y.p_error;
+        pid_stats.pose.position.y = quad.position_controller->y.i_error;
+        pid_stats.pose.position.z = quad.position_controller->y.d_error;
+        quad.position_controller_y_publisher.publish(pid_stats);
+
+        pid_stats.header.stamp = now;
+        pid_stats.header.seq = seq;
+        pid_stats.header.frame_id = "awesomo_position_controller_T";
+        pid_stats.pose.position.x = quad.position_controller->T.p_error;
+        pid_stats.pose.position.y = quad.position_controller->T.i_error;
+        pid_stats.pose.position.z = quad.position_controller->T.d_error;
+        quad.position_controller_z_publisher.publish(pid_stats);
 
 		// update
 		seq++;

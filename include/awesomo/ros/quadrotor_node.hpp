@@ -34,6 +34,9 @@
 #define POSITION_TOPIC "/mavros/setpoint_position/local"
 #define ATTITUDE_TOPIC "/mavros/setpoint_attitude/attitude"
 #define THROTTLE_TOPIC "/mavros/setpoint_attitude/att_throttle"
+#define POSITION_X_CONTROLLER_TOPIC "/awesomo/position_controller/x"
+#define POSITION_Y_CONTROLLER_TOPIC "/awesomo/position_controller/y"
+#define POSITION_Z_CONTROLLER_TOPIC "/awesomo/position_controller/z"
 
 #define HOVER_MODE 0
 #define DISCOVER_MODE 1
@@ -64,6 +67,7 @@ class Quadrotor
         ros::Subscriber pose_subscriber;
         ros::Subscriber imu_subscriber;
 
+
         ros::ServiceClient mode_client;
         ros::ServiceClient arming_client;
 
@@ -72,8 +76,6 @@ class Quadrotor
         std::vector<TagPose> tag_poses;
         Eigen::Vector3d tag_position;
 
-        CarrotController *carrot_controller;
-        PositionController *position_controller;
 
         void poseCallback(const geometry_msgs::PoseStamped &msg);
         void subscribeToPose(void);
@@ -105,16 +107,21 @@ class Quadrotor
         double mocap_pitch;
         double mocap_yaw;
 
+        CarrotController *carrot_controller;
+        PositionController *position_controller;
+
         ros::Publisher position_publisher;
         ros::Publisher attitude_publisher;
         ros::Publisher throttle_publisher;
+        ros::Publisher position_controller_x_publisher;
+        ros::Publisher position_controller_y_publisher;
+        ros::Publisher position_controller_z_publisher;
 
         Quadrotor(void);
         int arm(void);
         int disarm(void);
         int setOffboardModeOn(void);
         void runMission(geometry_msgs::PoseStamped &pose);
-        void runMission2(geometry_msgs::PoseStamped &pose);
         void positionControllerCalculate(float x, float y, float z, ros::Time last_request);
         void printPositionController(void);
         // void buildPositionMessage(
@@ -128,6 +135,11 @@ class Quadrotor
             ros::Time time
         );
         void buildThrottleMessage(std_msgs::Float64 &msg);
+        void buildPositionControllerMessage(
+            geometry_msgs::PoseStamped &msg,
+            int seq,
+            ros::Time time
+        );
         void traceSquare(
             geometry_msgs::PoseStamped &pose,
             int *index,
