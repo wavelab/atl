@@ -411,6 +411,7 @@ void Quadrotor::positionControllerCalculate(float x, float y, float z, ros::Time
 
     // throttle
     throttle_adjusted = 0.55 + throttle;
+    throttle_adjusted = throttle_adjusted / (cos(roll_adjusted) * cos(pitch_adjusted));
 
     // update position controller
     this->position_controller->roll = roll_adjusted;
@@ -497,6 +498,7 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "awesomo");
     ros::NodeHandle nh;
     ros::Time last_request;
+    ros::Time hover_time;
     ros::Time now;
 
     ros::Rate rate(100.0);  // publishing rate MUST be faster than 2Hz
@@ -511,6 +513,10 @@ int main(int argc, char **argv)
 	last_request = ros::Time::now();
 	int seq = 1;
 	int index = 0;
+	int hover_timer_start = 0;
+
+	float x = quad.pose_x;
+	float y = quad.pose_y;
 
     while (ros::ok()){
         // position.header.stamp = ros::Time::now();
@@ -525,9 +531,25 @@ int main(int argc, char **argv)
         // quad.runMission(position);
         // quad.runMission2(position);
 
+        if (index == 0) {
+            if ((1.0 - quad.pose_z) < 0.2 && hover_timer_start == 1 && ((ros::Time::now() - hover_time) > ros::Duration(0.5))) {
+                ROS_INFO("HOVER COMPLETE!");
+                ROS_INFO("Now moving to (0, 0, 1)!");
+                index++;
+            } else if ((1.0 - quad.pose_z) < 0.2 && hover_timer_start == 0) {
+                ROS_INFO("HOVER Hold!");
+                hover_timer_start = 1;
+                hover_time = ros::Time::now();
+            }
+        }
+
         // position controller
-        quad.positionControllerCalculate(0, 0, 1.0, last_request);
-        quad.printPositionController();
+        if (index == 0) {
+            quad.positionControllerCalculate(y, x, 1.0, last_request);
+        } else {
+            quad.positionControllerCalculate(0, 0, 1.0, last_request);
+        }
+        // quad.printPositionController();
         last_request = ros::Time::now();
         now = last_request;
 
