@@ -27,12 +27,12 @@ Quadrotor::Quadrotor(void)
     this->arming_client = this->node.serviceClient<mavros_msgs::CommandBool>(ARM_TOPIC);
 
     // initialize publishers
-    this->position_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_TOPIC, 100);
-    this->attitude_publisher = this->node.advertise<geometry_msgs::PoseStamped>(ATTITUDE_TOPIC, 100);
-    this->throttle_publisher = this->node.advertise<std_msgs::Float64>(THROTTLE_TOPIC, 100);
-    this->position_controller_x_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_X_CONTROLLER_TOPIC, 100);
-    this->position_controller_y_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_X_CONTROLLER_TOPIC, 100);
-    this->position_controller_z_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_Z_CONTROLLER_TOPIC, 100);
+    this->position_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_TOPIC, 50);
+    this->attitude_publisher = this->node.advertise<geometry_msgs::PoseStamped>(ATTITUDE_TOPIC, 50);
+    this->throttle_publisher = this->node.advertise<std_msgs::Float64>(THROTTLE_TOPIC, 50);
+    this->position_controller_x_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_X_CONTROLLER_TOPIC, 50);
+    this->position_controller_y_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_Y_CONTROLLER_TOPIC, 50);
+    this->position_controller_z_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_Z_CONTROLLER_TOPIC, 50);
 
 
     // state
@@ -527,7 +527,7 @@ int main(int argc, char **argv)
     ros::Time hover_time;
     ros::Time now;
 
-    ros::Rate rate(100.0);  // publishing rate MUST be faster than 2Hz
+    ros::Rate rate(50.0);  // publishing rate MUST be faster than 2Hz
     Quadrotor quad;
 	geometry_msgs::PoseStamped position;
 	geometry_msgs::PoseStamped attitude;
