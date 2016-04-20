@@ -334,6 +334,7 @@ int Camera::run(void)
         // this->printFPS(last_tic, frame_index);
         // cv::imshow("camera", image);
         // cv::waitKey(1);
+
     }
 
     return 0;
@@ -353,9 +354,9 @@ std::vector<TagPose> Camera::step(int &timeout)
         timeout
     );
     this->adjustMode(pose_estimates, timeout);
+
     return pose_estimates;
 }
-
 
 int Camera::photoMode(void)
 {

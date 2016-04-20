@@ -54,19 +54,19 @@ void fix_coordinate_frames(
 	double y_adjusted;
 
     // tag
-	// pos[0] = pose.translation[0];
-	// pos[1] = pose.translation[1];
-	// pos[2] = pose.translation[2];
+	pos[0] = pose.translation[0];
+	pos[1] = pose.translation[1];
+	pos[2] = pose.translation[2];
 
-    // [ENU camera]  [tag (forward, left, up)]
-	pos[0] = -1 * pose.translation[1];
-	pos[1] = pose.translation[2];
-	pos[2] = pose.translation[0];
-
-    // [ENU WORLD] [ENU camera]
-	pos[0] = -pos[0];
-	pos[1] = -pos[1];
-	pos[2] = pos[2];
+    // // [ENU camera]  [tag (forward, left, up)]
+	// pos[0] = -1 * pose.translation[1];
+	// pos[1] = pose.translation[2];
+	// pos[2] = pose.translation[0];
+    //
+    // // [ENU WORLD] [ENU camera]
+	// pos[0] = -pos[0];
+	// pos[1] = -pos[1];
+	// pos[2] = pos[2];
 
     // convert euler angles to quaternions
     quat = euler2quat(pose.roll, pose.pitch, pose.yaw);

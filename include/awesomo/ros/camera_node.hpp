@@ -5,7 +5,9 @@
 
 #include <ros/ros.h>
 #include <std_msgs/Float64.h>
+#include <tf/transform_datatypes.h>
 #include <geometry_msgs/Pose.h>
+#include <geometry_msgs/Quaternion.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/PoseWithCovariance.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
@@ -17,6 +19,7 @@
 
 // DEFINES
 #define ROS_TOPIC "awesomo/apriltag_pose"
+#define ROS_TOPIC2 "awesomo/test"
 // #define ROS_TOPIC "mavros/vision_pose/pose"
 // #define ROS_TOPIC "mavros/mocap/pose"
 // #define ROS_TOPIC "mavros/vision_pose/pose_cov"
