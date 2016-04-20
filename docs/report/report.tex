@@ -35,17 +35,19 @@
 \section{Introduction}
 Over the years there has been been a growing interest in autonomous landing of quadrotors as landing is often one of the most dangerous and risk prone parts of flight. There are now several commercial and research based implementations of autonomous landing with the DJI Phantom and Pixhawk flight controller both being capable of automatic landing using a series of sensors and control algorithms. However there does not yet seem to be a reliable method of landing a quadrotor on either a moving platform or in cases where there is relatively large cross wind disturbance. 
 
-In recent years there have been at least least 5 academic publications on the topic \cite{Lee2012, Kim2014, Voos2010, Friis2009, Ling2014, Herisse2012} that approach the problem from a variaty of angles. Overall none of these approachs have solved the issue and most only work on very slow moving platforms with little or no wind disturbances. One of the most challenging with autonomous precision landing is the difficulty of obtaining a reliable estimate of the landing target relative to the quadrotor, the landing target can often go out of the camera's field of view causing the quadrotor to lose track of the target, other vision based artifacts that include lighting, lens distortion, color, etc.
+In recent years there have been at least least 5 academic publications on the topic \cite{Lee2012, Kim2014, Voos2010, Friis2009, Ling2014, Herisse2012} that approach the problem from a variaty of angles. Overall none of these approach have completely solved the problem and most approaches only work on very slow moving platforms with little or no wind disturbances. 
 
+One of the most challenging parts with autonomous landing is the difficulty of obtaining a reliable estimate of the landing target relative to the quadrotor, the landing target can often go out of the camera's field of view causing the quadrotor to lose track of the target, other vision based artifacts that include lighting, lens distortion, color, etc. In many cases GPS is not a viable option both the landing target and the quadrotor due to the lack of accuracy unless an RTK GPS system is used. In many cases the use of an RTK system is not a readily available option due to cost or quadrotor needs. 
+
+\subsection{Related Work}
 The autonomous landing problem can be thought of as a set of three separate control problems or stages. First the quadrotor must detect the relative position and velocity of the landing target using either GPS of visual methods. Next the quadrotor must determine a rendezvous location with the landing target and plan the required flight trajectory. Once the quad has rendezvoused a final landing trajectory must be calculated between quadrotor and the landing pad. 
-
-In this project we focus developing a set of controllers that produce the final landing trajectory and using a fiducial marker called an AprilTag \textbf{\textit{CITE APRILTAGS}} to provide the estimated state of the quadrotor relative to the landing pad. 
-
-\section{Related Work} \textbf{(Needs love but might also just be cut.) }
 
 For perception existing solutions use a variety of simple to complex techniques. In \cite{Kim2014} a basic color threshold technique was to identify the landing target, while \cite{Herisse2012} used optical flow in images captured on board the quadrotor to obtain necessary relative information for control. 
 
 A comparison between a PID and Linear Quadratic Control (LQC) was explored in \cite{Friis2009}. However the authors admit, even though LQC performed slightly better than the PID controller the difference was minor and may be attributed to the additional time spent tuning the LQC. In \cite{Herisse2012} a PID controller was developed to land on a oscillating platform in the vertical direction with no lateral movement. While interesting, the solution took over 1 minute to transition from hovering over the landing pad to landing. Additionally the experiments did not seem to account for pitch or roll of the platform.  
+
+
+In this project we focus developing a set of controllers that produce the final landing trajectory and using a fiducial marker called an AprilTag \textbf{\textit{CITE APRILTAGS}} to provide the estimated state of the quadrotor relative to the landing pad. 
 
 \section{Methodology}
 The majority of effort in this project so far can be separated into two individual but complementary pieces. First, a significant effort effort was spent on ensuring the quadrotor's state was updated a a rate of at least 20 $Hz$. Next, using the information in the state  a set of PID controllers were developed that along with a state machine monitors the current relative position of the quadrotor and either initiates a landing procedure or attempts to minimize the relative displacement and velocity between the quadrotor and the landing pad in the horizontal plane. 
