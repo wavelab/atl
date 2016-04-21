@@ -396,8 +396,8 @@ void Quadrotor::positionControllerCalculate(float x, float y, float z, ros::Time
     ros::Duration dt;
 
     // configure x, y, z setpoint
-    this->position_controller->x.setpoint = x;
-    this->position_controller->y.setpoint = y;
+    this->position_controller->x.setpoint = y;
+    this->position_controller->y.setpoint = x;
     this->position_controller->T.setpoint = z;
 
     // position controller - calculate
@@ -421,9 +421,9 @@ void Quadrotor::positionControllerCalculate(float x, float y, float z, ros::Time
     throttle_adjusted = this->position_controller->hover_throttle + throttle;
     throttle_adjusted = throttle_adjusted / (cos(roll_adjusted) * cos(pitch_adjusted));
 
-    ROS_INFO("setpoint (%f, %f, %f)", x, y, z);
-    ROS_INFO("actual (%f, %f, %f)", this->pose_x, this->pose_y, this->pose_z);
-    ROS_INFO("roll: %f \t pitch: %f\n", roll_adjusted, pitch_adjusted);
+    // ROS_INFO("setpoint (%f, %f, %f)", x, y, z);
+    // ROS_INFO("actual (%f, %f, %f)", this->pose_x, this->pose_y, this->pose_z);
+    // ROS_INFO("roll: %f \t pitch: %f\n", roll_adjusted, pitch_adjusted);
     // ROS_INFO("throttle: %f", throttle_adjusted);
 
     // update position controller
@@ -557,11 +557,11 @@ int main(int argc, char **argv)
         // quad.runMission(position);
 
         if (index == 0) {
-            if ((1.0 - quad.pose_z) < 0.2 && hover_timer_start == 1 && ((ros::Time::now() - hover_time) > ros::Duration(0.5))) {
+            if ((1.0 - quad.pose_z) < 0.1 && hover_timer_start == 1 && ((ros::Time::now() - hover_time) > ros::Duration(2))) {
                 ROS_INFO("HOVER COMPLETE!");
                 ROS_INFO("Now moving to (0, 0, 1)!");
                 index++;
-            } else if ((1.0 - quad.pose_z) < 0.2 && hover_timer_start == 0) {
+            } else if ((1.0 - quad.pose_z) < 0.1 && hover_timer_start == 0) {
                 ROS_INFO("HOVER Hold!");
                 hover_timer_start = 1;
                 hover_time = ros::Time::now();
@@ -570,9 +570,9 @@ int main(int argc, char **argv)
 
         // position controller
         if (index == 0) {
-            quad.positionControllerCalculate(x, y, 1.0, last_request);
+            quad.positionControllerCalculate(x, y, 1.3, last_request);
         } else {
-            quad.positionControllerCalculate(0, 0, 1.0, last_request);
+            quad.positionControllerCalculate(0, 0, 1.3, last_request);
         }
         // quad.printPositionController();
         last_request = ros::Time::now();
@@ -587,29 +587,29 @@ int main(int argc, char **argv)
 		quad.buildThrottleMessage(throttle);
         quad.throttle_publisher.publish(throttle);
 
-        // pid_stats.header.stamp = now;
-        // pid_stats.header.seq = seq;
-        // pid_stats.header.frame_id = "awesomo_position_controller_x";
-        // pid_stats.pose.position.x = quad.position_controller->x.p_error;
-        // pid_stats.pose.position.y = quad.position_controller->x.i_error;
-        // pid_stats.pose.position.z = quad.position_controller->x.d_error;
-        // quad.position_controller_x_publisher.publish(pid_stats);
-        //
-        // pid_stats.header.stamp = now;
-        // pid_stats.header.seq = seq;
-        // pid_stats.header.frame_id = "awesomo_position_controller_y";
-        // pid_stats.pose.position.x = quad.position_controller->y.p_error;
-        // pid_stats.pose.position.y = quad.position_controller->y.i_error;
-        // pid_stats.pose.position.z = quad.position_controller->y.d_error;
-        // quad.position_controller_y_publisher.publish(pid_stats);
-        //
-        // pid_stats.header.stamp = now;
-        // pid_stats.header.seq = seq;
-        // pid_stats.header.frame_id = "awesomo_position_controller_T";
-        // pid_stats.pose.position.x = quad.position_controller->T.p_error;
-        // pid_stats.pose.position.y = quad.position_controller->T.i_error;
-        // pid_stats.pose.position.z = quad.position_controller->T.d_error;
-        // quad.position_controller_z_publisher.publish(pid_stats);
+        pid_stats.header.stamp = now;
+        pid_stats.header.seq = seq;
+        pid_stats.header.frame_id = "awesomo_position_controller_x";
+        pid_stats.pose.position.x = quad.position_controller->x.p_error;
+        pid_stats.pose.position.y = quad.position_controller->x.i_error;
+        pid_stats.pose.position.z = quad.position_controller->x.d_error;
+        quad.position_controller_x_publisher.publish(pid_stats);
+
+        pid_stats.header.stamp = now;
+        pid_stats.header.seq = seq;
+        pid_stats.header.frame_id = "awesomo_position_controller_y";
+        pid_stats.pose.position.x = quad.position_controller->y.p_error;
+        pid_stats.pose.position.y = quad.position_controller->y.i_error;
+        pid_stats.pose.position.z = quad.position_controller->y.d_error;
+        quad.position_controller_y_publisher.publish(pid_stats);
+
+        pid_stats.header.stamp = now;
+        pid_stats.header.seq = seq;
+        pid_stats.header.frame_id = "awesomo_position_controller_T";
+        pid_stats.pose.position.x = quad.position_controller->T.p_error;
+        pid_stats.pose.position.y = quad.position_controller->T.i_error;
+        pid_stats.pose.position.z = quad.position_controller->T.d_error;
+        quad.position_controller_z_publisher.publish(pid_stats);
 
 		// update
 		seq++;
