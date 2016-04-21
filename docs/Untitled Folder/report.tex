@@ -93,31 +93,15 @@ It was also noted that the image could be greatly down sampled as well if the qu
 In order to use this down sampling effectively without corrupting the AprilTag estimations, 3 camera calibration files were also computed at the normal, half and quarter camera resolutions. The calibration file passed to the AprilTag library during the state estimation procedure is selected based on what the current camera resolution is set at. 
 
 \subsection{Controller and State Monitoring}
-In this project it is assumed that the quadrotor has successfully rendezvoused with the target vehicle and has a clear view through the camera image of the landing target located on the target vehicle at all time. The first step of performing  autonomous landing is to position the quadrotor above the landing target such that the displacements in the x and y directions in the horizontal plane normal to the landing surface are near zero while simultaneously matching speed with the target vehicle. Next, while maintaining the near zero displacements in the x and y directions, the quadrotor must begin to descend at a safe rate such that the vertical distance between the quadrotor and the landing target is reduced until landing is achieved. Ideally the quadrotor will descend more rapidly when the vertical displacement between the qaudrotor and target is large, slowing down just before it hits the target in order to minimize time and energy requirements of the landing maneuver. 
+In this project it is assumed that the quadrotor has successfully rendezvoused with the target vehicle and at all points in time has a clear view through the camera image of the landing target located on the target vehicle. The first step of performing  autonomous landing is to position the quadrotor above the landing target such that the displacements in the x and y directions in the horizontal plane normal to the landing surface are near zero while simultaneously matching speed with the target vehicle. Next, while maintaining the near zero displacements in the x and y directions, the quadrotor must begin to descend at a safe rate such that the vertical distance between the quadrotor and the landing target is reduced until landing is achieved. Ideally the quadrotor will descend more rapidly when the vertical displacement between the qaudrotor and target is large, slowing down just before it hits the target in order to minimize time and energy requirements of the landing Vancouver. 
 
-To achieve the described behaviour, we developed a PID position controller that outputs attitude commands such as roll and pitch to reduce the horizontal and vertical distance between the quadrotor and the landing platform, as well as an altitude command to maintain a safe approach altitude such that the target does not go out of view during landing. We omit yaw control as we assume the quadrotor will be axis aligned with the direction of travel of the moving target. 
+In order to achieve the described behaviour, we developed a PID position controller that outputs attitude commands such as roll and pitch to reduce the horizontal and vertical distance between the quadrotor and the landing platform, as well as an altitude command to maintain a safe approach altitude such that the target does not go out of view during landing. We omit yaw control as we assume the quadrotor will be axis aligned with the direction of travel of the moving target. 
 
 The position controller takes the quadrotor's desired position and current position in $x$, $y$ and $z$ of the world frame as inputs, these inputs are mapped to attitude and altitude commands in the roll $\hat{\phi_t}$, pitch $\hat{\theta_t}$ and thrust $\hat{T_z}$ relative to the quadrotor frame as outlined in Equations \ref{eq:pid_roll}, \ref{eq:pid_pitch}, \ref{eq:pid_thrust}, these equations however assume that yaw $\psi$ is 0, if yaw is non-zero then roll and pitch need to be adjusted to account for the yaw changes as in Equation \ref{eq:pid_roll_adjusted} and \ref{eq:pid_pitch_adjusted}. The altitude command is adjusted when roll $\hat{\phi}$ and pitch $\hat{\theta}$ are non-zero to maintain altitude as in Equation \ref{eq:pid_thrust_adjusted}. 
 
 \begin{equation}
 	\label{eq:pid_error}
 	e = e_{\text{setpoint}} - e_{\text{actual}}
-\end{equation}
-
-\begin{equation}
-	\label{eq:pid_roll}
-	\hat{\phi_t} = K_p e_x + K_i \sum_{t = 0}^{t} e_{x, t} dt + K_d \dot{e}_{x,t}
-\end{equation}
-
-\begin{equation}
-	\label{eq:pid_pitch}
-	\hat{\theta_t} = K_p e_y + K_i \sum_{t = 0}^{t} \dot{e}_{y,t} dt + K_d \dot{e}_{y ,t}
-\end{equation}
-
-\begin{equation}
-	\label{eq:pid_thrust}
-	\hat{T_z} =
-		K_p e_z + K_i \sum_{t=0}^{t} \dot{e_z}_{,t} dt + K_d \dot{e_z}_{,t} 
 \end{equation}
 
 \begin{equation}
@@ -132,10 +116,11 @@ The position controller takes the quadrotor's desired position and current posit
 
 \begin{equation}
 	\label{eq:pid_thrust_adjusted}
-	T = 
+	T_{z} = 
 		T_{\text{hover}} +
 		\frac{\hat{T_{z}}}{cos(\phi_t) cos(\theta_t)}
 \end{equation}
+
 
 \section{Experimental Hardware}
 The quadrotor used in this experiment assembled from a DJI F450 quadrotor frame, 4 Emax 2213-935KV motors with complementary DJI E310 420S 20A electronic speed controllers. The flight controller selected for the project was a Pixhawk v2.4 running the PX4 firmware stack. An Odroid XU4 was selected as the onboard computer to processes captured images from a video stream and sends attitude commands via usb to the Pixhawk based of the PID controllers and current state as outlined above. Communication between the Odroid and the Pixhawk is handled by the mavros package which is a wrapper around the popular Mavlink communication protocal for UAVs.  Video was captured using a PointGrey Firefly 2.0 camera operating 60 frames per second (fps) with a resolution of 640 by 480 pixels along with a FujiFilm 135 degree FOV lens. The quadrotor and camera are highlighted in Figure \ref{Quadrotor}
