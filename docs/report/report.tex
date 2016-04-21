@@ -55,7 +55,7 @@ The majority of effort in this project so far can be separated into two individu
 \subsection{Measurement and State Estimation using AprilTags}
 One of the major challenges when using AprilTags on a robot that has limited computational power, such as a quadrotor, is the rate at which the AprilTag library can compute the state. This problem is exacerbated when using larger image sizes as the computational time of the AprilTag software appears to grow at least exponentially as shown in (add a figure here). This problem was also noted in the work of \cite{Ling2014} and he addressed the issue by reducing the brightness of the image so that majority of the image is black except for the AprilTag. An example of this implementation is shown in figure (Kevins image). This allowed Ling \cite{Lee2012} to calculate states at a rate of approximatly 10 - 15 fps but it came at the cost of requiring the brightness parameters to be set ahead of time and also removed a lot of the robustification that is provided in the standard AprilTag library.
 
-In this work, the slow rate of state estimation was addressed using a novel method where the image size and calibration parameters are set depending on the current distance between the quadrotors position relative to the landing pad. 
+In this work, the slow rate of state estimation was addressed using a novel method where the image size and calibration parameters are set depending on the distance between the quadrotor's position relative to the landing pad. 
 
 \subsubsection{Adaptive Image Preprocessing}
 
@@ -63,13 +63,13 @@ As discussed previously, the low rate of the AprilTag library when processing im
 
 \subsubsection{Adaptive Image Windowing}
 
-If one assumes that the quadrotor does not move to fast, there is relativity low rotation between image captures, and that the image update rate is quite fast (60 fps in this implementation), then the location the AprilTag in the following image can be estimated based off of the location it was last observed in the previous image. Therefore whenever an AprilTag is measured in an image, a bounding box around the AprilTag is calculated and then used in the following image to black out the protions of the image where the AprilTag is unlikely to be. An example of this implementation is highlighted in Figure (Adptive windowing).
+If one assumes that the quadrotor does not move to fast, there is relativity low rotation between image captures, and that the image update rate is quite fast (60 fps in this implementation), then the location the AprilTag in the following image can be estimated based off of the location it was last observed in the previous image. Therefore whenever an AprilTag is measured in an image, a bounding box around the AprilTag is calculated and then used in the following image to black out the portions of the image where the AprilTag is unlikely to be. An example of this implementation is highlighted in Figure (Adaptive windowing).
 
 
 While the adaptive windowing procedure works well for when the AprilTag observed at a distance, where they do not take up a significant portion of the image, it begins to fail when the quadrotor approach the landing pad as the observed size of AprilTag begins to become larger and larger in the  image. This leads to the processing time of the AprilTags to increase as the quadrotor gets closer, which is a major issue as in these cases a higher update rate is actually required. In cases where the AprilTag is not observed in the expected location (bounding box), the size of the bounding box is set to the size of the image and the entire image is processed. 
 
 \subsubsection{AprilTag Inception}
- In order to be used for landing, the AprilTag attached to the landing pad must be relatively larger so that it can be detected from a distance of at least 15 meters which from our experience means the AprilTag must be at least 50 cm by 50 cm in size. The large size of the AprilTag becomes a major issue during the final portion of the landing procedure as the AprilTag image will both appear quite large in the captured image which causes to the Adaptive Windowing Procedure outlined above to become ineffective. Furthermore close proximity to the AprilTag also grealy increases the chance that a portion of the AprilTag will be located outside of the captured image, causing no state estimation to be provided at the critical stages of landing. 
+ In order to be used for landing, the AprilTag attached to the landing pad must be relatively larger so that it can be detected from a distance of at least 15 meters which from our experience means the AprilTag must be at least 50 cm by 50 cm in size. The large size of the AprilTag becomes a major issue during the final portion of the landing procedure as the AprilTag image will both appear quite large in the captured image which causes to the Adaptive Windowing Procedure outlined above to become ineffective. Furthermore close proximity to the AprilTag also greatly increases the chance that a portion of the AprilTag will be located outside of the captured image, causing no state estimation to be provided at the critical stages of landing. 
  
 To address both the decreasing state update rate as a function of proximity and reduce the probablity of losing site of the AprilTag during landing a secondary AprilTag is embedded in the larger AprilTag. This secondary AprilTag is assigned different family id, and is placed in the center of a primary AprilTag. Whenever the secondary AprilTag is captured in the image, the adaptive windowing method is set to track only the secondary AprilTag rather than the larger one, which reduces the portion of the image that must be processed in with each image capture. An example of this procedure is highlighted in Figure \ref{fig:apriltagInception}.
 
@@ -83,7 +83,7 @@ To address both the decreasing state update rate as a function of proximity and 
 		\includegraphics[width=\textwidth]{images/apriltags_3.png}
 		\caption{1 Apriltag Detected }
 	\end{subfigure}
-	\caption{Apriltag Inception - To mitigate the FOV problem assocaited with }
+	\caption{Apriltag Inception }
 	\label{fig:apriltagInception}
 \end{figure}
 
