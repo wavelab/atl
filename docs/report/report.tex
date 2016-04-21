@@ -47,15 +47,27 @@ For perception existing solutions use a variety of simple to complex techniques.
 A comparison between a PID and Linear Quadratic Control (LQC) was explored in \cite{Friis2009}. However the authors admit, even though LQC performed slightly better than the PID controller the difference was minor and may be attributed to the additional time spent tuning the LQC. In \cite{Herisse2012} a PID controller was developed to land on a oscillating platform in the vertical direction with no lateral movement. While interesting, the solution took over 1 minute to transition from hovering over the landing pad to landing. Additionally the experiments did not seem to account for pitch or roll of the platform.  
 
 
-In this project we focus developing a set of controllers that produce the final landing trajectory and using a fiducial marker called an AprilTag \textbf{\textit{CITE APRILTAGS}} to provide the estimated state of the quadrotor relative to the landing pad. 
+In this project we focus developing a set of controllers that produce the final landing trajectory and using a fiducial marker called an AprilTags \cite{apriltags} to provide the estimated state of the quadrotor relative to the landing pad. 
 
 \section{Methodology}
-The majority of effort in this project so far can be separated into two individual but complementary pieces. First, a significant effort effort was spent on ensuring the quadrotor's state was updated a a rate of at least 20 $Hz$. Next, using the information in the state  a set of PID controllers were developed that along with a state machine monitors the current relative position of the quadrotor and either initiates a landing procedure or attempts to minimize the relative displacement and velocity between the quadrotor and the landing pad in the horizontal plane. 
+The majority of effort in this project thus far can be separated into two individual but complementary pieces. First, a significant effort effort was spent on ensuring the quadrotor's state was estimated at a rate of at least 20Hz with AprilTags. Secondly, using information from the estimated quadrotor state, a state machine and a set of PID controllers were developed that tracks and lands on a desired target.
 
 \subsection{Measurement and State Estimation using AprilTags}
-One of the major challenges when using AprilTags on a robot that has limited computational power, such as a quadrotor, is the rate at which the AprilTag library can compute the state. This problem is exacerbated when using larger image sizes as the computational time of the AprilTag software appears to grow at least exponentially as shown in (add a figure here). This problem was also noted in the work of \cite{Ling2014} and he addressed the issue by reducing the brightness of the image so that majority of the image is black except for the AprilTag. An example of this implementation is shown in figure (Kevins image). This allowed Ling \cite{Lee2012} to calculate states at a rate of approximatly 10 - 15 fps but it came at the cost of requiring the brightness parameters to be set ahead of time and also removed a lot of the robustification that is provided in the standard AprilTag library.
+One of the challenges we faced when estimating the quadrotor state using AprilTags was the computational resource required to sustain a rate of atleast 20hz. This problem is exacerbated when the image size increases, as do the computational time needed to extract the pose estimate of the AprilTag, from our initial experimentation the computational time grows exponentially as image size increases as shown in (add a figure here). This problem was also noted in the work of \cite{Ling2014} where he addressed the issue by reducing the brightness of the image so that the majority of the image is black except for the AprilTag, thus reducing image processing requirements. An example of this implementation is shown in Figure~\ref{fig:ling_apriltags} This allowed Ling \cite{Lee2012} to calculate states at a rate of approximatly 10 - 15 fps but it came at the cost of requiring the brightness parameters to be set ahead of time and also the lost of robustness in estimating the AprilTags.
 
-In this work, the slow rate of state estimation was addressed using a novel method where the image size and calibration parameters are set depending on the distance between the quadrotor's position relative to the landing pad. 
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[b]{0.45\linewidth}
+		\includegraphics[width=\textwidth]{images/ling_apriltags_1.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.45\linewidth}
+		\includegraphics[width=\textwidth]{images/ling_apriltags_2.png}
+	\end{subfigure}
+	\caption{Ling's approach to optimizing AprilTags detection \cite{Ling2014}}
+	\label{fig:ling_apriltags}
+\end{figure}
+
+In this work, the slow rate of state estimation was addressed using a novel method where the image size and calibration parameters are set depending on the distance between the quadrotor's position relative to the AprilTag, additionally we introduce the use of . 
 
 \subsubsection{Adaptive Image Preprocessing}
 
