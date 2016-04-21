@@ -22,4 +22,4 @@ throttle_controller:
     max: 0.3
     k_p: 0.2
     k_i: 0.0
-    k_d: 2
+    k_d: 20

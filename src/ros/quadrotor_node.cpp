@@ -87,7 +87,7 @@ void Quadrotor::subscribeToPose(void)
     ROS_INFO("subcribing to [POSE]");
     this->pose_subscriber = this->node.subscribe(
         POSE_TOPIC,
-        100,
+        50,
         &Quadrotor::poseCallback,
         this
     );
@@ -117,7 +117,7 @@ void Quadrotor::subscribeToMocap(void)
     ROS_INFO("subcribing to [MOCAP]");
     this->mocap_subscriber = this->node.subscribe(
         MOCAP_TOPIC,
-        100,
+        50,
         &Quadrotor::mocapCallback,
         this
     );
@@ -458,9 +458,9 @@ void Quadrotor::buildAtitudeMessage(
     msg.header.stamp = time;
     msg.header.seq = seq;
     msg.header.frame_id = "awesomo_quad_offboard_attitude_cmd";
-    msg.pose.position.x = 0.0;
-    msg.pose.position.y = 0.0;
-    msg.pose.position.z = 0.0;
+    msg.pose.position.x = this->pose_x;
+    msg.pose.position.y = this->pose_y;
+    msg.pose.position.z = this->pose_z;
     msg.pose.orientation.x = this->position_controller->rpy_quat.x();
     msg.pose.orientation.y = this->position_controller->rpy_quat.y();
     msg.pose.orientation.z = this->position_controller->rpy_quat.z();
@@ -560,19 +560,36 @@ int main(int argc, char **argv)
             if ((1.0 - quad.pose_z) < 0.1 && hover_timer_start == 1 && ((ros::Time::now() - hover_time) > ros::Duration(2))) {
                 ROS_INFO("HOVER COMPLETE!");
                 ROS_INFO("Now moving to (0, 0, 1)!");
+                hover_timer_start = 0;
                 index++;
             } else if ((1.0 - quad.pose_z) < 0.1 && hover_timer_start == 0) {
                 ROS_INFO("HOVER Hold!");
                 hover_timer_start = 1;
                 hover_time = ros::Time::now();
             }
+        // } else if (index == 1) {
+        //     float dx = pow(0.0 - quad.pose_x, 2);
+        //     float dy = pow(0.0 - quad.pose_y, 2);
+        //     float dz = pow(1.0 - quad.pose_z, 2);
+        //     float dist = sqrt(dx + dy + dz);
+        //
+        //     if (dist < 0.1 && hover_timer_start == 1 && ((ros::Time::now() - hover_time) > ros::Duration(2))) {
+        //         ROS_INFO("LANDING!");
+        //         index++;
+        //     } else if (dist < 0.1 && hover_timer_start == 0) {
+        //         hover_timer_start = 1;
+        //         hover_time = ros::Time::now();
+        //     }
         }
 
         // position controller
         if (index == 0) {
             quad.positionControllerCalculate(x, y, 1.3, last_request);
+        // } else if (index == 1) {
         } else {
             quad.positionControllerCalculate(0, 0, 1.3, last_request);
+        // } else if (index == 2) {
+        //     quad.positionControllerCalculate(0, 0, 0.4, last_request);
         }
         // quad.printPositionController();
         last_request = ros::Time::now();
