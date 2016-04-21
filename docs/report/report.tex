@@ -166,7 +166,68 @@ The quadrotor used in this experiment assembled from a DJI F450 quadrotor frame,
 	\end{itemize}
 	
 \end{itemize}
+
+\subsection{AprilTag Results}
+\begin{figure}
+	\centering
+	\begin{subfigure}[b]{\linewidth}
+		\includegraphics[width=\textwidth]{images/Apr_Distance_Error.eps}
+		\caption{}
+		\label{fig:pid_roll}
+	\end{subfigure}
+
+	\begin{subfigure}[b]{\linewidth}
+		\includegraphics[width=\textwidth]{images/Apr_FPS_vs_Dist.eps}
+		\caption{}
+		\label{fig:pid_roll}
+	\end{subfigure}
+\end{figure}
+
+
+
 \subsection{PID and Controller Results}
+
+\begin{figure*}
+	\centering
+	\includegraphics[width=\textwidth]{images/PID_Pitch_x_true_and_obs.eps}
+	\caption{Position Controller - Pitch Command}
+	\label{fig:pid_roll}
+\end{figure*}
+
+\begin{figure*}
+	\centering
+	\includegraphics[width=\textwidth]{images/PID_Pitch_Controls.eps}
+	\caption{Position Controller - Pitch Control Signal Components}
+	\label{fig:pid_roll}
+\end{figure*}
+
+\begin{figure*}
+	\centering
+	\includegraphics[width=\textwidth]{images/PID_Roll_y_true_and_obs.eps}
+	\caption{Position Controller - Roll Command}
+	\label{fig:pid_roll}
+\end{figure*}
+
+\begin{figure*}
+	\centering
+	\includegraphics[width=\textwidth]{images/PID_Roll_Controls.eps}
+	\caption{Position Controller - Roll Control Signal Components}
+	\label{fig:pid_roll}
+\end{figure*}
+
+\begin{figure*}
+	\centering
+	\includegraphics[width=\textwidth]{images/PID_Elevation_True_and_obs.eps}
+	\caption{Position Controller - Thrust Command}
+	\label{fig:pid_roll}
+\end{figure*}
+
+\begin{figure*}
+	\centering
+	\includegraphics[width=\textwidth]{images/PID_Elevation_Controls.eps}
+	\caption{Position Controller - Thrust Signal Components}
+	\label{fig:pid_roll}
+\end{figure*}
 
 So far the PID behaviours and gains have only been evaluated using a MOCAP system and tested only relative to a stationary target and these results are discussed herein. 
 
