@@ -114,6 +114,7 @@ A final technique used to optimize the AprilTag detection was the introduction o
 In order to use down sampling effectively without corrupting the AprilTag estimations, 3 camera calibration files were also computed at the full, half and quarter camera resolutions, corresponding calibration files were then used with the AprilTag library during the state estimation procedure based on the current image resolution to obtain the correct pose estimates. 
 
 \subsection{Controller and State Monitoring}
+\label{subsec:position_controller}
 In this project we assumed that the quadrotor has successfully rendezvoused with the target vehicle and has a clear view through the camera image of the landing target located on the target vehicle at all times. The first step towards autonomous landing is to position the quadrotor above the landing target such that the displacements in the x and y directions in the horizontal plane normal to the landing surface are near zero while simultaneously matching speed and aligning the axis with the target vehicle. Next, while maintaining the near zero displacements in the x and y directions, the quadrotor descends at a safe rate such that the vertical distance between the quadrotor and the landing target is reduced until landing is achieved. Ideally the quadrotor will descend rapidly when the vertical displacement between the qaudrotor and target is large, slowing down just abvove ($\approx 1m$) the landing target inorder to minimize time and energy requirements of the landing maneouver. 
 
 To achieve the described behaviour, we developed a PID position controller that outputs attitude commands such as roll and pitch to reduce the horizontal and vertical distance between the quadrotor and the landing platform, as well as an altitude command to maintain a safe approach altitude such that the target does not go out of view during landing. We omit yaw control as we assume the quadrotor will be axis aligned with the direction of travel of the moving target. 
@@ -170,23 +171,7 @@ The quadrotor used in this experiment assembled from a DJI F450 quadrotor frame,
 
 
 \section{Results}
-\begin{itemize}
-	\item Results of the image stuff
-	\begin{itemize}
-		\item Plot of FPS vs distance
-		\item Plot of true state vs mocap state?
-	\end{itemize}
-	
-	\item PID/Control results 
-	\begin{itemize}
-		\item Plot XY for the controller loop
-		\item Optimal PID settings
-		\item How we got there
-		\item Decent plot (V as a function of Z)
-		\item Video?
-	\end{itemize}
-	
-\end{itemize}
+
 
 \subsection{AprilTag Results}
 \begin{figure}
@@ -206,62 +191,10 @@ The quadrotor used in this experiment assembled from a DJI F450 quadrotor frame,
 
 
 
-\subsection{PID and Controller Results}
+For AprilTag pose estimation we have optimized and tested our solution using the Optitrack motion capture system to compare state estimates produced by our optimization, a demo of the AprilTag pose estimation can be seen in this 
+\href{https://www.youtube.com/watch?v=BBMlQphrqCY&index=19&list=PLk5z6lLnKFd6BD9EXWa09hqf6SNQhn59R}{video}.
 
-\begin{figure*}
-	\centering
-	\includegraphics[width=\textwidth]{images/PID_Pitch_x_true_and_obs.eps}
-	\caption{Position Controller - Pitch Command}
-	\label{fig:pid_roll}
-\end{figure*}
-
-\begin{figure*}
-	\centering
-	\includegraphics[width=\textwidth]{images/PID_Pitch_Controls.eps}
-	\caption{Position Controller - Pitch Control Signal Components}
-	\label{fig:pid_roll}
-\end{figure*}
-
-\begin{figure*}
-	\centering
-	\includegraphics[width=\textwidth]{images/PID_Roll_y_true_and_obs.eps}
-	\caption{Position Controller - Roll Command}
-	\label{fig:pid_roll}
-\end{figure*}
-
-\begin{figure*}
-	\centering
-	\includegraphics[width=\textwidth]{images/PID_Roll_Controls.eps}
-	\caption{Position Controller - Roll Control Signal Components}
-	\label{fig:pid_roll}
-\end{figure*}
-
-\begin{figure*}
-	\centering
-	\includegraphics[width=\textwidth]{images/PID_Elevation_True_and_obs.eps}
-	\caption{Position Controller - Thrust Command}
-	\label{fig:pid_roll}
-\end{figure*}
-
-\begin{figure*}
-	\centering
-	\includegraphics[width=\textwidth]{images/PID_Elevation_Controls.eps}
-	\caption{Position Controller - Thrust Signal Components}
-	\label{fig:pid_roll}
-\end{figure*}
-
-So far the PID behaviours and gains have only been evaluated using a MOCAP system and tested only relative to a stationary target and these results are discussed herein. 
-
-
-
-
-\section{Conclusion and Future Work}
-
-
-\section{Proposed Future Work}
-In the coming weeks, the PID controllers tested and developed using the MOCAP system will be tested using state estimates that are produced from the AprilTag library and the image preprocessing methods outlined in section \textbf{\textit{OUTLINE OF IMAGE PREPROCESSSING}}. 
-
-One major issue highlighted in Ling \cite{Ling2014} is that due to the relatively long processing time of the AprilTags library, the estimated state obtained at a time $t$ does not actually represent the current state due to a time lag. This time lag as outlined in \cite{Ling2014} and defined in \ref{Detection Delay} must be accounted for when using the camera to estimate state. Currently our proposed method to measure this lag is to use the MOCAP system to provide a ground truth for the state from which we can estimate the estimated state.  
+One major issue highlighted in Ling \cite{Ling2014} is that due to the relatively long processing time of the AprilTags library, the estimated state obtained at a time $t$ does not actually represent the current state due to a time lag. This time lag as outlined in \cite{Ling2014} and defined in \ref{Detection Delay} must be accounted for when using the camera to estimate state. We measured this lag using Optitrack motion capture system to provide a ground truth for the state from which we can estimate the estimated state.  
 
 \begin{equation}
 \label{Detection Delay}
@@ -276,17 +209,96 @@ If a gimbal is used there are two issues that arise. First a new set of controll
 
 
 
+\subsection{PID and Controller Results}
+
+Before implementing our own PID position controller, we initially assumed that we could reuse PX4 firmware's own position controller and feed in the pose estimation of the quadrotor relative to the AprilTag observed using an onboard camera, we however met countless problems with regards to the code required to issue position commands, and instability issues related to the time lag induced when extracting a pose from an AprilTag. We therefore implemented our own PID position controller discussed in Section~\ref{subsec:position_controller}, and through many iterations of manually tuning the PID gains we found the following parameters yielded the best control behaviour.
+
+\begin{center}
+	\vspace{-0.4cm}
+	\begin{tabular}{l r}
+		\hline
+		\textbf{Roll Controller} \\
+		\hline
+		$K_{p}$ &  0.205 \\
+		$K_{i}$ & 0.05 \\
+		$K_{d}$ &  0.02 \\
+		\\
+		\hline
+		\textbf{Pitch Controller} \\
+		\hline
+		$K_{p}$ & 0.205 \\
+		$K_{i}$ & 0.05 \\
+		$K_{d}$ & 0.02 \\
+		\\
+		\hline
+		\textbf{Thrust Controller} \\
+		\hline
+		$K_{p}$ & 0.2 \\
+		$K_{i}$ & 0.0 \\
+		$K_{d}$ & 0.02 \\
+	\end{tabular}
+\end{center}
+
+Figures \ref{fig:pid_roll_command} \ref{fig:pid_roll_error},	\ref{fig:pid_pitch_command}, \ref{fig:pid_pitch_error}, \ref{fig:pid_thrust_command}, \ref{fig:pid_thrust_error} showes the PID position control signal (roll, pitch and thrust) and corresponding proportional, integral and derivative error components while a quadrotor was set to hover at $(0, 0, 1)$ for approximately 65 seconds. Large disturbances were applied manually to the hovering quadrotor with a testing aparatus (a.k.a a plank of wood) to test the correction behaviour of the position controller implemented. 
+
+It can be observed in Figures \ref{fig:pid_roll_command} and \ref{fig:pid_pitch_command} that the roll and pitch commands are bounded to $\pm 20^o$ further more when the quadrotor is perturbed in any direction the position controller has been able recover within 2-4 seconds. Same applies to the thrust commands, when altitude is perturbed the quadrotor is able to self correct to the desired altitude with time. A video of the plotted dataset can be viewed \href{https://www.youtube.com/watch?v=v1QDdZ0LdMc&index=17&list=PLk5z6lLnKFd6BD9EXWa09hqf6SNQhn59R}{here}.
 
 
 
+
+
+\begin{figure*}
+	\centering
+	\includegraphics[width=\textwidth]{images/PID_Pitch_x_true_and_obs.eps}
+	\caption{Position Controller - Pitch Command}
+	\label{fig:pid_roll_command}
+\end{figure*}
+
+\begin{figure*}
+	\centering
+	\includegraphics[width=\textwidth]{images/PID_Pitch_Controls.eps}
+	\caption{Position Controller - Pitch Control Signal Components}
+	\label{fig:pid_roll_error}
+\end{figure*}
+
+\begin{figure*}
+	\centering
+	\includegraphics[width=\textwidth]{images/PID_Roll_y_true_and_obs.eps}
+	\caption{Position Controller - Roll Command}
+	\label{fig:pid_pitch_command}
+\end{figure*}
+
+\begin{figure*}
+	\centering
+	\includegraphics[width=\textwidth]{images/PID_Roll_Controls.eps}
+	\caption{Position Controller - Roll Control Signal Components}
+	\label{fig:pid_pitch_error}
+\end{figure*}
+
+\begin{figure*}
+	\centering
+	\includegraphics[width=\textwidth]{images/PID_Elevation_True_and_obs.eps}
+	\caption{Position Controller - Thrust Command}
+	\label{fig:pid_thrust_command}
+\end{figure*}
+
+\begin{figure*}
+	\centering
+	\includegraphics[width=\textwidth]{images/PID_Elevation_Controls.eps}
+	\caption{Position Controller - Thrust Signal Components}
+	\label{fig:pid_thrust_error}
+\end{figure*}
+
+
+
+
+
+
+
+\section{Conclusion and Future Work}
+Due to lack of time, we have not be able to complete the solution to autonomously land a quadrotor onto a moving platform. However, we have optimized the AprilTag pose estimation process and implemented our own position controller, what remains is the pose estimation of the quadrotor inbetween the pose estimation of the AprilTag. This is needed because even though we can obtain an accurate pose estimate of the quadrotor just by observing the AprilTag with a camera, the quadrotor can easily fly out of the AprilTag's view and lose track its own pose estimate, this is especially dangerous in quadrotors where a pose estimate is vital to its stability and navigation. It is our goal in the next coming weeks that we will implement a filter to estimate and combine the AprilTag and position controller to complete the autonomous landing solution.
 
 
 \bibliography{report}{}
 \bibliographystyle{ieeetr}
-
-
-
-
-
-
 \end{document}
