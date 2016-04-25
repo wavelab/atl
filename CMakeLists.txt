@@ -55,29 +55,15 @@ CATKIN_PACKAGE(
 ADD_LIBRARY(
     awesomo
     STATIC
-    src/sim.cpp
     src/pid.cpp
     src/util.cpp
     src/camera.cpp
-    src/controller.cpp
-    src/quadrotor.cpp
     src/apriltag.cpp
+    src/controller.cpp
     src/ros/ros_util.cpp
 )
 
 # EXECUTABLES
-#camera in capture mode
-ADD_EXECUTABLE(camera_photo_mode src/camera_photobooth.cpp)
-target_link_libraries(
-    camera_photo_mode
-    awesomo
-    apriltags
-    yaml-cpp
-    flycapture
-    ${OpenCV_LIBS}
-    ${catkin_LIBRARIES}
-)
-
 ## ROS NODE EXECUTABLES
 # camera_node
 ADD_EXECUTABLE(camera_node src/ros/camera_node.cpp)
@@ -140,11 +126,6 @@ TARGET_LINK_LIBRARIES(
     ${catkin_LIBRARIES}
 )
 INSTALL(TARGETS camera_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
-
-# tests/sim_test
-ADD_EXECUTABLE(sim_test tests/sim_test.cpp)
-TARGET_LINK_LIBRARIES(sim_test awesomo)
-INSTALL(TARGETS sim_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 # # tests/pid_test
 # ADD_EXECUTABLE(pid_test tests/pid_test.cpp)
