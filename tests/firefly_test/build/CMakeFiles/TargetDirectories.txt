@@ -1,1 +1,0 @@
-/home/stan/Projects/camera_test/build/CMakeFiles/fireflytest.dir
