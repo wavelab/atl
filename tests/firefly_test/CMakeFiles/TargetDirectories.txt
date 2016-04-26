@@ -1,1 +1,0 @@
-/home/chutsu/Dropbox/proj/awesomo/tests/firefly_test/CMakeFiles/fireflytest.dir

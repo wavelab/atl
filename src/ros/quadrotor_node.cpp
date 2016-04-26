@@ -34,7 +34,6 @@ Quadrotor::Quadrotor(void)
     this->position_controller_y_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_Y_CONTROLLER_TOPIC, 50);
     this->position_controller_z_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_Z_CONTROLLER_TOPIC, 50);
 
-
     // state
     this->mission_state = HOVER_MODE;
 

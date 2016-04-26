@@ -3,7 +3,6 @@
 #define MOCAP_TOPIC "/awesomo/mocap/pose"
 #include <std_msgs/Float64.h>
 
-
 float pos_x;
 float pos_y;
 float pos_z;
