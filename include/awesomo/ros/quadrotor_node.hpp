@@ -19,10 +19,10 @@
 #include <mavros_msgs/SetMode.h>
 #include <mavros_msgs/CommandBool.h>
 
+#include "awesomo/pid.hpp"
 #include "awesomo/util.hpp"
 #include "awesomo/camera.hpp"
 #include "awesomo/controller.hpp"
-#include "awesomo/pid.hpp"
 
 
 // CONSTANTS
@@ -121,14 +121,16 @@ class Quadrotor
         int arm(void);
         int disarm(void);
         int setOffboardModeOn(void);
-        void runMission(geometry_msgs::PoseStamped &pose);
         void positionControllerCalculate(float x, float y, float z, ros::Time last_request);
         void printPositionController(void);
-        // void buildPositionMessage(
-        //     geometry_msgs::PoseStamped &msg,
-        //     int seq,
-        //     ros::time time
-        // );
+        void buildPositionMessage(
+            geometry_msgs::PoseStamped &msg,
+            int seq,
+            ros::Time time,
+            float x,
+            float y,
+            float z
+        );
         void buildAtitudeMessage(
             geometry_msgs::PoseStamped &msg,
             int seq,
@@ -140,11 +142,7 @@ class Quadrotor
             int seq,
             ros::Time time
         );
-        void traceSquare(
-            geometry_msgs::PoseStamped &pose,
-            int *index,
-            ros::Time &last_request
-        );
+        void publishPositionControllerStats(int seq, ros::Time time);
 };
 
 #endif

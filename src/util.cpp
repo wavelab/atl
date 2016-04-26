@@ -11,6 +11,17 @@ double rad2deg(double d)
     return d * (180 / M_PI);
 }
 
+int fltcmp(double f1, double f2)
+{
+	if (fabs(f1 - f2) <= 0.0001) {
+		return 0;
+	} else if (f1 > f2) {
+		return 1;
+	} else {
+		return -1;
+	}
+}
+
 int euler2Quaternion(
     const double roll,
     const double pitch,

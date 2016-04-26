@@ -1,17 +1,6 @@
 #include "awesomo/ros/quadrotor_node.hpp"
 
 
-static int fltcmp(double f1, double f2)
-{
-	if (fabs(f1 - f2) <= 0.0001) {
-		return 0;
-	} else if (f1 > f2) {
-		return 1;
-	} else {
-		return -1;
-	}
-}
-
 Quadrotor::Quadrotor(void)
 {
     // wait till connected to FCU
@@ -61,12 +50,12 @@ Quadrotor::Quadrotor(void)
 
 void Quadrotor::poseCallback(const geometry_msgs::PoseStamped &msg)
 {
-    //  mocapposition
+    //  mocap position
     this->pose_x = msg.pose.position.x;
     this->pose_y = msg.pose.position.y;
     this->pose_z = msg.pose.position.z;
 
-    //  mocaporientation
+    //  mocap orientation
     quat2euler(msg.pose.orientation, &this->pose_roll, &this->pose_pitch, &this->pose_yaw);
 
     // print
@@ -210,180 +199,6 @@ int Quadrotor::setOffboardModeOn(void)
     }
 }
 
-void Quadrotor::runMission(geometry_msgs::PoseStamped &msg)
-{
-    double dist;
-    Eigen::Vector3d pos;
-    Eigen::Vector3d wp;
-    Eigen::Vector3d dest;
-    Eigen::Vector3d carrot;
-	std::vector<TagPose> pose_estimates;
-
-    // msg.header.stamp = ros::Time::now();
-    // msg.header.seq = seq;
-    // msg.header.frame_id = "awesomo_quad_offboard";
-
-    switch (this->mission_state) {
-    case HOVER_MODE:
-        // set hover coordinates
-        msg.pose.position.x = -0.75;
-        msg.pose.position.y = -0.75;
-		msg.pose.position.z = 1.6;
-
-        // check current position against hover coordinates
-        dest << -0.75, -0.75, 1.6;
-        pos << this->pose_x, this->pose_y, this->pose_z;
-        dist = (dest - pos).norm();
-
-        // check if waypoint reached
-        if (dist < 1) {
-            ROS_INFO("Hover state reached!");
-            ROS_INFO("Transitioning to discover mode!");
-            this->mission_state = DISCOVER_MODE;
-        }
-        break;
-
-    case DISCOVER_MODE:
-        // set hover coordinates
-        msg.pose.position.x = -0.75;
-        msg.pose.position.y = -0.75;
-		msg.pose.position.z = 1.6;
-
-        // find apriltag
-        pose_estimates = cam->step(this->tag_timeout);
-        if (pose_estimates.size()) {
-            this->tag_poses.push_back(pose_estimates.at(0));
-        }
-
-        // average estimates
-        if (tag_poses.size() == 20) {
-            double x = 0;
-            double y = 0;
-            double z = 0;
-
-            for (int i = 0; i < tag_poses.size(); i++) {
-                x = x + tag_poses[i].translation(0);
-                y = y + tag_poses[i].translation(1);
-                z = z + tag_poses[i].translation(2);
-            }
-
-            // quad position
-            pos << this->pose_x, this->pose_y, this->pose_z;
-            // tag position relative to quad (ENU)
-            this->tag_position << y / 20.0 , z / 20.0, x / 20.0;
-            // tag positiona in world (ENU)
-            this->tag_position(0) += pos(0);
-            this->tag_position(1) += pos(1);
-            this->tag_position(2) -= pos(2);
-
-            ROS_INFO("Collected enough tag estimations!");
-            ROS_INFO("Transitioning to planning mode!");
-            this->mission_state = PLANNING_MODE;
-        }
-
-        break;
-
-    case PLANNING_MODE:
-        // set hover coordinates
-        msg.pose.position.x = -0.75;
-        msg.pose.position.y = -0.75;
-		msg.pose.position.z = 1.6;
-
-        // quad position
-        pos << this->pose_x, this->pose_y, this->pose_z;
-        this->carrot_controller->waypoints.push_back(pos);
-        ROS_INFO(
-            "WAYPOINT 1 [Quad Position]: (%f, %f, %f)",
-            pos(0),
-            pos(1),
-            pos(2)
-        );
-        this->carrot_controller->wp_start << pos(0), pos(1), pos(2);
-
-        // top right
-        wp << -0.75, 0.75, 1.6;
-        this->carrot_controller->wp_end << wp;
-        this->carrot_controller->waypoints.push_back(wp);
-
-        wp << 0.75, 0.75, 1.6;
-        this->carrot_controller->waypoints.push_back(wp);
-
-        wp << 0.75, -0.75, 1.6;
-        this->carrot_controller->waypoints.push_back(wp);
-
-        wp << 0, -0.75, 1.6;
-        this->carrot_controller->waypoints.push_back(wp);
-
-        // above tag position
-        wp << this->tag_position(0), this->tag_position(1), 1.6;
-        this->carrot_controller->waypoints.push_back(wp);
-        ROS_INFO(
-            "WAYPOINT 2 [Above Tag]: (%f, %f, %f)",
-            wp(0),
-            wp(1),
-            wp(2)
-        );
-
-        // tag position
-        this->carrot_controller->waypoints.push_back(this->tag_position);
-        ROS_INFO(
-            "WAYPOINT 3 [Tag Position]: (%f, %f, %f)",
-            this->tag_position(0),
-            this->tag_position(1),
-            this->tag_position(2) + 0.3
-        );
-
-        // complete planning
-        this->carrot_controller->initialized = 1;
-        this->mission_state = CARROT_MODE;
-        ROS_INFO("Planning complete");
-        ROS_INFO("Transitioning to carrot mode!");
-
-        break;
-
-    case CARROT_MODE:
-        pos << this->pose_x, this->pose_y, this->pose_z;
-
-        if (this->carrot_controller->initialized == 0) {
-            this->mission_state = HOVER_MODE;
-            ROS_INFO("Controller not initialized");
-
-        } else if (this->carrot_controller->update(pos, carrot)) {
-            msg.pose.position.x = carrot(0);
-            msg.pose.position.y = carrot(1);
-            msg.pose.position.z = carrot(2);
-            ROS_INFO(
-                "Waypoint Start (%f, %f, %f)",
-                this->carrot_controller->wp_start(0),
-                this->carrot_controller->wp_start(1),
-                this->carrot_controller->wp_start(2)
-            );
-            ROS_INFO(
-                "Waypoint End (%f, %f, %f)",
-                this->carrot_controller->wp_end(0),
-                this->carrot_controller->wp_end(1),
-                this->carrot_controller->wp_end(2)
-            );
-            ROS_INFO(
-                "Carrot Point (%f, %f, %f)",
-                carrot(0),
-                carrot(1),
-                carrot(2)
-            );
-        } else {
-            // set hover coordinates
-            msg.pose.position.x = 0;
-            msg.pose.position.y = 0;
-            msg.pose.position.z = 0;
-
-            ROS_INFO("Final Waypoint reached");
-            ROS_INFO("MISSION ACCOMPLISHED!");
-            this->mission_state = MISSION_ACCOMPLISHED;
-        }
-        break;
-    }
-}
-
 void Quadrotor::positionControllerCalculate(float x, float y, float z, ros::Time last_request)
 {
     float roll;
@@ -420,11 +235,6 @@ void Quadrotor::positionControllerCalculate(float x, float y, float z, ros::Time
     throttle_adjusted = this->position_controller->hover_throttle + throttle;
     throttle_adjusted = throttle_adjusted / (cos(roll_adjusted) * cos(pitch_adjusted));
 
-    // ROS_INFO("setpoint (%f, %f, %f)", x, y, z);
-    // ROS_INFO("actual (%f, %f, %f)", this->pose_x, this->pose_y, this->pose_z);
-    // ROS_INFO("roll: %f \t pitch: %f\n", roll_adjusted, pitch_adjusted);
-    // ROS_INFO("throttle: %f", throttle_adjusted);
-
     // update position controller
     this->position_controller->roll = roll_adjusted;
     this->position_controller->pitch = pitch_adjusted;
@@ -448,18 +258,35 @@ void Quadrotor::printPositionController(void)
     ROS_INFO("---");
 }
 
+void Quadrotor::buildPositionMessage(
+    geometry_msgs::PoseStamped &msg,
+    int seq,
+    ros::Time time,
+    float x,
+    float y,
+    float z
+)
+{
+    msg.header.seq = seq;
+    msg.header.stamp = time;
+    msg.header.frame_id = "awesomo_position_cmd";
+    msg.pose.position.x = x;
+    msg.pose.position.y = y;
+    msg.pose.position.z = z;
+}
+
 void Quadrotor::buildAtitudeMessage(
     geometry_msgs::PoseStamped &msg,
     int seq,
     ros::Time time
 )
 {
-    msg.header.stamp = time;
     msg.header.seq = seq;
-    msg.header.frame_id = "awesomo_quad_offboard_attitude_cmd";
-    msg.pose.position.x = this->pose_x;
-    msg.pose.position.y = this->pose_y;
-    msg.pose.position.z = this->pose_z;
+    msg.header.stamp = time;
+    msg.header.frame_id = "awesomo_attitude_cmd";
+    msg.pose.position.x = 0;
+    msg.pose.position.y = 0;
+    msg.pose.position.z = 0;
     msg.pose.orientation.x = this->position_controller->rpy_quat.x();
     msg.pose.orientation.y = this->position_controller->rpy_quat.y();
     msg.pose.orientation.z = this->position_controller->rpy_quat.z();
@@ -471,166 +298,80 @@ void Quadrotor::buildThrottleMessage(std_msgs::Float64 &msg)
     msg.data = this->position_controller->throttle;
 }
 
+
+void Quadrotor::publishPositionControllerStats(int seq, ros::Time time)
+{
+	geometry_msgs::PoseStamped pid_stats;
+
+    // roll
+    pid_stats.header.seq = seq;
+    pid_stats.header.stamp = time;
+    pid_stats.header.frame_id = "awesomo_position_controller_x";
+    pid_stats.pose.position.x = this->position_controller->x.p_error;
+    pid_stats.pose.position.y = this->position_controller->x.i_error;
+    pid_stats.pose.position.z = this->position_controller->x.d_error;
+    this->position_controller_x_publisher.publish(pid_stats);
+
+    // pitch
+    pid_stats.header.seq = seq;
+    pid_stats.header.stamp = time;
+    pid_stats.header.frame_id = "awesomo_position_controller_y";
+    pid_stats.pose.position.x = this->position_controller->y.p_error;
+    pid_stats.pose.position.y = this->position_controller->y.i_error;
+    pid_stats.pose.position.z = this->position_controller->y.d_error;
+    this->position_controller_y_publisher.publish(pid_stats);
+
+    // throttle
+    pid_stats.header.seq = seq;
+    pid_stats.header.stamp = time;
+    pid_stats.header.frame_id = "awesomo_position_controller_T";
+    pid_stats.pose.position.x = this->position_controller->T.p_error;
+    pid_stats.pose.position.y = this->position_controller->T.i_error;
+    pid_stats.pose.position.z = this->position_controller->T.d_error;
+    this->position_controller_z_publisher.publish(pid_stats);
+}
+
 void Quadrotor::buildPositionControllerMessage(
     geometry_msgs::PoseStamped &msg,
     int seq,
     ros::Time time
 )
 {
-    msg.header.stamp = time;
-    msg.header.seq = seq;
-    msg.header.frame_id = "awesomo_quad_offboard_position_controller";
-    msg.pose.position.x = 0.0;
-    msg.pose.position.y = 0.0;
-    msg.pose.position.z = 0.0;
-    msg.pose.orientation.x = this->position_controller->rpy_quat.x();
-    msg.pose.orientation.y = this->position_controller->rpy_quat.y();
-    msg.pose.orientation.z = this->position_controller->rpy_quat.z();
-    msg.pose.orientation.w = this->position_controller->rpy_quat.w();
-}
+	geometry_msgs::PoseStamped attitude;
+    std_msgs::Float64 throttle;
 
-void Quadrotor::traceSquare(
-    geometry_msgs::PoseStamped &pose,
-    int *index,
-    ros::Time &last_request
-)
-{
-    if ((ros::Time::now() - last_request) > ros::Duration(10.0)) {
-        if (*index == 0) {
-            pose.pose.position.x = 0.5;
-            pose.pose.position.y = 0.5;
-            *index++;
-            ROS_INFO("x: 0.5\ty: 0.5");
-        } else if (*index == 1) {
-            pose.pose.position.x = 0.5;
-            pose.pose.position.y = -0.5;
-            ROS_INFO("x: 0.5\ty: -0.5");
-            *index++;
-        } else if (*index == 2) {
-            pose.pose.position.x = -0.5;
-            pose.pose.position.y = -0.5;
-            ROS_INFO("x: -0.5\ty: -0.5");
-            *index++;
-        } else if (*index == 3) {
-            pose.pose.position.x = -0.5;
-            pose.pose.position.y = 0.5;
-            ROS_INFO("x: -0.5\ty: 0.5");
-            *index = 0;
-        }
+    // atitude command
+    this->buildAtitudeMessage(attitude, seq, time);
+    this->attitude_publisher.publish(attitude);
 
-        last_request = ros::Time::now();
-    }
+    // throttle command
+    this->buildThrottleMessage(throttle);
+    this->throttle_publisher.publish(throttle);
 }
 
 int main(int argc, char **argv)
 {
     // setup
     ros::init(argc, argv, "awesomo");
-    ros::NodeHandle nh;
-    ros::Time last_request;
-    ros::Time hover_time;
     ros::Time now;
-
+    ros::Time last_request;
     ros::Rate rate(50.0);  // publishing rate MUST be faster than 2Hz
     Quadrotor quad;
-	geometry_msgs::PoseStamped position;
-	geometry_msgs::PoseStamped attitude;
-    std_msgs::Float64 throttle;
-	geometry_msgs::PoseStamped pid_stats;
 
     ROS_INFO("running ...");
-    // quad.arm();
-    // quad.setOffboardModeOn();
-	last_request = ros::Time::now();
 	int seq = 1;
 	int index = 0;
-	int hover_timer_start = 0;
-
-    ros::spinOnce();
-	float x = quad.pose_x;
-	float y = quad.pose_y;
-	float z = quad.pose_z;
-	ROS_INFO("quad (%f, %f, %f)", x, y, z);
 
     while (ros::ok()){
         // quad.runMission(position);
-
-        if (index == 0) {
-            if ((1.0 - quad.pose_z) < 0.1 && hover_timer_start == 1 && ((ros::Time::now() - hover_time) > ros::Duration(2))) {
-                ROS_INFO("HOVER COMPLETE!");
-                ROS_INFO("Now moving to (0, 0, 1)!");
-                hover_timer_start = 0;
-                index++;
-            } else if ((1.0 - quad.pose_z) < 0.1 && hover_timer_start == 0) {
-                ROS_INFO("HOVER Hold!");
-                hover_timer_start = 1;
-                hover_time = ros::Time::now();
-            }
-        // } else if (index == 1) {
-        //     float dx = pow(0.0 - quad.pose_x, 2);
-        //     float dy = pow(0.0 - quad.pose_y, 2);
-        //     float dz = pow(1.0 - quad.pose_z, 2);
-        //     float dist = sqrt(dx + dy + dz);
-        //
-        //     if (dist < 0.1 && hover_timer_start == 1 && ((ros::Time::now() - hover_time) > ros::Duration(2))) {
-        //         ROS_INFO("LANDING!");
-        //         index++;
-        //     } else if (dist < 0.1 && hover_timer_start == 0) {
-        //         hover_timer_start = 1;
-        //         hover_time = ros::Time::now();
-        //     }
-        }
-
-        // position controller
-        if (index == 0) {
-            quad.positionControllerCalculate(x, y, 1.3, last_request);
-        // } else if (index == 1) {
-        } else {
-            quad.positionControllerCalculate(0, 0, 1.3, last_request);
-        // } else if (index == 2) {
-        //     quad.positionControllerCalculate(0, 0, 0.4, last_request);
-        }
-        // quad.printPositionController();
         last_request = ros::Time::now();
         now = last_request;
 
 		// publish
-		// quad.position_publisher.publish(position);
 
-		quad.buildAtitudeMessage(attitude, seq, now);
-        quad.attitude_publisher.publish(attitude);
-
-		quad.buildThrottleMessage(throttle);
-        quad.throttle_publisher.publish(throttle);
-
-        pid_stats.header.stamp = now;
-        pid_stats.header.seq = seq;
-        pid_stats.header.frame_id = "awesomo_position_controller_x";
-        pid_stats.pose.position.x = quad.position_controller->x.p_error;
-        pid_stats.pose.position.y = quad.position_controller->x.i_error;
-        pid_stats.pose.position.z = quad.position_controller->x.d_error;
-        quad.position_controller_x_publisher.publish(pid_stats);
-
-        pid_stats.header.stamp = now;
-        pid_stats.header.seq = seq;
-        pid_stats.header.frame_id = "awesomo_position_controller_y";
-        pid_stats.pose.position.x = quad.position_controller->y.p_error;
-        pid_stats.pose.position.y = quad.position_controller->y.i_error;
-        pid_stats.pose.position.z = quad.position_controller->y.d_error;
-        quad.position_controller_y_publisher.publish(pid_stats);
-
-        pid_stats.header.stamp = now;
-        pid_stats.header.seq = seq;
-        pid_stats.header.frame_id = "awesomo_position_controller_T";
-        pid_stats.pose.position.x = quad.position_controller->T.p_error;
-        pid_stats.pose.position.y = quad.position_controller->T.i_error;
-        pid_stats.pose.position.z = quad.position_controller->T.d_error;
-        quad.position_controller_z_publisher.publish(pid_stats);
-
-		// update
-		seq++;
 
 		// end
+		seq++;
 		ros::spinOnce();
 		rate.sleep();
     }
