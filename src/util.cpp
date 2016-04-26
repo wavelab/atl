@@ -56,3 +56,11 @@ void quat2euler(
     tf::Matrix3x3 m(quat);
     m.getRPY(*roll, *pitch, *yaw);
 }
+
+
+static double tic(void)
+{
+    struct timeval t;
+    gettimeofday(&t, NULL);
+    return ((double) t.tv_sec + ((double) t.tv_usec) / 1000000.0);
+}

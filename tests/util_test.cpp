@@ -11,6 +11,7 @@ int test_euler2RotationMatrix(void);
 
 int test_euler2Quaternion(void)
 {
+    // testing the Eigen implemenation of euler to quad
     double roll = 0.0;
     double pitch = 0.0;
     double yaw = 0.0;
@@ -22,61 +23,7 @@ int test_euler2Quaternion(void)
 
     Eigen::Quaterniond q;
 
-    euler2Quaternion(roll, pitch, yaw, q);
-    x = q.x();
-    y = q.y();
-    z = q.z();
-    w = q.w();
-    mu_check(fltcmp(x, 0.0) == 0);
-    mu_check(fltcmp(y, 0.0) == 0);
-    mu_check(fltcmp(z, 0.0) == 0);
-    mu_check(fltcmp(w, 1.0) == 0);
-
-    roll = M_PI/2;
-    pitch = 0.0;
-    yaw = 0.0;
-
-    euler2Quaternion(roll, pitch, yaw, q);
-    x = q.x();
-    y = q.y();
-    z = q.z();
-    w = q.w();
-
-    mu_check(fltcmp(x, 0.707107) == 0);
-    mu_check(fltcmp(y, 0.0) == 0);
-    mu_check(fltcmp(z, 0.0) == 0);
-    mu_check(fltcmp(w, 0.707107) == 0);
-
-    roll = 0.0 ;
-    pitch = M_PI;
-    yaw = 0.0;
-
-    euler2Quaternion(roll, pitch, yaw, q);
-    x = q.x();
-    y = q.y();
-    z = q.z();
-    w = q.w();
-
-    mu_check(fltcmp(x, 0.0) == 0);
-    mu_check(fltcmp(y, 1.0) == 0);
-    mu_check(fltcmp(z, 0.0) == 0);
-    mu_check(fltcmp(w, 0.0) == 0);
-
-    roll = 0.0 ;
-    pitch = 0.0;
-    yaw = M_PI/3;
-
-    euler2Quaternion(roll, pitch, yaw, q);
-    x = q.x();
-    y = q.y();
-    z = q.z();
-    w = q.w();
-
-    mu_check(fltcmp(x, 0.0) == 0);
-    mu_check(fltcmp(y, 0.0) == 0);
-    mu_check(fltcmp(z, 0.5) == 0);
-    mu_check(fltcmp(w, 0.866025) == 0);
-
+    // Test rolling, pitching and yawing
     roll = M_PI ;
     pitch = M_PI/4;
     yaw = M_PI/3;
@@ -86,10 +33,6 @@ int test_euler2Quaternion(void)
     y = q.y();
     z = q.z();
     w = q.w();
-    // std::cout << x << std::endl;
-    // std::cout << y << std::endl;
-    // std::cout << z << std::endl;
-    // std::cout << w << std::endl;
 
     mu_check(fltcmp(x, 0.800103) == 0);
     mu_check(fltcmp(y, 0.46194) == 0);
@@ -225,7 +168,6 @@ int test_euler2RotationMatrix(void)
     mu_check(fltcmp(r22, rot(2, 1)) == 0);
     mu_check(fltcmp(r23, rot(2, 2)) == 0);
     return 0;
-
 
 }
 
