@@ -56,6 +56,18 @@ struct pose
     double yaw;
 };
 
+class Pose
+{
+    public:
+        double x;
+        double y;
+        double z;
+
+        double roll;
+        double pitch;
+        double yaw;
+};
+
 class Quadrotor
 {
     private:
@@ -87,26 +99,8 @@ class Quadrotor
         void waitForConnection(void);
 
     public:
-        double roll;
-        double pitch;
-        double yaw;
-
-        double pose_x;
-        double pose_y;
-        double pose_z;
-
-        double pose_roll;
-        double pose_pitch;
-        double pose_yaw;
-
-        double mocap_x;
-        double mocap_y;
-        double mocap_z;
-
-        double mocap_roll;
-        double mocap_pitch;
-        double mocap_yaw;
-
+        Pose pose;
+        Pose mocap_pose;
         CarrotController *carrot_controller;
         PositionController *position_controller;
 

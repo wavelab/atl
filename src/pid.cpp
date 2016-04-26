@@ -49,7 +49,7 @@ int pid_calculate(struct pid *p, float input, ros::Duration dt)
     // calculate output
     p->p_error = p->k_p * error;
     p->i_error = p->k_i * p->sum_error;
-    p->d_error = p->k_d * (error - p->prev_error);
+    p->d_error = p->k_d * (error - p->prev_error) / dt.toSec();
     p->output = p->p_error + p->i_error + p->d_error;
 
     // limit boundaries

@@ -50,24 +50,18 @@ Quadrotor::Quadrotor(void)
 
 void Quadrotor::poseCallback(const geometry_msgs::PoseStamped &msg)
 {
-    //  mocap position
-    this->pose_x = msg.pose.position.x;
-    this->pose_y = msg.pose.position.y;
-    this->pose_z = msg.pose.position.z;
+    // position
+    this->pose.x = msg.pose.position.x;
+    this->pose.y = msg.pose.position.y;
+    this->pose.z = msg.pose.position.z;
 
-    //  mocap orientation
-    quat2euler(msg.pose.orientation, &this->pose_roll, &this->pose_pitch, &this->pose_yaw);
-
-    // print
-    // ROS_INFO(
-    //     "GOT POSE: [roll: %f, pitch: %f, yaw: %f, x: %f, y: %f, z: %f]",
-    //     rad2deg(this->pose_roll),
-    //     rad2deg(this->pose_pitch),
-    //     rad2deg(this->pose_yaw),
-    //     pose_x,
-    //     pose_y,
-    //     pose_z
-    // );
+    // orientation
+    quat2euler(
+        msg.pose.orientation,
+        &this->pose.roll,
+        &this->pose.pitch,
+        &this->pose.yaw
+    );
 }
 
 void Quadrotor::subscribeToPose(void)
@@ -84,20 +78,17 @@ void Quadrotor::subscribeToPose(void)
 void Quadrotor::mocapCallback(const geometry_msgs::PoseStamped &msg)
 {
     // mocap position
-    this->mocap_x = msg.pose.position.x;
-    this->mocap_y = msg.pose.position.y;
-    this->mocap_z = msg.pose.position.z;
+    this->mocap_pose.x = msg.pose.position.x;
+    this->mocap_pose.y = msg.pose.position.y;
+    this->mocap_pose.z = msg.pose.position.z;
 
     // mocap orientation
-    quat2euler(msg.pose.orientation, &this->mocap_roll, &this->mocap_pitch, &this->mocap_yaw);
-
-    // print
-    // ROS_INFO(
-    //     "GOT MOCAP: [%f, %f, %f]",
-    //     rad2deg(this->mocap_roll),
-    //     rad2deg(this->mocap_pitch),
-    //     rad2deg(this->mocap_yaw)
-    // );
+    quat2euler(
+        msg.pose.orientation,
+        &this->mocap_pose.roll,
+        &this->mocap_pose.pitch,
+        &this->mocap_pose.yaw
+    );
 }
 
 void Quadrotor::subscribeToMocap(void)
@@ -113,13 +104,12 @@ void Quadrotor::subscribeToMocap(void)
 
 void Quadrotor::imuCallback(const sensor_msgs::Imu::ConstPtr &msg)
 {
-    quat2euler(msg->orientation, &this->roll, &this->pitch, &this->yaw);
-    // ROS_INFO(
-    //     "GOT IMU: [%f, %f, %f]",
-    //     rad2deg(this->roll),
-    //     rad2deg(this->pitch),
-    //     rad2deg(this->yaw)
-    // );
+    quat2euler(
+        msg->orientation,
+        &this->pose.roll,
+        &this->pose.pitch,
+        &this->pose.yaw
+    );
 }
 
 void Quadrotor::subscribeToIMU(void)
@@ -217,19 +207,19 @@ void Quadrotor::positionControllerCalculate(float x, float y, float z, ros::Time
     // position controller - calculate
     this->position_controller->dt = ros::Time::now() - last_request;
     dt = this->position_controller->dt;
-    pid_calculate(&this->position_controller->x, this->pose_y, dt);
-    pid_calculate(&this->position_controller->y, this->pose_x, dt);
-    pid_calculate(&this->position_controller->T, this->pose_z, dt);
+    pid_calculate(&this->position_controller->x, this->pose.y, dt);
+    pid_calculate(&this->position_controller->y, this->pose.x, dt);
+    pid_calculate(&this->position_controller->T, this->pose.z, dt);
     roll = -this->position_controller->x.output;
     pitch = this->position_controller->y.output;
     throttle = this->position_controller->T.output;
 
     // adjust roll and pitch according to yaw
-    if (this->pose_yaw < 0) {
-        this->pose_yaw += 2 * M_PI;
+    if (this->pose.yaw < 0) {
+        this->pose.yaw += 2 * M_PI;
     }
-    roll_adjusted = cos(this->pose_yaw) * roll - sin(this->pose_yaw) * pitch;
-    pitch_adjusted = sin(this->pose_yaw) * roll + cos(this->pose_yaw) * pitch;
+    roll_adjusted = cos(this->pose.yaw) * roll - sin(this->pose.yaw) * pitch;
+    pitch_adjusted = sin(this->pose.yaw) * roll + cos(this->pose.yaw) * pitch;
 
     // throttle
     throttle_adjusted = this->position_controller->hover_throttle + throttle;
@@ -246,12 +236,12 @@ void Quadrotor::printPositionController(void)
 {
     ROS_INFO("---");
     ROS_INFO("dt %f", this->position_controller->dt.toSec());
-    ROS_INFO("quadrotor.pose_x %f", this->pose_x);
-    ROS_INFO("quadrotor.pose_y %f", this->pose_y);
-    ROS_INFO("quadrotor.pose_z %f", this->pose_z);
-    ROS_INFO("quadrotor.pose_yaw %f", rad2deg(this->pose_yaw));
-    ROS_INFO("quadrotor.roll %f", rad2deg(this->roll));
-    ROS_INFO("quadrotor.pitch %f", rad2deg(this->pitch));
+    ROS_INFO("quadrotor.pose_x %f", this->pose.x);
+    ROS_INFO("quadrotor.pose_y %f", this->pose.y);
+    ROS_INFO("quadrotor.pose_z %f", this->pose.z);
+    ROS_INFO("quadrotor.pose_yaw %f", rad2deg(this->pose.yaw));
+    ROS_INFO("quadrotor.roll %f", rad2deg(this->pose.roll));
+    ROS_INFO("quadrotor.pitch %f", rad2deg(this->pose.pitch));
     ROS_INFO("roll.controller %f", rad2deg(this->position_controller->roll));
     ROS_INFO("pitch.controller %f", rad2deg(this->position_controller->pitch));
     ROS_INFO("throttle.controller %f", this->position_controller->throttle);
@@ -297,7 +287,6 @@ void Quadrotor::buildThrottleMessage(std_msgs::Float64 &msg)
 {
     msg.data = this->position_controller->throttle;
 }
-
 
 void Quadrotor::publishPositionControllerStats(int seq, ros::Time time)
 {
