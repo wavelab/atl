@@ -61,6 +61,7 @@ ADD_LIBRARY(
     src/apriltag.cpp
     src/controller.cpp
     src/ros/ros_util.cpp
+    src/ros/quadrotor.cpp
 )
 
 # EXECUTABLES
@@ -154,3 +155,21 @@ TARGET_LINK_LIBRARIES(
     ${catkin_LIBRARIES}
 )
 INSTALL(TARGETS ros_util_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+# tests/ros/quadrotor_node_test
+ADD_EXECUTABLE(quadrotor_node_test tests/ros/quadrotor_node_test.cpp)
+TARGET_LINK_LIBRARIES(
+    quadrotor_node_test
+    awesomo
+    apriltags
+    yaml-cpp
+    flycapture
+    ${OpenCV_LIBS}
+    ${catkin_LIBRARIES}
+)
+INSTALL(
+    TARGETS
+    quadrotor_node_test
+    RUNTIME DESTINATION
+    ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
