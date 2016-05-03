@@ -28,7 +28,7 @@ int test_rotation_matrix(void)
 
     // test and assert
     rotation_matrix(phi, theta, psi, rot_mat);
-    std::cout << rot_mat[0] << std::endl;
+
     mu_check(fltcmp(rot_mat[0], 0.0) == 0);
     mu_check(fltcmp(rot_mat[1], 0.0) == 0);
     mu_check(fltcmp(rot_mat[2], 0.0) == 0);
@@ -56,6 +56,7 @@ int test_single_rotation_matrx(void)
 
     // test and assert
     single_rotation_matrix(psi, rot_mat);
+
     mu_check(fltcmp(rot_mat[0], 0.0) == 0);
     mu_check(fltcmp(rot_mat[1], 0.0) == 0);
     mu_check(fltcmp(rot_mat[2], 0.0) == 0);

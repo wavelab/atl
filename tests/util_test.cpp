@@ -3,11 +3,23 @@
 
 
 // TESTS
-int test_euler2Quaternion(void);
 int test_deg2rad_and_rad2deg(void);
+int test_euler2Quaternion(void);
 int test_euler2quat_and_quat2euler(void);
 int test_euler2RotationMatrix(void);
 
+
+int test_deg2rad_and_rad2deg(void)
+{
+    double d_deg;
+    double d_rad;
+
+    d_deg = 10;
+    d_rad = deg2rad(d_deg);
+    mu_check(fltcmp(rad2deg(d_rad), d_deg) == 0);
+
+    return 0;
+}
 
 int test_euler2Quaternion(void)
 {
@@ -53,19 +65,21 @@ int test_euler2RotationMatrix(void)
     double r11, r12, r13;
     double r21, r22, r23;
 
+    // test roll, pitch, yaw set to 0
     roll = 0.0;
     pitch = 0.0;
     yaw = 0.0;
 
     euler2RotationMatrix(roll, pitch, yaw, rot);
 
-    // std::cout << rot << std::endl;
     r01 = 1;
     r02 = 0;
     r03 = 0;
+
     r11 = 0;
     r12 = 1;
     r13 = 0;
+
     r21 = 0;
     r22 = 0;
     r23 = 1;
@@ -83,18 +97,21 @@ int test_euler2RotationMatrix(void)
     mu_check(fltcmp(r23,rot(2,2)) == 0);
 
 
+    // test roll
     roll = M_PI;
     pitch = 0.0;
     yaw = 0.0;
 
     euler2RotationMatrix(roll, pitch, yaw, rot);
-    // std::cout << rot << std::endl;
+
     r01 = 1;
     r02 = 0;
     r03 = 0;
+
     r11 = 0;
     r12 = -1;
     r13 = 0;
+
     r21 = 0;
     r22 = 0;
     r23 = -1;
@@ -111,18 +128,21 @@ int test_euler2RotationMatrix(void)
     mu_check(fltcmp(r22, rot(2, 1)) == 0);
     mu_check(fltcmp(r23, rot(2, 2)) == 0);
 
+    // test roll and pitch
     roll = M_PI;
     pitch = M_PI/2;
     yaw = 0.0;
 
     euler2RotationMatrix(roll, pitch, yaw, rot);
-    // std::cout << rot << std::endl;
+
     r01 = 0;
     r02 = 0;
     r03 = -1;
+
     r11 = 0;
     r12 = -1;
     r13 = 0;
+
     r21 = -1;
     r22 = 0;
     r23 = 0;
@@ -140,6 +160,7 @@ int test_euler2RotationMatrix(void)
     mu_check(fltcmp(r23, rot(2, 2)) == 0);
 
 
+    // test roll, pitch and yaw
     roll = M_PI;
     pitch = -M_PI/2;
     yaw = M_PI/3;
@@ -167,18 +188,6 @@ int test_euler2RotationMatrix(void)
     mu_check(fltcmp(r21, rot(2, 0)) == 0);
     mu_check(fltcmp(r22, rot(2, 1)) == 0);
     mu_check(fltcmp(r23, rot(2, 2)) == 0);
-    return 0;
-
-}
-
-int test_deg2rad_and_rad2deg(void)
-{
-    double d_deg;
-    double d_rad;
-
-    d_deg = 10;
-    d_rad = deg2rad(d_deg);
-    mu_check(fltcmp(rad2deg(d_rad), d_deg) == 0);
 
     return 0;
 }
