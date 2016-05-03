@@ -18,6 +18,8 @@
 #include "awesomo/util.hpp"
 #include "awesomo/apriltag.hpp"
 
+
+
 // CONSTANTS
 #define CAMERA_NORMAL 0
 #define CAMERA_FIREFLY 1
@@ -32,6 +34,7 @@
 
 
 
+// CLASSES
 class CameraConfig
 {
     public:

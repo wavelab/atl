@@ -17,6 +17,8 @@
 // #define PID_CONFIG "/home/odroid/catkin_ws/src/awesomo/configs/position_controller/pid_semi_ok.yaml"
 
 
+
+// STRUCTURES
 struct pid
 {
     int sample_rate;
@@ -40,6 +42,9 @@ struct pid
     float max;
 };
 
+
+
+// CLASSES
 class CarrotController
 {
     public:

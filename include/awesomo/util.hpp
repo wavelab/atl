@@ -7,6 +7,22 @@
 #include <Eigen/Geometry>
 
 
+
+// CLASSES
+class Pose
+{
+    public:
+        double x;
+        double y;
+        double z;
+
+        double roll;
+        double pitch;
+        double yaw;
+};
+
+
+
 // FUNCTIONS
 double deg2rad(double d);
 double rad2deg(double d);

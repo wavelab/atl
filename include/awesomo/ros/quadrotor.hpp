@@ -24,6 +24,7 @@
 #include "awesomo/controller.hpp"
 
 
+
 // CONSTANTS
 #define IMU_TOPIC "/mavros/imu/data"
 #define ARM_TOPIC "/mavros/cmd/arming"
@@ -43,18 +44,9 @@
 #define CARROT_MODE 3
 #define MISSION_ACCOMPLISHED 4
 
-class Pose
-{
-    public:
-        double x;
-        double y;
-        double z;
 
-        double roll;
-        double pitch;
-        double yaw;
-};
 
+// CLASSES
 class Quadrotor
 {
     private:

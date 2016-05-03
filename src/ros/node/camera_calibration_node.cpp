@@ -29,10 +29,12 @@ int main(int argc, char **argv)
     while (ros::ok()) {
         // obtain image
         cam.getFrame(image);
-        cv::resize(image, result, cv::Size(640/4, 480/4));
+        // cv::resize(image, result, cv::Size(640/4, 480/4));
         msg = cv_bridge::CvImage(
             std_msgs::Header(),
-            "rgb8", result).toImageMsg();
+            "rgb8",
+            result
+        ).toImageMsg();
 
         // publish and spin
         pub.publish(msg);
