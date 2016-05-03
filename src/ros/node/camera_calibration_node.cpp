@@ -20,10 +20,7 @@ int main(int argc, char **argv)
 
     // setup
     Camera cam(0, CAMERA_FIREFLY);
-    cam.loadConfig(
-        "default",
-        "/home/chutsu/Dropbox/proj/awesomo/configs/pointgrey_firefly/ost.yaml"
-    );
+    cam.loadConfig("default", FIREFLY_640);
     cam.initCamera("default");
 
     while (ros::ok()) {
