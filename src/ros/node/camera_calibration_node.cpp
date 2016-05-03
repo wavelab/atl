@@ -11,6 +11,7 @@ int main(int argc, char **argv)
     cv::Mat image;
     cv::Mat result;
     sensor_msgs::ImagePtr msg;
+    std::string camera_config_path;
 
     ros::init(argc, argv, "awesomo_camera");
     ros::NodeHandle n;
@@ -19,9 +20,8 @@ int main(int argc, char **argv)
     image_transport::Publisher pub = it.advertise("awesomo/camera/image", 30);
 
     // setup
-    Camera cam(0, CAMERA_FIREFLY);
-    cam.loadConfig("default", FIREFLY_640);
-    cam.initCamera("default");
+	n.getParam("/camera_config_path", camera_config_path);
+    Camera cam(camera_config_path);
 
     while (ros::ok()) {
         // obtain image

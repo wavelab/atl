@@ -1,6 +1,8 @@
 #include "awesomo/munit.h"
 #include "awesomo/camera.hpp"
 
+#define CONFIG_PATH "configs/pointgrey_firefly"
+
 
 // TESTS
 int testRun(void);
@@ -10,19 +12,14 @@ void testSuite(void);
 
 int testCameraloadConfig(void)
 {
-    Camera cam(0, CAMERA_FIREFLY);
-    cam.loadConfig("default", FIREFLY_640);
+    Camera cam(CONFIG_PATH);
 
     return 0;
 }
 
 int testRun(void)
 {
-    Camera cam(0, CAMERA_FIREFLY);
-    cam.loadConfig("default", FIREFLY_640);
-    cam.loadConfig("320", FIREFLY_320);
-    cam.loadConfig("160", FIREFLY_160);
-    cam.initCamera("160");
+    Camera cam(CONFIG_PATH);
     cam.run();
 
     return 0;

@@ -85,6 +85,41 @@ Camera::Camera(int camera_index, int camera_type)
     this->tag_detector =  new TagDetector();
 }
 
+Camera::Camera(std::string camera_config_path)
+{
+    int nb_configs;
+    std::string config_key;
+    std::string config_path;
+    YAML::Node camera_config;
+
+    // load camera_config yaml file
+    camera_config = YAML::LoadFile(camera_config_path + "/camera_config.yaml");
+	nb_configs = camera_config["nb_configs"].as<int>();
+
+    // create camera object
+    this->camera_imshow = camera_config["camera_imshow"].as<int>();
+    this->camera_index = camera_config["camera_index"].as<int>();
+    this->tag_detector =  new TagDetector();
+
+	if (camera_config["camera_type"].as<std::string>() == "firefly") {
+        this->camera_type = CAMERA_FIREFLY;
+	} else {
+        this->camera_type = CAMERA_NORMAL;
+	}
+
+    // load different calibration files
+	for (int i = 0; i < nb_configs; i++) {
+	    config_key = camera_config["config_keys"][i].as<std::string>();
+	    config_path = camera_config_path + "/";
+	    config_path += camera_config["config_files"][i].as<std::string>();
+
+        this->loadConfig(config_key, config_path);
+	}
+
+    // start camera with first calibration file
+    this->initCamera(camera_config["config_keys"][0].as<std::string>());
+}
+
 static int checkMatrixYaml(YAML::Node matrix_yaml)
 {
     const std::string targets[3] = { "rows", "cols", "data" };
@@ -332,9 +367,10 @@ int Camera::run(void)
         this->adjustMode(pose_estimates, timeout);
 
         // this->printFPS(last_tic, frame_index);
-        // cv::imshow("camera", image);
-        // cv::waitKey(1);
-
+        if (this->camera_imshow) {
+            cv::imshow("camera", image);
+            cv::waitKey(1);
+        }
     }
 
     return 0;
@@ -345,15 +381,20 @@ std::vector<TagPose> Camera::step(int &timeout)
     cv::Mat image;
     std::vector<TagPose> pose_estimates;
 
-
+    // get frame and apriltag pose estimates
     this->getFrame(image);
-
     pose_estimates = this->tag_detector->processImage(
         this->config->camera_matrix,
         image,
         timeout
     );
     this->adjustMode(pose_estimates, timeout);
+
+    // imshow
+    if (this->camera_imshow) {
+        cv::imshow("camera", image);
+        cv::waitKey(1);
+    }
 
     return pose_estimates;
 }

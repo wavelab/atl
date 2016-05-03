@@ -19,6 +19,8 @@
 #include <mavros_msgs/SetMode.h>
 #include <mavros_msgs/CommandBool.h>
 
+#include <yaml-cpp/yaml.h>
+
 #include "awesomo/util.hpp"
 #include "awesomo/camera.hpp"
 #include "awesomo/controller.hpp"
@@ -61,7 +63,6 @@ class Quadrotor
         ros::ServiceClient mode_client;
         ros::ServiceClient arming_client;
 
-        Camera *cam;
         int tag_timeout;
         std::vector<TagPose> tag_poses;
         Eigen::Vector3d tag_position;
@@ -78,6 +79,8 @@ class Quadrotor
     public:
         Pose pose;
         Pose mocap_pose;
+
+        Camera *cam;
         CarrotController *carrot_controller;
         PositionController *position_controller;
 

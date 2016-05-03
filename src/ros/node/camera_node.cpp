@@ -33,6 +33,7 @@ int main(int argc, char **argv)
 	std::vector<TagPose> pose_estimates;
     geometry_msgs::PoseWithCovarianceStamped pose_msg;
     std_msgs::Float64 stupid;
+    std::string camera_config_path;
 
     ros::init(argc, argv, "awesomo_camera");
     ros::NodeHandle n;
@@ -49,11 +50,8 @@ int main(int argc, char **argv)
     publisher = n.advertise<geometry_msgs::PoseWithCovarianceStamped>(ROS_TOPIC, 100);
 
     // camera specifics
-    Camera cam(0, CAMERA_FIREFLY);
-    cam.loadConfig("default", FIREFLY_640);
-    cam.loadConfig("320", FIREFLY_320);
-    cam.loadConfig("160", FIREFLY_160);
-    cam.initCamera("320");
+	n.getParam("/camera_config_path", camera_config_path);
+    Camera cam(camera_config_path);
     ROS_INFO("Camera node is publishing pose data!");
 
 

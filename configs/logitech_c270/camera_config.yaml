@@ -1,0 +1,7 @@
+camera_type: "normal"
+camera_index: 0
+camera_imshow: 0
+
+nb_configs: 1
+config_keys: ["default"]
+config_files: ["ost.yaml"]

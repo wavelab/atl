@@ -3,49 +3,49 @@
 
 Quadrotor::Quadrotor(void)
 {
-    // wait till connected to FCU
-    this->waitForConnection();
-
-    // subscribe to topics
-    this->subscribeToPose();
-    this->subscribeToMocap();
-    this->subscribeToIMU();
-
-    // initialize clients to services
-    this->mode_client = this->node.serviceClient<mavros_msgs::SetMode>(MODE_TOPIC);
-    this->arming_client = this->node.serviceClient<mavros_msgs::CommandBool>(ARM_TOPIC);
-
-    // initialize publishers
-    this->position_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_TOPIC, 50);
-    this->attitude_publisher = this->node.advertise<geometry_msgs::PoseStamped>(ATTITUDE_TOPIC, 50);
-    this->throttle_publisher = this->node.advertise<std_msgs::Float64>(THROTTLE_TOPIC, 50);
-    this->position_controller_x_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_X_CONTROLLER_TOPIC, 50);
-    this->position_controller_y_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_Y_CONTROLLER_TOPIC, 50);
-    this->position_controller_z_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_Z_CONTROLLER_TOPIC, 50);
-
-    // state
-    this->mission_state = HOVER_MODE;
-
-    // initialize camera
-    this->tag_timeout = 0;
-    this->cam = new Camera(0, CAMERA_FIREFLY);
-    cam->loadConfig("default", FIREFLY_640);
-    cam->loadConfig("320", FIREFLY_320);
-    cam->loadConfig("160", FIREFLY_160);
-    cam->initCamera("320");
-
-    // intialize carrot controller
-    double look_ahead_dist = 0.2;
-    double wp_threshold = 0.3;
-    std::deque<Eigen::Vector3d> waypoints;
-    this->carrot_controller = new CarrotController(
-        waypoints,
-        look_ahead_dist,
-        wp_threshold
-    );
-
-    // initialize position controller
-    this->position_controller = new PositionController(PID_CONFIG);
+    // // wait till connected to FCU
+    // this->waitForConnection();
+    //
+    // // subscribe to topics
+    // this->subscribeToPose();
+    // this->subscribeToMocap();
+    // this->subscribeToIMU();
+    //
+    // // initialize clients to services
+    // this->mode_client = this->node.serviceClient<mavros_msgs::SetMode>(MODE_TOPIC);
+    // this->arming_client = this->node.serviceClient<mavros_msgs::CommandBool>(ARM_TOPIC);
+    //
+    // // initialize publishers
+    // this->position_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_TOPIC, 50);
+    // this->attitude_publisher = this->node.advertise<geometry_msgs::PoseStamped>(ATTITUDE_TOPIC, 50);
+    // this->throttle_publisher = this->node.advertise<std_msgs::Float64>(THROTTLE_TOPIC, 50);
+    // this->position_controller_x_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_X_CONTROLLER_TOPIC, 50);
+    // this->position_controller_y_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_Y_CONTROLLER_TOPIC, 50);
+    // this->position_controller_z_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_Z_CONTROLLER_TOPIC, 50);
+    //
+    // // state
+    // this->mission_state = HOVER_MODE;
+    //
+    // // initialize camera
+    // this->tag_timeout = 0;
+    // this->cam = new Camera(0, CAMERA_FIREFLY);
+    // cam->loadConfig("default", FIREFLY_640);
+    // cam->loadConfig("320", FIREFLY_320);
+    // cam->loadConfig("160", FIREFLY_160);
+    // cam->initCamera("320");
+    //
+    // // intialize carrot controller
+    // double look_ahead_dist = 0.2;
+    // double wp_threshold = 0.3;
+    // std::deque<Eigen::Vector3d> waypoints;
+    // this->carrot_controller = new CarrotController(
+    //     waypoints,
+    //     look_ahead_dist,
+    //     wp_threshold
+    // );
+    //
+    // // initialize position controller
+    // this->position_controller = new PositionController(PID_CONFIG);
 }
 
 void Quadrotor::poseCallback(const geometry_msgs::PoseStamped &msg)

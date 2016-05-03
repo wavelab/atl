@@ -97,9 +97,9 @@ std::vector<TagPose> TagDetector::processImage(
     }
 
     // display result
-    cv::imshow("camera - masked", masked);
+    // cv::imshow("camera - masked", masked);
     // cv::imshow("camera - grayscale", masked);
-    cv::waitKey(1);
+    // cv::waitKey(1);
 
     return pose_estimates;
 }

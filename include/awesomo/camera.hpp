@@ -24,14 +24,6 @@
 #define CAMERA_NORMAL 0
 #define CAMERA_FIREFLY 1
 
-// #define FIREFLY_640 "/home/chutsu/Dropbox/proj/awesomo/configs/pointgrey_firefly/ost_640.yaml"
-// #define FIREFLY_320 "/home/chutsu/Dropbox/proj/awesomo/configs/pointgrey_firefly/ost_320.yaml"
-// #define FIREFLY_160 "/home/chutsu/Dropbox/proj/awesomo/configs/pointgrey_firefly/ost_160.yaml"
-
-#define FIREFLY_640 "/home/odroid/awesomo/configs/pointgrey_firefly/ost_640.yaml"
-#define FIREFLY_320 "/home/odroid/awesomo/configs/pointgrey_firefly/ost_320.yaml"
-#define FIREFLY_160 "/home/odroid/awesomo/configs/pointgrey_firefly/ost_160.yaml"
-
 
 
 // CLASSES
@@ -55,6 +47,7 @@ class Camera
 
         int camera_index;
         int camera_type;
+        int camera_imshow;
         std::string camera_mode;
 
         cv::Rect roi_rect;
@@ -74,6 +67,7 @@ class Camera
         std::vector<TagPose> pose_estimates;
 
         Camera(int camera_index, int camera_type);
+        Camera(std::string camera_config_path);
         int initCamera(std::string camera_mode);
         CameraConfig *loadConfig(std::string mode, const std::string calib_file);
         int loadConfig(std::string camera_mode);
