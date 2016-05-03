@@ -1,4 +1,4 @@
-#include "awesomo/ros/quadrotor_node.hpp"
+#include "awesomo/ros/node/quadrotor_node.hpp"
 
 
 int main(int argc, char **argv)

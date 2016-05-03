@@ -1,4 +1,4 @@
-#include "awesomo/ros/camera_node.hpp"
+#include "awesomo/ros/node/camera_node.hpp"
 
 #define MOCAP_TOPIC "/awesomo/mocap/pose"
 #include <std_msgs/Float64.h>

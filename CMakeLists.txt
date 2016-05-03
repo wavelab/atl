@@ -67,7 +67,7 @@ ADD_LIBRARY(
 # EXECUTABLES
 ## ROS NODE EXECUTABLES
 # camera_node
-ADD_EXECUTABLE(camera_node src/ros/camera_node.cpp)
+ADD_EXECUTABLE(camera_node src/ros/node/camera_node.cpp)
 target_link_libraries(
     camera_node
     awesomo
@@ -83,7 +83,7 @@ INSTALL(
 )
 
 # calibration node
-ADD_EXECUTABLE(camera_calibration src/ros/camera_calibration_node.cpp)
+ADD_EXECUTABLE(camera_calibration src/ros/node/camera_calibration_node.cpp)
 TARGET_LINK_LIBRARIES(
     camera_calibration
     awesomo
@@ -95,7 +95,7 @@ TARGET_LINK_LIBRARIES(
 )
 
 # quadrotor_node
-ADD_EXECUTABLE(quadrotor_node src/ros/quadrotor_node.cpp)
+ADD_EXECUTABLE(quadrotor_node src/ros/node/quadrotor_node.cpp)
 TARGET_LINK_LIBRARIES(
     quadrotor_node
     awesomo
