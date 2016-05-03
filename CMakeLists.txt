@@ -55,7 +55,6 @@ CATKIN_PACKAGE(
 ADD_LIBRARY(
     awesomo
     STATIC
-    # src/pid.cpp
     src/util.cpp
     src/camera.cpp
     src/apriltag.cpp
@@ -127,11 +126,6 @@ TARGET_LINK_LIBRARIES(
     ${catkin_LIBRARIES}
 )
 INSTALL(TARGETS camera_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
-
-# # tests/pid_test
-# ADD_EXECUTABLE(pid_test tests/pid_test.cpp)
-# TARGET_LINK_LIBRARIES(pid_test awesomo)
-# INSTALL(TARGETS pid_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 # tests/controller_test
 ADD_EXECUTABLE(controller_test tests/controller_test.cpp)
