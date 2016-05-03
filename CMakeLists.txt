@@ -55,7 +55,7 @@ CATKIN_PACKAGE(
 ADD_LIBRARY(
     awesomo
     STATIC
-    src/pid.cpp
+    # src/pid.cpp
     src/util.cpp
     src/camera.cpp
     src/apriltag.cpp

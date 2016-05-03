@@ -161,3 +161,66 @@ void PositionController::loadConfig(const std::string config_file)
         throw;
     }
 }
+
+static void pid_calculate(struct pid *p, float input, float dt)
+{
+    float error;
+
+    // calculate errors
+    error = p->setpoint - input;
+    if (fabs(error) > p->dead_zone) {
+        p->sum_error += error * dt;
+    }
+
+    // calculate output
+    p->p_error = p->k_p * error;
+    p->i_error = p->k_i * p->sum_error;
+    p->d_error = p->k_d * (error - p->prev_error) / dt;
+    p->output = p->p_error + p->i_error + p->d_error;
+
+    // limit boundaries
+    if (p->output > p->max) {
+        p->output = p->max;
+    } else if (p->output < p->min) {
+        p->output = p->min;
+    }
+
+    // update error
+    p->prev_error = error;
+}
+
+void PositionController::calculate(float x, float y, float z, float yaw)
+{
+    float roll;
+    float pitch;
+    float throttle;
+    float roll_adjusted;
+    float pitch_adjusted;
+    float throttle_adjusted;
+    float dt;
+
+    pid_calculate(&this->x, y, this->dt);
+    pid_calculate(&this->y, x, this->dt);
+    pid_calculate(&this->T, z, this->dt);
+    roll = -this->x.output;
+    pitch = this->y.output;
+    throttle = this->T.output;
+
+    // adjust roll and pitch according to yaw
+    if (yaw < 0) {
+        // make sure yaw is within 0 - 360
+        yaw += 2 * M_PI;
+    }
+    roll_adjusted = cos(yaw) * roll - sin(yaw) * pitch;
+    pitch_adjusted = sin(yaw) * roll + cos(yaw) * pitch;
+
+    // throttle
+    throttle_adjusted = this->hover_throttle + throttle;
+    throttle_adjusted = throttle_adjusted / (cos(roll_adjusted) * cos(pitch_adjusted));
+
+    // update position controller
+    this->roll = roll_adjusted;
+    this->pitch = pitch_adjusted;
+    this->rpy_quat = euler2quat(roll_adjusted, pitch_adjusted, 0);
+    this->throttle = throttle_adjusted;
+}

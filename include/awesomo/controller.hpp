@@ -5,11 +5,10 @@
 #include <deque>
 
 #include <Eigen/Dense>
-
 #include <tf/transform_datatypes.h>
-
-#include "awesomo/pid.hpp"
 #include <yaml-cpp/yaml.h>
+
+#include "awesomo/util.hpp"
 
 
 // CONSTANTS
@@ -17,6 +16,29 @@
 #define PID_CONFIG "/home/odroid/catkin_ws/src/awesomo/configs/position_controller/pid.yaml"
 // #define PID_CONFIG "/home/odroid/catkin_ws/src/awesomo/configs/position_controller/pid_semi_ok.yaml"
 
+
+struct pid
+{
+    int sample_rate;
+
+    float setpoint;
+    float output;
+
+    float prev_error;
+    float sum_error;
+
+    float p_error;
+    float i_error;
+    float d_error;
+
+    float k_p;
+    float k_i;
+    float k_d;
+
+    float dead_zone;
+    float min;
+    float max;
+};
 
 class CarrotController
 {
@@ -66,10 +88,11 @@ class PositionController
         float hover_throttle;
 
         tf::Quaternion rpy_quat;
-        ros::Duration dt;
+        float dt;
 
         PositionController(const std::string config_file);
         void loadConfig(const std::string config_file);
+        void calculate(float x, float y, float z, float yaw);
 };
 
 #endif

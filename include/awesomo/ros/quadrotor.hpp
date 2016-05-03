@@ -19,7 +19,6 @@
 #include <mavros_msgs/SetMode.h>
 #include <mavros_msgs/CommandBool.h>
 
-#include "awesomo/pid.hpp"
 #include "awesomo/util.hpp"
 #include "awesomo/camera.hpp"
 #include "awesomo/controller.hpp"

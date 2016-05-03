@@ -196,45 +196,22 @@ void Quadrotor::positionControllerCalculate(float x, float y, float z, ros::Time
     float roll_adjusted;
     float pitch_adjusted;
     float throttle_adjusted;
-    ros::Duration dt;
+    float dt;
 
-    // configure x, y, z setpoint
+    // set x, y, z setpoint and dt
     this->position_controller->x.setpoint = y;
     this->position_controller->y.setpoint = x;
     this->position_controller->T.setpoint = z;
+    this->position_controller->dt = (ros::Time::now() - last_request).toSec();
 
-    // position controller - calculate
-    this->position_controller->dt = ros::Time::now() - last_request;
-    dt = this->position_controller->dt;
-    pid_calculate(&this->position_controller->x, this->pose.y, dt);
-    pid_calculate(&this->position_controller->y, this->pose.x, dt);
-    pid_calculate(&this->position_controller->T, this->pose.z, dt);
-    roll = -this->position_controller->x.output;
-    pitch = this->position_controller->y.output;
-    throttle = this->position_controller->T.output;
-
-    // adjust roll and pitch according to yaw
-    if (this->pose.yaw < 0) {
-        this->pose.yaw += 2 * M_PI;
-    }
-    roll_adjusted = cos(this->pose.yaw) * roll - sin(this->pose.yaw) * pitch;
-    pitch_adjusted = sin(this->pose.yaw) * roll + cos(this->pose.yaw) * pitch;
-
-    // throttle
-    throttle_adjusted = this->position_controller->hover_throttle + throttle;
-    throttle_adjusted = throttle_adjusted / (cos(roll_adjusted) * cos(pitch_adjusted));
-
-    // update position controller
-    this->position_controller->roll = roll_adjusted;
-    this->position_controller->pitch = pitch_adjusted;
-    this->position_controller->rpy_quat = euler2quat(roll_adjusted, pitch_adjusted, 0);
-    this->position_controller->throttle = throttle_adjusted;
+    // calculate new controller inputs
+    this->position_controller->calculate(this->pose.x, this->pose.y, this->pose.z, this->pose.yaw);
 }
 
 void Quadrotor::printPositionController(void)
 {
     ROS_INFO("---");
-    ROS_INFO("dt %f", this->position_controller->dt.toSec());
+    ROS_INFO("dt %f", this->position_controller->dt);
     ROS_INFO("quadrotor.pose_x %f", this->pose.x);
     ROS_INFO("quadrotor.pose_y %f", this->pose.y);
     ROS_INFO("quadrotor.pose_z %f", this->pose.z);
