@@ -61,6 +61,7 @@ class CarrotController
             double look_ahead_dist,
             double wp_threshold
         );
+        CarrotController(std::string config_file_path);
         Eigen::Vector3d closestPoint(
             Eigen::Vector3d position,
             Eigen::Vector3d wp_start,
@@ -97,7 +98,7 @@ class PositionController
 
         PositionController(const std::string config_file);
         void loadConfig(const std::string config_file);
-        void calculate(float x, float y, float z, float yaw);
+        void calculate(Pose p);
 };
 
 #endif

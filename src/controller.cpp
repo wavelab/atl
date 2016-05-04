@@ -18,6 +18,28 @@ CarrotController::CarrotController(
     this->wp_threshold = wp_threshold;
 }
 
+CarrotController::CarrotController(std::string config_file_path)
+{
+    YAML::Node carrot_config;
+    Eigen::Vector3d position;
+
+    carrot_config = YAML::LoadFile(config_file_path);
+    this->look_ahead_dist = carrot_config["look_ahead_dist"].as<float>();
+    this->wp_threshold = carrot_config["wp_threshold"].as<float>();
+
+    for (int i = 0; i < carrot_config["waypoints"].size(); i += 3) {
+        position <<
+            carrot_config["waypoints"][i].as<float>(),
+            carrot_config["waypoints"][i + 1].as<float>(),
+            carrot_config["waypoints"][i + 2].as<float>();
+
+        this->waypoints.push_back(position);
+    }
+    if (waypoints.size() > 0) {
+        this->initialized = 1;
+    }
+}
+
 Eigen::Vector3d CarrotController::closestPoint(
     Eigen::Vector3d position,
     Eigen::Vector3d wp_start,
@@ -189,7 +211,7 @@ static void pid_calculate(struct pid *p, float input, float dt)
     p->prev_error = error;
 }
 
-void PositionController::calculate(float x, float y, float z, float yaw)
+void PositionController::calculate(Pose pose)
 {
     float roll;
     float pitch;
@@ -199,20 +221,20 @@ void PositionController::calculate(float x, float y, float z, float yaw)
     float throttle_adjusted;
     float dt;
 
-    pid_calculate(&this->x, y, this->dt);
-    pid_calculate(&this->y, x, this->dt);
-    pid_calculate(&this->T, z, this->dt);
+    pid_calculate(&this->x, pose.y, this->dt);
+    pid_calculate(&this->y, pose.x, this->dt);
+    pid_calculate(&this->T, pose.z, this->dt);
     roll = -this->x.output;
     pitch = this->y.output;
     throttle = this->T.output;
 
     // adjust roll and pitch according to yaw
-    if (yaw < 0) {
+    if (pose.yaw < 0) {
         // make sure yaw is within 0 - 360
-        yaw += 2 * M_PI;
+        pose.yaw += 2 * M_PI;
     }
-    roll_adjusted = cos(yaw) * roll - sin(yaw) * pitch;
-    pitch_adjusted = sin(yaw) * roll + cos(yaw) * pitch;
+    roll_adjusted = cos(pose.yaw) * roll - sin(pose.yaw) * pitch;
+    pitch_adjusted = sin(pose.yaw) * roll + cos(pose.yaw) * pitch;
 
     // throttle
     throttle_adjusted = this->hover_throttle + throttle;

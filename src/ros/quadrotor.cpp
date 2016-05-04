@@ -1,51 +1,45 @@
 #include "awesomo/ros/quadrotor.hpp"
 
+Quadrotor::Quadrotor(void) {}
 
-Quadrotor::Quadrotor(void)
+Quadrotor::Quadrotor(std::map<std::string, std::string> configs)
 {
-    // // wait till connected to FCU
-    // this->waitForConnection();
-    //
-    // // subscribe to topics
-    // this->subscribeToPose();
-    // this->subscribeToMocap();
-    // this->subscribeToIMU();
-    //
-    // // initialize clients to services
-    // this->mode_client = this->node.serviceClient<mavros_msgs::SetMode>(MODE_TOPIC);
-    // this->arming_client = this->node.serviceClient<mavros_msgs::CommandBool>(ARM_TOPIC);
-    //
-    // // initialize publishers
-    // this->position_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_TOPIC, 50);
-    // this->attitude_publisher = this->node.advertise<geometry_msgs::PoseStamped>(ATTITUDE_TOPIC, 50);
-    // this->throttle_publisher = this->node.advertise<std_msgs::Float64>(THROTTLE_TOPIC, 50);
-    // this->position_controller_x_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_X_CONTROLLER_TOPIC, 50);
-    // this->position_controller_y_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_Y_CONTROLLER_TOPIC, 50);
-    // this->position_controller_z_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_Z_CONTROLLER_TOPIC, 50);
-    //
-    // // state
-    // this->mission_state = HOVER_MODE;
-    //
-    // // initialize camera
-    // this->tag_timeout = 0;
-    // this->cam = new Camera(0, CAMERA_FIREFLY);
-    // cam->loadConfig("default", FIREFLY_640);
-    // cam->loadConfig("320", FIREFLY_320);
-    // cam->loadConfig("160", FIREFLY_160);
-    // cam->initCamera("320");
-    //
-    // // intialize carrot controller
-    // double look_ahead_dist = 0.2;
-    // double wp_threshold = 0.3;
-    // std::deque<Eigen::Vector3d> waypoints;
-    // this->carrot_controller = new CarrotController(
-    //     waypoints,
-    //     look_ahead_dist,
-    //     wp_threshold
-    // );
-    //
-    // // initialize position controller
-    // this->position_controller = new PositionController(PID_CONFIG);
+    std::string config_path;
+
+    // state
+    this->mission_state = OFFLINE_MODE;
+
+    // wait till connected to FCU
+    this->waitForConnection();
+
+    // initialize clients to services
+    this->mode_client = this->node.serviceClient<mavros_msgs::SetMode>(MODE_TOPIC);
+    this->arming_client = this->node.serviceClient<mavros_msgs::CommandBool>(ARM_TOPIC);
+
+    // initialize publishers
+    this->position_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_TOPIC, 50);
+    this->attitude_publisher = this->node.advertise<geometry_msgs::PoseStamped>(ATTITUDE_TOPIC, 50);
+    this->throttle_publisher = this->node.advertise<std_msgs::Float64>(THROTTLE_TOPIC, 50);
+    this->position_controller_x_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_X_CONTROLLER_TOPIC, 50);
+    this->position_controller_y_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_Y_CONTROLLER_TOPIC, 50);
+    this->position_controller_z_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_Z_CONTROLLER_TOPIC, 50);
+
+    // initialize controllers
+    if (configs.count("position_controller")) {
+        config_path = configs["position_controller"];
+        this->position_controller = new PositionController(config_path);
+        ROS_INFO("position controller initialized!");
+    } else {
+        this->position_controller = NULL;
+    }
+
+    if (configs.count("carrot_controller")) {
+        config_path = configs["carrot_controller"];
+        this->carrot_controller = new CarrotController(config_path);
+        ROS_INFO("carrot controller initialized!");
+    } else {
+        this->carrot_controller = NULL;
+    }
 }
 
 void Quadrotor::poseCallback(const geometry_msgs::PoseStamped &msg)
@@ -61,17 +55,6 @@ void Quadrotor::poseCallback(const geometry_msgs::PoseStamped &msg)
         &this->pose.roll,
         &this->pose.pitch,
         &this->pose.yaw
-    );
-}
-
-void Quadrotor::subscribeToPose(void)
-{
-    ROS_INFO("subcribing to [POSE]");
-    this->pose_subscriber = this->node.subscribe(
-        POSE_TOPIC,
-        50,
-        &Quadrotor::poseCallback,
-        this
     );
 }
 
@@ -91,15 +74,9 @@ void Quadrotor::mocapCallback(const geometry_msgs::PoseStamped &msg)
     );
 }
 
-void Quadrotor::subscribeToMocap(void)
+void Quadrotor::stateCallback(const mavros_msgs::State::ConstPtr &msg)
 {
-    ROS_INFO("subcribing to [MOCAP]");
-    this->mocap_subscriber = this->node.subscribe(
-        MOCAP_TOPIC,
-        50,
-        &Quadrotor::mocapCallback,
-        this
-    );
+    state = *msg;
 }
 
 void Quadrotor::imuCallback(const sensor_msgs::Imu::ConstPtr &msg)
@@ -109,6 +86,28 @@ void Quadrotor::imuCallback(const sensor_msgs::Imu::ConstPtr &msg)
         &this->pose.roll,
         &this->pose.pitch,
         &this->pose.yaw
+    );
+}
+
+void Quadrotor::subscribeToPose(void)
+{
+    ROS_INFO("subcribing to [POSE]");
+    this->pose_subscriber = this->node.subscribe(
+        POSE_TOPIC,
+        50,
+        &Quadrotor::poseCallback,
+        this
+    );
+}
+
+void Quadrotor::subscribeToMocap(void)
+{
+    ROS_INFO("subcribing to [MOCAP]");
+    this->mocap_subscriber = this->node.subscribe(
+        MOCAP_TOPIC,
+        50,
+        &Quadrotor::mocapCallback,
+        this
     );
 }
 
@@ -123,11 +122,6 @@ void Quadrotor::subscribeToIMU(void)
     );
 }
 
-void Quadrotor::stateCallback(const mavros_msgs::State::ConstPtr &msg)
-{
-    state = *msg;
-}
-
 void Quadrotor::waitForConnection(void)
 {
     ROS_INFO("waiting for FCU ...");
@@ -135,6 +129,7 @@ void Quadrotor::waitForConnection(void)
         ros::spinOnce();
         sleep(1);
     }
+    ROS_INFO("connected to FCU!");
 }
 
 int Quadrotor::arm(void)
@@ -188,24 +183,25 @@ int Quadrotor::setOffboardModeOn(void)
     }
 }
 
-void Quadrotor::positionControllerCalculate(float x, float y, float z, ros::Time last_request)
+void Quadrotor::positionControllerCalculate(Position p, ros::Time last_request)
 {
-    float roll;
+    float roll;;
     float pitch;
     float throttle;
     float roll_adjusted;
     float pitch_adjusted;
     float throttle_adjusted;
     float dt;
+    Pose pose;
 
     // set x, y, z setpoint and dt
-    this->position_controller->x.setpoint = y;
-    this->position_controller->y.setpoint = x;
-    this->position_controller->T.setpoint = z;
+    this->position_controller->x.setpoint = p.y;
+    this->position_controller->y.setpoint = p.x;
+    this->position_controller->T.setpoint = p.z;
     this->position_controller->dt = (ros::Time::now() - last_request).toSec();
 
     // calculate new controller inputs
-    this->position_controller->calculate(this->pose.x, this->pose.y, this->pose.z, this->pose.yaw);
+    this->position_controller->calculate(this->pose);
 }
 
 void Quadrotor::printPositionController(void)

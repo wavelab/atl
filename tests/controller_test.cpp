@@ -2,13 +2,31 @@
 #include "awesomo/controller.hpp"
 
 
+#define CARROT_CONTROLLER_CONFIG "configs/carrot_controller/config.yaml"
+#define POSITION_CONTROLLER_CONFIG "configs/position_controller/config.yaml"
+
+
 // TESTS
+int testCarrotController(void);
 int testCarrotControllerClosestPoint(void);
 int testCarrotControllerCalculateCarrotPoint(void);
 int testCarrotControllerWaypointReached(void);
 int testCarrotControllerUpdate(void);
 int testPositionControllerLoadConfig(void);
 
+
+int testCarrotController(void)
+{
+    CarrotController *controller;
+
+    controller = new CarrotController(CARROT_CONTROLLER_CONFIG);
+    mu_check(controller->initialized != 0);
+    mu_check(controller->look_ahead_dist != 0);
+    mu_check(controller->wp_threshold != 0);
+    mu_check(controller->waypoints.size() != 0);
+
+    return 0;
+}
 
 int testCarrotControllerClosestPoint(void)
 {
@@ -152,7 +170,7 @@ int testCarrotControllerUpdate(void)
 int testPositionControllerLoadConfig(void)
 {
     PositionController *controller;
-    controller = new PositionController(PID_CONFIG);
+    controller = new PositionController(POSITION_CONTROLLER_CONFIG);
 
     mu_check(controller->roll == 0);
     mu_check(controller->pitch == 0);
@@ -184,6 +202,7 @@ int testPositionControllerLoadConfig(void)
 
 void testSuite(void)
 {
+    mu_add_test(testCarrotController);
     mu_add_test(testCarrotControllerClosestPoint);
     mu_add_test(testCarrotControllerCalculateCarrotPoint);
     mu_add_test(testCarrotControllerWaypointReached);

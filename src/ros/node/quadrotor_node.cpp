@@ -15,12 +15,20 @@ int main(int argc, char **argv)
 	int timeout = 0;
     Quadrotor quad;
     std::string camera_config_path;
+    std::string position_controller_config_path;
 
     ROS_INFO("running ...");
 
     // setup quadrotor
-	node_handle.getParam("/camera_config_path", camera_config_path);
-    quad.cam = new Camera(camera_config_path);
+	node_handle.getParam(
+	    "/camera_config_path",
+	    camera_config_path
+	);
+	node_handle.getParam(
+	    "/position_controller_config_path",
+	    position_controller_config_path
+	);
+    // quad.cam = new Camera(camera_config_path);
 
     while (ros::ok()){
         // quad.runMission(position);
@@ -28,7 +36,7 @@ int main(int argc, char **argv)
         now = last_request;
 
 		// publish
-        quad.cam->step(timeout);
+        // quad.cam->step(timeout);
 
 		// end
 		seq++;

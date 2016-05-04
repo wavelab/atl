@@ -1,28 +1,5 @@
 #include "awesomo/ros/node/camera_node.hpp"
 
-#define MOCAP_TOPIC "/awesomo/mocap/pose"
-#include <std_msgs/Float64.h>
-
-float pos_x;
-float pos_y;
-float pos_z;
-float quat_x;
-float quat_y;
-float quat_z;
-float quat_w;
-
-
-void mocapCallback(const geometry_msgs::PoseStamped &msg)
-{
-    pos_x = msg.pose.position.x;
-    pos_y = msg.pose.position.y;
-    pos_z = msg.pose.position.z;
-
-    quat_x = msg.pose.orientation.x;
-    quat_y = msg.pose.orientation.y;
-    quat_z = msg.pose.orientation.z;
-    quat_w = msg.pose.orientation.w;
-}
 
 int main(int argc, char **argv)
 {
@@ -32,7 +9,6 @@ int main(int argc, char **argv)
 	TagPose pose;
 	std::vector<TagPose> pose_estimates;
     geometry_msgs::PoseWithCovarianceStamped pose_msg;
-    std_msgs::Float64 stupid;
     std::string camera_config_path;
 
     ros::init(argc, argv, "awesomo_camera");
@@ -46,7 +22,6 @@ int main(int argc, char **argv)
     rotation_matrix(M_PI_2, -M_PI_2, 0.0, rot_mat);
 
     // ROS specifics
-    // publisher = n.advertise<geometry_msgs::PoseStamped>(ROS_TOPIC, 100);
     publisher = n.advertise<geometry_msgs::PoseWithCovarianceStamped>(ROS_TOPIC, 100);
 
     // camera specifics
@@ -57,6 +32,7 @@ int main(int argc, char **argv)
 
     // ROS node loop
     while (ros::ok()) {
+        // obtain pose estimates from camera
         pose_estimates = cam.step(timeout);
 
         // publish poses
@@ -65,9 +41,10 @@ int main(int argc, char **argv)
             pose = pose_estimates[i];
             build_pose_stamped_cov_msg(seq, pose, rot_mat, pose_msg);
             publisher.publish(pose_msg);
+
+            // update
             seq++;
         }
-
 
         // not sure we want to do this in the final version?
         // send last known estimate if tag not detected
@@ -76,6 +53,7 @@ int main(int argc, char **argv)
             pose_msg.header.seq = seq;
             pose_msg.header.stamp = ros::Time::now();
             publisher.publish(pose_msg);
+
             // update
             seq++;
         }

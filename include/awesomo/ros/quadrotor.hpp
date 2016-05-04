@@ -40,6 +40,7 @@
 #define POSITION_Y_CONTROLLER_TOPIC "/awesomo/position_controller/y"
 #define POSITION_Z_CONTROLLER_TOPIC "/awesomo/position_controller/z"
 
+#define OFFLINE_MODE -1
 #define HOVER_MODE 0
 #define DISCOVER_MODE 1
 #define PLANNING_MODE 2
@@ -68,19 +69,20 @@ class Quadrotor
         Eigen::Vector3d tag_position;
 
         void poseCallback(const geometry_msgs::PoseStamped &msg);
-        void subscribeToPose(void);
         void mocapCallback(const geometry_msgs::PoseStamped &msg);
-        void subscribeToMocap(void);
         void imuCallback(const sensor_msgs::Imu::ConstPtr &msg);
-        void subscribeToIMU(void);
         void stateCallback(const mavros_msgs::State::ConstPtr &msg);
+
+        void subscribeToPose(void);
+        void subscribeToMocap(void);
+        void subscribeToIMU(void);
+
         void waitForConnection(void);
 
     public:
         Pose pose;
         Pose mocap_pose;
 
-        Camera *cam;
         CarrotController *carrot_controller;
         PositionController *position_controller;
 
@@ -92,10 +94,11 @@ class Quadrotor
         ros::Publisher position_controller_z_publisher;
 
         Quadrotor(void);
+        Quadrotor(std::map<std::string, std::string> configs);
         int arm(void);
         int disarm(void);
         int setOffboardModeOn(void);
-        void positionControllerCalculate(float x, float y, float z, ros::Time last_request);
+        void positionControllerCalculate(Position p, ros::Time last_request);
         void printPositionController(void);
         void buildPositionMessage(
             geometry_msgs::PoseStamped &msg,

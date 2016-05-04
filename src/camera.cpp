@@ -421,6 +421,7 @@ int Camera::photoMode(void)
     // read capture device
     while (true) {
         this->getFrame(image);
+        // obtain pose estimates
         pose_estimates = this->tag_detector->processImage(
             this->config->camera_matrix,
             image,
@@ -428,14 +429,18 @@ int Camera::photoMode(void)
         );
         this->adjustMode(pose_estimates, timeout);
 
-        // cv::imshow("camera", image);
-        // cv::waitKey(1);
-
+        // save image
         key_input = cvWaitKey(100);
         if((char) key_input == 49){
             std::cout << "Saving a new image" << std::endl;
             image.copyTo(image_cap);
             imshow("image capture", image_cap);
+        }
+
+        // imshow
+        if (this->camera_imshow) {
+            cv::imshow("camera", image);
+            cv::waitKey(1);
         }
     }
 

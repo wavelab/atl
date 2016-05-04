@@ -21,6 +21,14 @@ class Pose
         double yaw;
 };
 
+class Position
+{
+    public:
+        double x;
+        double y;
+        double z;
+};
+
 
 
 // FUNCTIONS

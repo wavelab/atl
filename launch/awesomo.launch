@@ -5,5 +5,9 @@
 	<param
         name="camera_config_path"
 	    value="$(find awesomo)/configs/pointgrey_firefly" />
-	<node pkg="awesomo" type="quadrotor_node" name="quadrotor_node" output="screen" />
+	<node
+	    pkg="awesomo"
+	    type="quadrotor_node"
+	    name="quadrotor_node"
+	    output="screen" />
 </launch>
