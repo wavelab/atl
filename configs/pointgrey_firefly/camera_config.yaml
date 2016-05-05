@@ -6,10 +6,10 @@ apriltag_imshow: 1
 
 nb_configs: 3
 config_keys:
-    ["default", "340", "160"]
+    ["320", "160", "640"]
 config_files:
     [
-        "ost_640.yaml",
         "ost_320.yaml",
-        "ost_160.yaml"
+        "ost_160.yaml",
+        "ost_640.yaml"
     ]

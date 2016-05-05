@@ -105,8 +105,7 @@ std::vector<TagPose> TagDetector::processImage(
 
     // display result
     if (this->apriltag_imshow) {
-        cv::imshow("camera - masked", masked);
-        cv::imshow("camera - grayscale", masked);
+        cv::imshow("apriltag detection", masked);
         cv::waitKey(1);
     }
 

@@ -102,7 +102,7 @@ Camera::Camera(std::string camera_config_path)
     this->camera_index = camera_config["camera_index"].as<int>();
     this->camera_imshow = camera_config["camera_imshow"].as<int>();
     this->camera_snapshot = camera_config["camera_snapshot"].as<int>();
-    this->tag_detector =  new TagDetector();
+    this->tag_detector =  new TagDetector(camera_config["apriltag_imshow"].as<int>());
 
 	if (camera_config["camera_type"].as<std::string>() == "firefly") {
         this->camera_type = CAMERA_FIREFLY;
@@ -247,9 +247,12 @@ int Camera::loadConfig(std::string camera_mode)
             config->image_width,
             config->image_height
         );
+        ROS_INFO("Loaded config file [%s]", camera_mode.c_str());
+
     } else {
         ROS_INFO("Config file for mode [%s] not found!", camera_mode.c_str());
         return -1;
+
     }
 
     return 0;
@@ -336,6 +339,7 @@ void Camera::adjustMode(std::vector<TagPose> &pose_estimates, int &timeout)
         timeout++;
     } else {
         pose = pose_estimates[0];
+
         if (this->camera_mode == "320" && pose.translation[0] <= 1.5) {
             this->loadConfig("160");
             timeout = 0;
@@ -389,11 +393,11 @@ std::vector<TagPose> Camera::step(int &timeout)
     }
 
     // snapshot
-    if (this->camera_snapshot && (char) cv::waitKey(100) == 32) {
-        std::cout << "Saving a new image" << std::endl;
-        cv::imshow("image capture", image);
-        cv::imwrite("image.jpg", image);
-    }
+    // if (this->camera_snapshot && (char) cv::waitKey(100) == 32) {
+    //     std::cout << "Saving a new image" << std::endl;
+    //     cv::imshow("image capture", image);
+    //     cv::imwrite("image.jpg", image);
+    // }
 
     return pose_estimates;
 }
