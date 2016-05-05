@@ -3,6 +3,13 @@
 
 TagDetector::TagDetector(void)
 {
+    this->apriltag_imshow = 0;
+    this->detector = new AprilTags::TagDetector(AprilTags::tagCodes16h5);
+}
+
+TagDetector::TagDetector(int apriltag_imshow)
+{
+    this->apriltag_imshow = apriltag_imshow;
     this->detector = new AprilTags::TagDetector(AprilTags::tagCodes16h5);
 }
 
@@ -97,9 +104,11 @@ std::vector<TagPose> TagDetector::processImage(
     }
 
     // display result
-    // cv::imshow("camera - masked", masked);
-    // cv::imshow("camera - grayscale", masked);
-    // cv::waitKey(1);
+    if (this->apriltag_imshow) {
+        cv::imshow("camera - masked", masked);
+        cv::imshow("camera - grayscale", masked);
+        cv::waitKey(1);
+    }
 
     return pose_estimates;
 }

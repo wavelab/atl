@@ -48,6 +48,7 @@ class Camera
         int camera_index;
         int camera_type;
         int camera_imshow;
+        int camera_snapshot;
         std::string camera_mode;
 
         cv::Rect roi_rect;
@@ -71,9 +72,8 @@ class Camera
         int initCamera(std::string camera_mode);
         CameraConfig *loadConfig(std::string mode, const std::string calib_file);
         int loadConfig(std::string camera_mode);
-        int run(void);
         int getFrame(cv::Mat &image);
-        int photoMode(void);
+        int run(void);
         std::vector<TagPose> step(int &timeout);
 };
 

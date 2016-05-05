@@ -1,6 +1,8 @@
 camera_type: "firefly"
 camera_index: 0
-camera_imshow: 0
+camera_imshow: 1
+camera_snapshot: 1
+apriltag_imshow: 1
 
 nb_configs: 3
 config_keys:

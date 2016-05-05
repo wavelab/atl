@@ -82,7 +82,9 @@ Camera::Camera(int camera_index, int camera_type)
 {
     this->camera_index = camera_index;
     this->camera_type = camera_type;
+    this->camera_snapshot = 0;
     this->tag_detector =  new TagDetector();
+
 }
 
 Camera::Camera(std::string camera_config_path)
@@ -97,8 +99,9 @@ Camera::Camera(std::string camera_config_path)
 	nb_configs = camera_config["nb_configs"].as<int>();
 
     // create camera object
-    this->camera_imshow = camera_config["camera_imshow"].as<int>();
     this->camera_index = camera_config["camera_index"].as<int>();
+    this->camera_imshow = camera_config["camera_imshow"].as<int>();
+    this->camera_snapshot = camera_config["camera_snapshot"].as<int>();
     this->tag_detector =  new TagDetector();
 
 	if (camera_config["camera_type"].as<std::string>() == "firefly") {
@@ -349,6 +352,7 @@ int Camera::run(void)
     int timeout;
     double last_tic;
     cv::Mat image;
+    cv::Mat image_capture;
     std::vector<TagPose> pose_estimates;
 
     // setup
@@ -358,19 +362,7 @@ int Camera::run(void)
 
     // read capture device
     while (true) {
-        this->getFrame(image);
-        pose_estimates = this->tag_detector->processImage(
-            this->config->camera_matrix,
-            image,
-            timeout
-        );
-        this->adjustMode(pose_estimates, timeout);
-
-        // this->printFPS(last_tic, frame_index);
-        if (this->camera_imshow) {
-            cv::imshow("camera", image);
-            cv::waitKey(1);
-        }
+        this->step(timeout);
     }
 
     return 0;
@@ -396,53 +388,12 @@ std::vector<TagPose> Camera::step(int &timeout)
         cv::waitKey(1);
     }
 
-    return pose_estimates;
-}
-
-int Camera::photoMode(void)
-{
-    int frame_index;
-    int timeout;
-    double last_tic;
-    cv::Mat image;
-    std::vector<TagPose> pose_estimates;
-
-    int key_input;
-    cv::Mat image_cap;
-    int image_number;
-
-    // setup
-    timeout = 0;
-    frame_index = 0;
-    last_tic = tic();
-
-    image_number = 1;
-
-    // read capture device
-    while (true) {
-        this->getFrame(image);
-        // obtain pose estimates
-        pose_estimates = this->tag_detector->processImage(
-            this->config->camera_matrix,
-            image,
-            timeout
-        );
-        this->adjustMode(pose_estimates, timeout);
-
-        // save image
-        key_input = cvWaitKey(100);
-        if((char) key_input == 49){
-            std::cout << "Saving a new image" << std::endl;
-            image.copyTo(image_cap);
-            imshow("image capture", image_cap);
-        }
-
-        // imshow
-        if (this->camera_imshow) {
-            cv::imshow("camera", image);
-            cv::waitKey(1);
-        }
+    // snapshot
+    if (this->camera_snapshot && (char) cv::waitKey(100) == 32) {
+        std::cout << "Saving a new image" << std::endl;
+        cv::imshow("image capture", image);
+        cv::imwrite("image.jpg", image);
     }
 
-    return 0;
+    return pose_estimates;
 }
