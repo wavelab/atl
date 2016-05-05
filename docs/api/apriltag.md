@@ -6,7 +6,7 @@
 
 
 
-## TagPose
+### TagPose
 
 **Attributes**:
 
@@ -19,16 +19,16 @@
 
 
 
-## TagDetector
+### TagDetector
 
 
-### Constructors
+#### Constructors
 
     TagDetector(void)
     TagDetector(int apriltag_imshow)
 
 
-### Methods
+#### Methods
 
     void adjustROI(cv::Mat &image_gray, AprilTags::TagDetection &tag)
 
