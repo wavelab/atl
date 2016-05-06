@@ -1,13 +1,10 @@
 # [awesomo](https://chutsu.github.io/awesomo)
 
 ## Reference
-## Pixhawk
+### Pixhawk
 - [Serial Communication](#docs/reference/pixhawk/serial_communication)
 
-## Misc
-- [TODO](#docs/reference/TODO)
-
-## API
+### API
 - [apriltag](#docs/api/apriltag)
 - [camera](#docs/api/camera)
 - [controller](#docs/api/controller)
