@@ -27,7 +27,7 @@ CarrotController::CarrotController(std::string config_file_path)
     this->look_ahead_dist = carrot_config["look_ahead_dist"].as<float>();
     this->wp_threshold = carrot_config["wp_threshold"].as<float>();
 
-    for (int i = 0; i < carrot_config["waypoints"].size(); i += 3) {
+    for (int i = 0; i < (int) carrot_config["waypoints"].size(); i += 3) {
         position <<
             carrot_config["waypoints"][i].as<float>(),
             carrot_config["waypoints"][i + 1].as<float>(),
@@ -109,8 +109,6 @@ int CarrotController::waypointReached(
 
 int CarrotController::update(Eigen::Vector3d position, Eigen::Vector3d &carrot)
 {
-    int nb_waypoints;
-
     // pre-check
     if (this->initialized == 0) {
         return -2;
@@ -219,7 +217,6 @@ void PositionController::calculate(Pose pose)
     float roll_adjusted;
     float pitch_adjusted;
     float throttle_adjusted;
-    float dt;
 
     pid_calculate(&this->x, pose.y, this->dt);
     pid_calculate(&this->y, pose.x, this->dt);

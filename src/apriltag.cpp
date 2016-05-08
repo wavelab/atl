@@ -85,7 +85,7 @@ std::vector<TagPose> TagDetector::processImage(
 
     // extract apriltags and estimate pose
     apriltags = this->detector->extractTags(masked);
-    for (int i = 0; i < apriltags.size(); i++) {
+    for (int i = 0; i < (int) apriltags.size(); i++) {
         if (apriltags[i].id == 5 || apriltags[i].id == 0) {
             // this->printDetection(this->apriltags[i]);
             pose = this->obtainPose(apriltags[i], camera_matrix);

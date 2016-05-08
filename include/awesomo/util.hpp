@@ -1,6 +1,13 @@
 #ifndef __UTIL_H__
 #define __UTIL_H__
 
+#include <cstdio>
+#include <stdarg.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <unistd.h>
+
 #include <tf/transform_datatypes.h>
 #include <geometry_msgs/Quaternion.h>
 

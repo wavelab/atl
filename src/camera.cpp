@@ -123,24 +123,6 @@ Camera::Camera(std::string camera_config_path)
     this->initCamera(camera_config["config_keys"][0].as<std::string>());
 }
 
-static int checkMatrixYaml(YAML::Node matrix_yaml)
-{
-    const std::string targets[3] = { "rows", "cols", "data" };
-
-    // pre-check
-    if (matrix_yaml == NULL) {
-        return -1;
-    }
-
-    for (int i = 0; i < 3; i++) {
-        if (!matrix_yaml[targets[i]]) {
-            return -1;
-        }
-    }
-
-    return 0;
-}
-
 static cv::Mat loadMatrixFromYaml(YAML::Node matrix_yaml)
 {
     int rows;
@@ -352,17 +334,13 @@ void Camera::adjustMode(std::vector<TagPose> &pose_estimates, int &timeout)
 
 int Camera::run(void)
 {
-    int frame_index;
     int timeout;
-    double last_tic;
     cv::Mat image;
     cv::Mat image_capture;
     std::vector<TagPose> pose_estimates;
 
     // setup
     timeout = 0;
-    frame_index = 0;
-    last_tic = tic();
 
     // read capture device
     while (true) {
