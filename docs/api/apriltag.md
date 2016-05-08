@@ -51,13 +51,19 @@ image frames where Apriltags was not detected.
 
 ---
 
-    TagPose obtainPose(AprilTags::TagDetection &detection, cv::Mat camera_matrix)
+    TagPose obtainPose(
+        AprilTags::TagDetection &detection,
+        cv::Mat camera_matrix
+    )
 
 Obtain Apriltag pose from detected tag `detection` and `camera_matrix`.
 
 ---
 
-    void printDetection(AprilTags::TagDetection& detection)
+    void printDetection(
+        AprilTags::TagDetection &detection,
+        cv::Mat camera_matrix
+    )
 
 Print detected apriltags.
 

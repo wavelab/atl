@@ -166,31 +166,6 @@ TagPose TagDetector::obtainPose(
         tag_size = 1;
     }
 
-    // Eigen::Matrix4d transform;
-    // Eigen::Vector3d translation;
-    // transform = detection.getRelativeTransform(
-    //     tag_size,
-    //     camera_matrix.at<double>(0, 0),
-    //     camera_matrix.at<double>(1, 1),
-    //     camera_matrix.at<double>(0, 2),
-    //     camera_matrix.at<double>(1, 2)
-    // );
-    //
-    // Eigen::Matrix4d M;
-    // M << 0, 0, 1, 0,
-    //     -1, 0, 0, 0,
-    //     0, -1, 0, 0,
-    //     0, 0, 0, 1;
-    //
-    // Eigen::Matrix4d MT = M * transform;
-    // pose.translation = MT.col(3).head(3);
-    // rotation = transform.block(0, 0, 3, 3);
-    // F << 1, 0, 0,
-    //     0, -1, 0,
-    //     0, 0, 1;
-    // fixed_rot = F * rotation;
-    // convertToEuler(fixed_rot, pose.yaw, pose.pitch, pose.roll);
-
     // recovering the relative pose of a tag:
     detection.getRelativeTranslationRotation(
         tag_size,
@@ -208,23 +183,26 @@ TagPose TagDetector::obtainPose(
     return pose;
 }
 
-// void TagDetector::printDetection(AprilTags::TagDetection& tag)
-// {
-//     TagPose pose;
-//
-//     pose = this->obtainPose(tag);
-//     ROS_INFO("id: %d ", tag.id);
-//     ROS_INFO("Hamming: %d ", tag.hammingDistance);
-//     ROS_INFO("distance= %fm ", pose.translation.norm());
-//     ROS_INFO("x=%f ", pose.translation(0));
-//     ROS_INFO("y=%f ", pose.translation(1));
-//     ROS_INFO("z=%f ", pose.translation(2));
-//     ROS_INFO("yaw=%f ", rad2deg(pose.yaw));
-//     ROS_INFO("pitch=%f ", rad2deg(pose.pitch));
-//     ROS_INFO("roll=%f \n", rad2deg(pose.roll));
-//
-//     // also note that for SLAM/multi-view application it is better to
-//     // use reprojection error of corner points, because the noise in
-//     // this relative pose is very non-Gaussian; see iSAM source code
-//     // for suitable factors.
-// }
+void TagDetector::printDetection(
+    AprilTags::TagDetection &tag,
+    cv::Mat camera_matrix
+)
+{
+    TagPose pose;
+
+    pose = this->obtainPose(tag, camera_matrix);
+    ROS_INFO("id: %d ", tag.id);
+    ROS_INFO("Hamming: %d ", tag.hammingDistance);
+    ROS_INFO("distance= %fm ", pose.translation.norm());
+    ROS_INFO("x=%f ", pose.translation(0));
+    ROS_INFO("y=%f ", pose.translation(1));
+    ROS_INFO("z=%f ", pose.translation(2));
+    ROS_INFO("yaw=%f ", rad2deg(pose.yaw));
+    ROS_INFO("pitch=%f ", rad2deg(pose.pitch));
+    ROS_INFO("roll=%f \n", rad2deg(pose.roll));
+
+    // also note that for SLAM/multi-view application it is better to
+    // use reprojection error of corner points, because the noise in
+    // this relative pose is very non-Gaussian; see iSAM source code
+    // for suitable factors.
+}

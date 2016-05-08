@@ -12,6 +12,8 @@
 #include <AprilTags/TagDetector.h>
 #include <AprilTags/Tag16h5.h>
 
+#include "awesomo/util.hpp"
+
 
 #define _USE_MATH_DEFINES
 #ifdef M_PI
@@ -54,7 +56,10 @@ class TagDetector
             AprilTags::TagDetection &detection,
             cv::Mat camera_matrix
         );
-        void printDetection(AprilTags::TagDetection& detection);
+        void printDetection(
+            AprilTags::TagDetection &detection,
+            cv::Mat camera_matrix
+        );
 };
 
 #endif
