@@ -1,8 +1,9 @@
 #ifndef __IMU_HPP__
 #define __IMU_HPP__
 
+#include <math.h>
 #include <stdlib.h>
-#include <sys/timeb.h>
+#include <time.h>
 
 #include "navio2/MPU9250.h"
 #include "navio2/Util.h"
@@ -12,34 +13,37 @@
 class Accelerometer
 {
     public:
-        Accelerometer(void);
         float x;
         float y;
         float z;
         float roll;
         float pitch;
+
+        Accelerometer(void);
 };
 
 class Gyroscope
 {
     public:
-        Gyroscope(void);
         float x;
         float y;
         float z;
         float roll;
         float pitch;
+
+        Gyroscope(void);
 };
 
 class Magnetometer
 {
     public:
-        Magnetometer(void);
         float x;
         float y;
         float z;
         float roll;
         float pitch;
+
+        Magnetometer(void);
 };
 
 class IMU
@@ -51,10 +55,11 @@ class IMU
         Magnetometer *mag_data;
         float roll;
         float pitch;
-        struct timeb last_updated;
+        clock_t last_updated;
 
         IMU(void);
         void read(void);
+        void calculateOrientationCF(void);
         void update(void);
         void print(void);
 };

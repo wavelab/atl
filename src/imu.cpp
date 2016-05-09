@@ -55,6 +55,44 @@ void IMU::read(void)
     );
 }
 
+void IMU::calculateOrientationCF(void)
+{
+    float x;
+    float y;
+    float z;
+    float dt;
+    clock_t now;
+
+    /* setup */
+    x = this->accel_data->x;
+    y = this->accel_data->y;
+    z = this->accel_data->z;
+
+    // calculate dt
+    now = clock();
+    dt = ((double) now - this->last_updated) / CLOCKS_PER_SEC;
+
+    // calculate pitch and roll from accelerometer
+    this->accel_data->pitch = (atan(x / sqrt(pow(y, 2) + pow(z, 2)))) * 180 / M_PI;
+    this->accel_data->roll = (atan(y / sqrt(pow(x, 2) + pow(z, 2)))) * 180 / M_PI;
+
+    // complimentary filter
+    this->pitch = (0.98 * this->gyro_data->pitch) + (0.02 * this->accel_data->pitch);
+    this->roll = (0.98 * this->gyro_data->roll) + (0.02 * this->accel_data->roll);
+
+    // calculate pitch and roll from gyroscope
+    this->gyro_data->roll = (this->gyro_data->x * dt) + this->roll;
+    this->gyro_data->pitch = (this->gyro_data->y * dt) + this->pitch;
+
+    // update last_updated
+    this->last_updated = clock();
+}
+
+void IMU::update(void)
+{
+    this->calculateOrientationCF();
+}
+
 void IMU::print(void)
 {
     printf("Acc: %+7.3f %+7.3f %+7.3f  ",
@@ -76,34 +114,3 @@ void IMU::print(void)
     );
 }
 
-void IMU::calculateOrientation(void)
-{
-    float x;
-    float y;
-    float z;
-    int t_diff;
-    clock_t now;
-
-    /* setup */
-    x = this->accel_data->x;
-    y = this->accel_data->y;
-    z = this->accel_data->z;
-
-
-    /* calculate pitch and roll from accelerometer */
-    this->accel_data->pitch = (atan(x / sqrt(pow(y, 2) + pow(z, 2)))) * 180 / M_PI;
-    this->accel_data->roll = (atan(y / sqrt(pow(x, 2) + pow(z, 2)))) * 180 / M_PI;
-
-    this->pitch = (0.98 * this->gyro->pitch) + (0.02 * this->accel->pitch);
-    this->roll = (0.98 * this->gyro->roll) + (0.02 * this->accel->roll);
-
-    /* calculate pitch and roll from gyroscope */
-    this->gyro_data->roll = (this->gyro_data->x * dt) + this->roll;
-    this->gyro_data->pitch = (this->gyro_data->y * dt) + this->pitch;
-}
-
-void IMU::update(void)
-{
-
-
-}
