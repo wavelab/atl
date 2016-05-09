@@ -5,7 +5,6 @@
 #include <deque>
 
 #include <Eigen/Dense>
-#include <tf/transform_datatypes.h>
 #include <yaml-cpp/yaml.h>
 
 #include "util.hpp"
@@ -93,7 +92,7 @@ class PositionController
         float throttle;
         float hover_throttle;
 
-        tf::Quaternion rpy_quat;
+        // tf::Quaternion rpy_quat;
         float dt;
 
         PositionController(const std::string config_file);

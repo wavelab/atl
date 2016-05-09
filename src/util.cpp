@@ -51,23 +51,23 @@ int euler2RotationMatrix(
     return 0;
 }
 
-tf::Quaternion euler2quat(double roll, double pitch, double yaw)
-{
-    return tf::createQuaternionFromRPY(roll, pitch, yaw);
-}
+// tf::Quaternion euler2quat(double roll, double pitch, double yaw)
+// {
+//     return tf::createQuaternionFromRPY(roll, pitch, yaw);
+// }
 
-void quat2euler(
-    const geometry_msgs::Quaternion &q,
-    double *roll,
-    double *pitch,
-    double *yaw
-)
-{
-    tf::Quaternion quat(q.x, q.y, q.z, q.w);
-    tf::Matrix3x3 m(quat);
-    m.getRPY(*roll, *pitch, *yaw);
-}
-
+// void quat2euler(
+//     const geometry_msgs::Quaternion &q,
+//     double *roll,
+//     double *pitch,
+//     double *yaw
+// )
+// {
+//     tf::Quaternion quat(q.x, q.y, q.z, q.w);
+//     tf::Matrix3x3 m(quat);
+//     m.getRPY(*roll, *pitch, *yaw);
+// }
+//
 
 // static double tic(void)
 // {

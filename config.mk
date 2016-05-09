@@ -21,8 +21,10 @@ LIBS = \
 	-L$(LIB_DIR) \
 	-lawesomo \
 	-lflycapture \
-	-lnavio2\
-	-lm
+	-lyaml-cpp \
+	-lnavio2 \
+	-lm \
+	`pkg-config --libs --cflags opencv`
 
 # C COMPILER
 CC = g++

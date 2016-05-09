@@ -165,6 +165,8 @@ int testCarrotControllerUpdate(void)
     }
 
     outfile.close();
+
+    return 0;
 }
 
 int testPositionControllerLoadConfig(void)

@@ -240,6 +240,6 @@ void PositionController::calculate(Pose pose)
     // update position controller
     this->roll = roll_adjusted;
     this->pitch = pitch_adjusted;
-    this->rpy_quat = euler2quat(roll_adjusted, pitch_adjusted, 0);
+    // this->rpy_quat = euler2quat(roll_adjusted, pitch_adjusted, 0);
     this->throttle = throttle_adjusted;
 }

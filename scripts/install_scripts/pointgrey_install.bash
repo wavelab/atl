@@ -1,9 +1,10 @@
 #!/bin/bash
 set -e #halt on first error
 
+PACKAGE=flycapture2-2.8.3.1-amd64
+
 # get dir that the script is located in
 DIR=$( cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-echo $DIR
 
 install_pointgrey_drivers(){
     # pointgrey driver dependencies
@@ -19,11 +20,11 @@ install_pointgrey_drivers(){
     # unzip drivers
     cd $DIR
     cd ../../deps
-    unzip flycapture2-2.8.3.1-amd64.zip
-    cd flycapture2-2.8.3.1-amd64
+    unzip $PACAKGE.zip
+    cd $PACAKGE
     sudo sh install_flycapture.sh
     cd ..
-    rm -rf flycapture2-2.8.3.1
+    rm -rf $PACAKGE
 }
 
 # install coriander for setting camera configurations

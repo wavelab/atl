@@ -15,7 +15,7 @@ int Camera::initWebcam(int image_width, int image_height)
 
     // open
     if (this->capture->isOpened() == 0) {
-        ROS_INFO("Failed to open webcam!");
+        printf("Failed to open webcam!\n");
         return -1;
 
     } else {
@@ -23,7 +23,7 @@ int Camera::initWebcam(int image_width, int image_height)
         this->capture->set(CV_CAP_PROP_FRAME_HEIGHT, image_height);
 
     }
-    ROS_INFO("Camera initialized!");
+    printf("Camera initialized!");
 
     return 0;
 }
@@ -38,19 +38,19 @@ int Camera::initFirefly()
     // connect
     error = this->capture_firefly->Connect(0);
     if (error != FlyCapture2::PGRERROR_OK) {
-        ROS_INFO("Failed to connect to camera!");
+        printf("Failed to connect to camera!\n");
         return -1;
     } else {
-        ROS_INFO("Firefly camera connected!");
+        printf("Firefly camera connected!\n");
     }
 
     // start camera
     error = this->capture_firefly->StartCapture();
     if (error != FlyCapture2::PGRERROR_OK) {
-        ROS_INFO("Failed start camera!");
+        printf("Failed start camera!\n");
         return -1;
     } else {
-        ROS_INFO("Firefly initialized!");
+        printf("Firefly initialized!\n");
     }
 
     return 0;
@@ -60,7 +60,7 @@ int Camera::initCamera(std::string camera_mode)
 {
     // load calibration file
     if (this->loadConfig(camera_mode) == -1) {
-        ROS_INFO("Failed to initialize camera!");
+        printf("Failed to initialize camera!\n");
         return -1;
     }
 
@@ -70,10 +70,10 @@ int Camera::initCamera(std::string camera_mode)
     } else if (this->camera_type == CAMERA_FIREFLY) {
         this->initFirefly();
     } else {
-        ROS_INFO("Invalid Camera Type: %d!", this->camera_type);
-        ROS_INFO("Failed to initialize camera!");
+        printf("Invalid Camera Type: %d!\n", this->camera_type);
+        printf("Failed to initialize camera!\n");
     }
-    ROS_INFO("Camera is running...");
+    printf("Camera is running...\n");
 
     return 0;
 }
@@ -158,14 +158,14 @@ CameraConfig *Camera::loadConfig(std::string mode, const std::string calib_file)
         if (config["image_width"]) {
             camera_config->image_width = config["image_width"].as<int>();
         } else {
-            ROS_ERROR("Failed to load image_width");
+            printf("Failed to load image_width\n");
         }
 
         // image height
         if (config["image_height"]) {
             camera_config->image_height = config["image_height"].as<int>();
         } else {
-            ROS_ERROR("Failed to load image_height");
+            printf("Failed to load image_height\n");
         }
 
         // camera matrix
@@ -174,7 +174,7 @@ CameraConfig *Camera::loadConfig(std::string mode, const std::string calib_file)
                 config["camera_matrix"]
             );
         } else {
-            ROS_ERROR("Failed to load camera_matrix");
+            printf("Failed to load camera_matrix\n");
         }
 
         // distortion coefficients
@@ -183,7 +183,7 @@ CameraConfig *Camera::loadConfig(std::string mode, const std::string calib_file)
                 config["distortion_coefficients"]
             );
         } else {
-            ROS_ERROR("Failed to load distortion_coefficients");
+            printf("Failed to load distortion_coefficients\n");
         }
 
         // rectification matrix
@@ -192,7 +192,7 @@ CameraConfig *Camera::loadConfig(std::string mode, const std::string calib_file)
                 config["rectification_matrix"]
             );
         } else {
-            ROS_ERROR("Failed to load rectification_matrix");
+            printf("Failed to load rectification_matrix\n");
         }
 
         // projection matrix
@@ -201,12 +201,12 @@ CameraConfig *Camera::loadConfig(std::string mode, const std::string calib_file)
                 config["projection_matrix"]
             );
         } else {
-            ROS_ERROR("Failed to load proejection_matrix");
+            printf("Failed to load proejection_matrix\n");
         }
 
     } catch (YAML::BadFile &ex) {
-        ROS_ERROR(
-            "Failed to load calibration file: %s",
+        printf(
+            "Failed to load calibration file: %s\n",
             calib_file.c_str()
         );
         throw;
@@ -229,10 +229,10 @@ int Camera::loadConfig(std::string camera_mode)
             config->image_width,
             config->image_height
         );
-        ROS_INFO("Loaded config file [%s]", camera_mode.c_str());
+        printf("Loaded config file [%s]\n", camera_mode.c_str());
 
     } else {
-        ROS_INFO("Config file for mode [%s] not found!", camera_mode.c_str());
+        printf("Config file for mode [%s] not found!\n", camera_mode.c_str());
         return -1;
 
     }
@@ -256,7 +256,7 @@ int Camera::getFrame(cv::Mat &image)
         // get the image
         error = this->capture_firefly->RetrieveBuffer(&raw_img);
         if (error != FlyCapture2::PGRERROR_OK) {
-            ROS_INFO("Video capture error!");
+            printf("Video capture error!\n");
             return -1;
         }
 
@@ -286,7 +286,7 @@ int Camera::getFrame(cv::Mat &image)
         );
 
     } else {
-        ROS_INFO("Invalid Camera Type: %d!", camera_type);
+        printf("Invalid Camera Type: %d!\n", camera_type);
         return -2;
 
     }
@@ -310,7 +310,7 @@ void Camera::adjustMode(std::vector<TagPose> &pose_estimates, int &timeout)
 
     // pre-check
     if (timeout > 5 && this->camera_mode == "160") {
-        ROS_INFO("timeout!!");
+        printf("timeout!!\n");
         this->loadConfig("320");
         timeout = 0;
         return;

@@ -6,8 +6,6 @@
 #include <math.h>
 #include <sys/time.h>
 
-#include <ros/console.h>
-
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <AprilTags/TagDetector.h>

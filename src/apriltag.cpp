@@ -191,15 +191,15 @@ void TagDetector::printDetection(
     TagPose pose;
 
     pose = this->obtainPose(tag, camera_matrix);
-    ROS_INFO("id: %d ", tag.id);
-    ROS_INFO("Hamming: %d ", tag.hammingDistance);
-    ROS_INFO("distance= %fm ", pose.translation.norm());
-    ROS_INFO("x=%f ", pose.translation(0));
-    ROS_INFO("y=%f ", pose.translation(1));
-    ROS_INFO("z=%f ", pose.translation(2));
-    ROS_INFO("yaw=%f ", rad2deg(pose.yaw));
-    ROS_INFO("pitch=%f ", rad2deg(pose.pitch));
-    ROS_INFO("roll=%f \n", rad2deg(pose.roll));
+    printf("id: %d \n", tag.id);
+    printf("Hamming: %d \n", tag.hammingDistance);
+    printf("distance= %fm \n", pose.translation.norm());
+    printf("x=%f \n", pose.translation(0));
+    printf("y=%f \n", pose.translation(1));
+    printf("z=%f \n", pose.translation(2));
+    printf("yaw=%f \n", rad2deg(pose.yaw));
+    printf("pitch=%f \n", rad2deg(pose.pitch));
+    printf("roll=%f \n", rad2deg(pose.roll));
 
     // also note that for SLAM/multi-view application it is better to
     // use reprojection error of corner points, because the noise in

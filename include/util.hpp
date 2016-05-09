@@ -8,8 +8,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include <tf/transform_datatypes.h>
-#include <geometry_msgs/Quaternion.h>
+// #include <tf/transform_datatypes.h>
+// #include <geometry_msgs/Quaternion.h>
 
 #include <Eigen/Geometry>
 
@@ -53,12 +53,12 @@ int euler2RotationMatrix(
     const double yaw,
     Eigen::Matrix3d &rot
 );
-tf::Quaternion euler2quat(double roll, double pitch, double yaw);
-void quat2euler(
-    const geometry_msgs::Quaternion &q,
-    double *roll,
-    double *pitch,
-    double *yaw
-);
+// tf::Quaternion euler2quat(double roll, double pitch, double yaw);
+// void quat2euler(
+//     const geometry_msgs::Quaternion &q,
+//     double *roll,
+//     double *pitch,
+//     double *yaw
+// );
 
 #endif
