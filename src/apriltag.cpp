@@ -1,4 +1,4 @@
-#include "awesomo/apriltag.hpp"
+#include "apriltag.hpp"
 
 
 TagDetector::TagDetector(void)

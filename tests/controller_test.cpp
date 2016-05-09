@@ -1,5 +1,5 @@
-#include "awesomo/munit.h"
-#include "awesomo/controller.hpp"
+#include "munit.h"
+#include "controller.hpp"
 
 
 #define CARROT_CONTROLLER_CONFIG "configs/carrot_controller/config.yaml"

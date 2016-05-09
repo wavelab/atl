@@ -1,4 +1,4 @@
-#include "awesomo/camera.hpp"
+#include "camera.hpp"
 
 
 static double tic(void)

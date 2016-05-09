@@ -15,8 +15,8 @@
 #include <yaml-cpp/yaml.h>
 #include <FlyCapture2.h>
 
-#include "awesomo/util.hpp"
-#include "awesomo/apriltag.hpp"
+#include "util.hpp"
+#include "apriltag.hpp"
 
 
 

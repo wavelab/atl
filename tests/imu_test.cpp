@@ -1,5 +1,5 @@
-#include "awesomo/munit.h"
-#include "awesomo/imu.hpp"
+#include "munit.h"
+#include "imu.hpp"
 
 // TESTS
 int testImu(void);

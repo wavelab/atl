@@ -1,5 +1,5 @@
-#include "awesomo/munit.h"
-#include "awesomo/camera.hpp"
+#include "munit.h"
+#include "camera.hpp"
 
 #define CONFIG_PATH "configs/pointgrey_firefly"
 

@@ -2,12 +2,12 @@ include $(PWD)/config.mk
 FOLDER_NAME = src
 
 SRCS = $(wildcard *.cpp)
-OBJS = $(SRCS:.cpp=.o)
+OBJS = $(addprefix $(LIB_BUILD_DIR)/, $(SRCS:.cpp=.o))
 
-default: libawesomo
+default: $(LIB_DIR)/libawesomo.a
 
-%.o: %.cpp
+$(LIB_BUILD_DIR)/%.o: %.cpp
 	$(MAKE_OBJ)
 
-libawesomo: $(OBJS)
+$(LIB_DIR)/libawesomo.a: $(OBJS)
 	$(MAKE_STATIC_LIB)

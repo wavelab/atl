@@ -8,7 +8,7 @@
 #include <tf/transform_datatypes.h>
 #include <yaml-cpp/yaml.h>
 
-#include "awesomo/util.hpp"
+#include "util.hpp"
 
 
 // CONSTANTS
