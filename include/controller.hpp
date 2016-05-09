@@ -100,4 +100,19 @@ class PositionController
         void calculate(Pose p);
 };
 
+class AttitudeController
+{
+    public:
+        struct pid motor_1;
+        struct pid motor_2;
+        struct pid motor_3;
+        struct pid motor_4;
+
+        float dt;
+
+        AttitudeController(const std::string config_file);
+        void loadConfig(const std::string config_file);
+        void calculate(Pose p);
+};
+
 #endif
