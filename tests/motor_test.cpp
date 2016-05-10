@@ -15,6 +15,7 @@ int test_set_throttle(void)
 
     motors = new Motors();
 
+    motors->arm();
     motors->set_throttle(0, 1);
     motors->set_throttle(1, 1);
     motors->set_throttle(2, 1);
@@ -27,20 +28,20 @@ int test_set_throttle(void)
     motors->set_throttle(3, 0);
     sleep(2);
 
-    motors->set_throttle(0, 0.1);
-    sleep(1);
-    motors->set_throttle(1, 0.1);
-    sleep(1);
-    motors->set_throttle(2, 0.1);
-    sleep(1);
-    motors->set_throttle(3, 0.1);
-    sleep(1);
-
-    motors->set_throttle(0, 0);
-    motors->set_throttle(1, 0);
-    motors->set_throttle(2, 0);
-    motors->set_throttle(3, 0);
-    sleep(2);
+    // motors->set_throttle(0, 0.1);
+    // sleep(1);
+    // motors->set_throttle(1, 0.1);
+    // sleep(1);
+    // motors->set_throttle(2, 0.1);
+    // sleep(1);
+    // motors->set_throttle(3, 0.1);
+    // sleep(1);
+    //
+    // motors->set_throttle(0, 0);
+    // motors->set_throttle(1, 0);
+    // motors->set_throttle(2, 0);
+    // motors->set_throttle(3, 0);
+    // sleep(2);
 
 	return 0;
 }
