@@ -138,6 +138,8 @@ int CarrotController::update(Eigen::Vector3d position, Eigen::Vector3d &carrot)
 
 
 
+
+
 // POSITION CONTROLLER
 PositionController::PositionController(const std::string config_file)
 {
@@ -240,6 +242,67 @@ void PositionController::calculate(Pose pose)
     // update position controller
     this->roll = roll_adjusted;
     this->pitch = pitch_adjusted;
-    // this->rpy_quat = euler2quat(roll_adjusted, pitch_adjusted, 0);
     this->throttle = throttle_adjusted;
+}
+
+
+
+
+
+// ATTITUDE CONTROLLER
+AttitudeController::AttitudeController(void)
+{
+    this->m1 = 0.0f;
+    this->m2 = 0.0f;
+    this->m3 = 0.0f;
+    this->m4 = 0.0f;
+
+    this->dt = 0.0f;
+}
+
+void AttitudeController::loadConfig(const std::string config_file)
+{
+    try {
+        YAML::Node config = YAML::LoadFile(config_file);
+
+        // roll controller
+        this->roll.setpoint = config["roll_controller"]["setpoint"].as<float>();
+        this->roll.min = config["roll_controller"]["min"].as<float>();
+        this->roll.max = config["roll_controller"]["max"].as<float>();
+        this->roll.k_p = config["roll_controller"]["k_p"].as<float>();
+        this->roll.k_i = config["roll_controller"]["k_i"].as<float>();
+        this->roll.k_d = config["roll_controller"]["k_d"].as<float>();
+
+        // pitch controller
+        this->pitch.setpoint = config["pitch_controller"]["setpoint"].as<float>();
+        this->pitch.min = config["pitch_controller"]["min"].as<float>();
+        this->pitch.max = config["pitch_controller"]["max"].as<float>();
+        this->pitch.k_p = config["pitch_controller"]["k_p"].as<float>();
+        this->pitch.k_i = config["pitch_controller"]["k_i"].as<float>();
+        this->pitch.k_d = config["pitch_controller"]["k_d"].as<float>();
+
+    } catch (YAML::BadFile &ex) {
+        throw;
+    }
+}
+
+void AttitudeController::calculate(Orientation orientation, float throttle)
+{
+    float roll;
+    float pitch;
+
+    pid_calculate(&this->roll, orientation.roll, this->dt);
+    pid_calculate(&this->pitch, orientation.pitch, this->dt);
+    roll = this->roll.output;
+    pitch = this->pitch.output;
+
+    // APM motor mapping
+    // M1: TOP RIGHT
+    // M2: BOTTOM LEFT
+    // M3: TOP LEFT
+    // M4: BOTTOM RIGHT
+    this->m1 = throttle - roll + pitch;
+    this->m2 = throttle + roll - pitch;
+    this->m3 = throttle + roll + pitch;
+    this->m4 = throttle - roll - pitch;
 }

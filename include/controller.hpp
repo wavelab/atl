@@ -92,7 +92,6 @@ class PositionController
         float throttle;
         float hover_throttle;
 
-        // tf::Quaternion rpy_quat;
         float dt;
 
         PositionController(const std::string config_file);
@@ -103,16 +102,20 @@ class PositionController
 class AttitudeController
 {
     public:
-        struct pid motor_1;
-        struct pid motor_2;
-        struct pid motor_3;
-        struct pid motor_4;
+        struct pid roll;
+        struct pid pitch;
+
+        float m1;
+        float m2;
+        float m3;
+        float m4;
 
         float dt;
 
+        AttitudeController(void);
         AttitudeController(const std::string config_file);
         void loadConfig(const std::string config_file);
-        void calculate(Pose p);
+        void calculate(Orientation orientation, float throttle);
 };
 
 #endif

@@ -28,6 +28,14 @@ class Pose
         double yaw;
 };
 
+class Orientation
+{
+    public:
+        double roll;
+        double pitch;
+        double yaw;
+};
+
 class Position
 {
     public:

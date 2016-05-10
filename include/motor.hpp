@@ -24,6 +24,7 @@ class Motors
         float motor_4;
 
         Motors(void);
+        void arm(void);
         void set_throttle(int index, float percentage);
         void set_throttle_pwm(int index, int pwm);
 };
