@@ -3,18 +3,20 @@
 # Written by Mikhail Avkhimenia (mikhail.avkhimenia@emlid.com)
 # twitter.com/emlidtech || www.emlid.com || info@emlid.com
 #
-# This application visualizes Navio's IMU data. Tested to work under Ubuntu and 
+# This application visualizes Navio's IMU data. Tested to work under Ubuntu and
 # Mac OS X. It listens for data on the UDP port 7000. To run it type:
 # python 3Dimu.py
+
+import os
+import sys
+import threading
+import socket
+import select
 
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
 import serial
-import os
-import threading
-import socket
-import select
 
 # Initial rotation
 x = 0.7325378163287418
@@ -22,18 +24,7 @@ y = 0.4619397662556433
 z = -0.19134171618254486
 w = 0.4619397662556433
 
-#----------------------------------- Cube--------------------------------------
-
-# vertices = [
-#     -1.0, -1.0, -1.0,  -1.0, -1.0,  1.0,  -1.0,  1.0,  1.0,  -1.0,  1.0, -1.0,
-#      1.0, -1.0, -1.0,   1.0, -1.0,  1.0,   1.0,  1.0,  1.0,   1.0,  1.0, -1.0,
-#     -1.0, -1.0, -1.0,  -1.0, -1.0,  1.0,   1.0, -1.0,  1.0,   1.0, -1.0, -1.0,
-#     -1.0,  1.0, -1.0,  -1.0,  1.0,  1.0,   1.0,  1.0,  1.0,   1.0,  1.0, -1.0,
-#     -1.0, -1.0, -1.0,  -1.0,  1.0, -1.0,   1.0,  1.0, -1.0,   1.0, -1.0, -1.0,
-#     -1.0, -1.0,  1.0,  -1.0,  1.0,  1.0,   1.0,  1.0,  1.0,   1.0, -1.0,  1.0]
-
 #------------------------------ Parallelepiped --------------------------------
-
 vertices = [
     -1.0, -2.0, -0.5,  -1.0, -2.0,  0.5,  -1.0,  2.0,  0.5,  -1.0,  2.0, -0.5,
      1.0, -2.0, -0.5,   1.0, -2.0,  0.5,   1.0,  2.0,  0.5,   1.0,  2.0, -0.5,
@@ -50,13 +41,10 @@ colors = [
     0.68, 0.90, 0.80,  0.68, 0.88, 0.80,  0.68, 0.88, 0.80,  0.68, 0.88, 0.80,
     0.68, 0.88, 0.80,  0.68, 0.88, 0.80,  0.68, 0.88, 0.80,  0.68, 0.88, 0.80]
 
-# ================================ Main loop ==================================
-
 def Draw():
     global x, y, z, w
 
-    # --------------------- --- Parsing IMU data ------------------------------
-
+    # parse IMU data
     while True:
         ready = select.select([socket_in_ahrs], [], [], 0.025)
         if ready[0]:
@@ -70,28 +58,21 @@ def Draw():
         else:
             break
 
-    # ---------------- 3D transfomations and visualization --------------------
-
+    # 3D transfomations and visualization
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-
     glLoadIdentity()
-
     gluLookAt(0, -10, 0, 0, 0, 0, 0, 0, 1)
-
     qrmatrix = [1.0-2.0*(y*y+z*z),  2.0*(x*y+w*z),      2.0*(x*z-w*y),      0.0,
                 2.0*(x*y-w*z),      1.0-2.0*(x*x+z*z),  2.0*(y*z+w*x),      0.0,
                 2.0*(x*z+w*y),      2.0*(y*z-w*x),      1.0-2.0*(x*x+y*y),  0.0,
                 0.0,                0.0,                0.0,                1.0]
 
     glMultMatrixf(qrmatrix);
-
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, vertices);
     glColorPointer(3, GL_FLOAT, 0, colors);
-
     glDrawArrays(GL_QUADS, 0, 24);
-
     glWindowPos2i(20, 20)
 
     glDisableClientState(GL_COLOR_ARRAY);
@@ -99,34 +80,42 @@ def Draw():
 
     glutSwapBuffers()
 
-#================================ Main ========================================
 
-socket_in_ahrs = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-socket_in_ahrs.bind(("0.0.0.0", 7000))
+if __name__ ==  "__main__":
+    port = 7000
+    window_title = "Emlid IMU visualizer"
 
-glutInit(sys.argv)
-glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_MULTISAMPLE)
-glutInitWindowSize(960, 540)
-glutCreateWindow("Emlid IMU visualizer")
-glutDisplayFunc(Draw)
-glutIdleFunc(Draw)
+    if len(sys.argv) > 1:
+        port = int(sys.argv[1])
+    if len(sys.argv) > 2:
+        window_title = int(sys.argv[2])
 
-# Fullscreen mode
-# glutGameModeString("1920x1080:32@50")
-# glutEnterGameMode()
+    socket_in_ahrs = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    socket_in_ahrs.bind(("0.0.0.0", port))
 
-glClearColor(0.344, 0.347, 0.355, 1)
-glClearDepth(1.0)
-glDepthFunc(GL_LESS)
-glEnable(GL_DEPTH_TEST)
-glShadeModel(GL_SMOOTH)
+    glutInit(sys.argv)
+    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_MULTISAMPLE)
+    glutInitWindowSize(960, 540)
+    glutCreateWindow(window_title)
+    glutDisplayFunc(Draw)
+    glutIdleFunc(Draw)
 
-glEnable(GL_BLEND);
-glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    # Fullscreen mode
+    # glutGameModeString("1920x1080:32@50")
+    # glutEnterGameMode()
 
-glMatrixMode(GL_PROJECTION)
-glLoadIdentity()
-gluPerspective(45.0, 960.0 / 540.0, 0.1, 100.0)
-glMatrixMode(GL_MODELVIEW)
+    glClearColor(0.344, 0.347, 0.355, 1)
+    glClearDepth(1.0)
+    glDepthFunc(GL_LESS)
+    glEnable(GL_DEPTH_TEST)
+    glShadeModel(GL_SMOOTH)
 
-glutMainLoop()
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glMatrixMode(GL_PROJECTION)
+    glLoadIdentity()
+    gluPerspective(45.0, 960.0 / 540.0, 0.1, 100.0)
+    glMatrixMode(GL_MODELVIEW)
+
+    glutMainLoop()

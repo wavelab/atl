@@ -9,6 +9,7 @@
 
 #include "munit.h"
 #include "imu.hpp"
+#include "util.hpp"
 
 // TESTS
 int testImu(void);
@@ -18,6 +19,7 @@ int testImu(void)
     IMU imu;
     int s;
     struct sockaddr_in serv_addr;
+    struct sockaddr_in serv_addr2;
 
     // setup UDP socket
     s = socket(AF_INET, SOCK_DGRAM, 0);
@@ -32,33 +34,48 @@ int testImu(void)
     serv_addr.sin_addr.s_addr = inet_addr("192.168.1.20");
     serv_addr.sin_port = htons(7000);
 
-    // // bind to server
-    // if (bind(s, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
-    //     perror("Failed to bind to visualizer");
-    //     exit(EXIT_FAILURE);
-    // }
+    memset((char *) &serv_addr2, 0, sizeof(serv_addr2));
+    serv_addr2.sin_family = AF_INET;
+    serv_addr2.sin_addr.s_addr = inet_addr("192.168.1.20");
+    serv_addr2.sin_port = htons(7001);
 
-    char buf[100];
-    // float w;
-    // float x;
-    // float y;
-    // float z;
+    char filtered_data[100];
+    char accel_raw[100];
+    Eigen::Quaterniond q;
 
     while (1) {
-        imu.read();
-        imu.print();
+        imu.update();
 
-        sprintf(buf, "%f %f %f %f", 1.0, 1.0, 1.0, 1.0);
+        euler2Quaternion(imu.roll, imu.pitch, 0, q);
+        memset(filtered_data, '\0', sizeof(filtered_data));
+        sprintf(filtered_data, "%f %f %f %f", q.w(), q.x(), q.y(), q.z());
+
+        euler2Quaternion(imu.accel_data->roll, imu.accel_data->pitch, 0, q);
+        memset(accel_raw, '\0', sizeof(accel_raw));
+        sprintf(accel_raw, "%f %f %f %f", q.w(), q.x(), q.y(), q.z());
+
+        // printf("roll: %f, pitch: %f\n", imu.roll, imu.pitch);
 
         sendto(
             s,
-            buf,
-            strlen(buf),
+            filtered_data,
+            strlen(filtered_data),
             0,
             (struct sockaddr *) &serv_addr,
             sizeof(serv_addr)
         );
-		usleep(500000);
+
+        sendto(
+            s,
+            accel_raw,
+            strlen(accel_raw),
+            0,
+            (struct sockaddr *) &serv_addr2,
+            sizeof(serv_addr2)
+        );
+
+		// usleep(500000);
+		usleep(50000);
     }
 
 	return 0;

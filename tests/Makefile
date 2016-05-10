@@ -6,5 +6,5 @@ OBJS := $(addprefix $(TESTS_BUILD_DIR)/, $(OBJS))
 
 default: $(OBJS)
 
-$(TESTS_BUILD_DIR)/%.o: %.cpp
+$(TESTS_BUILD_DIR)/%.o: %.cpp $(LIB_DIR)/libawesomo.a
 	$(MAKE_TEST)

@@ -21,6 +21,7 @@ LIBS = \
 	-L$(LIB_DIR) \
 	-lawesomo \
 	-lflycapture \
+	-lapriltags \
 	-lyaml-cpp \
 	-lnavio2 \
 	-lm \

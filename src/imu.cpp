@@ -30,12 +30,52 @@ IMU::IMU(void)
     this->accel_data = new Accelerometer();
     this->gyro_data = new Gyroscope();
     this->mag_data = new Magnetometer();
+
+    this->last_updated = -1;
 }
 
-void IMU::read(void)
+void IMU::calculateOrientationCF(void)
+{
+    float x;
+    float y;
+    float z;
+    float dt;
+    clock_t now;
+
+    // pre-check
+    if (this->last_updated == -1) {
+        this->last_updated = clock();
+        return;
+    }
+
+    /* setup */
+    x = this->accel_data->x;
+    y = this->accel_data->y;
+    z = this->accel_data->z;
+
+    // calculate dt
+    now = clock();
+    dt = ((double) now - this->last_updated) / CLOCKS_PER_SEC;
+
+    // calculate pitch and roll from accelerometer
+    this->accel_data->roll = (atan(x / sqrt(pow(y, 2) + pow(z, 2))));
+    this->accel_data->pitch = (atan(y / sqrt(pow(x, 2) + pow(z, 2))));
+
+    // complimentary filter
+    this->roll = (0.8 * this->gyro_data->roll) + (0.2 * this->accel_data->roll);
+    this->pitch = (0.8 * this->gyro_data->pitch) + (0.2 * this->accel_data->pitch);
+
+    // calculate pitch and roll from gyroscope
+    this->gyro_data->roll = (this->gyro_data->y * dt) + this->roll;
+    this->gyro_data->pitch = (this->gyro_data->x * dt) + this->pitch;
+
+    // update last_updated
+    this->last_updated = clock();
+}
+
+void IMU::update(void)
 {
     this->mpu9250->update();
-
     this->mpu9250->read_accelerometer(
         &this->accel_data->x,
         &this->accel_data->y,
@@ -53,43 +93,7 @@ void IMU::read(void)
         &this->mag_data->y,
         &this->mag_data->z
     );
-}
 
-void IMU::calculateOrientationCF(void)
-{
-    float x;
-    float y;
-    float z;
-    float dt;
-    clock_t now;
-
-    /* setup */
-    x = this->accel_data->x;
-    y = this->accel_data->y;
-    z = this->accel_data->z;
-
-    // calculate dt
-    now = clock();
-    dt = ((double) now - this->last_updated) / CLOCKS_PER_SEC;
-
-    // calculate pitch and roll from accelerometer
-    this->accel_data->pitch = (atan(x / sqrt(pow(y, 2) + pow(z, 2)))) * 180 / M_PI;
-    this->accel_data->roll = (atan(y / sqrt(pow(x, 2) + pow(z, 2)))) * 180 / M_PI;
-
-    // complimentary filter
-    this->pitch = (0.98 * this->gyro_data->pitch) + (0.02 * this->accel_data->pitch);
-    this->roll = (0.98 * this->gyro_data->roll) + (0.02 * this->accel_data->roll);
-
-    // calculate pitch and roll from gyroscope
-    this->gyro_data->roll = (this->gyro_data->x * dt) + this->roll;
-    this->gyro_data->pitch = (this->gyro_data->y * dt) + this->pitch;
-
-    // update last_updated
-    this->last_updated = clock();
-}
-
-void IMU::update(void)
-{
     this->calculateOrientationCF();
 }
 
