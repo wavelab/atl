@@ -74,8 +74,8 @@ int test_throttle_with_rc(void)
 
 void testSuite(void)
 {
-    // mu_add_test(test_set_throttle);
-    mu_add_test(test_throttle_with_rc);
+    mu_add_test(test_set_throttle);
+    // mu_add_test(test_throttle_with_rc);
 }
 
 mu_run_tests(testSuite)

@@ -113,4 +113,3 @@ void IMU::print(void)
         this->mag_data->z
     );
 }
-
