@@ -37,8 +37,16 @@ void Motors::set_throttle(int index, float percentage)
     float duty_cycle;
     float duty_range;
 
+    // calculate duty cycle
     duty_range = DUTY_MAX - DUTY_MIN;
     duty_cycle = DUTY_MIN + (duty_range * percentage);
+
+    // bound the duty cycle
+    if (duty_cycle > DUTY_MAX) {
+        duty_cycle = DUTY_MAX;
+    } else if (duty_cycle < DUTY_MIN) {
+        duty_cycle = DUTY_MIN;
+    }
 
     this->pwm->set_duty_cycle(index, duty_cycle);
 }
