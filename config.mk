@@ -5,6 +5,8 @@ LIB_DIR = $(BUILD_DIR)/lib
 LIB_BUILD_DIR = $(BUILD_DIR)/awesomo
 TESTS_BIN_DIR = $(BIN_DIR)/tests
 TESTS_BUILD_DIR = $(BUILD_DIR)/tests
+CALIBRATION_BIN_DIR = $(BIN_DIR)/calibration
+CALIBRATION_BUILD_DIR = $(BUILD_DIR)/calibration
 
 
 # INCLUDE AND LIBRARY PATHS
@@ -47,6 +49,11 @@ MAKE_TEST = \
 	echo "TEST [$<]"; \
 	$(CC) -c $< -o $@ $(CFLAGS); \
 	$(CC) $@ -o $(addprefix $(TESTS_BIN_DIR)/, $(notdir $(@:.o=))) $(LIBS);
+
+MAKE_CALIBRATION = \
+	echo "EXE [$<]"; \
+	$(CC) -c $< -o $@ $(CFLAGS); \
+	$(CC) $@ -o $(addprefix $(CALIBRATION_BIN_DIR)/, $(notdir $(@:.o=))) $(LIBS);
 
 MAKE_STATIC_LIB = \
 	echo "AR [$@]"; \

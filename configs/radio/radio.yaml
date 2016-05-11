@@ -1,23 +1,23 @@
 channel_1:
-  min: 1494
-  max: 1494
+  min: 1072
+  max: 1910
 ---
 channel_2:
-  min: 1499
-  max: 1499
+  min: 1079
+  max: 1917
 ---
 channel_3:
-  min: 1157
-  max: 1157
+  min: 1008
+  max: 1918
 ---
 channel_4:
-  min: 1509
-  max: 1509
+  min: 1090
+  max: 1920
 ---
 channel_5:
   min: 961
-  max: 961
+  max: 2067
 ---
 channel_6:
-  min: 2067
+  min: 960
   max: 2067
