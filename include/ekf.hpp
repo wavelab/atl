@@ -28,7 +28,17 @@ struct ekf
 
 
 // FUNCTIONS
-void ekf_prediction_update(struct ekf *estimator, g_func, G_func, u);
-void ekf_measurement_update(struct ekf *estimator, h_func, H_func, y)
+void ekf_prediction_update(
+    struct ekf *estimator,
+    Eigen::VectorXd (*g_function)(Eigen::VectorXd &, Eigen::VectorXd &, double),
+    Eigen::VectorXd (*G_function)(Eigen::VectorXd &, Eigen::VectorXd &, double),
+    Eigen::VectorXd u
+);
+void ekf_measurement_update(
+    struct ekf *estimator,
+    Eigen::VectorXd (*h_function)(Eigen::VectorXd &, double),
+    Eigen::VectorXd (*H_function)(Eigen::VectorXd &, double),
+    Eigen::VectorXd y
+);
 
 #endif
