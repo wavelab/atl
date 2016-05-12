@@ -60,6 +60,10 @@ class Magnetometer
 
 class IMU
 {
+    private:
+        void obtainHardIronErrors(void);
+        void obtainSoftIronErrors(void);
+
     public:
         InertialSensor *mpu9250;
         Accelerometer *accel_data;
@@ -72,7 +76,6 @@ class IMU
 
         IMU(void);
         void calibrateGyroscope(void);
-        void obtainHardIronErrors(void);
         void calibrateMagnetometer(void);
         void calculateOrientationCF(void);
         void update(void);

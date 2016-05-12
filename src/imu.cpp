@@ -105,6 +105,8 @@ void IMU::obtainHardIronErrors(void)
         mag_z_bound[1] = std::max(this->mag_data->z, mag_z_bound[1]);
 
         usleep(100);
+        std::cout << "Collecting sample";
+        std::cout << "(" << i + 1 << " out of " << nb_samples << ")" << std::endl;
     }
 
     // average min max for each magnetometer axis
@@ -113,12 +115,15 @@ void IMU::obtainHardIronErrors(void)
     this->mag_data->offset_z = (mag_z_bound[0] + mag_z_bound[1]) / 2.0;
 }
 
+void IMU::obtainSoftIronErrors(void)
+{
+
+
+}
+
 void IMU::calibrateMagnetometer(void)
 {
     this->obtainHardIronErrors();
-
-    // TODO
-    // Soft Iron Errors
 
 }
 
