@@ -88,7 +88,7 @@ if __name__ ==  "__main__":
     if len(sys.argv) > 1:
         port = int(sys.argv[1])
     if len(sys.argv) > 2:
-        window_title = int(sys.argv[2])
+        window_title = sys.argv[2]
 
     socket_in_ahrs = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     socket_in_ahrs.bind(("0.0.0.0", port))

@@ -36,9 +36,6 @@ IMU::IMU(void)
     this->gyro_data = new Gyroscope();
     this->mag_data = new Magnetometer();
 
-    this->sensor_fusion = new AHRS();
-    this->sensor_fusion->setGyroOffset(0.0, 0.0, 0.0);
-
     this->last_updated = -1;
 }
 

@@ -1,6 +1,8 @@
 #ifndef __IMU_HPP__
 #define __IMU_HPP__
 
+#include <iostream>
+
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
@@ -63,7 +65,6 @@ class IMU
         Accelerometer *accel_data;
         Gyroscope *gyro_data;
         Magnetometer *mag_data;
-        AHRS *sensor_fusion;
         float roll;
         float pitch;
         float yaw;
@@ -71,6 +72,8 @@ class IMU
 
         IMU(void);
         void calibrateGyroscope(void);
+        void obtainHardIronErrors(void);
+        void calibrateMagnetometer(void);
         void calculateOrientationCF(void);
         void update(void);
         void print(void);
