@@ -162,6 +162,7 @@ int output_channel_bounds(struct channel_bounds *cb)
     YAML::Emitter yaml;
 
     // setup
+    std::cout << "Saving radio calibration to [radio.yaml]" << std::endl;
     outfile.open("radio.yaml");
 
     // channel 1
@@ -233,6 +234,7 @@ int output_channel_bounds(struct channel_bounds *cb)
     // write to file
     outfile << yaml.c_str() << std::endl;
     outfile.close();
+    std::cout << "Done!" << std::endl;
 
     return 0;
 }
