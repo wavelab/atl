@@ -2,14 +2,17 @@
 #define __IMU_HPP__
 
 #include <iostream>
+#include <fstream>
 
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
 
-#include "navio2/MPU9250.h"
-#include "navio2/Util.h"
+#include <navio2/MPU9250.h>
+#include <navio2/Util.h>
+
+#include "util.hpp"
 
 
 // CLASSES

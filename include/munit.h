@@ -23,18 +23,6 @@ static int failed = 0;
 #define KCYN  "\x1B[1;36m"
 #define KWHT  "\x1B[1;37m"
 
-/* COMPARATOR FUNCTIONS */
-#define EPSILON 0.0001
-inline int fltcmp(float x, float y)
-{
-    if (fabs(x - y) < EPSILON) {
-        return 0;
-    } else if (x > y) {
-        return 1;
-    } else {
-        return -1;
-    }
-}
 
 /* MUNIT */
 #define mu_assert(test, message) \

@@ -6,6 +6,9 @@ Accelerometer::Accelerometer(void)
     this->x = 0.0f;
     this->y = 0.0f;
     this->z = 0.0f;
+    this->offset_x = 0.0f;
+    this->offset_y = 0.0f;
+    this->offset_z = 0.0f;
 }
 
 Gyroscope::Gyroscope(void)
@@ -13,6 +16,9 @@ Gyroscope::Gyroscope(void)
     this->x = 0.0f;
     this->y = 0.0f;
     this->z = 0.0f;
+    this->offset_x = 0.0f;
+    this->offset_y = 0.0f;
+    this->offset_z = 0.0f;
 }
 
 Magnetometer::Magnetometer(void)
@@ -20,6 +26,9 @@ Magnetometer::Magnetometer(void)
     this->x = 0.0f;
     this->y = 0.0f;
     this->z = 0.0f;
+    this->offset_x = 0.0f;
+    this->offset_y = 0.0f;
+    this->offset_z = 0.0f;
 }
 
 
@@ -80,16 +89,20 @@ void IMU::obtainHardIronErrors(void)
     // setup
     nb_samples = 1000;
 
+    std::ofstream outfile;
+    outfile.open("magnetometer.csv");
+
     // initialize bound values
     this->update();
+    this->update();
     mag_x_bound[0] = this->mag_data->x;
-    mag_x_bound[0] = this->mag_data->x;
+    mag_x_bound[1] = this->mag_data->x;
 
     mag_y_bound[0] = this->mag_data->y;
-    mag_y_bound[0] = this->mag_data->y;
+    mag_y_bound[1] = this->mag_data->y;
 
     mag_z_bound[0] = this->mag_data->z;
-    mag_z_bound[0] = this->mag_data->z;
+    mag_z_bound[1] = this->mag_data->z;
 
     // obtain min max for each magnetometer axis
     for (int i = 0; i < nb_samples; i++) {
@@ -104,15 +117,35 @@ void IMU::obtainHardIronErrors(void)
         mag_z_bound[0] = std::min(this->mag_data->z, mag_z_bound[0]);
         mag_z_bound[1] = std::max(this->mag_data->z, mag_z_bound[1]);
 
-        usleep(100);
+        usleep(100 * 1000);
         std::cout << "Collecting sample";
         std::cout << "(" << i + 1 << " out of " << nb_samples << ")" << std::endl;
+        printf(
+            "mag [x: %f, y: %f, z: %f]\n\n",
+            this->mag_data->x,
+            this->mag_data->y,
+            this->mag_data->z
+        );
+
+        outfile << this->mag_data->x << ",";
+        outfile << this->mag_data->y << ",";
+        outfile << this->mag_data->z << std::endl;
     }
+
+    outfile.close();
 
     // average min max for each magnetometer axis
     this->mag_data->offset_x = (mag_x_bound[0] + mag_x_bound[1]) / 2.0;
     this->mag_data->offset_y = (mag_y_bound[0] + mag_y_bound[1]) / 2.0;
     this->mag_data->offset_z = (mag_z_bound[0] + mag_z_bound[1]) / 2.0;
+
+    printf("mag x [min: %f, max %f]\n", mag_x_bound[0], mag_x_bound[1]);
+    printf("mag y [min: %f, max %f]\n", mag_y_bound[0], mag_y_bound[1]);
+    printf("mag z [min: %f, max %f]\n", mag_z_bound[0], mag_z_bound[1]);
+
+    printf("mag x offset: %f\n", this->mag_data->offset_x);
+    printf("mag y offset: %f\n", this->mag_data->offset_y);
+    printf("mag z offset: %f\n", this->mag_data->offset_z);
 }
 
 void IMU::obtainSoftIronErrors(void)
@@ -124,7 +157,6 @@ void IMU::obtainSoftIronErrors(void)
 void IMU::calibrateMagnetometer(void)
 {
     this->obtainHardIronErrors();
-
 }
 
 void IMU::calculateOrientationCF(void)
@@ -163,14 +195,18 @@ void IMU::calculateOrientationCF(void)
     this->gyro_data->pitch = (this->gyro_data->x * dt) + this->pitch;
 
     // calculate yaw from magnetometer
-    if (this->mag_data->y > 0) {
-        this->yaw = 90 - atan2(this->mag_data->x, this->mag_data->y) * 180 / M_PI;
-    } else if (this->mag_data->y < 0) {
-        this->yaw = 270 - atan2(this->mag_data->x, this->mag_data->y) * 180 / M_PI;
-    } else if (this->mag_data->y == 0 && this->mag_data->x < 0) {
-        this->yaw = 180;
-    } else if (this->mag_data->y == 0 && this->mag_data->x > 0) {
-        this->yaw = 0.0;
+    // if (this->mag_data->y > 0) {
+    //     this->yaw = 90 - atan2(this->mag_data->x, this->mag_data->y) * 180 / M_PI;
+    // } else if (this->mag_data->y < 0) {
+    //     this->yaw = 270 - atan2(this->mag_data->x, this->mag_data->y) * 180 / M_PI;
+    // } else if (fltcmp(this->mag_data->y, 0.0) == 0 && this->mag_data->x < 0) {
+    //     this->yaw = 180;
+    // } else if (fltcmp(this->mag_data->y, 0.0) == 0 && this->mag_data->x > 0) {
+    //     this->yaw = 0.0;
+    // }
+    this->yaw = atan2(this->mag_data->y, this->mag_data->x);
+    if (this->yaw < 0) {
+        this->yaw += 2 * M_PI;
     }
 
     // update last_updated
@@ -208,37 +244,16 @@ void IMU::update(void)
     // this->gyro_data->x = this->gyro_data->x + this->gyro_data->offset_x;
     // this->gyro_data->y = this->gyro_data->y + this->gyro_data->offset_y;
     // this->gyro_data->z = this->gyro_data->z + this->gyro_data->offset_z;
-    //
-    // this->mag_data->x = this->mag_data->x + this->mag_data->offset_x;
-    // this->mag_data->y = this->mag_data->y + this->mag_data->offset_y;
-    // this->mag_data->z = this->mag_data->z + this->mag_data->offset_z;
+
+    // this->mag_data->x = this->mag_data->x - this->mag_data->offset_x;
+    // this->mag_data->y = this->mag_data->y - this->mag_data->offset_y;
+    // this->mag_data->z = this->mag_data->z - this->mag_data->offset_z;
+
+    this->mag_data->x = this->mag_data->x - 2.219;
+    this->mag_data->y = this->mag_data->y - 38.869;
+    this->mag_data->z = this->mag_data->z - 14.04;
 
     this->calculateOrientationCF();
-
-
-
-    // if (this->last_updated != -1) {
-    //     clock_t now = clock();
-    //     float dt = ((double) now - this->last_updated) / CLOCKS_PER_SEC;
-    //
-    //     this->sensor_fusion->updateIMU(
-    //         this->accel_data->x / 9.81,
-    //         this->accel_data->y / 9.81,
-    //         this->accel_data->z / 9.81,
-    //         this->gyro_data->x,
-    //         this->gyro_data->y,
-    //         this->gyro_data->z,
-    //         dt
-    //     );
-    //
-    //     this->sensor_fusion->getEuler(
-    //         &this->roll,
-    //         &this->pitch,
-    //         &this->yaw
-    //     );
-    // }
-    //
-    // this->last_updated = clock();
 }
 
 void IMU::print(void)

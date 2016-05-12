@@ -8,10 +8,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-// #include <tf/transform_datatypes.h>
-// #include <geometry_msgs/Quaternion.h>
-
 #include <Eigen/Geometry>
+
+
 
 
 
@@ -49,6 +48,7 @@ class Position
 // FUNCTIONS
 double deg2rad(double d);
 double rad2deg(double d);
+int fltcmp(float v1, float v2);
 int euler2Quaternion(
     const double roll,
     const double pitch,
@@ -61,6 +61,8 @@ int euler2RotationMatrix(
     const double yaw,
     Eigen::Matrix3d &rot
 );
+
+
 // tf::Quaternion euler2quat(double roll, double pitch, double yaw);
 // void quat2euler(
 //     const geometry_msgs::Quaternion &q,

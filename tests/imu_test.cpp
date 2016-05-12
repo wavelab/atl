@@ -13,6 +13,7 @@
 
 // TESTS
 int testImu(void);
+int testCalibrateMagnetometer(void);
 
 
 int testImu(void)
@@ -112,9 +113,20 @@ int testImu(void)
 	return 0;
 }
 
+int testCalibrateMagnetometer(void)
+{
+    IMU imu;
+
+    imu.calibrateMagnetometer();
+
+
+    return 0;
+}
+
 void testSuite(void)
 {
     mu_add_test(testImu);
+    // mu_add_test(testCalibrateMagnetometer);
 }
 
 mu_run_tests(testSuite)
