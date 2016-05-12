@@ -58,28 +58,47 @@ int testImu(void)
             "roll: %f pitch: %f yaw: %f\n",
             imu.roll,
             imu.pitch,
-            // imu.yaw * 180.0 / M_PI
             imu.yaw
         );
         // printf(
         //     "mag_x: %f mag_y: %f mag_z: %f\n",
-        //     imu.mag_data->x,
-        //     imu.mag_data->y,
-        //     imu.mag_data->z
+        //     imu.mag->x,
+        //     imu.mag->y,
+        //     imu.mag->z
         // );
 
-        euler2Quaternion(imu.roll, imu.pitch, imu.yaw, q);
+
+        // prepare filtered data string
+        euler2Quaternion(
+            imu.roll,
+            imu.pitch,
+            imu.yaw * M_PI / 180.0,
+            q
+        );
         memset(filtered_data, '\0', sizeof(filtered_data));
         sprintf(filtered_data, "%f %f %f %f", q.w(), q.x(), q.y(), q.z());
 
-        // euler2Quaternion(imu.accel_data->roll, imu.accel_data->pitch, imu.accel_data->yaw, q);
-        // memset(accel_raw, '\0', sizeof(accel_raw));
-        // sprintf(accel_raw, "%f %f %f %f", q.w(), q.x(), q.y(), q.z());
-        //
-        // euler2Quaternion(imu.gyro_data->roll, imu.gyro_data->pitch, imu.gyro_data->yaw, q);
-        // memset(gyro_raw, '\0', sizeof(gyro_raw));
-        // sprintf(gyro_raw, "%f %f %f %f", q.w(), q.x(), q.y(), q.z());
+        // prepare aceleration data string
+        euler2Quaternion(
+            imu.accel->roll,
+            imu.accel->pitch,
+            imu.mag->bearing,
+            q
+        );
+        memset(accel_raw, '\0', sizeof(accel_raw));
+        sprintf(accel_raw, "%f %f %f %f", q.w(), q.x(), q.y(), q.z());
 
+        // prepare gyroscope data string
+        euler2Quaternion(
+            imu.gyro->roll,
+            imu.gyro->pitch,
+            imu.mag->bearing,
+            q
+        );
+        memset(gyro_raw, '\0', sizeof(gyro_raw));
+        sprintf(gyro_raw, "%f %f %f %f", q.w(), q.x(), q.y(), q.z());
+
+        // send filtered, accelerometer and gyroscope data
         sendto(
             s,
             filtered_data,
@@ -89,25 +108,24 @@ int testImu(void)
             sizeof(serv_addr)
         );
 
-        // sendto(
-        //     s,
-        //     accel_raw,
-        //     strlen(accel_raw),
-        //     0,
-        //     (struct sockaddr *) &serv_addr2,
-        //     sizeof(serv_addr2)
-        // );
-        //
-        // sendto(
-        //     s,
-        //     gyro_raw,
-        //     strlen(gyro_raw),
-        //     0,
-        //     (struct sockaddr *) &serv_addr3,
-        //     sizeof(serv_addr3)
-        // );
+        sendto(
+            s,
+            accel_raw,
+            strlen(accel_raw),
+            0,
+            (struct sockaddr *) &serv_addr2,
+            sizeof(serv_addr2)
+        );
 
-		// usleep(500000);
+        sendto(
+            s,
+            gyro_raw,
+            strlen(gyro_raw),
+            0,
+            (struct sockaddr *) &serv_addr3,
+            sizeof(serv_addr3)
+        );
+
 		usleep(50000);
     }
 
