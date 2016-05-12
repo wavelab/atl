@@ -41,6 +41,9 @@ IMU::IMU(void)
     this->mpu9250 = new MPU9250();
 	this->mpu9250->initialize();
 
+	this->lsm9ds1 = new LSM9DS1();
+    this->lsm9ds1->initialize();
+
     this->accel_data = new Accelerometer();
     this->gyro_data = new Gyroscope();
     this->mag_data = new Magnetometer();
@@ -195,18 +198,9 @@ void IMU::calculateOrientationCF(void)
     this->gyro_data->pitch = (this->gyro_data->x * dt) + this->pitch;
 
     // calculate yaw from magnetometer
-    // if (this->mag_data->y > 0) {
-    //     this->yaw = 90 - atan2(this->mag_data->x, this->mag_data->y) * 180 / M_PI;
-    // } else if (this->mag_data->y < 0) {
-    //     this->yaw = 270 - atan2(this->mag_data->x, this->mag_data->y) * 180 / M_PI;
-    // } else if (fltcmp(this->mag_data->y, 0.0) == 0 && this->mag_data->x < 0) {
-    //     this->yaw = 180;
-    // } else if (fltcmp(this->mag_data->y, 0.0) == 0 && this->mag_data->x > 0) {
-    //     this->yaw = 0.0;
-    // }
-    this->yaw = atan2(this->mag_data->y, this->mag_data->x);
+    this->yaw = atan2(this->mag_data->y, this->mag_data->x) * 180 / M_PI;
     if (this->yaw < 0) {
-        this->yaw += 2 * M_PI;
+        this->yaw = 360 + this->yaw;
     }
 
     // update last_updated
@@ -216,6 +210,7 @@ void IMU::calculateOrientationCF(void)
 void IMU::update(void)
 {
     this->mpu9250->update();
+    this->lsm9ds1->update();
 
     // read sensor raw values
     this->mpu9250->read_accelerometer(

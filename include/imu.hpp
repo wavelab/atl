@@ -10,6 +10,7 @@
 #include <unistd.h>
 
 #include <navio2/MPU9250.h>
+#include <navio2/LSM9DS1.h>
 #include <navio2/Util.h>
 
 #include "util.hpp"
@@ -69,9 +70,12 @@ class IMU
 
     public:
         InertialSensor *mpu9250;
+        InertialSensor *lsm9ds1;
+
         Accelerometer *accel_data;
         Gyroscope *gyro_data;
         Magnetometer *mag_data;
+
         float roll;
         float pitch;
         float yaw;

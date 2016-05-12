@@ -58,6 +58,7 @@ int testImu(void)
             "roll: %f pitch: %f yaw: %f\n",
             imu.roll,
             imu.pitch,
+            // imu.yaw * 180.0 / M_PI
             imu.yaw
         );
         // printf(
