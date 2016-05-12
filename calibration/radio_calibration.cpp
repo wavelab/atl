@@ -79,44 +79,44 @@ void initialize_channel_bounds(struct channel_bounds *cb, RCControl &rc)
 {
     rc.update();
 
-    cb->ch1_min = rc.channel_1;
-    cb->ch1_max = rc.channel_1;
+    cb->ch1_min = rc.ch1;
+    cb->ch1_max = rc.ch1;
 
-    cb->ch2_min = rc.channel_2;
-    cb->ch2_max = rc.channel_2;
+    cb->ch2_min = rc.ch2;
+    cb->ch2_max = rc.ch2;
 
-    cb->ch3_min = rc.channel_3;
-    cb->ch3_max = rc.channel_3;
+    cb->ch3_min = rc.ch3;
+    cb->ch3_max = rc.ch3;
 
-    cb->ch4_min = rc.channel_4;
-    cb->ch4_max = rc.channel_4;
+    cb->ch4_min = rc.ch4;
+    cb->ch4_max = rc.ch4;
 
-    cb->ch5_min = rc.channel_5;
-    cb->ch5_max = rc.channel_5;
+    cb->ch5_min = rc.ch5;
+    cb->ch5_max = rc.ch5;
 
-    cb->ch6_min = rc.channel_6;
-    cb->ch6_max = rc.channel_6;
+    cb->ch6_min = rc.ch6;
+    cb->ch6_max = rc.ch6;
 }
 
 void record_channel_bounds(struct channel_bounds *cb, RCControl &rc)
 {
-    cb->ch1_min = std::min(rc.channel_1, cb->ch1_min);
-    cb->ch1_max = std::max(rc.channel_1, cb->ch1_max);
+    cb->ch1_min = std::min(rc.ch1, cb->ch1_min);
+    cb->ch1_max = std::max(rc.ch1, cb->ch1_max);
 
-    cb->ch2_min = std::min(rc.channel_2, cb->ch2_min);
-    cb->ch2_max = std::max(rc.channel_2, cb->ch2_max);
+    cb->ch2_min = std::min(rc.ch2, cb->ch2_min);
+    cb->ch2_max = std::max(rc.ch2, cb->ch2_max);
 
-    cb->ch3_min = std::min(rc.channel_3, cb->ch3_min);
-    cb->ch3_max = std::max(rc.channel_3, cb->ch3_max);
+    cb->ch3_min = std::min(rc.ch3, cb->ch3_min);
+    cb->ch3_max = std::max(rc.ch3, cb->ch3_max);
 
-    cb->ch4_min = std::min(rc.channel_4, cb->ch4_min);
-    cb->ch4_max = std::max(rc.channel_4, cb->ch4_max);
+    cb->ch4_min = std::min(rc.ch4, cb->ch4_min);
+    cb->ch4_max = std::max(rc.ch4, cb->ch4_max);
 
-    cb->ch5_min = std::min(rc.channel_5, cb->ch5_min);
-    cb->ch5_max = std::max(rc.channel_5, cb->ch5_max);
+    cb->ch5_min = std::min(rc.ch5, cb->ch5_min);
+    cb->ch5_max = std::max(rc.ch5, cb->ch5_max);
 
-    cb->ch6_min = std::min(rc.channel_6, cb->ch6_min);
-    cb->ch6_max = std::max(rc.channel_6, cb->ch6_max);
+    cb->ch6_min = std::min(rc.ch6, cb->ch6_min);
+    cb->ch6_max = std::max(rc.ch6, cb->ch6_max);
 }
 
 void print_channel_bounds(struct channel_bounds *cb)

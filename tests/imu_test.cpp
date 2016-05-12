@@ -53,7 +53,18 @@ int testImu(void)
 
     while (1) {
         imu.update();
-        printf("roll: %f pitch: %f yaw: %f\n", imu.roll, imu.pitch, imu.yaw);
+        printf(
+            "roll: %f pitch: %f yaw: %f\n",
+            imu.roll,
+            imu.pitch,
+            imu.yaw
+        );
+        // printf(
+        //     "mag_x: %f mag_y: %f mag_z: %f\n",
+        //     imu.mag_data->x,
+        //     imu.mag_data->y,
+        //     imu.mag_data->z
+        // );
 
         euler2Quaternion(imu.roll, imu.pitch, imu.yaw, q);
         memset(filtered_data, '\0', sizeof(filtered_data));

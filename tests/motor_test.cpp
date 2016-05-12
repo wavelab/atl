@@ -60,9 +60,9 @@ int test_throttle_with_rc(void)
     while (1) {
         rc_control->update();
 
-        roll = (rc_control->channel_1 - 1500.0) / (2000.0 - 1500.0);
-        pitch = (rc_control->channel_2 - 1500.0) / (2000.0 - 1500.0);
-        throttle = (rc_control->channel_3 - 1092) / (1900.0 - 1092.0);
+        roll = (rc_control->ch1 - 1500.0) / (2000.0 - 1500.0);
+        pitch = (rc_control->ch2 - 1500.0) / (2000.0 - 1500.0);
+        throttle = (rc_control->ch3 - 1092) / (1900.0 - 1092.0);
 
         motors->set_throttle(0, throttle - roll + pitch);
         motors->set_throttle(1, throttle + roll - pitch);
