@@ -27,8 +27,9 @@ void ekf_measurement_update(
 {
     Eigen::MatrixXd h;
     Eigen::MatrixXd H;
-    Eigen::MatrixXd I = Eigen::MatrixXd::Identity(e->mu.size(), e->mu.size());
+    Eigen::MatrixXd I;
 
+    I = Eigen::MatrixXd::Identity(e->mu.size(), e->mu.size());
     h = e->h_function(e->mu_p, e->dt);
     H = e->H_function(e->mu_p, e->dt);
 

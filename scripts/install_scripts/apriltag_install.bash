@@ -17,8 +17,10 @@ install_dependencies()
 install_apriltags()
 {
     # create build directory for awesomo
+    ORIG_CWD=$PWD
     mkdir -p $BUILD_PATH
 
+    # clone and build apriltags
     cd $BUILD_PATH
     svn --trust-server-cert --non-interactive co https://svn.csail.mit.edu/apriltags
     cd apriltags
@@ -26,12 +28,15 @@ install_apriltags()
     echo $BUILD_PREFIX
     mkdir -p $BUILD_PREFIX
     make
+
+    # install apriltags
     cp -r ./build/include/AprilTags /usr/include/
-    cp -r ./build/lib/libapriltags.a /usr/lib/
+    cp ./build/lib/libapriltags.a /usr/lib/
 
     # remove apriltags repo
-    # cd $BUILD_PATH
-    # rm -rf apriltags
+    cd $BUILD_PATH
+    rm -rf apriltags
+    cd $ORIG_CWD
 }
 
 

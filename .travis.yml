@@ -12,7 +12,7 @@ before_install:
     - sudo bash scripts/install_scripts/apriltag_install.bash
 
 script:
-    - echo "Done :)"
+    - make
 
 notifications:
     recipients:
