@@ -2,9 +2,6 @@
 set -e #halt on first error
 
 PACAKGE=flycapture.2.9.3.13_armhf
-# get dir that the script is located in
-DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-
 
 install_pointgrey_drivers(){
     # pointgrey driver dependencies

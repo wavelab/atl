@@ -11,6 +11,7 @@
 lib
 bin
 obj
+build
 tags
 
 # scripts and folders
@@ -19,3 +20,5 @@ run.sh
 # matlab
 *.mat
 octave-workspace
+
+.ropeproject

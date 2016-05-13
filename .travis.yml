@@ -11,6 +11,7 @@ before_install:
     - sudo bash scripts/install_scripts/ros_install.bash
     - sudo bash scripts/install_scripts/apriltag_install.bash
     - sudo bash scripts/install_scripts/pointgrey_install.bash
+    - sudo bash scripts/install_scripts/navio2_cpp_install.bash
 
 script:
     - make
