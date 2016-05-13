@@ -27,11 +27,12 @@ void ekf_measurement_update(
 {
     Eigen::MatrixXd h;
     Eigen::MatrixXd H;
+    Eigen::MatrixXd I = Eigen::MatrixXd::Identity(e->mu.size(), e->mu.size());
 
     h = e->h_function(e->mu_p, e->dt);
     H = e->H_function(e->mu_p, e->dt);
 
-    // K = e->S_p * H.transpose() * inv(H * e->S_p * H.transpose() + e->Q);
+    e->K = e->S_p * H.transpose() * (H * e->S_p * H.transpose() + e->Q).inverse();
     e->mu = e->mu_p + e->K * (y - h);
-    // e->S = (eye(length(e->mu)) - K * H) * e->S_p;
+    e->S = (I - e->K * H) * e->S_p;
 }
