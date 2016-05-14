@@ -48,9 +48,9 @@ Magnetometer::Magnetometer(void)
     this->z_min = 0.0f;
     this->z_max = 0.0f;
 
-    this->x_scale = 1.0f;
-    this->y_scale = 1.0f;
-    this->z_scale = 1.0f;
+    this->scale_x = 1.0f;
+    this->scale_y = 1.0f;
+    this->scale_z = 1.0f;
 
     this->bearing = 0.0f;
 }
@@ -75,12 +75,17 @@ IMU::IMU(void)
     this->last_updated = -1;
 }
 
-void IMU::calibrateGyroscope(void)
+void IMU::calibrateGyroscope(const std::string config_path)
 {
     float gx;
     float gy;
     float gz;
     float offset[3];
+    YAML::Emitter yaml;
+    std::ofstream config_file;
+
+    // setup
+    config_file.open(config_path);
 
     // obtain average gyroscope rates
     for (int i = 0; i < 100; i++) {
@@ -101,16 +106,83 @@ void IMU::calibrateGyroscope(void)
     this->gyro->offset_x = offset[0];
     this->gyro->offset_y = offset[1];
     this->gyro->offset_z = offset[2];
+
+    // record gyroscope
+    yaml << YAML::BeginMap;
+    yaml << YAML::Key << "gyroscope";
+        yaml << YAML::BeginMap;
+        yaml << YAML::Key << "offset_x";
+        yaml << YAML::Value << this->gyro->offset_x;
+        yaml << YAML::Key << "offset_y";
+        yaml << YAML::Value << this->gyro->offset_y;
+        yaml << YAML::Key << "offset_z";
+        yaml << YAML::Value << this->gyro->offset_z;
+        yaml << YAML::EndMap;
+    yaml << YAML::EndMap;
+
+    // write to file
+    config_file << yaml.c_str() << std::endl;
+    config_file.close();
 }
 
-void IMU::obtainHardIronErrors(void)
+void IMU::calibrateAccelerometer(const std::string config_path)
+{
+    float gx;
+    float gy;
+    float gz;
+    float offset[3];
+    YAML::Emitter yaml;
+    std::ofstream config_file;
+
+    // obtain average gyroscope rates
+    for (int i = 0; i < 100; i++) {
+        this->mpu9250->update();
+        this->mpu9250->read_accelerometer(&gx, &gy, &gz);
+
+        offset[0] += -gx;
+        offset[1] += -gy;
+        offset[2] += -gz;
+
+        usleep(10000);
+    }
+
+    offset[0] /= 100.0;
+    offset[1] /= 100.0;
+    offset[2] /= 100.0;
+
+    this->gyro->offset_x = offset[0];
+    this->gyro->offset_y = offset[1];
+    this->gyro->offset_z = offset[2];
+
+    // record gyroscope
+    yaml << YAML::BeginMap;
+    yaml << YAML::Key << "gyroscope";
+        yaml << YAML::BeginMap;
+        yaml << YAML::Key << "offset_x";
+        yaml << YAML::Value << this->gyro->offset_x;
+        yaml << YAML::Key << "offset_y";
+        yaml << YAML::Value << this->gyro->offset_y;
+        yaml << YAML::Key << "offset_z";
+        yaml << YAML::Value << this->gyro->offset_z;
+        yaml << YAML::EndMap;
+    yaml << YAML::EndMap;
+
+    // write to file
+    config_file << yaml.c_str() << std::endl;
+    config_file.close();
+}
+
+void IMU::obtainHardIronErrors(const std::string record_path)
 {
     clock_t time_start;
     float calibrate_duration;
+    std::ofstream record_file;
 
     // setup
     time_start = clock();
     calibrate_duration = 20;
+    record_file.open(record_path);
+    record_file << "x,y,z" << std::endl;
 
     // initialize bound values
     this->update();
@@ -137,19 +209,17 @@ void IMU::obtainHardIronErrors(void)
 
         this->mag->z_min = std::min(this->mag->z, this->mag->z_min);
         this->mag->z_max = std::max(this->mag->z, this->mag->z_max);
+
+        record_file << this->mag->x << ",";
+        record_file << this->mag->y << ",";
+        record_file << this->mag->z << std::endl;
     }
+    record_file.close();
 
     // average min max for each magnetometer axis
     this->mag->offset_x = (this->mag->x_min + this->mag->x_max) / 2.0;
     this->mag->offset_y = (this->mag->y_min + this->mag->y_max) / 2.0;
     this->mag->offset_z = (this->mag->z_min + this->mag->z_max) / 2.0;
-
-    printf(
-        "mag offset [x: %f, y: %f, z: %f]\n",
-        this->mag->offset_x,
-        this->mag->offset_y,
-        this->mag->offset_z
-    );
 }
 
 void IMU::obtainSoftIronErrors(void)
@@ -175,15 +245,48 @@ void IMU::obtainSoftIronErrors(void)
     avg = (avgs[0] + avgs[1] + avgs[2]) / 3;
 
     // scale each axis to remove the eliptical shape
-    this->mag->x_scale = avg / avgs[0];
-    this->mag->y_scale = avg / avgs[1];
-    this->mag->z_scale = avg / avgs[2];
+    this->mag->scale_x = avg / avgs[0];
+    this->mag->scale_y = avg / avgs[1];
+    this->mag->scale_z = avg / avgs[2];
 }
 
-void IMU::calibrateMagnetometer(void)
+void IMU::calibrateMagnetometer(
+    const std::string config_path,
+    const std::string record_path
+)
 {
-    this->obtainHardIronErrors();
+    std::ofstream config_file;
+    YAML::Emitter yaml;
+
+    // setup
+    config_file.open(config_path);
+
+    // obtain hard and soft iron errors
+    this->obtainHardIronErrors(record_path);
     this->obtainSoftIronErrors();
+
+    // record hard and soft iron errors
+    yaml << YAML::BeginMap;
+    yaml << YAML::Key << "magnetometer";
+        yaml << YAML::BeginMap;
+        yaml << YAML::Key << "offset_x";
+        yaml << YAML::Value << this->mag->offset_x;
+        yaml << YAML::Key << "offset_y";
+        yaml << YAML::Value << this->mag->offset_y;
+        yaml << YAML::Key << "offset_z";
+        yaml << YAML::Value << this->mag->offset_z;
+        yaml << YAML::Key << "scale_x";
+        yaml << YAML::Value << this->mag->scale_x;
+        yaml << YAML::Key << "scale_y";
+        yaml << YAML::Value << this->mag->scale_y;
+        yaml << YAML::Key << "scale_z";
+        yaml << YAML::Value << this->mag->scale_z;
+        yaml << YAML::EndMap;
+    yaml << YAML::EndMap;
+
+    // write to file
+    config_file << yaml.c_str() << std::endl;
+    config_file.close();
 }
 
 void IMU::calculateOrientationCF(void)
@@ -276,9 +379,9 @@ void IMU::update(void)
     this->mag->y = this->mag->y - 38.869;
     this->mag->z = this->mag->z - 14.04;
 
-    this->mag->x *= this->mag->x_scale;
-    this->mag->y *= this->mag->y_scale;
-    this->mag->z *= this->mag->z_scale;
+    this->mag->x *= this->mag->scale_x;
+    this->mag->y *= this->mag->scale_y;
+    this->mag->z *= this->mag->scale_z;
 
     this->calculateOrientationCF();
 }

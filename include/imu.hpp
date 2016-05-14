@@ -13,6 +13,8 @@
 #include <navio2/LSM9DS1.h>
 #include <navio2/Util.h>
 
+#include <yaml-cpp/yaml.h>
+
 #include "util.hpp"
 
 
@@ -71,9 +73,9 @@ class Magnetometer
         float z_min;
         float z_max;
 
-        float x_scale;
-        float y_scale;
-        float z_scale;
+        float scale_x;
+        float scale_y;
+        float scale_z;
 
         float bearing;
 
@@ -83,7 +85,7 @@ class Magnetometer
 class IMU
 {
     private:
-        void obtainHardIronErrors(void);
+        void obtainHardIronErrors(const std::string record_path);
         void obtainSoftIronErrors(void);
 
     public:
@@ -100,8 +102,12 @@ class IMU
         clock_t last_updated;
 
         IMU(void);
-        void calibrateGyroscope(void);
-        void calibrateMagnetometer(void);
+        void calibrateGyroscope(const std::string config_path);
+        void calibrateAccelerometer(const std::string config_path);
+        void calibrateMagnetometer(
+            const std::string config_path,
+            const std::string record_path
+        );
         void calculateOrientationCF(void);
         void update(void);
         void print(void);

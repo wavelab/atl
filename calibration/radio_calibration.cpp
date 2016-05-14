@@ -16,7 +16,7 @@
 #define NONBLOCK_DISABLE 1
 
 #define RADIO_CALIBRATION_INSTRUCTIONS \
-    "Start Radio Calibration\n" \
+    "Radio Calibration\n" \
     "Move all radio channels to its extreme positions!\n" \
     "Once you are done press the ENTER key to exit!\n" \
     "You may also press 'p' to print current channel bounds\n";

@@ -98,21 +98,18 @@ Eigen::MatrixXd H_function (Eigen::VectorXd & mu_p, double dt){
 
 int testPredictionUpdate(void)
 {
-    ekf prediction_ekf;
-
+    struct ekf prediction_ekf;
     double dt;
-    dt = 0.1;
-
     Eigen::VectorXd mu(6);
-    mu << 1, 1, 1, 1, 1, 1;
-
     Eigen::MatrixXd S;
-    S = Eigen::MatrixXd::Identity(mu.size(), mu.size());
-
     Eigen::MatrixXd R;
-    S = Eigen::MatrixXd::Identity(mu.size(), mu.size());
-
     Eigen::VectorXd u_test(6);
+
+    // setup
+    dt = 0.1;
+    mu << 1, 1, 1, 1, 1, 1;
+    S = Eigen::MatrixXd::Identity(mu.size(), mu.size());
+    R = Eigen::MatrixXd::Identity(mu.size(), mu.size());
     u_test << 1, 1, 1, 1, 1, 1;
 
     prediction_ekf.mu = mu;
