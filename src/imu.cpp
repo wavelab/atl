@@ -130,24 +130,87 @@ void IMU::calibrateAccelerometer(const std::string config_path)
     float ax;
     float ay;
     float az;
+    float min;
+    float max;
+    float bounds[6];
     char c;
     int loop;
     YAML::Emitter yaml;
     std::ofstream config_file;
 
     // setup
+    loop = 1;
     config_file.open(config_path);
     nonblock(NONBLOCK_ENABLE);
 
+    // initialize bounds
+    this->mpu9250->update();
+    this->mpu9250->read_accelerometer(&ax, &ay, &az);
+    bounds[0] = ax;
+    bounds[1] = ax;
+    bounds[2] = ay;
+    bounds[3] = ay;
+    bounds[4] = az;
+    bounds[5] = az;
+
     // obtain average gyroscope rates
     for (int i = 0; i < 6; i++) {
+        switch (i) {
+        case 0:
+            std::cout << "Place quadrotor flat on the ground" << std::endl;
+            break;
+        case 1:
+            std::cout << "Place quadrotor upside down" << std::endl;
+            break;
+        case 2:
+            std::cout << "Place quadrotor on its left side" << std::endl;
+            break;
+        case 3:
+            std::cout << "Place quadrotor on its right side" << std::endl;
+            break;
+        case 4:
+            std::cout << "Quadrotor nose up" << std::endl;
+            break;
+        case 5:
+            std::cout << "Quadrotor nose down" << std::endl;
+            break;
+        }
+        std::cout << "Press ENTER when you have done so" << std::endl;
+
+        loop = 1;
         while (loop) {
             this->mpu9250->update();
             this->mpu9250->read_accelerometer(&ax, &ay, &az);
-            if (kbhit()) {
-                break;
+            this->print();
 
+            // switch (i) {
+            // case 0:
+            //     break;
+            // case 1:
+            //     break;
+            // case 2:
+            //     break;
+            // case 3:
+            //     break;
+            // case 4:
+            //     break;
+            // case 5:
+            //     break;
+            // }
+
+            // keyboard event
+            if (kbhit()) {
+                c = fgetc(stdin);
+
+                // exit if 'q' was pressed
+                if (c == 'q') {
+                    return;
+                } else if (c == 10) {
+                    loop = 0;
+                }
+                break;
             }
+
         }
     }
 

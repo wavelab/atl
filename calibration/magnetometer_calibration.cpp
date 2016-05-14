@@ -13,15 +13,9 @@
 
 int main(void)
 {
-    int loop;
-    char c;
     IMU imu;
 
-    // setup
-    loop = 1;
     std::cout << MAGNETOMETER_CALIBRATION_INSTRUCTIONS;
-
-    // calibrate magnetometer
     imu.calibrateMagnetometer(CONFIG_PATH, RECORD_PATH);
 
     return 0;
