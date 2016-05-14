@@ -125,78 +125,96 @@ void IMU::calibrateGyroscope(const std::string config_path)
     config_file.close();
 }
 
+static void printAccelerometerCalibrationInstructions(int i)
+{
+    switch (i) {
+    case 0:
+        std::cout << "Place quadrotor flat on the ground" << std::endl;
+        break;
+    case 1:
+        std::cout << "Place quadrotor upside down" << std::endl;
+        break;
+    case 2:
+        std::cout << "Place quadrotor on its left side" << std::endl;
+        break;
+    case 3:
+        std::cout << "Place quadrotor on its right side" << std::endl;
+        break;
+    case 4:
+        std::cout << "Quadrotor nose up" << std::endl;
+        break;
+    case 5:
+        std::cout << "Quadrotor nose down" << std::endl;
+        break;
+    }
+    std::cout << "Press ENTER when you have done so" << std::endl;
+}
+
+static void recordAccelerometerBounds(int i, float *bounds, float *data)
+{
+    switch (i) {
+    case 0:
+        bounds[5] = std::max(data[2], bounds[5]);
+        break;
+    case 1:
+        bounds[4] = std::min(data[2], bounds[4]);
+        break;
+    case 2:
+        bounds[3] = std::max(data[1], bounds[3]);
+        break;
+    case 3:
+        bounds[2] = std::min(data[1], bounds[2]);
+        break;
+    case 4:
+        bounds[0] = std::max(data[0], bounds[0]);
+        break;
+    case 5:
+        bounds[1] = std::min(data[0], bounds[1]);
+        break;
+    }
+}
+
 void IMU::calibrateAccelerometer(const std::string config_path)
 {
-    float ax;
-    float ay;
-    float az;
-    float min;
-    float max;
-    float bounds[6];
     char c;
-    int loop;
+    float data[3];
+    float bounds[6];
     YAML::Emitter yaml;
     std::ofstream config_file;
 
     // setup
-    loop = 1;
     config_file.open(config_path);
     nonblock(NONBLOCK_ENABLE);
 
     // initialize bounds
     this->mpu9250->update();
-    this->mpu9250->read_accelerometer(&ax, &ay, &az);
-    bounds[0] = ax;
-    bounds[1] = ax;
-    bounds[2] = ay;
-    bounds[3] = ay;
-    bounds[4] = az;
-    bounds[5] = az;
+    this->mpu9250->read_accelerometer(&data[0], &data[1], &data[2]);
+    bounds[0] = data[0];
+    bounds[1] = data[0];
+    bounds[2] = data[1];
+    bounds[3] = data[1];
+    bounds[4] = data[2];
+    bounds[5] = data[2];
+
+    char line[50];
 
     // obtain average gyroscope rates
     for (int i = 0; i < 6; i++) {
-        switch (i) {
-        case 0:
-            std::cout << "Place quadrotor flat on the ground" << std::endl;
-            break;
-        case 1:
-            std::cout << "Place quadrotor upside down" << std::endl;
-            break;
-        case 2:
-            std::cout << "Place quadrotor on its left side" << std::endl;
-            break;
-        case 3:
-            std::cout << "Place quadrotor on its right side" << std::endl;
-            break;
-        case 4:
-            std::cout << "Quadrotor nose up" << std::endl;
-            break;
-        case 5:
-            std::cout << "Quadrotor nose down" << std::endl;
-            break;
-        }
-        std::cout << "Press ENTER when you have done so" << std::endl;
+        printAccelerometerCalibrationInstructions(i);
 
-        loop = 1;
-        while (loop) {
+        while (1) {
+            // obtain accelerometer bounds
             this->mpu9250->update();
-            this->mpu9250->read_accelerometer(&ax, &ay, &az);
-            this->print();
+            this->mpu9250->read_accelerometer(&data[0], &data[1], &data[2]);
+            recordAccelerometerBounds(i, bounds, data);
 
-            // switch (i) {
-            // case 0:
-            //     break;
-            // case 1:
-            //     break;
-            // case 2:
-            //     break;
-            // case 3:
-            //     break;
-            // case 4:
-            //     break;
-            // case 5:
-            //     break;
-            // }
+            for (int j = 0; j < strlen(line); j++) {
+                printf("\b \b");
+            }
+            memset(line, '\0', 50);
+            sprintf(line, "x: %f, y: %f, z: %f", data[0], data[1], data[2]);
+            printf(line);
+            // usleep(100 * 1000);
 
             // keyboard event
             if (kbhit()) {
@@ -206,19 +224,19 @@ void IMU::calibrateAccelerometer(const std::string config_path)
                 if (c == 'q') {
                     return;
                 } else if (c == 10) {
-                    loop = 0;
+                    break;
                 }
-                break;
             }
 
         }
     }
 
-    // this->accel->offset_x = offset[0];
-    // this->accel->offset_y = offset[1];
-    // this->accel->offset_z = offset[2];
+    // calculate offset
+    this->accel->offset_x = (bounds[1] - bounds[0]) / 2;
+    this->accel->offset_y = (bounds[3] - bounds[2]) / 2;
+    this->accel->offset_z = (bounds[5] - bounds[4]) / 2;
 
-    // record gyroscope
+    // record offsets
     yaml << YAML::BeginMap;
     yaml << YAML::Key << "accelerometer";
         yaml << YAML::BeginMap;
