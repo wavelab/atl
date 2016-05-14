@@ -7,10 +7,15 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <termios.h>
 
 #include <Eigen/Geometry>
 
 
+
+// CONSTANTS
+#define NONBLOCK_ENABLE 0
+#define NONBLOCK_DISABLE 1
 
 
 
@@ -61,7 +66,8 @@ int euler2RotationMatrix(
     const double yaw,
     Eigen::Matrix3d &rot
 );
-
+int kbhit(void);
+void nonblock(int state);
 
 // tf::Quaternion euler2quat(double roll, double pitch, double yaw);
 // void quat2euler(

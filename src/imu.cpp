@@ -127,43 +127,44 @@ void IMU::calibrateGyroscope(const std::string config_path)
 
 void IMU::calibrateAccelerometer(const std::string config_path)
 {
-    float gx;
-    float gy;
-    float gz;
-    float offset[3];
+    float ax;
+    float ay;
+    float az;
+    char c;
+    int loop;
     YAML::Emitter yaml;
     std::ofstream config_file;
 
+    // setup
+    config_file.open(config_path);
+    nonblock(NONBLOCK_ENABLE);
+
     // obtain average gyroscope rates
-    for (int i = 0; i < 100; i++) {
-        this->mpu9250->update();
-        this->mpu9250->read_accelerometer(&gx, &gy, &gz);
+    for (int i = 0; i < 6; i++) {
+        while (loop) {
+            this->mpu9250->update();
+            this->mpu9250->read_accelerometer(&ax, &ay, &az);
+            if (kbhit()) {
+                break;
 
-        offset[0] += -gx;
-        offset[1] += -gy;
-        offset[2] += -gz;
-
-        usleep(10000);
+            }
+        }
     }
 
-    offset[0] /= 100.0;
-    offset[1] /= 100.0;
-    offset[2] /= 100.0;
-
-    this->gyro->offset_x = offset[0];
-    this->gyro->offset_y = offset[1];
-    this->gyro->offset_z = offset[2];
+    // this->accel->offset_x = offset[0];
+    // this->accel->offset_y = offset[1];
+    // this->accel->offset_z = offset[2];
 
     // record gyroscope
     yaml << YAML::BeginMap;
-    yaml << YAML::Key << "gyroscope";
+    yaml << YAML::Key << "accelerometer";
         yaml << YAML::BeginMap;
         yaml << YAML::Key << "offset_x";
-        yaml << YAML::Value << this->gyro->offset_x;
+        yaml << YAML::Value << this->accel->offset_x;
         yaml << YAML::Key << "offset_y";
-        yaml << YAML::Value << this->gyro->offset_y;
+        yaml << YAML::Value << this->accel->offset_y;
         yaml << YAML::Key << "offset_z";
-        yaml << YAML::Value << this->gyro->offset_z;
+        yaml << YAML::Value << this->accel->offset_z;
         yaml << YAML::EndMap;
     yaml << YAML::EndMap;
 
