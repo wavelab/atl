@@ -27,39 +27,39 @@
 // CLASSES
 class TagPose
 {
-    public:
-        int id;
-        double distance;
-        double yaw;
-        double pitch;
-        double roll;
-        Eigen::Vector3d translation;
+public:
+    int id;
+    double distance;
+    double yaw;
+    double pitch;
+    double roll;
+    Eigen::Vector3d translation;
 };
 
 class TagDetector
 {
-    private:
-        AprilTags::TagDetector *detector;
-        cv::Rect roi_rect;
-        int apriltag_imshow;
+private:
+    AprilTags::TagDetector *detector;
+    cv::Rect roi_rect;
+    int apriltag_imshow;
 
-    public:
-        TagDetector(void);
-        TagDetector(int apriltag_imshow);
-        void adjustROI(cv::Mat &image_gray, AprilTags::TagDetection &tag);
-        std::vector<TagPose> processImage(
-            cv::Mat &camera_matrix,
-            cv::Mat &image,
-            int &timeout
-        );
-        TagPose obtainPose(
-            AprilTags::TagDetection &detection,
-            cv::Mat camera_matrix
-        );
-        void printDetection(
-            AprilTags::TagDetection &detection,
-            cv::Mat camera_matrix
-        );
+public:
+    TagDetector(void);
+    TagDetector(int apriltag_imshow);
+    void adjustROI(cv::Mat &image_gray, AprilTags::TagDetection &tag);
+    std::vector<TagPose> processImage(
+        cv::Mat &camera_matrix,
+        cv::Mat &image,
+        int &timeout
+    );
+    TagPose obtainPose(
+        AprilTags::TagDetection &detection,
+        cv::Mat camera_matrix
+    );
+    void printDetection(
+        AprilTags::TagDetection &detection,
+        cv::Mat camera_matrix
+    );
 };
 
 #endif

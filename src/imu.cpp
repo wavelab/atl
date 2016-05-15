@@ -146,11 +146,10 @@ void Magnetometer::saveConfiguration(const std::string config_path)
 // IMU
 IMU::IMU(void)
 {
-    this->mpu9250 = new MPU9250();
-	this->mpu9250->initialize();
+    this->state = IMU_IDLE;
 
+    this->mpu9250 = new MPU9250();
 	this->lsm9ds1 = new LSM9DS1();
-    this->lsm9ds1->initialize();
 
     this->accel = new Accelerometer();
     this->gyro = new Gyroscope();
@@ -159,14 +158,83 @@ IMU::IMU(void)
     this->last_updated = -1;
 }
 
-void IMU::calibrateGyroscope(const std::string config_path)
+void IMU::initialize(void)
+{
+	this->mpu9250->initialize();
+    this->lsm9ds1->initialize();
+    this->state = IMU_RUNNING;
+}
+
+int IMU::update(void)
+{
+    // pre-check
+    if (this->state == IMU_IDLE) {
+        return -1;
+    }
+
+    // poll sensors
+    this->mpu9250->update();
+    this->lsm9ds1->update();
+
+    // read sensor raw values
+    this->mpu9250->read_gyroscope(
+        &this->gyro->x,
+        &this->gyro->y,
+        &this->gyro->z
+    );
+
+    this->mpu9250->read_accelerometer(
+        &this->accel->x,
+        &this->accel->y,
+        &this->accel->z
+    );
+
+    this->mpu9250->read_magnetometer(
+        &this->mag->x,
+        &this->mag->y,
+        &this->mag->z
+    );
+
+    // apply sensor offsets
+    this->accel->x = this->accel->x + this->accel->offset_x;
+    this->accel->y = this->accel->y + this->accel->offset_y;
+    this->accel->z = this->accel->z + this->accel->offset_z;
+
+    this->gyro->x = this->gyro->x + this->gyro->offset_x;
+    this->gyro->y = this->gyro->y + this->gyro->offset_y;
+    this->gyro->z = this->gyro->z + this->gyro->offset_z;
+
+    this->mag->x = (this->mag->x - this->mag->offset_x) * this->mag->scale_x;
+    this->mag->y = (this->mag->y - this->mag->offset_y) * this->mag->scale_y;
+    this->mag->z = (this->mag->z - this->mag->offset_z) * this->mag->scale_z;
+
+    // fuse imu data
+    this->calculateOrientationCF();
+
+    return 0;
+}
+
+int IMU::calibrateGyroscope(const std::string config_path)
 {
     float gx;
     float gy;
     float gz;
     float offset[3];
 
+    // pre-check
+    if (this->state == IMU_IDLE) {
+        return -1;
+
+    } else if (this->state == IMU_UNIT_TESTING) {
+        offset[0] = 100.0;
+        offset[1] = 200.0;
+        offset[2] = 300.0;
+        goto GYRO_OFFSET_CALC;
+
+    }
+
     // obtain average gyroscope rates
+    std::cout << GYROSCOPE_CALIBRATION_INSTRUCTIONS;
     for (int i = 0; i < 100; i++) {
         this->mpu9250->update();
         this->mpu9250->read_gyroscope(&gx, &gy, &gz);
@@ -178,6 +246,7 @@ void IMU::calibrateGyroscope(const std::string config_path)
         usleep(10000);
     }
 
+GYRO_OFFSET_CALC:
     offset[0] /= 100.0;
     offset[1] /= 100.0;
     offset[2] /= 100.0;
@@ -186,9 +255,11 @@ void IMU::calibrateGyroscope(const std::string config_path)
     this->gyro->offset_y = offset[1];
     this->gyro->offset_z = offset[2];
     this->gyro->saveConfiguration(config_path);
+
+    return 0;
 }
 
-static void printAccelerometerCalibrationInstructions(int i)
+void IMU::printAccelerometerCalibrationInstructions(int i)
 {
     switch (i) {
     case 0:
@@ -213,7 +284,7 @@ static void printAccelerometerCalibrationInstructions(int i)
     std::cout << "Press ENTER when you have done so" << std::endl;
 }
 
-static void recordAccelerometerBounds(int i, float *bounds, float *data)
+void IMU::recordAccelerometerBounds(int i, float *bounds, float *data)
 {
     switch (i) {
     case 0:
@@ -237,7 +308,7 @@ static void recordAccelerometerBounds(int i, float *bounds, float *data)
     }
 }
 
-static void printAccelerometerData(char *line, float *data)
+void IMU::printAccelerometerData(char *line, float *data)
 {
     for (int j = 0; j < (int) strlen(line); j++) {
         printf("\b \b");
@@ -248,32 +319,15 @@ static void printAccelerometerData(char *line, float *data)
     fflush(stdout);
 }
 
-void IMU::calibrateAccelerometer(const std::string config_path)
+int IMU::obtainAccelerometerBounds(float *bounds, char *line)
 {
     char c;
-    char line[50];
     float data[3];
-    float bounds[6];
-    YAML::Emitter yaml;
-    std::ofstream config_file;
 
-    // setup
-    memset(line, '\0', 50);
-    config_file.open(config_path);
-    nonblock(NONBLOCK_ENABLE);
-
-    // initialize bounds
-    this->mpu9250->update();
-    this->mpu9250->read_accelerometer(&data[0], &data[1], &data[2]);
-    for (int i = 0; i < 6; i++) {
-        bounds[0] = 0.0f;
-    }
-
-    // obtain average gyroscope rates
+    // obtain accelerometer bounds
     for (int i = 0; i < 6; i++) {
         printAccelerometerCalibrationInstructions(i);
 
-        // obtain accelerometer bounds
         while (1) {
             this->mpu9250->update();
             this->mpu9250->read_accelerometer(&data[0], &data[1], &data[2]);
@@ -285,10 +339,11 @@ void IMU::calibrateAccelerometer(const std::string config_path)
             // keyboard event
             if (kbhit()) {
                 c = fgetc(stdin);
+                printf("\n\n");
 
                 // exit if 'q' was pressed
                 if (c == 'q') {
-                    return;
+                    return -2;
                 } else if (c == 10) {
                     break;
                 }
@@ -296,18 +351,75 @@ void IMU::calibrateAccelerometer(const std::string config_path)
         }
     }
 
-    // calculate offset
+    return 0;
+}
+
+int IMU::calibrateAccelerometer(const std::string config_path)
+{
+    char line[50];
+    float bounds[6];
+    YAML::Emitter yaml;
+    std::ofstream config_file;
+
+    // pre-check
+    if (this->state == IMU_IDLE) {
+        return -1;
+
+    } else if (this->state == IMU_UNIT_TESTING) {
+        bounds[1] = 2;
+        bounds[0] = 2;
+        bounds[3] = 2;
+        bounds[2] = 2;
+        bounds[5] = 2;
+        bounds[4] = 2;
+
+        goto ACCEL_OFFSET_CALC;
+    }
+
+    // setup
+    memset(line, '\0', 50);
+    config_file.open(config_path);
+    nonblock(NONBLOCK_ENABLE);
+    for (int i = 0; i < 6; i++) {
+        bounds[0] = 0.0f;
+    }
+
+    // obtain average gyroscope rates
+    std::cout << ACCELEROMETER_CALIBRATION_INSTRUCTIONS;
+    if (obtainAccelerometerBounds(bounds, line) == -2) {
+        return -2;
+    }
+
+
+ACCEL_OFFSET_CALC:
     this->accel->offset_x = (bounds[1] + bounds[0]) / 2.0;
     this->accel->offset_y = (bounds[3] + bounds[2]) / 2.0;
     this->accel->offset_z = (bounds[5] + bounds[4]) / 2.0;
     this->accel->saveConfiguration(config_path);
+
+    return 0;
 }
 
-void IMU::obtainHardIronErrors(const std::string record_path)
+int IMU::obtainHardIronErrors(const std::string record_path)
 {
     clock_t time_start;
     float calibrate_duration;
     std::ofstream record_file;
+
+    // pre-check
+    if (this->state == IMU_IDLE) {
+        return -1;
+
+    } else if (this->state == IMU_UNIT_TESTING) {
+        this->mag->x_min = 0.0;
+        this->mag->x_max = 1.0;
+        this->mag->y_min = 0.0;
+        this->mag->y_max = 2.0;
+        this->mag->z_min = 0.0;
+        this->mag->z_max = 3.0;
+
+        goto MAG_OFFSET_CALC;
+    }
 
     // setup
     time_start = clock();
@@ -317,13 +429,10 @@ void IMU::obtainHardIronErrors(const std::string record_path)
 
     // initialize bound values
     this->update();
-    this->update();
     this->mag->x_min = this->mag->x;
     this->mag->x_max = this->mag->x;
-
     this->mag->y_min = this->mag->y;
     this->mag->y_max = this->mag->y;
-
     this->mag->z_min = this->mag->z;
     this->mag->z_max = this->mag->z;
 
@@ -334,10 +443,8 @@ void IMU::obtainHardIronErrors(const std::string record_path)
 
         this->mag->x_min = std::min(this->mag->x, this->mag->x_min);
         this->mag->x_max = std::max(this->mag->x, this->mag->x_max);
-
         this->mag->y_min = std::min(this->mag->y, this->mag->y_min);
         this->mag->y_max = std::max(this->mag->y, this->mag->y_max);
-
         this->mag->z_min = std::min(this->mag->z, this->mag->z_min);
         this->mag->z_max = std::max(this->mag->z, this->mag->z_max);
 
@@ -346,19 +453,37 @@ void IMU::obtainHardIronErrors(const std::string record_path)
         record_file << this->mag->z << std::endl;
     }
     record_file.close();
+    chmod(record_path.c_str(), S_IRWXU|S_IRWXG|S_IRWXO);
 
+MAG_OFFSET_CALC:
     // average min max for each magnetometer axis
     this->mag->offset_x = (this->mag->x_min + this->mag->x_max) / 2.0;
     this->mag->offset_y = (this->mag->y_min + this->mag->y_max) / 2.0;
     this->mag->offset_z = (this->mag->z_min + this->mag->z_max) / 2.0;
+
+    return 0;
 }
 
-void IMU::obtainSoftIronErrors(void)
+int IMU::obtainSoftIronErrors(void)
 {
     float vmax[3];
     float vmin[3];
     float avgs[3];
     float avg;
+
+    // pre-check
+    if (this->state == IMU_IDLE) {
+        return -1;
+
+    } else if (this->state == IMU_UNIT_TESTING) {
+        this->mag->x_min = 0.0;
+        this->mag->x_max = 1.0;
+        this->mag->y_min = 0.0;
+        this->mag->y_max = 2.0;
+        this->mag->z_min = 0.0;
+        this->mag->z_max = 3.0;
+
+    }
 
     // calculate average distance of center
     vmax[0] = this->mag->x_max - this->mag->offset_x;
@@ -379,17 +504,33 @@ void IMU::obtainSoftIronErrors(void)
     this->mag->scale_x = avg / avgs[0];
     this->mag->scale_y = avg / avgs[1];
     this->mag->scale_z = avg / avgs[2];
+
+    return 0;
 }
 
-void IMU::calibrateMagnetometer(
+int IMU::calibrateMagnetometer(
     const std::string config_path,
     const std::string record_path
 )
 {
+    // pre-check
+    if (this->state == IMU_IDLE) {
+        return -1;
+    }
+
     // obtain hard and soft iron errors
-    this->obtainHardIronErrors(record_path);
-    this->obtainSoftIronErrors();
+    std::cout << MAGNETOMETER_CALIBRATION_INSTRUCTIONS;
+    if (this->obtainHardIronErrors(record_path) == -1) {
+        return -2;
+    }
+
+    if (this->obtainSoftIronErrors() == -1) {
+        return -3;
+    }
+
     this->mag->saveConfiguration(config_path);
+
+    return 0;
 }
 
 void IMU::calculateOrientationCF(void)
@@ -439,54 +580,6 @@ void IMU::calculateOrientationCF(void)
 
     // update last_updated
     this->last_updated = clock();
-}
-
-void IMU::update(void)
-{
-    this->mpu9250->update();
-    this->lsm9ds1->update();
-
-    // read sensor raw values
-    this->mpu9250->read_accelerometer(
-        &this->accel->x,
-        &this->accel->y,
-        &this->accel->z
-    );
-
-    this->mpu9250->read_gyroscope(
-        &this->gyro->x,
-        &this->gyro->y,
-        &this->gyro->z
-    );
-
-    this->mpu9250->read_magnetometer(
-        &this->mag->x,
-        &this->mag->y,
-        &this->mag->z
-    );
-
-    // apply sensor offsets
-    this->accel->x = this->accel->x + this->accel->offset_x;
-    this->accel->y = this->accel->y + this->accel->offset_y;
-    this->accel->z = this->accel->z + this->accel->offset_z;
-
-    this->gyro->x = this->gyro->x + this->gyro->offset_x;
-    this->gyro->y = this->gyro->y + this->gyro->offset_y;
-    this->gyro->z = this->gyro->z + this->gyro->offset_z;
-
-    // this->mag->x = this->mag->x - this->mag->offset_x;
-    // this->mag->y = this->mag->y - this->mag->offset_y;
-    // this->mag->z = this->mag->z - this->mag->offset_z;
-
-    this->mag->x = this->mag->x - 2.219;
-    this->mag->y = this->mag->y - 38.869;
-    this->mag->z = this->mag->z - 14.04;
-
-    this->mag->x *= this->mag->scale_x;
-    this->mag->y *= this->mag->scale_y;
-    this->mag->z *= this->mag->scale_z;
-
-    this->calculateOrientationCF();
 }
 
 void IMU::print(void)

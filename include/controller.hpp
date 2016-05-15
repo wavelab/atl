@@ -46,76 +46,76 @@ struct pid
 // CLASSES
 class CarrotController
 {
-    public:
-        std::deque<Eigen::Vector3d> waypoints;
-        int initialized;
-        double look_ahead_dist;
-        double wp_threshold;
-        Eigen::Vector3d wp_start;
-        Eigen::Vector3d wp_end;
+public:
+    std::deque<Eigen::Vector3d> waypoints;
+    int initialized;
+    double look_ahead_dist;
+    double wp_threshold;
+    Eigen::Vector3d wp_start;
+    Eigen::Vector3d wp_end;
 
-        CarrotController();
-        CarrotController(
-            std::deque<Eigen::Vector3d> waypoints,
-            double look_ahead_dist,
-            double wp_threshold
-        );
-        CarrotController(std::string config_file_path);
-        Eigen::Vector3d closestPoint(
-            Eigen::Vector3d position,
-            Eigen::Vector3d wp_start,
-            Eigen::Vector3d wp_end
-        );
-        Eigen::Vector3d calculateCarrotPoint(
-            Eigen::Vector3d position,
-            double r,
-            Eigen::Vector3d wp_start,
-            Eigen::Vector3d wp_end
-        );
-        int waypointReached(
-            Eigen::Vector3d position,
-            Eigen::Vector3d waypoint,
-            double threshold
-        );
-        int update(Eigen::Vector3d position, Eigen::Vector3d &carrot);
+    CarrotController();
+    CarrotController(
+        std::deque<Eigen::Vector3d> waypoints,
+        double look_ahead_dist,
+        double wp_threshold
+    );
+    CarrotController(std::string config_file_path);
+    Eigen::Vector3d closestPoint(
+        Eigen::Vector3d position,
+        Eigen::Vector3d wp_start,
+        Eigen::Vector3d wp_end
+    );
+    Eigen::Vector3d calculateCarrotPoint(
+        Eigen::Vector3d position,
+        double r,
+        Eigen::Vector3d wp_start,
+        Eigen::Vector3d wp_end
+    );
+    int waypointReached(
+        Eigen::Vector3d position,
+        Eigen::Vector3d waypoint,
+        double threshold
+    );
+    int update(Eigen::Vector3d position, Eigen::Vector3d &carrot);
 };
 
 class PositionController
 {
-    public:
-        struct pid x;
-        struct pid y;
-        struct pid T;
+public:
+    struct pid x;
+    struct pid y;
+    struct pid T;
 
-        float roll;
-        float pitch;
-        float throttle;
-        float hover_throttle;
+    float roll;
+    float pitch;
+    float throttle;
+    float hover_throttle;
 
-        float dt;
+    float dt;
 
-        PositionController(const std::string config_file);
-        void loadConfig(const std::string config_file);
-        void calculate(Pose p);
+    PositionController(const std::string config_file);
+    void loadConfig(const std::string config_file);
+    void calculate(Pose p);
 };
 
 class AttitudeController
 {
-    public:
-        struct pid roll;
-        struct pid pitch;
+public:
+    struct pid roll;
+    struct pid pitch;
 
-        float m1;
-        float m2;
-        float m3;
-        float m4;
+    float m1;
+    float m2;
+    float m3;
+    float m4;
 
-        float dt;
+    float dt;
 
-        AttitudeController(void);
-        AttitudeController(const std::string config_file);
-        void loadConfig(const std::string config_file);
-        void calculate(Orientation orientation, float throttle);
+    AttitudeController(void);
+    AttitudeController(const std::string config_file);
+    void loadConfig(const std::string config_file);
+    void calculate(Orientation orientation, float throttle);
 };
 
 #endif

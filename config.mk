@@ -33,7 +33,7 @@ LIBS = \
 CC = g++
 STANDARD = -std=c++11
 DEBUG_FLAGS = -g
-WARN_FLAGS = -Wall
+WARN_FLAGS = -Wall -Wno-unknown-pragmas
 CFLAGS = $(INCLUDES) $(STANDARD) $(DEBUG_FLAGS) $(WARN_FLAGS)
 
 # ARCHIVER

@@ -27,52 +27,52 @@
 // CLASSES
 class CameraConfig
 {
-    public:
-        int camera_mode;
-        int image_width;
-        int image_height;
+public:
+    int camera_mode;
+    int image_width;
+    int image_height;
 
-        cv::Mat camera_matrix;
-        cv::Mat rectification_matrix;
-        cv::Mat distortion_coefficients;
-        cv::Mat projection_matrix;
+    cv::Mat camera_matrix;
+    cv::Mat rectification_matrix;
+    cv::Mat distortion_coefficients;
+    cv::Mat projection_matrix;
 };
 
 class Camera
 {
-    private:
-        TagDetector *tag_detector;
+private:
+    TagDetector *tag_detector;
 
-        int camera_index;
-        int camera_type;
-        int camera_imshow;
-        int camera_snapshot;
-        std::string camera_mode;
+    int camera_index;
+    int camera_type;
+    int camera_imshow;
+    int camera_snapshot;
+    std::string camera_mode;
 
-        cv::Rect roi_rect;
-        CameraConfig *config;
-        std::map<std::string, CameraConfig *> configs;
+    cv::Rect roi_rect;
+    CameraConfig *config;
+    std::map<std::string, CameraConfig *> configs;
 
-        cv::VideoCapture *capture;
-        FlyCapture2::Camera *capture_firefly;
+    cv::VideoCapture *capture;
+    FlyCapture2::Camera *capture_firefly;
 
-        int initWebcam(int image_width, int image_height);
-        int initFirefly();
-        void printFPS(double &last_tic, int &frame);
-        void adjustMode(std::vector<TagPose> &pose_estimates, int &timeout);
+    int initWebcam(int image_width, int image_height);
+    int initFirefly();
+    void printFPS(double &last_tic, int &frame);
+    void adjustMode(std::vector<TagPose> &pose_estimates, int &timeout);
 
-    public:
-        vector<AprilTags::TagDetection> apriltags;
-        std::vector<TagPose> pose_estimates;
+public:
+    vector<AprilTags::TagDetection> apriltags;
+    std::vector<TagPose> pose_estimates;
 
-        Camera(int camera_index, int camera_type);
-        Camera(std::string camera_config_path);
-        int initCamera(std::string camera_mode);
-        CameraConfig *loadConfig(std::string mode, const std::string calib_file);
-        int loadConfig(std::string camera_mode);
-        int getFrame(cv::Mat &image);
-        int run(void);
-        std::vector<TagPose> step(int &timeout);
+    Camera(int camera_index, int camera_type);
+    Camera(std::string camera_config_path);
+    int initCamera(std::string camera_mode);
+    CameraConfig *loadConfig(std::string mode, const std::string calib_file);
+    int loadConfig(std::string camera_mode);
+    int getFrame(cv::Mat &image);
+    int run(void);
+    std::vector<TagPose> step(int &timeout);
 };
 
 #endif

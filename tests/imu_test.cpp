@@ -11,18 +11,95 @@
 #include "imu.hpp"
 #include "util.hpp"
 
+
+// CONSTANTS
+#define GYRO_CONFIG_FILE "./gyroscope.yaml"
+#define ACCEL_CONFIG_FILE "./accelerometer.yaml"
+#define MAG_CONFIG_FILE "./magnetometer.yaml"
+#define MAG_RECORD_FILE "./magnetometer.dat"
+
+
 // TESTS
-int testImu(void);
+int testUpdate(void);
+int testCalibrateGyroscope(void);
+int testCalibrateAccelerometer(void);
 int testCalibrateMagnetometer(void);
 
 
-int testImu(void)
+void transmitAccelGyroData(int s, struct sockaddr_in *server, struct IMU *imu)
+{
+    char filtered_data[100];
+    char accel_raw[100];
+    char gyro_raw[100];
+    Eigen::Quaterniond q;
+
+    // prepare filtered data string
+    euler2Quaternion(
+        imu->roll,
+        imu->pitch,
+        imu->yaw * M_PI / 180.0,
+        q
+    );
+    memset(filtered_data, '\0', sizeof(filtered_data));
+    sprintf(filtered_data, "%f %f %f %f", q.w(), q.x(), q.y(), q.z());
+
+    // prepare aceleration data string
+    euler2Quaternion(
+        imu->accel->roll,
+        imu->accel->pitch,
+        imu->mag->bearing,
+        q
+    );
+    memset(accel_raw, '\0', sizeof(accel_raw));
+    sprintf(accel_raw, "%f %f %f %f", q.w(), q.x(), q.y(), q.z());
+
+    // prepare gyroscope data string
+    euler2Quaternion(
+        imu->gyro->roll,
+        imu->gyro->pitch,
+        imu->mag->bearing,
+        q
+    );
+    memset(gyro_raw, '\0', sizeof(gyro_raw));
+    sprintf(gyro_raw, "%f %f %f %f", q.w(), q.x(), q.y(), q.z());
+
+    // send filtered, accelerometer and gyroscope data
+    server->sin_port = htons(7000);
+    sendto(
+        s,
+        filtered_data,
+        strlen(filtered_data),
+        0,
+        (struct sockaddr *) &server,
+        sizeof(server)
+    );
+
+    server->sin_port = htons(7001);
+    sendto(
+        s,
+        accel_raw,
+        strlen(accel_raw),
+        0,
+        (struct sockaddr *) &server,
+        sizeof(server)
+    );
+
+    server->sin_port = htons(7002);
+    sendto(
+        s,
+        gyro_raw,
+        strlen(gyro_raw),
+        0,
+        (struct sockaddr *) &server,
+        sizeof(server)
+    );
+}
+
+int testUpdate(void)
 {
     IMU imu;
     int s;
-    struct sockaddr_in serv_addr;
-    struct sockaddr_in serv_addr2;
-    struct sockaddr_in serv_addr3;
+    struct sockaddr_in server;
 
     // setup UDP socket
     s = socket(AF_INET, SOCK_DGRAM, 0);
@@ -32,120 +109,85 @@ int testImu(void)
     }
 
     // construct server details
-    memset((char *) &serv_addr, 0, sizeof(serv_addr));
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_addr.s_addr = inet_addr("192.168.1.20");
-    serv_addr.sin_port = htons(7000);
+    memset((char *) &server, 0, sizeof(server));
+    server.sin_family = AF_INET;
+    server.sin_addr.s_addr = inet_addr("192.168.1.20");
+    server.sin_port = htons(7000);
 
-    memset((char *) &serv_addr2, 0, sizeof(serv_addr2));
-    serv_addr2.sin_family = AF_INET;
-    serv_addr2.sin_addr.s_addr = inet_addr("192.168.1.20");
-    serv_addr2.sin_port = htons(7001);
-
-    memset((char *) &serv_addr3, 0, sizeof(serv_addr3));
-    serv_addr3.sin_family = AF_INET;
-    serv_addr3.sin_addr.s_addr = inet_addr("192.168.1.20");
-    serv_addr3.sin_port = htons(7002);
-
-    char filtered_data[100];
-    char accel_raw[100];
-    char gyro_raw[100];
-    Eigen::Quaterniond q;
-
-    while (1) {
+    for (int i = 0; i < 100; i++) {
         imu.update();
-        printf(
-            "roll: %f pitch: %f yaw: %f\n",
-            imu.roll,
-            imu.pitch,
-            imu.yaw
-        );
-        // printf(
-        //     "mag_x: %f mag_y: %f mag_z: %f\n",
-        //     imu.mag->x,
-        //     imu.mag->y,
-        //     imu.mag->z
-        // );
 
+        mu_check(fltcmp(imu.gyro->x, 0.0) != 0);
+        mu_check(fltcmp(imu.gyro->y, 0.0) != 0);
+        mu_check(fltcmp(imu.gyro->z, 0.0) != 0);
 
-        // prepare filtered data string
-        euler2Quaternion(
-            imu.roll,
-            imu.pitch,
-            imu.yaw * M_PI / 180.0,
-            q
-        );
-        memset(filtered_data, '\0', sizeof(filtered_data));
-        sprintf(filtered_data, "%f %f %f %f", q.w(), q.x(), q.y(), q.z());
+        mu_check(fltcmp(imu.accel->x, 0.0) != 0);
+        mu_check(fltcmp(imu.accel->y, 0.0) != 0);
+        mu_check(fltcmp(imu.accel->z, 0.0) != 0);
 
-        // prepare aceleration data string
-        euler2Quaternion(
-            imu.accel->roll,
-            imu.accel->pitch,
-            imu.mag->bearing,
-            q
-        );
-        memset(accel_raw, '\0', sizeof(accel_raw));
-        sprintf(accel_raw, "%f %f %f %f", q.w(), q.x(), q.y(), q.z());
+        mu_check(fltcmp(imu.mag->x, 0.0) != 0);
+        mu_check(fltcmp(imu.mag->y, 0.0) != 0);
+        mu_check(fltcmp(imu.mag->z, 0.0) != 0);
 
-        // prepare gyroscope data string
-        euler2Quaternion(
-            imu.gyro->roll,
-            imu.gyro->pitch,
-            imu.mag->bearing,
-            q
-        );
-        memset(gyro_raw, '\0', sizeof(gyro_raw));
-        sprintf(gyro_raw, "%f %f %f %f", q.w(), q.x(), q.y(), q.z());
-
-        // send filtered, accelerometer and gyroscope data
-        sendto(
-            s,
-            filtered_data,
-            strlen(filtered_data),
-            0,
-            (struct sockaddr *) &serv_addr,
-            sizeof(serv_addr)
-        );
-
-        sendto(
-            s,
-            accel_raw,
-            strlen(accel_raw),
-            0,
-            (struct sockaddr *) &serv_addr2,
-            sizeof(serv_addr2)
-        );
-
-        sendto(
-            s,
-            gyro_raw,
-            strlen(gyro_raw),
-            0,
-            (struct sockaddr *) &serv_addr3,
-            sizeof(serv_addr3)
-        );
-
+        transmitAccelGyroData(s, &server, &imu);
 		usleep(50000);
     }
 
 	return 0;
 }
 
+int testCalibrateGyroscope(void)
+{
+    IMU imu;
+
+    imu.state = IMU_UNIT_TESTING;
+    imu.calibrateGyroscope(GYRO_CONFIG_FILE);
+
+    mu_check(fltcmp(imu.gyro->offset_x, 1.0) == 0);
+    mu_check(fltcmp(imu.gyro->offset_y, 2.0) == 0);
+    mu_check(fltcmp(imu.gyro->offset_z, 3.0) == 0);
+
+    return 0;
+}
+
+int testCalibrateAccelerometer(void)
+{
+    IMU imu;
+
+    imu.state = IMU_UNIT_TESTING;
+    imu.calibrateAccelerometer(ACCEL_CONFIG_FILE);
+
+    mu_check(fltcmp(imu.accel->offset_x, 2.0) == 0);
+    mu_check(fltcmp(imu.accel->offset_y, 2.0) == 0);
+    mu_check(fltcmp(imu.accel->offset_z, 2.0) == 0);
+
+    return 0;
+}
+
 int testCalibrateMagnetometer(void)
 {
     IMU imu;
 
-    // imu.calibrateMagnetometer();
+    imu.state = IMU_UNIT_TESTING;
+    imu.calibrateMagnetometer(MAG_CONFIG_FILE, MAG_RECORD_FILE);
 
+    mu_check(fltcmp(imu.mag->offset_x, 0.5) != 0);
+    mu_check(fltcmp(imu.mag->offset_y, 1.0) != 0);
+    mu_check(fltcmp(imu.mag->offset_z, 1.5) != 0);
+
+    mu_check(fltcmp(imu.mag->scale_x, 0.0) != 0);
+    mu_check(fltcmp(imu.mag->scale_y, 0.0) != 0);
+    mu_check(fltcmp(imu.mag->scale_z, 0.0) != 0);
 
     return 0;
 }
 
 void testSuite(void)
 {
-    mu_add_test(testImu);
-    // mu_add_test(testCalibrateMagnetometer);
+    // mu_add_test(testUpdate);
+    mu_add_test(testCalibrateGyroscope);
+    mu_add_test(testCalibrateAccelerometer);
+    mu_add_test(testCalibrateMagnetometer);
 }
 
 mu_run_tests(testSuite)

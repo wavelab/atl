@@ -11,39 +11,39 @@
 
 class RCControl
 {
-    public:
-        RCInput *rc_control;
+public:
+    RCInput *rc_control;
 
-        bool calibrated;
+    bool calibrated;
 
-        int ch1;
-        int ch1_min;
-        int ch1_max;
+    int ch1;
+    int ch1_min;
+    int ch1_max;
 
-        int ch2;
-        int ch2_min;
-        int ch2_max;
+    int ch2;
+    int ch2_min;
+    int ch2_max;
 
-        int ch3;
-        int ch3_min;
-        int ch3_max;
+    int ch3;
+    int ch3_min;
+    int ch3_max;
 
-        int ch4;
-        int ch4_min;
-        int ch4_max;
+    int ch4;
+    int ch4_min;
+    int ch4_max;
 
-        int ch5;
-        int ch5_min;
-        int ch5_max;
+    int ch5;
+    int ch5_min;
+    int ch5_max;
 
-        int ch6;
-        int ch6_min;
-        int ch6_max;
+    int ch6;
+    int ch6_min;
+    int ch6_max;
 
-        RCControl(void);
-        RCControl(std::string config_path);
-        void update(void);
-        void print(void);
+    RCControl(void);
+    RCControl(std::string config_path);
+    void update(void);
+    void print(void);
 };
 
 

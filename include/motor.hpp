@@ -15,18 +15,18 @@
 // CLASSES
 class Motors
 {
-    public:
-        PWM *pwm;
-        float period;
-        float motor_1;
-        float motor_2;
-        float motor_3;
-        float motor_4;
+public:
+    PWM *pwm;
+    float period;
+    float motor_1;
+    float motor_2;
+    float motor_3;
+    float motor_4;
 
-        Motors(void);
-        void arm(void);
-        void set_throttle(int index, float percentage);
-        void set_throttle_pwm(int index, int pwm);
+    Motors(void);
+    void arm(void);
+    void set_throttle(int index, float percentage);
+    void set_throttle_pwm(int index, int pwm);
 };
 
 #endif
