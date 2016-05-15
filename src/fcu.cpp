@@ -12,12 +12,6 @@ FCU::FCU(void)
     this->attitude_controller = new AttitudeController();
 }
 
-void FCU::intializeAttitudeEstimator(void)
-{
-    this->attitude_estimator;
-
-}
-
 int FCU::initialize(void)
 {
     this->imu->initialize();
@@ -28,11 +22,10 @@ int FCU::initialize(void)
     return 0;
 }
 
-int runRCMode(void)
+int FCU::runRCMode(void)
 {
     float roll;
     float pitch;
-    float yaw;
     float throttle;
 
     // TODO: need to extract out magic numbers and load radio calibration
@@ -53,14 +46,14 @@ int runRCMode(void)
     return 0;
 }
 
-int runAutopilotMode(void)
+int FCU::runAutopilotMode(void)
 {
     Orientation orientation;
     float throttle;
 
     // setup
-    orientation.roll = imu.roll;
-    orientation.pitch = imu.pitch;
+    orientation.roll = this->imu->roll;
+    orientation.pitch = this->imu->pitch;
     throttle = 0.5;
 
     // calculate attitude

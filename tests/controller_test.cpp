@@ -203,35 +203,35 @@ int testPositionControllerLoadConfig(void)
     return 0;
 }
 
-int testAttitudeController(void)
-{
-    AttitudeController *controller;
-    controller = new AttitudeController();
-
-    Motors *motors;
-    RCControl *rc_control;
-    float roll;
-    float pitch;
-    float throttle;
-
-    motors = new Motors();
-    rc_control = new RCControl();
-
-    while (1) {
-        rc_control->update();
-
-        roll = (rc_control->ch1 - 1500.0) / (2000.0 - 1500.0);
-        pitch = (rc_control->ch2 - 1500.0) / (2000.0 - 1500.0);
-        throttle = (rc_control->ch3 - 1092) / (1900.0 - 1092.0);
-
-        motors->set_throttle(0, throttle - roll + pitch);
-        motors->set_throttle(1, throttle + roll - pitch);
-        motors->set_throttle(2, throttle + roll + pitch);
-        motors->set_throttle(3, throttle - roll - pitch);
-    }
-
-    return 0;
-}
+// int testAttitudeController(void)
+// {
+//     AttitudeController *controller;
+//     controller = new AttitudeController();
+//
+//     Motors *motors;
+//     RCControl *rc_control;
+//     float roll;
+//     float pitch;
+//     float throttle;
+//
+//     motors = new Motors();
+//     rc_control = new RCControl();
+//
+//     while (1) {
+//         rc_control->update();
+//
+//         roll = (rc_control->ch1 - 1500.0) / (2000.0 - 1500.0);
+//         pitch = (rc_control->ch2 - 1500.0) / (2000.0 - 1500.0);
+//         throttle = (rc_control->ch3 - 1092) / (1900.0 - 1092.0);
+//
+//         motors->set_throttle(0, throttle - roll + pitch);
+//         motors->set_throttle(1, throttle + roll - pitch);
+//         motors->set_throttle(2, throttle + roll + pitch);
+//         motors->set_throttle(3, throttle - roll - pitch);
+//     }
+//
+//     return 0;
+// }
 
 void testSuite(void)
 {
@@ -241,7 +241,7 @@ void testSuite(void)
     mu_add_test(testCarrotControllerWaypointReached);
     // mu_add_test(testCarrotControllerUpdate);
     mu_add_test(testPositionControllerLoadConfig);
-    mu_add_test(testAttitudeController);
+    // mu_add_test(testAttitudeController);
 }
 
 mu_run_tests(testSuite)

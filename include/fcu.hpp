@@ -5,6 +5,7 @@
 #include "ekf.hpp"
 #include "imu.hpp"
 #include "motor.hpp"
+#include "controller.hpp"
 
 
 // CONTANTS
@@ -21,7 +22,7 @@ public:
     int state;
 
     IMU *imu;
-    Motor *motors;
+    Motors *motors;
     RCControl *rc_control;
 
     struct ekf *attitude_estimator;
