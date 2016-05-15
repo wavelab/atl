@@ -12,6 +12,7 @@ int testRC(void)
 {
     RCControl rc;
 
+    rc.initialize();
     while (1) {
         rc.update();
         rc.print();

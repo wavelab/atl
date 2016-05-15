@@ -100,43 +100,27 @@ Eigen::MatrixXd H_function (Eigen::VectorXd & mu_p, double dt){
     return H;
 }
 
-// int testEkfCheck(void){
-//     struct ekf test_ekf;
-//     int result = ekf_check(&test_ekf);
-//
-//
-// }
-//
-
-
 void ekf_new(struct ekf *new_ekf)
 {
-    // struct ekf *new_ekf;
-    // new_ekf = (struct ekf *) malloc(sizeof(struct ekf *));
-
-    // Initialize values
-    double dt = 0.2;
-
+    double dt;
     Eigen::VectorXd mu(6);
-    mu << 1, 1, 1, 1, 1, 1;
-
     Eigen::MatrixXd S;
-    S = Eigen::MatrixXd::Identity(mu.size(), mu.size());
-
     Eigen::MatrixXd R;
-    R = Eigen::MatrixXd::Identity(mu.size(), mu.size());
-
     Eigen::VectorXd u_test(6);
-    u_test << 1, 1, 1, 1, 1, 1;
-
     Eigen::VectorXd y_test(9);
-    y_test << 1, 2, 3, 4, 5, 6, 7, 8, 9;
-
     Eigen::MatrixXd Q;
-    Q = Eigen::MatrixXd::Identity(y_test.size(), y_test.size());
-
     Eigen::MatrixXd I;
+
+    // setup
+    dt = 0.2;
+    mu << 1, 1, 1, 1, 1, 1;
+    S = Eigen::MatrixXd::Identity(mu.size(), mu.size());
+    R = Eigen::MatrixXd::Identity(mu.size(), mu.size());
+    u_test << 1, 1, 1, 1, 1, 1;
+    y_test << 1, 2, 3, 4, 5, 6, 7, 8, 9;
+    Q = Eigen::MatrixXd::Identity(y_test.size(), y_test.size());
     I = Eigen::MatrixXd::Identity(mu.size(), mu.size());
+
     // Assign inital values to ekf
     new_ekf->mu = mu;
     new_ekf->dt = dt;
@@ -156,26 +140,25 @@ void ekf_new(struct ekf *new_ekf)
     new_ekf->H_function = H_function;
 }
 
-
 int testPredictionUpdate(void)
 {
     Eigen::VectorXd u_test(6);
-    u_test << 1, 1, 1, 1, 1, 1;
 
+    u_test << 1, 1, 1, 1, 1, 1;
     ekf_prediction_update(&estimator, u_test);
+
 	return 0;
 }
 
 int testMeasurementUpdate(void)
 {
-
     Eigen::VectorXd y_test(9);
-    y_test << 1, 2, 3, 4, 5, 6, 7, 8, 9;
 
+    y_test << 1, 2, 3, 4, 5, 6, 7, 8, 9;
     ekf_measurement_update(&estimator,  y_test);
+
 	return 0;
 }
-
 
 void testSuite(void)
 {

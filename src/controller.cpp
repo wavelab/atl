@@ -184,7 +184,7 @@ void PositionController::loadConfig(const std::string config_file)
     }
 }
 
-static void pid_calculate(struct pid *p, float input, float dt)
+static float pid_calculate(struct pid *p, float input, float dt)
 {
     float error;
 
@@ -209,6 +209,8 @@ static void pid_calculate(struct pid *p, float input, float dt)
 
     // update error
     p->prev_error = error;
+
+    return p->output;
 }
 
 void PositionController::calculate(Pose pose)
@@ -291,10 +293,9 @@ void AttitudeController::calculate(Orientation orientation, float throttle)
     float roll;
     float pitch;
 
-    pid_calculate(&this->roll, orientation.roll, this->dt);
-    pid_calculate(&this->pitch, orientation.pitch, this->dt);
-    roll = this->roll.output;
-    pitch = this->pitch.output;
+    // calculate
+    roll = pid_calculate(&this->roll, orientation.roll, this->dt);
+    pitch = pid_calculate(&this->pitch, orientation.pitch, this->dt);
 
     // APM motor mapping
     // M1: TOP RIGHT

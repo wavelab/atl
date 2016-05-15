@@ -42,6 +42,7 @@ public:
 
     RCControl(void);
     RCControl(std::string config_path);
+    int initialize(void);
     void update(void);
     void print(void);
 };

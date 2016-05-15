@@ -207,7 +207,7 @@ int testAttitudeController(void)
 {
     AttitudeController *controller;
     controller = new AttitudeController();
-:w
+
     Motors *motors;
     RCControl *rc_control;
     float roll;

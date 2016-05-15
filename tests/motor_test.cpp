@@ -57,6 +57,9 @@ int test_throttle_with_rc(void)
     motors = new Motors();
     rc_control = new RCControl();
 
+    motors->arm();
+    rc_control->initialize();
+
     while (1) {
         rc_control->update();
 

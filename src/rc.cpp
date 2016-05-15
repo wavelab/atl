@@ -4,7 +4,6 @@
 RCControl::RCControl(void)
 {
     this->rc_control = new RCInput();
-    this->rc_control->init();
     this->calibrated = false;
 
     ch1 = 0;
@@ -37,7 +36,6 @@ RCControl::RCControl(std::string config_path)
     YAML::Node config;
 
     this->rc_control = new RCInput();
-    this->rc_control->init();
     this->calibrated = true;
 
     config = YAML::LoadFile(config_path);
@@ -65,6 +63,12 @@ RCControl::RCControl(std::string config_path)
     ch6 = 0;
     ch6_min = config["channel_6"]["min"].as<int>();
     ch6_max = config["channel_6"]["max"].as<int>();
+}
+
+int RCControl::initialize(void)
+{
+    this->rc_control->init();
+    return 0;
 }
 
 void RCControl::update(void)
