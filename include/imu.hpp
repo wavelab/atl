@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
+#include <sys/stat.h>
 
 #include <navio2/MPU9250.h>
 #include <navio2/LSM9DS1.h>
@@ -34,6 +35,7 @@ class Accelerometer
         float pitch;
 
         Accelerometer(void);
+        void saveConfiguration(const std::string config_path);
 };
 
 class Gyroscope
@@ -51,6 +53,7 @@ class Gyroscope
         float pitch;
 
         Gyroscope(void);
+        void saveConfiguration(const std::string config_path);
 };
 
 class Magnetometer
@@ -80,6 +83,7 @@ class Magnetometer
         float bearing;
 
         Magnetometer(void);
+        void saveConfiguration(const std::string config_path);
 };
 
 class IMU

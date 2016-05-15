@@ -11,15 +11,9 @@
 
 int main(void)
 {
-    int loop;
-    char c;
     IMU imu;
 
-    // setup
-    loop = 1;
     std::cout << GYROSCOPE_CALIBRATION_INSTRUCTIONS;
-
-    // calibrate gyroscope
     imu.calibrateGyroscope(CONFIG_PATH);
 
     return 0;
