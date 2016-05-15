@@ -13,6 +13,7 @@
 
 
 // CONSTANTS
+#define IMU_RECORD_FILE "./imu.dat"
 #define GYRO_CONFIG_FILE "./gyroscope.yaml"
 #define ACCEL_CONFIG_FILE "./accelerometer.yaml"
 #define MAG_CONFIG_FILE "./magnetometer.yaml"
@@ -100,6 +101,11 @@ int testUpdate(void)
     IMU imu;
     int s;
     struct sockaddr_in server;
+    std::ofstream record_file;
+
+    // setup
+    record_file.open(IMU_RECORD_FILE);
+    record_file << "ax,ay,az,gx,gy,gz,mx,my,mx" << std::endl;
 
     // setup UDP socket
     s = socket(AF_INET, SOCK_DGRAM, 0);
@@ -114,8 +120,21 @@ int testUpdate(void)
     server.sin_addr.s_addr = inet_addr("192.168.1.20");
     server.sin_port = htons(7000);
 
+    // test imu update
     for (int i = 0; i < 100; i++) {
         imu.update();
+
+        record_file << imu.accel->x << ",";
+        record_file << imu.accel->y << ",";
+        record_file << imu.accel->z << ",";
+
+        record_file << imu.gyro->x << ",";
+        record_file << imu.gyro->y << ",";
+        record_file << imu.gyro->z << ",";
+
+        record_file << imu.mag->x << ",";
+        record_file << imu.mag->y << ",";
+        record_file << imu.mag->z << std::endl;
 
         mu_check(fltcmp(imu.gyro->x, 0.0) != 0);
         mu_check(fltcmp(imu.gyro->y, 0.0) != 0);
@@ -132,6 +151,9 @@ int testUpdate(void)
         transmitAccelGyroData(s, &server, &imu);
 		usleep(50000);
     }
+
+    // clean up
+    record_file.close();
 
 	return 0;
 }
@@ -184,10 +206,10 @@ int testCalibrateMagnetometer(void)
 
 void testSuite(void)
 {
-    // mu_add_test(testUpdate);
-    mu_add_test(testCalibrateGyroscope);
-    mu_add_test(testCalibrateAccelerometer);
-    mu_add_test(testCalibrateMagnetometer);
+    mu_add_test(testUpdate);
+    // mu_add_test(testCalibrateGyroscope);
+    // mu_add_test(testCalibrateAccelerometer);
+    // mu_add_test(testCalibrateMagnetometer);
 }
 
 mu_run_tests(testSuite)
