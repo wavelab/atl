@@ -5,6 +5,7 @@
 #### Odroid
 - [Flashing](#docs/reference/odroid/flashing)
 - [Resizing Partitions](#docs/reference/odroid/resize_partition)
+
 #### Pixhawk
 - [Serial Communication](#docs/reference/pixhawk/serial_communication)
 
@@ -25,4 +26,3 @@
 - [controller](#docs/api/controller)
 - [ekf](#/docs/api/ekf)
 - [util](#docs/api/util)
-
