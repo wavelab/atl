@@ -29,6 +29,7 @@ LIBS = \
 	-lm \
 	`pkg-config --libs --cflags opencv`
 
+
 # C COMPILER
 CC = g++
 STANDARD = -std=c++11
@@ -36,9 +37,17 @@ DEBUG_FLAGS = -g
 WARN_FLAGS = -Wall -Wno-unknown-pragmas
 CFLAGS = $(INCLUDES) $(STANDARD) $(DEBUG_FLAGS) $(WARN_FLAGS)
 
+CCACHE_EXISTS = $(shell ccache -V)
+ifdef CCACHE_EXISTS
+	CC := ccache $(CC)
+	CXX := ccache $(CXX)
+endif
+
+
 # ARCHIVER
 AR = ar
 ARFLAGS = rvs
+
 
 # COMMANDS
 MAKE_OBJ = \
