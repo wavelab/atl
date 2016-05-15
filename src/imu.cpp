@@ -15,6 +15,32 @@ Accelerometer::Accelerometer(void)
     this->pitch = 0.0f;
 }
 
+void Accelerometer::saveConfiguration(const std::string config_path)
+{
+    YAML::Emitter yaml;
+    std::ofstream config_file;
+
+    // setup
+    config_file.open(config_path);
+
+    // record gyroscope
+    yaml << YAML::BeginMap;
+    yaml << YAML::Key << "accelerometer";
+        yaml << YAML::BeginMap;
+        yaml << YAML::Key << "offset_x";
+        yaml << YAML::Value << this->offset_x;
+        yaml << YAML::Key << "offset_y";
+        yaml << YAML::Value << this->offset_y;
+        yaml << YAML::Key << "offset_z";
+        yaml << YAML::Value << this->offset_z;
+        yaml << YAML::EndMap;
+    yaml << YAML::EndMap;
+
+    // write to file
+    config_file << yaml.c_str() << std::endl;
+    config_file.close();
+}
+
 Gyroscope::Gyroscope(void)
 {
     this->x = 0.0f;
@@ -27,6 +53,32 @@ Gyroscope::Gyroscope(void)
 
     this->roll = 0.0f;
     this->pitch = 0.0f;
+}
+
+void Gyroscope::saveConfiguration(const std::string config_path)
+{
+    YAML::Emitter yaml;
+    std::ofstream config_file;
+
+    // setup
+    config_file.open(config_path);
+
+    // record gyroscope
+    yaml << YAML::BeginMap;
+    yaml << YAML::Key << "gyroscope";
+        yaml << YAML::BeginMap;
+        yaml << YAML::Key << "offset_x";
+        yaml << YAML::Value << this->offset_x;
+        yaml << YAML::Key << "offset_y";
+        yaml << YAML::Value << this->offset_y;
+        yaml << YAML::Key << "offset_z";
+        yaml << YAML::Value << this->offset_z;
+        yaml << YAML::EndMap;
+    yaml << YAML::EndMap;
+
+    // write to file
+    config_file << yaml.c_str() << std::endl;
+    config_file.close();
 }
 
 Magnetometer::Magnetometer(void)
@@ -55,6 +107,35 @@ Magnetometer::Magnetometer(void)
     this->bearing = 0.0f;
 }
 
+void Magnetometer::saveConfiguration(const std::string config_path)
+{
+    YAML::Emitter yaml;
+    std::ofstream config_file;
+
+    // record hard and soft iron errors
+    yaml << YAML::BeginMap;
+    yaml << YAML::Key << "magnetometer";
+        yaml << YAML::BeginMap;
+        yaml << YAML::Key << "offset_x";
+        yaml << YAML::Value << this->offset_x;
+        yaml << YAML::Key << "offset_y";
+        yaml << YAML::Value << this->offset_y;
+        yaml << YAML::Key << "offset_z";
+        yaml << YAML::Value << this->offset_z;
+        yaml << YAML::Key << "scale_x";
+        yaml << YAML::Value << this->scale_x;
+        yaml << YAML::Key << "scale_y";
+        yaml << YAML::Value << this->scale_y;
+        yaml << YAML::Key << "scale_z";
+        yaml << YAML::Value << this->scale_z;
+        yaml << YAML::EndMap;
+    yaml << YAML::EndMap;
+
+    // write to file
+    config_file << yaml.c_str() << std::endl;
+    config_file.close();
+}
+
 
 
 
@@ -81,11 +162,6 @@ void IMU::calibrateGyroscope(const std::string config_path)
     float gy;
     float gz;
     float offset[3];
-    YAML::Emitter yaml;
-    std::ofstream config_file;
-
-    // setup
-    config_file.open(config_path);
 
     // obtain average gyroscope rates
     for (int i = 0; i < 100; i++) {
@@ -106,23 +182,7 @@ void IMU::calibrateGyroscope(const std::string config_path)
     this->gyro->offset_x = offset[0];
     this->gyro->offset_y = offset[1];
     this->gyro->offset_z = offset[2];
-
-    // record gyroscope
-    yaml << YAML::BeginMap;
-    yaml << YAML::Key << "gyroscope";
-        yaml << YAML::BeginMap;
-        yaml << YAML::Key << "offset_x";
-        yaml << YAML::Value << this->gyro->offset_x;
-        yaml << YAML::Key << "offset_y";
-        yaml << YAML::Value << this->gyro->offset_y;
-        yaml << YAML::Key << "offset_z";
-        yaml << YAML::Value << this->gyro->offset_z;
-        yaml << YAML::EndMap;
-    yaml << YAML::EndMap;
-
-    // write to file
-    config_file << yaml.c_str() << std::endl;
-    config_file.close();
+    this->gyro->saveConfiguration(config_path);
 }
 
 static void printAccelerometerCalibrationInstructions(int i)
@@ -160,61 +220,64 @@ static void recordAccelerometerBounds(int i, float *bounds, float *data)
         bounds[4] = std::min(data[2], bounds[4]);
         break;
     case 2:
-        bounds[3] = std::max(data[1], bounds[3]);
+        bounds[3] = std::max(data[0], bounds[3]);
         break;
     case 3:
-        bounds[2] = std::min(data[1], bounds[2]);
+        bounds[2] = std::min(data[0], bounds[2]);
         break;
     case 4:
-        bounds[0] = std::max(data[0], bounds[0]);
+        bounds[1] = std::max(data[1], bounds[1]);
         break;
     case 5:
-        bounds[1] = std::min(data[0], bounds[1]);
+        bounds[0] = std::min(data[1], bounds[0]);
         break;
     }
+}
+
+static void printAccelerometerData(char *line, float *data)
+{
+    for (int j = 0; j < (int) strlen(line); j++) {
+        printf("\b \b");
+    }
+    memset(line, '\0', strlen(line));
+    sprintf(line, "x: %f, y: %f, z: %f", data[0], data[1], data[2]);
+    printf(line);
+    fflush(stdout);
 }
 
 void IMU::calibrateAccelerometer(const std::string config_path)
 {
     char c;
+    char line[50];
     float data[3];
     float bounds[6];
     YAML::Emitter yaml;
     std::ofstream config_file;
 
     // setup
+    memset(line, '\0', 50);
     config_file.open(config_path);
     nonblock(NONBLOCK_ENABLE);
 
     // initialize bounds
     this->mpu9250->update();
     this->mpu9250->read_accelerometer(&data[0], &data[1], &data[2]);
-    bounds[0] = data[0];
-    bounds[1] = data[0];
-    bounds[2] = data[1];
-    bounds[3] = data[1];
-    bounds[4] = data[2];
-    bounds[5] = data[2];
-
-    char line[50];
+    for (int i = 0; i < 6; i++) {
+        bounds[0] = 0.0f;
+    }
 
     // obtain average gyroscope rates
     for (int i = 0; i < 6; i++) {
         printAccelerometerCalibrationInstructions(i);
 
+        // obtain accelerometer bounds
         while (1) {
-            // obtain accelerometer bounds
             this->mpu9250->update();
             this->mpu9250->read_accelerometer(&data[0], &data[1], &data[2]);
             recordAccelerometerBounds(i, bounds, data);
 
-            for (int j = 0; j < strlen(line); j++) {
-                printf("\b \b");
-            }
-            memset(line, '\0', 50);
-            sprintf(line, "x: %f, y: %f, z: %f", data[0], data[1], data[2]);
-            printf(line);
-            // usleep(100 * 1000);
+            // print accelerometer data
+            printAccelerometerData(line, data);
 
             // keyboard event
             if (kbhit()) {
@@ -227,31 +290,14 @@ void IMU::calibrateAccelerometer(const std::string config_path)
                     break;
                 }
             }
-
         }
     }
 
     // calculate offset
-    this->accel->offset_x = (bounds[1] - bounds[0]) / 2;
-    this->accel->offset_y = (bounds[3] - bounds[2]) / 2;
-    this->accel->offset_z = (bounds[5] - bounds[4]) / 2;
-
-    // record offsets
-    yaml << YAML::BeginMap;
-    yaml << YAML::Key << "accelerometer";
-        yaml << YAML::BeginMap;
-        yaml << YAML::Key << "offset_x";
-        yaml << YAML::Value << this->accel->offset_x;
-        yaml << YAML::Key << "offset_y";
-        yaml << YAML::Value << this->accel->offset_y;
-        yaml << YAML::Key << "offset_z";
-        yaml << YAML::Value << this->accel->offset_z;
-        yaml << YAML::EndMap;
-    yaml << YAML::EndMap;
-
-    // write to file
-    config_file << yaml.c_str() << std::endl;
-    config_file.close();
+    this->accel->offset_x = (bounds[1] + bounds[0]) / 2.0;
+    this->accel->offset_y = (bounds[3] + bounds[2]) / 2.0;
+    this->accel->offset_z = (bounds[5] + bounds[4]) / 2.0;
+    this->accel->saveConfiguration(config_path);
 }
 
 void IMU::obtainHardIronErrors(const std::string record_path)
@@ -337,38 +383,10 @@ void IMU::calibrateMagnetometer(
     const std::string record_path
 )
 {
-    std::ofstream config_file;
-    YAML::Emitter yaml;
-
-    // setup
-    config_file.open(config_path);
-
     // obtain hard and soft iron errors
     this->obtainHardIronErrors(record_path);
     this->obtainSoftIronErrors();
-
-    // record hard and soft iron errors
-    yaml << YAML::BeginMap;
-    yaml << YAML::Key << "magnetometer";
-        yaml << YAML::BeginMap;
-        yaml << YAML::Key << "offset_x";
-        yaml << YAML::Value << this->mag->offset_x;
-        yaml << YAML::Key << "offset_y";
-        yaml << YAML::Value << this->mag->offset_y;
-        yaml << YAML::Key << "offset_z";
-        yaml << YAML::Value << this->mag->offset_z;
-        yaml << YAML::Key << "scale_x";
-        yaml << YAML::Value << this->mag->scale_x;
-        yaml << YAML::Key << "scale_y";
-        yaml << YAML::Value << this->mag->scale_y;
-        yaml << YAML::Key << "scale_z";
-        yaml << YAML::Value << this->mag->scale_z;
-        yaml << YAML::EndMap;
-    yaml << YAML::EndMap;
-
-    // write to file
-    config_file << yaml.c_str() << std::endl;
-    config_file.close();
+    this->mag->saveConfiguration(config_path);
 }
 
 void IMU::calculateOrientationCF(void)
