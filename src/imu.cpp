@@ -231,6 +231,11 @@ int IMU::calibrateGyroscope(const std::string config_path)
         offset[2] = 300.0;
         goto GYRO_OFFSET_CALC;
 
+    } else {
+        offset[0] = 0.0;
+        offset[1] = 0.0;
+        offset[2] = 0.0;
+
     }
 
     // obtain average gyroscope rates

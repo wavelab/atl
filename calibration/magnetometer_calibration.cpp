@@ -7,6 +7,7 @@
 int main(void)
 {
     IMU imu;
+    imu.initialize();
     imu.calibrateMagnetometer(CONFIG_PATH, RECORD_PATH);
     return 0;
 }
