@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
+#include <sys/stat.h>
 
 #include <navio2/MPU9250.h>
 #include <navio2/LSM9DS1.h>

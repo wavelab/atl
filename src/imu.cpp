@@ -39,6 +39,7 @@ void Accelerometer::saveConfiguration(const std::string config_path)
     // write to file
     config_file << yaml.c_str() << std::endl;
     config_file.close();
+    chmod(config_path.c_str(), S_IRWXU|S_IRWXG|S_IRWXO);
 }
 
 Gyroscope::Gyroscope(void)
@@ -79,6 +80,7 @@ void Gyroscope::saveConfiguration(const std::string config_path)
     // write to file
     config_file << yaml.c_str() << std::endl;
     config_file.close();
+    chmod(config_path.c_str(), S_IRWXU|S_IRWXG|S_IRWXO);
 }
 
 Magnetometer::Magnetometer(void)
@@ -134,6 +136,7 @@ void Magnetometer::saveConfiguration(const std::string config_path)
     // write to file
     config_file << yaml.c_str() << std::endl;
     config_file.close();
+    chmod(config_path.c_str(), S_IRWXU|S_IRWXG|S_IRWXO);
 }
 
 
@@ -240,8 +243,8 @@ static void printAccelerometerData(char *line, float *data)
         printf("\b \b");
     }
     memset(line, '\0', strlen(line));
-    sprintf(line, "x: %f, y: %f, z: %f", data[0], data[1], data[2]);
-    printf(line);
+    sprintf(line, "x: %f, y: %f, z: %f     ", data[0], data[1], data[2]);
+    printf("%s", line);
     fflush(stdout);
 }
 
