@@ -1,6 +1,5 @@
 #include "ekf.hpp"
 
-
 void ekf_prediction_update(struct ekf *e, Eigen::VectorXd u, float dt)
 {
     Eigen::MatrixXd g;
@@ -126,10 +125,12 @@ void initialize_att_ekf(struct ekf *new_ekf, Eigen::VectorXd mu)
 
     // Initialize values
 
+    Eigen::MatrixXd S;
     Eigen::MatrixXd R;
     Eigen::MatrixXd Q;
     Eigen::MatrixXd I;
 
+    S = Eigen::MatrixXd::Identity(mu.size(), mu.size());
     R = Eigen::MatrixXd::Identity(mu.size(), mu.size());
     I = Eigen::MatrixXd::Identity(mu.size(), mu.size());
     Q = Eigen::MatrixXd::Zero(9, 9);
@@ -160,6 +161,7 @@ void initialize_att_ekf(struct ekf *new_ekf, Eigen::VectorXd mu)
 
     // Assign inital values to ekf
     new_ekf->mu = mu;
+    new_ekf->S  = S;
     new_ekf->R  = R;
     new_ekf->I  = I;
     new_ekf->Q  = Q;

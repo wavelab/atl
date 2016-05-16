@@ -39,7 +39,7 @@ Eigen::MatrixXd att_G_function(Eigen::VectorXd &mu_p, Eigen::VectorXd &u,
 Eigen::VectorXd att_h_function(Eigen::VectorXd &y, float dt);
 Eigen::MatrixXd att_H_function(Eigen::VectorXd &mu_p, float dt);
 
-int initilize_att_ekf(ekf *att_ekf, Eigen::MatrixXd &R, Eigen::MatrixXd &Q,
+void initialize_att_ekf(ekf *att_ekf,
                       Eigen::VectorXd mu_init);
 
 #endif
