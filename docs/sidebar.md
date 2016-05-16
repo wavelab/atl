@@ -12,6 +12,8 @@
 #### PointGrey Camera
 - [Drivers](#docs/reference/pointgrey/install)
 
+#### IMUs
+-[MPU-9250](#docs/reference/mpu9250/MPU-9250-IMU)
 ### Maths
 #### Sensor Fusion
 - [current models for ekf](#docs/reference/ekf/current_model)
