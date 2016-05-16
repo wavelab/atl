@@ -132,6 +132,31 @@ void initialize_att_ekf(struct ekf *new_ekf, Eigen::VectorXd mu)
 
     R = Eigen::MatrixXd::Identity(mu.size(), mu.size());
     I = Eigen::MatrixXd::Identity(mu.size(), mu.size());
+    Q = Eigen::MatrixXd::Zero(9, 9);
+
+    // Best guess for the R values process noise
+    R(0, 0) = 0.05;
+    R(1, 1) = 0.05;
+    R(2, 2) = 0.05;
+
+    R(3, 3) = 0.0005;
+    R(4, 4) = 0.0005;
+    R(5, 5) = 0.0005;
+
+    // Magnometer measurement noise
+    Q(0, 0) = 2.0;
+    Q(1, 1) = 2.0;
+    Q(2, 2) = 2.0;
+
+    // Accelerometer measurement noise
+    Q(3, 3) = 0.2;
+    Q(4, 4) = 0.2;
+    Q(5, 5) = 0.2;
+
+    // Gyro measurement noise
+    Q(6, 6) = 0.02;
+    Q(7, 7) = 0.02;
+    Q(8, 8) = 0.02;
 
     // Assign inital values to ekf
     new_ekf->mu = mu;
