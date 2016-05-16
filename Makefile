@@ -1,5 +1,12 @@
 include config.mk
 
+CCACHE_EXISTS = $(shell ccache -V)
+ifdef CCACHE_EXISTS
+	CC := ccache $(CC)
+	CXX := ccache $(CXX)
+endif
+
+
 default: all done
 
 all: mkdirs libawesomo tests calibration
