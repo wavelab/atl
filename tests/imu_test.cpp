@@ -27,7 +27,7 @@ int testCalibrateAccelerometer(void);
 int testCalibrateMagnetometer(void);
 
 
-void transmitAccelGyroData(int s, struct sockaddr_in *server, struct IMU *imu)
+void transmitAccelGyroData(int s, struct sockaddr_in *server, IMU &imu)
 {
     char filtered_data[100];
     char accel_raw[100];
@@ -36,9 +36,9 @@ void transmitAccelGyroData(int s, struct sockaddr_in *server, struct IMU *imu)
 
     // prepare filtered data string
     euler2Quaternion(
-        imu->roll,
-        imu->pitch,
-        imu->yaw * M_PI / 180.0,
+        imu.roll,
+        imu.pitch,
+        imu.yaw * M_PI / 180.0,
         q
     );
     memset(filtered_data, '\0', sizeof(filtered_data));
@@ -46,9 +46,9 @@ void transmitAccelGyroData(int s, struct sockaddr_in *server, struct IMU *imu)
 
     // prepare aceleration data string
     euler2Quaternion(
-        imu->accel->roll,
-        imu->accel->pitch,
-        imu->mag->bearing,
+        imu.accel->roll,
+        imu.accel->pitch,
+        imu.mag->bearing,
         q
     );
     memset(accel_raw, '\0', sizeof(accel_raw));
@@ -56,9 +56,9 @@ void transmitAccelGyroData(int s, struct sockaddr_in *server, struct IMU *imu)
 
     // prepare gyroscope data string
     euler2Quaternion(
-        imu->gyro->roll,
-        imu->gyro->pitch,
-        imu->mag->bearing,
+        imu.gyro->roll,
+        imu.gyro->pitch,
+        imu.mag->bearing,
         q
     );
     memset(gyro_raw, '\0', sizeof(gyro_raw));
@@ -71,8 +71,8 @@ void transmitAccelGyroData(int s, struct sockaddr_in *server, struct IMU *imu)
         filtered_data,
         strlen(filtered_data),
         0,
-        (struct sockaddr *) &server,
-        sizeof(server)
+        (struct sockaddr *) server,
+        sizeof(*server)
     );
 
     server->sin_port = htons(7001);
@@ -81,8 +81,8 @@ void transmitAccelGyroData(int s, struct sockaddr_in *server, struct IMU *imu)
         accel_raw,
         strlen(accel_raw),
         0,
-        (struct sockaddr *) &server,
-        sizeof(server)
+        (struct sockaddr *) server,
+        sizeof(*server)
     );
 
     server->sin_port = htons(7002);
@@ -91,11 +91,11 @@ void transmitAccelGyroData(int s, struct sockaddr_in *server, struct IMU *imu)
         gyro_raw,
         strlen(gyro_raw),
         0,
-        (struct sockaddr *) &server,
-        sizeof(server)
+        (struct sockaddr *) server,
+        sizeof(*server)
     );
 
-    usleep(50000);
+    usleep(50 * 1000);
 }
 
 int testUpdate(void)
@@ -121,41 +121,42 @@ int testUpdate(void)
     // construct server details
     memset((char *) &server, 0, sizeof(server));
     server.sin_family = AF_INET;
-    server.sin_addr.s_addr = inet_addr("192.168.1.20");
+    server.sin_addr.s_addr = inet_addr("192.168.1.10");
     server.sin_port = htons(7000);
 
     // test imu update
-    for (int i = 0; i < 10000; i++) {
-        imu.update();
+    // for (int i = 0; i < 10000; i++) {
+    while (1) {
+         imu.update();
 
         // record imu data
-        record_file << imu.accel->x << ",";
-        record_file << imu.accel->y << ",";
-        record_file << imu.accel->z << ",";
-
-        record_file << imu.gyro->x << ",";
-        record_file << imu.gyro->y << ",";
-        record_file << imu.gyro->z << ",";
-
-        record_file << imu.mag->x << ",";
-        record_file << imu.mag->y << ",";
-        record_file << imu.mag->z << std::endl;
+        // record_file << imu.accel->x << ",";
+        // record_file << imu.accel->y << ",";
+        // record_file << imu.accel->z << ",";
+        //
+        // record_file << imu.gyro->x << ",";
+        // record_file << imu.gyro->y << ",";
+        // record_file << imu.gyro->z << ",";
+        //
+        // record_file << imu.mag->x << ",";
+        // record_file << imu.mag->y << ",";
+        // record_file << imu.mag->z << std::endl;
 
         // aseert
-        mu_check(fltcmp(imu.accel->x, data[0]) != 0);
-        mu_check(fltcmp(imu.accel->y, data[1]) != 0);
-        mu_check(fltcmp(imu.accel->z, data[2]) != 0);
-
-        mu_check(fltcmp(imu.gyro->x, data[3]) != 0);
-        mu_check(fltcmp(imu.gyro->y, data[4]) != 0);
-        mu_check(fltcmp(imu.gyro->z, data[5]) != 0);
-
-        mu_check(fltcmp(imu.mag->x, data[6]) != 0);
-        mu_check(fltcmp(imu.mag->y, data[7]) != 0);
-        mu_check(fltcmp(imu.mag->z, data[8]) != 0);
+        // mu_check(fltcmp(imu.accel->x, data[0]) != 0);
+        // mu_check(fltcmp(imu.accel->y, data[1]) != 0);
+        // mu_check(fltcmp(imu.accel->z, data[2]) != 0);
+        //
+        // mu_check(fltcmp(imu.gyro->x, data[3]) != 0);
+        // mu_check(fltcmp(imu.gyro->y, data[4]) != 0);
+        // mu_check(fltcmp(imu.gyro->z, data[5]) != 0);
+        //
+        // mu_check(fltcmp(imu.mag->x, data[6]) != 0);
+        // mu_check(fltcmp(imu.mag->y, data[7]) != 0);
+        // mu_check(fltcmp(imu.mag->z, data[8]) != 0);
 
         // transmit
-        transmitAccelGyroData(s, &server, &imu);
+        transmitAccelGyroData(s, &server, imu);
 
         // cache data
         data[0] = imu.accel->x;
@@ -228,9 +229,9 @@ int testCalibrateMagnetometer(void)
 void testSuite(void)
 {
     mu_add_test(testUpdate);
-    mu_add_test(testCalibrateGyroscope);
-    mu_add_test(testCalibrateAccelerometer);
-    mu_add_test(testCalibrateMagnetometer);
+    // mu_add_test(testCalibrateGyroscope);
+    // mu_add_test(testCalibrateAccelerometer);
+    // mu_add_test(testCalibrateMagnetometer);
 }
 
 mu_run_tests(testSuite)
