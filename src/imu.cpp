@@ -192,7 +192,7 @@ void IMU::initialize(void)
 {
     Eigen::VectorXd mu(6);
 
-    if (this->state != IMU_UNIT_TESTING) {
+    if (this->state == IMU_IDLE) {
         this->mpu9250->initialize();
         this->lsm9ds1->initialize();
         this->state = IMU_RUNNING;
@@ -260,7 +260,7 @@ int IMU::update(void)
 
 ESTIMATION:
     // fuse imu data
-    // this->calculateOrientationCF();
+    this->calculateOrientationCF();
 
     return 0;
 }
@@ -680,9 +680,15 @@ void IMU::print(void)
         this->gyro->z
     );
 
-    printf("Mag: %+7.3f %+7.3f %+7.3f\n",
+    printf("Mag: %+7.3f %+7.3f %+7.3f  ",
         this->mag->x,
         this->mag->y,
         this->mag->z
+    );
+
+    printf("IMU [RPY]: %+7.3f %+7.3f %+7.3f\n",
+        this->roll,
+        this->pitch,
+        this->yaw
     );
 }

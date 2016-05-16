@@ -124,6 +124,7 @@ int main(int argc, char **argv)
     // test imu update
     while (1) {
         imu.update();
+        imu.print();
 
         // record imu data
         record_file << imu.accel->x << ",";
