@@ -17,10 +17,10 @@
 - [current models for ekf](#docs/reference/ekf/current_model)
 
 
-### TODO
+## TODO
 - [todo](#docs/reference/TODO)
 
-### API
+## API
 - [apriltag](#docs/api/apriltag)
 - [camera](#docs/api/camera)
 - [controller](#docs/api/controller)
