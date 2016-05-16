@@ -15,6 +15,14 @@ Accelerometer::Accelerometer(void)
     this->pitch = 0.0f;
 }
 
+void Accelerometer::LoadConfiguration(const std::string config_path)
+{
+    YAML::Node config = YAML::LoadFile(config_path);
+    this->offset_x = config["offset_x"].as<float>();
+    this->offset_y = config["offset_y"].as<float>();
+    this->offset_z = config["offset_z"].as<float>();
+}
+
 void Accelerometer::saveConfiguration(const std::string config_path)
 {
     YAML::Emitter yaml;
@@ -54,6 +62,14 @@ Gyroscope::Gyroscope(void)
 
     this->roll = 0.0f;
     this->pitch = 0.0f;
+}
+
+void Gyroscope::LoadConfiguration(const std::string config_path)
+{
+    YAML::Node config = YAML::LoadFile(config_path);
+    this->offset_x = config["offset_x"].as<float>();
+    this->offset_y = config["offset_y"].as<float>();
+    this->offset_z = config["offset_z"].as<float>();
 }
 
 void Gyroscope::saveConfiguration(const std::string config_path)
@@ -107,6 +123,14 @@ Magnetometer::Magnetometer(void)
     this->scale_z = 1.0f;
 
     this->bearing = 0.0f;
+}
+
+void Magnetometer::LoadConfiguration(const std::string config_path)
+{
+    YAML::Node config = YAML::LoadFile(config_path);
+    this->offset_x = config["offset_x"].as<float>();
+    this->offset_y = config["offset_y"].as<float>();
+    this->offset_z = config["offset_z"].as<float>();
 }
 
 void Magnetometer::saveConfiguration(const std::string config_path)

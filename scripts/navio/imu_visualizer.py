@@ -49,6 +49,7 @@ def Draw():
         ready = select.select([socket_in_ahrs], [], [], 0.025)
         if ready[0]:
             data = socket_in_ahrs.recv(80).split()
+            print data
 
             if len(data) >= 4:
                 w = float(data[0])

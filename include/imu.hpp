@@ -51,6 +51,7 @@ public:
     float pitch;
 
     Accelerometer(void);
+    void LoadConfiguration(const std::string config_path);
     void saveConfiguration(const std::string config_path);
 };
 
@@ -69,6 +70,7 @@ public:
     float pitch;
 
     Gyroscope(void);
+    void LoadConfiguration(const std::string config_path);
     void saveConfiguration(const std::string config_path);
 };
 
@@ -99,6 +101,7 @@ public:
     float bearing;
 
     Magnetometer(void);
+    void LoadConfiguration(const std::string config_path);
     void saveConfiguration(const std::string config_path);
 };
 
