@@ -15,12 +15,12 @@ Accelerometer::Accelerometer(void)
     this->pitch = 0.0f;
 }
 
-void Accelerometer::LoadConfiguration(const std::string config_path)
+void Accelerometer::loadConfiguration(const std::string config_path)
 {
     YAML::Node config = YAML::LoadFile(config_path);
-    this->offset_x = config["offset_x"].as<float>();
-    this->offset_y = config["offset_y"].as<float>();
-    this->offset_z = config["offset_z"].as<float>();
+    this->offset_x = config["accelerometer"]["offset_x"].as<float>();
+    this->offset_y = config["accelerometer"]["offset_y"].as<float>();
+    this->offset_z = config["accelerometer"]["offset_z"].as<float>();
 }
 
 void Accelerometer::saveConfiguration(const std::string config_path)
@@ -64,12 +64,12 @@ Gyroscope::Gyroscope(void)
     this->pitch = 0.0f;
 }
 
-void Gyroscope::LoadConfiguration(const std::string config_path)
+void Gyroscope::loadConfiguration(const std::string config_path)
 {
     YAML::Node config = YAML::LoadFile(config_path);
-    this->offset_x = config["offset_x"].as<float>();
-    this->offset_y = config["offset_y"].as<float>();
-    this->offset_z = config["offset_z"].as<float>();
+    this->offset_x = config["gyroscope"]["offset_x"].as<float>();
+    this->offset_y = config["gyroscope"]["offset_y"].as<float>();
+    this->offset_z = config["gyroscope"]["offset_z"].as<float>();
 }
 
 void Gyroscope::saveConfiguration(const std::string config_path)
@@ -125,12 +125,15 @@ Magnetometer::Magnetometer(void)
     this->bearing = 0.0f;
 }
 
-void Magnetometer::LoadConfiguration(const std::string config_path)
+void Magnetometer::loadConfiguration(const std::string config_path)
 {
     YAML::Node config = YAML::LoadFile(config_path);
-    this->offset_x = config["offset_x"].as<float>();
-    this->offset_y = config["offset_y"].as<float>();
-    this->offset_z = config["offset_z"].as<float>();
+    this->offset_x = config["magnetometer"]["offset_x"].as<float>();
+    this->offset_y = config["magnetometer"]["offset_y"].as<float>();
+    this->offset_z = config["magnetometer"]["offset_z"].as<float>();
+    this->scale_x = config["magnetometer"]["scale_x"].as<float>();
+    this->scale_y = config["magnetometer"]["scale_y"].as<float>();
+    this->scale_z = config["magnetometer"]["scale_z"].as<float>();
 }
 
 void Magnetometer::saveConfiguration(const std::string config_path)
@@ -176,7 +179,7 @@ IMU::IMU(void)
     this->state = IMU_IDLE;
 
     this->mpu9250 = new MPU9250();
-	this->lsm9ds1 = new LSM9DS1();
+    this->lsm9ds1 = new LSM9DS1();
 
     this->accel = new Accelerometer();
     this->gyro = new Gyroscope();
@@ -189,9 +192,11 @@ void IMU::initialize(void)
 {
     Eigen::VectorXd mu(6);
 
-	this->mpu9250->initialize();
-    this->lsm9ds1->initialize();
-    this->state = IMU_RUNNING;
+    if (this->state != IMU_UNIT_TESTING) {
+        this->mpu9250->initialize();
+        this->lsm9ds1->initialize();
+        this->state = IMU_RUNNING;
+    }
 
     // initialize initial belief
     // for (int i = 0; i < 10; i++) {
@@ -213,6 +218,8 @@ int IMU::update(void)
     // pre-check
     if (this->state == IMU_IDLE) {
         return -1;
+    } else if (this->state == IMU_UNIT_TESTING) {
+        goto ESTIMATION;
     }
 
     // poll sensors
@@ -251,6 +258,7 @@ int IMU::update(void)
     this->mag->y = (this->mag->y - this->mag->offset_y) * this->mag->scale_y;
     this->mag->z = (this->mag->z - this->mag->offset_z) * this->mag->scale_z;
 
+ESTIMATION:
     // fuse imu data
     // this->calculateOrientationCF();
 

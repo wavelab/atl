@@ -1,0 +1,4 @@
+gyroscope:
+  offset_x: 1
+  offset_y: 2
+  offset_z: 3

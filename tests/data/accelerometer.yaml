@@ -1,0 +1,4 @@
+accelerometer:
+  offset_x: 2
+  offset_y: 2
+  offset_z: 2

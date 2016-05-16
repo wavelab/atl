@@ -1,0 +1,7 @@
+magnetometer:
+  offset_x: 0.5
+  offset_y: 1
+  offset_z: 1.5
+  scale_x: 2
+  scale_y: 1
+  scale_z: 0.6666667

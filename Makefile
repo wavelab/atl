@@ -9,7 +9,7 @@ endif
 
 default: all done
 
-all: mkdirs libawesomo tests calibration
+all: mkdirs libawesomo tests tools
 
 libawesomo: mkdirs
 	@make -s -C src
@@ -17,24 +17,24 @@ libawesomo: mkdirs
 tests: mkdirs libawesomo
 	@make -s -C tests
 
-calibration: mkdirs libawesomo
-	@make -s -C calibration
+tools: mkdirs libawesomo
+	@make -s -C tools
 
 mkdirs:
 	@mkdir -p $(LIB_DIR)
 	@mkdir -p $(LIB_BUILD_DIR)
 	@mkdir -p $(TESTS_BUILD_DIR)
 	@mkdir -p $(TESTS_BIN_DIR)
-	@mkdir -p $(CALIBRATION_BUILD_DIR)
-	@mkdir -p $(CALIBRATION_BIN_DIR)
+	@mkdir -p $(TOOLS_BUILD_DIR)
+	@mkdir -p $(TOOLS_BIN_DIR)
 
 rmdirs:
 	@rm -rf $(LIB_DIR)
 	@rm -rf $(LIB_BUILD_DIR)
 	@rm -rf $(TESTS_BUILD_DIR)
 	@rm -rf $(TESTS_BIN_DIR)
-	@rm -rf $(CALIBRATION_BUILD_DIR)
-	@rm -rf $(CALIBRATION_BIN_DIR)
+	@rm -rf $(TOOLS_BUILD_DIR)
+	@rm -rf $(TOOLS_BIN_DIR)
 
 clean: rmdirs
 	@echo "cleaning ..."
