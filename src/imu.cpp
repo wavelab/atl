@@ -114,6 +114,9 @@ void Magnetometer::saveConfiguration(const std::string config_path)
     YAML::Emitter yaml;
     std::ofstream config_file;
 
+    // setup
+    config_file.open(config_path);
+
     // record hard and soft iron errors
     yaml << YAML::BeginMap;
     yaml << YAML::Key << "magnetometer";
