@@ -18,8 +18,6 @@ static void help(void)
 {
     std::cout << "usage: imu_visualizer [IP address to transmit data]";
     std::cout << std::endl;
-    std::cout << "example: imu_visualizer 192.168.1.20";
-    std::cout << std::endl;
 }
 
 static void transmitData(int s, struct sockaddr_in *server, IMU &imu)
@@ -103,7 +101,6 @@ int main(int argc, char **argv)
     // pre-check
     if (argc < 2) {
         help();
-        exit(EXIT_FAILURE);
     }
 
     // setup
@@ -126,7 +123,7 @@ int main(int argc, char **argv)
 
     // test imu update
     while (1) {
-         imu.update();
+        imu.update();
 
         // record imu data
         record_file << imu.accel->x << ",";
@@ -147,7 +144,6 @@ int main(int argc, char **argv)
 
     // clean up
     record_file.close();
-    std::cout << "saved imu data to [" << IMU_RECORD_FILE << "]" << std::endl;
 
 	return 0;
 }

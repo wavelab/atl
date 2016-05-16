@@ -40,5 +40,11 @@ clean: rmdirs
 	@echo "cleaning ..."
 	@echo "done! :)"
 
+imu_server:
+	@./build/bin/tools/imu_visualizer $1
+
+imu_host:
+	@python scripts/navio/imu_visualizer.py 7000 imu
+
 done:
 	@echo "done! :)"
