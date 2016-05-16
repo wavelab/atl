@@ -16,6 +16,7 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include "ekf.hpp"
 #include "util.hpp"
 
 
@@ -125,6 +126,8 @@ public:
     Gyroscope *gyro;
     Magnetometer *mag;
 
+    struct ekf attitude_estimator;
+
     float roll;
     float pitch;
     float yaw;
@@ -145,6 +148,7 @@ public:
         const std::string record_path
     );
     void calculateOrientationCF(void);
+    void calculateOrientationEKF(void);
     void print(void);
 };
 

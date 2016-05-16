@@ -1,5 +1,6 @@
 #include "ekf.hpp"
 
+
 void ekf_prediction_update(struct ekf *e, Eigen::VectorXd u, float dt)
 {
     Eigen::MatrixXd g;
@@ -26,11 +27,16 @@ void ekf_measurement_update(struct ekf *e, Eigen::VectorXd y, float dt)
     e->S = (e->I - e->K * H) *  e->S_p;
 }
 
+
+
+
 // Attitude Ekf functions
-
-Eigen::VectorXd att_g_function(Eigen::VectorXd &mu, Eigen::VectorXd &u,
-                               float dt){
-
+Eigen::VectorXd ekf_attitude_g(
+    Eigen::VectorXd &mu,
+    Eigen::VectorXd &u,
+    float dt
+)
+{
     // work with only roll, pitch, yaw and first order derivatives
     // mu[0] = roll
     // mu[1] = pitch
@@ -41,68 +47,66 @@ Eigen::VectorXd att_g_function(Eigen::VectorXd &mu, Eigen::VectorXd &u,
 
     Eigen::VectorXd mu_p(6);
 
-    mu_p(0)   = mu(0) + mu(3)*dt + u(0);
-    mu_p(1)   = mu(1) + mu(4)*dt + u(1);
-    mu_p(2)   = mu(2) + mu(5)*dt + u(2);
-    mu_p(3)   = mu(3)            + u(3);
-    mu_p(4)   = mu(4)            + u(4);
-    mu_p(5)   = mu(5)            + u(5);
+    mu_p(0) = mu(0) + mu(3) * dt + u(0);
+    mu_p(1) = mu(1) + mu(4) * dt + u(1);
+    mu_p(2) = mu(2) + mu(5) * dt + u(2);
+    mu_p(3) = mu(3)              + u(3);
+    mu_p(4) = mu(4)              + u(4);
+    mu_p(5) = mu(5)              + u(5);
 
     return mu_p;
 }
 
-Eigen::MatrixXd att_G_function(Eigen::VectorXd & mu, Eigen::VectorXd &input,
-        float dt){
-    //this g function linear as currently written
-    return Eigen::MatrixXd::Identity(6,6);
+Eigen::MatrixXd ekf_attitude_G(
+    Eigen::VectorXd &mu,
+    Eigen::VectorXd &input,
+    float dt
+)
+{
+    // g function linear as currently written
+    return Eigen::MatrixXd::Identity(6, 6);
 }
 
-Eigen::VectorXd att_h_function(Eigen::VectorXd & m, float dt){
-    // measurement, m,  vector layout
-    // measurement[0] = roll_mag
-    // measurement[1] = pitch_mag
-    // measurement[2] = yaw_mag
-    // measurement[3] = accelerometer_x
-    // measurement[4] = accelerometer_y
-    // measurement[5] = accelerometer_z
-    // measurement[6] = gyro_roll_rate
-    // measurement[7] = gyro_pitch_rate
-    // measurement[8] = gyro_yaw_rate
-
+Eigen::VectorXd ekf_attitude_h(Eigen::VectorXd &mu_p, float dt)
+{
     Eigen::VectorXd y(9);
-    // gyro
-    y(0) = m(0);
-    y(1) = m(1);
-    y(2) = m(2);
 
-    y(3) = atan2(m(3), sqrt(m(4)*m(4) + m(5)*m(5)));
-    y(4) = atan2(m(4), sqrt(m(3)*m(3) + m(5)*m(5)));
-    y(5) = atan2(m(5), sqrt(m(3)*m(3) + m(4)*m(4)));
+    // accel (x, y, z) - m/s^2
+    y(3) = atan2(mu_p(3), sqrt(pow(mu_p(4), 2) + pow(mu_p(5), 2)));
+    y(4) = atan2(mu_p(4), sqrt(pow(mu_p(3), 2) + pow(mu_p(5), 2)));
+    y(5) = atan2(mu_p(5), sqrt(pow(mu_p(3), 2) + pow(mu_p(4), 2)));
 
-    y(6) = m(0);
-    y(7) = m(1);
-    y(8) = m(2);
+    // gyro (x, y, z) - rad/s
+    y(6) = mu_p(0);
+    y(7) = mu_p(1);
+    y(8) = mu_p(2);
+
+    // mag (x, y, z) - units?
+    y(0) = mu_p(0);
+    y(1) = mu_p(1);
+    y(2) = mu_p(2);
 
     return y;
 }
 
-
-Eigen::MatrixXd att_H_function (Eigen::VectorXd & mu_p, float dt){
+Eigen::MatrixXd ekf_attitude_H(Eigen::VectorXd & mu_p, float dt)
+{
     Eigen::MatrixXd H(9, 6);
+
+    // fill H with zero
     H.topLeftCorner(9, 6) = Eigen::MatrixXd::Zero(9, 6);
 
     // magnometer differential results in identity matrix
-    H.topLeftCorner(3,3) = Eigen::MatrixXd::Identity(3, 3);
+    H.topLeftCorner(3, 3) = Eigen::MatrixXd::Identity(3, 3);
 
     // gyro differential also results in identity matrix
-    H.bottomLeftCorner(3,3) = Eigen::MatrixXd::Identity(3, 3);
+    H.bottomLeftCorner(3, 3) = Eigen::MatrixXd::Identity(3, 3);
 
     // linearize accelerometer measurments
-    float a = sqrt(mu_p[4] * mu_p[4] + mu_p[5] * mu_p[5]);
-    float b = sqrt(mu_p[3] * mu_p[3] + mu_p[5] * mu_p[5]);
-    float c = sqrt(mu_p[3] * mu_p[3] + mu_p[4] * mu_p[4]);
-
-    float L = mu_p[3] * mu_p[3] + mu_p[4] * mu_p[4] + mu_p[5] * mu_p[5];
+    float a = sqrt(pow(mu_p[4], 2) + pow(mu_p[5], 2));
+    float b = sqrt(pow(mu_p[3], 2) + pow(mu_p[5], 2));
+    float c = sqrt(pow(mu_p[3], 2) + pow(mu_p[4], 2));
+    float L = pow(mu_p[3], 2) + pow(mu_p[4], 2) + pow(mu_p[5], 2);
 
     // add each entry into the H matrix
     H(3, 3) = a / L;
@@ -120,22 +124,20 @@ Eigen::MatrixXd att_H_function (Eigen::VectorXd & mu_p, float dt){
     return H;
 }
 
-void initialize_att_ekf(struct ekf *new_ekf, Eigen::VectorXd mu)
+void ekf_attitude_estimator_initialize(struct ekf *e, Eigen::VectorXd mu)
 {
-
-    // Initialize values
-
     Eigen::MatrixXd S;
     Eigen::MatrixXd R;
     Eigen::MatrixXd Q;
     Eigen::MatrixXd I;
 
+    // initialize values
     S = Eigen::MatrixXd::Identity(mu.size(), mu.size());
     R = Eigen::MatrixXd::Identity(mu.size(), mu.size());
     I = Eigen::MatrixXd::Identity(mu.size(), mu.size());
     Q = Eigen::MatrixXd::Zero(9, 9);
 
-    // Best guess for the R values process noise
+    // best guess for the R values process noise
     R(0, 0) = 0.05;
     R(1, 1) = 0.05;
     R(2, 2) = 0.05;
@@ -144,35 +146,31 @@ void initialize_att_ekf(struct ekf *new_ekf, Eigen::VectorXd mu)
     R(4, 4) = 0.0005;
     R(5, 5) = 0.0005;
 
-    // Magnometer measurement noise
-    Q(0, 0) = 2.0;
-    Q(1, 1) = 2.0;
-    Q(2, 2) = 2.0;
+    // magnometer measurement noise
+    Q(0, 0) = 20.0;
+    Q(1, 1) = 20.0;
+    Q(2, 2) = 20.0;
 
-    // Accelerometer measurement noise
+    // accelerometer measurement noise
     Q(3, 3) = 0.2;
     Q(4, 4) = 0.2;
     Q(5, 5) = 0.2;
 
-    // Gyro measurement noise
+    // gyro measurement noise
     Q(6, 6) = 0.02;
     Q(7, 7) = 0.02;
     Q(8, 8) = 0.02;
 
-    // Assign inital values to ekf
-    new_ekf->mu = mu;
-    new_ekf->S  = S;
-    new_ekf->R  = R;
-    new_ekf->I  = I;
-    new_ekf->Q  = Q;
+    // assign inital values to ekf
+    e->mu = mu;
+    e->S  = S;
+    e->R  = R;
+    e->I  = I;
+    e->Q  = Q;
 
-    // Assign g, G, h, and H functions
-    new_ekf->g_function = att_g_function;
-    new_ekf->G_function = att_G_function;
-
-    new_ekf->h_function = att_h_function;
-    new_ekf->H_function = att_H_function;
+    // assign g, G, h, and H functions
+    e->g_function = ekf_attitude_g;
+    e->G_function = ekf_attitude_G;
+    e->h_function = ekf_attitude_h;
+    e->H_function = ekf_attitude_H;
 }
-
-
-

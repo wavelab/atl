@@ -187,9 +187,25 @@ IMU::IMU(void)
 
 void IMU::initialize(void)
 {
+    Eigen::VectorXd mu(6);
+
 	this->mpu9250->initialize();
     this->lsm9ds1->initialize();
     this->state = IMU_RUNNING;
+
+    // initialize initial belief
+    // for (int i = 0; i < 10; i++) {
+    //     this->update();
+    //     this->calculateOrientationCF();
+    // }
+    // mu <<
+    //     this->roll,  // roll
+    //     this->pitch,  // pitch
+    //     this->yaw,  // yaw
+    //     0,  // roll vel
+    //     0,  // pitch vel
+    //     0;  // yaw vel
+    // ekf_attitude_estimator_intialize(this->attitude_estimator, mu);
 }
 
 int IMU::update(void)
@@ -236,7 +252,7 @@ int IMU::update(void)
     this->mag->z = (this->mag->z - this->mag->offset_z) * this->mag->scale_z;
 
     // fuse imu data
-    this->calculateOrientationCF();
+    // this->calculateOrientationCF();
 
     return 0;
 }
@@ -612,6 +628,34 @@ void IMU::calculateOrientationCF(void)
 
     // update last_updated
     this->last_updated = clock();
+}
+
+void IMU::calculateOrientationEKF(void)
+{
+    // clock_t now;
+    // float dt;
+    //
+    // // calculate dt
+    // now = clock();
+    // dt = ((float) now - this->last_updated) / CLOCKS_PER_SEC;
+    //
+    // // estimate attitude
+    // ekf_prediction_update(
+    //     this->attitude_estimator,
+    //     this->attitude_estimator.mu_p,
+    //     dt
+    // );
+    // ekf_measurement_update(
+    //     this->attitude_estimator,
+    //     ,
+    //     dt
+    // );
+    // this->roll = this->attitude_estimator.mu(0);
+    // this->pitch = this->attitude_estimator.mu(1);
+    // this->yaw = this->attitude_estimator.mu(2);
+    //
+    // // update last_updated
+    // this->last_updated = clock();
 }
 
 void IMU::print(void)

@@ -8,7 +8,6 @@
 // STRUCTURES
 struct ekf
 {
-
     Eigen::VectorXd mu;
     Eigen::MatrixXd S;
     Eigen::MatrixXd R;
@@ -25,21 +24,24 @@ struct ekf
     Eigen::MatrixXd (*H_function)(Eigen::VectorXd &, float);
 };
 
+
 // FUNCTIONS
-int ekf_check(struct ekf *estimator);
 void ekf_prediction_update(struct ekf *estimator, Eigen::VectorXd u, float dt);
 void ekf_measurement_update(struct ekf *estimator, Eigen::VectorXd y, float dt);
 
-
-// Attitude EKF
-Eigen::VectorXd att_g_function(Eigen::VectorXd &mu_p, Eigen::VectorXd &u,
-                               float dt);
-Eigen::MatrixXd att_G_function(Eigen::VectorXd &mu_p, Eigen::VectorXd &u,
-                               float dt);
-Eigen::VectorXd att_h_function(Eigen::VectorXd &y, float dt);
-Eigen::MatrixXd att_H_function(Eigen::VectorXd &mu_p, float dt);
-
-void initialize_att_ekf(ekf *att_ekf,
-                      Eigen::VectorXd mu_init);
+// attitude EKF
+Eigen::VectorXd ekf_attitude_g(
+    Eigen::VectorXd &mu_p,
+    Eigen::VectorXd &u,
+    float dt
+);
+Eigen::MatrixXd ekf_attitude_G(
+    Eigen::VectorXd &mu_p,
+    Eigen::VectorXd &u,
+    float dt
+);
+Eigen::VectorXd ekf_attitude_h(Eigen::VectorXd &y, float dt);
+Eigen::MatrixXd ekf_attitude_H(Eigen::VectorXd &mu_p, float dt);
+void ekf_attitude_estimator_initialize(struct ekf *att_ekf, Eigen::VectorXd mu_init);
 
 #endif
