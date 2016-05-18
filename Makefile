@@ -43,7 +43,7 @@ clean: rmdirs
 imu_server:
 	@./build/bin/tools/imu_visualizer $1
 
-imu_host:
+imu_client:
 	@python scripts/navio/imu_visualizer.py 7000 imu
 
 done:
