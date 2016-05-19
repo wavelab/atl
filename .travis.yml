@@ -8,10 +8,7 @@ cache:
     - apt
 
 before_install:
-    - sudo bash scripts/install_scripts/ros_install.bash
-    - sudo bash scripts/install_scripts/apriltag_install.bash
-    - sudo bash scripts/install_scripts/husky_simulator_install.bash
-    - sudo bash scripts/install_scripts/px4_simulator_install.bash
+    - sudo bash scripts/install_scripts/dependencies.bash
 
 script:
     - echo "Done :)"
