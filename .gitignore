@@ -12,6 +12,7 @@ lib
 bin
 obj
 tags
+build
 
 # scripts and folders
 run.sh
