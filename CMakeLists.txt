@@ -56,43 +56,12 @@ ADD_LIBRARY(
     awesomo
     STATIC
     src/util.cpp
-    src/camera.cpp
-    src/apriltag.cpp
     src/controller.cpp
-    src/ros/ros_util.cpp
     src/ros/quadrotor.cpp
 )
 
 # EXECUTABLES
 ## ROS NODE EXECUTABLES
-# camera_node
-ADD_EXECUTABLE(camera_node src/ros/node/camera_node.cpp)
-target_link_libraries(
-    camera_node
-    awesomo
-    apriltags
-    yaml-cpp
-    flycapture
-    ${OpenCV_LIBS}
-    ${catkin_LIBRARIES}
-)
-INSTALL(
-    TARGETS camera_node
-    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-
-# calibration node
-ADD_EXECUTABLE(camera_calibration src/ros/node/camera_calibration_node.cpp)
-TARGET_LINK_LIBRARIES(
-    camera_calibration
-    awesomo
-    apriltags
-    yaml-cpp
-    flycapture
-    ${OpenCV_LIBS}
-    ${catkin_LIBRARIES}
-)
-
 # quadrotor_node
 ADD_EXECUTABLE(quadrotor_node src/ros/node/quadrotor_node.cpp)
 TARGET_LINK_LIBRARIES(
@@ -114,19 +83,6 @@ INSTALL(
 
 
 ## UNIT TESTS
-# tests/camera_test
-ADD_EXECUTABLE(camera_test tests/camera_test.cpp)
-TARGET_LINK_LIBRARIES(
-    camera_test
-    awesomo
-    apriltags
-    yaml-cpp
-    flycapture
-    ${OpenCV_LIBS}
-    ${catkin_LIBRARIES}
-)
-INSTALL(TARGETS camera_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
-
 # tests/controller_test
 ADD_EXECUTABLE(controller_test tests/controller_test.cpp)
 TARGET_LINK_LIBRARIES(controller_test awesomo yaml-cpp)
@@ -136,19 +92,6 @@ INSTALL(TARGETS controller_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINA
 ADD_EXECUTABLE(util_test tests/util_test.cpp)
 TARGET_LINK_LIBRARIES(util_test awesomo)
 INSTALL(TARGETS util_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
-
-# tests/ros/ros_util
-ADD_EXECUTABLE(ros_util_test tests/ros/ros_util_test.cpp)
-TARGET_LINK_LIBRARIES(
-    ros_util_test
-    awesomo
-    apriltags
-    yaml-cpp
-    flycapture
-    ${OpenCV_LIBS}
-    ${catkin_LIBRARIES}
-)
-INSTALL(TARGETS ros_util_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 # tests/ros/quadrotor_node_test
 ADD_EXECUTABLE(quadrotor_node_test tests/ros/quadrotor_node_test.cpp)

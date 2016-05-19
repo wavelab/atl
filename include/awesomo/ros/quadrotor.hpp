@@ -22,7 +22,6 @@
 #include <yaml-cpp/yaml.h>
 
 #include "awesomo/util.hpp"
-#include "awesomo/camera.hpp"
 #include "awesomo/controller.hpp"
 
 
@@ -65,7 +64,6 @@ class Quadrotor
         ros::ServiceClient arming_client;
 
         int tag_timeout;
-        std::vector<TagPose> tag_poses;
         Eigen::Vector3d tag_position;
 
         void poseCallback(const geometry_msgs::PoseStamped &msg);
