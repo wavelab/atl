@@ -17,12 +17,30 @@ Quadrotor::Quadrotor(std::map<std::string, std::string> configs)
     this->arming_client = this->node.serviceClient<mavros_msgs::CommandBool>(ARM_TOPIC);
 
     // initialize publishers
-    this->position_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_TOPIC, 50);
-    this->attitude_publisher = this->node.advertise<geometry_msgs::PoseStamped>(ATTITUDE_TOPIC, 50);
-    this->throttle_publisher = this->node.advertise<std_msgs::Float64>(THROTTLE_TOPIC, 50);
-    this->position_controller_x_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_X_CONTROLLER_TOPIC, 50);
-    this->position_controller_y_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_Y_CONTROLLER_TOPIC, 50);
-    this->position_controller_z_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_Z_CONTROLLER_TOPIC, 50);
+    this->position_publisher = this->node.advertise<geometry_msgs::PoseStamped>(
+        POSITION_TOPIC,
+        50
+    );
+    this->attitude_publisher = this->node.advertise<geometry_msgs::PoseStamped>(
+        ATTITUDE_TOPIC,
+        50
+    );
+    this->throttle_publisher = this->node.advertise<std_msgs::Float64>(
+        THROTTLE_TOPIC,
+        50
+    );
+    this->position_controller_x_publisher = this->node.advertise<geometry_msgs::PoseStamped>(
+        POSITION_X_CONTROLLER_TOPIC,
+        50
+    );
+    this->position_controller_y_publisher = this->node.advertise<geometry_msgs::PoseStamped>(
+        POSITION_Y_CONTROLLER_TOPIC,
+        50
+    );
+    this->position_controller_z_publisher = this->node.advertise<geometry_msgs::PoseStamped>(
+        POSITION_Z_CONTROLLER_TOPIC,
+        50
+    );
 
     // initialize controllers
     if (configs.count("position_controller")) {
@@ -89,39 +107,6 @@ void Quadrotor::imuCallback(const sensor_msgs::Imu::ConstPtr &msg)
     );
 }
 
-void Quadrotor::subscribeToPose(void)
-{
-    ROS_INFO("subcribing to [POSE]");
-    this->pose_subscriber = this->node.subscribe(
-        POSE_TOPIC,
-        50,
-        &Quadrotor::poseCallback,
-        this
-    );
-}
-
-void Quadrotor::subscribeToMocap(void)
-{
-    ROS_INFO("subcribing to [MOCAP]");
-    this->mocap_subscriber = this->node.subscribe(
-        MOCAP_TOPIC,
-        50,
-        &Quadrotor::mocapCallback,
-        this
-    );
-}
-
-void Quadrotor::subscribeToIMU(void)
-{
-    ROS_INFO("subcribing to [IMU_DATA]");
-    this->imu_subscriber = this->node.subscribe(
-        IMU_TOPIC,
-        50,
-        &Quadrotor::imuCallback,
-        this
-    );
-}
-
 void Quadrotor::waitForConnection(void)
 {
     ROS_INFO("waiting for FCU ...");
@@ -181,6 +166,39 @@ int Quadrotor::setOffboardModeOn(void)
     } else {
         return -1;
     }
+}
+
+void Quadrotor::subscribeToPose(void)
+{
+    ROS_INFO("subcribing to [POSE]");
+    this->pose_subscriber = this->node.subscribe(
+        POSE_TOPIC,
+        50,
+        &Quadrotor::poseCallback,
+        this
+    );
+}
+
+void Quadrotor::subscribeToMocap(void)
+{
+    ROS_INFO("subcribing to [MOCAP]");
+    this->mocap_subscriber = this->node.subscribe(
+        MOCAP_TOPIC,
+        50,
+        &Quadrotor::mocapCallback,
+        this
+    );
+}
+
+void Quadrotor::subscribeToIMU(void)
+{
+    ROS_INFO("subcribing to [IMU_DATA]");
+    this->imu_subscriber = this->node.subscribe(
+        IMU_TOPIC,
+        50,
+        &Quadrotor::imuCallback,
+        this
+    );
 }
 
 void Quadrotor::positionControllerCalculate(Position p, ros::Time last_request)
@@ -292,7 +310,7 @@ void Quadrotor::publishPositionControllerStats(int seq, ros::Time time)
     this->position_controller_z_publisher.publish(pid_stats);
 }
 
-void Quadrotor::buildPositionControllerMessage(
+void Quadrotor::publishPositionControllerMessage(
     geometry_msgs::PoseStamped &msg,
     int seq,
     ros::Time time

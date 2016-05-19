@@ -1,11 +1,12 @@
 #!/bin/bash
-set -e #halt on first error
+set -e  # halt on first error
 
-# get dir that the script is located in
-DIR=$( cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-echo $DIR
+PACKAGE_DIR=$PWD/deps
+PACKAGE_NAME=flycapture2-2.8.3.1-amd64
+PACKAGE_EXT=.zip
 
-install_pointgrey_drivers(){
+install_pointgrey_drivers()
+{
     # pointgrey driver dependencies
     sudo apt-get install \
         libraw1394-11 \
@@ -16,18 +17,25 @@ install_pointgrey_drivers(){
         libusb-1.0-0 \
         -y
 
-    # unzip drivers
-    cd $DIR
-    cd ../../deps
-    unzip flycapture2-2.8.3.1-amd64.zip
-    cd flycapture2-2.8.3.1-amd64
-    sudo sh install_flycapture.sh
-    cd ..
-    rm -rf flycapture2-2.8.3.1
+    # unzip and install flycapture
+    cd $PACKAGE_DIR
+    unzip ${PACKAGE_NAME}${PACAKGE_EXT}
+    cd $PACKAGE_NAME
+    sh install_flycapture.sh << EOF
+y
+y
+$USER
+y
+y
+n
+EOF
+    cd -
+    rm -rf $PACAKGE_NAME
 }
 
 # install coriander for setting camera configurations
-install_coriander(){
+install_coriander()
+{
     sudo apt-get install coriander -y
 }
 

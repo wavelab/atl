@@ -73,10 +73,6 @@ class Quadrotor
         void imuCallback(const sensor_msgs::Imu::ConstPtr &msg);
         void stateCallback(const mavros_msgs::State::ConstPtr &msg);
 
-        void subscribeToPose(void);
-        void subscribeToMocap(void);
-        void subscribeToIMU(void);
-
         void waitForConnection(void);
 
     public:
@@ -98,6 +94,9 @@ class Quadrotor
         int arm(void);
         int disarm(void);
         int setOffboardModeOn(void);
+        void subscribeToPose(void);
+        void subscribeToMocap(void);
+        void subscribeToIMU(void);
         void positionControllerCalculate(Position p, ros::Time last_request);
         void printPositionController(void);
         void buildPositionMessage(
@@ -114,12 +113,12 @@ class Quadrotor
             ros::Time time
         );
         void buildThrottleMessage(std_msgs::Float64 &msg);
-        void buildPositionControllerMessage(
+        void publishPositionControllerStats(int seq, ros::Time time);
+        void publishPositionControllerMessage(
             geometry_msgs::PoseStamped &msg,
             int seq,
             ros::Time time
         );
-        void publishPositionControllerStats(int seq, ros::Time time);
 };
 
 #endif
