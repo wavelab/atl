@@ -41,7 +41,6 @@ INCLUDE_DIRECTORIES(
     /usr/include/flycapture
     $(Boost_INCLUDE_DIR)
     ./include
-    ./include/awesomo/navio
 )
 
 # BUILD AS CATKIN PACKAGE
@@ -62,21 +61,6 @@ ADD_LIBRARY(
     src/controller.cpp
     src/ros/ros_util.cpp
     src/ros/quadrotor.cpp
-)
-
-ADD_LIBRARY(
-    navio
-    STATIC
-    src/navio/ADS1115.cpp
-    src/navio/gpio.cpp
-    src/navio/I2Cdev.cpp
-    src/navio/MB85RC04.cpp
-    src/navio/MB85RC256.cpp
-    src/navio/MPU9250.cpp
-    src/navio/MS5611.cpp
-    src/navio/PCA9685.cpp
-    src/navio/Ublox.cpp
-    src/navio/Util.cpp
 )
 
 # EXECUTABLES
@@ -147,11 +131,6 @@ INSTALL(TARGETS camera_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION
 ADD_EXECUTABLE(controller_test tests/controller_test.cpp)
 TARGET_LINK_LIBRARIES(controller_test awesomo yaml-cpp)
 INSTALL(TARGETS controller_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
-
-# tests/imu_test
-ADD_EXECUTABLE(imu_test tests/imu_test.cpp)
-TARGET_LINK_LIBRARIES(imu_test navio)
-INSTALL(TARGETS imu_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 # tests/util_test
 ADD_EXECUTABLE(util_test tests/util_test.cpp)
