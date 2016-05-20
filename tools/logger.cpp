@@ -1,4 +1,5 @@
 #include <time.h>
+#include <pthread.h>
 #include <sys/time.h>
 
 #include <navio2/Ublox.h>
@@ -12,6 +13,7 @@
 #define GPS_RECORD_FILE "gps.dat"
 
 
+// FUNCTIONS
 static void writeIMURecordFileHeader(std::ofstream &imu_file)
 {
     imu_file << "t,us,";
@@ -109,20 +111,66 @@ void recordGPSData(std::vector<double> pos_data, std::ofstream &gps_file, struct
     }
 }
 
-int main(int argc, char **argv)
+static void *logIMUData(void *args)
 {
     IMU imu;
-    Ublox gps;
     std::ofstream imu_file;
-    std::ofstream gps_file;
-    std::vector<double> pos_data;
+    struct timeval now;
 
     // setup
     imu.initialize();
     imu_file.open(IMU_RECORD_FILE);
-    gps_file.open(GPS_RECORD_FILE);
     writeIMURecordFileHeader(imu_file);
+
+    // record imu data
+    while (1) {
+        imu.update();
+        imu.print();
+
+        gettimeofday(&now, NULL);
+        recordIMUData(imu, imu_file, now);
+    }
+
+    // clean up
+    imu_file.close();
+
+    return NULL;
+}
+
+static void *logGPSData(void *args)
+{
+    Ublox gps;
+    int msg_ok;
+    struct timeval now;
+    std::ofstream gps_file;
+    std::vector<double> pos_data;
+
+    // setup
+    gps_file.open(GPS_RECORD_FILE);
     writeGPSRecordFileHeader(gps_file);
+
+    // record gps data
+    while (1) {
+        gettimeofday(&now, NULL);
+        msg_ok = gps.decodeSingleMessage(Ublox::NAV_POSLLH, pos_data);
+
+        if (msg_ok == 1 && pos_data[0] == 0x03) {
+            recordGPSData(pos_data, gps_file, now);
+        } else if (msg_ok == 1 && pos_data[0] == 0x03) {
+            std::cout << "Lost 3D Fix" << std::endl;
+        }
+    }
+
+    // clean up
+    gps_file.close();
+
+    return NULL;
+}
+
+int main(int argc, char **argv)
+{
+    Ublox gps;
+    std::vector<double> pos_data;
 
     // check gps
     if (gps.testConnection()) {
@@ -147,24 +195,14 @@ int main(int argc, char **argv)
     }
 
     // log data
-    while (1) {
-        imu.update();
-        imu.print();
+    pthread_t imu_thread;
+    pthread_t gps_thread;
 
-        // record imu data
-        timeval now;
-        gettimeofday(&now, NULL);
-        recordIMUData(imu, imu_file, now);
+    pthread_create(&imu_thread, NULL, logIMUData, NULL);
+    pthread_create(&gps_thread, NULL, logGPSData, NULL);
 
-        // record gps data
-        if (gps.decodeSingleMessage(Ublox::NAV_POSLLH, pos_data) == 1) {
-            recordGPSData(pos_data, gps_file, now);
-        }
-    }
-
-    // clean up
-    imu_file.close();
-    gps_file.close();
+    pthread_join(imu_thread, NULL);
+    pthread_join(gps_thread, NULL);
 
     return 0;
 }

@@ -27,6 +27,7 @@ LIBS = \
 	-lyaml-cpp \
 	-lnavio2 \
 	-lm \
+	-lpthread \
 	`pkg-config --libs --cflags opencv`
 
 
