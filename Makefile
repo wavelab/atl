@@ -43,11 +43,7 @@ clean: rmdirs
 imu_transmit:
 	@./build/bin/tools/imu_visualizer ${IP}
 
-<<<<<<< HEAD
-imu_client:
-=======
 imu_visualize:
->>>>>>> 2125b8ae1ae741a09b52aa42615ba5d227a76505
 	@python scripts/navio/imu_visualizer.py 7000 imu
 
 done:
