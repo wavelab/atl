@@ -86,14 +86,6 @@ static void recordIMUData(IMU &imu, std::ofstream &imu_file, struct timeval &now
 
 void recordGPSData(std::vector<double> pos_data, std::ofstream &gps_file, struct timeval &now)
 {
-    printf("GPS Millisecond Time of Week: %.0lf s\n", pos_data[0]/1000);
-    printf("Longitude: %lf\n", pos_data[1]/10000000);
-    printf("Latitude: %lf\n", pos_data[2]/10000000);
-    printf("Height above Ellipsoid: %.3lf m\n", pos_data[3]/1000);
-    printf("Height above mean sea level: %.3lf m\n", pos_data[4]/1000);
-    printf("Horizontal Accuracy Estimate: %.3lf m\n", pos_data[5]/1000);
-    printf("Vertical Accuracy Estimate: %.3lf m\n", pos_data[6]/1000);
-
     // record time according to raspberry pi in seconds and micro seconds
     if ((int) pos_data[0] == 0x03) {
         gps_file << now.tv_sec << ",";
@@ -125,7 +117,7 @@ static void *logIMUData(void *args)
     // record imu data
     while (1) {
         imu.update();
-        imu.print();
+        // imu.print();
 
         gettimeofday(&now, NULL);
         recordIMUData(imu, imu_file, now);
@@ -156,7 +148,7 @@ static void *logGPSData(void *args)
 
         if (msg_ok == 1 && pos_data[0] == 0x03) {
             recordGPSData(pos_data, gps_file, now);
-        } else if (msg_ok == 1 && pos_data[0] == 0x03) {
+        } else if (msg_ok == 1 && pos_data[0] != 0x03) {
             std::cout << "Lost 3D Fix" << std::endl;
         }
     }
