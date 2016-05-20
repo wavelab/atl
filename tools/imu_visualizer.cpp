@@ -1,6 +1,8 @@
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <time.h>
+#include <sys/time.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -106,7 +108,7 @@ int main(int argc, char **argv)
     // setup
     imu.initialize();
     record_file.open(IMU_RECORD_FILE);
-    record_file << "ax,ay,az,gx,gy,gz,mx,my,mz" << std::endl;
+    record_file << "t,us,ax,ay,az,gx,gy,gz,mx,my,mz" << std::endl;
 
     // setup UDP socket
     s = socket(AF_INET, SOCK_DGRAM, 0);
@@ -121,12 +123,21 @@ int main(int argc, char **argv)
     server.sin_addr.s_addr = inet_addr(argv[1]);
     server.sin_port = htons(7000);
 
+    timeval time_current;
+    gettimeofday(&time_current, NULL);
+
     // test imu update
     while (1) {
         imu.update();
-        imu.print();
+        // imu.print();
 
         // record imu data
+        // record_file << (unsigned) time(NULL) << ",";
+        gettimeofday(&time_current, NULL);
+
+        record_file << time_current.tv_sec << ",";
+        record_file << time_current.tv_usec << ",";
+
         record_file << imu.accel->x << ",";
         record_file << imu.accel->y << ",";
         record_file << imu.accel->z << ",";
@@ -140,7 +151,7 @@ int main(int argc, char **argv)
         record_file << imu.mag->z << std::endl;
 
         // transmit
-        transmitData(s, &server, imu);
+        // transmitData(s, &server, imu);
     }
 
     // clean up
