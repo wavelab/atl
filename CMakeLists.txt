@@ -53,7 +53,7 @@ CATKIN_PACKAGE(
 
 # LIBRARY
 ADD_LIBRARY(
-    awesomo
+    libawesomo
     STATIC
     src/util.cpp
     src/controller.cpp
@@ -63,10 +63,10 @@ ADD_LIBRARY(
 # EXECUTABLES
 ## ROS NODE EXECUTABLES
 # quadrotor_node
-ADD_EXECUTABLE(quadrotor_node src/ros/node/quadrotor_node.cpp)
+ADD_EXECUTABLE(awesomo src/ros/awesomo.cpp)
 TARGET_LINK_LIBRARIES(
-    quadrotor_node
     awesomo
+    libawesomo
     apriltags
     yaml-cpp
     flycapture
@@ -74,7 +74,7 @@ TARGET_LINK_LIBRARIES(
     ${catkin_LIBRARIES}
 )
 INSTALL(
-    TARGETS quadrotor_node
+    TARGETS awesomo
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
@@ -85,19 +85,19 @@ INSTALL(
 ## UNIT TESTS
 # tests/controller_test
 ADD_EXECUTABLE(controller_test tests/controller_test.cpp)
-TARGET_LINK_LIBRARIES(controller_test awesomo yaml-cpp)
+TARGET_LINK_LIBRARIES(controller_test libawesomo yaml-cpp)
 INSTALL(TARGETS controller_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 # tests/util_test
 ADD_EXECUTABLE(util_test tests/util_test.cpp)
-TARGET_LINK_LIBRARIES(util_test awesomo)
+TARGET_LINK_LIBRARIES(util_test libawesomo)
 INSTALL(TARGETS util_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 # tests/ros/quadrotor_node_test
 ADD_EXECUTABLE(quadrotor_node_test tests/ros/quadrotor_node_test.cpp)
 TARGET_LINK_LIBRARIES(
     quadrotor_node_test
-    awesomo
+    libawesomo
     apriltags
     yaml-cpp
     flycapture

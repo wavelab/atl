@@ -1,4 +1,4 @@
-#include "awesomo/ros/node/quadrotor_node.hpp"
+#include "awesomo/ros/quadrotor.hpp"
 
 
 int main(int argc, char **argv)
@@ -31,7 +31,7 @@ int main(int argc, char **argv)
 	);
 
 	// setup quad
-	quad.subscribeToIMU();
+	quad.subscribeToPose();
     last_request = ros::Time::now();
 
     while (ros::ok()){
