@@ -137,7 +137,7 @@ int main(int argc, char **argv)
 	while (1) {
 		if (gps.decodeSingleMessage(Ublox::NAV_POSLLH, pos_data) == 1) {
 			if ((int) pos_data[0] != 0x03) {
-				std::cout << "." << std::endl;
+				std::cout << ".";
 			} else {
 				std::cout << "\nGot 3D fix! continuing!" << std::endl;
 				break;
