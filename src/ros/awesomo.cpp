@@ -6,7 +6,7 @@ int main(int argc, char **argv)
     // setup
     ros::init(argc, argv, "awesomo");
     ros::NodeHandle node_handle;
-    ros::Rate rate(50.0);  // publishing rate MUST be faster than 2Hz
+    ros::Rate rate(50.0);
     ros::Time last_request;
     geometry_msgs::PoseStamped msg;
 
@@ -17,8 +17,6 @@ int main(int argc, char **argv)
     Position pos;
     std::string camera_config_path;
     std::string position_controller_config_path;
-
-    ROS_INFO("running ...");
 
     // get configuration paths
 	node_handle.getParam(
@@ -31,6 +29,7 @@ int main(int argc, char **argv)
 	);
 
 	// setup quad
+    ROS_INFO("running ...");
 	quad.subscribeToPose();
     last_request = ros::Time::now();
 

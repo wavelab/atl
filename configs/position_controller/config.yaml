@@ -5,7 +5,7 @@ roll_controller:
     max: 0.2
     k_p: 0.205
     k_i: 0.05
-    k_d: 20
+    k_d: 0.2
 pitch_controller:
     setpoint: 0.0
     deadzone: 0.1
@@ -13,7 +13,7 @@ pitch_controller:
     max: 0.2
     k_p: 0.205
     k_i: 0.05
-    k_d: 20
+    k_d: 0.2
 throttle_controller:
     hover_throttle: 0.63
     setpoint: 1.0
@@ -22,4 +22,4 @@ throttle_controller:
     max: 0.3
     k_p: 0.2
     k_i: 0.0
-    k_d: 20
+    k_d: 0.2
