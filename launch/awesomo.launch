@@ -1,13 +1,10 @@
 <launch>
-    <!-- <include file="$(find mavros)/launch/px4.launch" /> -->
-	<!-- <include file="$(find mocap_optitrack)/launch/mocap_awesomo.launch" /> -->
-
 	<param
-        name="camera_config_path"
-	    value="$(find awesomo)/configs/pointgrey_firefly" />
+        name="position_controller"
+	    value="$(find awesomo)/configs/position_controller" />
 	<node
 	    pkg="awesomo"
-	    type="quadrotor_node"
-	    name="quadrotor_node"
+	    type="awesomo"
+	    name="awesomo"
 	    output="screen" />
 </launch>

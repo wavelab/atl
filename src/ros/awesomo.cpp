@@ -13,32 +13,27 @@ int main(int argc, char **argv)
 	int seq = 1;
 	int index = 0;
 	int timeout = 0;
-    Quadrotor quad;
+    Quadrotor *quad;
     Position pos;
-    std::string camera_config_path;
-    std::string position_controller_config_path;
+    std::string position_controller_config;
+    std::map<std::string, std::string> configs;
 
     // get configuration paths
-	node_handle.getParam(
-	    "/camera_config_path",
-	    camera_config_path
-	);
-	node_handle.getParam(
-	    "/position_controller_config_path",
-	    position_controller_config_path
-	);
+	node_handle.getParam("/position_controller", position_controller_config);
+	configs["position_controller"] = position_controller_config;
 
 	// setup quad
     ROS_INFO("running ...");
-	quad.subscribeToPose();
+    quad = new Quadrotor(configs);
+	quad->subscribeToPose();
     last_request = ros::Time::now();
 
     while (ros::ok()){
         pos.x = 0;
         pos.y = 0;
-        pos.z = 0;
-        quad.positionControllerCalculate(pos, last_request);
-        quad.publishPositionControllerMessage(msg, seq, ros::Time::now());
+        pos.z = 1.5;
+        quad->positionControllerCalculate(pos, last_request);
+        quad->publishPositionControllerMessage(msg, seq, ros::Time::now());
         last_request = ros::Time::now();
 
 		// end
