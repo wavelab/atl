@@ -107,6 +107,13 @@ void Quadrotor::imuCallback(const sensor_msgs::Imu::ConstPtr &msg)
     );
 }
 
+void Quadrotor::radioCallback(const mavros_msgs::RCIn &msg)
+{
+    for (int i = 0; i < 16; i++){
+        this->rc_in[i] = msg.channels[i];
+    }
+}
+
 void Quadrotor::waitForConnection(void)
 {
     ROS_INFO("waiting for FCU ...");
@@ -199,6 +206,17 @@ void Quadrotor::subscribeToIMU(void)
         &Quadrotor::imuCallback,
         this
     );
+}
+
+void Quadrotor::subscribeToRadioIn(void)
+{
+    ROS_INFO("subscribing to [RADIO_IN]");
+    this->radio_subscriber = this->node.subscribe(
+            RADIO_TOPIC,
+            50,
+            &Quadrotor::radioCallback,
+            this
+     );
 }
 
 void Quadrotor::positionControllerCalculate(Position setpoint, ros::Time last_request)
