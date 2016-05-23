@@ -9,7 +9,7 @@ config_keys:
     ["320", "160", "640"]
 config_files:
     [
-        "ost_320.yaml",
-        "ost_160.yaml",
-        "ost_640.yaml"
+        "320_by_240.yaml",
+        "160_by_120.yaml",
+        "640_by_480.yaml"
     ]
