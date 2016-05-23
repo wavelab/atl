@@ -226,6 +226,14 @@ void Quadrotor::positionControllerCalculate(Position setpoint, ros::Time last_re
     // calculate new controller inputs
     dt = (ros::Time::now() - last_request).toSec();
     this->position_controller->calculate(setpoint, this->pose, dt);
+    // ROS_INFO("pose: %f\t%f\t%f", this->pose.x, this->pose.y, this->pose.z);
+    // ROS_INFO("setpoint: %f\t%f\t%f", setpoint.x, setpoint.y, setpoint.z);
+    // ROS_INFO(
+    //     "output: %f\t%f\t%f",
+    //     this->position_controller->roll * 180 / M_PI,
+    //     this->position_controller->pitch * 180 / M_PI,
+    //     this->position_controller->throttle
+    // );
 }
 
 void Quadrotor::printPositionController(void)

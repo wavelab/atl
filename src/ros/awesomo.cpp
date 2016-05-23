@@ -31,29 +31,29 @@ int main(int argc, char **argv)
 
     while (ros::ok()){
         // reset position controller errors
-        if (quad->rc_in[6] > 1500) {
-            // ROS_INFO("RC value is: %i ", quad->rc_in[6]);
-            quad->position_controller->x.p_error = 0.0;
-            quad->position_controller->x.i_error = 0.0;
-            quad->position_controller->x.d_error = 0.0;
+        if (quad->rc_in[6] < 1500) {
+            quad->position_controller->x.sum_error = 0.0;
+            quad->position_controller->x.prev_error = 0.0;
+            quad->position_controller->x.output = 0.0;
 
-            quad->position_controller->y.p_error = 0.0;
-            quad->position_controller->y.i_error = 0.0;
-            quad->position_controller->y.d_error = 0.0;
+            quad->position_controller->y.sum_error = 0.0;
+            quad->position_controller->y.prev_error = 0.0;
+            quad->position_controller->y.output = 0.0;
 
-            quad->position_controller->T.p_error = 0.0;
-            quad->position_controller->T.i_error = 0.0;
-            quad->position_controller->T.d_error = 0.0;
+            quad->position_controller->T.sum_error = 0.0;
+            quad->position_controller->T.prev_error = 0.0;
+            quad->position_controller->T.output = 0.0;
+
+            // configure setpoint to be where the quad currently is
+            pos.x = quad->pose.x;
+            pos.y = quad->pose.y;
+            pos.z = 1.5;
         }
 
         // publish quadrotor position controller
-        pos.x = 0;
-        pos.y = 0;
-        pos.z = 1.5;
         quad->positionControllerCalculate(pos, last_request);
         quad->publishPositionControllerMessage(msg, seq, ros::Time::now());
         quad->publishPositionControllerStats(seq, ros::Time::now());
-        // quad->printPositionController();
 
 		// end
 		seq++;

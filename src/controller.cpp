@@ -156,28 +156,49 @@ void PositionController::loadConfig(const std::string config_file)
 
         // roll controller
         this->x.setpoint = config["roll_controller"]["setpoint"].as<float>();
-        this->x.min = config["roll_controller"]["min"].as<float>();
-        this->x.max = config["roll_controller"]["max"].as<float>();
+        this->x.output = 0.0f;
+        this->x.prev_error = 0.0f;
+        this->x.sum_error = 0.0f;
+        this->x.p_error = 0.0f;
+        this->x.i_error = 0.0f;
+        this->x.d_error = 0.0f;
         this->x.k_p = config["roll_controller"]["k_p"].as<float>();
         this->x.k_i = config["roll_controller"]["k_i"].as<float>();
         this->x.k_d = config["roll_controller"]["k_d"].as<float>();
+        this->x.dead_zone = config["roll_controller"]["deadzone"].as<float>();
+        this->x.min = config["roll_controller"]["min"].as<float>();
+        this->x.max = config["roll_controller"]["max"].as<float>();
 
         // pitch controller
-        this->y.setpoint = config["pitch_controller"]["setpoint"].as<float>();
-        this->y.min = config["pitch_controller"]["min"].as<float>();
-        this->y.max = config["pitch_controller"]["max"].as<float>();
-        this->y.k_p = config["pitch_controller"]["k_p"].as<float>();
-        this->y.k_i = config["pitch_controller"]["k_i"].as<float>();
-        this->y.k_d = config["pitch_controller"]["k_d"].as<float>();
+        this->y.setpoint = config["roll_controller"]["setpoint"].as<float>();
+        this->y.output = 0.0f;
+        this->y.prev_error = 0.0f;
+        this->y.sum_error = 0.0f;
+        this->y.p_error = 0.0f;
+        this->y.i_error = 0.0f;
+        this->y.d_error = 0.0f;
+        this->y.k_p = config["roll_controller"]["k_p"].as<float>();
+        this->y.k_i = config["roll_controller"]["k_i"].as<float>();
+        this->y.k_d = config["roll_controller"]["k_d"].as<float>();
+        this->y.dead_zone = config["roll_controller"]["deadzone"].as<float>();
+        this->y.min = config["roll_controller"]["min"].as<float>();
+        this->y.max = config["roll_controller"]["max"].as<float>();
 
         // throttle_controller
         this->hover_throttle = config["throttle_controller"]["hover_throttle"].as<float>();
         this->T.setpoint = config["throttle_controller"]["setpoint"].as<float>();
-        this->T.min = config["throttle_controller"]["min"].as<float>();
-        this->T.max = config["throttle_controller"]["max"].as<float>();
+        this->T.output = 0.0f;
+        this->T.prev_error = 0.0f;
+        this->T.sum_error = 0.0f;
+        this->T.p_error = 0.0f;
+        this->T.i_error = 0.0f;
+        this->T.d_error = 0.0f;
         this->T.k_p = config["throttle_controller"]["k_p"].as<float>();
         this->T.k_i = config["throttle_controller"]["k_i"].as<float>();
         this->T.k_d = config["throttle_controller"]["k_d"].as<float>();
+        this->T.dead_zone = config["throttle_controller"]["deadzone"].as<float>();
+        this->T.min = config["throttle_controller"]["min"].as<float>();
+        this->T.max = config["throttle_controller"]["max"].as<float>();
 
     } catch (YAML::BadFile &ex) {
         throw;
@@ -244,7 +265,7 @@ void PositionController::calculate(Position setpoint, Pose robot, float dt)
 
     // throttle
     throttle_adjusted = this->hover_throttle + throttle;
-    throttle_adjusted = throttle_adjusted / (cos(roll_adjusted) * cos(pitch_adjusted));
+    throttle_adjusted /= fabs(cos(roll_adjusted) * cos(pitch_adjusted));
 
     // update position controller
     this->roll = roll_adjusted;
