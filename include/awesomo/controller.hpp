@@ -92,13 +92,11 @@ class PositionController
         float pitch;
         float throttle;
         float hover_throttle;
-
         tf::Quaternion rpy_quat;
-        float dt;
 
         PositionController(const std::string config_file);
         void loadConfig(const std::string config_file);
-        void calculate(Pose p);
+        void calculate(Position setpoint, Pose robot, float dt);
 };
 
 #endif

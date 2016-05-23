@@ -201,31 +201,18 @@ void Quadrotor::subscribeToIMU(void)
     );
 }
 
-void Quadrotor::positionControllerCalculate(Position p, ros::Time last_request)
+void Quadrotor::positionControllerCalculate(Position setpoint, ros::Time last_request)
 {
-    float roll;;
-    float pitch;
-    float throttle;
-    float roll_adjusted;
-    float pitch_adjusted;
-    float throttle_adjusted;
     float dt;
-    Pose pose;
-
-    // set x, y, z setpoint and dt
-    this->position_controller->x.setpoint = p.y;
-    this->position_controller->y.setpoint = p.x;
-    this->position_controller->T.setpoint = p.z;
-    this->position_controller->dt = (ros::Time::now() - last_request).toSec();
 
     // calculate new controller inputs
-    this->position_controller->calculate(this->pose);
+    dt = (ros::Time::now() - last_request).toSec();
+    this->position_controller->calculate(setpoint, this->pose, dt);
 }
 
 void Quadrotor::printPositionController(void)
 {
     ROS_INFO("---");
-    ROS_INFO("dt %f", this->position_controller->dt);
     ROS_INFO("quadrotor.pose_x %f", this->pose.x);
     ROS_INFO("quadrotor.pose_y %f", this->pose.y);
     ROS_INFO("quadrotor.pose_z %f", this->pose.z);
