@@ -26,16 +26,18 @@ int main(int argc, char **argv)
     ROS_INFO("running ...");
     quad = new Quadrotor(configs);
 	quad->subscribeToPose();
+	quad->subscribeToRadioIn();
     last_request = ros::Time::now();
 
     while (ros::ok()){
+        // ROS_INFO("RC value is: %i ", quad->rc_in[6]);
         pos.x = 0;
         pos.y = 0;
         pos.z = 1.5;
         quad->positionControllerCalculate(pos, last_request);
         quad->publishPositionControllerMessage(msg, seq, ros::Time::now());
         quad->publishPositionControllerStats(seq, ros::Time::now());
-        quad->printPositionController();
+        // quad->printPositionController();
 
 		// end
 		seq++;
