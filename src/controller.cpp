@@ -211,7 +211,7 @@ static void pid_calculate(struct pid *p, float input, float dt)
     p->prev_error = error;
 }
 
-void PositionController::calculate(Pose pose)
+void PositionController::calculate(Position setpoint, Pose robot, float dt)
 {
     float roll;
     float pitch;
@@ -219,22 +219,26 @@ void PositionController::calculate(Pose pose)
     float roll_adjusted;
     float pitch_adjusted;
     float throttle_adjusted;
-    float dt;
 
-    pid_calculate(&this->x, pose.y, this->dt);
-    pid_calculate(&this->y, pose.x, this->dt);
-    pid_calculate(&this->T, pose.z, this->dt);
+    this->x.setpoint = setpoint.x;
+    this->y.setpoint = setpoint.y;
+    this->T.setpoint = setpoint.z;
+
+    pid_calculate(&this->x, robot.x, dt);
+    pid_calculate(&this->y, robot.y, dt);
+    pid_calculate(&this->T, robot.z, dt);
+
     roll = -this->x.output;
     pitch = this->y.output;
     throttle = this->T.output;
 
     // adjust roll and pitch according to yaw
-    if (pose.yaw < 0) {
+    if (robot.yaw < 0) {
         // make sure yaw is within 0 - 360
-        pose.yaw += 2 * M_PI;
+        robot.yaw += 2 * M_PI;
     }
-    roll_adjusted = cos(pose.yaw) * roll - sin(pose.yaw) * pitch;
-    pitch_adjusted = sin(pose.yaw) * roll + cos(pose.yaw) * pitch;
+    roll_adjusted = cos(robot.yaw) * roll - sin(robot.yaw) * pitch;
+    pitch_adjusted = sin(robot.yaw) * roll + cos(robot.yaw) * pitch;
 
     // throttle
     throttle_adjusted = this->hover_throttle + throttle;

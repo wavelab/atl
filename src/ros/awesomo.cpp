@@ -34,6 +34,7 @@ int main(int argc, char **argv)
         pos.z = 1.5;
         quad->positionControllerCalculate(pos, last_request);
         quad->publishPositionControllerMessage(msg, seq, ros::Time::now());
+        quad->printPositionController();
         last_request = ros::Time::now();
 
 		// end
