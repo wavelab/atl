@@ -220,12 +220,14 @@ void PositionController::calculate(Position setpoint, Pose robot, float dt)
     float pitch_adjusted;
     float throttle_adjusted;
 
-    this->x.setpoint = setpoint.x;
-    this->y.setpoint = setpoint.y;
+    // Note: Position Controller is (x - roll, y - pitch, T - thrust)
+    // This position controller assumes yaw is aligned with the world x axis
+    this->x.setpoint = setpoint.y;
+    this->y.setpoint = setpoint.x;
     this->T.setpoint = setpoint.z;
 
-    pid_calculate(&this->x, robot.x, dt);
-    pid_calculate(&this->y, robot.y, dt);
+    pid_calculate(&this->x, robot.y, dt);
+    pid_calculate(&this->y, robot.x, dt);
     pid_calculate(&this->T, robot.z, dt);
 
     roll = -this->x.output;
