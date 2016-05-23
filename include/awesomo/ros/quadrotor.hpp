@@ -18,6 +18,7 @@
 #include <mavros_msgs/State.h>
 #include <mavros_msgs/SetMode.h>
 #include <mavros_msgs/CommandBool.h>
+#include <mavros_msgs/RCIn.h>
 
 #include <yaml-cpp/yaml.h>
 
@@ -38,6 +39,7 @@
 #define POSITION_X_CONTROLLER_TOPIC "/awesomo/position_controller/x"
 #define POSITION_Y_CONTROLLER_TOPIC "/awesomo/position_controller/y"
 #define POSITION_Z_CONTROLLER_TOPIC "/awesomo/position_controller/z"
+#define RADIO_TOPIC "/mavros/rc/in"
 
 #define OFFLINE_MODE -1
 #define HOVER_MODE 0
@@ -59,6 +61,7 @@ class Quadrotor
         ros::Subscriber mocap_subscriber;
         ros::Subscriber pose_subscriber;
         ros::Subscriber imu_subscriber;
+        ros::Subscriber radio_subscriber;
 
         ros::ServiceClient mode_client;
         ros::ServiceClient arming_client;
@@ -69,13 +72,16 @@ class Quadrotor
         void poseCallback(const geometry_msgs::PoseStamped &msg);
         void mocapCallback(const geometry_msgs::PoseStamped &msg);
         void imuCallback(const sensor_msgs::Imu::ConstPtr &msg);
+        void radioCallback(const mavros_msgs::RCIn &msg);
         void stateCallback(const mavros_msgs::State::ConstPtr &msg);
+
 
         void waitForConnection(void);
 
     public:
         Pose pose;
         Pose mocap_pose;
+        int rc_in[16];
 
         CarrotController *carrot_controller;
         PositionController *position_controller;
@@ -95,6 +101,7 @@ class Quadrotor
         void subscribeToPose(void);
         void subscribeToMocap(void);
         void subscribeToIMU(void);
+        void subscribeToRadioIn(void);
         void positionControllerCalculate(Position p, ros::Time last_request);
         void printPositionController(void);
         void buildPositionMessage(
