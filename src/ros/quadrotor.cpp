@@ -294,6 +294,8 @@ void Quadrotor::publishPositionControllerStats(int seq, ros::Time time)
     pid_stats.pose.position.x = this->position_controller->x.p_error;
     pid_stats.pose.position.y = this->position_controller->x.i_error;
     pid_stats.pose.position.z = this->position_controller->x.d_error;
+    pid_stats.pose.orientation.x = this->position_controller->x.output;
+    pid_stats.pose.orientation.y = this->position_controller->x.setpoint;
     this->position_controller_x_publisher.publish(pid_stats);
 
     // pitch
@@ -303,6 +305,8 @@ void Quadrotor::publishPositionControllerStats(int seq, ros::Time time)
     pid_stats.pose.position.x = this->position_controller->y.p_error;
     pid_stats.pose.position.y = this->position_controller->y.i_error;
     pid_stats.pose.position.z = this->position_controller->y.d_error;
+    pid_stats.pose.orientation.x = this->position_controller->y.output;
+    pid_stats.pose.orientation.y = this->position_controller->y.setpoint;
     this->position_controller_y_publisher.publish(pid_stats);
 
     // throttle
@@ -312,6 +316,8 @@ void Quadrotor::publishPositionControllerStats(int seq, ros::Time time)
     pid_stats.pose.position.x = this->position_controller->T.p_error;
     pid_stats.pose.position.y = this->position_controller->T.i_error;
     pid_stats.pose.position.z = this->position_controller->T.d_error;
+    pid_stats.pose.orientation.x = this->position_controller->T.output;
+    pid_stats.pose.orientation.y = this->position_controller->T.setpoint;
     this->position_controller_z_publisher.publish(pid_stats);
 }
 

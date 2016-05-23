@@ -30,7 +30,23 @@ int main(int argc, char **argv)
     last_request = ros::Time::now();
 
     while (ros::ok()){
-        // ROS_INFO("RC value is: %i ", quad->rc_in[6]);
+        // reset position controller errors
+        if (quad->rc_in[6] > 1500) {
+            // ROS_INFO("RC value is: %i ", quad->rc_in[6]);
+            quad->position_controller->x.p_error = 0.0;
+            quad->position_controller->x.i_error = 0.0;
+            quad->position_controller->x.d_error = 0.0;
+
+            quad->position_controller->y.p_error = 0.0;
+            quad->position_controller->y.i_error = 0.0;
+            quad->position_controller->y.d_error = 0.0;
+
+            quad->position_controller->T.p_error = 0.0;
+            quad->position_controller->T.i_error = 0.0;
+            quad->position_controller->T.d_error = 0.0;
+        }
+
+        // publish quadrotor position controller
         pos.x = 0;
         pos.y = 0;
         pos.z = 1.5;
