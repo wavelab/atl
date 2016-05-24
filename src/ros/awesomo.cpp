@@ -15,12 +15,18 @@ int main(int argc, char **argv)
 	int timeout = 0;
     Quadrotor *quad;
     Position pos;
+    Eigen::Vector3d position;
+    Eigen::Vector3d carrot;
+    Eigen::Vector3d wp;
     std::string position_controller_config;
+    std::string carrot_controller_config;
     std::map<std::string, std::string> configs;
 
     // get configuration paths
 	node_handle.getParam("/position_controller", position_controller_config);
 	configs["position_controller"] = position_controller_config;
+	node_handle.getParam("/carrot_controller", carrot_controller_config);
+	configs["carrot_controller"] = carrot_controller_config;
 
 	// setup quad
     ROS_INFO("running ...");
@@ -28,6 +34,7 @@ int main(int argc, char **argv)
 	quad->subscribeToPose();
 	quad->subscribeToRadioIn();
     last_request = ros::Time::now();
+    int initlialize_carrot = 0;
 
     while (ros::ok()){
         // reset position controller errors
@@ -47,7 +54,35 @@ int main(int argc, char **argv)
             // configure setpoint to be where the quad currently is
             pos.x = quad->pose.x;
             pos.y = quad->pose.y;
-            pos.z = 1.5;
+            pos.z = quad->pose.z + 3;
+
+            wp << pos.x, pos.y, pos.z;
+            quad->carrot_controller->waypoints.push_back(wp);
+
+            wp << pos.x + 5, pos.y, pos.z;
+            quad->carrot_controller->waypoints.push_back(wp);
+
+            wp << pos.x + 5, pos.y + 5, pos.z;
+            quad->carrot_controller->waypoints.push_back(wp);
+
+            wp << pos.x, pos.y + 5, pos.z;
+            quad->carrot_controller->waypoints.push_back(wp);
+
+            wp << pos.x + 5, pos.y, pos.z;
+            quad->carrot_controller->waypoints.push_back(wp);
+
+            wp << pos.x, pos.y, pos.z;
+            quad->carrot_controller->waypoints.push_back(wp);
+            quad->carrot_controller->initialized;
+
+        } else {
+            // carrot controller
+            position << quad->pose.x, quad->pose.y, quad->pose.z;
+            quad->carrot_controller->update(position, carrot);
+            pos.x = carrot(0);
+            pos.y = carrot(1);
+            pos.z = carrot(2);
+
         }
 
         // publish quadrotor position controller

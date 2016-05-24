@@ -1,6 +1,3 @@
-look_ahead_dist: 0.2
+look_ahead_dist: 0.1
 wp_threshold: 0.3
-waypoints: [
-    0, 0, 0,
-    1, 1, 0
-]
+waypoints: []

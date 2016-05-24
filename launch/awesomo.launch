@@ -1,10 +1,11 @@
 <?xml version="1.0"?>
 <launch>
-    <!-- <include file="$(find mavros)/launch/px4.launch" /> -->
-
 	<param
         name="position_controller"
         value="$(find awesomo)/configs/position_controller/config.yaml" />
+	<param
+        name="carrot_controller"
+        value="$(find awesomo)/configs/carrot_controller/config.yaml" />
 	<node
 	    pkg="awesomo"
 	    type="awesomo"
