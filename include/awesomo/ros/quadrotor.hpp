@@ -103,6 +103,7 @@ class Quadrotor
         void subscribeToIMU(void);
         void subscribeToRadioIn(void);
         void positionControllerCalculate(Position p, ros::Time last_request);
+        void resetPositionController(void);
         void printPositionController(void);
         void buildPositionMessage(
             geometry_msgs::PoseStamped &msg,

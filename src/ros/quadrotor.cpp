@@ -219,21 +219,27 @@ void Quadrotor::subscribeToRadioIn(void)
      );
 }
 
+void Quadrotor::resetPositionController(void)
+{
+    this->position_controller->x.sum_error = 0.0;
+    this->position_controller->x.prev_error = 0.0;
+    this->position_controller->x.output = 0.0;
+
+    this->position_controller->y.sum_error = 0.0;
+    this->position_controller->y.prev_error = 0.0;
+    this->position_controller->y.output = 0.0;
+
+    this->position_controller->T.sum_error = 0.0;
+    this->position_controller->T.prev_error = 0.0;
+    this->position_controller->T.output = 0.0;
+}
+
 void Quadrotor::positionControllerCalculate(Position setpoint, ros::Time last_request)
 {
     float dt;
 
-    // calculate new controller inputs
     dt = (ros::Time::now() - last_request).toSec();
     this->position_controller->calculate(setpoint, this->pose, dt);
-    // ROS_INFO("pose: %f\t%f\t%f", this->pose.x, this->pose.y, this->pose.z);
-    // ROS_INFO("setpoint: %f\t%f\t%f", setpoint.x, setpoint.y, setpoint.z);
-    // ROS_INFO(
-    //     "output: %f\t%f\t%f",
-    //     this->position_controller->roll * 180 / M_PI,
-    //     this->position_controller->pitch * 180 / M_PI,
-    //     this->position_controller->throttle
-    // );
 }
 
 void Quadrotor::printPositionController(void)

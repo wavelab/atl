@@ -1,6 +1,46 @@
 #include "awesomo/ros/quadrotor.hpp"
 
 
+static void initialize_mission(Quad &quad)
+{
+    Position pos;
+    Eigen::Vector3d wp;
+    Eigen::Vector3d carrot;
+    Eigen::Vector3d position;
+
+    // current position + some altitude
+    pos.x = quad->pose.x;
+    pos.y = quad->pose.y;
+    pos.z = quad->pose.z + 3;
+
+    // waypoint 1
+    wp << pos.x, pos.y, pos.z;
+    quad->carrot_controller->waypoints.push_back(wp);
+
+    // waypoint 2
+    wp << pos.x + 5, pos.y, pos.z;
+    quad->carrot_controller->waypoints.push_back(wp);
+
+    // waypoint 3
+    wp << pos.x + 5, pos.y + 5, pos.z;
+    quad->carrot_controller->waypoints.push_back(wp);
+
+    // waypoint 4
+    wp << pos.x, pos.y + 5, pos.z;
+    quad->carrot_controller->waypoints.push_back(wp);
+
+    // waypoint 5
+    wp << pos.x + 5, pos.y, pos.z;
+    quad->carrot_controller->waypoints.push_back(wp);
+
+    // back to waypoint 1
+    wp << pos.x, pos.y, pos.z;
+    quad->carrot_controller->waypoints.push_back(wp);
+
+    // initialize carrot controller
+    quad->carrot_controller->initialized = 1;
+}
+
 int main(int argc, char **argv)
 {
     // setup
@@ -17,15 +57,14 @@ int main(int argc, char **argv)
     Position pos;
     Eigen::Vector3d position;
     Eigen::Vector3d carrot;
-    Eigen::Vector3d wp;
     std::string position_controller_config;
     std::string carrot_controller_config;
     std::map<std::string, std::string> configs;
 
     // get configuration paths
 	node_handle.getParam("/position_controller", position_controller_config);
-	configs["position_controller"] = position_controller_config;
 	node_handle.getParam("/carrot_controller", carrot_controller_config);
+	configs["position_controller"] = position_controller_config;
 	configs["carrot_controller"] = carrot_controller_config;
 
 	// setup quad
@@ -37,48 +76,28 @@ int main(int argc, char **argv)
     int initlialize_carrot = 0;
 
     while (ros::ok()){
-        // reset position controller errors
+        // listening for offboard mode
         if (quad->rc_in[6] < 1500) {
-            quad->position_controller->x.sum_error = 0.0;
-            quad->position_controller->x.prev_error = 0.0;
-            quad->position_controller->x.output = 0.0;
-
-            quad->position_controller->y.sum_error = 0.0;
-            quad->position_controller->y.prev_error = 0.0;
-            quad->position_controller->y.output = 0.0;
-
-            quad->position_controller->T.sum_error = 0.0;
-            quad->position_controller->T.prev_error = 0.0;
-            quad->position_controller->T.output = 0.0;
+            quad->resetPositionController();
 
             // configure setpoint to be where the quad currently is
             pos.x = quad->pose.x;
             pos.y = quad->pose.y;
             pos.z = quad->pose.z + 3;
 
-            wp << pos.x, pos.y, pos.z;
-            quad->carrot_controller->waypoints.push_back(wp);
-
-            wp << pos.x + 5, pos.y, pos.z;
-            quad->carrot_controller->waypoints.push_back(wp);
-
-            wp << pos.x + 5, pos.y + 5, pos.z;
-            quad->carrot_controller->waypoints.push_back(wp);
-
-            wp << pos.x, pos.y + 5, pos.z;
-            quad->carrot_controller->waypoints.push_back(wp);
-
-            wp << pos.x + 5, pos.y, pos.z;
-            quad->carrot_controller->waypoints.push_back(wp);
-
-            wp << pos.x, pos.y, pos.z;
-            quad->carrot_controller->waypoints.push_back(wp);
-            quad->carrot_controller->initialized;
+            // initialize carrot controller
+            initialize_mission(quad);
 
         } else {
             // carrot controller
             position << quad->pose.x, quad->pose.y, quad->pose.z;
-            quad->carrot_controller->update(position, carrot);
+            if (quad->carrot_controller->update(position, carrot) == 0) {
+                ROS_INFO("Mission Completed!");
+                pos.x = position.x;
+                pos.y = position.y;
+                pos.z = position.z;
+            }
+
             pos.x = carrot(0);
             pos.y = carrot(1);
             pos.z = carrot(2);

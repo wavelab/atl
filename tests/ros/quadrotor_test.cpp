@@ -5,7 +5,6 @@
 // TESTS
 int testQuadrotorPositionControllerCalculate(void);
 
-
 int testQuadrotorPositionControllerCalculate(void)
 {
     Quadrotor q;
@@ -20,7 +19,6 @@ int testQuadrotorPositionControllerCalculate(void)
 
     return 0;
 }
-
 
 void test_suite(void)
 {

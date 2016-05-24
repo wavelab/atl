@@ -94,9 +94,9 @@ TARGET_LINK_LIBRARIES(util_test libawesomo)
 INSTALL(TARGETS util_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 # tests/ros/quadrotor_node_test
-ADD_EXECUTABLE(quadrotor_node_test tests/ros/quadrotor_node_test.cpp)
+ADD_EXECUTABLE(quadrotor_test tests/ros/quadrotor_test.cpp)
 TARGET_LINK_LIBRARIES(
-    quadrotor_node_test
+    quadrotor_test
     libawesomo
     apriltags
     yaml-cpp
@@ -106,7 +106,7 @@ TARGET_LINK_LIBRARIES(
 )
 INSTALL(
     TARGETS
-    quadrotor_node_test
+    quadrotor_test
     RUNTIME DESTINATION
     ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
