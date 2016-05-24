@@ -78,6 +78,21 @@ INSTALL(
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
+# Tracker node CHANGE NAME STAN THIS IS DUMB
+ADD_EXECUTABLE(tracker src/ros/tracker.cpp)
+TARGET_LINK_LIBRARIES(
+    tracker
+    libawesomo
+    apriltags
+    yaml-cpp
+    flycapture
+    ${OpenCV_LIBS}
+    ${catkin_LIBRARIES}
+)
+INSTALL(
+    TARGETS tracker
+    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 
 
