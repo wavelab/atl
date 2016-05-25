@@ -58,6 +58,7 @@ ADD_LIBRARY(
     src/util.cpp
     src/controller.cpp
     src/ros/quadrotor.cpp
+    src/camera_mount_config.cpp
 )
 
 # EXECUTABLES
@@ -125,6 +126,11 @@ INSTALL(
     RUNTIME DESTINATION
     ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
+
+# tests/camear_mount_config_test
+ADD_EXECUTABLE(camera_config_test tests/camera_config_test.cpp)
+TARGET_LINK_LIBRARIES(camera_config_test libawesomo yaml-cpp)
+INSTALL(TARGETS camera_config_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 
 # LAUNCH AND CONFIG FILES

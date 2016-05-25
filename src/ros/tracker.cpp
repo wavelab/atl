@@ -19,6 +19,7 @@ class cameraPoseCorrector
         tf::Quaternion apr_orientation;
         Eigen::Matrix3d mount_rot;
         Eigen::Vector3d t;
+        Eigen::Matrix3d mirroring;
 
         void tfCallback( const geometry_msgs::PoseStamped &input);
         void subscribeToPose(void);
@@ -35,6 +36,8 @@ class cameraPoseCorrector
 void cameraPoseCorrector::tfCallback(const geometry_msgs::PoseStamped &input)
 {
     Eigen::Vector3d temp;
+    this->mirroring = Eigen::MatrixXd::Identity(3, 3);
+    this->mirroring(0, 0) = -1;
     euler2RotationMatrix(
             this->mount_roll,
             this->mount_pitch,
@@ -42,7 +45,7 @@ void cameraPoseCorrector::tfCallback(const geometry_msgs::PoseStamped &input)
             this->mount_rot
     );
     temp << input.pose.position.x, input.pose.position.y, input.pose.position.z;
-    this->t = this->mount_rot * temp;
+    this->t = this->mirroring * this->mount_rot * temp;
 
     // this->apr_orientation = input.pose.orientation;
 }
