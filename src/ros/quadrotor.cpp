@@ -7,7 +7,7 @@ Quadrotor::Quadrotor(std::map<std::string, std::string> configs)
     std::string config_path;
 
     // state
-    this->mission_state = OFFLINE_MODE;
+    this->mission_state = IDLE_MODE;
 
     // wait till connected to FCU
     this->waitForConnection();
@@ -41,6 +41,10 @@ Quadrotor::Quadrotor(std::map<std::string, std::string> configs)
         POSITION_Z_CONTROLLER_TOPIC,
         50
     );
+
+    // initialize subscribers
+	this->subscribeToPose();
+	this->subscribeToRadioIn();
 
     // initialize rc_in[16] array
     for (int i = 0; i < 16; i++) {

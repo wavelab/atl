@@ -25,8 +25,6 @@ int main(int argc, char **argv)
 	// setup quad
     ROS_INFO("running ...");
     quad = new Quadrotor(configs);
-	quad->subscribeToPose();
-	quad->subscribeToRadioIn();
     last_request = ros::Time::now();
 
     while (ros::ok()){
