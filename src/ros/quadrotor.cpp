@@ -42,6 +42,11 @@ Quadrotor::Quadrotor(std::map<std::string, std::string> configs)
         50
     );
 
+    // initialize rc_in[16] array
+    for (int i = 0; i < 16; i++) {
+        this->rc_in[i] = 0.0f;
+    }
+
     // initialize controllers
     if (configs.count("position_controller")) {
         config_path = configs["position_controller"];
@@ -351,4 +356,105 @@ void Quadrotor::publishPositionControllerMessage(
     // throttle command
     this->buildThrottleMessage(throttle);
     this->throttle_publisher.publish(throttle);
+}
+
+void Quadrotor::initializeMission(void)
+{
+    Position pos;
+    Eigen::Vector3d wp;
+    Eigen::Vector3d carrot;
+    Eigen::Vector3d position;
+
+    // current position + some altitude
+    pos.x = this->pose.x;
+    pos.y = this->pose.y;
+    pos.z = this->pose.z + 3;
+
+    // waypoint 1
+    wp << pos.x, pos.y, pos.z;
+    this->carrot_controller->wp_start = wp;
+    this->carrot_controller->waypoints.push_back(wp);
+
+    // waypoint 2
+    wp << pos.x + 5, pos.y, pos.z;
+    this->carrot_controller->wp_end = wp;
+    this->carrot_controller->waypoints.push_back(wp);
+
+    // waypoint 3
+    wp << pos.x + 5, pos.y + 5, pos.z;
+    this->carrot_controller->waypoints.push_back(wp);
+
+    // waypoint 4
+    wp << pos.x, pos.y + 5, pos.z;
+    this->carrot_controller->waypoints.push_back(wp);
+
+    // back to waypoint 1
+    wp << pos.x, pos.y, pos.z;
+    this->carrot_controller->waypoints.push_back(wp);
+
+    // initialize carrot controller
+    this->carrot_controller->initialized = 1;
+}
+
+void Quadrotor::runMission(
+    geometry_msgs::PoseStamped &msg,
+    int seq,
+    ros::Time last_request
+)
+{
+    Position pos;
+    Eigen::Vector3d position;
+    Eigen::Vector3d carrot;
+
+    switch (this->mission_state) {
+    case IDLE_MODE:
+        // check if offboard switch has been turned on
+        if (this->rc_in[6] < 1500) {
+            this->resetPositionController();
+
+            // configure setpoint to be where the quad currently is
+            pos.x = this->pose.x;
+            pos.y = this->pose.y;
+            pos.z = this->pose.z + 3;
+
+        } else {
+            // transition to offboard mode
+            this->mission_state = INITIALIZE_MODE;
+
+        }
+        break;
+
+    case INITIALIZE_MODE:
+        this->initializeMission();
+        std::cout << "Carrot controller initialized!" << std::endl;
+        this->mission_state = CARROT_MODE;
+        break;
+
+    case CARROT_MODE:
+        position << this->pose.x, this->pose.y, this->pose.z;
+        if (this->carrot_controller->update(position, carrot) == 0) {
+            ROS_INFO("Landing!");
+            pos.x = this->pose.x;
+            pos.y = this->pose.y;
+            pos.z = this->pose.z - 2;
+            this->mission_state = LAND_MODE;
+
+        } else {
+            pos.x = carrot(0);
+            pos.y = carrot(1);
+            pos.z = carrot(2);
+
+        }
+
+        break;
+
+    case LAND_MODE:
+        // do nothing
+        break;
+    }
+
+    // publish quadrotor position controller
+    this->positionControllerCalculate(pos, last_request);
+    this->publishPositionControllerMessage(msg, seq, ros::Time::now());
+    this->publishPositionControllerStats(seq, ros::Time::now());
 }

@@ -41,12 +41,11 @@
 #define POSITION_Z_CONTROLLER_TOPIC "/awesomo/position_controller/z"
 #define RADIO_TOPIC "/mavros/rc/in"
 
-#define OFFLINE_MODE -1
-#define HOVER_MODE 0
-#define DISCOVER_MODE 1
-#define PLANNING_MODE 2
-#define CARROT_MODE 3
-#define MISSION_ACCOMPLISHED 4
+#define IDLE_MODE 0
+#define INITIALIZE_MODE 1
+#define CARROT_MODE 2
+#define LAND_MODE 3
+
 
 
 
@@ -124,6 +123,12 @@ class Quadrotor
             geometry_msgs::PoseStamped &msg,
             int seq,
             ros::Time time
+        );
+        void initializeMission(void);
+        void runMission(
+            geometry_msgs::PoseStamped &msg,
+            int seq,
+            ros::Time last_request
         );
 };
 
