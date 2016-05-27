@@ -45,11 +45,17 @@ Quadrotor::Quadrotor(std::map<std::string, std::string> configs)
     // initialize subscribers
 	this->subscribeToPose();
 	this->subscribeToRadioIn();
+	this->subscribeToLanding();
 
     // initialize rc_in[16] array
     for (int i = 0; i < 16; i++) {
         this->rc_in[i] = 0.0f;
     }
+
+    // initialize landing zone
+    this->landing_zone.x = 0.0;
+    this->landing_zone.y = 0.0;
+    this->landing_zone.z = 0.0;
 
     // initialize controllers
     if (configs.count("position_controller")) {
@@ -121,6 +127,13 @@ void Quadrotor::radioCallback(const mavros_msgs::RCIn &msg)
     for (int i = 0; i < 16; i++){
         this->rc_in[i] = msg.channels[i];
     }
+}
+
+void Quadrotor::landingCallback(const geometry_msgs::PoseStamped &msg)
+{
+    this->landing_zone.x = msg.pose.position.x;
+    this->landing_zone.y = msg.pose.position.y;
+    this->landing_zone.z = msg.pose.position.z;
 }
 
 void Quadrotor::waitForConnection(void)
@@ -226,6 +239,17 @@ void Quadrotor::subscribeToRadioIn(void)
             &Quadrotor::radioCallback,
             this
      );
+}
+
+void Quadrotor::subscribeToLanding(void)
+{
+    ROS_INFO("subcribing to [Landing Zone]");
+    this->landing_subscriber = this->node.subscribe(
+        LANDING_TOPIC,
+        50,
+        &Quadrotor::landingCallback,
+        this
+    );
 }
 
 void Quadrotor::resetPositionController(void)
@@ -424,6 +448,7 @@ void Quadrotor::runMission(
         } else {
             // transition to offboard mode
             this->mission_state = INITIALIZE_MODE;
+            // this->mission_state = TRACKING_MODE;
 
         }
         break;
@@ -450,6 +475,12 @@ void Quadrotor::runMission(
 
         }
 
+        break;
+
+    case TRACKING_MODE:
+        pos.x = this->landing_zone.x;
+        pos.y = this->landing_zone.y;
+        pos.z = 5;
         break;
 
     case LAND_MODE:

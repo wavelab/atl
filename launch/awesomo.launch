@@ -1,5 +1,23 @@
 <?xml version="1.0"?>
 <launch>
+    <!-- ATIM -->
+	<param
+        name="camera_config_path"
+	    value="$(find atim)/configs/pointgrey_firefly" />
+	<node
+	    pkg="atim"
+	    type="atim"
+	    name="atim"
+	    output="screen" />
+
+    <!-- LANDING TARGET -->
+	<node
+	    pkg="awesomo"
+	    type="awesomo_landing_target"
+	    name="awesomo_landing_target"
+	    output="screen" />
+
+    <!-- CONTROLLER -->
 	<param
         name="position_controller"
         value="$(find awesomo)/configs/position_controller/config.yaml" />

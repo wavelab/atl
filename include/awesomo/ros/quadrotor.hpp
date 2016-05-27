@@ -40,11 +40,13 @@
 #define POSITION_Y_CONTROLLER_TOPIC "/awesomo/position_controller/y"
 #define POSITION_Z_CONTROLLER_TOPIC "/awesomo/position_controller/z"
 #define RADIO_TOPIC "/mavros/rc/in"
+#define LANDING_TOPIC "/awesomo/landing_target/pose"
 
 #define IDLE_MODE 0
 #define INITIALIZE_MODE 1
 #define CARROT_MODE 2
-#define LAND_MODE 3
+#define TRACKING_MODE 3
+#define LAND_MODE 4
 
 
 
@@ -61,6 +63,7 @@ private:
     ros::Subscriber pose_subscriber;
     ros::Subscriber imu_subscriber;
     ros::Subscriber radio_subscriber;
+    ros::Subscriber landing_subscriber;
 
     ros::ServiceClient mode_client;
     ros::ServiceClient arming_client;
@@ -69,11 +72,13 @@ private:
     void mocapCallback(const geometry_msgs::PoseStamped &msg);
     void imuCallback(const sensor_msgs::Imu::ConstPtr &msg);
     void radioCallback(const mavros_msgs::RCIn &msg);
+    void landingCallback(const geometry_msgs::PoseStamped &msg);
     void stateCallback(const mavros_msgs::State::ConstPtr &msg);
     void waitForConnection(void);
 
 public:
     Pose pose;
+    Position landing_zone;
     Pose mocap_pose;
     int rc_in[16];
 
@@ -96,6 +101,7 @@ public:
     void subscribeToMocap(void);
     void subscribeToIMU(void);
     void subscribeToRadioIn(void);
+    void subscribeToLanding(void);
     void positionControllerCalculate(Position p, ros::Time last_request);
     void resetPositionController(void);
     void printPositionController(void);
