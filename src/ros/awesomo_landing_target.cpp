@@ -6,43 +6,46 @@
 #include <geometry_msgs/PoseStamped.h>
 
 #include "awesomo/util.hpp"
+#include "awesomo/camera.hpp"
 
-#define POSE_TOPIC "/atim/pose"
+#define ATIM_POSE_TOPIC "/atim/pose"
+#define SENSOR_FUSION_POSE_TOPIC "/awesomo/landing_target/pose"
 
-class cameraPoseCorrector
+
+class LandingTarget
 {
-    public:
-        double mount_roll = 0;
-        double mount_pitch = -M_PI/2;
-        double mount_yaw = 0;
+public:
+    double mount_roll = 0;
+    double mount_pitch = -M_PI/2;
+    double mount_yaw = 0;
 
-        tf::Quaternion apr_orientation;
-        Eigen::Matrix3d mount_rot;
-        Eigen::Vector3d t;
-        Eigen::Matrix3d mirroring;
+    tf::Quaternion apr_orientation;
+    Eigen::Matrix3d mount_rot;
+    Eigen::Vector3d t;
+    Eigen::Matrix3d mirroring;
 
-        void tfCallback( const geometry_msgs::PoseStamped &input);
-        void subscribeToPose(void);
-        void publishRotatedValues(int seq, ros::Time time);
+    void tfCallback( const geometry_msgs::PoseStamped &input);
+    void subscribeToPose(void);
+    void publishRotatedValues(int seq, ros::Time time);
 
-        ros::NodeHandle n;
-        ros::Subscriber poseSubscriber;
-        ros::Publisher correction_publisher = n.advertise<geometry_msgs::PoseStamped>(
-                "correctedpose",
-                50
-                );
+    ros::NodeHandle n;
+    ros::Subscriber poseSubscriber;
+    ros::Publisher correction_publisher = n.advertise<geometry_msgs::PoseStamped>(
+        SENSOR_FUSION_POSE_TOPIC,
+        50
+    );
 };
 
-void cameraPoseCorrector::tfCallback(const geometry_msgs::PoseStamped &input)
+void LandingTarget::tfCallback(const geometry_msgs::PoseStamped &input)
 {
     Eigen::Vector3d temp;
     this->mirroring = Eigen::MatrixXd::Identity(3, 3);
     this->mirroring(0, 0) = -1;
     euler2RotationMatrix(
-            this->mount_roll,
-            this->mount_pitch,
-            this->mount_yaw,
-            this->mount_rot
+        this->mount_roll,
+        this->mount_pitch,
+        this->mount_yaw,
+        this->mount_rot
     );
     temp << input.pose.position.x, input.pose.position.y, input.pose.position.z;
     this->t = this->mirroring * this->mount_rot * temp;
@@ -50,19 +53,18 @@ void cameraPoseCorrector::tfCallback(const geometry_msgs::PoseStamped &input)
     // this->apr_orientation = input.pose.orientation;
 }
 
-void cameraPoseCorrector::subscribeToPose(void)
+void LandingTarget::subscribeToPose(void)
 {
-    ROS_INFO("subscribing to POSE");
+    ROS_INFO("subscribing to ATIM POSE");
     this->poseSubscriber = this->n.subscribe(
-            POSE_TOPIC,
-            500,
-            &cameraPoseCorrector::tfCallback,
-            this
+        ATIM_POSE_TOPIC,
+        500,
+        &LandingTarget::tfCallback,
+        this
      );
 }
 
-
-void cameraPoseCorrector::publishRotatedValues(int seq, ros::Time time)
+void LandingTarget::publishRotatedValues(int seq, ros::Time time)
 {
     geometry_msgs::PoseStamped correctedPose;
 
@@ -78,19 +80,21 @@ void cameraPoseCorrector::publishRotatedValues(int seq, ros::Time time)
 
 int main(int argc, char **argv)
 {
-    // setup
     ros::init(argc, argv, "transform_test");
     ros::NodeHandle node_handle;
     ros::Rate rate(50.0);
     ros::Time last_request;
-    cameraPoseCorrector *CPC;
-    CPC = new cameraPoseCorrector();
+    LandingTarget *target;
     ROS_INFO("Running transform test");
 
-    CPC->subscribeToPose();
+    // setup
+    target = new LandingTarget();
+    target->subscribeToPose();
     int seq = 0;
+
+    // publish
     while (ros::ok()){
-        CPC->publishRotatedValues(seq, ros::Time::now());
+        target->publishRotatedValues(seq, ros::Time::now());
         ros::spinOnce();
         rate.sleep();
         seq++;
@@ -98,6 +102,3 @@ int main(int argc, char **argv)
 
     return 0;
 }
-
-
-

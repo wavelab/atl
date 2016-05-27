@@ -79,10 +79,9 @@ INSTALL(
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-# Tracker node CHANGE NAME STAN THIS IS DUMB
-ADD_EXECUTABLE(tracker src/ros/tracker.cpp)
+ADD_EXECUTABLE(awesomo_landing_target src/ros/awesomo_landing_target.cpp)
 TARGET_LINK_LIBRARIES(
-    tracker
+    awesomo_landing_target
     libawesomo
     apriltags
     yaml-cpp
@@ -91,7 +90,7 @@ TARGET_LINK_LIBRARIES(
     ${catkin_LIBRARIES}
 )
 INSTALL(
-    TARGETS tracker
+    TARGETS awesomo_landing_target
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
