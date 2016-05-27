@@ -1,7 +1,7 @@
 #include "awesomo/camera.hpp"
 
 
-int CameraMountConfig::initialize(
+int CameraMountRBT::initialize(
     double camRoll,
     double camPitch,
     double camYaw,
@@ -32,7 +32,7 @@ int CameraMountConfig::initialize(
     return 0;
 }
 
-int CameraMountConfig::initializeMirrorMtx(
+int CameraMountRBT::initializeMirrorMtx(
     double camMirrorX,
     double camMirrorY,
     double camMirrorZ
@@ -49,7 +49,7 @@ int CameraMountConfig::initializeMirrorMtx(
     return 0;
 }
 
-int CameraMountConfig::convertPoseToMtx(
+int CameraMountRBT::convertPoseToMtx(
     Pose &poseIn,
     Eigen::Matrix4d &poseMtxOut
 )
@@ -72,7 +72,7 @@ int CameraMountConfig::convertPoseToMtx(
     return 0;
 }
 
-int CameraMountConfig::convertPositionToVector(
+int CameraMountRBT::convertPositionToVector(
     Position &positionIn,
     Eigen::Vector4d &positionVectorOut
 )
@@ -85,19 +85,19 @@ int CameraMountConfig::convertPositionToVector(
     return 0;
 }
 
-int CameraMountConfig::applyMirrorToPoseMtx(Eigen::Matrix4d &poseIn)
+int CameraMountRBT::applyMirrorToPoseMtx(Eigen::Matrix4d &poseIn)
 {
     poseIn = this->camMirroring * poseIn;
     return 0;
 }
 
-int CameraMountConfig::applyMirrorToPositionVector(Eigen::Vector4d &positionIn)
+int CameraMountRBT::applyMirrorToPositionVector(Eigen::Vector4d &positionIn)
 {
     positionIn = this->camMirroring * positionIn;
     return 0;
 }
 
-int CameraMountConfig::applyRBTtoPosition(Position &positionIn)
+int CameraMountRBT::applyRBTtoPosition(Position &positionIn)
 {
     Eigen::Vector4d positionVect;
 

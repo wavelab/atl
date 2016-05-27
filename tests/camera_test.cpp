@@ -3,14 +3,14 @@
 
 
 // TESTS
-void createCamConfig(CameraMountConfig &config);
+void createCamConfig(CameraMountRBT &config);
 int testCameraConfig(void);
 int testCameraConfigInitialize(void);
 int testCameraConfigInitializeMirror(void);
 int testCameraConfigApplyRBTtoPosition(void);
 
 
-void createCamConfig(CameraMountConfig &config)
+void createCamConfig(CameraMountRBT &config)
 {
     config.initialize(M_PI/2, 0, 0, 1, 0.5, -2);
     config.initializeMirrorMtx(-1, 1, 1);
@@ -18,13 +18,13 @@ void createCamConfig(CameraMountConfig &config)
 
 int testCameraConfig(void)
 {
-   CameraMountConfig config;
+   CameraMountRBT config;
    return 0;
 }
 
 int testCameraConfigInitialize(void)
 {
-    CameraMountConfig config;
+    CameraMountRBT config;
     config.initialize(M_PI/2, M_PI, M_PI, 1, 0.5, -2);
     config.initializeMirrorMtx(-1, 1, 1);
 
@@ -40,7 +40,7 @@ int testCameraConfigInitialize(void)
 
 int testCameraConfigInitializeMirror(void)
 {
-    CameraMountConfig config;
+    CameraMountRBT config;
     config.initializeMirrorMtx(-1, 1, 1);
 
     // std::cout << config.camMirroring;
@@ -53,7 +53,7 @@ int testCameraConfigInitializeMirror(void)
 
 int testCameraConfigApplyRBTtoPosition(void)
 {
-    CameraMountConfig config;
+    CameraMountRBT config;
     config.initialize(M_PI/2, M_PI/2, 0, -2, 0, 0);
     // config.initializeMirrorMtx(-1, 1, 1);
 

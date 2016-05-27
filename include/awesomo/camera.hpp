@@ -1,7 +1,7 @@
 # include "awesomo/util.hpp"
 
 
-class CameraMountConfig
+class CameraMountRBT
 {
 public:
     Eigen::Matrix3d camRotation;
@@ -10,7 +10,7 @@ public:
     Eigen::Matrix4d camRBT;  // Rigid Body Transformation matrix
     int mirror_initialized = 0;
 
-    CameraMountConfig(){};
+    CameraMountRBT(){};
     int initialize(
         double camRoll,
         double camPitch,
