@@ -46,6 +46,14 @@ int euler2RotationMatrix(
     const double yaw,
     Eigen::Matrix3d &rot
 );
+
+int applyRotationToPosition(
+    double roll,
+    double pitch,
+    double yaw,
+    Position &position
+);
+
 tf::Quaternion euler2quat(double roll, double pitch, double yaw);
 void quat2euler(
     const geometry_msgs::Quaternion &q,

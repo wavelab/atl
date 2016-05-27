@@ -68,6 +68,31 @@ void quat2euler(
     m.getRPY(*roll, *pitch, *yaw);
 }
 
+int applyRotationToPosition(
+    double roll,
+    double pitch,
+    double yaw,
+    Position &position
+)
+{
+    Eigen::Matrix3d rotation;
+    Eigen::Vector3d position_temp;
+
+    euler2RotationMatrix(
+        roll,
+        pitch,
+        yaw,
+        rotation
+    );
+    position_temp << position.x, position.y, position.z;
+    position_temp = rotation * position_temp;
+    position.x = position_temp[0];
+    position.y = position_temp[1];
+    position.z = position_temp[2];
+
+    return 0;
+}
+
 
 static double tic(void)
 {

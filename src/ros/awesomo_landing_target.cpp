@@ -11,20 +11,25 @@
 
 #define ATIM_POSE_TOPIC "/atim/pose"
 #define SENSOR_FUSION_POSE_TOPIC "/awesomo/landing_target/pose"
+#define MAVROS_LOCAL_POSITION_TOPIC "/mavros/local_position/pose"
 
 class LandingTarget
 {
     public:
         CameraMountRBT cam_rbt;
         Position position;
+        Pose local_pose;
 
         LandingTarget(CameraMountRBT &cam_rbt);
-        void callback( const geometry_msgs::PoseStamped &input);
-        void subscribeToPose(void);
+        void localPoseCallback(const geometry_msgs::PoseStamped &input);
+        void cameraRBTCallback( const geometry_msgs::PoseStamped &input);
+        void subscribeToAtimPose(void);
+        void subscribeToLocalPositionPose(void);
         void publishRotatedValues(int seq, ros::Time time);
 
         ros::NodeHandle n;
-        ros::Subscriber poseSubscriber;
+        ros::Subscriber atimPoseSubscriber;
+        ros::Subscriber localPositionPoseSubscriber;
         ros::Publisher correction_publisher = n.advertise<geometry_msgs::PoseStamped>(
             SENSOR_FUSION_POSE_TOPIC,
             50
@@ -34,31 +39,61 @@ class LandingTarget
 LandingTarget::LandingTarget(CameraMountRBT &cam_rbt)
 {
     this->cam_rbt = cam_rbt;
+    this->local_pose.roll = 0.0;
+    this->local_pose.pitch = 0.0;
+    this->local_pose.yaw = 0.0;
 }
 
-void LandingTarget::callback(const geometry_msgs::PoseStamped &input)
+void LandingTarget::cameraRBTCallback(const geometry_msgs::PoseStamped &input)
 {
-    // Eigen::Vector3d temp;
-    // temp << input.pose.position.x, input.pose.position.y, input.pose.position.z;
     this->position.x = input.pose.position.x;
     this->position.y = input.pose.position.y;
     this->position.z = input.pose.position.z;
 
     this->cam_rbt.applyRBTtoPosition(this->position);
-    // this->t = this->mirroring * this->mount_rot * temp;
+    applyRotationToPosition(
+        this->local_pose.roll,
+        this->local_pose.pitch,
+        this->local_pose.yaw,
+        this->position
+    );
 }
 
-void LandingTarget::subscribeToPose(void)
+void LandingTarget::localPoseCallback(const geometry_msgs::PoseStamped &input)
+{
+    this->local_pose.x = input.pose.position.x;
+    this->local_pose.y = input.pose.position.y;
+    this->local_pose.z = input.pose.position.z;
+
+    quat2euler(
+        input.pose.orientation,
+        &this->local_pose.roll,
+        &this->local_pose.pitch,
+        &this->local_pose.yaw
+    );
+}
+
+void LandingTarget::subscribeToAtimPose(void)
 {
     ROS_INFO("subscribing to ATIM POSE");
-    this->poseSubscriber = this->n.subscribe(
+    this->atimPoseSubscriber = this->n.subscribe(
             ATIM_POSE_TOPIC,
             500,
-            &LandingTarget::callback,
+            &LandingTarget::cameraRBTCallback,
             this
      );
 }
 
+void LandingTarget::subscribeToLocalPositionPose(void)
+{
+    ROS_INFO("subscribing to MAVROS LOCAL POSITION POSE");
+    this->atimPoseSubscriber = this->n.subscribe(
+            MAVROS_LOCAL_POSITION_TOPIC,
+            500,
+            &LandingTarget::localPoseCallback,
+            this
+     );
+}
 
 void LandingTarget::publishRotatedValues(int seq, ros::Time time)
 {
@@ -104,7 +139,8 @@ int main(int argc, char **argv)
     target = new LandingTarget(cam_rbt);
 
     ROS_INFO("Publishing tracker");
-    target->subscribeToPose();
+    target->subscribeToAtimPose();
+    target->subscribeToLocalPositionPose();
     int seq = 0;
 
     // publish
