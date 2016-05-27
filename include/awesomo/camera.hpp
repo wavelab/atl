@@ -1,3 +1,5 @@
+#ifndef __CAMERA_HPP__
+#define __CAMERA_HPP__
 # include "awesomo/util.hpp"
 
 
@@ -37,3 +39,5 @@ public:
     int applyMirrorToPositionVector(Eigen::Vector4d &positionIn);
     int applyRBTtoPosition(Position &positionIn);
 };
+
+#endif

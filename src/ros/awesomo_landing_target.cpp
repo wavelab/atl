@@ -7,21 +7,18 @@
 
 #include "awesomo/camera.hpp"
 #include "awesomo/util.hpp"
+#include "awesomo/camera.hpp"
 
-#define POSE_TOPIC "/atim/pose"
+#define ATIM_POSE_TOPIC "/atim/pose"
+#define SENSOR_FUSION_POSE_TOPIC "/awesomo/landing_target/pose"
 
-class CameraPoseCorrection
+class LandingTarget
 {
     public:
         CameraMountRBT cam_rbt;
-
-        tf::Quaternion apr_orientation;
-        Eigen::Matrix3d mount_rot;
-        // Eigen::Vector3d t;
         Position position;
-        Eigen::Matrix3d mirroring;
 
-        CameraPoseCorrection(CameraMountRBT &cam_rbt);
+        LandingTarget(CameraMountRBT &cam_rbt);
         void callback( const geometry_msgs::PoseStamped &input);
         void subscribeToPose(void);
         void publishRotatedValues(int seq, ros::Time time);
@@ -29,17 +26,17 @@ class CameraPoseCorrection
         ros::NodeHandle n;
         ros::Subscriber poseSubscriber;
         ros::Publisher correction_publisher = n.advertise<geometry_msgs::PoseStamped>(
-                "awesomo/tracker/position",
-                50
-                );
+            SENSOR_FUSION_POSE_TOPIC,
+            50
+        );
 };
 
-CameraPoseCorrection::CameraPoseCorrection(CameraMountRBT &cam_rbt)
+LandingTarget::LandingTarget(CameraMountRBT &cam_rbt)
 {
     this->cam_rbt = cam_rbt;
 }
 
-void CameraPoseCorrection::callback(const geometry_msgs::PoseStamped &input)
+void LandingTarget::callback(const geometry_msgs::PoseStamped &input)
 {
     // Eigen::Vector3d temp;
     // temp << input.pose.position.x, input.pose.position.y, input.pose.position.z;
@@ -51,19 +48,19 @@ void CameraPoseCorrection::callback(const geometry_msgs::PoseStamped &input)
     // this->t = this->mirroring * this->mount_rot * temp;
 }
 
-void CameraPoseCorrection::subscribeToPose(void)
+void LandingTarget::subscribeToPose(void)
 {
-    ROS_INFO("subscribing to POSE");
+    ROS_INFO("subscribing to ATIM POSE");
     this->poseSubscriber = this->n.subscribe(
-            POSE_TOPIC,
+            ATIM_POSE_TOPIC,
             500,
-            &CameraPoseCorrection::callback,
+            &LandingTarget::callback,
             this
      );
 }
 
 
-void CameraPoseCorrection::publishRotatedValues(int seq, ros::Time time)
+void LandingTarget::publishRotatedValues(int seq, ros::Time time)
 {
     geometry_msgs::PoseStamped correctedPose;
 
@@ -92,7 +89,7 @@ int main(int argc, char **argv)
     double mount_z = 0.07;
 
     CameraMountRBT cam_rbt;
-    CameraPoseCorrection *CPC;
+    LandingTarget *target;
 
     cam_rbt.initialize(
         mount_roll,
@@ -104,13 +101,15 @@ int main(int argc, char **argv)
         );
 
     cam_rbt.initializeMirrorMtx(-1, 1, 1);
-    CPC = new CameraPoseCorrection(cam_rbt);
+    target = new LandingTarget(cam_rbt);
 
     ROS_INFO("Publishing tracker");
-    CPC->subscribeToPose();
+    target->subscribeToPose();
     int seq = 0;
+
+    // publish
     while (ros::ok()){
-        CPC->publishRotatedValues(seq, ros::Time::now());
+        target->publishRotatedValues(seq, ros::Time::now());
         ros::spinOnce();
         rate.sleep();
         seq++;
@@ -118,6 +117,3 @@ int main(int argc, char **argv)
 
     return 0;
 }
-
-
-
