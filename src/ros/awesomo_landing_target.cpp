@@ -15,25 +15,25 @@
 
 class LandingTarget
 {
-    public:
-        CameraMountRBT cam_rbt;
-        Position position;
-        Pose local_pose;
+public:
+    CameraMountRBT cam_rbt;
+    Position position;
+    Pose local_pose;
 
-        LandingTarget(CameraMountRBT &cam_rbt);
-        void localPoseCallback(const geometry_msgs::PoseStamped &input);
-        void cameraRBTCallback( const geometry_msgs::PoseStamped &input);
-        void subscribeToAtimPose(void);
-        void subscribeToLocalPositionPose(void);
-        void publishRotatedValues(int seq, ros::Time time);
+    LandingTarget(CameraMountRBT &cam_rbt);
+    void localPoseCallback(const geometry_msgs::PoseStamped &input);
+    void cameraRBTCallback( const geometry_msgs::PoseStamped &input);
+    void subscribeToAtimPose(void);
+    void subscribeToLocalPositionPose(void);
+    void publishRotatedValues(int seq, ros::Time time);
 
-        ros::NodeHandle n;
-        ros::Subscriber atimPoseSubscriber;
-        ros::Subscriber localPositionPoseSubscriber;
-        ros::Publisher correction_publisher = n.advertise<geometry_msgs::PoseStamped>(
-            SENSOR_FUSION_POSE_TOPIC,
-            50
-        );
+    ros::NodeHandle n;
+    ros::Subscriber atimPoseSubscriber;
+    ros::Subscriber localPositionPoseSubscriber;
+    ros::Publisher correction_publisher = n.advertise<geometry_msgs::PoseStamped>(
+        SENSOR_FUSION_POSE_TOPIC,
+        50
+    );
 };
 
 LandingTarget::LandingTarget(CameraMountRBT &cam_rbt)
@@ -42,6 +42,9 @@ LandingTarget::LandingTarget(CameraMountRBT &cam_rbt)
     this->local_pose.roll = 0.0;
     this->local_pose.pitch = 0.0;
     this->local_pose.yaw = 0.0;
+    this->position.x = 0.0;
+    this->position.y = 0.0;
+    this->position.z = 0.0;
 }
 
 void LandingTarget::cameraRBTCallback(const geometry_msgs::PoseStamped &input)
@@ -49,6 +52,13 @@ void LandingTarget::cameraRBTCallback(const geometry_msgs::PoseStamped &input)
     this->position.x = input.pose.position.x;
     this->position.y = input.pose.position.y;
     this->position.z = input.pose.position.z;
+
+    // ROS_INFO(
+    //     "pose: %f\t%f\t%f",
+    //     this->position.x,
+    //     this->position.y,
+    //     this->position.z
+    // );
 
     this->cam_rbt.applyRBTtoPosition(this->position);
     applyRotationToPosition(
@@ -65,33 +75,45 @@ void LandingTarget::localPoseCallback(const geometry_msgs::PoseStamped &input)
     this->local_pose.y = input.pose.position.y;
     this->local_pose.z = input.pose.position.z;
 
+
     quat2euler(
         input.pose.orientation,
         &this->local_pose.roll,
         &this->local_pose.pitch,
         &this->local_pose.yaw
     );
+
+    this->local_pose.roll = -1 * this->local_pose.roll;
+    this->local_pose.pitch = -1 * this->local_pose.pitch;
+    this->local_pose.yaw = -1 * this->local_pose.yaw;
+
+    // ROS_INFO(
+    //     "pose: %f\t%f\t%f",
+    //     this->local_pose.roll,
+    //     this->local_pose.pitch,
+    //     this->local_pose.yaw
+    // );
 }
 
 void LandingTarget::subscribeToAtimPose(void)
 {
     ROS_INFO("subscribing to ATIM POSE");
     this->atimPoseSubscriber = this->n.subscribe(
-            ATIM_POSE_TOPIC,
-            500,
-            &LandingTarget::cameraRBTCallback,
-            this
-     );
+        ATIM_POSE_TOPIC,
+        50,
+        &LandingTarget::cameraRBTCallback,
+        this
+    );
 }
 
 void LandingTarget::subscribeToLocalPositionPose(void)
 {
     ROS_INFO("subscribing to MAVROS LOCAL POSITION POSE");
-    this->atimPoseSubscriber = this->n.subscribe(
-            MAVROS_LOCAL_POSITION_TOPIC,
-            500,
-            &LandingTarget::localPoseCallback,
-            this
+    this->localPositionPoseSubscriber = this->n.subscribe(
+        MAVROS_LOCAL_POSITION_TOPIC,
+        50,
+        &LandingTarget::localPoseCallback,
+        this
      );
 }
 
@@ -133,7 +155,7 @@ int main(int argc, char **argv)
         mount_x,
         mount_y,
         mount_z
-        );
+    );
 
     cam_rbt.initializeMirrorMtx(-1, 1, 1);
     target = new LandingTarget(cam_rbt);
