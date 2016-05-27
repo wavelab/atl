@@ -52,84 +52,79 @@
 // CLASSES
 class Quadrotor
 {
-    private:
-        int mission_state;
-        mavros_msgs::State state;
-        ros::NodeHandle node;
+private:
+    int mission_state;
+    mavros_msgs::State state;
+    ros::NodeHandle node;
 
-        ros::Subscriber mocap_subscriber;
-        ros::Subscriber pose_subscriber;
-        ros::Subscriber imu_subscriber;
-        ros::Subscriber radio_subscriber;
+    ros::Subscriber mocap_subscriber;
+    ros::Subscriber pose_subscriber;
+    ros::Subscriber imu_subscriber;
+    ros::Subscriber radio_subscriber;
 
-        ros::ServiceClient mode_client;
-        ros::ServiceClient arming_client;
+    ros::ServiceClient mode_client;
+    ros::ServiceClient arming_client;
 
-        int tag_timeout;
-        Eigen::Vector3d tag_position;
+    void poseCallback(const geometry_msgs::PoseStamped &msg);
+    void mocapCallback(const geometry_msgs::PoseStamped &msg);
+    void imuCallback(const sensor_msgs::Imu::ConstPtr &msg);
+    void radioCallback(const mavros_msgs::RCIn &msg);
+    void stateCallback(const mavros_msgs::State::ConstPtr &msg);
+    void waitForConnection(void);
 
-        void poseCallback(const geometry_msgs::PoseStamped &msg);
-        void mocapCallback(const geometry_msgs::PoseStamped &msg);
-        void imuCallback(const sensor_msgs::Imu::ConstPtr &msg);
-        void radioCallback(const mavros_msgs::RCIn &msg);
-        void stateCallback(const mavros_msgs::State::ConstPtr &msg);
+public:
+    Pose pose;
+    Pose mocap_pose;
+    int rc_in[16];
 
+    CarrotController *carrot_controller;
+    PositionController *position_controller;
 
-        void waitForConnection(void);
+    ros::Publisher position_publisher;
+    ros::Publisher attitude_publisher;
+    ros::Publisher throttle_publisher;
+    ros::Publisher position_controller_x_publisher;
+    ros::Publisher position_controller_y_publisher;
+    ros::Publisher position_controller_z_publisher;
 
-    public:
-        Pose pose;
-        Pose mocap_pose;
-        int rc_in[16];
-
-        CarrotController *carrot_controller;
-        PositionController *position_controller;
-
-        ros::Publisher position_publisher;
-        ros::Publisher attitude_publisher;
-        ros::Publisher throttle_publisher;
-        ros::Publisher position_controller_x_publisher;
-        ros::Publisher position_controller_y_publisher;
-        ros::Publisher position_controller_z_publisher;
-
-        Quadrotor(void);
-        Quadrotor(std::map<std::string, std::string> configs);
-        int arm(void);
-        int disarm(void);
-        int setOffboardModeOn(void);
-        void subscribeToPose(void);
-        void subscribeToMocap(void);
-        void subscribeToIMU(void);
-        void subscribeToRadioIn(void);
-        void positionControllerCalculate(Position p, ros::Time last_request);
-        void resetPositionController(void);
-        void printPositionController(void);
-        void buildPositionMessage(
-            geometry_msgs::PoseStamped &msg,
-            int seq,
-            ros::Time time,
-            float x,
-            float y,
-            float z
-        );
-        void buildAtitudeMessage(
-            geometry_msgs::PoseStamped &msg,
-            int seq,
-            ros::Time time
-        );
-        void buildThrottleMessage(std_msgs::Float64 &msg);
-        void publishPositionControllerStats(int seq, ros::Time time);
-        void publishPositionControllerMessage(
-            geometry_msgs::PoseStamped &msg,
-            int seq,
-            ros::Time time
-        );
-        void initializeMission(void);
-        void runMission(
-            geometry_msgs::PoseStamped &msg,
-            int seq,
-            ros::Time last_request
-        );
+    Quadrotor(void);
+    Quadrotor(std::map<std::string, std::string> configs);
+    int arm(void);
+    int disarm(void);
+    int setOffboardModeOn(void);
+    void subscribeToPose(void);
+    void subscribeToMocap(void);
+    void subscribeToIMU(void);
+    void subscribeToRadioIn(void);
+    void positionControllerCalculate(Position p, ros::Time last_request);
+    void resetPositionController(void);
+    void printPositionController(void);
+    void buildPositionMessage(
+        geometry_msgs::PoseStamped &msg,
+        int seq,
+        ros::Time time,
+        float x,
+        float y,
+        float z
+    );
+    void buildAtitudeMessage(
+        geometry_msgs::PoseStamped &msg,
+        int seq,
+        ros::Time time
+    );
+    void buildThrottleMessage(std_msgs::Float64 &msg);
+    void publishPositionControllerStats(int seq, ros::Time time);
+    void publishPositionControllerMessage(
+        geometry_msgs::PoseStamped &msg,
+        int seq,
+        ros::Time time
+    );
+    void initializeMission(void);
+    void runMission(
+        geometry_msgs::PoseStamped &msg,
+        int seq,
+        ros::Time last_request
+    );
 };
 
 #endif
