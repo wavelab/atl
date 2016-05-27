@@ -56,9 +56,9 @@ ADD_LIBRARY(
     libawesomo
     STATIC
     src/util.cpp
+    src/camera.cpp
     src/controller.cpp
     src/ros/quadrotor.cpp
-    src/camera_mount_config.cpp
 )
 
 # EXECUTABLES
@@ -100,19 +100,25 @@ INSTALL(
 
 ## UNIT TESTS
 # tests/controller_test
-ADD_EXECUTABLE(controller_test tests/controller_test.cpp)
-TARGET_LINK_LIBRARIES(controller_test libawesomo yaml-cpp)
-INSTALL(TARGETS controller_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+ADD_EXECUTABLE(awesomo_controller_test tests/controller_test.cpp)
+TARGET_LINK_LIBRARIES(awesomo_controller_test libawesomo yaml-cpp)
+INSTALL(
+    TARGETS awesomo_controller_test
+    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 # tests/util_test
-ADD_EXECUTABLE(util_test tests/util_test.cpp)
-TARGET_LINK_LIBRARIES(util_test libawesomo)
-INSTALL(TARGETS util_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+ADD_EXECUTABLE(awesomo_util_test tests/util_test.cpp)
+TARGET_LINK_LIBRARIES(awesomo_util_test libawesomo)
+INSTALL(
+    TARGETS awesomo_util_test
+    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 # tests/ros/quadrotor_node_test
-ADD_EXECUTABLE(quadrotor_test tests/ros/quadrotor_test.cpp)
+ADD_EXECUTABLE(awesomo_quadrotor_test tests/ros/quadrotor_test.cpp)
 TARGET_LINK_LIBRARIES(
-    quadrotor_test
+    awesomo_quadrotor_test
     libawesomo
     apriltags
     yaml-cpp
@@ -121,16 +127,14 @@ TARGET_LINK_LIBRARIES(
     ${catkin_LIBRARIES}
 )
 INSTALL(
-    TARGETS
-    quadrotor_test
-    RUNTIME DESTINATION
-    ${CATKIN_PACKAGE_BIN_DESTINATION}
+    TARGETS awesomo_quadrotor_test
+    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
 # tests/camear_mount_config_test
-ADD_EXECUTABLE(camera_config_test tests/camera_config_test.cpp)
-TARGET_LINK_LIBRARIES(camera_config_test libawesomo yaml-cpp)
-INSTALL(TARGETS camera_config_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+ADD_EXECUTABLE(awesomo_camera_test tests/camera_test.cpp)
+TARGET_LINK_LIBRARIES(awesomo_camera_test libawesomo yaml-cpp)
+INSTALL(TARGETS awesomo_camera_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 
 # LAUNCH AND CONFIG FILES

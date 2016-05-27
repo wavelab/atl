@@ -1,6 +1,7 @@
-#include "awesomo/camera_mount_config.hpp"
+#include "awesomo/camera.hpp"
 
-int cameraMountConfig::initialize(
+
+int CameraMountConfig::initialize(
     double camRoll,
     double camPitch,
     double camYaw,
@@ -31,7 +32,7 @@ int cameraMountConfig::initialize(
     return 0;
 }
 
-int cameraMountConfig::initializeMirrorMtx(
+int CameraMountConfig::initializeMirrorMtx(
     double camMirrorX,
     double camMirrorY,
     double camMirrorZ
@@ -48,12 +49,11 @@ int cameraMountConfig::initializeMirrorMtx(
     return 0;
 }
 
-
-int cameraMountConfig::convertPoseToMtx(
+int CameraMountConfig::convertPoseToMtx(
     Pose &poseIn,
-    Eigen::Matrix4d &poseMtxOut)
+    Eigen::Matrix4d &poseMtxOut
+)
 {
-
     Eigen::Matrix3d poseRotationMtx;
     euler2RotationMatrix(
         poseIn.roll,
@@ -72,10 +72,10 @@ int cameraMountConfig::convertPoseToMtx(
     return 0;
 }
 
-
-int cameraMountConfig::convertPositionToVector(
+int CameraMountConfig::convertPositionToVector(
     Position &positionIn,
-    Eigen::Vector4d &positionVectorOut)
+    Eigen::Vector4d &positionVectorOut
+)
 {
     positionVectorOut(0) = positionIn.x;
     positionVectorOut(1) = positionIn.y;
@@ -85,48 +85,26 @@ int cameraMountConfig::convertPositionToVector(
     return 0;
 }
 
-
-int cameraMountConfig::applyMirrorToPoseMtx(Eigen::Matrix4d &poseIn)
+int CameraMountConfig::applyMirrorToPoseMtx(Eigen::Matrix4d &poseIn)
 {
     poseIn = this->camMirroring * poseIn;
     return 0;
 }
 
-
-int cameraMountConfig::applyMirrorToPositionVector(
-    Eigen::Vector4d &positionIn
-)
+int CameraMountConfig::applyMirrorToPositionVector(Eigen::Vector4d &positionIn)
 {
     positionIn = this->camMirroring * positionIn;
     return 0;
 }
 
-
-
-int cameraMountConfig::applyRBTtoPose(Pose &poseIn)
-{
-
-    // Needs RotationMtx 2 euler again...
-    // Eigen::Matrix4d poseMtx;
-    //
-    // this->convertPoseToMtx(poseIn, poseMtx);
-    // poseMtx = poseMtx * this->camRBT;
-    // if (this->mirror_initialized == 1)
-    // {
-    //     poseMtx = this->camMirroring * poseMtx;
-    // }
-    // return 0;
-}
-
-int cameraMountConfig::applyRBTtoPosition(Position &positionIn)
+int CameraMountConfig::applyRBTtoPosition(Position &positionIn)
 {
     Eigen::Vector4d positionVect;
 
     this->convertPositionToVector(positionIn, positionVect);
     positionVect = this->camRBT * positionVect;
 
-    if (this->mirror_initialized == 1)
-    {
+    if (this->mirror_initialized == 1) {
         positionVect = this->camMirroring * positionVect;
     }
 
@@ -134,11 +112,5 @@ int cameraMountConfig::applyRBTtoPosition(Position &positionIn)
     positionIn.y = positionVect(1);
     positionIn.z = positionVect(2);
 
-
     return 0;
 }
-
-
-
-
-

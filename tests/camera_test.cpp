@@ -1,29 +1,30 @@
 #include "awesomo/munit.h"
-#include "awesomo/camera_mount_config.hpp"
+#include "awesomo/camera.hpp"
 
-
-void createCamConfig(cameraMountConfig &config)
-{
-    config.initialize(M_PI/2, 0, 0, 1, 0.5, -2);
-    config.initializeMirrorMtx(-1, 1, 1);
-}
 
 // TESTS
-
+void createCamConfig(CameraMountConfig &config);
 int testCameraConfig(void);
 int testCameraConfigInitialize(void);
 int testCameraConfigInitializeMirror(void);
 int testCameraConfigApplyRBTtoPosition(void);
 
 
+void createCamConfig(CameraMountConfig &config)
+{
+    config.initialize(M_PI/2, 0, 0, 1, 0.5, -2);
+    config.initializeMirrorMtx(-1, 1, 1);
+}
+
 int testCameraConfig(void)
 {
-   cameraMountConfig config;
+   CameraMountConfig config;
+   return 0;
 }
 
 int testCameraConfigInitialize(void)
 {
-    cameraMountConfig config;
+    CameraMountConfig config;
     config.initialize(M_PI/2, M_PI, M_PI, 1, 0.5, -2);
     config.initializeMirrorMtx(-1, 1, 1);
 
@@ -39,7 +40,7 @@ int testCameraConfigInitialize(void)
 
 int testCameraConfigInitializeMirror(void)
 {
-    cameraMountConfig config;
+    CameraMountConfig config;
     config.initializeMirrorMtx(-1, 1, 1);
 
     // std::cout << config.camMirroring;
@@ -50,10 +51,9 @@ int testCameraConfigInitializeMirror(void)
     return 0;
 }
 
-
 int testCameraConfigApplyRBTtoPosition(void)
 {
-    cameraMountConfig config;
+    CameraMountConfig config;
     config.initialize(M_PI/2, M_PI/2, 0, -2, 0, 0);
     // config.initializeMirrorMtx(-1, 1, 1);
 
@@ -72,7 +72,6 @@ int testCameraConfigApplyRBTtoPosition(void)
     return 0;
 }
 
-
 void test_suite(void)
 {
     mu_add_test(testCameraConfigInitialize);
@@ -81,22 +80,3 @@ void test_suite(void)
 }
 
 mu_run_tests(test_suite)
-
-
-// int testCarrotController(void)
-// {
-//     CarrotController *controller;
-//
-//     controller = new CarrotController(CARROT_CONTROLLER_CONFIG);
-//     mu_check(controller->initialized != 0);
-//     mu_check(controller->look_ahead_dist != 0);
-//     mu_check(controller->wp_threshold != 0);
-//     mu_check(controller->waypoints.size() != 0);
-//
-//     return 0;
-// }
-//
-// int testCarrotControllerClosestPoint(void)
-// {
-//     CarrotController controller;
-//     Eigen::Vector3d wp_start;
