@@ -56,6 +56,12 @@ Quadrotor::Quadrotor(std::map<std::string, std::string> configs)
     this->landing_zone.x = 0.0;
     this->landing_zone.y = 0.0;
     this->landing_zone.z = 0.0;
+    this->landing_zone_prev.x = 0.0;
+    this->landing_zone_prev.y = 0.0;
+    this->landing_zone_prev.z = 0.0;
+    this->landing_zone_world.x = 0.0;
+    this->landing_zone_world.y = 0.0;
+    this->landing_zone_world.z = 0.0;
 
     // initialize controllers
     if (configs.count("position_controller")) {
@@ -447,8 +453,15 @@ void Quadrotor::runMission(
 
         } else {
             // transition to offboard mode
-            this->mission_state = INITIALIZE_MODE;
-            // this->mission_state = TRACKING_MODE;
+            // this->mission_state = INITIALIZE_MODE;
+            this->mission_state = TRACKING_MODE;
+            this->landing_zone_prev.x = this->landing_zone.x;
+            this->landing_zone_prev.y = this->landing_zone.y;
+            this->landing_zone_prev.z = this->landing_zone.z;
+            this->landing_zone_world.x = this->pose.x;
+            this->landing_zone_world.y = this->pose.y;
+            this->landing_zone_world.z = 10;
+            // ROS_INFO("TRACKING MODE INITIALIZED");
 
         }
         break;
@@ -474,13 +487,28 @@ void Quadrotor::runMission(
             pos.z = carrot(2);
 
         }
-
         break;
 
     case TRACKING_MODE:
-        pos.x = this->landing_zone.x;
-        pos.y = this->landing_zone.y;
-        pos.z = 5;
+        if (this->landing_zone_prev.x != this->landing_zone.x && this->landing_zone_prev.y != this->landing_zone.y) {
+            pos.x = this->pose.x + this->landing_zone.x;
+            pos.y = this->pose.y + this->landing_zone.y;
+            pos.z = 10;
+            this->landing_zone_prev.x = this->landing_zone.x;
+            this->landing_zone_prev.y = this->landing_zone.y;
+            this->landing_zone_prev.z = this->landing_zone.z;
+
+            this->landing_zone_world.x = pos.x;
+            this->landing_zone_world.y = pos.y;
+            this->landing_zone_world.z = 10;
+
+        } else {
+            pos.x = this->landing_zone_world.x;
+            pos.y = this->landing_zone_world.y;
+            pos.z = 10;
+
+        }
+        ROS_INFO("position: %f\t%f\t%f", pos.x, pos.y, pos.z);
         break;
 
     case LAND_MODE:

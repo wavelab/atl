@@ -79,6 +79,8 @@ private:
 public:
     Pose pose;
     Position landing_zone;
+    Position landing_zone_prev;
+    Position landing_zone_world;
     Pose mocap_pose;
     int rc_in[16];
 

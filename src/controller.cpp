@@ -266,6 +266,9 @@ void PositionController::calculate(Position setpoint, Pose robot, float dt)
     // throttle
     throttle_adjusted = this->hover_throttle + throttle;
     throttle_adjusted /= fabs(cos(roll_adjusted) * cos(pitch_adjusted));
+    if (throttle_adjusted > 1.0) {
+        throttle_adjusted = 1.0;
+    }
 
     // update position controller
     this->roll = roll_adjusted;

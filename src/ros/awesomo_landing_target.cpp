@@ -61,12 +61,12 @@ void LandingTarget::cameraRBTCallback(const geometry_msgs::PoseStamped &input)
     // );
 
     this->cam_rbt.applyRBTtoPosition(this->position);
-    applyRotationToPosition(
-        this->local_pose.roll,
-        this->local_pose.pitch,
-        this->local_pose.yaw,
-        this->position
-    );
+    // applyRotationToPosition(
+    //     this->local_pose.roll,
+    //     this->local_pose.pitch,
+    //     this->local_pose.yaw,
+    //     this->position
+    // );
 }
 
 void LandingTarget::localPoseCallback(const geometry_msgs::PoseStamped &input)
