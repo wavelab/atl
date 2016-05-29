@@ -23,7 +23,7 @@ public:
 
     LandingTarget(CameraMountRBT &cam_rbt);
     void localPoseCallback(const geometry_msgs::PoseStamped &input);
-    void cameraRBTCallback( const atim::AtimPoseStamped &input);
+    void cameraRBTCallback(const atim::AtimPoseStamped &input);
     void subscribeToAtimPose(void);
     void subscribeToLocalPositionPose(void);
     void publishRotatedValues(int seq, ros::Time time);
@@ -31,10 +31,7 @@ public:
     ros::NodeHandle n;
     ros::Subscriber atimPoseSubscriber;
     ros::Subscriber localPositionPoseSubscriber;
-    ros::Publisher correction_publisher = n.advertise<geometry_msgs::PoseStamped>(
-        SENSOR_FUSION_POSE_TOPIC,
-        50
-    );
+    ros::Publisher correction_publisher;
 };
 
 LandingTarget::LandingTarget(CameraMountRBT &cam_rbt)
@@ -46,6 +43,10 @@ LandingTarget::LandingTarget(CameraMountRBT &cam_rbt)
     this->position.x = 0.0;
     this->position.y = 0.0;
     this->position.z = 0.0;
+    this->correction_publisher = n.advertise<geometry_msgs::PoseStamped>(
+        SENSOR_FUSION_POSE_TOPIC,
+        50
+    );
 }
 
 void LandingTarget::cameraRBTCallback(const atim::AtimPoseStamped &msg)
