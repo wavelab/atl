@@ -64,7 +64,7 @@ ADD_LIBRARY(
     src/util.cpp
     src/camera.cpp
     src/controller.cpp
-    src/ros/quadrotor.cpp
+    # src/ros/quadrotor.cpp
 )
 
 # EXECUTABLES
@@ -120,21 +120,21 @@ INSTALL(
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-# tests/ros/quadrotor_node_test
-ADD_EXECUTABLE(awesomo_quadrotor_test tests/ros/quadrotor_test.cpp)
-TARGET_LINK_LIBRARIES(
-    awesomo_quadrotor_test
-    libawesomo
-    apriltags
-    yaml-cpp
-    flycapture
-    ${OpenCV_LIBS}
-    ${catkin_LIBRARIES}
-)
-INSTALL(
-    TARGETS awesomo_quadrotor_test
-    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+# # tests/ros/quadrotor_node_test
+# ADD_EXECUTABLE(awesomo_quadrotor_test tests/ros/quadrotor_test.cpp)
+# TARGET_LINK_LIBRARIES(
+#     awesomo_quadrotor_test
+#     libawesomo
+#     apriltags
+#     yaml-cpp
+#     flycapture
+#     ${OpenCV_LIBS}
+#     ${catkin_LIBRARIES}
+# )
+# INSTALL(
+#     TARGETS awesomo_quadrotor_test
+#     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+# )
 
 # tests/camear_mount_config_test
 ADD_EXECUTABLE(awesomo_camera_test tests/camera_test.cpp)
