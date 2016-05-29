@@ -64,7 +64,7 @@ ADD_LIBRARY(
     src/util.cpp
     src/camera.cpp
     src/controller.cpp
-    # src/ros/quadrotor.cpp
+    src/quadrotor.cpp
 )
 
 # EXECUTABLES

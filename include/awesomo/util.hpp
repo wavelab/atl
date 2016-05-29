@@ -11,22 +11,35 @@
 // CLASSES
 class Pose
 {
-    public:
-        double x;
-        double y;
-        double z;
+public:
+    double x;
+    double y;
+    double z;
 
-        double roll;
-        double pitch;
-        double yaw;
+    double roll;
+    double pitch;
+    double yaw;
+};
+
+class Attitude
+{
+public:
+    double x;
+    double y;
+    double z;
+    double w;
+
+    double roll;
+    double pitch;
+    double yaw;
 };
 
 class Position
 {
-    public:
-        double x;
-        double y;
-        double z;
+public:
+    double x;
+    double y;
+    double z;
 };
 
 

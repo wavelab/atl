@@ -3,10 +3,7 @@
 #include <unistd.h>
 
 #include <ros/ros.h>
-#include <tf/transform_datatypes.h>
-
 #include <std_msgs/Float64.h>
-#include <sensor_msgs/Imu.h>
 #include <geometry_msgs/PoseStamped.h>
 
 #define MAVLINK_DIALECT common
@@ -16,15 +13,13 @@
 #include <mavros_msgs/CommandBool.h>
 #include <mavros_msgs/RCIn.h>
 
-#include <yaml-cpp/yaml.h>
-
 #include "awesomo/util.hpp"
 #include "awesomo/controller.hpp"
+#include "awesomo/quadrotor.hpp"
 
 
 
 // ROS TOPICS
-#define IMU_TOPIC "/mavros/imu/data"
 #define ARM_TOPIC "/mavros/cmd/arming"
 #define MOCAP_TOPIC "/awesomo/mocap/pose"
 #define MODE_TOPIC "/mavros/set_mode"
@@ -40,51 +35,25 @@
 
 
 
-// STATES
-#define IDLE_MODE 0
-#define INITIALIZE_MODE 1
-#define CARROT_MODE 2
-#define TRACKING_MODE 3
-#define LAND_MODE 4
-
-
-
-
-
 class Awesomo
 {
-private:
-    int mission_state;
-    mavros_msgs::State state;
+public:
     ros::NodeHandle node;
+    mavros_msgs::State state;
 
-    ros::Subscriber mocap_subscriber;
-    ros::Subscriber pose_subscriber;
-    ros::Subscriber imu_subscriber;
-    ros::Subscriber radio_subscriber;
-    ros::Subscriber landing_subscriber;
+    Pose pose;
+    Pose mocap_pose;
+    Position landing_zone;
+    int rc_in[16];
+    Quadrotor *quad;
 
     ros::ServiceClient mode_client;
     ros::ServiceClient arming_client;
 
-    void poseCallback(const geometry_msgs::PoseStamped &msg);
-    void mocapCallback(const geometry_msgs::PoseStamped &msg);
-    void imuCallback(const sensor_msgs::Imu::ConstPtr &msg);
-    void radioCallback(const mavros_msgs::RCIn &msg);
-    void landingCallback(const geometry_msgs::PoseStamped &msg);
-    void stateCallback(const mavros_msgs::State::ConstPtr &msg);
-    void waitForConnection(void);
-
-public:
-    Pose pose;
-    Position landing_zone;
-    Position landing_zone_prev;
-    Position landing_zone_world;
-    Pose mocap_pose;
-    int rc_in[16];
-
-    CarrotController *carrot_controller;
-    PositionController *position_controller;
+    ros::Subscriber mocap_subscriber;
+    ros::Subscriber pose_subscriber;
+    ros::Subscriber radio_subscriber;
+    ros::Subscriber landing_subscriber;
 
     ros::Publisher position_publisher;
     ros::Publisher attitude_publisher;
@@ -93,55 +62,44 @@ public:
     ros::Publisher position_controller_y_publisher;
     ros::Publisher position_controller_z_publisher;
 
-    Awesomo(void);
+    void poseCallback(const geometry_msgs::PoseStamped &msg);
+    void mocapCallback(const geometry_msgs::PoseStamped &msg);
+    void radioCallback(const mavros_msgs::RCIn &msg);
+    void landingCallback(const geometry_msgs::PoseStamped &msg);
+    void stateCallback(const mavros_msgs::State::ConstPtr &msg);
+    void waitForConnection(void);
+
     Awesomo(std::map<std::string, std::string> configs);
     int arm(void);
     int disarm(void);
     int setOffboardModeOn(void);
     void subscribeToPose(void);
     void subscribeToMocap(void);
-    void subscribeToIMU(void);
     void subscribeToRadioIn(void);
     void subscribeToLanding(void);
-    void positionControllerCalculate(Position p, ros::Time last_request);
-    void resetPositionController(void);
-    void printPositionController(void);
-    void buildPositionMessage(
-        geometry_msgs::PoseStamped &msg,
-        int seq,
-        ros::Time time,
-        float x,
-        float y,
-        float z
-    );
-    void buildAtitudeMessage(
-        geometry_msgs::PoseStamped &msg,
-        int seq,
-        ros::Time time
-    );
-    void buildThrottleMessage(std_msgs::Float64 &msg);
     void publishPositionControllerStats(int seq, ros::Time time);
     void publishPositionControllerMessage(
         geometry_msgs::PoseStamped &msg,
         int seq,
         ros::Time time
     );
-    void initializeMission(void);
-    void runMission(
+    void run(
         geometry_msgs::PoseStamped &msg,
         int seq,
         ros::Time last_request
     );
 };
 
-Awesomo::Awesomo(void) {}
-
 Awesomo::Awesomo(std::map<std::string, std::string> configs)
 {
     std::string config_path;
 
     // state
-    this->mission_state = IDLE_MODE;
+    for (int i = 0; i < 16; i++) {
+        this->rc_in[i] = 0.0f;
+    }
+
+    quad = new Quadrotor(configs);
 
     // wait till connected to FCU
     this->waitForConnection();
@@ -149,6 +107,11 @@ Awesomo::Awesomo(std::map<std::string, std::string> configs)
     // initialize clients to services
     this->mode_client = this->node.serviceClient<mavros_msgs::SetMode>(MODE_TOPIC);
     this->arming_client = this->node.serviceClient<mavros_msgs::CommandBool>(ARM_TOPIC);
+
+    // initialize subscribers
+	this->subscribeToPose();
+	this->subscribeToRadioIn();
+	this->subscribeToLanding();
 
     // initialize publishers
     this->position_publisher = this->node.advertise<geometry_msgs::PoseStamped>(
@@ -176,43 +139,6 @@ Awesomo::Awesomo(std::map<std::string, std::string> configs)
         50
     );
 
-    // initialize subscribers
-	this->subscribeToPose();
-	this->subscribeToRadioIn();
-	this->subscribeToLanding();
-
-    // initialize rc_in[16] array
-    for (int i = 0; i < 16; i++) {
-        this->rc_in[i] = 0.0f;
-    }
-
-    // initialize landing zone
-    this->landing_zone.x = 0.0;
-    this->landing_zone.y = 0.0;
-    this->landing_zone.z = 0.0;
-    this->landing_zone_prev.x = 0.0;
-    this->landing_zone_prev.y = 0.0;
-    this->landing_zone_prev.z = 0.0;
-    this->landing_zone_world.x = 0.0;
-    this->landing_zone_world.y = 0.0;
-    this->landing_zone_world.z = 0.0;
-
-    // initialize controllers
-    if (configs.count("position_controller")) {
-        config_path = configs["position_controller"];
-        this->position_controller = new PositionController(config_path);
-        ROS_INFO("position controller initialized!");
-    } else {
-        this->position_controller = NULL;
-    }
-
-    if (configs.count("carrot_controller")) {
-        config_path = configs["carrot_controller"];
-        this->carrot_controller = new CarrotController(config_path);
-        ROS_INFO("carrot controller initialized!");
-    } else {
-        this->carrot_controller = NULL;
-    }
 }
 
 void Awesomo::poseCallback(const geometry_msgs::PoseStamped &msg)
@@ -250,16 +176,6 @@ void Awesomo::mocapCallback(const geometry_msgs::PoseStamped &msg)
 void Awesomo::stateCallback(const mavros_msgs::State::ConstPtr &msg)
 {
     state = *msg;
-}
-
-void Awesomo::imuCallback(const sensor_msgs::Imu::ConstPtr &msg)
-{
-    quat2euler(
-        msg->orientation,
-        &this->pose.roll,
-        &this->pose.pitch,
-        &this->pose.yaw
-    );
 }
 
 void Awesomo::radioCallback(const mavros_msgs::RCIn &msg)
@@ -359,17 +275,6 @@ void Awesomo::subscribeToMocap(void)
     );
 }
 
-void Awesomo::subscribeToIMU(void)
-{
-    ROS_INFO("subcribing to [IMU_DATA]");
-    this->imu_subscriber = this->node.subscribe(
-        IMU_TOPIC,
-        50,
-        &Awesomo::imuCallback,
-        this
-    );
-}
-
 void Awesomo::subscribeToRadioIn(void)
 {
     ROS_INFO("subscribing to [RADIO_IN]");
@@ -392,120 +297,42 @@ void Awesomo::subscribeToLanding(void)
     );
 }
 
-void Awesomo::resetPositionController(void)
-{
-    this->position_controller->x.sum_error = 0.0;
-    this->position_controller->x.prev_error = 0.0;
-    this->position_controller->x.output = 0.0;
-
-    this->position_controller->y.sum_error = 0.0;
-    this->position_controller->y.prev_error = 0.0;
-    this->position_controller->y.output = 0.0;
-
-    this->position_controller->T.sum_error = 0.0;
-    this->position_controller->T.prev_error = 0.0;
-    this->position_controller->T.output = 0.0;
-}
-
-void Awesomo::positionControllerCalculate(Position setpoint, ros::Time last_request)
-{
-    float dt;
-
-    dt = (ros::Time::now() - last_request).toSec();
-    this->position_controller->calculate(setpoint, this->pose, dt);
-}
-
-void Awesomo::printPositionController(void)
-{
-    ROS_INFO("---");
-    ROS_INFO("quadrotor.pose_x %f", this->pose.x);
-    ROS_INFO("quadrotor.pose_y %f", this->pose.y);
-    ROS_INFO("quadrotor.pose_z %f", this->pose.z);
-    ROS_INFO("quadrotor.pose_yaw %f", rad2deg(this->pose.yaw));
-    ROS_INFO("quadrotor.roll %f", rad2deg(this->pose.roll));
-    ROS_INFO("quadrotor.pitch %f", rad2deg(this->pose.pitch));
-    ROS_INFO("roll.controller %f", rad2deg(this->position_controller->roll));
-    ROS_INFO("pitch.controller %f", rad2deg(this->position_controller->pitch));
-    ROS_INFO("throttle.controller %f", this->position_controller->throttle);
-    ROS_INFO("---");
-}
-
-void Awesomo::buildPositionMessage(
-    geometry_msgs::PoseStamped &msg,
-    int seq,
-    ros::Time time,
-    float x,
-    float y,
-    float z
-)
-{
-    msg.header.seq = seq;
-    msg.header.stamp = time;
-    msg.header.frame_id = "awesomo_position_cmd";
-    msg.pose.position.x = x;
-    msg.pose.position.y = y;
-    msg.pose.position.z = z;
-}
-
-void Awesomo::buildAtitudeMessage(
-    geometry_msgs::PoseStamped &msg,
-    int seq,
-    ros::Time time
-)
-{
-    msg.header.seq = seq;
-    msg.header.stamp = time;
-    msg.header.frame_id = "awesomo_attitude_cmd";
-    msg.pose.position.x = 0;
-    msg.pose.position.y = 0;
-    msg.pose.position.z = 0;
-    msg.pose.orientation.x = this->position_controller->rpy_quat.x();
-    msg.pose.orientation.y = this->position_controller->rpy_quat.y();
-    msg.pose.orientation.z = this->position_controller->rpy_quat.z();
-    msg.pose.orientation.w = this->position_controller->rpy_quat.w();
-}
-
-void Awesomo::buildThrottleMessage(std_msgs::Float64 &msg)
-{
-    msg.data = this->position_controller->throttle;
-}
-
 void Awesomo::publishPositionControllerStats(int seq, ros::Time time)
 {
-	geometry_msgs::PoseStamped pid_stats;
+	geometry_msgs::PoseStamped msg;
 
     // roll
-    pid_stats.header.seq = seq;
-    pid_stats.header.stamp = time;
-    pid_stats.header.frame_id = "awesomo_position_controller_x";
-    pid_stats.pose.position.x = this->position_controller->x.p_error;
-    pid_stats.pose.position.y = this->position_controller->x.i_error;
-    pid_stats.pose.position.z = this->position_controller->x.d_error;
-    pid_stats.pose.orientation.x = this->position_controller->x.output * M_PI / 180;
-    pid_stats.pose.orientation.y = this->position_controller->x.setpoint;
-    this->position_controller_x_publisher.publish(pid_stats);
+    msg.header.seq = seq;
+    msg.header.stamp = time;
+    msg.header.frame_id = "awesomo_position_controller_x";
+    msg.pose.position.x = this->quad->position_controller->x.p_error;
+    msg.pose.position.y = this->quad->position_controller->x.i_error;
+    msg.pose.position.z = this->quad->position_controller->x.d_error;
+    msg.pose.orientation.x = this->quad->position_controller->x.output * M_PI / 180;
+    msg.pose.orientation.y = this->quad->position_controller->x.setpoint;
+    this->position_controller_x_publisher.publish(msg);
 
     // pitch
-    pid_stats.header.seq = seq;
-    pid_stats.header.stamp = time;
-    pid_stats.header.frame_id = "awesomo_position_controller_y";
-    pid_stats.pose.position.x = this->position_controller->y.p_error;
-    pid_stats.pose.position.y = this->position_controller->y.i_error;
-    pid_stats.pose.position.z = this->position_controller->y.d_error;
-    pid_stats.pose.orientation.x = this->position_controller->y.output * M_PI / 180;
-    pid_stats.pose.orientation.y = this->position_controller->y.setpoint;
-    this->position_controller_y_publisher.publish(pid_stats);
+    msg.header.seq = seq;
+    msg.header.stamp = time;
+    msg.header.frame_id = "awesomo_position_controller_y";
+    msg.pose.position.x = this->quad->position_controller->y.p_error;
+    msg.pose.position.y = this->quad->position_controller->y.i_error;
+    msg.pose.position.z = this->quad->position_controller->y.d_error;
+    msg.pose.orientation.x = this->quad->position_controller->y.output * M_PI / 180;
+    msg.pose.orientation.y = this->quad->position_controller->y.setpoint;
+    this->position_controller_y_publisher.publish(msg);
 
     // throttle
-    pid_stats.header.seq = seq;
-    pid_stats.header.stamp = time;
-    pid_stats.header.frame_id = "awesomo_position_controller_T";
-    pid_stats.pose.position.x = this->position_controller->T.p_error;
-    pid_stats.pose.position.y = this->position_controller->T.i_error;
-    pid_stats.pose.position.z = this->position_controller->T.d_error;
-    pid_stats.pose.orientation.x = this->position_controller->T.output * M_PI / 180;
-    pid_stats.pose.orientation.y = this->position_controller->T.setpoint;
-    this->position_controller_z_publisher.publish(pid_stats);
+    msg.header.seq = seq;
+    msg.header.stamp = time;
+    msg.header.frame_id = "awesomo_position_controller_T";
+    msg.pose.position.x = this->quad->position_controller->T.p_error;
+    msg.pose.position.y = this->quad->position_controller->T.i_error;
+    msg.pose.position.z = this->quad->position_controller->T.d_error;
+    msg.pose.orientation.x = this->quad->position_controller->T.output * M_PI / 180;
+    msg.pose.orientation.y = this->quad->position_controller->T.setpoint;
+    this->position_controller_z_publisher.publish(msg);
 }
 
 void Awesomo::publishPositionControllerMessage(
@@ -518,140 +345,36 @@ void Awesomo::publishPositionControllerMessage(
     std_msgs::Float64 throttle;
 
     // atitude command
-    this->buildAtitudeMessage(attitude, seq, time);
+    attitude.header.seq = seq;
+    attitude.header.stamp = time;
+    attitude.header.frame_id = "awesomo_attitude_cmd";
+    attitude.pose.position.x = 0;
+    attitude.pose.position.y = 0;
+    attitude.pose.position.z = 0;
+    attitude.pose.orientation.x = this->quad->position_controller->rpy_quat.x();
+    attitude.pose.orientation.y = this->quad->position_controller->rpy_quat.y();
+    attitude.pose.orientation.z = this->quad->position_controller->rpy_quat.z();
+    attitude.pose.orientation.w = this->quad->position_controller->rpy_quat.w();
     this->attitude_publisher.publish(attitude);
 
     // throttle command
-    this->buildThrottleMessage(throttle);
+    throttle.data = this->quad->position_controller->throttle;
     this->throttle_publisher.publish(throttle);
 }
 
-void Awesomo::initializeMission(void)
-{
-    Position pos;
-    Eigen::Vector3d wp;
-    Eigen::Vector3d carrot;
-    Eigen::Vector3d position;
-
-    // current position + some altitude
-    pos.x = this->pose.x;
-    pos.y = this->pose.y;
-    pos.z = this->pose.z + 3;
-
-    // waypoint 1
-    wp << pos.x, pos.y, pos.z;
-    this->carrot_controller->wp_start = wp;
-    this->carrot_controller->waypoints.push_back(wp);
-
-    // waypoint 2
-    wp << pos.x + 5, pos.y, pos.z;
-    this->carrot_controller->wp_end = wp;
-    this->carrot_controller->waypoints.push_back(wp);
-
-    // waypoint 3
-    wp << pos.x + 5, pos.y + 5, pos.z;
-    this->carrot_controller->waypoints.push_back(wp);
-
-    // waypoint 4
-    wp << pos.x, pos.y + 5, pos.z;
-    this->carrot_controller->waypoints.push_back(wp);
-
-    // back to waypoint 1
-    wp << pos.x, pos.y, pos.z;
-    this->carrot_controller->waypoints.push_back(wp);
-
-    // initialize carrot controller
-    this->carrot_controller->initialized = 1;
-}
-
-void Awesomo::runMission(
+void Awesomo::run(
     geometry_msgs::PoseStamped &msg,
     int seq,
     ros::Time last_request
 )
 {
-    Position pos;
-    Eigen::Vector3d position;
-    Eigen::Vector3d carrot;
+    float dt;
 
-    switch (this->mission_state) {
-    case IDLE_MODE:
-        // check if offboard switch has been turned on
-        if (this->rc_in[6] < 1500) {
-            this->resetPositionController();
-
-            // configure setpoint to be where the quad currently is
-            pos.x = this->pose.x;
-            pos.y = this->pose.y;
-            pos.z = this->pose.z + 3;
-
-        } else {
-            // transition to offboard mode
-            // this->mission_state = INITIALIZE_MODE;
-            this->mission_state = TRACKING_MODE;
-            this->landing_zone_prev.x = this->landing_zone.x;
-            this->landing_zone_prev.y = this->landing_zone.y;
-            this->landing_zone_prev.z = this->landing_zone.z;
-            this->landing_zone_world.x = this->pose.x;
-            this->landing_zone_world.y = this->pose.y;
-            this->landing_zone_world.z = 10;
-            // ROS_INFO("TRACKING MODE INITIALIZED");
-
-        }
-        break;
-
-    case INITIALIZE_MODE:
-        this->initializeMission();
-        std::cout << "Carrot controller initialized!" << std::endl;
-        this->mission_state = CARROT_MODE;
-        break;
-
-    case CARROT_MODE:
-        position << this->pose.x, this->pose.y, this->pose.z;
-        if (this->carrot_controller->update(position, carrot) == 0) {
-            ROS_INFO("Landing!");
-            pos.x = this->pose.x;
-            pos.y = this->pose.y;
-            pos.z = this->pose.z - 2;
-            this->mission_state = LAND_MODE;
-
-        } else {
-            pos.x = carrot(0);
-            pos.y = carrot(1);
-            pos.z = carrot(2);
-
-        }
-        break;
-
-    case TRACKING_MODE:
-        if (this->landing_zone_prev.x != this->landing_zone.x && this->landing_zone_prev.y != this->landing_zone.y) {
-            pos.x = this->pose.x + this->landing_zone.x;
-            pos.y = this->pose.y + this->landing_zone.y;
-            pos.z = 10;
-            this->landing_zone_prev.x = this->landing_zone.x;
-            this->landing_zone_prev.y = this->landing_zone.y;
-            this->landing_zone_prev.z = this->landing_zone.z;
-
-            this->landing_zone_world.x = pos.x;
-            this->landing_zone_world.y = pos.y;
-            this->landing_zone_world.z = 10;
-
-        } else {
-            pos.x = this->landing_zone_world.x;
-            pos.y = this->landing_zone_world.y;
-            pos.z = 10;
-
-        }
-        ROS_INFO("position: %f\t%f\t%f", pos.x, pos.y, pos.z);
-        break;
-
-    case LAND_MODE:
-        // do nothing
-        break;
-    }
+    // calculate attitude from position controller
+    dt = (ros::Time::now() - last_request).toSec();
+    this->quad->runMission(this->pose, this->landing_zone, dt);
 
     // publish quadrotor position controller
-    this->positionControllerCalculate(pos, last_request);
     this->publishPositionControllerMessage(msg, seq, ros::Time::now());
     this->publishPositionControllerStats(seq, ros::Time::now());
 }
@@ -665,7 +388,8 @@ int main(int argc, char **argv)
     ros::Time last_request;
     geometry_msgs::PoseStamped msg;
 
-	int seq = 1;
+	float dt;
+	int seq;
     Awesomo *awesomo;
     std::string position_controller_config;
     std::string carrot_controller_config;
@@ -679,12 +403,13 @@ int main(int argc, char **argv)
 
 	// setup awesomo
     ROS_INFO("running ...");
+    seq = 1;
     awesomo = new Awesomo(configs);
     last_request = ros::Time::now();
 
     while (ros::ok()){
         // awesomo run mission
-        awesomo->runMission(msg, seq, last_request);
+        awesomo->run(msg, seq, last_request);
 
 		// end
 		seq++;
