@@ -20,7 +20,9 @@ FIND_PACKAGE(
     REQUIRED COMPONENTS
     roscpp
     rospy
+    atim
     std_msgs
+    message_generation
     image_transport
     cv_bridge
 )
@@ -43,13 +45,17 @@ INCLUDE_DIRECTORIES(
     ./include
 )
 
+# ROS MESSAGE
+
+
 # BUILD AS CATKIN PACKAGE
 CATKIN_PACKAGE(
     INCLUDE_DIRS include
     LIBRARIES awesomo
-    CATKIN_DEPENDS roscpp rospy std_msgs
+    CATKIN_DEPENDS roscpp rospy std_msgs message_runtime
     DEPENDS system_lib
 )
+# ADD_MESSAGE_FILES(DIRECTORY atim/msgs FILES AtimPoseStamped.msg)
 
 # LIBRARY
 ADD_LIBRARY(

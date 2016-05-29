@@ -4,6 +4,7 @@
 #include <std_msgs/Float64.h>
 #include <sensor_msgs/Imu.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <atim/AtimPoseStamped.h>
 
 #include "awesomo/camera.hpp"
 #include "awesomo/util.hpp"
@@ -22,7 +23,7 @@ public:
 
     LandingTarget(CameraMountRBT &cam_rbt);
     void localPoseCallback(const geometry_msgs::PoseStamped &input);
-    void cameraRBTCallback( const geometry_msgs::PoseStamped &input);
+    void cameraRBTCallback( const atim::AtimPoseStamped &input);
     void subscribeToAtimPose(void);
     void subscribeToLocalPositionPose(void);
     void publishRotatedValues(int seq, ros::Time time);
@@ -47,11 +48,14 @@ LandingTarget::LandingTarget(CameraMountRBT &cam_rbt)
     this->position.z = 0.0;
 }
 
-void LandingTarget::cameraRBTCallback(const geometry_msgs::PoseStamped &input)
+void LandingTarget::cameraRBTCallback(const atim::AtimPoseStamped &msg)
 {
-    this->position.x = input.pose.position.x;
-    this->position.y = input.pose.position.y;
-    this->position.z = input.pose.position.z;
+    bool tag_detected;
+
+    this->position.x = msg.pose.position.x;
+    this->position.y = msg.pose.position.y;
+    this->position.z = msg.pose.position.z;
+    tag_detected = msg.tag_detected;
 
     // ROS_INFO(
     //     "pose: %f\t%f\t%f",
@@ -60,13 +64,15 @@ void LandingTarget::cameraRBTCallback(const geometry_msgs::PoseStamped &input)
     //     this->position.z
     // );
 
-    this->cam_rbt.applyRBTtoPosition(this->position);
-    // applyRotationToPosition(
-    //     this->local_pose.roll,
-    //     this->local_pose.pitch,
-    //     this->local_pose.yaw,
-    //     this->position
-    // );
+    if (tag_detected) {
+        this->cam_rbt.applyRBTtoPosition(this->position);
+        // applyRotationToPosition(
+        //     this->local_pose.roll,
+        //     this->local_pose.pitch,
+        //     this->local_pose.yaw,
+        //     this->position
+        // );
+    }
 }
 
 void LandingTarget::localPoseCallback(const geometry_msgs::PoseStamped &input)
@@ -74,7 +80,6 @@ void LandingTarget::localPoseCallback(const geometry_msgs::PoseStamped &input)
     this->local_pose.x = input.pose.position.x;
     this->local_pose.y = input.pose.position.y;
     this->local_pose.z = input.pose.position.z;
-
 
     quat2euler(
         input.pose.orientation,
