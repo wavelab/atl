@@ -132,27 +132,15 @@ void Quadrotor::runMission(Pose robot_pose, Position landing_zone, float dt)
     // mission
     switch (this->mission_state) {
     case IDLE_MODE:
-        // check if offboard switch has been turned on
-        // if (this->rc_in[6] < 1500) {
-        //     this->resetPositionController();
-        //
-        //     // configure setpoint to be where the quad currently is
-        //     p.x = this->pose.x;
-        //     p.y = this->pose.y;
-        //     p.z = this->pose.z + 3;
-        //
-        // } else {
-            // transition to offboard mode
-            // this->mission_state = INITIALIZE_MODE;
-            this->mission_state = TRACKING_MODE;
-            this->landing_zone_prev.x = landing_zone.x;
-            this->landing_zone_prev.y = landing_zone.y;
-            this->landing_zone_prev.z = landing_zone.z;
-            this->landing_zone_world.x = this->pose.x;
-            this->landing_zone_world.y = this->pose.y;
-            this->landing_zone_world.z = 10;
-
-        // }
+        // transition to offboard mode
+        // this->mission_state = INITIALIZE_MODE;
+        this->mission_state = TRACKING_MODE;
+        this->landing_zone_prev.x = landing_zone.x;
+        this->landing_zone_prev.y = landing_zone.y;
+        this->landing_zone_prev.z = landing_zone.z;
+        this->landing_zone_world.x = this->pose.x;
+        this->landing_zone_world.y = this->pose.y;
+        this->landing_zone_world.z = 10;
         break;
 
     case INITIALIZE_MODE:

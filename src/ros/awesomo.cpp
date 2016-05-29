@@ -279,10 +279,10 @@ void Awesomo::subscribeToRadioIn(void)
 {
     ROS_INFO("subscribing to [RADIO_IN]");
     this->radio_subscriber = this->node.subscribe(
-            RADIO_TOPIC,
-            50,
-            &Awesomo::radioCallback,
-            this
+        RADIO_TOPIC,
+        50,
+        &Awesomo::radioCallback,
+        this
      );
 }
 
@@ -408,8 +408,12 @@ int main(int argc, char **argv)
     last_request = ros::Time::now();
 
     while (ros::ok()){
-        // awesomo run mission
-        awesomo->run(msg, seq, last_request);
+        // check if offboard switch has been turned on
+        if (awesomo->rc_in[6] < 1500) {
+            awesomo->quad->resetPositionController();
+        } else {
+            awesomo->run(msg, seq, last_request);
+        }
 
 		// end
 		seq++;
