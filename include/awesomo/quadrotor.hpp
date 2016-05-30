@@ -14,15 +14,6 @@
 #define TRACKING_MODE 3
 #define LAND_MODE 4
 
-class LandingTargetPosition
-{
-public:
-    bool detected;
-    float x;
-    float y;
-    float z;
-};
-
 class Quadrotor
 {
 public:

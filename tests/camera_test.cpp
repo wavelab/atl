@@ -59,7 +59,7 @@ int testCameraConfigApplyRBTtoPosition(void)
 
     std::cout << config.camRotation << std::endl;
 
-    Position position1;
+    LandingTargetPosition position1;
     position1.x = 0;
     position1.y = 1;
     position1.z = 0;

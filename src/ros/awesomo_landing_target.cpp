@@ -6,7 +6,6 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <atim/AtimPoseStamped.h>
 
-#include "awesomo/camera.hpp"
 #include "awesomo/util.hpp"
 #include "awesomo/camera.hpp"
 
@@ -18,7 +17,7 @@ class LandingTarget
 {
 public:
     CameraMountRBT cam_rbt;
-    Position position;
+    LandingTargetPosition position;
     Pose local_pose;
 
     LandingTarget(CameraMountRBT &cam_rbt);
@@ -43,7 +42,8 @@ LandingTarget::LandingTarget(CameraMountRBT &cam_rbt)
     this->position.x = 0.0;
     this->position.y = 0.0;
     this->position.z = 0.0;
-    this->correction_publisher = n.advertise<geometry_msgs::PoseStamped>(
+    this->position.detected = false;
+    this->correction_publisher = n.advertise<atim::AtimPoseStamped>(
         SENSOR_FUSION_POSE_TOPIC,
         50
     );
@@ -56,7 +56,7 @@ void LandingTarget::cameraRBTCallback(const atim::AtimPoseStamped &msg)
     this->position.x = msg.pose.position.x;
     this->position.y = msg.pose.position.y;
     this->position.z = msg.pose.position.z;
-    tag_detected = msg.tag_detected;
+    this->position.detected = msg.tag_detected;
 
     // ROS_INFO(
     //     "pose: %f\t%f\t%f",
@@ -65,14 +65,14 @@ void LandingTarget::cameraRBTCallback(const atim::AtimPoseStamped &msg)
     //     this->position.z
     // );
 
-    if (tag_detected) {
+    if (this->position.detected) {
         this->cam_rbt.applyRBTtoPosition(this->position);
-        // applyRotationToPosition(
-        //     this->local_pose.roll,
-        //     this->local_pose.pitch,
-        //     this->local_pose.yaw,
-        //     this->position
-        // );
+        applyRotationToPosition(
+            this->local_pose.roll,
+            this->local_pose.pitch,
+            this->local_pose.yaw,
+            this->position
+        );
     }
 }
 
@@ -125,7 +125,7 @@ void LandingTarget::subscribeToLocalPositionPose(void)
 
 void LandingTarget::publishRotatedValues(int seq, ros::Time time)
 {
-    geometry_msgs::PoseStamped correctedPose;
+    atim::AtimPoseStamped correctedPose;
 
     correctedPose.header.seq = seq;
     correctedPose.header.stamp = time;
@@ -133,6 +133,7 @@ void LandingTarget::publishRotatedValues(int seq, ros::Time time)
     correctedPose.pose.position.x = this->position.x;
     correctedPose.pose.position.y = this->position.y;
     correctedPose.pose.position.z = this->position.z;
+    correctedPose.tag_detected = this->position.detected;
     this->correction_publisher.publish(correctedPose);
 }
 

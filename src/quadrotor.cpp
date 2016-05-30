@@ -171,7 +171,7 @@ void Quadrotor::runMission(
         break;
 
     case TRACKING_MODE:
-        if (this->landing_zone_prev.x != landing_zone.x && this->landing_zone_prev.y != landing_zone.y) {
+        if (landing_zone.detected == true) {
             p.x = this->pose.x + landing_zone.x;
             p.y = this->pose.y + landing_zone.y;
             p.z = 10;

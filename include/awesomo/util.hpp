@@ -42,6 +42,16 @@ public:
     double z;
 };
 
+class LandingTargetPosition
+{
+public:
+    bool detected;
+    float x;
+    float y;
+    float z;
+};
+
+
 
 
 // FUNCTIONS
@@ -64,7 +74,7 @@ int applyRotationToPosition(
     double roll,
     double pitch,
     double yaw,
-    Position &position
+    LandingTargetPosition &position
 );
 
 tf::Quaternion euler2quat(double roll, double pitch, double yaw);

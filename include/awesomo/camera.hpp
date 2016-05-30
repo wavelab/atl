@@ -1,6 +1,8 @@
 #ifndef __CAMERA_HPP__
 #define __CAMERA_HPP__
+
 # include "awesomo/util.hpp"
+
 
 
 class CameraMountRBT
@@ -32,12 +34,12 @@ public:
         Eigen::Matrix4d &poseMtxOut
     );
     int convertPositionToVector(
-        Position &positionIn,
+        LandingTargetPosition &positionIn,
         Eigen::Vector4d &positionVectorOut
     );
     int applyMirrorToPoseMtx(Eigen::Matrix4d &poseIn);
     int applyMirrorToPositionVector(Eigen::Vector4d &positionIn);
-    int applyRBTtoPosition(Position &positionIn);
+    int applyRBTtoPosition(LandingTargetPosition &positionIn);
 };
 
 #endif

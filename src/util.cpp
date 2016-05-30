@@ -72,7 +72,7 @@ int applyRotationToPosition(
     double roll,
     double pitch,
     double yaw,
-    Position &position
+    LandingTargetPosition &position
 )
 {
     Eigen::Matrix3d rotation;

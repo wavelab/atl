@@ -73,7 +73,7 @@ int CameraMountRBT::convertPoseToMtx(
 }
 
 int CameraMountRBT::convertPositionToVector(
-    Position &positionIn,
+    LandingTargetPosition &positionIn,
     Eigen::Vector4d &positionVectorOut
 )
 {
@@ -97,7 +97,7 @@ int CameraMountRBT::applyMirrorToPositionVector(Eigen::Vector4d &positionIn)
     return 0;
 }
 
-int CameraMountRBT::applyRBTtoPosition(Position &positionIn)
+int CameraMountRBT::applyRBTtoPosition(LandingTargetPosition &positionIn)
 {
     Eigen::Vector4d positionVect;
 
