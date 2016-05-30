@@ -13,6 +13,8 @@
 #include <mavros_msgs/CommandBool.h>
 #include <mavros_msgs/RCIn.h>
 
+#include <atim/AtimPoseStamped.h>
+
 #include "awesomo/util.hpp"
 #include "awesomo/controller.hpp"
 #include "awesomo/quadrotor.hpp"
@@ -43,7 +45,8 @@ public:
 
     Pose pose;
     Pose mocap_pose;
-    Position landing_zone;
+    LandingTargetPosition landing_zone;
+    bool landing_zone_detected;
     int rc_in[16];
     Quadrotor *quad;
 
@@ -65,7 +68,7 @@ public:
     void poseCallback(const geometry_msgs::PoseStamped &msg);
     void mocapCallback(const geometry_msgs::PoseStamped &msg);
     void radioCallback(const mavros_msgs::RCIn &msg);
-    void landingCallback(const geometry_msgs::PoseStamped &msg);
+    void landingCallback(const atim::AtimPoseStamped &msg);
     void stateCallback(const mavros_msgs::State::ConstPtr &msg);
     void waitForConnection(void);
 
@@ -185,8 +188,9 @@ void Awesomo::radioCallback(const mavros_msgs::RCIn &msg)
     }
 }
 
-void Awesomo::landingCallback(const geometry_msgs::PoseStamped &msg)
+void Awesomo::landingCallback(const atim::AtimPoseStamped &msg)
 {
+    this->landing_zone.detected = msg.tag_detected;
     this->landing_zone.x = msg.pose.position.x;
     this->landing_zone.y = msg.pose.position.y;
     this->landing_zone.z = msg.pose.position.z;
@@ -402,8 +406,8 @@ int main(int argc, char **argv)
 	configs["carrot_controller"] = carrot_controller_config;
 
 	// setup awesomo
-    ROS_INFO("running ...");
     seq = 1;
+    ROS_INFO("running ...");
     awesomo = new Awesomo(configs);
     last_request = ros::Time::now();
 

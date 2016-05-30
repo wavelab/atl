@@ -120,7 +120,11 @@ void Quadrotor::initializeMission(void)
     this->carrot_controller->initialized = 1;
 }
 
-void Quadrotor::runMission(Pose robot_pose, Position landing_zone, float dt)
+void Quadrotor::runMission(
+    Pose robot_pose,
+    LandingTargetPosition landing_zone,
+    float dt
+)
 {
     Position p;
     Eigen::Vector3d position;

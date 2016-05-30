@@ -14,6 +14,14 @@
 #define TRACKING_MODE 3
 #define LAND_MODE 4
 
+class LandingTargetPosition
+{
+public:
+    bool detected;
+    float x;
+    float y;
+    float z;
+};
 
 class Quadrotor
 {
@@ -33,7 +41,11 @@ public:
     void updatePose(Pose p);
     void resetPositionController(void);
     void initializeMission(void);
-    void runMission(Pose robot_pose, Position landing_zone, float dt);
+    void runMission(
+        Pose robot_pose,
+        LandingTargetPosition landing_zone,
+        float dt
+    );
 };
 
 #endif
