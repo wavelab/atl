@@ -10,7 +10,7 @@
 #include "awesomo/camera.hpp"
 
 #define ATIM_POSE_TOPIC "/atim/pose"
-#define SENSOR_FUSION_POSE_TOPIC "/awesomo/landing_target/pose"
+#define LANDING_TARGET_TOPIC "/awesomo/landing_target/pose"
 #define MAVROS_LOCAL_POSITION_TOPIC "/mavros/local_position/pose"
 
 class LandingTarget
@@ -44,7 +44,7 @@ LandingTarget::LandingTarget(CameraMountRBT &cam_rbt)
     this->position.z = 0.0;
     this->position.detected = false;
     this->correction_publisher = n.advertise<atim::AtimPoseStamped>(
-        SENSOR_FUSION_POSE_TOPIC,
+        LANDING_TARGET_TOPIC,
         50
     );
 }

@@ -46,7 +46,11 @@ INCLUDE_DIRECTORIES(
 )
 
 # ROS MESSAGE
-
+ADD_MESSAGE_FILES(
+    DIRECTORY msg
+    FILES PositionControllerStats.msg
+)
+GENERATE_MESSAGES(DEPENDENCIES std_msgs)
 
 # BUILD AS CATKIN PACKAGE
 CATKIN_PACKAGE(
@@ -55,7 +59,6 @@ CATKIN_PACKAGE(
     CATKIN_DEPENDS roscpp rospy std_msgs message_runtime
     DEPENDS system_lib
 )
-# ADD_MESSAGE_FILES(DIRECTORY atim/msgs FILES AtimPoseStamped.msg)
 
 # LIBRARY
 ADD_LIBRARY(
@@ -66,6 +69,11 @@ ADD_LIBRARY(
     src/controller.cpp
     src/quadrotor.cpp
 )
+
+
+
+
+
 
 # EXECUTABLES
 ## ROS NODE EXECUTABLES

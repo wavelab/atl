@@ -18,6 +18,7 @@
 #include "awesomo/util.hpp"
 #include "awesomo/controller.hpp"
 #include "awesomo/quadrotor.hpp"
+#include "awesomo/PositionControllerStats.h"
 
 
 
