@@ -65,15 +65,16 @@ void LandingTarget::cameraRBTCallback(const atim::AtimPoseStamped &msg)
     //     this->position.z
     // );
 
-    if (this->position.detected) {
-        this->cam_rbt.applyRBTtoPosition(this->position);
-        applyRotationToPosition(
-            this->local_pose.roll,
-            this->local_pose.pitch,
-            this->local_pose.yaw,
-            this->position
-        );
-    }
+    this->cam_rbt.applyRBTtoPosition(this->position);
+    // if (this->position.detected) {
+    //     this->cam_rbt.applyRBTtoPosition(this->position);
+    //     applyRotationToPosition(
+    //         this->local_pose.roll,
+    //         this->local_pose.pitch,
+    //         this->local_pose.yaw,
+    //         this->position
+    //     );
+    // }
 }
 
 void LandingTarget::localPoseCallback(const geometry_msgs::PoseStamped &input)

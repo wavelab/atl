@@ -139,12 +139,14 @@ void Quadrotor::runMission(
         // transition to offboard mode
         // this->mission_state = INITIALIZE_MODE;
         this->mission_state = TRACKING_MODE;
+
         this->landing_zone_prev.x = landing_zone.x;
         this->landing_zone_prev.y = landing_zone.y;
         this->landing_zone_prev.z = landing_zone.z;
+
         this->landing_zone_world.x = this->pose.x;
         this->landing_zone_world.y = this->pose.y;
-        this->landing_zone_world.z = 10;
+        this->landing_zone_world.z = 5;
         break;
 
     case INITIALIZE_MODE:
@@ -174,7 +176,7 @@ void Quadrotor::runMission(
         if (landing_zone.detected == true) {
             p.x = this->pose.x + landing_zone.x;
             p.y = this->pose.y + landing_zone.y;
-            p.z = 10;
+            p.z = 5;
 
             this->landing_zone_prev.x = landing_zone.x;
             this->landing_zone_prev.y = landing_zone.y;
@@ -182,12 +184,12 @@ void Quadrotor::runMission(
 
             this->landing_zone_world.x = p.x;
             this->landing_zone_world.y = p.y;
-            this->landing_zone_world.z = 10;
+            this->landing_zone_world.z = 5;
 
         } else {
             p.x = this->landing_zone_world.x;
             p.y = this->landing_zone_world.y;
-            p.z = 10;
+            p.z = 5;
 
         }
         break;

@@ -416,9 +416,8 @@ int main(int argc, char **argv)
         // check if offboard switch has been turned on
         if (awesomo->rc_in[6] < 1500) {
             awesomo->quad->resetPositionController();
-        } else {
-            awesomo->run(msg, seq, last_request);
         }
+        awesomo->run(msg, seq, last_request);
 
 		// end
 		seq++;
