@@ -53,10 +53,11 @@ void LandingTarget::cameraRBTCallback(const atim::AtimPoseStamped &msg)
 {
     bool tag_detected;
 
-    this->position.x = msg.pose.position.x;
-    this->position.y = msg.pose.position.y;
-    this->position.z = msg.pose.position.z;
-    this->position.detected = msg.tag_detected;
+    if (msg.tag_detected) {
+        this->position.x = msg.pose.position.x;
+        this->position.y = msg.pose.position.y;
+        this->position.z = msg.pose.position.z;
+        this->position.detected = msg.tag_detected;
 
     // ROS_INFO(
     //     "pose: %f\t%f\t%f",
@@ -65,16 +66,18 @@ void LandingTarget::cameraRBTCallback(const atim::AtimPoseStamped &msg)
     //     this->position.z
     // );
 
-    this->cam_rbt.applyRBTtoPosition(this->position);
-    // if (this->position.detected) {
-    //     this->cam_rbt.applyRBTtoPosition(this->position);
-    //     applyRotationToPosition(
-    //         this->local_pose.roll,
-    //         this->local_pose.pitch,
-    //         this->local_pose.yaw,
-    //         this->position
-    //     );
-    // }
+    // this->cam_rbt.applyRBTtoPosition(this->position);
+        this->cam_rbt.applyRBTtoPosition(this->position);
+        // applyRotationToPosition(
+        //     this->local_pose.roll,
+        //     this->local_pose.pitch,
+        //     this->local_pose.yaw,
+        //     this->position
+        // );
+    }
+    else{
+        this->position.detected = msg.tag_detected;
+    }
 }
 
 void LandingTarget::localPoseCallback(const geometry_msgs::PoseStamped &input)
