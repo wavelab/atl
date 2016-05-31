@@ -120,6 +120,22 @@ INSTALL(
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
+# tests/quadrotor_test
+ADD_EXECUTABLE(awesomo_quadrotor_test tests/quadrotor_test.cpp)
+TARGET_LINK_LIBRARIES(
+    awesomo_quadrotor_test
+    libawesomo
+    apriltags
+    yaml-cpp
+    flycapture
+    ${OpenCV_LIBS}
+    ${catkin_LIBRARIES}
+)
+INSTALL(
+    TARGETS awesomo_quadrotor_test
+    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
 # tests/util_test
 ADD_EXECUTABLE(awesomo_util_test tests/util_test.cpp)
 TARGET_LINK_LIBRARIES(awesomo_util_test libawesomo)
@@ -128,23 +144,7 @@ INSTALL(
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-# # tests/ros/quadrotor_node_test
-# ADD_EXECUTABLE(awesomo_quadrotor_test tests/ros/quadrotor_test.cpp)
-# TARGET_LINK_LIBRARIES(
-#     awesomo_quadrotor_test
-#     libawesomo
-#     apriltags
-#     yaml-cpp
-#     flycapture
-#     ${OpenCV_LIBS}
-#     ${catkin_LIBRARIES}
-# )
-# INSTALL(
-#     TARGETS awesomo_quadrotor_test
-#     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
-
-# tests/camear_mount_config_test
+# tests/camera_mount_config_test
 ADD_EXECUTABLE(awesomo_camera_test tests/camera_test.cpp)
 TARGET_LINK_LIBRARIES(awesomo_camera_test libawesomo yaml-cpp)
 INSTALL(TARGETS awesomo_camera_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})

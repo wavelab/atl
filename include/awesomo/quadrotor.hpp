@@ -7,6 +7,9 @@
 #include "awesomo/controller.hpp"
 
 
+// CONSTANTS
+#define LZ_THRESHOLD 5
+
 // STATES
 #define IDLE_MODE 0
 #define INITIALIZE_MODE 1
@@ -14,13 +17,16 @@
 #define TRACKING_MODE 3
 #define LAND_MODE 4
 
+
 class Quadrotor
 {
 public:
     // state
     int mission_state;
+
     Pose pose;
-    Position landing_zone_prev;
+    float hover_height;
+    int landing_zone_belief;
     Position landing_zone_world;
 
     // controllers
