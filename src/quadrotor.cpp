@@ -12,27 +12,22 @@ Quadrotor::Quadrotor(std::map<std::string, std::string> configs)
     this->pose.y = 0.0;
     this->pose.z = 0.0;
 
-    this->landing_zone_prev.x = 0.0;
-    this->landing_zone_prev.y = 0.0;
-    this->landing_zone_prev.z = 0.0;
-
     this->landing_zone_world.x = 0.0;
     this->landing_zone_world.y = 0.0;
     this->landing_zone_world.z = 0.0;
 
-    // initialize controllers
+    // initialize position controller
     if (configs.count("position_controller")) {
         config_path = configs["position_controller"];
         this->position_controller = new PositionController(config_path);
-        std::cout << "position controller initialized!" << std::endl;
     } else {
         this->position_controller = NULL;
     }
 
+    // initialize carrot controller
     if (configs.count("carrot_controller")) {
         config_path = configs["carrot_controller"];
         this->carrot_controller = new CarrotController(config_path);
-        std::cout << "carrot controller initialized!" << std::endl;
     } else {
         this->carrot_controller = NULL;
     }
@@ -139,14 +134,11 @@ void Quadrotor::runMission(
         // transition to offboard mode
         // this->mission_state = INITIALIZE_MODE;
         this->mission_state = TRACKING_MODE;
-
-        this->landing_zone_prev.x = landing_zone.x;
-        this->landing_zone_prev.y = landing_zone.y;
-        this->landing_zone_prev.z = landing_zone.z;
+        this->hover_height = robot_pose.z + 5.0;
 
         this->landing_zone_world.x = this->pose.x;
         this->landing_zone_world.y = this->pose.y;
-        this->landing_zone_world.z = 5;
+        this->landing_zone_world.z = this->hover_height;
         break;
 
     case INITIALIZE_MODE:
@@ -173,23 +165,33 @@ void Quadrotor::runMission(
         break;
 
     case TRACKING_MODE:
+        // tag detected?
         if (landing_zone.detected == true) {
-            p.x = this->pose.x + landing_zone.x;
-            p.y = this->pose.y + landing_zone.y;
-            p.z = 5;
+            // check detection redunancy
+            if (this->landing_zone_belief < LZ_THRESHOLD) {
+                this->landing_zone_belief++;
 
-            this->landing_zone_prev.x = landing_zone.x;
-            this->landing_zone_prev.y = landing_zone.y;
-            this->landing_zone_prev.z = landing_zone.z;
+                p.x = this->landing_zone_world.x;
+                p.y = this->landing_zone_world.y;
+                p.z = this->hover_height;
 
-            this->landing_zone_world.x = p.x;
-            this->landing_zone_world.y = p.y;
-            this->landing_zone_world.z = 5;
+            } else {
+                this->landing_zone_world.x = p.x;
+                this->landing_zone_world.y = p.y;
+                this->landing_zone_world.z = p.z;
+
+                p.x = this->pose.x + landing_zone.x;
+                p.y = this->pose.y + landing_zone.y;
+                p.z = this->hover_height;
+
+            }
 
         } else {
+            this->landing_zone_belief = 0; // reset belief
+
             p.x = this->landing_zone_world.x;
             p.y = this->landing_zone_world.y;
-            p.z = 5;
+            p.z = this->hover_height;
 
         }
         break;
