@@ -60,7 +60,7 @@ void LandingTarget::cameraRBTCallback(const atim::AtimPoseStamped &msg)
         this->position.detected = msg.tag_detected;
 
     // ROS_INFO(
-    //     "pose: %f\t%f\t%f",
+    //     "pose before: %f\t%f\t%f",
     //     this->position.x,
     //     this->position.y,
     //     this->position.z
@@ -95,7 +95,7 @@ void LandingTarget::localPoseCallback(const geometry_msgs::PoseStamped &input)
 
     this->local_pose.roll = -1 * this->local_pose.roll;
     this->local_pose.pitch = -1 * this->local_pose.pitch;
-    this->local_pose.yaw = -1 * this->local_pose.yaw;
+    this->local_pose.yaw = 0 * this->local_pose.yaw;
 
     // ROS_INFO(
     //     "pose: %f\t%f\t%f",
@@ -152,9 +152,13 @@ int main(int argc, char **argv)
     double mount_roll = 0;
     double mount_pitch = -M_PI/2;
     double mount_yaw = 0;
-    double mount_x = 0.067;
+    // double mount_x = 0.067;
+    // double mount_y = 0.0;
+    // double mount_z = 0.07;
+
+    double mount_x = 0.0;
     double mount_y = 0.0;
-    double mount_z = 0.07;
+    double mount_z = 0.0;
 
     CameraMountRBT cam_rbt;
     LandingTarget *target;

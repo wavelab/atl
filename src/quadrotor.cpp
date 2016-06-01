@@ -191,7 +191,7 @@ void Quadrotor::runMission(
             p.x = this->pose.x;
             p.y = this->pose.y;
             p.z = this->pose.z - 2;
-            this->mission_state = LAND_MODE;
+            // this->mission_state = LAND_MODE;
 
         } else {
             p.x = carrot(0);
