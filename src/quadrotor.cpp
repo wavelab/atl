@@ -12,9 +12,9 @@ Quadrotor::Quadrotor(std::map<std::string, std::string> configs)
     this->pose.y = 0.0;
     this->pose.z = 0.0;
 
-    this->landing_zone_world.x = 0.0;
-    this->landing_zone_world.y = 0.0;
-    this->landing_zone_world.z = 0.0;
+    this->going_to.x = 0.0;
+    this->going_to.y = 0.0;
+    this->going_to.z = 0.0;
 
     // initialize position controller
     if (configs.count("position_controller")) {
@@ -122,8 +122,10 @@ void Quadrotor::runMission(
 )
 {
     Position p;
+    Eigen::Vector3d wp;
     Eigen::Vector3d position;
     Eigen::Vector3d carrot;
+    double elasped;
 
     // update pose
     this->updatePose(robot_pose);
@@ -136,12 +138,47 @@ void Quadrotor::runMission(
         this->mission_state = TRACKING_MODE;
         this->hover_height = robot_pose.z + 5.0;
 
-        this->landing_zone_world.x = this->pose.x;
-        this->landing_zone_world.y = this->pose.y;
-        this->landing_zone_world.z = this->hover_height;
+        // preset the landing zone position so when tag detection
+        // is lost it will hover in the same spot
+        this->going_to.x = this->pose.x;
+        this->going_to.y = this->pose.y;
+        this->going_to.z = this->hover_height;
         break;
 
-    case INITIALIZE_MODE:
+    case DISCOVER_MODE:
+        // tag detected?
+        if (landing_zone.detected == true) {
+            // check detection redunancy
+            if (this->landing_zone_belief == 10) {
+                this->mission_state = CARROT_TRACKER_MODE;
+                this->landing_zone_belief = 0;
+
+                // add start waypoint
+                wp << this->pose.x, this->pose.y, this->pose.z;
+                this->carrot_controller->wp_start = wp;
+                this->carrot_controller->waypoints.push_back(wp);
+
+                // add end waypoint
+                wp << landing_zone.x, landing_zone.y, this->hover_height;
+                this->carrot_controller->wp_end = wp;
+                this->carrot_controller->waypoints.push_back(wp);
+
+                // initialize carrot controller and wp_last_added
+                this->carrot_controller->initialized = 1;
+                this->wp_last_added = time(NULL);
+
+            } else {
+                this->landing_zone_belief++;
+
+            }
+        }
+
+        p.x = this->going_to.x;
+        p.y = this->going_to.y;
+        p.z = this->hover_height;
+        break;
+
+    case CARROT_INITIALIZE_MODE:
         this->initializeMission();
         this->mission_state = CARROT_MODE;
         std::cout << "Carrot controller initialized!" << std::endl;
@@ -171,14 +208,14 @@ void Quadrotor::runMission(
             if (this->landing_zone_belief < LZ_THRESHOLD) {
                 this->landing_zone_belief++;
 
-                p.x = this->landing_zone_world.x;
-                p.y = this->landing_zone_world.y;
+                p.x = this->going_to.x;
+                p.y = this->going_to.y;
                 p.z = this->hover_height;
 
             } else {
-                this->landing_zone_world.x = p.x;
-                this->landing_zone_world.y = p.y;
-                this->landing_zone_world.z = p.z;
+                this->going_to.x = p.x;
+                this->going_to.y = p.y;
+                this->going_to.z = p.z;
 
                 p.x = this->pose.x + landing_zone.x;
                 p.y = this->pose.y + landing_zone.y;
@@ -187,17 +224,46 @@ void Quadrotor::runMission(
             }
 
         } else {
-            this->landing_zone_belief = 0; // reset belief
+            this->landing_zone_belief = 0;  // reset belief
 
-            p.x = this->landing_zone_world.x;
-            p.y = this->landing_zone_world.y;
+            p.x = this->going_to.x;
+            p.y = this->going_to.y;
             p.z = this->hover_height;
 
         }
         break;
 
-    case LAND_MODE:
-        // do nothing
+    case CARROT_TRACKER_MODE:
+        // calculate new carrot
+        position << this->pose.x, this->pose.y, this->pose.z;
+        carrot << this->going_to.x,
+                  this->going_to.y,
+                  this->going_to.z;
+        this->carrot_controller->update(position, carrot);
+
+        // add new waypoint
+        elasped = difftime(this->wp_last_added, time(NULL));
+        if (elasped > 1.0 && landing_zone.detected == true) {
+            // lower hover height if we are close to target
+            if ((this->pose.x - landing_zone.x) < 0.2 && (this->pose.x - landing_zone.x) < 0.2) {
+                this->hover_height = this->hover_height * 0.9;
+            }
+
+            wp << landing_zone.x, landing_zone.y, this->hover_height;
+            this->carrot_controller->waypoints.push_back(wp);
+        }
+        this->wp_last_added = time(NULL);
+
+        // move to position
+        p.x = carrot(0);
+        p.y = carrot(1);
+        p.z = carrot(2);
+
+        // keep track of where it was going
+        this->going_to.x = carrot(0),
+        this->going_to.y = carrot(1),
+        this->going_to.z = carrot(2);
+
         break;
     }
 

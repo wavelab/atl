@@ -12,10 +12,11 @@
 
 // STATES
 #define IDLE_MODE 0
-#define INITIALIZE_MODE 1
-#define CARROT_MODE 2
-#define TRACKING_MODE 3
-#define LAND_MODE 4
+#define DISCOVER_MODE 1
+#define CARROT_INITIALIZE_MODE 2
+#define CARROT_MODE 3
+#define TRACKING_MODE 4
+#define CARROT_TRACKER_MODE 5
 
 
 class Quadrotor
@@ -27,7 +28,8 @@ public:
     Pose pose;
     float hover_height;
     int landing_zone_belief;
-    Position landing_zone_world;
+    Position going_to;
+    time_t wp_last_added;
 
     // controllers
     CarrotController *carrot_controller;

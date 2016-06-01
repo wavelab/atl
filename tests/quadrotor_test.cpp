@@ -45,9 +45,9 @@ int testQuadrotor(void)
 	mu_check(quad->pose.y == 0);
 	mu_check(quad->pose.z == 0);
 
-	mu_check(quad->landing_zone_world.x == 0);
-	mu_check(quad->landing_zone_world.y == 0);
-	mu_check(quad->landing_zone_world.z == 0);
+	mu_check(quad->going_to.x == 0);
+	mu_check(quad->going_to.y == 0);
+	mu_check(quad->going_to.z == 0);
 
 	mu_check(quad->position_controller != NULL);
 	mu_check(quad->carrot_controller != NULL);
@@ -209,9 +209,9 @@ int testQuadrotorRunMission(void)
     // test and assert
     quad->runMission(robot_pose, landing_zone, dt);
     mu_check(quad->mission_state == TRACKING_MODE);
-    mu_check(fltcmp(quad->landing_zone_world.x, robot_pose.x) == 0);
-    mu_check(fltcmp(quad->landing_zone_world.y, robot_pose.y) == 0);
-    mu_check(fltcmp(quad->landing_zone_world.z, 5) == 0);
+    mu_check(fltcmp(quad->going_to.x, robot_pose.x) == 0);
+    mu_check(fltcmp(quad->going_to.y, robot_pose.y) == 0);
+    mu_check(fltcmp(quad->going_to.z, 5) == 0);
 
 	robot_pose.x = 1.0f;
 	robot_pose.y = 1.0f;
@@ -219,9 +219,9 @@ int testQuadrotorRunMission(void)
 
     quad->runMission(robot_pose, landing_zone, dt);
     mu_check(quad->mission_state == TRACKING_MODE);
-    // mu_check(fltcmp(quad->landing_zone_world.x, robot_pose.x) == 0);
-    // mu_check(fltcmp(quad->landing_zone_world.y, robot_pose.y) == 0);
-    // mu_check(fltcmp(quad->landing_zone_world.z, 5) == 0);
+    // mu_check(fltcmp(quad->going_to.x, robot_pose.x) == 0);
+    // mu_check(fltcmp(quad->going_to.y, robot_pose.y) == 0);
+    // mu_check(fltcmp(quad->going_to.z, 5) == 0);
 
     return 0;
 }
