@@ -8,7 +8,7 @@
 
 
 // CONSTANTS
-#define LZ_THRESHOLD 2
+#define LZ_THRESHOLD 0
 
 // STATES
 #define IDLE_MODE 0

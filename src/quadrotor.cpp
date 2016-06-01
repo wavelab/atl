@@ -176,13 +176,13 @@ void Quadrotor::runMission(
                 p.z = this->hover_height;
 
             } else {
-                // this->landing_zone_world.x = p.x;
-                // this->landing_zone_world.y = p.y;
-                // this->landing_zone_world.z = p.z;
-
                 p.x = this->pose.x + landing_zone.x;
                 p.y = this->pose.y + landing_zone.y;
                 p.z = this->hover_height;
+
+                this->landing_zone_world.x = p.x;
+                this->landing_zone_world.y = p.y;
+                this->landing_zone_world.z = p.z;
 
             }
 
