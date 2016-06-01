@@ -136,7 +136,7 @@ void Quadrotor::runMission(
         // transition to offboard mode
         // this->mission_state = INITIALIZE_MODE;
         this->mission_state = TRACKING_MODE;
-        this->hover_height = robot_pose.z + 5.0;
+        this->hover_height = robot_pose.z + 3.0;
 
         // preset the landing zone position so when tag detection
         // is lost it will hover in the same spot
@@ -213,14 +213,13 @@ void Quadrotor::runMission(
                 p.z = this->hover_height;
 
             } else {
-                this->going_to.x = p.x;
-                this->going_to.y = p.y;
-                this->going_to.z = p.z;
-
                 p.x = this->pose.x + landing_zone.x;
                 p.y = this->pose.y + landing_zone.y;
                 p.z = this->hover_height;
 
+                this->going_to.x = p.x;
+                this->going_to.y = p.y;
+                this->going_to.z = p.z;
             }
 
         } else {
@@ -268,5 +267,6 @@ void Quadrotor::runMission(
     }
 
     // calcualte new attitude using position controller
+    // std::cout << "move to: " << p.x << " " << p.y << std::endl;
     this->positionControllerCalculate(p, dt);
 }

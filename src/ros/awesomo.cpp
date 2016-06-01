@@ -399,6 +399,7 @@ int main(int argc, char **argv)
     std::string position_controller_config;
     std::string carrot_controller_config;
     std::map<std::string, std::string> configs;
+    std_msgs::Float64 throttle;
 
     // get configuration paths
 	node_handle.getParam("/position_controller", position_controller_config);
@@ -416,8 +417,13 @@ int main(int argc, char **argv)
         // check if offboard switch has been turned on
         if (awesomo->rc_in[6] < 1500) {
             awesomo->quad->resetPositionController();
+
+            throttle.data = 0.0;
+            awesomo->throttle_publisher.publish(throttle);
+        } else {
+            awesomo->run(msg, seq, last_request);
+
         }
-        awesomo->run(msg, seq, last_request);
 
 		// end
 		seq++;
