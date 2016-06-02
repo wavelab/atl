@@ -26,9 +26,11 @@ public:
     int mission_state;
 
     Pose pose;
+    Position going_to;
+
     float hover_height;
     int landing_zone_belief;
-    Position going_to;
+
     time_t wp_last_added;
 
     // controllers
