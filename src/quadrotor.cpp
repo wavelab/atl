@@ -128,6 +128,8 @@ void Quadrotor::runMission(
     Eigen::Vector3d wp;
     Eigen::Vector3d position;
     Eigen::Vector3d carrot;
+	Eigen::VectorXd mu(9);
+	Eigen::VectorXd y(3);
     double elasped;
 
     // update pose
@@ -138,7 +140,8 @@ void Quadrotor::runMission(
     case IDLE_MODE:
         // transition to offboard mode
         // this->mission_state = INITIALIZE_MODE;
-        this->mission_state = DISCOVER_MODE;
+        // this->mission_state = DISCOVER_MODE;
+        this->mission_state = KF_DISCOVER_MODE;
         this->hover_height = robot_pose.z + 3.0;
 
         // preset the landing zone position so when tag detection
@@ -271,6 +274,48 @@ void Quadrotor::runMission(
         this->going_to.y = carrot(1),
         this->going_to.z = carrot(2);
 
+        break;
+
+    case KF_DISCOVER_MODE:
+        if (landing_zone.detected == true) {
+            mu << this->pose.x + landing_zone.x,  // pos_x
+                  this->pose.y + landing_zone.y,  // pos_y
+                  this->pose.z + landing_zone.z,  // pos_z
+                  0.0, 0.0, 0.0,  // vel_x, vel_y, vel_z
+                  0.0, 0.0, 0.0;  // acc_x, acc_y, acc_z
+            apriltag_kf_setup(&this->apriltag_estimator, mu);
+
+            std::cout << "Going to KF Tracker Mode!" << std::endl;
+            this->mission_state = KF_TRACKING_MODE;
+
+        } else {
+            p.x = this->going_to.x;
+            p.y = this->going_to.y;
+            p.z = this->hover_height;
+
+        }
+        break;
+
+    case KF_TRACKING_MODE:
+        // transform detected tag to world frame
+        y << this->pose.x + landing_zone.x,
+             this->pose.y + landing_zone.y,
+             this->pose.z + landing_zone.z;
+
+        // estimate tag position
+        apriltag_kf_estimate(&this->apriltag_estimator, y, dt, landing_zone.detected);
+
+        // build position
+        p.x = this->apriltag_estimator.mu(0);
+        p.y = this->apriltag_estimator.mu(1);
+        p.z = this->hover_height;
+
+        // keep track of apriltag position
+        if (landing_zone.detected == true) {
+            this->going_to.x = p.x;
+            this->going_to.y = p.y;
+            this->going_to.z = p.z;
+        }
         break;
     }
 

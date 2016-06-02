@@ -5,6 +5,7 @@
 
 #include "awesomo/util.hpp"
 #include "awesomo/controller.hpp"
+#include "awesomo/estimator.hpp"
 
 
 // CONSTANTS
@@ -17,6 +18,8 @@
 #define CARROT_MODE 3
 #define TRACKING_MODE 4
 #define CARROT_TRACKER_MODE 5
+#define KF_DISCOVER_MODE 6
+#define KF_TRACKING_MODE 7
 
 
 class Quadrotor
@@ -36,6 +39,9 @@ public:
     // controllers
     CarrotController *carrot_controller;
     PositionController *position_controller;
+
+    // estimators
+    struct kf apriltag_estimator;
 
     Quadrotor(std::map<std::string, std::string> configs);
     Attitude positionControllerCalculate(Position p, float dt);
