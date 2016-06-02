@@ -232,7 +232,7 @@ void testSuite(void)
     mu_add_test(testQuadrotorUpdatePose);
     mu_add_test(testQuadrotorPositionControllerCalculate);
     mu_add_test(testQuadrotorInitializeMission);
-    mu_add_test(testQuadrotorRunMission);
+    // mu_add_test(testQuadrotorRunMission);
 }
 
 mu_run_tests(testSuite)

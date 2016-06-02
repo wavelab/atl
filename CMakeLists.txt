@@ -26,8 +26,8 @@ FIND_PACKAGE(
     image_transport
     cv_bridge
 )
-FIND_PACKAGE(OpenCV)
-FIND_PACKAGE(Boost)
+FIND_PACKAGE(OpenCV REQUIRED)
+FIND_PACKAGE(Boost REQUIRED)
 
 # LIBS
 LINK_DIRECTORIES(
@@ -68,6 +68,7 @@ ADD_LIBRARY(
     src/camera.cpp
     src/controller.cpp
     src/quadrotor.cpp
+    src/estimator.cpp
 )
 
 
@@ -133,6 +134,22 @@ TARGET_LINK_LIBRARIES(
 )
 INSTALL(
     TARGETS awesomo_quadrotor_test
+    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+# tests/estimator_test
+ADD_EXECUTABLE(awesomo_estimator_test tests/estimator_test.cpp)
+TARGET_LINK_LIBRARIES(
+    awesomo_estimator_test
+    libawesomo
+    apriltags
+    yaml-cpp
+    flycapture
+    ${OpenCV_LIBS}
+    ${catkin_LIBRARIES}
+)
+INSTALL(
+    TARGETS awesomo_estimator_test
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
