@@ -5,6 +5,7 @@
 #include <ros/ros.h>
 #include <std_msgs/Float64.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/TwistStamped.h>
 
 #define MAVLINK_DIALECT common
 #include <mavros/mavros.h>
@@ -27,6 +28,7 @@
 #define MOCAP_TOPIC "/awesomo/mocap/pose"
 #define MODE_TOPIC "/mavros/set_mode"
 #define POSE_TOPIC "/mavros/local_position/pose"
+#define VELOCITY_TOPIC "/mavros/local_position/velocity"
 #define POSITION_TOPIC "/mavros/setpoint_position/local"
 #define ATTITUDE_TOPIC "/mavros/setpoint_attitude/attitude"
 #define THROTTLE_TOPIC "/mavros/setpoint_attitude/att_throttle"
@@ -45,6 +47,7 @@ public:
     mavros_msgs::State state;
 
     Pose pose;
+    Velocity velocity;
     Pose mocap_pose;
     LandingTargetPosition landing_zone;
     bool landing_zone_detected;
@@ -56,6 +59,7 @@ public:
 
     ros::Subscriber mocap_subscriber;
     ros::Subscriber pose_subscriber;
+    ros::Subscriber velocity_subscriber;
     ros::Subscriber radio_subscriber;
     ros::Subscriber landing_subscriber;
 
@@ -67,6 +71,7 @@ public:
     ros::Publisher position_controller_z_publisher;
 
     void poseCallback(const geometry_msgs::PoseStamped &msg);
+    void velocityCallback(const geometry_msgs::TwistStamped &msg);
     void mocapCallback(const geometry_msgs::PoseStamped &msg);
     void radioCallback(const mavros_msgs::RCIn &msg);
     void landingCallback(const atim::AtimPoseStamped &msg);
@@ -78,6 +83,7 @@ public:
     int disarm(void);
     int setOffboardModeOn(void);
     void subscribeToPose(void);
+    void subscribeToVelocity(void);
     void subscribeToMocap(void);
     void subscribeToRadioIn(void);
     void subscribeToLanding(void);
@@ -102,7 +108,6 @@ Awesomo::Awesomo(std::map<std::string, std::string> configs)
     for (int i = 0; i < 16; i++) {
         this->rc_in[i] = 0.0f;
     }
-
     quad = new Quadrotor(configs);
 
     // wait till connected to FCU
@@ -114,6 +119,7 @@ Awesomo::Awesomo(std::map<std::string, std::string> configs)
 
     // initialize subscribers
 	this->subscribeToPose();
+	this->subscribeToVelocity();
 	this->subscribeToRadioIn();
 	this->subscribeToLanding();
 
@@ -159,6 +165,17 @@ void Awesomo::poseCallback(const geometry_msgs::PoseStamped &msg)
         &this->pose.pitch,
         &this->pose.yaw
     );
+}
+
+void Awesomo::velocityCallback(const geometry_msgs::TwistStamped &msg)
+{
+    this->velocity.linear_x = msg.twist.linear.x;
+    this->velocity.linear_y = msg.twist.linear.y;
+    this->velocity.linear_z = msg.twist.linear.z;
+
+    this->velocity.angular_x = msg.twist.angular.x;
+    this->velocity.angular_y = msg.twist.angular.y;
+    this->velocity.angular_z = msg.twist.angular.z;
 }
 
 void Awesomo::mocapCallback(const geometry_msgs::PoseStamped &msg)
@@ -265,6 +282,17 @@ void Awesomo::subscribeToPose(void)
         POSE_TOPIC,
         50,
         &Awesomo::poseCallback,
+        this
+    );
+}
+
+void Awesomo::subscribeToVelocity(void)
+{
+    ROS_INFO("subcribing to [VELOCITY]");
+    this->velocity_subscriber = this->node.subscribe(
+        VELOCITY_TOPIC,
+        50,
+        &Awesomo::velocityCallback,
         this
     );
 }
