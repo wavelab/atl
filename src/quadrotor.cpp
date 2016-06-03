@@ -141,7 +141,6 @@ void Quadrotor::runMission(
         std::cout << "Currently in Idle Mode!" << std::endl;
         // transition to offboard mode
         // this->mission_state = INITIALIZE_MODE;
-        // this->mission_state = DISCOVER_MODE;
         this->mission_state = KF_DISCOVER_MODE;
         this->hover_height = robot_pose.z + 3.0;
 
@@ -150,40 +149,6 @@ void Quadrotor::runMission(
         this->going_to.x = this->pose.x;
         this->going_to.y = this->pose.y;
         this->going_to.z = this->hover_height;
-        break;
-
-    case DISCOVER_MODE:
-        // tag detected?
-        if (landing_zone.detected == true) {
-            // check detection redunancy
-            if (this->landing_zone_belief == 5) {
-                std::cout << "Going to Carrot Tracker Mode!" << std::endl;
-                this->mission_state = CARROT_TRACKER_MODE;
-                this->landing_zone_belief = 0;
-
-                // add start waypoint
-                wp << this->pose.x, this->pose.y, this->pose.z;
-                this->carrot_controller->wp_start = wp;
-                this->carrot_controller->waypoints.push_back(wp);
-
-                // add end waypoint
-                wp << this->pose.x + landing_zone.x, this->pose.y + landing_zone.y, this->hover_height;
-                this->carrot_controller->wp_end = wp;
-                this->carrot_controller->waypoints.push_back(wp);
-
-                // initialize carrot controller and wp_last_added
-                this->carrot_controller->initialized = 1;
-                this->wp_last_added = time(NULL);
-
-            } else {
-                this->landing_zone_belief++;
-
-            }
-        }
-
-        p.x = this->going_to.x;
-        p.y = this->going_to.y;
-        p.z = this->hover_height;
         break;
 
     case CARROT_INITIALIZE_MODE:
@@ -205,37 +170,6 @@ void Quadrotor::runMission(
             p.x = carrot(0);
             p.y = carrot(1);
             p.z = carrot(2);
-
-        }
-        break;
-
-    case TRACKING_MODE:
-        // tag detected?
-        if (landing_zone.detected == true) {
-            // check detection redunancy
-            if (this->landing_zone_belief < LZ_THRESHOLD) {
-                this->landing_zone_belief++;
-
-                p.x = this->going_to.x;
-                p.y = this->going_to.y;
-                p.z = this->hover_height;
-
-            } else {
-                p.x = this->pose.x + landing_zone.x;
-                p.y = this->pose.y + landing_zone.y;
-                p.z = this->hover_height;
-
-                this->going_to.x = p.x;
-                this->going_to.y = p.y;
-                this->going_to.z = p.z;
-            }
-
-        } else {
-            this->landing_zone_belief = 0;  // reset belief
-
-            p.x = this->going_to.x;
-            p.y = this->going_to.y;
-            p.z = this->hover_height;
 
         }
         break;
@@ -267,7 +201,12 @@ void Quadrotor::runMission(
              this->pose.z + landing_zone.z;
 
         // estimate tag position
-        apriltag_kf_estimate(&this->apriltag_estimator, y, dt, landing_zone.detected);
+        apriltag_kf_estimate(
+            &this->apriltag_estimator,
+            y,
+            dt,
+            landing_zone.detected
+        );
 
         // build position
         p.x = this->apriltag_estimator.mu(0);
@@ -288,6 +227,12 @@ void Quadrotor::runMission(
             this->going_to.z = p.z;
         }
         break;
+
+    // default:
+    //     printf("ERROR! Invalid quadrotor state [%d]\n", this->mission_state);
+    //     exit(-1);
+    //     break;
+
     }
 
     // calcualte new attitude using position controller
