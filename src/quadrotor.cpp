@@ -240,43 +240,6 @@ void Quadrotor::runMission(
         }
         break;
 
-    case CARROT_TRACKER_MODE:
-        // add new waypoint
-        elasped = difftime(time(NULL), this->wp_last_added);
-        if (elasped > 1.0 && landing_zone.detected == true) {
-            std::cout << "elapsed 1s!" << std::endl;
-            // lower hover height if we are close to target
-            // if ((this->pose.x - landing_zone.x) < 0.2 && (this->pose.x - landing_zone.x) < 0.2) {
-            //     this->hover_height = this->hover_height * 0.9;
-            // }
-
-            wp <<
-                this->pose.x + landing_zone.x,
-                this->pose.y + landing_zone.y,
-                this->hover_height;
-            this->carrot_controller->waypoints.push_back(wp);
-            this->wp_last_added = time(NULL);
-        }
-
-        // calculate new carrot
-        position << this->pose.x, this->pose.y, this->pose.z;
-        carrot << this->going_to.x,
-                  this->going_to.y,
-                  this->going_to.z;
-        this->carrot_controller->update(position, carrot);
-
-        // move to position
-        p.x = carrot(0);
-        p.y = carrot(1);
-        p.z = carrot(2);
-
-        // keep track of where it was going
-        this->going_to.x = carrot(0),
-        this->going_to.y = carrot(1),
-        this->going_to.z = carrot(2);
-
-        break;
-
     case KF_DISCOVER_MODE:
         if (landing_zone.detected == true) {
             mu << this->pose.x + landing_zone.x,  // pos_x
@@ -311,7 +274,14 @@ void Quadrotor::runMission(
         p.y = this->apriltag_estimator.mu(1);
         p.z = this->hover_height;
 
-        // keep track of apriltag position
+        // hover - close enough
+        if (landing_zone.x < 0.1 && landing_zone.y < 0.1) {
+            p.x = this->pose.x;
+            p.y = this->pose.z;
+            p.z = this->hover_height;
+        }
+
+        // keep track of target position
         if (landing_zone.detected == true) {
             this->going_to.x = p.x;
             this->going_to.y = p.y;
@@ -321,6 +291,5 @@ void Quadrotor::runMission(
     }
 
     // calcualte new attitude using position controller
-    // std::cout << "move to: " << p.x << " " << p.y << std::endl;
     this->positionControllerCalculate(p, dt);
 }

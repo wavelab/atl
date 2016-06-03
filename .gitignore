@@ -20,3 +20,8 @@ run.sh
 # matlab
 *.mat
 octave-workspace
+
+# misc
+.ropeproject
+
+
