@@ -138,6 +138,7 @@ void Quadrotor::runMission(
     // mission
     switch (this->mission_state) {
     case IDLE_MODE:
+        std::cout << "Currently in Idle Mode!" << std::endl;
         // transition to offboard mode
         // this->mission_state = INITIALIZE_MODE;
         // this->mission_state = DISCOVER_MODE;
