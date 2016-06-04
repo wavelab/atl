@@ -417,7 +417,7 @@ int main(int argc, char **argv)
     // setup
     ros::init(argc, argv, "awesomo");
     ros::NodeHandle node_handle;
-    ros::Rate rate(50.0);
+    ros::Rate rate(100.0);
     ros::Time last_request;
     geometry_msgs::PoseStamped msg;
 

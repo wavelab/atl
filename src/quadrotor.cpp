@@ -213,12 +213,12 @@ void Quadrotor::runMission(
         p.y = this->apriltag_estimator.mu(1);
         p.z = this->hover_height;
 
-        // hover - close enough
-        if (landing_zone.x < 0.1 && landing_zone.y < 0.1) {
-            p.x = this->pose.x;
-            p.y = this->pose.z;
-            p.z = this->hover_height;
-        }
+        // // hover - close enough
+        // if (landing_zone.x < 0.1 && landing_zone.y < 0.1) {
+        //     p.x = this->pose.x;
+        //     p.y = this->pose.z;
+        //     p.z = this->hover_height;
+        // }
 
         // keep track of target position
         if (landing_zone.detected == true) {
