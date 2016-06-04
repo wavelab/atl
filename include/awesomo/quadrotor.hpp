@@ -12,6 +12,7 @@
 #define LZ_THRESHOLD 0
 
 // STATES
+#define KILL_ENGINES -1
 #define IDLE_MODE 0
 #define CARROT_INITIALIZE_MODE 1
 #define CARROT_MODE 2
@@ -31,7 +32,8 @@ public:
     float hover_height;
     int landing_zone_belief;
 
-    time_t wp_last_added;
+    time_t tracking_start;
+    time_t height_last_updated;
 
     // controllers
     CarrotController *carrot_controller;
@@ -45,7 +47,7 @@ public:
     void updatePose(Pose p);
     void resetPositionController(void);
     void initializeMission(void);
-    void runMission(
+    int runMission(
         Pose robot_pose,
         LandingTargetPosition landing_zone,
         float dt

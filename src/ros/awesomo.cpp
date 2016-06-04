@@ -449,8 +449,9 @@ int main(int argc, char **argv)
             throttle.data = 0.0;
             awesomo->throttle_publisher.publish(throttle);
         } else {
-            awesomo->run(msg, seq, last_request);
-
+            if (awesomo->run(msg, seq, last_request)) {
+                awesomo->disarm();
+            }
         }
 
 		// end

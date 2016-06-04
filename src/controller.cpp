@@ -276,3 +276,42 @@ void PositionController::calculate(Position setpoint, Pose robot, float dt)
     this->rpy_quat = euler2quat(roll_adjusted, pitch_adjusted, 0);
     this->throttle = throttle_adjusted;
 }
+
+
+
+// LANDING CONTROLLER
+LandingController::LandingController(const std::string config_file)
+{
+    this->loadConfig(config_file);
+}
+
+void LandingController::loadConfig(const std::string config_file)
+{
+    try {
+        YAML::Node config = YAML::LoadFile(config_file);
+
+        // thrust controller
+        this->thrust.setpoint = config["thrust_controller"]["setpoint"].as<float>();
+        this->thrust.output = 0.0f;
+        this->thrust.prev_error = 0.0f;
+        this->thrust.sum_error = 0.0f;
+        this->thrust.p_error = 0.0f;
+        this->thrust.i_error = 0.0f;
+        this->thrust.d_error = 0.0f;
+        this->thrust.k_p = config["thrust_controller"]["k_p"].as<float>();
+        this->thrust.k_i = config["thrust_controller"]["k_i"].as<float>();
+        this->thrust.k_d = config["thrust_controller"]["k_d"].as<float>();
+        this->thrust.dead_zone = config["thrust_controller"]["deadzone"].as<float>();
+        this->thrust.min = config["thrust_controller"]["min"].as<float>();
+        this->thrust.max = config["thrust_controller"]["max"].as<float>();
+
+    } catch (YAML::BadFile &ex) {
+        throw;
+    }
+}
+
+void LandingController::calculate(float setpoint, Pose robot, float dt)
+{
+
+
+}
