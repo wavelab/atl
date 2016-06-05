@@ -3,20 +3,17 @@ std_msgs/Header header
 float32 roll_p_error
 float32 roll_i_error
 float32 roll_d_error
-float32 roll_input
 float32 roll_output
 float32 roll_setpoint
 
 float32 pitch_p_error
 float32 pitch_i_error
 float32 pitch_d_error
-float32 pitch_input
 float32 pitch_output
 float32 pitch_setpoint
 
 float32 throttle_p_error
 float32 throttle_i_error
 float32 throttle_d_error
-float32 throttle_input
 float32 throttle_output
 float32 throttle_setpoint

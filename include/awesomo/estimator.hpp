@@ -7,8 +7,6 @@
 // STRUCTURES
 struct kf
 {
-    Eigen::VectorXd mu;
-
     Eigen::MatrixXd A;
     Eigen::MatrixXd B;
     Eigen::MatrixXd R;
@@ -19,6 +17,8 @@ struct kf
     Eigen::MatrixXd S;
     Eigen::MatrixXd I;
     Eigen::MatrixXd K;
+
+    Eigen::VectorXd mu;
 
     Eigen::VectorXd mu_p;
     Eigen::MatrixXd S_p;

@@ -20,6 +20,7 @@
 #include "awesomo/controller.hpp"
 #include "awesomo/quadrotor.hpp"
 #include "awesomo/PositionControllerStats.h"
+#include "awesomo/KFStats.h"
 
 
 
@@ -32,9 +33,8 @@
 #define POSITION_TOPIC "/mavros/setpoint_position/local"
 #define ATTITUDE_TOPIC "/mavros/setpoint_attitude/attitude"
 #define THROTTLE_TOPIC "/mavros/setpoint_attitude/att_throttle"
-#define POSITION_X_CONTROLLER_TOPIC "/awesomo/position_controller/x"
-#define POSITION_Y_CONTROLLER_TOPIC "/awesomo/position_controller/y"
-#define POSITION_Z_CONTROLLER_TOPIC "/awesomo/position_controller/z"
+#define POSITION_CONTROLLER_TOPIC "/awesomo/position_controller/stats"
+#define KF_ESTIMATION_TOPIC "/awesomo/kf_estimation/stats"
 #define RADIO_TOPIC "/mavros/rc/in"
 #define LANDING_TOPIC "/awesomo/landing_target/pose"
 
@@ -66,9 +66,8 @@ public:
     ros::Publisher position_publisher;
     ros::Publisher attitude_publisher;
     ros::Publisher throttle_publisher;
-    ros::Publisher position_controller_x_publisher;
-    ros::Publisher position_controller_y_publisher;
-    ros::Publisher position_controller_z_publisher;
+    ros::Publisher position_controller_stats_publisher;
+    ros::Publisher kf_estimator_stats_publisher;
 
     void poseCallback(const geometry_msgs::PoseStamped &msg);
     void velocityCallback(const geometry_msgs::TwistStamped &msg);
@@ -93,6 +92,7 @@ public:
         int seq,
         ros::Time time
     );
+    void publishKFStats(int seq, ros::Time time);
     int run(
         geometry_msgs::PoseStamped &msg,
         int seq,
@@ -136,19 +136,14 @@ Awesomo::Awesomo(std::map<std::string, std::string> configs)
         THROTTLE_TOPIC,
         50
     );
-    this->position_controller_x_publisher = this->node.advertise<geometry_msgs::PoseStamped>(
-        POSITION_X_CONTROLLER_TOPIC,
+    this->position_controller_stats_publisher = this->node.advertise<awesomo::PositionControllerStats>(
+        POSITION_CONTROLLER_TOPIC,
         50
     );
-    this->position_controller_y_publisher = this->node.advertise<geometry_msgs::PoseStamped>(
-        POSITION_Y_CONTROLLER_TOPIC,
+    this->kf_estimator_stats_publisher = this->node.advertise<awesomo::KFStats>(
+        KF_ESTIMATION_TOPIC,
         50
     );
-    this->position_controller_z_publisher = this->node.advertise<geometry_msgs::PoseStamped>(
-        POSITION_Z_CONTROLLER_TOPIC,
-        50
-    );
-
 }
 
 void Awesomo::poseCallback(const geometry_msgs::PoseStamped &msg)
@@ -332,40 +327,35 @@ void Awesomo::subscribeToLanding(void)
 
 void Awesomo::publishPositionControllerStats(int seq, ros::Time time)
 {
-	geometry_msgs::PoseStamped msg;
+	awesomo::PositionControllerStats msg;
+
+    // msg header
+    msg.header.seq = seq;
+    msg.header.stamp = time;
+    msg.header.frame_id = "awesomo_position_controller";
 
     // roll
-    msg.header.seq = seq;
-    msg.header.stamp = time;
-    msg.header.frame_id = "awesomo_position_controller_x";
-    msg.pose.position.x = this->quad->position_controller->x.p_error;
-    msg.pose.position.y = this->quad->position_controller->x.i_error;
-    msg.pose.position.z = this->quad->position_controller->x.d_error;
-    msg.pose.orientation.x = this->quad->position_controller->x.output * M_PI / 180;
-    msg.pose.orientation.y = this->quad->position_controller->x.setpoint;
-    this->position_controller_x_publisher.publish(msg);
+    msg.pitch_p_error = this->quad->position_controller->x.p_error;
+    msg.pitch_i_error = this->quad->position_controller->x.i_error;
+    msg.pitch_d_error = this->quad->position_controller->x.d_error;
+    msg.pitch_output = this->quad->position_controller->x.output * M_PI / 180;
+    msg.pitch_setpoint  = this->quad->position_controller->x.setpoint;
 
     // pitch
-    msg.header.seq = seq;
-    msg.header.stamp = time;
-    msg.header.frame_id = "awesomo_position_controller_y";
-    msg.pose.position.x = this->quad->position_controller->y.p_error;
-    msg.pose.position.y = this->quad->position_controller->y.i_error;
-    msg.pose.position.z = this->quad->position_controller->y.d_error;
-    msg.pose.orientation.x = this->quad->position_controller->y.output * M_PI / 180;
-    msg.pose.orientation.y = this->quad->position_controller->y.setpoint;
-    this->position_controller_y_publisher.publish(msg);
+    msg.roll_p_error = this->quad->position_controller->y.p_error;
+    msg.roll_i_error = this->quad->position_controller->y.i_error;
+    msg.roll_d_error = this->quad->position_controller->y.d_error;
+    msg.roll_output = this->quad->position_controller->y.output * M_PI / 180;
+    msg.roll_setpoint  = this->quad->position_controller->y.setpoint;
 
-    // throttle
-    msg.header.seq = seq;
-    msg.header.stamp = time;
-    msg.header.frame_id = "awesomo_position_controller_T";
-    msg.pose.position.x = this->quad->position_controller->T.p_error;
-    msg.pose.position.y = this->quad->position_controller->T.i_error;
-    msg.pose.position.z = this->quad->position_controller->T.d_error;
-    msg.pose.orientation.x = this->quad->position_controller->T.output * M_PI / 180;
-    msg.pose.orientation.y = this->quad->position_controller->T.setpoint;
-    this->position_controller_z_publisher.publish(msg);
+    // thrust
+    msg.throttle_p_error = this->quad->position_controller->T.p_error;
+    msg.throttle_i_error = this->quad->position_controller->T.i_error;
+    msg.throttle_d_error = this->quad->position_controller->T.d_error;
+    msg.throttle_output = this->quad->position_controller->T.output * M_PI / 180;
+    msg.throttle_setpoint = this->quad->position_controller->T.setpoint;
+
+    this->position_controller_stats_publisher.publish(msg);
 }
 
 void Awesomo::publishPositionControllerMessage(
@@ -393,6 +383,90 @@ void Awesomo::publishPositionControllerMessage(
     // throttle command
     throttle.data = this->quad->position_controller->throttle;
     this->throttle_publisher.publish(throttle);
+}
+
+void Awesomo::publishKFStats(int seq, ros::Time time)
+{
+	awesomo::KFStats msg;
+	struct kf *estimator;
+
+	// setup
+	estimator = &this->quad->apriltag_estimator;
+
+    // message header
+    msg.header.seq = seq;
+    msg.header.stamp = time;
+    msg.header.frame_id = "awesomo_kf_estimation";
+
+    // A matrix
+    msg.A_rows = estimator->A.rows();
+    msg.A_cols = estimator->A.cols();
+    for (int i = 0; i < estimator->A.size(); i++) {
+        msg.A_data[i] = estimator->A(i);
+    }
+
+    // B matrix
+    msg.B_rows = estimator->B.rows();
+    msg.B_cols = estimator->B.cols();
+    for (int i = 0; i < estimator->B.size(); i++) {
+        msg.B_data[i] = estimator->B(i);
+    }
+
+    // R matrix
+    msg.R_rows = estimator->R.rows();
+    msg.R_cols = estimator->R.cols();
+    for (int i = 0; i < estimator->R.size(); i++) {
+        msg.R_data[i] = estimator->R(i);
+    }
+
+    // C matrix
+    msg.C_rows = estimator->C.rows();
+    msg.C_cols = estimator->C.cols();
+    for (int i = 0; i < estimator->C.size(); i++) {
+        msg.C_data[i] = estimator->C(i);
+    }
+
+    // Q matrix
+    msg.Q_rows = estimator->Q.rows();
+    msg.Q_cols = estimator->Q.cols();
+    for (int i = 0; i < estimator->Q.size(); i++) {
+        msg.Q_data[i] = estimator->Q(i);
+    }
+
+    // S matrix
+    msg.S_rows = estimator->S.rows();
+    msg.S_cols = estimator->S.cols();
+    for (int i = 0; i < estimator->S.size(); i++) {
+        msg.S_data[i] = estimator->S(i);
+    }
+
+    // K matrix
+    msg.K_rows = estimator->K.rows();
+    msg.K_cols = estimator->K.cols();
+    for (int i = 0; i < estimator->K.size(); i++) {
+        msg.K_data[i] = estimator->K(i);
+    }
+
+    // mu vector
+    msg.mu_size = estimator->mu.size();
+    for (int i = 0; i < estimator->mu.size(); i++) {
+        msg.mu_data[i] = estimator->mu(i);
+    }
+
+    // mu vector
+    msg.mu_p_size = estimator->mu_p.size();
+    for (int i = 0; i < estimator->mu_p.size(); i++) {
+        msg.mu_p_data[i] = estimator->mu_p(i);
+    }
+
+    // S_p matrix
+    msg.S_p_rows = estimator->S_p.rows();
+    msg.S_p_cols = estimator->S_p.cols();
+    for (int i = 0; i < estimator->S_p.size(); i++) {
+        msg.S_p_data[i] = estimator->S_p(i);
+    }
+
+    this->kf_estimator_stats_publisher.publish(msg);
 }
 
 int Awesomo::run(

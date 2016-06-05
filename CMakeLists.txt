@@ -48,7 +48,9 @@ INCLUDE_DIRECTORIES(
 # ROS MESSAGE
 ADD_MESSAGE_FILES(
     DIRECTORY msg
-    FILES PositionControllerStats.msg
+    FILES
+    PositionControllerStats.msg
+    KFStats.msg
 )
 GENERATE_MESSAGES(DEPENDENCIES std_msgs)
 
