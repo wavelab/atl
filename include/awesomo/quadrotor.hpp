@@ -17,9 +17,9 @@
 #define HOVER_MODE 1
 #define CARROT_INITIALIZE_MODE 2
 #define CARROT_MODE 3
-#define KF_DISCOVER_MODE 4
-#define KF_TRACKING_MODE 5
-#define KF_LANDING_MODE 6
+#define DISCOVER_MODE 4
+#define TRACKING_MODE 5
+#define LANDING_MODE 6
 
 
 class Quadrotor
@@ -31,7 +31,10 @@ public:
     Pose pose;
     Position going_to;
 
+    bool hover_point_set;
     float hover_height;
+    Position hover_point;
+
     int landing_zone_belief;
 
     time_t tracking_start;
@@ -49,6 +52,13 @@ public:
     void updatePose(Pose p);
     void resetPositionController(void);
     void initializeMission(void);
+    void runIdleMode(Pose robot_pose);
+    Position runHoverMode(Pose robot_pose);
+    void initializeCarrotController(void);
+    Position runCarrotMode(Pose robot_pose);
+    Position runKFDiscoverMode(Pose robot_pose, LandingTargetPosition landing_zone);
+    Position runKFTrackingMode(Pose robot_pose, LandingTargetPosition landing_zone, float dt);
+    Position runLandingMode(Pose robot_pose, LandingTargetPosition landing_zone, float dt);
     int runMission(
         Pose robot_pose,
         LandingTargetPosition landing_zone,
