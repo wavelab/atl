@@ -401,50 +401,64 @@ void Awesomo::publishKFStats(int seq, ros::Time time)
     // A matrix
     msg.A_rows = estimator->A.rows();
     msg.A_cols = estimator->A.cols();
-    for (int i = 0; i < estimator->A.size(); i++) {
-        msg.A_data[i] = estimator->A(i);
+    for (int i = 0; i < estimator->A.rows(); i++) {
+        for (int j = 0; j < estimator->A.cols(); j++) {
+            msg.A_data[i] = estimator->A(i, j);
+        }
     }
 
     // B matrix
     msg.B_rows = estimator->B.rows();
     msg.B_cols = estimator->B.cols();
-    for (int i = 0; i < estimator->B.size(); i++) {
-        msg.B_data[i] = estimator->B(i);
+    for (int i = 0; i < estimator->B.rows(); i++) {
+        for (int j = 0; j < estimator->B.cols(); j++) {
+            msg.A_data[i] = estimator->B(i, j);
+        }
     }
 
     // R matrix
     msg.R_rows = estimator->R.rows();
     msg.R_cols = estimator->R.cols();
-    for (int i = 0; i < estimator->R.size(); i++) {
-        msg.R_data[i] = estimator->R(i);
+    for (int i = 0; i < estimator->R.rows(); i++) {
+        for (int j = 0; j < estimator->R.cols(); j++) {
+            msg.A_data[i] = estimator->R(i, j);
+        }
     }
 
     // C matrix
     msg.C_rows = estimator->C.rows();
     msg.C_cols = estimator->C.cols();
-    for (int i = 0; i < estimator->C.size(); i++) {
-        msg.C_data[i] = estimator->C(i);
+    for (int i = 0; i < estimator->C.rows(); i++) {
+        for (int j = 0; j < estimator->C.cols(); j++) {
+            msg.A_data[i] = estimator->C(i, j);
+        }
     }
 
     // Q matrix
     msg.Q_rows = estimator->Q.rows();
     msg.Q_cols = estimator->Q.cols();
-    for (int i = 0; i < estimator->Q.size(); i++) {
-        msg.Q_data[i] = estimator->Q(i);
+    for (int i = 0; i < estimator->Q.rows(); i++) {
+        for (int j = 0; j < estimator->Q.cols(); j++) {
+            msg.A_data[i] = estimator->Q(i, j);
+        }
     }
 
     // S matrix
     msg.S_rows = estimator->S.rows();
     msg.S_cols = estimator->S.cols();
-    for (int i = 0; i < estimator->S.size(); i++) {
-        msg.S_data[i] = estimator->S(i);
+    for (int i = 0; i < estimator->S.rows(); i++) {
+        for (int j = 0; j < estimator->S.cols(); j++) {
+            msg.A_data[i] = estimator->S(i, j);
+        }
     }
 
     // K matrix
     msg.K_rows = estimator->K.rows();
     msg.K_cols = estimator->K.cols();
-    for (int i = 0; i < estimator->K.size(); i++) {
-        msg.K_data[i] = estimator->K(i);
+    for (int i = 0; i < estimator->K.rows(); i++) {
+        for (int j = 0; j < estimator->K.cols(); j++) {
+            msg.A_data[i] = estimator->K(i, j);
+        }
     }
 
     // mu vector
@@ -462,8 +476,10 @@ void Awesomo::publishKFStats(int seq, ros::Time time)
     // S_p matrix
     msg.S_p_rows = estimator->S_p.rows();
     msg.S_p_cols = estimator->S_p.cols();
-    for (int i = 0; i < estimator->S_p.size(); i++) {
-        msg.S_p_data[i] = estimator->S_p(i);
+    for (int i = 0; i < estimator->S_p.rows(); i++) {
+        for (int j = 0; j < estimator->S_p.cols(); j++) {
+            msg.A_data[i] = estimator->S_p(i, j);
+        }
     }
 
     this->kf_estimator_stats_publisher.publish(msg);

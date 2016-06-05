@@ -1,5 +1,7 @@
 std_msgs/Header header
 
+# NOTE: matrix data are row wise
+
 int32 A_rows
 int32 A_cols
 float32[] A_data
