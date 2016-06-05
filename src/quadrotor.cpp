@@ -12,11 +12,12 @@ Quadrotor::Quadrotor(std::map<std::string, std::string> configs)
     this->pose.y = 0.0;
     this->pose.z = 0.0;
 
-    this->going_to.x = 0.0;
-    this->going_to.y = 0.0;
-    this->going_to.z = 0.0;
-
+    this->hover_point_set = false;
+    this->hover_point.x = 0.0;
+    this->hover_point.y = 0.0;
+    this->hover_point.z = 0.0;
     this->hover_height = 0.0;
+
     this->landing_zone_belief = 0;
 
     // initialize position controller
@@ -86,13 +87,13 @@ void Quadrotor::runIdleMode(Pose robot_pose)
 
     // transition to offboard mode
     this->mission_state = DISCOVER_MODE;
-    this->hover_height = robot_pose.z + 3.0;
 
-    // preset the landing zone position so when tag detection
-    // is lost it will hover in the same spot
-    this->going_to.x = robot_pose.x;
-    this->going_to.y = robot_pose.y;
-    this->going_to.z = this->hover_height;
+    // hover inplace
+    this->hover_point_set = true;
+    this->hover_point.x = robot_pose.x;
+    this->hover_point.y = robot_pose.y;
+    this->hover_point.z = robot_pose.z + 3.0;
+    this->hover_height = robot_pose.z + 3.0;
 }
 
 Position Quadrotor::runHoverMode(Pose robot_pose)
@@ -187,7 +188,7 @@ Position Quadrotor::runCarrotMode(Pose robot_pose)
     return cmd;
 }
 
-Position Quadrotor::runKFDiscoverMode(Pose robot_pose, LandingTargetPosition landing_zone)
+Position Quadrotor::runDiscoverMode(Pose robot_pose, LandingTargetPosition landing_zone)
 {
     Position cmd;
 	Eigen::VectorXd mu(9);
@@ -204,18 +205,23 @@ Position Quadrotor::runKFDiscoverMode(Pose robot_pose, LandingTargetPosition lan
         // transition to tracker mode
         std::cout << "Transitioning to Tracker Mode!" << std::endl;
         this->mission_state = TRACKING_MODE;
-
-    } else {
-        // hover in-place
-        robot_pose.z += 3;
-        cmd = this->runHoverMode(robot_pose);
-
+        this->tracking_start = time(NULL);
     }
+
+    // hover in-place
+    if (this->hover_point_set == false) {
+        robot_pose.z += 3;
+    }
+    cmd = this->runHoverMode(robot_pose);
 
     return cmd;
 }
 
-Position Quadrotor::runKFTrackingMode(Pose robot_pose, LandingTargetPosition landing_zone, float dt)
+Position Quadrotor::runTrackingMode(
+    Pose robot_pose,
+    LandingTargetPosition landing_zone,
+    float dt
+)
 {
     Position cmd;
 	Eigen::VectorXd y(3);
@@ -234,37 +240,42 @@ Position Quadrotor::runKFTrackingMode(Pose robot_pose, LandingTargetPosition lan
         landing_zone.detected
     );
 
-    // build position
+    // build position command
     cmd.x = this->apriltag_estimator.mu(0);
     cmd.y = this->apriltag_estimator.mu(1);
     cmd.z = this->hover_height;
 
     // keep track of target position
     if (landing_zone.detected == true) {
-        this->going_to.x = cmd.x;
-        this->going_to.y = cmd.y;
-        this->going_to.z = cmd.z;
+        // update hover point
+        this->hover_point_set = true;
+        this->hover_point.x = cmd.x;
+        this->hover_point.y = cmd.y;
+        this->hover_point.z = cmd.z;
+        this->hover_height = cmd.z;
 
-        // transition to landing
+        // transition to landing?
         elasped = difftime(time(NULL), this->tracking_start);
         if (elasped > 5 && landing_zone.x < 0.2 && landing_zone.y < 0.2) {
             this->mission_state = LANDING_MODE;
             this->height_last_updated = time(NULL);
-            std::cout << "Landing!" << std::endl;
+            std::cout << "Transitioning to Landing Mode!" << std::endl;
 
         }
 
     } else {
-        cmd.x = this->going_to.x;
-        cmd.y = this->going_to.y;
-        cmd.z = this->going_to.z;
+        cmd = this->runHoverMode(robot_pose);
 
     }
 
     return cmd;
 }
 
-Position Quadrotor::runLandingMode(Pose robot_pose, LandingTargetPosition landing_zone, float dt)
+Position Quadrotor::runLandingMode(
+    Pose robot_pose,
+    LandingTargetPosition landing_zone,
+    float dt
+)
 {
     Position cmd;
 	Eigen::VectorXd mu(9);
@@ -272,9 +283,9 @@ Position Quadrotor::runLandingMode(Pose robot_pose, LandingTargetPosition landin
     double elasped;
 
     // transform detected tag to world frame
-    y << this->pose.x + landing_zone.x,
-         this->pose.y + landing_zone.y,
-         this->pose.z + landing_zone.z;
+    y << robot_pose.x + landing_zone.x,
+         robot_pose.y + landing_zone.y,
+         robot_pose.z + landing_zone.z;
 
     // estimate tag position
     apriltag_kf_estimate(
@@ -300,26 +311,28 @@ Position Quadrotor::runLandingMode(Pose robot_pose, LandingTargetPosition landin
         this->height_last_updated = time(NULL);
     }
 
-    // build position
+    // build position command
     cmd.x = this->apriltag_estimator.mu(0);
     cmd.y = this->apriltag_estimator.mu(1);
     cmd.z = this->hover_height;
 
     // keep track of target position
     if (landing_zone.detected == true) {
-        this->going_to.x = cmd.x;
-        this->going_to.y = cmd.y;
-        this->going_to.z = cmd.z;
+        // update hover point
+        this->hover_point_set = true;
+        this->hover_point.x = cmd.x;
+        this->hover_point.y = cmd.y;
+        this->hover_point.z = cmd.z;
+        this->hover_height = cmd.z;
 
         // kill engines (landed?)
         if (landing_zone.x < 0.2 && landing_zone.y < 0.2 && landing_zone.z < 0.4) {
-            this->mission_state = LANDING_MODE;
+            printf("Mission Accomplished - disarming quadrotor!\n");
+            this->mission_state = MISSION_ACCOMPLISHED;
         }
 
     } else {
-        cmd.x = this->going_to.x;
-        cmd.y = this->going_to.y;
-        cmd.z = this->going_to.z;
+        cmd = this->runHoverMode(robot_pose);
 
     }
 
@@ -356,11 +369,11 @@ int Quadrotor::runMission(
         break;
 
     case DISCOVER_MODE:
-        position = this->runKFDiscoverMode(robot_pose, landing_zone);
+        position = this->runDiscoverMode(robot_pose, landing_zone);
         break;
 
     case TRACKING_MODE:
-        position = this->runKFTrackingMode(robot_pose, landing_zone, dt);
+        position = this->runTrackingMode(robot_pose, landing_zone, dt);
         break;
 
     case LANDING_MODE:

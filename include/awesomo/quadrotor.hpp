@@ -29,7 +29,6 @@ public:
     int mission_state;
 
     Pose pose;
-    Position going_to;
 
     bool hover_point_set;
     float hover_height;
@@ -55,9 +54,20 @@ public:
     Position runHoverMode(Pose robot_pose);
     void initializeCarrotController(void);
     Position runCarrotMode(Pose robot_pose);
-    Position runKFDiscoverMode(Pose robot_pose, LandingTargetPosition landing_zone);
-    Position runKFTrackingMode(Pose robot_pose, LandingTargetPosition landing_zone, float dt);
-    Position runLandingMode(Pose robot_pose, LandingTargetPosition landing_zone, float dt);
+    Position runDiscoverMode(
+        Pose robot_pose,
+        LandingTargetPosition landing_zone
+    );
+    Position runTrackingMode(
+        Pose robot_pose,
+        LandingTargetPosition landing_zone,
+        float dt
+    );
+    Position runLandingMode(
+        Pose robot_pose,
+        LandingTargetPosition landing_zone,
+        float dt
+    );
     int runMission(
         Pose robot_pose,
         LandingTargetPosition landing_zone,

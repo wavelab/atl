@@ -117,6 +117,7 @@ void apriltag_kf_estimate(struct kf *e, Eigen::VectorXd y, float dt, bool tag_de
 		e->S = e->S_p;
 
 	}
+
 }
 
 void ekf_prediction_update(struct ekf *e, Eigen::VectorXd u, float dt)
