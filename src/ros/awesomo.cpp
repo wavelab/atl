@@ -93,7 +93,7 @@ public:
         int seq,
         ros::Time time
     );
-    void run(
+    int run(
         geometry_msgs::PoseStamped &msg,
         int seq,
         ros::Time last_request
@@ -395,7 +395,7 @@ void Awesomo::publishPositionControllerMessage(
     this->throttle_publisher.publish(throttle);
 }
 
-void Awesomo::run(
+int Awesomo::run(
     geometry_msgs::PoseStamped &msg,
     int seq,
     ros::Time last_request
@@ -405,11 +405,19 @@ void Awesomo::run(
 
     // calculate attitude from position controller
     dt = (ros::Time::now() - last_request).toSec();
-    this->quad->runMission(this->pose, this->landing_zone, dt);
 
-    // publish quadrotor position controller
-    this->publishPositionControllerMessage(msg, seq, ros::Time::now());
-    this->publishPositionControllerStats(seq, ros::Time::now());
+    // run mission
+    if (this->quad->runMission(this->pose, this->landing_zone, dt)) {
+        this->publishPositionControllerMessage(msg, seq, ros::Time::now());
+        this->publishPositionControllerStats(seq, ros::Time::now());
+        return 1;
+
+    } else {
+        this->disarm();
+        return 0;
+
+    }
+
 }
 
 int main(int argc, char **argv)
@@ -445,13 +453,12 @@ int main(int argc, char **argv)
         // check if offboard switch has been turned on
         if (awesomo->rc_in[6] < 1500) {
             awesomo->quad->resetPositionController();
-
             throttle.data = 0.0;
             awesomo->throttle_publisher.publish(throttle);
+
         } else {
-            if (awesomo->run(msg, seq, last_request)) {
-                awesomo->disarm();
-            }
+            awesomo->run(msg, seq, last_request);
+
         }
 
 		// end

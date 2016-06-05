@@ -226,9 +226,6 @@ int Quadrotor::runMission(
                 this->height_last_updated = time(NULL);
                 std::cout << "Landing!" << std::endl;
 
-            } else if (elapsed % 1 == 0) {
-                printf("Tracked for %d seconds!\n", elapsed);
-
             }
 
         } else {
@@ -258,7 +255,7 @@ int Quadrotor::runMission(
         elasped = difftime(time(NULL), this->height_last_updated);
         if (elasped > 1 && landing_zone.detected == true) {
             if (landing_zone.x < 0.3 && landing_zone.y < 0.3) {
-                this->hover_height *= 0.7;
+                this->hover_height = this->hover_height * 0.7;
                 printf("Lowering hover height to %f\n", this->hover_height);
 
             } else {
@@ -293,8 +290,8 @@ int Quadrotor::runMission(
 
         }
 
-    case KILL_ENGINES:
-        return 1;
+    case MISSION_ACCOMPLISHED:
+        return 0;
         break;
 
     }
@@ -302,5 +299,5 @@ int Quadrotor::runMission(
     // calcualte new attitude using position controller
     this->positionControllerCalculate(p, dt);
 
-    return 0;
+    return 1;
 }

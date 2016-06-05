@@ -12,12 +12,14 @@
 #define LZ_THRESHOLD 0
 
 // STATES
-#define KILL_ENGINES -1
+#define MISSION_ACCOMPLISHED -1
 #define IDLE_MODE 0
-#define CARROT_INITIALIZE_MODE 1
-#define CARROT_MODE 2
-#define KF_DISCOVER_MODE 3
-#define KF_TRACKING_MODE 4
+#define HOVER_MODE 1
+#define CARROT_INITIALIZE_MODE 2
+#define CARROT_MODE 3
+#define KF_DISCOVER_MODE 4
+#define KF_TRACKING_MODE 5
+#define KF_LANDING_MODE 6
 
 
 class Quadrotor
