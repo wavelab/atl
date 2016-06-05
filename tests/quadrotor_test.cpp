@@ -14,7 +14,13 @@ int testQuadrotor(void);
 int testQuadrotorUpdatePose(void);
 int testQuadrotorPositionControllerCalculate(void);
 int testQuadrotorResetPositionController(void);
-int testQuadrotorInitializeMission(void);
+int testQuadrotorRunIdleMode(void);
+int testQuadrotorRunHoverMode(void);
+int testQuadrotorInitializeCarrotController(void);
+int testQuadrotorRunCarrotMode(void);
+int testQuadrotorRunKFDiscoveryMode(void);
+int testQuadrotorRunKFTrackingMode(void);
+int testQuadrotorRunLandingMode(void);
 int testQuadrotorRunMission(void);
 
 
@@ -149,7 +155,57 @@ int testQuadrotorResetPositionController(void)
     return 0;
 }
 
-int testQuadrotorInitializeMission(void)
+int testQuadrotorRunIdleMode(void)
+{
+    Quadrotor *quad;
+    Pose robot_pose;
+
+    // setup
+	quad = testSetup();
+	robot_pose.x = 1.0;
+	robot_pose.y = 2.0;
+	robot_pose.z = 3.0;
+
+	// test and assert
+	quad->runIdleMode(robot_pose);
+	mu_check(quad->mission_state == DISCOVER_MODE);
+	mu_check(fltcmp(quad->hover_height, robot_pose.z + 3) == 0);
+	mu_check(fltcmp(quad->going_to.x, robot_pose.x) == 0);
+	mu_check(fltcmp(quad->going_to.y, robot_pose.y) == 0);
+	mu_check(fltcmp(quad->going_to.z, robot_pose.z + 3) == 0);
+
+    return 0;
+}
+
+int testQuadrotorRunHoverMode(void)
+{
+    Quadrotor *quad;
+    Pose robot_pose;
+    Position cmd;
+
+    // setup
+	quad = testSetup();
+	robot_pose.x = 1.0;
+	robot_pose.y = 2.0;
+	robot_pose.z = 3.0;
+
+	// test and assert
+	cmd = quad->runHoverMode(robot_pose);
+
+    mu_check(quad->hover_point_set == true);
+    mu_check(fltcmp(quad->hover_point.x, robot_pose.x) == 0);
+    mu_check(fltcmp(quad->hover_point.y, robot_pose.y) == 0);
+    mu_check(fltcmp(quad->hover_point.z, robot_pose.z) == 0);
+    mu_check(fltcmp(quad->hover_height, robot_pose.z) == 0);
+
+    mu_check(fltcmp(cmd.x, robot_pose.x) == 0);
+    mu_check(fltcmp(cmd.y, robot_pose.y) == 0);
+    mu_check(fltcmp(cmd.z, robot_pose.z) == 0);
+
+    return 0;
+}
+
+int testQuadrotorInitializeCarrotController(void)
 {
     Quadrotor *quad;
     Pose p;
@@ -167,7 +223,7 @@ int testQuadrotorInitializeMission(void)
 	quad->updatePose(p);
 
 	// test and assert
-	quad->initializeMission();
+	quad->initializeCarrotController();
 
 	mu_check(fltcmp(quad->carrot_controller->wp_start(0), p.x) == 0);
 	mu_check(fltcmp(quad->carrot_controller->wp_start(1), p.y) == 0);
@@ -179,6 +235,106 @@ int testQuadrotorInitializeMission(void)
 
 	mu_check(quad->carrot_controller->waypoints.size() == 5);
 	mu_check(quad->carrot_controller->initialized == 1);
+
+    return 0;
+}
+
+int testQuadrotorRunCarrotMode(void)
+{
+    Quadrotor *quad;
+    Pose p;
+    Pose robot_pose;
+    Position cmd;
+
+    // setup
+	quad = testSetup();
+
+	p.x = 0.0;
+	p.y = 0.0;
+	p.z = 3.0;
+	p.roll = 0.0;
+	p.pitch = 0.0;
+	p.yaw = 0.0;
+
+	quad->updatePose(p);
+	quad->initializeCarrotController();
+
+	// test and assert
+	// waypoint 1
+	robot_pose.x = 0.0;
+	robot_pose.y = 0.0;
+	robot_pose.z = 6.0;
+	cmd = quad->runCarrotMode(robot_pose);
+	mu_check(quad->carrot_controller->waypoints.size() == 5);
+	mu_print("pos: %f %f %f\n", robot_pose.x, robot_pose.y, robot_pose.z);
+	mu_print("cmd: %f %f %f\n", cmd.x, cmd.y, cmd.z);
+	mu_print("waypoints: %d\n\n", (int) quad->carrot_controller->waypoints.size());
+
+	// waypoint 2
+	robot_pose.x = 5.0;
+	robot_pose.y = 0.0;
+	robot_pose.z = 6.0;
+	cmd = quad->runCarrotMode(robot_pose);
+	mu_check(quad->carrot_controller->waypoints.size() == 4);
+	mu_print("pos: %f %f %f\n", robot_pose.x, robot_pose.y, robot_pose.z);
+	mu_print("cmd: %f %f %f\n", cmd.x, cmd.y, cmd.z);
+	mu_print("waypoints: %d\n\n", (int) quad->carrot_controller->waypoints.size());
+
+	// waypoint 3
+	robot_pose.x = 5.0;
+	robot_pose.y = 5.0;
+	robot_pose.z = 6.0;
+	cmd = quad->runCarrotMode(robot_pose);
+	mu_check(quad->carrot_controller->waypoints.size() == 3);
+	mu_print("pos: %f %f %f\n", robot_pose.x, robot_pose.y, robot_pose.z);
+	mu_print("cmd: %f %f %f\n", cmd.x, cmd.y, cmd.z);
+	mu_print("waypoints: %d\n\n", (int) quad->carrot_controller->waypoints.size());
+
+	// waypoint 4
+	robot_pose.x = 0.0;
+	robot_pose.y = 5.0;
+	robot_pose.z = 6.0;
+	cmd = quad->runCarrotMode(robot_pose);
+	mu_check(quad->carrot_controller->waypoints.size() == 2);
+	mu_print("pos: %f %f %f\n", robot_pose.x, robot_pose.y, robot_pose.z);
+	mu_print("cmd: %f %f %f\n", cmd.x, cmd.y, cmd.z);
+	mu_print("waypoints: %d\n\n", (int) quad->carrot_controller->waypoints.size());
+
+	// waypoint finished
+	robot_pose.x = 0.0;
+	robot_pose.y = 0.0;
+	robot_pose.z = 6.0;
+	cmd = quad->runCarrotMode(robot_pose);
+	mu_check(quad->carrot_controller->waypoints.size() == 2);
+	mu_print("pos: %f %f %f\n", robot_pose.x, robot_pose.y, robot_pose.z);
+	mu_print("cmd: %f %f %f\n", cmd.x, cmd.y, cmd.z);
+	mu_print("waypoints: %d\n\n", (int) quad->carrot_controller->waypoints.size());
+
+    // check if hover mode activated
+	mu_check(quad->mission_state == HOVER_MODE);
+	mu_check(quad->hover_point_set == true);
+	mu_check(fltcmp(quad->hover_point.x, quad->carrot_controller->wp_end(0)) == 0);
+	mu_check(fltcmp(quad->hover_point.y, quad->carrot_controller->wp_end(1)) == 0);
+	mu_check(fltcmp(quad->hover_point.z, quad->carrot_controller->wp_end(2)) == 0);
+	mu_check(fltcmp(quad->hover_height, quad->carrot_controller->wp_end(2)) == 0);
+
+    return 0;
+}
+
+int testQuadrotorRunKFDiscoveryMode(void)
+{
+
+    return 0;
+}
+
+int testQuadrotorRunKFTrackingMode(void)
+{
+
+    return 0;
+}
+
+int testQuadrotorRunLandingMode(void)
+{
 
     return 0;
 }
@@ -231,7 +387,13 @@ void testSuite(void)
     mu_add_test(testQuadrotor);
     mu_add_test(testQuadrotorUpdatePose);
     mu_add_test(testQuadrotorPositionControllerCalculate);
-    mu_add_test(testQuadrotorInitializeMission);
+    mu_add_test(testQuadrotorRunIdleMode);
+    mu_add_test(testQuadrotorRunHoverMode);
+    mu_add_test(testQuadrotorInitializeCarrotController);
+    mu_add_test(testQuadrotorRunCarrotMode);
+    // mu_add_test(testQuadrotorRunKFDiscoveryMode);
+    // mu_add_test(testQuadrotorRunKFTrackingMode);
+    // mu_add_test(testQuadrotorRunLandingMode);
     // mu_add_test(testQuadrotorRunMission);
 }
 

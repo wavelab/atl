@@ -51,7 +51,6 @@ public:
     Attitude positionControllerCalculate(Position p, float dt);
     void updatePose(Pose p);
     void resetPositionController(void);
-    void initializeMission(void);
     void runIdleMode(Pose robot_pose);
     Position runHoverMode(Pose robot_pose);
     void initializeCarrotController(void);
