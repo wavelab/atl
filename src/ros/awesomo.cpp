@@ -5,6 +5,7 @@
 #include <ros/ros.h>
 #include <std_msgs/Float64.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <geometry_msgs/TwistStamped.h>
 
 #define MAVLINK_DIALECT common
@@ -37,6 +38,7 @@
 #define KF_ESTIMATION_TOPIC "/awesomo/kf_estimation/stats"
 #define RADIO_TOPIC "/mavros/rc/in"
 #define LANDING_TOPIC "/awesomo/landing_target/pose"
+#define GPS_TOPIC "/mavros/global_position/local"
 
 
 
@@ -49,6 +51,7 @@ public:
     Pose pose;
     Velocity velocity;
     Pose mocap_pose;
+    Pose gps_pose;
     LandingTargetPosition landing_zone;
     bool landing_zone_detected;
     int rc_in[16];
@@ -62,6 +65,7 @@ public:
     ros::Subscriber velocity_subscriber;
     ros::Subscriber radio_subscriber;
     ros::Subscriber landing_subscriber;
+    ros::Subscriber gps_subscriber;
 
     ros::Publisher position_publisher;
     ros::Publisher attitude_publisher;
@@ -74,6 +78,7 @@ public:
     void mocapCallback(const geometry_msgs::PoseStamped &msg);
     void radioCallback(const mavros_msgs::RCIn &msg);
     void landingCallback(const atim::AtimPoseStamped &msg);
+    void gpsCallback(const geometry_msgs::PoseWithCovarianceStamped &msg);
     void stateCallback(const mavros_msgs::State::ConstPtr &msg);
     void waitForConnection(void);
 
@@ -86,6 +91,7 @@ public:
     void subscribeToMocap(void);
     void subscribeToRadioIn(void);
     void subscribeToLanding(void);
+    void subscribeToGPS(void);
     void publishPositionControllerStats(int seq, ros::Time time);
     void publishPositionControllerMessage(
         geometry_msgs::PoseStamped &msg,
@@ -209,6 +215,20 @@ void Awesomo::landingCallback(const atim::AtimPoseStamped &msg)
     this->landing_zone.z = msg.pose.position.z;
 }
 
+void Awesomo::gpsCallback(const geometry_msgs::PoseWithCovarianceStamped &msg)
+{
+    this->gps_pose.x = msg.pose.pose.position.x;
+    this->gps_pose.y = msg.pose.pose.position.y;
+    this->gps_pose.z = msg.pose.pose.position.z;
+
+    quat2euler(
+        msg.pose.pose.orientation,
+        &this->gps_pose.roll,
+        &this->gps_pose.pitch,
+        &this->gps_pose.yaw
+    );
+}
+
 void Awesomo::waitForConnection(void)
 {
     ROS_INFO("waiting for FCU ...");
@@ -321,6 +341,17 @@ void Awesomo::subscribeToLanding(void)
         LANDING_TOPIC,
         50,
         &Awesomo::landingCallback,
+        this
+    );
+}
+
+void Awesomo::subscribeToGPS(void)
+{
+    ROS_INFO("subcribing to [GPS UTM]");
+    this->gps_subscriber = this->node.subscribe(
+        GPS_TOPIC,
+        50,
+        &Awesomo::gpsCallback,
         this
     );
 }
