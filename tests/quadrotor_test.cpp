@@ -245,6 +245,8 @@ int testQuadrotorRunCarrotMode(void)
     Pose p;
     Pose robot_pose;
     Position cmd;
+    float x_waypoints[5] = {0.0, 5.0, 5.0, 0.0, 0.0};
+    float y_waypoints[5] = {0.0, 0.0, 5.0, 5.0, 0.0};
 
     // setup
 	quad = testSetup();
@@ -260,55 +262,25 @@ int testQuadrotorRunCarrotMode(void)
 	quad->initializeCarrotController();
 
 	// test and assert
-	// waypoint 1
-	robot_pose.x = 0.0;
-	robot_pose.y = 0.0;
-	robot_pose.z = 6.0;
-	cmd = quad->runCarrotMode(robot_pose);
-	mu_check(quad->carrot_controller->waypoints.size() == 5);
-	mu_print("pos: %f %f %f\n", robot_pose.x, robot_pose.y, robot_pose.z);
-	mu_print("cmd: %f %f %f\n", cmd.x, cmd.y, cmd.z);
-	mu_print("waypoints: %d\n\n", (int) quad->carrot_controller->waypoints.size());
+	for (int i = 0; i < 5; i++) {
+        // (i + 1)-th waypoint
+        robot_pose.x = x_waypoints[i];
+        robot_pose.y = y_waypoints[i];
+        robot_pose.z = 6.0;
+        cmd = quad->runCarrotMode(robot_pose);
 
-	// waypoint 2
-	robot_pose.x = 5.0;
-	robot_pose.y = 0.0;
-	robot_pose.z = 6.0;
-	cmd = quad->runCarrotMode(robot_pose);
-	mu_check(quad->carrot_controller->waypoints.size() == 4);
-	mu_print("pos: %f %f %f\n", robot_pose.x, robot_pose.y, robot_pose.z);
-	mu_print("cmd: %f %f %f\n", cmd.x, cmd.y, cmd.z);
-	mu_print("waypoints: %d\n\n", (int) quad->carrot_controller->waypoints.size());
+        if (i < 3) {
+            // check waypoint 2 to 4
+            mu_check(quad->carrot_controller->waypoints.size() == (5 - i));
+        } else {
+            // check waypoint 5
+            mu_check(quad->carrot_controller->waypoints.size() == 2);
+        }
 
-	// waypoint 3
-	robot_pose.x = 5.0;
-	robot_pose.y = 5.0;
-	robot_pose.z = 6.0;
-	cmd = quad->runCarrotMode(robot_pose);
-	mu_check(quad->carrot_controller->waypoints.size() == 3);
-	mu_print("pos: %f %f %f\n", robot_pose.x, robot_pose.y, robot_pose.z);
-	mu_print("cmd: %f %f %f\n", cmd.x, cmd.y, cmd.z);
-	mu_print("waypoints: %d\n\n", (int) quad->carrot_controller->waypoints.size());
-
-	// waypoint 4
-	robot_pose.x = 0.0;
-	robot_pose.y = 5.0;
-	robot_pose.z = 6.0;
-	cmd = quad->runCarrotMode(robot_pose);
-	mu_check(quad->carrot_controller->waypoints.size() == 2);
-	mu_print("pos: %f %f %f\n", robot_pose.x, robot_pose.y, robot_pose.z);
-	mu_print("cmd: %f %f %f\n", cmd.x, cmd.y, cmd.z);
-	mu_print("waypoints: %d\n\n", (int) quad->carrot_controller->waypoints.size());
-
-	// waypoint finished
-	robot_pose.x = 0.0;
-	robot_pose.y = 0.0;
-	robot_pose.z = 6.0;
-	cmd = quad->runCarrotMode(robot_pose);
-	mu_check(quad->carrot_controller->waypoints.size() == 2);
-	mu_print("pos: %f %f %f\n", robot_pose.x, robot_pose.y, robot_pose.z);
-	mu_print("cmd: %f %f %f\n", cmd.x, cmd.y, cmd.z);
-	mu_print("waypoints: %d\n\n", (int) quad->carrot_controller->waypoints.size());
+        mu_print("pos: %f %f %f\n", robot_pose.x, robot_pose.y, robot_pose.z);
+        mu_print("cmd: %f %f %f\n", cmd.x, cmd.y, cmd.z);
+        mu_print("waypoints: %d\n\n", (int) quad->carrot_controller->waypoints.size());
+	}
 
     // check if hover mode activated
 	mu_check(quad->mission_state == HOVER_MODE);
@@ -323,6 +295,34 @@ int testQuadrotorRunCarrotMode(void)
 
 int testQuadrotorRunKFDiscoveryMode(void)
 {
+    Quadrotor *quad;
+    Pose p;
+    Pose robot_pose;
+    LandingTargetPosition landing_zone;
+    Position cmd;
+
+    // setup
+	quad = testSetup();
+
+	// test tracking mode
+	robot_pose.x = 1.0;
+	robot_pose.y = 2.0;
+	robot_pose.z = 3.0;
+
+	landing_zone.detected = true;
+	landing_zone.x = 0.0;
+	landing_zone.y = 0.0;
+	landing_zone.z = 0.0;
+
+    cmd = quad->runKFDiscoverMode(robot_pose, landing_zone);
+    mu_check(quad->mission_state == TRACKING_MODE);
+
+    // test hover during discover mode
+	landing_zone.detected = false;
+    cmd = quad->runKFDiscoverMode(robot_pose, landing_zone);
+    mu_check(fltcmp(cmd.x, 1.0) == 0);
+    mu_check(fltcmp(cmd.y, 2.0) == 0);
+    mu_check(fltcmp(cmd.z, 6.0) == 0);
 
     return 0;
 }
@@ -391,7 +391,7 @@ void testSuite(void)
     mu_add_test(testQuadrotorRunHoverMode);
     mu_add_test(testQuadrotorInitializeCarrotController);
     mu_add_test(testQuadrotorRunCarrotMode);
-    // mu_add_test(testQuadrotorRunKFDiscoveryMode);
+    mu_add_test(testQuadrotorRunKFDiscoveryMode);
     // mu_add_test(testQuadrotorRunKFTrackingMode);
     // mu_add_test(testQuadrotorRunLandingMode);
     // mu_add_test(testQuadrotorRunMission);
