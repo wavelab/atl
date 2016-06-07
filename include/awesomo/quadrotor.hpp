@@ -47,7 +47,11 @@ public:
     struct kf apriltag_estimator;
 
     Quadrotor(std::map<std::string, std::string> configs);
-    Attitude positionControllerCalculate(Position p, float dt);
+    Attitude positionControllerCalculate(
+        Position setpoint,
+        Pose robot_pose,
+        float dt
+    );
     void updatePose(Pose p);
     void resetPositionController(void);
     void runIdleMode(Pose robot_pose);
@@ -64,6 +68,11 @@ public:
         float dt
     );
     Position runLandingMode(
+        Pose robot_pose,
+        LandingTargetPosition landing_zone,
+        float dt
+    );
+    int Quadrotor::followWaypoints(
         Pose robot_pose,
         LandingTargetPosition landing_zone,
         float dt

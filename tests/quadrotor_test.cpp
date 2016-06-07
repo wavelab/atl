@@ -113,7 +113,7 @@ int testQuadrotorPositionControllerCalculate(void)
 	dt = 0.1;
 
 	// test and assert
-	quad->positionControllerCalculate(setpoint, dt);
+	quad->positionControllerCalculate(setpoint, p, dt);
 	mu_check(fltcmp(quad->position_controller->roll, 0.0f) != 0);
 	mu_check(fltcmp(quad->position_controller->pitch, 0.0f) != 0);
 
