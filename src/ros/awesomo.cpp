@@ -574,6 +574,8 @@ int main(int argc, char **argv)
         // check if offboard switch has been turned on
         if (awesomo->rc_in[6] < 1500) {
             awesomo->quad->resetPositionController();
+
+            // keep sending dummy values else px4 stops listening
             throttle.data = 0.0;
             awesomo->throttle_publisher.publish(throttle);
 

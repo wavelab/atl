@@ -55,7 +55,7 @@ int testQuadrotor(void)
 	mu_check(fltcmp(quad->hover_point.x, 0.0) == 0);
 	mu_check(fltcmp(quad->hover_point.y, 0.0) == 0);
 	mu_check(fltcmp(quad->hover_point.z, 0.0) == 0);
-	mu_check(fltcmp(quad->hover_height, 0.0) == 0);
+	mu_check(quad->hover_height >  0.0);
 
 	mu_check(quad->position_controller != NULL);
 	mu_check(quad->carrot_controller != NULL);
@@ -114,8 +114,8 @@ int testQuadrotorPositionControllerCalculate(void)
 
 	// test and assert
 	quad->positionControllerCalculate(setpoint, p, dt);
-	mu_check(fltcmp(quad->position_controller->roll, 0.0f) != 0);
-	mu_check(fltcmp(quad->position_controller->pitch, 0.0f) != 0);
+	mu_check(fltcmp(quad->position_controller->roll, 0) == 0);
+	mu_check(fltcmp(quad->position_controller->pitch, 0) == 0);
 
     return 0;
 }
@@ -174,8 +174,8 @@ int testQuadrotorRunIdleMode(void)
 	mu_check(quad->hover_point_set == true);
 	mu_check(fltcmp(quad->hover_point.x, robot_pose.x) == 0);
 	mu_check(fltcmp(quad->hover_point.y, robot_pose.y) == 0);
-	mu_check(fltcmp(quad->hover_point.z, robot_pose.z + 3) == 0);
-	mu_check(fltcmp(quad->hover_height, robot_pose.z + 3) == 0);
+	mu_check(fltcmp(quad->hover_point.z, quad->hover_height) == 0);
+	mu_check(quad->hover_height > 0);
 
     return 0;
 }
@@ -185,15 +185,17 @@ int testQuadrotorRunHoverMode(void)
     Quadrotor *quad;
     Pose robot_pose;
     Position cmd;
+    float dt;
 
     // setup
 	quad = testSetup();
 	robot_pose.x = 1.0;
 	robot_pose.y = 2.0;
 	robot_pose.z = 3.0;
+	dt = 0.1;
 
 	// test and assert
-	cmd = quad->runHoverMode(robot_pose);
+	cmd = quad->runHoverMode(robot_pose, dt);
 
     mu_check(quad->hover_point_set == true);
     mu_check(fltcmp(quad->hover_point.x, robot_pose.x) == 0);
@@ -230,11 +232,11 @@ int testQuadrotorInitializeCarrotController(void)
 
 	mu_check(fltcmp(quad->carrot_controller->wp_start(0), p.x) == 0);
 	mu_check(fltcmp(quad->carrot_controller->wp_start(1), p.y) == 0);
-	mu_check(fltcmp(quad->carrot_controller->wp_start(2), p.z + 3) == 0);
+	mu_check(fltcmp(quad->carrot_controller->wp_start(2), quad->hover_height) == 0);
 
 	mu_check(fltcmp(quad->carrot_controller->wp_end(0), p.x + 5) == 0);
 	mu_check(fltcmp(quad->carrot_controller->wp_end(1), p.y) == 0);
-	mu_check(fltcmp(quad->carrot_controller->wp_end(2), p.z + 3) == 0);
+	mu_check(fltcmp(quad->carrot_controller->wp_end(2), quad->hover_height) == 0);
 
 	mu_check(quad->carrot_controller->waypoints.size() == 5);
 	mu_check(quad->carrot_controller->initialized == 1);
@@ -250,9 +252,12 @@ int testQuadrotorRunCarrotMode(void)
     Position cmd;
     float x_waypoints[5] = {0.0, 5.0, 5.0, 0.0, 0.0};
     float y_waypoints[5] = {0.0, 0.0, 5.0, 5.0, 0.0};
+    float dt;
 
     // setup
 	quad = testSetup();
+
+	dt = 0.1;
 
 	p.x = 0.0;
 	p.y = 0.0;
@@ -269,8 +274,8 @@ int testQuadrotorRunCarrotMode(void)
         // (i + 1)-th waypoint
         robot_pose.x = x_waypoints[i];
         robot_pose.y = y_waypoints[i];
-        robot_pose.z = 6.0;
-        cmd = quad->runCarrotMode(robot_pose);
+        robot_pose.z = quad->hover_height;
+        cmd = quad->runCarrotMode(robot_pose, dt);
 
         if (i < 3) {
             // check waypoint 2 to 4
@@ -302,9 +307,11 @@ int testQuadrotorRunDiscoveryMode(void)
     Pose robot_pose;
     LandingTargetPosition landing_zone;
     Position cmd;
+    float dt;
 
     // setup
 	quad = testSetup();
+	dt = 0.1;
 
 	// test transition to tracking mode
 	robot_pose.x = 1.0;
@@ -316,15 +323,15 @@ int testQuadrotorRunDiscoveryMode(void)
 	landing_zone.y = 0.0;
 	landing_zone.z = 0.0;
 
-    cmd = quad->runDiscoverMode(robot_pose, landing_zone);
+    cmd = quad->runDiscoverMode(robot_pose, landing_zone, dt);
     mu_check(quad->mission_state == TRACKING_MODE);
 
     // test hover during discover mode
 	landing_zone.detected = false;
-    cmd = quad->runDiscoverMode(robot_pose, landing_zone);
+    cmd = quad->runDiscoverMode(robot_pose, landing_zone, dt);
     mu_check(fltcmp(cmd.x, 1.0) == 0);
     mu_check(fltcmp(cmd.y, 2.0) == 0);
-    mu_check(fltcmp(cmd.z, 6.0) == 0);
+    mu_check(fltcmp(cmd.z, quad->hover_height) == 0);
 
     // check quad->tracking_start was instanciated within 2 seconds ago
     mu_check(quad->tracking_start <= time(NULL));
@@ -355,7 +362,7 @@ int testQuadrotorRunTrackingMode(void)
 	landing_zone.y = 0.0;
 	landing_zone.z = 0.0;
 
-	quad->runDiscoverMode(robot_pose, landing_zone);
+	quad->runDiscoverMode(robot_pose, landing_zone, dt);
 	cmd = quad->runTrackingMode(robot_pose, landing_zone, dt);
     mu_print("cmd: %f %f %f\n\n", cmd.x, cmd.y, cmd.z);
 
@@ -388,6 +395,7 @@ int testQuadrotorRunLandingMode(void)
 {
     Quadrotor *quad;
     float dt;
+    float old_hover_height;
     Pose robot_pose;
     LandingTargetPosition landing_zone;
     Position cmd;
@@ -395,6 +403,7 @@ int testQuadrotorRunLandingMode(void)
     // setup
 	quad = testSetup();
 	dt = 0.1;
+	old_hover_height = quad->hover_height;
 
 	robot_pose.x = 1.0;
 	robot_pose.y = 2.0;
@@ -405,34 +414,34 @@ int testQuadrotorRunLandingMode(void)
 	landing_zone.y = 0.0;
 	landing_zone.z = 4.0;
 
-	quad->runDiscoverMode(robot_pose, landing_zone);
+	quad->runDiscoverMode(robot_pose, landing_zone, dt);
 	quad->mission_state = LANDING_MODE;
 
 	// test landing mode - lower height
     quad->height_last_updated = time(NULL) - 2;
 	cmd = quad->runLandingMode(robot_pose, landing_zone, dt);
-    mu_check(fltcmp(quad->hover_height, 4.2) == 0);
+    mu_check(fltcmp(quad->hover_height, old_hover_height * 0.7) == 0);
 
     // test landing mode - do not lower height
     quad->height_last_updated = time(NULL);
-    landing_zone.x = 0.3;
-    landing_zone.y = 0.3;
+    landing_zone.x = 1;
+    landing_zone.y = 1;
 	cmd = quad->runLandingMode(robot_pose, landing_zone, dt);
-    mu_check(fltcmp(quad->hover_height, 4.2) == 0);
+    mu_check(fltcmp(quad->hover_height, old_hover_height * 0.7) == 0);
 
 	// test landing mode - increase height
     quad->height_last_updated = time(NULL) - 2;
-    landing_zone.x = 0.3;
-    landing_zone.y = 0.3;
+    landing_zone.x = 1;
+    landing_zone.y = 1;
 	cmd = quad->runLandingMode(robot_pose, landing_zone, dt);
-    mu_check(fltcmp(quad->hover_height, 4.7) == 0);
+    mu_check(fltcmp(quad->hover_height, old_hover_height * 0.7 + 0.5) == 0);
 
     // test landing mode - do not increase height
     quad->height_last_updated = time(NULL);
-    landing_zone.x = 0.3;
-    landing_zone.y = 0.3;
+    landing_zone.x = 1;
+    landing_zone.y = 1;
 	cmd = quad->runLandingMode(robot_pose, landing_zone, dt);
-    mu_check(fltcmp(quad->hover_height, 4.7) == 0);
+    mu_check(fltcmp(quad->hover_height, old_hover_height * 0.7 + 0.5) == 0);
 
     // test landing mode - kill engines
     landing_zone.x = 0.19;
@@ -502,6 +511,7 @@ void testSuite(void)
     mu_add_test(testQuadrotor);
     mu_add_test(testQuadrotorUpdatePose);
     mu_add_test(testQuadrotorPositionControllerCalculate);
+    mu_add_test(testQuadrotorResetPositionController);
     mu_add_test(testQuadrotorRunIdleMode);
     mu_add_test(testQuadrotorRunHoverMode);
     mu_add_test(testQuadrotorInitializeCarrotController);
