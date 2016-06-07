@@ -16,9 +16,11 @@ Quadrotor::Quadrotor(std::map<std::string, std::string> configs)
     this->hover_point.x = 0.0;
     this->hover_point.y = 0.0;
     this->hover_point.z = 0.0;
-    this->hover_height = 3.0;
+    this->hover_height = 5.0;
 
     this->landing_zone_belief = 0;
+
+    this->estimator_initialized = false;
 
     // initialize position controller
     if (configs.count("position_controller")) {
@@ -211,6 +213,7 @@ Position Quadrotor::runDiscoverMode(
               0.0, 0.0, 0.0,  // vel_x, vel_y, vel_z
               0.0, 0.0, 0.0;  // acc_x, acc_y, acc_z
         apriltag_kf_setup(&this->apriltag_estimator, mu);
+        this->estimator_initialized = true;
 
         // transition to tracker mode
         std::cout << "Transitioning to Tracker Mode!" << std::endl;
@@ -352,8 +355,8 @@ Position Quadrotor::runLandingMode(
         cmd = this->hover_point;
 
         // kill engines (landed?)
-        if (landing_zone.x < 0.5 && landing_zone.y < 0.5 && landing_zone.z < 0.4) {
-            printf("Mission Accomplished - disarming quadrotor!\n");
+        if (landing_zone.x < 0.5 && landing_zone.y < 0.5 && landing_zone.z < 0.2) {
+            printf("Mission Accomplished!\n");
             this->mission_state = MISSION_ACCOMPLISHED;
         }
 

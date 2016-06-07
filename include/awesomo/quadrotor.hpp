@@ -44,6 +44,7 @@ public:
     PositionController *position_controller;
 
     // estimators
+    bool estimator_initialized;
     struct kf apriltag_estimator;
 
     Quadrotor(std::map<std::string, std::string> configs);

@@ -422,98 +422,110 @@ void Awesomo::publishKFStats(int seq, ros::Time time)
 	struct kf *estimator;
 
 	// setup
-	estimator = &this->quad->apriltag_estimator;
+	if (this->quad->estimator_initialized) {
+        estimator = &this->quad->apriltag_estimator;
 
-    // message header
-    msg.header.seq = seq;
-    msg.header.stamp = time;
-    msg.header.frame_id = "awesomo_kf_estimation";
+        // message header
+        msg.header.seq = seq;
+        msg.header.stamp = time;
+        msg.header.frame_id = "awesomo_kf_estimation";
 
-    // A matrix
-    msg.A_rows = estimator->A.rows();
-    msg.A_cols = estimator->A.cols();
-    for (int i = 0; i < estimator->A.rows(); i++) {
-        for (int j = 0; j < estimator->A.cols(); j++) {
-            msg.A_data[i] = estimator->A(i, j);
+        // A matrix
+        msg.A_rows = estimator->A.rows();
+        msg.A_cols = estimator->A.cols();
+        msg.A_data.clear();
+        for (int i = 0; i < estimator->A.rows(); i++) {
+            for (int j = 0; j < estimator->A.cols(); j++) {
+                msg.A_data.push_back(estimator->A(i, j));
+            }
         }
-    }
 
-    // B matrix
-    msg.B_rows = estimator->B.rows();
-    msg.B_cols = estimator->B.cols();
-    for (int i = 0; i < estimator->B.rows(); i++) {
-        for (int j = 0; j < estimator->B.cols(); j++) {
-            msg.A_data[i] = estimator->B(i, j);
+        // B matrix
+        msg.B_rows = estimator->B.rows();
+        msg.B_cols = estimator->B.cols();
+        msg.B_data.clear();
+        for (int i = 0; i < estimator->B.rows(); i++) {
+            for (int j = 0; j < estimator->B.cols(); j++) {
+                msg.B_data.push_back(estimator->B(i, j));
+            }
         }
-    }
 
-    // R matrix
-    msg.R_rows = estimator->R.rows();
-    msg.R_cols = estimator->R.cols();
-    for (int i = 0; i < estimator->R.rows(); i++) {
-        for (int j = 0; j < estimator->R.cols(); j++) {
-            msg.A_data[i] = estimator->R(i, j);
+        // R matrix
+        msg.R_rows = estimator->R.rows();
+        msg.R_cols = estimator->R.cols();
+        msg.R_data.clear();
+        for (int i = 0; i < estimator->R.rows(); i++) {
+            for (int j = 0; j < estimator->R.cols(); j++) {
+                msg.R_data.push_back(estimator->R(i, j));
+            }
         }
-    }
 
-    // C matrix
-    msg.C_rows = estimator->C.rows();
-    msg.C_cols = estimator->C.cols();
-    for (int i = 0; i < estimator->C.rows(); i++) {
-        for (int j = 0; j < estimator->C.cols(); j++) {
-            msg.A_data[i] = estimator->C(i, j);
+        // C matrix
+        msg.C_rows = estimator->C.rows();
+        msg.C_cols = estimator->C.cols();
+        msg.C_data.clear();
+        for (int i = 0; i < estimator->C.rows(); i++) {
+            for (int j = 0; j < estimator->C.cols(); j++) {
+                msg.C_data.push_back(estimator->C(i, j));
+            }
         }
-    }
 
-    // Q matrix
-    msg.Q_rows = estimator->Q.rows();
-    msg.Q_cols = estimator->Q.cols();
-    for (int i = 0; i < estimator->Q.rows(); i++) {
-        for (int j = 0; j < estimator->Q.cols(); j++) {
-            msg.A_data[i] = estimator->Q(i, j);
+        // Q matrix
+        msg.Q_rows = estimator->Q.rows();
+        msg.Q_cols = estimator->Q.cols();
+        msg.Q_data.clear();
+        for (int i = 0; i < estimator->Q.rows(); i++) {
+            for (int j = 0; j < estimator->Q.cols(); j++) {
+                msg.Q_data.push_back(estimator->Q(i, j));
+            }
         }
-    }
 
-    // S matrix
-    msg.S_rows = estimator->S.rows();
-    msg.S_cols = estimator->S.cols();
-    for (int i = 0; i < estimator->S.rows(); i++) {
-        for (int j = 0; j < estimator->S.cols(); j++) {
-            msg.A_data[i] = estimator->S(i, j);
+        // S matrix
+        msg.S_rows = estimator->S.rows();
+        msg.S_cols = estimator->S.cols();
+        msg.S_data.clear();
+        for (int i = 0; i < estimator->S.rows(); i++) {
+            for (int j = 0; j < estimator->S.cols(); j++) {
+                msg.S_data.push_back(estimator->S(i, j));
+            }
         }
-    }
 
-    // K matrix
-    msg.K_rows = estimator->K.rows();
-    msg.K_cols = estimator->K.cols();
-    for (int i = 0; i < estimator->K.rows(); i++) {
-        for (int j = 0; j < estimator->K.cols(); j++) {
-            msg.A_data[i] = estimator->K(i, j);
+        // K matrix
+        msg.K_rows = estimator->K.rows();
+        msg.K_cols = estimator->K.cols();
+        msg.K_data.clear();
+        for (int i = 0; i < estimator->K.rows(); i++) {
+            for (int j = 0; j < estimator->K.cols(); j++) {
+                msg.K_data.push_back(estimator->K(i, j));
+            }
         }
-    }
 
-    // mu vector
-    msg.mu_size = estimator->mu.size();
-    for (int i = 0; i < estimator->mu.size(); i++) {
-        msg.mu_data[i] = estimator->mu(i);
-    }
-
-    // mu vector
-    msg.mu_p_size = estimator->mu_p.size();
-    for (int i = 0; i < estimator->mu_p.size(); i++) {
-        msg.mu_p_data[i] = estimator->mu_p(i);
-    }
-
-    // S_p matrix
-    msg.S_p_rows = estimator->S_p.rows();
-    msg.S_p_cols = estimator->S_p.cols();
-    for (int i = 0; i < estimator->S_p.rows(); i++) {
-        for (int j = 0; j < estimator->S_p.cols(); j++) {
-            msg.A_data[i] = estimator->S_p(i, j);
+        // mu vector
+        msg.mu_size = estimator->mu.size();
+        msg.mu_data.clear();
+        for (int i = 0; i < estimator->mu.size(); i++) {
+            msg.mu_data.push_back(estimator->mu(i));
         }
-    }
 
-    this->kf_estimator_stats_publisher.publish(msg);
+        // mu vector
+        msg.mu_p_size = estimator->mu_p.size();
+        msg.mu_p_data.clear();
+        for (int i = 0; i < estimator->mu_p.size(); i++) {
+            msg.mu_p_data.push_back(estimator->mu_p(i));
+        }
+
+        // S_p matrix
+        msg.S_p_rows = estimator->S_p.rows();
+        msg.S_p_cols = estimator->S_p.cols();
+        msg.S_p_data.clear();
+        for (int i = 0; i < estimator->S_p.rows(); i++) {
+            for (int j = 0; j < estimator->S_p.cols(); j++) {
+                msg.S_p_data.push_back(estimator->S_p(i, j));
+            }
+        }
+
+        this->kf_estimator_stats_publisher.publish(msg);
+    }
 }
 
 int Awesomo::run(
@@ -531,6 +543,7 @@ int Awesomo::run(
     if (this->quad->runMission(this->pose, this->landing_zone, dt)) {
         this->publishPositionControllerMessage(msg, seq, ros::Time::now());
         this->publishPositionControllerStats(seq, ros::Time::now());
+        this->publishKFStats(seq, ros::Time::now());
         return 1;
 
     } else {
@@ -580,7 +593,9 @@ int main(int argc, char **argv)
             awesomo->throttle_publisher.publish(throttle);
 
         } else {
-            awesomo->run(msg, seq, last_request);
+            if (awesomo->run(msg, seq, last_request) == 0) {
+                break;
+            }
 
         }
 
