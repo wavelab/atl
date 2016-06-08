@@ -57,6 +57,8 @@ int testQuadrotor(void)
 	mu_check(quad->landing_config->descend_multiplier >= 0);
 	mu_check(quad->landing_config->descend_multiplier < 1);
 	mu_check(quad->landing_config->recover_multiplier > 1);
+	mu_check(quad->landing_config->x_threshold > 0);
+	mu_check(quad->landing_config->y_threshold > 0);
 	mu_check(quad->landing_config->x_cutoff > 0);
 	mu_check(quad->landing_config->y_cutoff > 0);
 	mu_check(quad->landing_config->z_cutoff > 0);
@@ -383,7 +385,7 @@ int testQuadrotorRunTrackingMode(void)
 
 	quad->runDiscoverMode(robot_pose, landing_zone, dt);
 	cmd = quad->runTrackingMode(robot_pose, landing_zone, dt);
-    mu_print("cmd: %f %f %f\n\n", cmd.x, cmd.y, cmd.z);
+    mu_print("cmd: %f %f %f\n", cmd.x, cmd.y, cmd.z);
 
 	// test tracking mode - time step 2
 	robot_pose.x = 1.1;
@@ -394,7 +396,7 @@ int testQuadrotorRunTrackingMode(void)
 	landing_zone.y = 0.0;
 	landing_zone.z = 0.0;
 	cmd = quad->runTrackingMode(robot_pose, landing_zone, dt);
-    mu_print("cmd: %f %f %f\n\n", cmd.x, cmd.y, cmd.z);
+    mu_print("cmd: %f %f %f\n", cmd.x, cmd.y, cmd.z);
 
 	// test tracking mode - time step 3
 	robot_pose.x = 1.2;
@@ -405,7 +407,7 @@ int testQuadrotorRunTrackingMode(void)
 	landing_zone.y = 0.0;
 	landing_zone.z = 0.0;
 	cmd = quad->runTrackingMode(robot_pose, landing_zone, dt);
-    mu_print("cmd: %f %f %f\n\n", cmd.x, cmd.y, cmd.z);
+    mu_print("cmd: %f %f %f\n", cmd.x, cmd.y, cmd.z);
 
     return 0;
 }
@@ -437,22 +439,22 @@ int testQuadrotorRunLandingMode(void)
 	quad->mission_state = LANDING_MODE;
 
 	// test landing mode - lower height
-    quad->height_last_updated = time(NULL) - 2;
+    quad->height_last_updated = time(NULL) - 10;
 	cmd = quad->runLandingMode(robot_pose, landing_zone, dt);
     mu_check(quad->hover_point->z < old_hover_height);
 
     // test landing mode - do not lower height
     old_hover_height = quad->hover_point->z;
     quad->height_last_updated = time(NULL);
-    landing_zone.x = 1;
-    landing_zone.y = 1;
+    landing_zone.x = 10;
+    landing_zone.y = 10;
 	cmd = quad->runLandingMode(robot_pose, landing_zone, dt);
     mu_check(fltcmp(quad->hover_point->z, old_hover_height) == 0);
 
 	// test landing mode - increase height
-    quad->height_last_updated = time(NULL) - 2;
-    landing_zone.x = 1;
-    landing_zone.y = 1;
+    quad->height_last_updated = time(NULL) - 10;
+    landing_zone.x = 10;
+    landing_zone.y = 10;
 	cmd = quad->runLandingMode(robot_pose, landing_zone, dt);
     mu_check(quad->hover_point->z > old_hover_height);
 
@@ -465,9 +467,10 @@ int testQuadrotorRunLandingMode(void)
     mu_check(fltcmp(quad->hover_point->z, old_hover_height) == 0);
 
     // test landing mode - kill engines
-    landing_zone.x = 0.19;
-    landing_zone.y = 0.19;
-    landing_zone.z = 0.39;
+    landing_zone.x = quad->landing_config->x_cutoff;
+    landing_zone.y = quad->landing_config->y_cutoff;
+    landing_zone.z = quad->landing_config->z_cutoff;
+    quad->landing_zone_belief = quad->landing_config->belief_threshold;
 	cmd = quad->runLandingMode(robot_pose, landing_zone, dt);
 	mu_check(quad->mission_state == MISSION_ACCOMPLISHED);
 
@@ -517,10 +520,11 @@ int testQuadrotorRunMission(void)
     mu_check(quad->mission_state == LANDING_MODE);
 
     // test LANDING_MODE
-    landing_zone.x = 0.19;
-    landing_zone.y = 0.19;
-    landing_zone.z = 0.39;  // set detected landing zone within disarm range
-	quad->runLandingMode(robot_pose, landing_zone, dt);
+    landing_zone.x = quad->landing_config->x_cutoff;
+    landing_zone.y = quad->landing_config->y_cutoff;
+    landing_zone.z = quad->landing_config->z_cutoff;
+    quad->landing_zone_belief = quad->landing_config->belief_threshold;
+    quad->runMission(robot_pose, landing_zone, dt);
 	mu_check(quad->mission_state == MISSION_ACCOMPLISHED);
 
     return 0;

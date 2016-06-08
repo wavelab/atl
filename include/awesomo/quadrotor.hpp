@@ -61,6 +61,8 @@ public:
     float period;
     float descend_multiplier;
     float recover_multiplier;
+    float x_threshold;
+    float y_threshold;
 
     // disarm conditions
     float x_cutoff;
@@ -73,6 +75,8 @@ public:
         period(0),
         descend_multiplier(0),
         recover_multiplier(0),
+        x_threshold(0),
+        y_threshold(0),
         x_cutoff(0),
         y_cutoff(0),
         z_cutoff(0),

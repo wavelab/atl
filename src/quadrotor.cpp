@@ -53,6 +53,9 @@ int Quadrotor::loadConfig(std::string config_file_path)
     YAML::Node config;
     YAML::Node tracking;
     YAML::Node landing;
+    YAML::Node threshold;
+    YAML::Node multiplier;
+    YAML::Node disarm;
 
 
     try {
@@ -75,15 +78,20 @@ int Quadrotor::loadConfig(std::string config_file_path)
         landing = config["landing"]["height_update"];
         this->landing_config->period = landing["period"].as<float>();
 
-        landing = config["landing"]["height_update"]["multiplier"];
-        this->landing_config->descend_multiplier = landing["descend"].as<float>();
-        this->landing_config->recover_multiplier = landing["recover"].as<float>();
+        threshold = config["landing"]["height_update"]["threshold"];
+        this->landing_config->x_threshold = threshold["x"].as<float>();
+        this->landing_config->y_threshold = threshold["y"].as<float>();
 
-        landing = config["landing"]["disarm_conditions"];
-        this->landing_config->x_cutoff = landing["x_cutoff"].as<float>();
-        this->landing_config->y_cutoff = landing["y_cutoff"].as<float>();
-        this->landing_config->z_cutoff = landing["z_cutoff"].as<float>();
-        this->landing_config->belief_threshold = landing["belief_threshold"].as<float>();
+        multiplier = config["landing"]["height_update"]["multiplier"];
+        this->landing_config->descend_multiplier = multiplier["descend"].as<float>();
+        this->landing_config->recover_multiplier = multiplier["recover"].as<float>();
+
+
+        disarm = config["landing"]["disarm_conditions"];
+        this->landing_config->x_cutoff = disarm["x_cutoff"].as<float>();
+        this->landing_config->y_cutoff = disarm["y_cutoff"].as<float>();
+        this->landing_config->z_cutoff = disarm["z_cutoff"].as<float>();
+        this->landing_config->belief_threshold = disarm["belief_threshold"].as<float>();
 
     } catch (YAML::BadFile &ex) {
         throw;
@@ -367,6 +375,22 @@ Position Quadrotor::runLandingMode(
 	Eigen::VectorXd mu(9);
 	Eigen::VectorXd y(3);
     double elasped;
+    float x_threshold;
+    float y_threshold;
+    float x_cutoff;
+    float y_cutoff;
+    float z_cutoff;
+    float descend_multiplier;
+    float recover_multiplier;
+
+    // setup
+    x_threshold = this->landing_config->x_threshold;
+    y_threshold = this->landing_config->y_threshold;
+    x_cutoff = this->landing_config->x_cutoff;
+    y_cutoff = this->landing_config->y_cutoff;
+    z_cutoff = this->landing_config->z_cutoff;
+    descend_multiplier = this->landing_config->descend_multiplier;
+    recover_multiplier = this->landing_config->recover_multiplier;
 
     // measured landing zone x, y, z
     y << landing_zone.x, landing_zone.y, landing_zone.z;
@@ -381,13 +405,13 @@ Position Quadrotor::runLandingMode(
 
     // lower height
     elasped = difftime(time(NULL), this->height_last_updated);
-    if (elasped > 2 && landing_zone.detected == true) {
-        if (landing_zone.x < 2 && landing_zone.y < 2) {
-            this->hover_point->z = this->hover_point->z * 0.8;
+    if (elasped > this->landing_config->period && landing_zone.detected == true) {
+        if (landing_zone.x < x_threshold && landing_zone.y < y_threshold) {
+            this->hover_point->z = this->hover_point->z * descend_multiplier;
             printf("Lowering hover height to %f\n", this->hover_point->z);
 
         } else {
-            this->hover_point->z += 0.5;
+            this->hover_point->z = this->hover_point->z * recover_multiplier;
             printf("Increasing hover height to %f\n", this->hover_point->z);
 
         }
@@ -412,13 +436,13 @@ Position Quadrotor::runLandingMode(
         cmd.z = this->hover_point->z;
 
         // kill engines (landed?)
-        if (landing_zone.x < 0.5 && landing_zone.y < 0.5 && landing_zone.z < 0.4) {
-            this->landing_zone_belief += 1;
-
-            if (this->landing_zone_belief == 10) {
+        if (landing_zone.x <= x_cutoff && landing_zone.y <= y_cutoff && landing_zone.z <= z_cutoff) {
+            if (this->landing_zone_belief == this->landing_config->belief_threshold) {
                 printf("Mission Accomplished!\n");
                 this->mission_state = MISSION_ACCOMPLISHED;
             }
+
+            this->landing_zone_belief++;
         }
 
         // modify setpoint and robot pose as we use GPS or AprilTag
