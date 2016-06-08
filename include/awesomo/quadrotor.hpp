@@ -117,14 +117,15 @@ public:
 
     // methods
     int loadConfig(std::string config_file_path);
+    void updatePose(Pose p);
+    void updateHoverPointWithTag(Pose robot_pose, float tag_x, float tag_y);
+    bool hasLanded(LandingTargetPosition landing_zone);
     Attitude positionControllerCalculate(
         Position setpoint,
         Pose robot_pose,
         float dt
     );
-    void updatePose(Pose p);
     void resetPositionController(void);
-    void updateHoverPointWithTag(Pose robot_pose, float tag_x, float tag_y);
     void runIdleMode(Pose robot_pose);
     Position runHoverMode(Pose robot_pose, float dt);
     void initializeCarrotController(void);

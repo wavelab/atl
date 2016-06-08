@@ -568,14 +568,17 @@ int main(int argc, char **argv)
     Awesomo *awesomo;
     std::string position_controller_config;
     std::string carrot_controller_config;
+    std::string quadrotor_config;
     std::map<std::string, std::string> configs;
     std_msgs::Float64 throttle;
 
     // get configuration paths
 	node_handle.getParam("/position_controller", position_controller_config);
 	node_handle.getParam("/carrot_controller", carrot_controller_config);
+	node_handle.getParam("/quadrotor", quadrotor_config);
 	configs["position_controller"] = position_controller_config;
 	configs["carrot_controller"] = carrot_controller_config;
+	configs["quadrotor"] = quadrotor_config;
 
 	// setup awesomo
     seq = 1;

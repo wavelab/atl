@@ -3,7 +3,7 @@ hover_point:
 
 tracking:
     min_track_time: 5.0
-    target_lost_limit: 4.0
+    target_lost_limit: 2.0
     position_offset:
         x: 0.0
         y: 0.0
@@ -16,7 +16,7 @@ landing:
             x: 2.1
             y: 2.2
         multiplier:
-            descend: 0.8
+            descend: 0.7
             recover: 1.2
 
     disarm_conditions:
@@ -26,5 +26,5 @@ landing:
         z_cutoff: 0.3
 
         # num of frames apriltag is detected before disarm
-        # this introduces redundancy rejection
+        # this introduces noise rejection
         belief_threshold: 10

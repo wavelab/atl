@@ -19,6 +19,9 @@
 
     <!-- CONTROLLER -->
 	<param
+        name="quadrotor"
+        value="$(find awesomo)/configs/quadrotor/config.yaml" />
+	<param
         name="position_controller"
         value="$(find awesomo)/configs/position_controller/config.yaml" />
 	<param
