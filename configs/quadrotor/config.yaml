@@ -1,1 +1,25 @@
-hover_deadzone: 0.1
+hover_point:
+    height: 8.0
+
+tracking:
+    position_offset:
+        x: 0.0
+        y: 0.0
+        z: 0.0
+
+landing:
+    height_update:
+        period: 2
+        multiplier:
+            descend: 0.8
+            recover: 1.2
+
+    disarm_conditions:
+        # x, y ,z disarm conditions from AprilTag center
+        x_cutoff: 0.5
+        y_cutoff: 0.5
+        z_cutoff: 0.3
+
+        # num of frames apriltag is detected before disarm
+        # this introduces redundancy rejection
+        belief_threshold: 10
