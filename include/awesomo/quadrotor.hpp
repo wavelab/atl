@@ -42,6 +42,10 @@ public:
 class TrackingConfig
 {
 public:
+    // track time
+    float min_track_time;
+    float target_lost_limit;
+
     // position offsets
     float offset_x;
     float offset_y;
@@ -51,7 +55,8 @@ public:
     TrackingConfig(void):
         offset_x(0),
         offset_y(0),
-        offset_z(0) {}
+        offset_z(0),
+        min_track_time(10) {}
 };
 
 class LandingConfig
@@ -95,6 +100,7 @@ public:
     Pose pose;
     HoverPoint *hover_point;
     time_t tracking_start;
+    time_t tag_last_updated;
     int landing_zone_belief;
     time_t height_last_updated;
 
@@ -104,7 +110,7 @@ public:
 
     // estimators
     bool estimator_initialized;
-    struct kf apriltag_estimator;
+    struct kf tag_estimator;
 
     // constructors
     Quadrotor(std::map<std::string, std::string> configs);
@@ -118,11 +124,17 @@ public:
     );
     void updatePose(Pose p);
     void resetPositionController(void);
+    void updateHoverPointWithTag(Pose robot_pose, float tag_x, float tag_y);
     void runIdleMode(Pose robot_pose);
     Position runHoverMode(Pose robot_pose, float dt);
     void initializeCarrotController(void);
     Position runCarrotMode(Pose robot_pose, float dt);
     Position runDiscoverMode(
+        Pose robot_pose,
+        LandingTargetPosition landing_zone,
+        float dt
+    );
+    Position trackApriltag(
         Pose robot_pose,
         LandingTargetPosition landing_zone,
         float dt

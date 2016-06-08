@@ -423,7 +423,7 @@ void Awesomo::publishKFStats(int seq, ros::Time time)
 
 	// setup
 	if (this->quad->estimator_initialized) {
-        estimator = &this->quad->apriltag_estimator;
+        estimator = &this->quad->tag_estimator;
 
         // message header
         msg.header.seq = seq;

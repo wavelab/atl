@@ -2,6 +2,8 @@ hover_point:
     height: 8.0
 
 tracking:
+    min_track_time: 5.0
+    target_lost_limit: 4.0
     position_offset:
         x: 0.0
         y: 0.0
