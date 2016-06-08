@@ -16,7 +16,7 @@ Quadrotor::Quadrotor(std::map<std::string, std::string> configs)
     this->hover_point.x = 0.0;
     this->hover_point.y = 0.0;
     this->hover_point.z = 0.0;
-    this->hover_height = 5.0;
+    this->hover_height = 8.0;
 
     this->landing_zone_belief = 0;
 
@@ -271,19 +271,19 @@ Position Quadrotor::runTrackingMode(
         cmd = this->hover_point;
 
         // transition to landing?
-        elasped = difftime(time(NULL), this->tracking_start);
-        if (elasped > 5 && landing_zone.x < 0.2 && landing_zone.y < 0.2) {
-            this->mission_state = LANDING_MODE;
-            this->height_last_updated = time(NULL);
-            std::cout << "Transitioning to Landing Mode!" << std::endl;
-
-        }
+        // elasped = difftime(time(NULL), this->tracking_start);
+        // if (elasped > 3 && landing_zone.x < 2.0 && landing_zone.y < 2.0) {
+        //     this->mission_state = LANDING_MODE;
+        //     this->height_last_updated = time(NULL);
+        //     std::cout << "Transitioning to Landing Mode!" << std::endl;
+        //
+        // }
 
         // modify setpoint and robot pose as we use GPS or AprilTag
         // swap robot pose with setpoint, since we are using AprilTag as
         // world origin, so now if
         robot_pose.x = -tag_position.x;
-        robot_pose.y = -tag_position.y;
+        robot_pose.y = tag_position.y;
         robot_pose.z = tag_position.z;
 
         tag_position.x = 0.0f;
@@ -326,9 +326,9 @@ Position Quadrotor::runLandingMode(
 
     // lower height
     elasped = difftime(time(NULL), this->height_last_updated);
-    if (elasped > 1 && landing_zone.detected == true) {
-        if (landing_zone.x < 1 && landing_zone.y < 1) {
-            this->hover_height = this->hover_height * 0.7;
+    if (elasped > 2 && landing_zone.detected == true) {
+        if (landing_zone.x < 2 && landing_zone.y < 2) {
+            this->hover_height = this->hover_height * 0.8;
             printf("Lowering hover height to %f\n", this->hover_height);
 
         } else {
@@ -355,16 +355,20 @@ Position Quadrotor::runLandingMode(
         cmd = this->hover_point;
 
         // kill engines (landed?)
-        if (landing_zone.x < 0.5 && landing_zone.y < 0.5 && landing_zone.z < 0.2) {
-            printf("Mission Accomplished!\n");
-            this->mission_state = MISSION_ACCOMPLISHED;
+        if (landing_zone.x < 0.5 && landing_zone.y < 0.5 && landing_zone.z < 0.4) {
+            this->landing_zone_belief += 1;
+
+            if (this->landing_zone_belief == 10) {
+                printf("Mission Accomplished!\n");
+                this->mission_state = MISSION_ACCOMPLISHED;
+            }
         }
 
         // modify setpoint and robot pose as we use GPS or AprilTag
         // swap robot pose with setpoint, since we are using AprilTag as
         // world origin, so now if
         robot_pose.x = -tag_position.x;
-        robot_pose.y = -tag_position.y;
+        robot_pose.y = tag_position.y;
         robot_pose.z = tag_position.z;  // don't desend
 
         tag_position.x = 0.0f;
