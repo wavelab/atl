@@ -207,6 +207,13 @@ void Quadrotor::runIdleMode(Pose robot_pose)
 
     // transition to offboard mode
     this->mission_state = DISCOVER_MODE;
+
+     // hover inplace
+    this->hover_point->initialized = true;
+    this->hover_point->x = robot_pose.x;
+    this->hover_point->y = robot_pose.y;
+    this->hover_point->z;   // already set by config file
+
 }
 
 Position Quadrotor::runHoverMode(Pose robot_pose, float dt)
@@ -354,9 +361,11 @@ Position Quadrotor::trackApriltag(
 	// calculate how long we've lost target
 	target_lost_elasped = difftime(time(NULL), this->tag_last_updated);
 
-    // estimate tag position adn  build position command
+    // estimate tag position
     y << landing_zone.x, landing_zone.y, landing_zone.z;
     apriltag_kf_estimate(&this->tag_estimator, y, dt, landing_zone.detected);
+
+    // build position command
     tag_position.x = this->tag_estimator.mu(0);
     tag_position.y = this->tag_estimator.mu(1);
     tag_position.z = this->hover_point->z;
@@ -365,14 +374,10 @@ Position Quadrotor::trackApriltag(
     if (landing_zone.detected == true) {
         // update last time we saw the tag
         this->tag_last_updated = time(NULL);
+        this->updateHoverPointWithTag(robot_pose, landing_zone.x, landing_zone.y);
 
-    } else if (target_lost_elasped < this->tracking_config->target_lost_limit) {
-        // do nothing (just use estimate from KF)
-        // printf("Losted target for %f seconds!\n", target_lost_elasped);
-
-    } else {
+    } else if (target_lost_elasped > this->tracking_config->target_lost_limit) {
         printf("Hovering in place!\n");
-        this->hover_point->initialized = false;
         cmd = this->runHoverMode(robot_pose, dt);
         return cmd;
 
@@ -393,9 +398,11 @@ Position Quadrotor::trackApriltag(
     this->positionControllerCalculate(tag_position, robot_pose, dt);
 
     // build commanded position
-    cmd.x = robot_pose.x;
-    cmd.y = robot_pose.y;
-    cmd.z = robot_pose.z;
+    cmd.x = this->hover_point->x;
+    cmd.y = this->hover_point->y;
+    cmd.z = this->hover_point->z;
+
+    return cmd;
 }
 
 Position Quadrotor::runTrackingMode(

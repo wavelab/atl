@@ -506,24 +506,24 @@ int testQuadrotorRunMission(void)
     mu_check(quad->hover_point->initialized ==  true);
     mu_check(fltcmp(quad->hover_point->x, robot_pose.x) == 0);
     mu_check(fltcmp(quad->hover_point->y, robot_pose.y) == 0);
-    mu_check(fltcmp(quad->hover_point->z, 3) == 0);
+    mu_check(quad->hover_point->z > 0);
 
     // test TRACKER_MODE
     quad->runMission(robot_pose, landing_zone, dt);
     mu_check(quad->mission_state == TRACKING_MODE);
     mu_check(fltcmp(quad->hover_point->x, robot_pose.x) == 0);
     mu_check(fltcmp(quad->hover_point->y, robot_pose.y) == 0);
-    mu_check(fltcmp(quad->hover_point->z, robot_pose.z + 3) == 0);
+    mu_check(quad->hover_point->z > 0);
 
     quad->tracking_start = quad->tracking_start - 6;  // emulate tracking for 6 seconds
     quad->runMission(robot_pose, landing_zone, dt);
     mu_check(quad->mission_state == LANDING_MODE);
 
     // test LANDING_MODE
-    landing_zone.x = quad->landing_config->x_cutoff;
-    landing_zone.y = quad->landing_config->y_cutoff;
-    landing_zone.z = quad->landing_config->z_cutoff;
-    quad->landing_zone_belief = quad->landing_config->belief_threshold;
+    // landing_zone.x = quad->landing_config->x_cutoff;
+    // landing_zone.y = quad->landing_config->y_cutoff;
+    // landing_zone.z = quad->landing_config->z_cutoff;
+    quad->landing_zone_belief = quad->landing_config->belief_threshold - 1;
     quad->runMission(robot_pose, landing_zone, dt);
 	mu_check(quad->mission_state == MISSION_ACCOMPLISHED);
 
