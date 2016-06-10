@@ -284,6 +284,7 @@ void Quadrotor::initializeCarrotController(void)
 
 Position Quadrotor::runCarrotMode(Pose robot_pose, float dt)
 {
+    int retval;
     Position cmd;
     Eigen::Vector3d position;
     Eigen::Vector3d carrot;
@@ -292,14 +293,31 @@ Position Quadrotor::runCarrotMode(Pose robot_pose, float dt)
     position << robot_pose.x, robot_pose.y, robot_pose.z;
 
     // calculate new carrot point
-    if (this->carrot_controller->update(position, carrot) == 0) {
+    retval = this->carrot_controller->update(position, carrot);
+
+    if (retval == 0) {
         std::cout << "No more waypoints!" << std::endl;
         std::cout << "Transitioning to Hover Mode!" << std::endl;
+
+        this->mission_state = HOVER_MODE;
         this->hover_point->initialized = true;
         this->hover_point->x = this->carrot_controller->wp_end(0);
         this->hover_point->y = this->carrot_controller->wp_end(1);
         this->hover_point->z = this->carrot_controller->wp_end(2);
-        this->mission_state = HOVER_MODE;
+
+        cmd.x = this->hover_point->x;
+        cmd.y = this->hover_point->y;
+        cmd.z = this->hover_point->z;
+
+    } else if (retval == 1) {
+        this->hover_point->initialized = true;
+        this->hover_point->x = carrot(0);
+        this->hover_point->y = carrot(1);
+        this->hover_point->z = carrot(2);
+
+        cmd.x = carrot(0);
+        cmd.y = carrot(1);
+        cmd.z = carrot(2);
 
     } else {
         cmd = this->runHoverMode(robot_pose, dt);
@@ -354,7 +372,7 @@ Position Quadrotor::trackApriltag(
 )
 {
     Position cmd;
-    Position tag_position;
+    Position tag;
 	Eigen::VectorXd y(3);
 	float target_lost_elasped;
 
@@ -366,15 +384,15 @@ Position Quadrotor::trackApriltag(
     apriltag_kf_estimate(&this->tag_estimator, y, dt, landing_zone.detected);
 
     // build position command
-    tag_position.x = this->tag_estimator.mu(0);
-    tag_position.y = this->tag_estimator.mu(1);
-    tag_position.z = this->hover_point->z;
+    tag.x = this->tag_estimator.mu(0);
+    tag.y = this->tag_estimator.mu(1);
+    tag.z = this->hover_point->z;
 
     // keep track of target position
     if (landing_zone.detected == true) {
         // update last time we saw the tag
         this->tag_last_updated = time(NULL);
-        this->updateHoverPointWithTag(robot_pose, tag_position.x, tag_position.y);
+        this->updateHoverPointWithTag(robot_pose, tag.x, tag.y);
 
     } else if (target_lost_elasped > this->tracking_config->target_lost_limit) {
         printf("Hovering in place!\n");
@@ -386,16 +404,16 @@ Position Quadrotor::trackApriltag(
     // modify setpoint and robot pose as we use GPS or AprilTag
     // swap robot pose with setpoint, since we are using AprilTag as
     // world origin, so now if
-    robot_pose.x = -tag_position.x;
-    robot_pose.y = tag_position.y;
-    robot_pose.z = tag_position.z;  // don't desend
+    robot_pose.x = -tag.x;
+    robot_pose.y = tag.y;
+    robot_pose.z = tag.z;  // don't desend
 
-    tag_position.x = 0.0f;
-    tag_position.y = 0.0f;
-    tag_position.z = robot_pose.z;
+    tag.x = 0.0f;
+    tag.y = 0.0f;
+    tag.z = robot_pose.z;
 
     // calcualte new attitude using position controller
-    this->positionControllerCalculate(tag_position, robot_pose, dt);
+    this->positionControllerCalculate(tag, robot_pose, dt);
 
     // build commanded position
     cmd.x = this->hover_point->x;

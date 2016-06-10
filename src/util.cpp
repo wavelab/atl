@@ -93,7 +93,6 @@ int applyRotationToPosition(
     return 0;
 }
 
-
 static double tic(void)
 {
     struct timeval t;
