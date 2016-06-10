@@ -374,7 +374,7 @@ Position Quadrotor::trackApriltag(
     if (landing_zone.detected == true) {
         // update last time we saw the tag
         this->tag_last_updated = time(NULL);
-        this->updateHoverPointWithTag(robot_pose, landing_zone.x, landing_zone.y);
+        this->updateHoverPointWithTag(robot_pose, tag_position.x, tag_position.y);
 
     } else if (target_lost_elasped > this->tracking_config->target_lost_limit) {
         printf("Hovering in place!\n");
