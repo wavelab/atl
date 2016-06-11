@@ -1,9 +1,9 @@
 hover_point:
-    height: 8.0
+    height: 1.0
 
 tracking:
     min_track_time: 5.0
-    target_lost_limit: 2.0
+    target_lost_limit: 1.0
     position_offset:
         x: 0.0
         y: 0.0
@@ -23,7 +23,7 @@ landing:
         # x, y ,z disarm conditions from AprilTag center
         x_cutoff: 0.5
         y_cutoff: 0.5
-        z_cutoff: 0.3
+        z_cutoff: 0.2
 
         # num of frames apriltag is detected before disarm
         # this introduces noise rejection

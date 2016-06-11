@@ -545,7 +545,6 @@ int Awesomo::run(
         this->publishPositionControllerStats(seq, ros::Time::now());
         this->publishKFStats(seq, ros::Time::now());
         return 1;
-
     } else {
         this->disarm();
         return 0;
