@@ -59,7 +59,7 @@ int Quadrotor::loadConfig(std::string config_file_path)
         config = YAML::LoadFile(config_file_path);
 
         // load hover point config
-        this->hover_point->initialized = true;
+        this->hover_point->initialized = false; // later in the code this will be set
         this->hover_point->x = 0.0f;
         this->hover_point->y = 0.0f;
         this->hover_point->z = config["hover_point"]["height"].as<float>();
@@ -147,10 +147,12 @@ void Quadrotor::runIdleMode(Pose robot_pose)
     this->mission_state = DISCOVER_MODE;
 
     // hover inplace
-    this->hover_point->initialized = true;
-    this->hover_point->x = robot_pose.x;
-    this->hover_point->y = robot_pose.y;
-    this->hover_point->z;  // configured in config file
+    if (this->hover_point->initialized == false) {
+        this->hover_point->initialized = true;
+        this->hover_point->x = robot_pose.x;
+        this->hover_point->y = robot_pose.y;
+        this->hover_point->z;  // configured in config file
+    }
 }
 
 Position Quadrotor::runHoverMode(Pose robot_pose)
@@ -442,7 +444,7 @@ int Quadrotor::runMission(
 {
     Position tag_position;
     Position tag_origin;
-    Pose pose;
+    Pose fake_robot_pose;
     double target_lost_elasped;
 
     // calculate time elasped for target lost
@@ -483,23 +485,20 @@ int Quadrotor::runMission(
     // modify setpoint and robot pose as we use GPS or AprilTag
     // swap robot pose with setpoint, since we are using AprilTag as
     // world origin, so now if
-    pose.x = -tag_position.x;
-    pose.y = tag_position.y;
-    pose.z = tag_position.z;  // don't desend
+    fake_robot_pose.x = -tag_position.x;
+    fake_robot_pose.y = -tag_position.y;
+    fake_robot_pose.z = robot_pose.z;  // don't desend
 
     tag_origin.x = 0.0f;
     tag_origin.y = 0.0f;
-    tag_origin.z = pose.z;
+    tag_origin.z = tag_position.z;
 
-    if (target_lost_elasped > 1) {
-    // } else {
+    if (landing_zone.detected == false) {
+        this->positionControllerCalculate(tag_origin, fake_robot_pose, dt);
+    } else {
         std::cout << "Hovering!" << std::endl;
         this->runHoverMode(robot_pose);
-
     }
-
-    // calcualte new attitude using position controller
-    this->positionControllerCalculate(tag_origin, pose, dt);
 
     return 1;
 }
