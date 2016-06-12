@@ -362,10 +362,10 @@ Position Quadrotor::runLandingMode(
 
     }
 
-    // lower height
+    // lower height or increase height
     elasped = difftime(time(NULL), this->height_last_updated);
     if (elasped > 1 && landing_zone.detected == true) {
-        if (landing_zone.x < 0.3 && landing_zone.y < 0.3) {
+        if (landing_zone.x < 0.5 && landing_zone.y < 0.5) {
             this->hover_point->z = this->hover_point->z * 0.7;
             printf("Lowering hover height to %f\n", this->hover_point->z);
 

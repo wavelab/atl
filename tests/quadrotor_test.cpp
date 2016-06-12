@@ -53,7 +53,7 @@ int testQuadrotor(void)
 	mu_check(quad->pose.y == 0);
 	mu_check(quad->pose.z == 0);
 
-	mu_check(quad->hover_point->initialized == true);
+	mu_check(quad->hover_point->initialized == false);
 	mu_check(fltcmp(quad->hover_point->x, 0.0) == 0);
 	mu_check(fltcmp(quad->hover_point->y, 0.0) == 0);
 	mu_check(quad->hover_point->z > 0);
@@ -213,12 +213,12 @@ int testQuadrotorRunHoverMode(void)
 	cmd = quad->runHoverMode(robot_pose);
 
     mu_check(quad->hover_point->initialized == true);
-    mu_check(fltcmp(quad->hover_point->x, 0) == 0);
-    mu_check(fltcmp(quad->hover_point->y, 0) == 0);
+    mu_check(fltcmp(quad->hover_point->x, 1) == 0);
+    mu_check(fltcmp(quad->hover_point->y, 2) == 0);
     mu_check(quad->hover_point->z > 0);
 
-    mu_check(fltcmp(cmd.x, 0) == 0);
-    mu_check(fltcmp(cmd.y, 0) == 0);
+    mu_check(fltcmp(cmd.x, 1) == 0);
+    mu_check(fltcmp(cmd.y, 2) == 0);
     mu_check(cmd.z > 0);
 
 	// test hover point when it is not intialized
@@ -448,15 +448,15 @@ int testQuadrotorRunLandingMode(void)
 
 	// test landing mode - increase height
     quad->height_last_updated = time(NULL) - 2;
-    landing_zone.x = 0.3;
-    landing_zone.y = 0.3;
+    landing_zone.x = 0.51;
+    landing_zone.y = 0.51;
 	cmd = quad->runLandingMode(robot_pose, landing_zone, dt);
     mu_check(fltcmp(quad->hover_point->z, 4.2 * 1.2) == 0);
 
     // test landing mode - do not increase height
     quad->height_last_updated = time(NULL);
-    landing_zone.x = 0.3;
-    landing_zone.y = 0.3;
+    landing_zone.x = 0.5;
+    landing_zone.y = 0.5;
 	cmd = quad->runLandingMode(robot_pose, landing_zone, dt);
     mu_check(fltcmp(quad->hover_point->z, 4.2 * 1.2) == 0);
 
