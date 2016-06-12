@@ -562,7 +562,6 @@ int main(int argc, char **argv)
     ros::Time last_request;
     geometry_msgs::PoseStamped msg;
 
-	float dt;
 	int seq;
     Awesomo *awesomo;
     std::string position_controller_config;
