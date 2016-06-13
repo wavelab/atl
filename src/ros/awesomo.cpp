@@ -22,6 +22,7 @@
 #include "awesomo/quadrotor.hpp"
 #include "awesomo/PositionControllerStats.h"
 #include "awesomo/KFStats.h"
+#include "awesomo/KFPlotting.h"
 
 
 
@@ -36,6 +37,7 @@
 #define THROTTLE_TOPIC "/mavros/setpoint_attitude/att_throttle"
 #define POSITION_CONTROLLER_TOPIC "/awesomo/position_controller/stats"
 #define KF_ESTIMATION_TOPIC "/awesomo/kf_estimation/stats"
+#define KF_ESTIMATION_PLOTTING_TOPIC "/awesomo/kf_estimation/states"
 #define RADIO_TOPIC "/mavros/rc/in"
 #define LANDING_TOPIC "/awesomo/landing_target/pose"
 #define GPS_TOPIC "/mavros/global_position/local"
@@ -71,6 +73,7 @@ public:
     ros::Publisher throttle_publisher;
     ros::Publisher position_controller_stats_publisher;
     ros::Publisher kf_estimator_stats_publisher;
+    ros::Publisher kf_estimator_stats_plotting_publisher;
 
     void poseCallback(const geometry_msgs::PoseStamped &msg);
     void velocityCallback(const geometry_msgs::TwistStamped &msg);
@@ -98,6 +101,7 @@ public:
         ros::Time time
     );
     void publishKFStats(int seq, ros::Time time);
+    void publishKFStatsForPlotting(int seq, ros::Time time);
     int run(
         geometry_msgs::PoseStamped &msg,
         int seq,
@@ -147,6 +151,10 @@ Awesomo::Awesomo(std::map<std::string, std::string> configs)
     );
     this->kf_estimator_stats_publisher = this->node.advertise<awesomo::KFStats>(
         KF_ESTIMATION_TOPIC,
+        50
+    );
+    this->kf_estimator_stats_plotting_publisher = this->node.advertise<awesomo::KFPlotting>(
+        KF_ESTIMATION_PLOTTING_TOPIC,
         50
     );
 }
@@ -513,6 +521,38 @@ void Awesomo::publishKFStats(int seq, ros::Time time)
     }
 
     this->kf_estimator_stats_publisher.publish(msg);
+}
+
+void Awesomo::publishKFStatsForPlotting(int seq, ros::Time time)
+{
+    awesomo::KFPlotting msg;
+    struct kf *estimator;
+
+    // setup
+    if (this->quad->estimator_initialized) {
+        estimator = &this->quad->apriltag_estimator;
+
+        // message header
+        msg.header.seq = seq;
+        msg.header.stamp = time;
+        msg.header.frame_id = "awesomo_kf_estimation";
+
+        // mu vector
+        msg.x = estimator->mu(0);
+        msg.y = estimator->mu(1);
+        msg.z = estimator->mu(2);
+
+        msg.vel_x = estimator->mu(3);
+        msg.vel_y = estimator->mu(4);
+        msg.vel_z = estimator->mu(5);
+
+        msg.acc_x = estimator->mu(6);
+        msg.acc_y = estimator->mu(7);
+        msg.acc_z = estimator->mu(8);
+
+        // publish
+        this->kf_estimator_stats_plotting_publisher.publish(msg);
+    }
 }
 
 int Awesomo::run(
