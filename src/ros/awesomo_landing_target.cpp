@@ -24,6 +24,7 @@ public:
     LandingTarget(CameraMountRBT &cam_rbt);
     void localPoseCallback(const geometry_msgs::PoseStamped &input);
     void cameraRBTCallback(const atim::AtimPoseStamped &input);
+    void cameraRBTWithIMUCallback(const atim::AtimPoseStamped &msg);
     void subscribeToAtimPose(void);
     void subscribeToLocalPositionPose(void);
     void publishRotatedValues(int seq, ros::Time time);
@@ -79,6 +80,31 @@ void LandingTarget::cameraRBTCallback(const atim::AtimPoseStamped &msg)
             this->local_pose.pitch,
             this->local_pose.yaw,
             this->position
+        );
+    }
+    else{
+        this->position.detected = msg.tag_detected;
+    }
+}
+
+void LandingTarget::cameraRBTWithIMUCallback(const atim::AtimPoseStamped &msg)
+{
+    bool tag_detected;
+
+    if (msg.tag_detected) {
+        this->position.x = msg.pose.position.x;
+        this->position.y = msg.pose.position.y;
+        this->position.z = msg.pose.position.z;
+        this->position.detected = msg.tag_detected;
+
+
+        this->cam_rbt.applyRBTtoPosition(this->position);
+        applyRotationToPosition(
+           msg.pose.orientation.x,
+           msg.pose.orientation.y,
+           msg.pose.orientation.z,
+           msg.pose.orientation.w,
+           this->position
         );
     }
     else{
