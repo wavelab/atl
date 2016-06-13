@@ -51,6 +51,7 @@ ADD_MESSAGE_FILES(
     FILES
     PositionControllerStats.msg
     KFStats.msg
+    KFPlotting.msg
 )
 GENERATE_MESSAGES(DEPENDENCIES std_msgs)
 
