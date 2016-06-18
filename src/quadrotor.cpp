@@ -333,6 +333,7 @@ Position Quadrotor::runLandingMode(
 )
 {
     Position tag;
+    Position estimation;
 	Eigen::VectorXd mu(9);
 	Eigen::VectorXd y(3);
     double elasped;
@@ -352,6 +353,10 @@ Position Quadrotor::runLandingMode(
     tag.x = this->apriltag_estimator.mu(0);
     tag.y = this->apriltag_estimator.mu(1);
     tag.z = this->hover_point->z;
+
+    estimation.x = this->apriltag_estimator.mu(0);
+    estimation.y = this->apriltag_estimator.mu(1);
+    estimation.z = this->apriltag_estimator.mu(2);
 
     // keep track of target position
     if (landing_zone.detected == true) {
@@ -383,7 +388,7 @@ Position Quadrotor::runLandingMode(
         printf("Mission Accomplished - disarming quadrotor!\n");
         this->mission_state = MISSION_ACCOMPLISHED;
 
-    } else if (tag.x < 0.5 && tag.y < 0.5 && tag.z < 0.2) {
+    } else if (estimation.x < 0.5 && estimation.y < 0.5 && estimation.z < 0.2) {
         printf("Mission Accomplished - disarming quadrotor!\n");
         this->mission_state = MISSION_ACCOMPLISHED;
 
@@ -493,11 +498,14 @@ int Quadrotor::runMission(
     tag_origin.y = 0.0f;
     tag_origin.z = tag_position.z;
 
-    if (landing_zone.detected == false) {
+    std::cout << landing_zone.detected << std::endl;
+    if (landing_zone.detected) {
         this->positionControllerCalculate(tag_origin, fake_robot_pose, dt);
+
     } else {
         std::cout << "Hovering!" << std::endl;
         this->runHoverMode(robot_pose);
+
     }
 
     return 1;
