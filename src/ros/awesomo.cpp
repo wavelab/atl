@@ -7,6 +7,7 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <geometry_msgs/TwistStamped.h>
+#include <tf/transform_broadcaster.h>
 
 #define MAVLINK_DIALECT common
 #include <mavros/mavros.h>
@@ -75,6 +76,8 @@ public:
     ros::Publisher kf_estimator_stats_publisher;
     ros::Publisher kf_estimator_stats_plotting_publisher;
 
+    tf::TransformBroadcaster imu_tf_broadcaster;
+
     void poseCallback(const geometry_msgs::PoseStamped &msg);
     void velocityCallback(const geometry_msgs::TwistStamped &msg);
     void mocapCallback(const geometry_msgs::PoseStamped &msg);
@@ -83,6 +86,7 @@ public:
     void gpsCallback(const geometry_msgs::PoseWithCovarianceStamped &msg);
     void stateCallback(const mavros_msgs::State::ConstPtr &msg);
     void waitForConnection(void);
+    void imuCallback(const geometry_msgs::PoseStamped &msg);
 
     Awesomo(std::map<std::string, std::string> configs);
     int arm(void);
@@ -173,6 +177,26 @@ void Awesomo::poseCallback(const geometry_msgs::PoseStamped &msg)
         &this->pose.pitch,
         &this->pose.yaw
     );
+
+    tf::Transform transform;
+    transform.setOrigin(tf::Vector3(
+        this->pose.x, this->pose.y, this->pose.z));
+
+    if (this->pose.z < -10.0){// with no gps z tends to go very negative
+        transform.setOrigin(tf::Vector3(
+            this->pose.x, this->pose.y, 1.0));
+    }
+
+
+    tf::Quaternion q(
+        msg.pose.orientation.x,
+        msg.pose.orientation.y,
+        msg.pose.orientation.z,
+        msg.pose.orientation.w
+    );
+    transform.setRotation(q);
+    this->imu_tf_broadcaster.sendTransform(
+            tf::StampedTransform(transform, ros::Time::now(), "world", "pixhawk_imu"));
 }
 
 void Awesomo::velocityCallback(const geometry_msgs::TwistStamped &msg)
@@ -625,6 +649,7 @@ int main(int argc, char **argv)
             }
 
         }
+
 
 		// end
 		seq++;

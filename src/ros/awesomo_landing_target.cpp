@@ -1,9 +1,11 @@
+#include <std_msgs/Float64.h>
+
 #include <ros/ros.h>
 #include <tf/transform_datatypes.h>
-
-#include <std_msgs/Float64.h>
 #include <sensor_msgs/Imu.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <tf/transform_broadcaster.h>
+#include <tf/transform_listener.h>
 #include <atim/AtimPoseStamped.h>
 
 #include "awesomo/util.hpp"
@@ -34,6 +36,8 @@ public:
     ros::Subscriber localPositionPoseSubscriber;
     ros::Publisher correction_publisher;
     ros::Publisher redivert_publisher;
+
+    tf::TransformBroadcaster landing_target_tf_broadcaster;
 };
 
 LandingTarget::LandingTarget(CameraMountRBT &cam_rbt)
@@ -191,15 +195,30 @@ int main(int argc, char **argv)
     ros::Time last_request;
 
     double mount_roll = 0;
-    double mount_pitch = -M_PI/2;
+    double mount_pitch = M_PI;
     double mount_yaw = 0;
     // double mount_x = 0.067;
     // double mount_y = 0.0;
     // double mount_z = 0.07;
 
-    double mount_x = 0.0;
+    double mount_x = 1.0;
     double mount_y = 0.0;
     double mount_z = 0.0;
+
+    tf::TransformBroadcaster camera_imu_br;
+    tf::Transform camera_imu_tf;
+    tf::Quaternion q;
+
+    q.setRPY(mount_roll, mount_pitch, mount_yaw);
+    camera_imu_tf.setOrigin(tf::Vector3(mount_x, mount_y, mount_z));
+    camera_imu_tf.setRotation(q);
+
+    tf::TransformBroadcaster camera_image_br;
+    tf::Transform camera_image_tf;
+    tf::Quaternion q_image;
+    q_image.setRPY(0, 0, 0);
+    camera_image_tf.setOrigin(tf::Vector3(0.0, 0 , 1.0));
+    camera_image_tf.setRotation(q_image);
 
     CameraMountRBT cam_rbt;
     LandingTarget *target;
@@ -224,6 +243,17 @@ int main(int argc, char **argv)
     // publish
     while (ros::ok()){
         target->publishRotatedValues(seq, ros::Time::now());
+        camera_imu_br.sendTransform(
+            tf::StampedTransform(
+                camera_imu_tf, ros::Time::now(), "pixhawk_imu", "camera"
+            )
+        );
+
+        camera_image_br.sendTransform(
+            tf::StampedTransform(
+                camera_image_tf, ros::Time::now(), "camera", "image"
+            )
+        );
         ros::spinOnce();
         rate.sleep();
         seq++;

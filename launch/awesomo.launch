@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
     <!-- ATIM -->
-	<param
+    <!--	<param
         name="camera_config_path"
 	    value="$(find atim)/configs/pointgrey_firefly" />
 	<node
@@ -9,7 +9,7 @@
 	    type="atim"
 	    name="atim"
 	    output="screen" />
-
+    /-->
     <!-- LANDING TARGET -->
 	<node
 	    pkg="awesomo"
