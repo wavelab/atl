@@ -77,6 +77,7 @@ public:
     ros::Publisher kf_estimator_stats_plotting_publisher;
 
     tf::TransformBroadcaster imu_tf_broadcaster;
+    tf::Transform world_imu_tf;
 
     void poseCallback(const geometry_msgs::PoseStamped &msg);
     void velocityCallback(const geometry_msgs::TwistStamped &msg);
@@ -178,25 +179,19 @@ void Awesomo::poseCallback(const geometry_msgs::PoseStamped &msg)
         &this->pose.yaw
     );
 
-    tf::Transform transform;
-    transform.setOrigin(tf::Vector3(
+    this->world_imu_tf.setOrigin(tf::Vector3(
         this->pose.x, this->pose.y, this->pose.z));
 
-    if (this->pose.z < -10.0){// with no gps z tends to go very negative
-        transform.setOrigin(tf::Vector3(
-            this->pose.x, this->pose.y, 1.0));
-    }
-
-
-    tf::Quaternion q(
-        msg.pose.orientation.x,
-        msg.pose.orientation.y,
-        msg.pose.orientation.z,
-        msg.pose.orientation.w
+    this->world_imu_tf.setRotation(
+        tf::Quaternion(
+            msg.pose.orientation.x,
+            msg.pose.orientation.y,
+            msg.pose.orientation.z,
+            msg.pose.orientation.w
+        )
     );
-    transform.setRotation(q);
     this->imu_tf_broadcaster.sendTransform(
-            tf::StampedTransform(transform, ros::Time::now(), "world", "pixhawk"));
+            tf::StampedTransform(world_imu_tf, ros::Time::now(), "world", "pixhawk"));
 }
 
 void Awesomo::velocityCallback(const geometry_msgs::TwistStamped &msg)

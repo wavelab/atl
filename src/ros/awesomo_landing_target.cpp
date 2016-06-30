@@ -70,28 +70,30 @@ void LandingTarget::cameraRBTCallback(const atim::AtimPoseStamped &msg)
 
     if (msg.tag_detected) {
         this->position.x = msg.pose.position.x;
-        this->position.y = -msg.pose.position.y;
+        this->position.y = msg.pose.position.y * -1; // atim frame weirdness
         this->position.z = msg.pose.position.z;
         this->position.detected = msg.tag_detected;
 
         this->cam_rbt.applyRBTtoPosition(this->position);
         // negate the rotation using the imu
         applyRotationToPosition(
-            1 * this->local_pose.roll,
-            -1 * this->local_pose.pitch,
-            0 * this->local_pose.yaw,
+            this->local_pose.roll,
+            this->local_pose.pitch * -1,
+            this->local_pose.yaw * 0, // do not correct for yaw (body planar frame)
             this->position
         );
-    ROS_INFO(
-        "pose before: %f\t%f\t%f",
-        this->position.x,
-        this->position.y,
-        this->position.z
-    );
+        ROS_INFO(
+            "target pose in NED, body planar: %f\t%f\t%f",
+            this->position.x,
+            this->position.y,
+            this->position.z
+        );
 
 
-        this->position.x -= 0.07;
-        this->position.z -= 0.08;
+        // Apply translation required due to camera mount
+        this->position.x += -0.07;
+        this->position.y += 0.00;
+        this->position.z += 0.08;
 
         this->body_planner_target_location_tf.setOrigin(
             tf::Vector3(
@@ -102,8 +104,8 @@ void LandingTarget::cameraRBTCallback(const atim::AtimPoseStamped &msg)
         );
 
         this->body_planner_target_location_tf.setRotation(
-            tf::Quaternion(0, 0, 0, 1)
-        );
+            tf::Quaternion(0, 0, 0, 1) // identity Quaternion
+       );
 
         this->body_planar_target_location_br.sendTransform(
             tf::StampedTransform(
@@ -134,10 +136,6 @@ void LandingTarget::localPoseCallback(const geometry_msgs::PoseStamped &input)
         &this->local_pose.yaw
     );
 
-    // this->local_pose.roll =  this->local_pose.roll;
-    // this->local_pose.pitch =  this->local_pose.pitch;
-    // this->local_pose.yaw = 0 * this->local_pose.yaw;
-
     tf::Quaternion q;
     q.setRPY(
         this->local_pose.roll,
@@ -145,6 +143,7 @@ void LandingTarget::localPoseCallback(const geometry_msgs::PoseStamped &input)
         0 * this->local_pose.yaw
     );
 
+    // rotate around y, then  z
     tf::Quaternion q_enu_to_ned;
     q_enu_to_ned.setRPY(0, M_PI, M_PI);
 
@@ -214,25 +213,18 @@ int main(int argc, char **argv)
     double mount_roll = 0;
     double mount_pitch = -M_PI/2;
     double mount_yaw = 0;
-    // double mount_x = 0.067;
-    // double mount_y = 0.0;
-    // double mount_z = 0.07;
-
-    double mount_x = 0.0;
-    double mount_y = 0.0;
-    double mount_z = 0.0;
-
 
     CameraMountRBT cam_rbt;
     LandingTarget *target;
 
+    // do not add translations here, they are not applied properly..
     cam_rbt.initialize(
         mount_roll,
         mount_pitch,
         mount_yaw,
-        mount_x,
-        mount_y,
-        mount_z
+        0,
+        0,
+        0
     );
 
     cam_rbt.initializeMirrorMtx(-1, 1, 1);
