@@ -196,7 +196,7 @@ void Awesomo::poseCallback(const geometry_msgs::PoseStamped &msg)
     );
     transform.setRotation(q);
     this->imu_tf_broadcaster.sendTransform(
-            tf::StampedTransform(transform, ros::Time::now(), "world", "pixhawk_imu"));
+            tf::StampedTransform(transform, ros::Time::now(), "world", "pixhawk"));
 }
 
 void Awesomo::velocityCallback(const geometry_msgs::TwistStamped &msg)

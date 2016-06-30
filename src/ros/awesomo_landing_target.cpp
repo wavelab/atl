@@ -37,7 +37,11 @@ public:
     ros::Publisher correction_publisher;
     ros::Publisher redivert_publisher;
 
-    tf::TransformBroadcaster landing_target_tf_broadcaster;
+    tf::TransformBroadcaster body_planar_tf_br;
+    tf::Transform body_planar_tf;
+    tf::TransformBroadcaster body_planar_target_location_br;
+    tf::Transform body_planner_target_location_tf;
+
 };
 
 LandingTarget::LandingTarget(CameraMountRBT &cam_rbt)
@@ -66,55 +70,56 @@ void LandingTarget::cameraRBTCallback(const atim::AtimPoseStamped &msg)
 
     if (msg.tag_detected) {
         this->position.x = msg.pose.position.x;
-        this->position.y = msg.pose.position.y;
+        this->position.y = -msg.pose.position.y;
         this->position.z = msg.pose.position.z;
         this->position.detected = msg.tag_detected;
 
-    // ROS_INFO(
-    //     "pose before: %f\t%f\t%f",
-    //     this->position.x,
-    //     this->position.y,
-    //     this->position.z
-    // );
-
-    // this->cam_rbt.applyRBTtoPosition(this->position);
         this->cam_rbt.applyRBTtoPosition(this->position);
+        // negate the rotation using the imu
         applyRotationToPosition(
-            this->local_pose.roll,
-            this->local_pose.pitch,
-            this->local_pose.yaw,
+            1 * this->local_pose.roll,
+            -1 * this->local_pose.pitch,
+            0 * this->local_pose.yaw,
             this->position
         );
-    }
-    else{
-        this->position.detected = msg.tag_detected;
-    }
-}
-
-void LandingTarget::cameraRBTWithIMUCallback(const atim::AtimPoseStamped &msg)
-{
-    bool tag_detected;
-
-    if (msg.tag_detected) {
-        this->position.x = msg.pose.position.x;
-        this->position.y = msg.pose.position.y;
-        this->position.z = msg.pose.position.z;
-        this->position.detected = msg.tag_detected;
+    ROS_INFO(
+        "pose before: %f\t%f\t%f",
+        this->position.x,
+        this->position.y,
+        this->position.z
+    );
 
 
-        this->cam_rbt.applyRBTtoPosition(this->position);
-        applyRotationToPosition(
-           msg.pose.orientation.x,
-           msg.pose.orientation.y,
-           msg.pose.orientation.z,
-           msg.pose.orientation.w,
-           this->position
+        this->position.x -= 0.07;
+        this->position.z -= 0.08;
+
+        this->body_planner_target_location_tf.setOrigin(
+            tf::Vector3(
+                this->position.x,
+                this->position.y,
+                this->position.z
+            )
+        );
+
+        this->body_planner_target_location_tf.setRotation(
+            tf::Quaternion(0, 0, 0, 1)
+        );
+
+        this->body_planar_target_location_br.sendTransform(
+            tf::StampedTransform(
+                this->body_planner_target_location_tf,
+                ros::Time::now(),
+                "body_planar_frame",
+                "target_location"
+            )
         );
     }
+
     else{
         this->position.detected = msg.tag_detected;
     }
 }
+
 
 void LandingTarget::localPoseCallback(const geometry_msgs::PoseStamped &input)
 {
@@ -129,16 +134,28 @@ void LandingTarget::localPoseCallback(const geometry_msgs::PoseStamped &input)
         &this->local_pose.yaw
     );
 
-    this->local_pose.roll = -1 * this->local_pose.roll;
-    this->local_pose.pitch = -1 * this->local_pose.pitch;
-    this->local_pose.yaw = 0 * this->local_pose.yaw;
+    // this->local_pose.roll =  this->local_pose.roll;
+    // this->local_pose.pitch =  this->local_pose.pitch;
+    // this->local_pose.yaw = 0 * this->local_pose.yaw;
 
-    // ROS_INFO(
-    //     "pose: %f\t%f\t%f",
-    //     this->local_pose.roll,
-    //     this->local_pose.pitch,
-    //     this->local_pose.yaw
-    // );
+    tf::Quaternion q;
+    q.setRPY(
+        this->local_pose.roll,
+        this->local_pose.pitch,
+        0 * this->local_pose.yaw
+    );
+
+    tf::Quaternion q_enu_to_ned;
+    q_enu_to_ned.setRPY(0, M_PI, M_PI);
+
+    this->body_planar_tf.setOrigin(tf::Vector3(0, 0, 0));
+    this->body_planar_tf.setRotation(q.inverse() * q_enu_to_ned);
+
+    this->body_planar_tf_br.sendTransform(
+        tf::StampedTransform(
+            this->body_planar_tf, ros::Time::now(), "pixhawk", "body_planar_frame"
+        )
+    );
 }
 
 void LandingTarget::subscribeToAtimPose(void)
@@ -195,30 +212,16 @@ int main(int argc, char **argv)
     ros::Time last_request;
 
     double mount_roll = 0;
-    double mount_pitch = M_PI;
+    double mount_pitch = -M_PI/2;
     double mount_yaw = 0;
     // double mount_x = 0.067;
     // double mount_y = 0.0;
     // double mount_z = 0.07;
 
-    double mount_x = 1.0;
+    double mount_x = 0.0;
     double mount_y = 0.0;
     double mount_z = 0.0;
 
-    tf::TransformBroadcaster camera_imu_br;
-    tf::Transform camera_imu_tf;
-    tf::Quaternion q;
-
-    q.setRPY(mount_roll, mount_pitch, mount_yaw);
-    camera_imu_tf.setOrigin(tf::Vector3(mount_x, mount_y, mount_z));
-    camera_imu_tf.setRotation(q);
-
-    tf::TransformBroadcaster camera_image_br;
-    tf::Transform camera_image_tf;
-    tf::Quaternion q_image;
-    q_image.setRPY(0, 0, 0);
-    camera_image_tf.setOrigin(tf::Vector3(0.0, 0 , 1.0));
-    camera_image_tf.setRotation(q_image);
 
     CameraMountRBT cam_rbt;
     LandingTarget *target;
@@ -243,17 +246,6 @@ int main(int argc, char **argv)
     // publish
     while (ros::ok()){
         target->publishRotatedValues(seq, ros::Time::now());
-        camera_imu_br.sendTransform(
-            tf::StampedTransform(
-                camera_imu_tf, ros::Time::now(), "pixhawk_imu", "camera"
-            )
-        );
-
-        camera_image_br.sendTransform(
-            tf::StampedTransform(
-                camera_image_tf, ros::Time::now(), "camera", "image"
-            )
-        );
         ros::spinOnce();
         rate.sleep();
         seq++;
