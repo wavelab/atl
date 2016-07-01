@@ -20,8 +20,8 @@ class LandingTarget
 {
 public:
     CameraMountRBT cam_rbt;
-    LandingTargetPosition position;
-    Pose local_pose;
+    LandingTargetPosition landing_target_position;
+    Pose FC_local_pose; // local pose from Flight Controller, FC
 
     LandingTarget(CameraMountRBT &cam_rbt);
     void localPoseCallback(const geometry_msgs::PoseStamped &input);
@@ -47,13 +47,13 @@ public:
 LandingTarget::LandingTarget(CameraMountRBT &cam_rbt)
 {
     this->cam_rbt = cam_rbt;
-    this->local_pose.roll = 0.0;
-    this->local_pose.pitch = 0.0;
-    this->local_pose.yaw = 0.0;
-    this->position.x = 0.0;
-    this->position.y = 0.0;
-    this->position.z = 0.0;
-    this->position.detected = false;
+    this->FC_local_pose.roll = 0.0;
+    this->FC_local_pose.pitch = 0.0;
+    this->FC_local_pose.yaw = 0.0;
+    this->landing_target_position.x = 0.0;
+    this->landing_target_position.y = 0.0;
+    this->landing_target_position.z = 0.0;
+    this->landing_target_position.detected = false;
     this->correction_publisher = n.advertise<atim::AtimPoseStamped>(
         LANDING_TARGET_TOPIC,
         50
@@ -69,37 +69,37 @@ void LandingTarget::cameraRBTCallback(const atim::AtimPoseStamped &msg)
     bool tag_detected;
 
     if (msg.tag_detected) {
-        this->position.x = msg.pose.position.x;
-        this->position.y = msg.pose.position.y * -1; // atim frame weirdness
-        this->position.z = msg.pose.position.z;
-        this->position.detected = msg.tag_detected;
+        this->landing_target_position.x = msg.pose.position.x;
+        this->landing_target_position.y = -1 * msg.pose.position.y; // atim frame weirdness
+        this->landing_target_position.z = msg.pose.position.z;
+        this->landing_target_position.detected = msg.tag_detected;
 
-        this->cam_rbt.applyRBTtoPosition(this->position);
+        this->cam_rbt.applyRBTtoPosition(this->landing_target_position);
         // negate the rotation using the imu
         applyRotationToPosition(
-            this->local_pose.roll,
-            this->local_pose.pitch * -1,
-            this->local_pose.yaw * 0, // do not correct for yaw (body planar frame)
-            this->position
+            this->FC_local_pose.roll,
+            this->FC_local_pose.pitch * -1,
+            this->FC_local_pose.yaw * 0, // do not correct for yaw (body planar frame)
+            this->landing_target_position
         );
         ROS_INFO(
             "target pose in NED, body planar: %f\t%f\t%f",
-            this->position.x,
-            this->position.y,
-            this->position.z
+            this->landing_target_position.x,
+            this->landing_target_position.y,
+            this->landing_target_position.z
         );
 
-
         // Apply translation required due to camera mount
-        this->position.x += -0.07;
-        this->position.y += 0.00;
-        this->position.z += 0.08;
+        // in NED
+        this->landing_target_position.x += -0.07;
+        this->landing_target_position.y += 0.00;
+        this->landing_target_position.z += 0.08;
 
         this->body_planner_target_location_tf.setOrigin(
             tf::Vector3(
-                this->position.x,
-                this->position.y,
-                this->position.z
+                this->landing_target_position.x,
+                this->landing_target_position.y,
+                this->landing_target_position.z
             )
         );
 
@@ -118,29 +118,29 @@ void LandingTarget::cameraRBTCallback(const atim::AtimPoseStamped &msg)
     }
 
     else{
-        this->position.detected = msg.tag_detected;
+        this->landing_target_position.detected = msg.tag_detected;
     }
 }
 
 
 void LandingTarget::localPoseCallback(const geometry_msgs::PoseStamped &input)
 {
-    this->local_pose.x = input.pose.position.x;
-    this->local_pose.y = input.pose.position.y;
-    this->local_pose.z = input.pose.position.z;
+    this->FC_local_pose.x = input.pose.position.x;
+    this->FC_local_pose.y = input.pose.position.y;
+    this->FC_local_pose.z = input.pose.position.z;
 
     quat2euler(
         input.pose.orientation,
-        &this->local_pose.roll,
-        &this->local_pose.pitch,
-        &this->local_pose.yaw
+        &this->FC_local_pose.roll,
+        &this->FC_local_pose.pitch,
+        &this->FC_local_pose.yaw
     );
 
     tf::Quaternion q;
     q.setRPY(
-        this->local_pose.roll,
-        this->local_pose.pitch,
-        0 * this->local_pose.yaw
+        this->FC_local_pose.roll,
+        this->FC_local_pose.pitch,
+        0 * this->FC_local_pose.yaw
     );
 
     // rotate around y, then  z
@@ -187,16 +187,16 @@ void LandingTarget::publishRotatedValues(int seq, ros::Time time)
     correctedPose.header.seq = seq;
     correctedPose.header.stamp = time;
     correctedPose.header.frame_id = "awesomo/tracker_position";
-    correctedPose.pose.position.x = this->position.x;
-    correctedPose.pose.position.y = this->position.y;
-    correctedPose.pose.position.z = this->position.z;
-    correctedPose.tag_detected = this->position.detected;
+    correctedPose.pose.position.x = this->landing_target_position.x;
+    correctedPose.pose.position.y = this->landing_target_position.y;
+    correctedPose.pose.position.z = this->landing_target_position.z;
+    correctedPose.tag_detected = this->landing_target_position.detected;
 
     correctedPose2.header.seq = seq;
     correctedPose2.header.stamp = time;
-    correctedPose2.pose.position.x = this->position.x;
-    correctedPose2.pose.position.y = this->position.y;
-    correctedPose2.pose.position.z = this->position.z;
+    correctedPose2.pose.position.x = this->landing_target_position.x;
+    correctedPose2.pose.position.y = this->landing_target_position.y;
+    correctedPose2.pose.position.z = this->landing_target_position.z;
 
     this->correction_publisher.publish(correctedPose);
     this->redivert_publisher.publish(correctedPose2);
@@ -210,18 +210,18 @@ int main(int argc, char **argv)
     ros::Rate rate(50.0);
     ros::Time last_request;
 
-    double mount_roll = 0;
-    double mount_pitch = -M_PI/2;
-    double mount_yaw = 0;
+    double camera_mount_roll = 0;
+    double camera_mount_pitch = -M_PI/2;
+    double camera_mount_yaw = 0;
 
     CameraMountRBT cam_rbt;
     LandingTarget *target;
 
     // do not add translations here, they are not applied properly..
     cam_rbt.initialize(
-        mount_roll,
-        mount_pitch,
-        mount_yaw,
+        camera_mount_roll,
+        camera_mount_pitch,
+        camera_mount_yaw,
         0,
         0,
         0

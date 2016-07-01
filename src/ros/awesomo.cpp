@@ -76,7 +76,7 @@ public:
     ros::Publisher kf_estimator_stats_publisher;
     ros::Publisher kf_estimator_stats_plotting_publisher;
 
-    tf::TransformBroadcaster imu_tf_broadcaster;
+    tf::TransformBroadcaster world_imu_tf_broadcaster;
     tf::Transform world_imu_tf;
 
     void poseCallback(const geometry_msgs::PoseStamped &msg);
@@ -166,12 +166,11 @@ Awesomo::Awesomo(std::map<std::string, std::string> configs)
 
 void Awesomo::poseCallback(const geometry_msgs::PoseStamped &msg)
 {
-    // position
+    // ENU coordinates
     this->pose.x = msg.pose.position.x;
     this->pose.y = msg.pose.position.y;
     this->pose.z = msg.pose.position.z;
 
-    // orientation
     quat2euler(
         msg.pose.orientation,
         &this->pose.roll,
@@ -179,9 +178,15 @@ void Awesomo::poseCallback(const geometry_msgs::PoseStamped &msg)
         &this->pose.yaw
     );
 
-    this->world_imu_tf.setOrigin(tf::Vector3(
-        this->pose.x, this->pose.y, this->pose.z));
+    this->world_imu_tf.setOrigin(
+        tf::Vector3(
+            this->pose.x,
+            this->pose.y,
+            this->pose.z
+        )
+    );
 
+    // for display in rviz, serves no other function
     this->world_imu_tf.setRotation(
         tf::Quaternion(
             msg.pose.orientation.x,
@@ -190,7 +195,8 @@ void Awesomo::poseCallback(const geometry_msgs::PoseStamped &msg)
             msg.pose.orientation.w
         )
     );
-    this->imu_tf_broadcaster.sendTransform(
+
+    this->world_imu_tf_broadcaster.sendTransform(
             tf::StampedTransform(world_imu_tf, ros::Time::now(), "world", "pixhawk"));
 }
 
