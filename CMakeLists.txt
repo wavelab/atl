@@ -91,6 +91,7 @@ SET(Awesomo_libs
 ## ROS NODE EXECUTABLES
 # quadrotor_node
 ADD_EXECUTABLE(awesomo src/ros/awesomo.cpp)
+ADD_DEPENDENCIES(awesomo ${PROJECT_NAME}_gencpp)
 TARGET_LINK_LIBRARIES(
     awesomo
     ${Awesomo_libs}
