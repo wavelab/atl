@@ -35,7 +35,7 @@ Quadrotor::Quadrotor(std::map<std::string, std::string> configs)
         this->position_controller = NULL;
     }
 
-    // initialize carrot controller
+    // carrot controller
     if (configs.count("carrot_controller")) {
         config_path = configs["carrot_controller"];
         this->carrot_controller = new CarrotController(config_path);
@@ -102,6 +102,55 @@ void Quadrotor::updatePose(Pose pose)
     this->pose.yaw = pose.yaw;
 }
 
+void Quadrotor::updateHoverPointWithTag(Pose robot_pose, float tag_x, float tag_y)
+{
+    this->hover_point->initialized = true;
+    this->hover_point->x = robot_pose.x + tag_x;
+    this->hover_point->y = robot_pose.y + tag_y;
+}
+
+bool Quadrotor::hasLanded(LandingTargetPosition landing_zone)
+{
+    struct kf *estimator;
+    float x_cutoff;
+    float y_cutoff;
+    float z_cutoff;
+    bool tag_x_ok;
+    bool tag_y_ok;
+    bool tag_z_ok;
+    bool mu_x_ok;
+    bool mu_y_ok;
+    bool mu_z_ok;
+
+    // setup
+    estimator = &this->tag_estimator;
+    x_cutoff = this->landing_config->x_cutoff;
+    y_cutoff = this->landing_config->y_cutoff;
+    z_cutoff = this->landing_config->z_cutoff;
+
+    tag_x_ok = (landing_zone.x < x_cutoff) ? true: false;
+    tag_y_ok = (landing_zone.y < y_cutoff) ? true: false;
+    tag_z_ok = (landing_zone.z < z_cutoff) ? true: false;
+
+    mu_x_ok = (estimator->mu(0) < x_cutoff) ? true: false;
+    mu_y_ok = (estimator->mu(1) < y_cutoff) ? true: false;
+    mu_z_ok = (estimator->mu(2) < z_cutoff) ? true: false;
+
+    // landed detection
+    if (landing_zone.detected && tag_x_ok && tag_y_ok && tag_z_ok) {
+        this->landing_zone_belief++;
+    } else if (mu_x_ok && mu_y_ok && mu_z_ok) {
+        this->landing_zone_belief++;
+    }
+
+    // disarm?
+    if (this->landing_zone_belief == this->landing_config->belief_threshold) {
+        return true;
+    }
+
+    return false;
+}
+
 Attitude Quadrotor::positionControllerCalculate(
     Position setpoint,
     Pose robot_pose,
@@ -109,6 +158,8 @@ Attitude Quadrotor::positionControllerCalculate(
 )
 {
     Attitude a;
+    // printf("setpoint: %f %f %f\n", setpoint.x, setpoint.y, setpoint.z);
+    // printf("robot_pose: %f %f %f\n", robot_pose.x, robot_pose.y, robot_pose.z);
 
     this->position_controller->calculate(setpoint, robot_pose, dt);
 
@@ -141,7 +192,7 @@ void Quadrotor::resetPositionController(void)
 
 void Quadrotor::runIdleMode(Pose robot_pose)
 {
-    std::cout << "IDEL MODE!" << std::endl;
+    std::cout << "IDLE MODE!" << std::endl;
 
     // transition to offboard mode
     this->mission_state = DISCOVER_MODE;
@@ -190,7 +241,7 @@ void Quadrotor::initializeCarrotController(void)
     // current position + some altitude
     p.x = this->pose.x;
     p.y = this->pose.y;
-    p.z = this->pose.z + 3;
+    p.z = this->hover_point->z;
 
     // waypoint 1
     wp << p.x, p.y, p.z;
@@ -222,6 +273,7 @@ void Quadrotor::initializeCarrotController(void)
 
 Position Quadrotor::runCarrotMode(Pose robot_pose, float dt)
 {
+    int retval;
     Position cmd;
     Eigen::Vector3d position;
     Eigen::Vector3d carrot;
@@ -235,6 +287,24 @@ Position Quadrotor::runCarrotMode(Pose robot_pose, float dt)
         std::cout << "Transitioning to Hover Mode!" << std::endl;
 
         this->mission_state = HOVER_MODE;
+        this->hover_point->initialized = true;
+        this->hover_point->x = this->carrot_controller->wp_end(0);
+        this->hover_point->y = this->carrot_controller->wp_end(1);
+        this->hover_point->z = this->carrot_controller->wp_end(2);
+
+        cmd.x = this->hover_point->x;
+        cmd.y = this->hover_point->y;
+        cmd.z = this->hover_point->z;
+
+    } else if (retval == 1) {
+        this->hover_point->initialized = true;
+        this->hover_point->x = carrot(0);
+        this->hover_point->y = carrot(1);
+        this->hover_point->z = carrot(2);
+
+        cmd.x = carrot(0);
+        cmd.y = carrot(1);
+        cmd.z = carrot(2);
 
         this->hover_point->initialized = true;
         this->hover_point->x = this->carrot_controller->wp_end(0);
@@ -254,7 +324,11 @@ Position Quadrotor::runCarrotMode(Pose robot_pose, float dt)
     return cmd;
 }
 
-Position Quadrotor::runDiscoverMode(Pose robot_pose, LandingTargetPosition landing_zone)
+Position Quadrotor::runDiscoverMode(
+    Pose robot_pose,
+    LandingTargetPosition landing_zone,
+    float dt
+)
 {
     Position cmd;
 	Eigen::VectorXd mu(9);
@@ -266,7 +340,8 @@ Position Quadrotor::runDiscoverMode(Pose robot_pose, LandingTargetPosition landi
               landing_zone.z,  // pos_z relative to quad
               0.0, 0.0, 0.0,  // vel_x, vel_y, vel_z
               0.0, 0.0, 0.0;  // acc_x, acc_y, acc_z
-        apriltag_kf_setup(&this->apriltag_estimator, mu);
+        apriltag_kf_setup(&this->tag_estimator, mu);
+        this->estimator_initialized = true;
 
         // transition to tracker mode
         std::cout << "Transitioning to Tracker Mode!" << std::endl;
@@ -279,10 +354,13 @@ Position Quadrotor::runDiscoverMode(Pose robot_pose, LandingTargetPosition landi
         this->hover_point->y = robot_pose.y + landing_zone.y;
     }
 
+    // hover in-place
+    cmd = this->runHoverMode(robot_pose, dt);
+
     return cmd;
 }
 
-Position Quadrotor::runTrackingMode(
+Position Quadrotor::trackApriltag(
     Pose robot_pose,
     LandingTargetPosition landing_zone,
     float dt
@@ -290,18 +368,14 @@ Position Quadrotor::runTrackingMode(
 {
     Position tag;
 	Eigen::VectorXd y(3);
-    double elasped;
+	float target_lost_elasped;
 
-    // measured landing zone x, y, z
-    y << landing_zone.x, landing_zone.y, landing_zone.z;
+	// calculate how long we've lost target
+	target_lost_elasped = difftime(time(NULL), this->tag_last_updated);
 
     // estimate tag position
-    apriltag_kf_estimate(
-        &this->apriltag_estimator,
-        y,
-        dt,
-        landing_zone.detected
-    );
+    y << landing_zone.x, landing_zone.y, landing_zone.z;
+    apriltag_kf_estimate(&this->tag_estimator, y, dt, landing_zone.detected);
 
     // build position command
     tag.x = this->apriltag_estimator.mu(0);
@@ -328,6 +402,34 @@ Position Quadrotor::runTrackingMode(
     return tag;
 }
 
+Position Quadrotor::runTrackingMode(
+    Pose robot_pose,
+    LandingTargetPosition landing_zone,
+    float dt
+)
+{
+    double elasped;
+    float min_track_time;
+    bool x_ok;
+    bool y_ok;
+
+    // setup
+    min_track_time = this->tracking_config->min_track_time;
+    x_ok = (landing_zone.x < this->landing_config->x_threshold) ? true : false;
+    y_ok = (landing_zone.y < this->landing_config->y_threshold) ? true : false;
+
+    // transition to landing?
+    elasped = difftime(time(NULL), this->tracking_start);
+    if (elasped > min_track_time && x_ok && y_ok) {
+        this->mission_state = LANDING_MODE;
+        this->height_last_updated = time(NULL);
+        std::cout << "Transitioning to Landing Mode!" << std::endl;
+
+    }
+
+    return this->trackApriltag(robot_pose, landing_zone, dt);
+}
+
 Position Quadrotor::runLandingMode(
     Pose robot_pose,
     LandingTargetPosition landing_zone,
@@ -339,17 +441,19 @@ Position Quadrotor::runLandingMode(
 	Eigen::VectorXd mu(9);
 	Eigen::VectorXd y(3);
     double elasped;
+    float descend_multiplier;
+    float recover_multiplier;
+    float x_threshold;
+    float y_threshold;
 
-    // measured landing zone x, y, z
-    y << landing_zone.x, landing_zone.y, landing_zone.z;
+    // setup
+    descend_multiplier = this->landing_config->descend_multiplier;
+    recover_multiplier = this->landing_config->recover_multiplier;
+    x_threshold = this->landing_config->x_threshold;
+    y_threshold = this->landing_config->y_threshold;
 
-    // estimate tag position
-    apriltag_kf_estimate(
-        &this->apriltag_estimator,
-        y,
-        dt,
-        landing_zone.detected
-    );
+    // estimate apriltag
+    cmd = this->trackApriltag(robot_pose, landing_zone, dt);
 
     // build position command
     tag.x = this->apriltag_estimator.mu(0);
@@ -482,11 +586,11 @@ int Quadrotor::runMission(
         break;
 
     case TRACKING_MODE:
-        tag_position = this->runTrackingMode(robot_pose, landing_zone, dt);
+        this->runTrackingMode(robot_pose, landing_zone, dt);
         break;
 
     case LANDING_MODE:
-        tag_position = this->runLandingMode(robot_pose, landing_zone, dt);
+        this->runLandingMode(robot_pose, landing_zone, dt);
         break;
 
     case MISSION_ACCOMPLISHED:

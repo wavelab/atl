@@ -11,8 +11,8 @@ landing:
     height_update:
         period: 2
         multiplier:
-            descend: 0.8
-            recover: 1.2
+        descend: 0.8
+        recover: 1.2
 
     disarm_conditions:
         # x, y ,z disarm conditions from AprilTag center
