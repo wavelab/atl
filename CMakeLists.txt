@@ -51,6 +51,7 @@ ADD_MESSAGE_FILES(
     FILES
     PositionControllerStats.msg
     KFStats.msg
+    KFPlotting.msg
 )
 GENERATE_MESSAGES(DEPENDENCIES std_msgs)
 
@@ -75,9 +76,6 @@ ADD_LIBRARY(
 
 
 
-
-
-
 # EXECUTABLES
 ## ROS NODE EXECUTABLES
 # quadrotor_node
@@ -91,6 +89,7 @@ TARGET_LINK_LIBRARIES(
     ${OpenCV_LIBS}
     ${catkin_LIBRARIES}
 )
+ADD_DEPENDENCIES(awesomo ${PROJECT_NAME}_gencpp)
 INSTALL(
     TARGETS awesomo
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

@@ -93,6 +93,29 @@ int applyRotationToPosition(
     return 0;
 }
 
+int applyRotationToPosition(
+    double x,
+    double y,
+    double z,
+    double w,
+    LandingTargetPosition &position
+)
+{
+    Eigen::Quaterniond quat(w, x, y, z);
+    Eigen::Matrix3d rotation;
+    Eigen::Vector3d position_temp;
+
+    quat.normalize();
+    rotation = quat.toRotationMatrix();
+    position_temp << position.x, position.y, position.z;
+    position_temp = rotation * position_temp;
+    position.x = position_temp[0];
+    position.y = position_temp[1];
+    position.z = position_temp[2];
+
+    return 0;
+}
+
 static double tic(void)
 {
     struct timeval t;

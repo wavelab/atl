@@ -125,6 +125,14 @@ int applyRotationToPosition(
     LandingTargetPosition &position
 );
 
+int applyRotationToPosition(
+    double x,
+    double y,
+    double z,
+    double w,
+    LandingTargetPosition &position
+);
+
 tf::Quaternion euler2quat(double roll, double pitch, double yaw);
 void quat2euler(
     const geometry_msgs::Quaternion &q,

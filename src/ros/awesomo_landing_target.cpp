@@ -10,6 +10,7 @@
 #include "awesomo/camera.hpp"
 
 #define ATIM_POSE_TOPIC "/atim/pose"
+#define ATIM_REDIVERT_POSE_TOPIC "/atim/pose/standard"
 #define LANDING_TARGET_TOPIC "/awesomo/landing_target/pose"
 #define MAVROS_LOCAL_POSITION_TOPIC "/mavros/local_position/pose"
 
@@ -23,6 +24,7 @@ public:
     LandingTarget(CameraMountRBT &cam_rbt);
     void localPoseCallback(const geometry_msgs::PoseStamped &input);
     void cameraRBTCallback(const atim::AtimPoseStamped &input);
+    void cameraRBTWithIMUCallback(const atim::AtimPoseStamped &msg);
     void subscribeToAtimPose(void);
     void subscribeToLocalPositionPose(void);
     void publishRotatedValues(int seq, ros::Time time);
@@ -31,6 +33,7 @@ public:
     ros::Subscriber atimPoseSubscriber;
     ros::Subscriber localPositionPoseSubscriber;
     ros::Publisher correction_publisher;
+    ros::Publisher redivert_publisher;
 };
 
 LandingTarget::LandingTarget(CameraMountRBT &cam_rbt)
@@ -45,6 +48,10 @@ LandingTarget::LandingTarget(CameraMountRBT &cam_rbt)
     this->position.detected = false;
     this->correction_publisher = n.advertise<atim::AtimPoseStamped>(
         LANDING_TARGET_TOPIC,
+        50
+    );
+    this->redivert_publisher = n.advertise<geometry_msgs::PoseStamped>(
+        ATIM_REDIVERT_POSE_TOPIC,
         50
     );
 }
@@ -73,6 +80,31 @@ void LandingTarget::cameraRBTCallback(const atim::AtimPoseStamped &msg)
             this->local_pose.pitch,
             this->local_pose.yaw,
             this->position
+        );
+    }
+    else{
+        this->position.detected = msg.tag_detected;
+    }
+}
+
+void LandingTarget::cameraRBTWithIMUCallback(const atim::AtimPoseStamped &msg)
+{
+    bool tag_detected;
+
+    if (msg.tag_detected) {
+        this->position.x = msg.pose.position.x;
+        this->position.y = msg.pose.position.y;
+        this->position.z = msg.pose.position.z;
+        this->position.detected = msg.tag_detected;
+
+
+        this->cam_rbt.applyRBTtoPosition(this->position);
+        applyRotationToPosition(
+           msg.pose.orientation.x,
+           msg.pose.orientation.y,
+           msg.pose.orientation.z,
+           msg.pose.orientation.w,
+           this->position
         );
     }
     else{
@@ -130,6 +162,7 @@ void LandingTarget::subscribeToLocalPositionPose(void)
 void LandingTarget::publishRotatedValues(int seq, ros::Time time)
 {
     atim::AtimPoseStamped correctedPose;
+    geometry_msgs::PoseStamped correctedPose2;
 
     correctedPose.header.seq = seq;
     correctedPose.header.stamp = time;
@@ -138,7 +171,15 @@ void LandingTarget::publishRotatedValues(int seq, ros::Time time)
     correctedPose.pose.position.y = this->position.y;
     correctedPose.pose.position.z = this->position.z;
     correctedPose.tag_detected = this->position.detected;
+
+    correctedPose2.header.seq = seq;
+    correctedPose2.header.stamp = time;
+    correctedPose2.pose.position.x = this->position.x;
+    correctedPose2.pose.position.y = this->position.y;
+    correctedPose2.pose.position.z = this->position.z;
+
     this->correction_publisher.publish(correctedPose);
+    this->redivert_publisher.publish(correctedPose2);
 }
 
 int main(int argc, char **argv)

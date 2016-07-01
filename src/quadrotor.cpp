@@ -27,7 +27,7 @@ Quadrotor::Quadrotor(std::map<std::string, std::string> configs)
     // estimators
     this->estimator_initialized = false;
 
-    // position controller
+    // initialize position controller
     if (configs.count("position_controller")) {
         config_path = configs["position_controller"];
         this->position_controller = new PositionController(config_path);
@@ -35,7 +35,7 @@ Quadrotor::Quadrotor(std::map<std::string, std::string> configs)
         this->position_controller = NULL;
     }
 
-    // carrot controller
+    // initialize carrot controller
     if (configs.count("carrot_controller")) {
         config_path = configs["carrot_controller"];
         this->carrot_controller = new CarrotController(config_path);
@@ -51,51 +51,38 @@ Quadrotor::Quadrotor(std::map<std::string, std::string> configs)
 int Quadrotor::loadConfig(std::string config_file_path)
 {
     YAML::Node config;
-    YAML::Node offset;
     YAML::Node tracking;
     YAML::Node landing;
-    YAML::Node threshold;
-    YAML::Node multiplier;
-    YAML::Node disarm;
-
 
     try {
         // load config
         config = YAML::LoadFile(config_file_path);
 
         // load hover point config
-        this->hover_point->initialized = true;
+        this->hover_point->initialized = false; // later in the code this will be set
         this->hover_point->x = 0.0f;
         this->hover_point->y = 0.0f;
         this->hover_point->z = config["hover_point"]["height"].as<float>();
 
         // load tracking config
-        tracking = config["tracking"];
-        this->tracking_config->min_track_time = tracking["min_track_time"].as<float>();
-        this->tracking_config->target_lost_limit = tracking["target_lost_limit"].as<float>();
-
-        offset = config["tracking"]["position_offset"];
-        this->tracking_config->offset_x = offset["x"].as<float>();
-        this->tracking_config->offset_y = offset["y"].as<float>();
-        this->tracking_config->offset_z = offset["z"].as<float>();
+        tracking = config["tracking"]["position_offset"];
+        this->tracking_config->offset_x = tracking["x"].as<float>();
+        this->tracking_config->offset_y = tracking["y"].as<float>();
+        this->tracking_config->offset_z = tracking["z"].as<float>();
 
         // load landing config
         landing = config["landing"]["height_update"];
         this->landing_config->period = landing["period"].as<float>();
 
-        threshold = config["landing"]["height_update"]["threshold"];
-        this->landing_config->x_threshold = threshold["x"].as<float>();
-        this->landing_config->y_threshold = threshold["y"].as<float>();
+        landing = config["landing"]["height_update"]["multiplier"];
+        this->landing_config->descend_multiplier = landing["descend"].as<float>();
+        this->landing_config->recover_multiplier = landing["recover"].as<float>();
 
-        multiplier = config["landing"]["height_update"]["multiplier"];
-        this->landing_config->descend_multiplier = multiplier["descend"].as<float>();
-        this->landing_config->recover_multiplier = multiplier["recover"].as<float>();
-
-        disarm = config["landing"]["disarm_conditions"];
-        this->landing_config->x_cutoff = disarm["x_cutoff"].as<float>();
-        this->landing_config->y_cutoff = disarm["y_cutoff"].as<float>();
-        this->landing_config->z_cutoff = disarm["z_cutoff"].as<float>();
-        this->landing_config->belief_threshold = disarm["belief_threshold"].as<float>();
+        landing = config["landing"]["disarm_conditions"];
+        this->landing_config->x_cutoff = landing["x_cutoff"].as<float>();
+        this->landing_config->y_cutoff = landing["y_cutoff"].as<float>();
+        this->landing_config->z_cutoff = landing["z_cutoff"].as<float>();
+        this->landing_config->belief_threshold = landing["belief_threshold"].as<float>();
 
     } catch (YAML::BadFile &ex) {
         throw;
@@ -115,55 +102,6 @@ void Quadrotor::updatePose(Pose pose)
     this->pose.yaw = pose.yaw;
 }
 
-void Quadrotor::updateHoverPointWithTag(Pose robot_pose, float tag_x, float tag_y)
-{
-    this->hover_point->initialized = true;
-    this->hover_point->x = robot_pose.x + tag_x;
-    this->hover_point->y = robot_pose.y + tag_y;
-}
-
-bool Quadrotor::hasLanded(LandingTargetPosition landing_zone)
-{
-    struct kf *estimator;
-    float x_cutoff;
-    float y_cutoff;
-    float z_cutoff;
-    bool tag_x_ok;
-    bool tag_y_ok;
-    bool tag_z_ok;
-    bool mu_x_ok;
-    bool mu_y_ok;
-    bool mu_z_ok;
-
-    // setup
-    estimator = &this->tag_estimator;
-    x_cutoff = this->landing_config->x_cutoff;
-    y_cutoff = this->landing_config->y_cutoff;
-    z_cutoff = this->landing_config->z_cutoff;
-
-    tag_x_ok = (landing_zone.x < x_cutoff) ? true: false;
-    tag_y_ok = (landing_zone.y < y_cutoff) ? true: false;
-    tag_z_ok = (landing_zone.z < z_cutoff) ? true: false;
-
-    mu_x_ok = (estimator->mu(0) < x_cutoff) ? true: false;
-    mu_y_ok = (estimator->mu(1) < y_cutoff) ? true: false;
-    mu_z_ok = (estimator->mu(2) < z_cutoff) ? true: false;
-
-    // landed detection
-    if (landing_zone.detected && tag_x_ok && tag_y_ok && tag_z_ok) {
-        this->landing_zone_belief++;
-    } else if (mu_x_ok && mu_y_ok && mu_z_ok) {
-        this->landing_zone_belief++;
-    }
-
-    // disarm?
-    if (this->landing_zone_belief == this->landing_config->belief_threshold) {
-        return true;
-    }
-
-    return false;
-}
-
 Attitude Quadrotor::positionControllerCalculate(
     Position setpoint,
     Pose robot_pose,
@@ -171,8 +109,6 @@ Attitude Quadrotor::positionControllerCalculate(
 )
 {
     Attitude a;
-    // printf("setpoint: %f %f %f\n", setpoint.x, setpoint.y, setpoint.z);
-    // printf("robot_pose: %f %f %f\n", robot_pose.x, robot_pose.y, robot_pose.z);
 
     this->position_controller->calculate(setpoint, robot_pose, dt);
 
@@ -205,16 +141,18 @@ void Quadrotor::resetPositionController(void)
 
 void Quadrotor::runIdleMode(Pose robot_pose)
 {
-    std::cout << "IDLE MODE!" << std::endl;
+    std::cout << "IDEL MODE!" << std::endl;
 
     // transition to offboard mode
     this->mission_state = DISCOVER_MODE;
 
-     // hover inplace
-    this->hover_point->initialized = true;
-    this->hover_point->x = robot_pose.x;
-    this->hover_point->y = robot_pose.y;
-    this->hover_point->z;   // already set by config file
+    // hover inplace
+    if (this->hover_point->initialized == false) {
+        this->hover_point->initialized = true;
+        this->hover_point->x = robot_pose.x;
+        this->hover_point->y = robot_pose.y;
+        this->hover_point->z;  // configured in config file
+    }
 }
 
 Position Quadrotor::runHoverMode(Pose robot_pose, float dt)
@@ -226,14 +164,14 @@ Position Quadrotor::runHoverMode(Pose robot_pose, float dt)
         this->hover_point->initialized = true;
         this->hover_point->x = robot_pose.x;
         this->hover_point->y = robot_pose.y;
-        this->hover_point->z = robot_pose.z;
+        this->hover_point->z;  // configured in config file
     }
 
-    // commanded position
+    // command position
     cmd.x = this->hover_point->x;
     cmd.y = this->hover_point->y;
     cmd.z = this->hover_point->z;
-    // position controller calculate
+
     this->positionControllerCalculate(cmd, robot_pose, dt);
 
     return cmd;
@@ -252,7 +190,7 @@ void Quadrotor::initializeCarrotController(void)
     // current position + some altitude
     p.x = this->pose.x;
     p.y = this->pose.y;
-    p.z = this->hover_point->z;
+    p.z = this->pose.z + 3;
 
     // waypoint 1
     wp << p.x, p.y, p.z;
@@ -284,7 +222,6 @@ void Quadrotor::initializeCarrotController(void)
 
 Position Quadrotor::runCarrotMode(Pose robot_pose, float dt)
 {
-    int retval;
     Position cmd;
     Eigen::Vector3d position;
     Eigen::Vector3d carrot;
@@ -293,45 +230,31 @@ Position Quadrotor::runCarrotMode(Pose robot_pose, float dt)
     position << robot_pose.x, robot_pose.y, robot_pose.z;
 
     // calculate new carrot point
-    retval = this->carrot_controller->update(position, carrot);
-
-    if (retval == 0) {
+    if (this->carrot_controller->update(position, carrot)) {
         std::cout << "No more waypoints!" << std::endl;
         std::cout << "Transitioning to Hover Mode!" << std::endl;
 
         this->mission_state = HOVER_MODE;
+
         this->hover_point->initialized = true;
         this->hover_point->x = this->carrot_controller->wp_end(0);
         this->hover_point->y = this->carrot_controller->wp_end(1);
         this->hover_point->z = this->carrot_controller->wp_end(2);
 
-        cmd.x = this->hover_point->x;
-        cmd.y = this->hover_point->y;
-        cmd.z = this->hover_point->z;
-
-    } else if (retval == 1) {
-        this->hover_point->initialized = true;
-        this->hover_point->x = carrot(0);
-        this->hover_point->y = carrot(1);
-        this->hover_point->z = carrot(2);
-
-        cmd.x = carrot(0);
-        cmd.y = carrot(1);
-        cmd.z = carrot(2);
 
     } else {
         cmd = this->runHoverMode(robot_pose, dt);
-
+        return cmd;
     }
+
+    cmd.x = carrot(0);
+    cmd.y = carrot(1);
+    cmd.z = carrot(2);
 
     return cmd;
 }
 
-Position Quadrotor::runDiscoverMode(
-    Pose robot_pose,
-    LandingTargetPosition landing_zone,
-    float dt
-)
+Position Quadrotor::runDiscoverMode(Pose robot_pose, LandingTargetPosition landing_zone)
 {
     Position cmd;
 	Eigen::VectorXd mu(9);
@@ -343,8 +266,7 @@ Position Quadrotor::runDiscoverMode(
               landing_zone.z,  // pos_z relative to quad
               0.0, 0.0, 0.0,  // vel_x, vel_y, vel_z
               0.0, 0.0, 0.0;  // acc_x, acc_y, acc_z
-        apriltag_kf_setup(&this->tag_estimator, mu);
-        this->estimator_initialized = true;
+        apriltag_kf_setup(&this->apriltag_estimator, mu);
 
         // transition to tracker mode
         std::cout << "Transitioning to Tracker Mode!" << std::endl;
@@ -352,77 +274,9 @@ Position Quadrotor::runDiscoverMode(
         this->tracking_start = time(NULL);
 
         // keep track of hover point
-        this->updateHoverPointWithTag(robot_pose, landing_zone.x, landing_zone.y);
-
-        cmd.x = this->hover_point->x;
-        cmd.y = this->hover_point->y;
-        cmd.z = this->hover_point->z;
-    }
-
-    // hover in-place
-    cmd = this->runHoverMode(robot_pose, dt);
-
-    return cmd;
-}
-
-Position Quadrotor::trackApriltag(
-    Pose robot_pose,
-    LandingTargetPosition landing_zone,
-    float dt
-)
-{
-    Position cmd;
-    Position tag;
-	Eigen::VectorXd y(3);
-	float target_lost_elasped;
-
-	// calculate how long we've lost target
-	target_lost_elasped = difftime(time(NULL), this->tag_last_updated);
-
-    // estimate tag position
-    y << landing_zone.x, landing_zone.y, landing_zone.z;
-    apriltag_kf_estimate(&this->tag_estimator, y, dt, landing_zone.detected);
-
-    // build position command
-    tag.x = this->tag_estimator.mu(0);
-    tag.y = this->tag_estimator.mu(1);
-    tag.z = this->tag_estimator.mu(2);
-    // printf("tag: %f %f %f\n", tag.x, tag.y, tag.z);
-
-    // keep track of target position
-    if (landing_zone.detected == true) {
-        // update last time we saw the tag
-        this->tag_last_updated = time(NULL);
-        this->hover_point->x = robot_pose.x + tag.x;
-        this->hover_point->y = robot_pose.y + tag.y;
-    }
-
-    // modify setpoint and robot pose as we use GPS or AprilTag
-    // swap robot pose with setpoint, since we are using AprilTag as
-    // world origin, so now if
-    robot_pose.x = -tag.x;
-    robot_pose.y = tag.y;
-    robot_pose.z = tag.z;  // don't desend
-
-    tag.x = 0.0f;
-    tag.y = 0.0f;
-    tag.z = this->hover_point->z;
-
-    // calcualte new attitude using position controller
-    this->positionControllerCalculate(tag, robot_pose, dt);
-    // build commanded position
-    cmd.x = this->hover_point->x;
-    cmd.y = this->hover_point->y;
-    cmd.z = this->hover_point->z;
-    printf("cmd: %f %f %f\n", cmd.x, cmd.y, cmd.z);
-    printf("robot_pose: %f %f %f\n", robot_pose.x, robot_pose.y, robot_pose.z);
-    printf("tag_pose: %f %f %f\n", tag.x, tag.y, tag.z);
-
-    if (target_lost_elasped > this->tracking_config->target_lost_limit) {
-        printf("target_lost_elasped: %f\n", target_lost_elasped);
-        // printf("Hovering in place!\n");
-        cmd = this->runHoverMode(robot_pose, dt);
-        return cmd;
+        this->hover_point->initialized = true;
+        this->hover_point->x = robot_pose.x + landing_zone.x;
+        this->hover_point->y = robot_pose.y + landing_zone.y;
     }
 
     return cmd;
@@ -434,26 +288,44 @@ Position Quadrotor::runTrackingMode(
     float dt
 )
 {
+    Position tag;
+	Eigen::VectorXd y(3);
     double elasped;
-    float min_track_time;
-    bool x_ok;
-    bool y_ok;
 
-    // setup
-    min_track_time = this->tracking_config->min_track_time;
-    x_ok = (landing_zone.x < this->landing_config->x_threshold) ? true : false;
-    y_ok = (landing_zone.y < this->landing_config->y_threshold) ? true : false;
+    // measured landing zone x, y, z
+    y << landing_zone.x, landing_zone.y, landing_zone.z;
 
-    // transition to landing?
-    elasped = difftime(time(NULL), this->tracking_start);
-    if (elasped > min_track_time && x_ok && y_ok) {
-        this->mission_state = LANDING_MODE;
-        this->height_last_updated = time(NULL);
-        std::cout << "Transitioning to Landing Mode!" << std::endl;
+    // estimate tag position
+    apriltag_kf_estimate(
+        &this->apriltag_estimator,
+        y,
+        dt,
+        landing_zone.detected
+    );
 
+    // build position command
+    tag.x = this->apriltag_estimator.mu(0);
+    tag.y = this->apriltag_estimator.mu(1);
+    tag.z = this->hover_point->z;
+
+    // keep track of target position
+    if (landing_zone.detected == true) {
+        // update hover point
+        this->hover_point->initialized = true;
+        this->hover_point->x = robot_pose.x + landing_zone.x;
+        this->hover_point->y = robot_pose.y + landing_zone.y;
+        this->target_last_updated = time(NULL);
     }
 
-    return this->trackApriltag(robot_pose, landing_zone, dt);
+    // transition to landing?
+    // elasped = difftime(time(NULL), this->tracking_start);
+    // if (elasped > 5 && landing_zone.detected && landing_zone.x < 2.0 && landing_zone.y < 2.0) {
+    //     this->mission_state = LANDING_MODE;
+    //     this->height_last_updated = time(NULL);
+    //     std::cout << "Transitioning to Landing Mode!" << std::endl;
+    // }
+
+    return tag;
 }
 
 Position Quadrotor::runLandingMode(
@@ -462,31 +334,57 @@ Position Quadrotor::runLandingMode(
     float dt
 )
 {
-    Position cmd;
+    Position tag;
+    Position estimation;
+	Eigen::VectorXd mu(9);
+	Eigen::VectorXd y(3);
     double elasped;
-    float descend_multiplier;
-    float recover_multiplier;
-    float x_threshold;
-    float y_threshold;
 
-    // setup
-    descend_multiplier = this->landing_config->descend_multiplier;
-    recover_multiplier = this->landing_config->recover_multiplier;
-    x_threshold = this->landing_config->x_threshold;
-    y_threshold = this->landing_config->y_threshold;
+    // measured landing zone x, y, z
+    y << landing_zone.x, landing_zone.y, landing_zone.z;
 
-    // estimate apriltag
-    cmd = this->trackApriltag(robot_pose, landing_zone, dt);
+    // estimate tag position
+    apriltag_kf_estimate(
+        &this->apriltag_estimator,
+        y,
+        dt,
+        landing_zone.detected
+    );
 
-    // lower height
+    // build position command
+    tag.x = this->apriltag_estimator.mu(0);
+    tag.y = this->apriltag_estimator.mu(1);
+    tag.z = this->hover_point->z;
+
+    estimation.x = this->apriltag_estimator.mu(0);
+    estimation.y = this->apriltag_estimator.mu(1);
+    estimation.z = this->apriltag_estimator.mu(2);
+
+    // printf(
+    //     "estimation: %f %f %f\n",
+    //     this->apriltag_estimator.mu(0),
+    //     this->apriltag_estimator.mu(1),
+    //     this->apriltag_estimator.mu(2)
+    // );
+
+    // keep track of target position
+    if (landing_zone.detected == true) {
+        this->hover_point->initialized = true;
+        this->hover_point->x = robot_pose.x + tag.x;
+        this->hover_point->y = robot_pose.y + tag.y;
+        this->target_last_updated = time(NULL);
+
+    }
+
+    // lower height or increase height
     elasped = difftime(time(NULL), this->height_last_updated);
-    if (elasped > this->landing_config->period && landing_zone.detected == true) {
-        if (landing_zone.x < x_threshold && landing_zone.y < y_threshold) {
-            this->hover_point->z = this->hover_point->z * descend_multiplier;
+    if (elasped > 1 && landing_zone.detected == true) {
+        if (landing_zone.x < 0.5 && landing_zone.y < 0.5) {
+            this->hover_point->z = this->hover_point->z * 0.7;
             printf("Lowering hover height to %f\n", this->hover_point->z);
 
         } else {
-            this->hover_point->z = this->hover_point->z * recover_multiplier;
+            this->hover_point->z = this->hover_point->z * 1.2;
             printf("Increasing hover height to %f\n", this->hover_point->z);
 
         }
@@ -495,12 +393,17 @@ Position Quadrotor::runLandingMode(
     }
 
     // kill engines (landed?)
-    if (this->hasLanded(landing_zone)) {
-        printf("Mission Accomplished!\n");
+    if (landing_zone.x < 0.5 && landing_zone.y < 0.5 && landing_zone.z < 0.2) {
+        printf("Mission Accomplished - disarming quadrotor!\n");
         this->mission_state = MISSION_ACCOMPLISHED;
+
+    } else if (estimation.x < 0.5 && estimation.y < 0.5 && estimation.z < 0.2) {
+        printf("Mission Accomplished - disarming quadrotor!\n");
+        this->mission_state = MISSION_ACCOMPLISHED;
+
     }
 
-    return cmd;
+    return tag;
 }
 
 int Quadrotor::followWaypoints(
@@ -554,7 +457,12 @@ int Quadrotor::runMission(
 )
 {
     Position tag_position;
-    Pose pose;
+    Position tag_origin;
+    Pose fake_robot_pose;
+    double target_lost_elasped;
+
+    // calculate time elasped for target lost
+    target_lost_elasped = difftime(time(NULL), this->target_last_updated);
 
     // update pose
     this->updatePose(robot_pose);
@@ -564,27 +472,46 @@ int Quadrotor::runMission(
     case IDLE_MODE:
         this->runIdleMode(robot_pose);
         this->runHoverMode(robot_pose, dt);
-        break;
-
-    case HOVER_MODE:
-        this->runHoverMode(robot_pose, dt);
+        return 1;
         break;
 
     case DISCOVER_MODE:
-        this->runDiscoverMode(robot_pose, landing_zone, dt);
+        this->runDiscoverMode(robot_pose, landing_zone);
+        this->runHoverMode(robot_pose, dt);
+        return 1;
         break;
 
     case TRACKING_MODE:
-        this->runTrackingMode(robot_pose, landing_zone, dt);
+        tag_position = this->runTrackingMode(robot_pose, landing_zone, dt);
         break;
 
     case LANDING_MODE:
-        this->runLandingMode(robot_pose, landing_zone, dt);
+        tag_position = this->runLandingMode(robot_pose, landing_zone, dt);
         break;
 
     case MISSION_ACCOMPLISHED:
         return 0;
         break;
+
+    }
+
+    // change from GPS to using AprilTag as world origin
+    // modify setpoint and robot pose as we use GPS or AprilTag
+    // swap robot pose with setpoint, since we are using AprilTag as
+    // world origin, so now if
+    fake_robot_pose.x = -tag_position.x;
+    fake_robot_pose.y = -tag_position.y;
+    fake_robot_pose.z = robot_pose.z;  // don't desend
+
+    tag_origin.x = 0.0f;
+    tag_origin.y = 0.0f;
+    tag_origin.z = tag_position.z;
+
+    if (landing_zone.detected) {
+        this->positionControllerCalculate(tag_origin, fake_robot_pose, dt);
+
+    } else {
+        this->runHoverMode(robot_pose, dt);
 
     }
 
