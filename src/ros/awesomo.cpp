@@ -7,6 +7,7 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <geometry_msgs/TwistStamped.h>
+#include <tf/transform_broadcaster.h>
 
 #define MAVLINK_DIALECT common
 #include <mavros/mavros.h>
@@ -75,6 +76,9 @@ public:
     ros::Publisher kf_estimator_stats_publisher;
     ros::Publisher kf_estimator_stats_plotting_publisher;
 
+    tf::TransformBroadcaster world_imu_tf_broadcaster;
+    tf::Transform world_imu_tf;
+
     void poseCallback(const geometry_msgs::PoseStamped &msg);
     void velocityCallback(const geometry_msgs::TwistStamped &msg);
     void mocapCallback(const geometry_msgs::PoseStamped &msg);
@@ -83,6 +87,7 @@ public:
     void gpsCallback(const geometry_msgs::PoseWithCovarianceStamped &msg);
     void stateCallback(const mavros_msgs::State::ConstPtr &msg);
     void waitForConnection(void);
+    void imuCallback(const geometry_msgs::PoseStamped &msg);
 
     Awesomo(std::map<std::string, std::string> configs);
     int arm(void);
@@ -161,18 +166,38 @@ Awesomo::Awesomo(std::map<std::string, std::string> configs)
 
 void Awesomo::poseCallback(const geometry_msgs::PoseStamped &msg)
 {
-    // position
+    // ENU coordinates
     this->pose.x = msg.pose.position.x;
     this->pose.y = msg.pose.position.y;
     this->pose.z = msg.pose.position.z;
 
-    // orientation
     quat2euler(
         msg.pose.orientation,
         &this->pose.roll,
         &this->pose.pitch,
         &this->pose.yaw
     );
+
+    this->world_imu_tf.setOrigin(
+        tf::Vector3(
+            this->pose.x,
+            this->pose.y,
+            this->pose.z
+        )
+    );
+
+    // for display in rviz, serves no other function
+    this->world_imu_tf.setRotation(
+        tf::Quaternion(
+            msg.pose.orientation.x,
+            msg.pose.orientation.y,
+            msg.pose.orientation.z,
+            msg.pose.orientation.w
+        )
+    );
+
+    this->world_imu_tf_broadcaster.sendTransform(
+            tf::StampedTransform(world_imu_tf, ros::Time::now(), "world", "pixhawk"));
 }
 
 void Awesomo::velocityCallback(const geometry_msgs::TwistStamped &msg)
@@ -625,6 +650,7 @@ int main(int argc, char **argv)
             }
 
         }
+
 
 		// end
 		seq++;
