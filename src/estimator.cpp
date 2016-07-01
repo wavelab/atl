@@ -58,7 +58,7 @@ void apriltag_kf_setup(struct kf *e, Eigen::VectorXd mu)
 	I = Eigen::MatrixXd::Identity(9, 9);
 	K = Eigen::MatrixXd::Zero(9, 9);
 	// mu_p = Eigen::VectorXd::Zero(9);
-	S_p = Eigen::MatrixXd::Zero(9, 9) * 100;
+	S_p = Eigen::MatrixXd::Zero(9, 9);
 
     // configure kalman filter
     e->mu = mu;

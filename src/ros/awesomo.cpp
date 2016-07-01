@@ -398,24 +398,24 @@ void Awesomo::publishPositionControllerStats(int seq, ros::Time time)
     msg.header.frame_id = "awesomo_position_controller";
 
     // roll
-    msg.roll_p_error = this->quad->position_controller->x.p_error;
-    msg.roll_i_error = this->quad->position_controller->x.i_error;
-    msg.roll_d_error = this->quad->position_controller->x.d_error;
-    msg.roll_output = this->quad->position_controller->x.output * 180 / M_PI;
-    msg.roll_setpoint  = this->quad->position_controller->x.setpoint;
+    msg.pitch_p_error = this->quad->position_controller->x.p_error;
+    msg.pitch_i_error = this->quad->position_controller->x.i_error;
+    msg.pitch_d_error = this->quad->position_controller->x.d_error;
+    msg.pitch_output = this->quad->position_controller->x.output * M_PI / 180;
+    msg.pitch_setpoint  = this->quad->position_controller->x.setpoint;
 
     // pitch
-    msg.pitch_p_error = this->quad->position_controller->y.p_error;
-    msg.pitch_i_error = this->quad->position_controller->y.i_error;
-    msg.pitch_d_error = this->quad->position_controller->y.d_error;
-    msg.pitch_output = this->quad->position_controller->y.output * 180 / M_PI;
-    msg.pitch_setpoint  = this->quad->position_controller->y.setpoint;
+    msg.roll_p_error = this->quad->position_controller->y.p_error;
+    msg.roll_i_error = this->quad->position_controller->y.i_error;
+    msg.roll_d_error = this->quad->position_controller->y.d_error;
+    msg.roll_output = this->quad->position_controller->y.output * M_PI / 180;
+    msg.roll_setpoint  = this->quad->position_controller->y.setpoint;
 
     // thrust
     msg.throttle_p_error = this->quad->position_controller->T.p_error;
     msg.throttle_i_error = this->quad->position_controller->T.i_error;
     msg.throttle_d_error = this->quad->position_controller->T.d_error;
-    msg.throttle_output = this->quad->position_controller->T.output * 180 / M_PI;
+    msg.throttle_output = this->quad->position_controller->T.output * M_PI / 180;
     msg.throttle_setpoint = this->quad->position_controller->T.setpoint;
 
     this->position_controller_stats_publisher.publish(msg);
@@ -454,110 +454,98 @@ void Awesomo::publishKFStats(int seq, ros::Time time)
 	struct kf *estimator;
 
 	// setup
-	if (this->quad->estimator_initialized) {
-        estimator = &this->quad->tag_estimator;
+	estimator = &this->quad->apriltag_estimator;
 
-        // message header
-        msg.header.seq = seq;
-        msg.header.stamp = time;
-        msg.header.frame_id = "awesomo_kf_estimation";
+    // message header
+    msg.header.seq = seq;
+    msg.header.stamp = time;
+    msg.header.frame_id = "awesomo_kf_estimation";
 
-        // A matrix
-        msg.A_rows = estimator->A.rows();
-        msg.A_cols = estimator->A.cols();
-        msg.A_data.clear();
-        for (int i = 0; i < estimator->A.rows(); i++) {
-            for (int j = 0; j < estimator->A.cols(); j++) {
-                msg.A_data.push_back(estimator->A(i, j));
-            }
+    // A matrix
+    msg.A_rows = estimator->A.rows();
+    msg.A_cols = estimator->A.cols();
+    for (int i = 0; i < estimator->A.rows(); i++) {
+        for (int j = 0; j < estimator->A.cols(); j++) {
+            msg.A_data[i] = estimator->A(i, j);
         }
-
-        // B matrix
-        msg.B_rows = estimator->B.rows();
-        msg.B_cols = estimator->B.cols();
-        msg.B_data.clear();
-        for (int i = 0; i < estimator->B.rows(); i++) {
-            for (int j = 0; j < estimator->B.cols(); j++) {
-                msg.B_data.push_back(estimator->B(i, j));
-            }
-        }
-
-        // R matrix
-        msg.R_rows = estimator->R.rows();
-        msg.R_cols = estimator->R.cols();
-        msg.R_data.clear();
-        for (int i = 0; i < estimator->R.rows(); i++) {
-            for (int j = 0; j < estimator->R.cols(); j++) {
-                msg.R_data.push_back(estimator->R(i, j));
-            }
-        }
-
-        // C matrix
-        msg.C_rows = estimator->C.rows();
-        msg.C_cols = estimator->C.cols();
-        msg.C_data.clear();
-        for (int i = 0; i < estimator->C.rows(); i++) {
-            for (int j = 0; j < estimator->C.cols(); j++) {
-                msg.C_data.push_back(estimator->C(i, j));
-            }
-        }
-
-        // Q matrix
-        msg.Q_rows = estimator->Q.rows();
-        msg.Q_cols = estimator->Q.cols();
-        msg.Q_data.clear();
-        for (int i = 0; i < estimator->Q.rows(); i++) {
-            for (int j = 0; j < estimator->Q.cols(); j++) {
-                msg.Q_data.push_back(estimator->Q(i, j));
-            }
-        }
-
-        // S matrix
-        msg.S_rows = estimator->S.rows();
-        msg.S_cols = estimator->S.cols();
-        msg.S_data.clear();
-        for (int i = 0; i < estimator->S.rows(); i++) {
-            for (int j = 0; j < estimator->S.cols(); j++) {
-                msg.S_data.push_back(estimator->S(i, j));
-            }
-        }
-
-        // K matrix
-        msg.K_rows = estimator->K.rows();
-        msg.K_cols = estimator->K.cols();
-        msg.K_data.clear();
-        for (int i = 0; i < estimator->K.rows(); i++) {
-            for (int j = 0; j < estimator->K.cols(); j++) {
-                msg.K_data.push_back(estimator->K(i, j));
-            }
-        }
-
-        // mu vector
-        msg.mu_size = estimator->mu.size();
-        msg.mu_data.clear();
-        for (int i = 0; i < estimator->mu.size(); i++) {
-            msg.mu_data.push_back(estimator->mu(i));
-        }
-
-        // mu vector
-        msg.mu_p_size = estimator->mu_p.size();
-        msg.mu_p_data.clear();
-        for (int i = 0; i < estimator->mu_p.size(); i++) {
-            msg.mu_p_data.push_back(estimator->mu_p(i));
-        }
-
-        // S_p matrix
-        msg.S_p_rows = estimator->S_p.rows();
-        msg.S_p_cols = estimator->S_p.cols();
-        msg.S_p_data.clear();
-        for (int i = 0; i < estimator->S_p.rows(); i++) {
-            for (int j = 0; j < estimator->S_p.cols(); j++) {
-                msg.S_p_data.push_back(estimator->S_p(i, j));
-            }
-        }
-
-        this->kf_estimator_stats_publisher.publish(msg);
     }
+
+    // B matrix
+    msg.B_rows = estimator->B.rows();
+    msg.B_cols = estimator->B.cols();
+    for (int i = 0; i < estimator->B.rows(); i++) {
+        for (int j = 0; j < estimator->B.cols(); j++) {
+            msg.A_data[i] = estimator->B(i, j);
+        }
+    }
+
+    // R matrix
+    msg.R_rows = estimator->R.rows();
+    msg.R_cols = estimator->R.cols();
+    for (int i = 0; i < estimator->R.rows(); i++) {
+        for (int j = 0; j < estimator->R.cols(); j++) {
+            msg.A_data[i] = estimator->R(i, j);
+        }
+    }
+
+    // C matrix
+    msg.C_rows = estimator->C.rows();
+    msg.C_cols = estimator->C.cols();
+    for (int i = 0; i < estimator->C.rows(); i++) {
+        for (int j = 0; j < estimator->C.cols(); j++) {
+            msg.A_data[i] = estimator->C(i, j);
+        }
+    }
+
+    // Q matrix
+    msg.Q_rows = estimator->Q.rows();
+    msg.Q_cols = estimator->Q.cols();
+    for (int i = 0; i < estimator->Q.rows(); i++) {
+        for (int j = 0; j < estimator->Q.cols(); j++) {
+            msg.A_data[i] = estimator->Q(i, j);
+        }
+    }
+
+    // S matrix
+    msg.S_rows = estimator->S.rows();
+    msg.S_cols = estimator->S.cols();
+    for (int i = 0; i < estimator->S.rows(); i++) {
+        for (int j = 0; j < estimator->S.cols(); j++) {
+            msg.A_data[i] = estimator->S(i, j);
+        }
+    }
+
+    // K matrix
+    msg.K_rows = estimator->K.rows();
+    msg.K_cols = estimator->K.cols();
+    for (int i = 0; i < estimator->K.rows(); i++) {
+        for (int j = 0; j < estimator->K.cols(); j++) {
+            msg.A_data[i] = estimator->K(i, j);
+        }
+    }
+
+    // mu vector
+    msg.mu_size = estimator->mu.size();
+    for (int i = 0; i < estimator->mu.size(); i++) {
+        msg.mu_data[i] = estimator->mu(i);
+    }
+
+    // mu vector
+    msg.mu_p_size = estimator->mu_p.size();
+    for (int i = 0; i < estimator->mu_p.size(); i++) {
+        msg.mu_p_data[i] = estimator->mu_p(i);
+    }
+
+    // S_p matrix
+    msg.S_p_rows = estimator->S_p.rows();
+    msg.S_p_cols = estimator->S_p.cols();
+    for (int i = 0; i < estimator->S_p.rows(); i++) {
+        for (int j = 0; j < estimator->S_p.cols(); j++) {
+            msg.A_data[i] = estimator->S_p(i, j);
+        }
+    }
+
+    this->kf_estimator_stats_publisher.publish(msg);
 }
 
 void Awesomo::publishKFStatsForPlotting(int seq, ros::Time time)
@@ -607,8 +595,8 @@ int Awesomo::run(
     if (this->quad->runMission(this->pose, this->landing_zone, dt)) {
         this->publishPositionControllerMessage(msg, seq, ros::Time::now());
         this->publishPositionControllerStats(seq, ros::Time::now());
-        this->publishKFStats(seq, ros::Time::now());
         return 1;
+
     } else {
         this->disarm();
         return 0;
@@ -626,12 +614,12 @@ int main(int argc, char **argv)
     ros::Time last_request;
     geometry_msgs::PoseStamped msg;
 
+	float dt;
 	int seq;
     Awesomo *awesomo;
     std::string quadrotor_config;
     std::string position_controller_config;
     std::string carrot_controller_config;
-    std::string quadrotor_config;
     std::map<std::string, std::string> configs;
     std_msgs::Float64 throttle;
 
@@ -639,14 +627,9 @@ int main(int argc, char **argv)
 	node_handle.getParam("/quadrotor", quadrotor_config);
 	node_handle.getParam("/position_controller", position_controller_config);
 	node_handle.getParam("/carrot_controller", carrot_controller_config);
-<<<<<<< HEAD
 	configs["quadrotor"] = quadrotor_config;
-=======
-	node_handle.getParam("/quadrotor", quadrotor_config);
->>>>>>> ros
 	configs["position_controller"] = position_controller_config;
 	configs["carrot_controller"] = carrot_controller_config;
-	configs["quadrotor"] = quadrotor_config;
 
 	// setup awesomo
     seq = 1;
@@ -658,18 +641,12 @@ int main(int argc, char **argv)
         // check if offboard switch has been turned on
         if (awesomo->rc_in[6] < 1500) {
             awesomo->quad->resetPositionController();
-
-            // keep sending dummy values else px4 stops listening
             throttle.data = 0.0;
             awesomo->throttle_publisher.publish(throttle);
 
         } else {
             if (awesomo->run(msg, seq, last_request) == 0) {
-<<<<<<< HEAD
                 return 0;
-=======
-                break;
->>>>>>> ros
             }
 
         }
