@@ -42,10 +42,6 @@ public:
 class TrackingConfig
 {
 public:
-    // track time
-    float min_track_time;
-    float target_lost_limit;
-
     // position offsets
     float offset_x;
     float offset_y;
@@ -55,8 +51,7 @@ public:
     TrackingConfig(void):
         offset_x(0),
         offset_y(0),
-        offset_z(0),
-        min_track_time(10) {}
+        offset_z(0) {}
 };
 
 class LandingConfig
@@ -66,8 +61,6 @@ public:
     float period;
     float descend_multiplier;
     float recover_multiplier;
-    float x_threshold;
-    float y_threshold;
 
     // disarm conditions
     float x_cutoff;
@@ -80,8 +73,6 @@ public:
         period(0),
         descend_multiplier(0),
         recover_multiplier(0),
-        x_threshold(0),
-        y_threshold(0),
         x_cutoff(0),
         y_cutoff(0),
         z_cutoff(0),
@@ -99,9 +90,9 @@ public:
     int mission_state;
     Pose pose;
     HoverPoint *hover_point;
-    time_t tracking_start;
-    time_t tag_last_updated;
     int landing_zone_belief;
+    time_t tracking_start;
+    time_t target_last_updated;
     time_t height_last_updated;
 
     // controllers
@@ -110,21 +101,16 @@ public:
 
     // estimators
     bool estimator_initialized;
-    struct kf tag_estimator;
+    struct kf apriltag_estimator;
 
-    // constructors
     Quadrotor(std::map<std::string, std::string> configs);
-
-    // methods
     int loadConfig(std::string config_file_path);
-    void updatePose(Pose p);
-    void updateHoverPointWithTag(Pose robot_pose, float tag_x, float tag_y);
-    bool hasLanded(LandingTargetPosition landing_zone);
     Attitude positionControllerCalculate(
         Position setpoint,
         Pose robot_pose,
         float dt
     );
+    void updatePose(Pose p);
     void resetPositionController(void);
     void runIdleMode(Pose robot_pose);
     Position runHoverMode(Pose robot_pose, float dt);
@@ -132,13 +118,7 @@ public:
     Position runCarrotMode(Pose robot_pose, float dt);
     Position runDiscoverMode(
         Pose robot_pose,
-        LandingTargetPosition landing_zone,
-        float dt
-    );
-    Position trackApriltag(
-        Pose robot_pose,
-        LandingTargetPosition landing_zone,
-        float dt
+        LandingTargetPosition landing_zone
     );
     Position runTrackingMode(
         Pose robot_pose,

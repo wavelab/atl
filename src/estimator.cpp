@@ -58,7 +58,7 @@ void apriltag_kf_setup(struct kf *e, Eigen::VectorXd mu)
 	I = Eigen::MatrixXd::Identity(9, 9);
 	K = Eigen::MatrixXd::Zero(9, 9);
 	// mu_p = Eigen::VectorXd::Zero(9);
-	S_p = Eigen::MatrixXd::Zero(9, 9) * 100;
+	S_p = Eigen::MatrixXd::Zero(9, 9);
 
     // configure kalman filter
     e->mu = mu;
@@ -80,27 +80,27 @@ void apriltag_kf_setup(struct kf *e, Eigen::VectorXd mu)
 
 void apriltag_kf_estimate(struct kf *e, Eigen::VectorXd y, float dt, bool tag_detected)
 {
-	// // adjust transition matrix (assuming constant acceleration)
-	// e->A << 1, 0, 0, dt, 0, 0, pow(dt, 2) / 2.0, 0, 0,
-	// 	 0, 1, 0, 0, dt, 0, 0, pow(dt, 2) / 2.0, 0,
-	// 	 0, 0, 1, 0, 0, dt, 0, 0, pow(dt, 2) / 2.0,
-	// 	 0, 0, 0, 1, 0, 0, dt, 0, 0,
-	// 	 0, 0, 0, 0, 1, 0, 0, dt, 0,
-	// 	 0, 0, 0, 0, 0, 1, 0, 0, dt,
-	// 	 0, 0, 0, 0, 0, 0, 1, 0, 0,
-	// 	 0, 0, 0, 0, 0, 0, 0, 1, 0,
-	// 	 0, 0, 0, 0, 0, 0, 0, 0, 1;
+	// adjust transition matrix (assuming constant acceleration)
+	e->A << 1, 0, 0, dt, 0, 0, pow(dt, 2) / 2.0, 0, 0,
+		 0, 1, 0, 0, dt, 0, 0, pow(dt, 2) / 2.0, 0,
+		 0, 0, 1, 0, 0, dt, 0, 0, pow(dt, 2) / 2.0,
+		 0, 0, 0, 1, 0, 0, dt, 0, 0,
+		 0, 0, 0, 0, 1, 0, 0, dt, 0,
+		 0, 0, 0, 0, 0, 1, 0, 0, dt,
+		 0, 0, 0, 0, 0, 0, 1, 0, 0,
+		 0, 0, 0, 0, 0, 0, 0, 1, 0,
+		 0, 0, 0, 0, 0, 0, 0, 0, 1;
 
     // hack
-	e->A << 1, 0, 0, dt, 0, 0, 0, 0, 0,
-		 0, 1, 0, 0, dt, 0, 0, 0, 0,
-		 0, 0, 1, 0, 0, dt, 0, 0, 0,
-		 0, 0, 0, 1, 0, 0, 0, 0, 0,
-		 0, 0, 0, 0, 1, 0, 0, 0, 0,
-		 0, 0, 0, 0, 0, 1, 0, 0, 0,
-		 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		 0, 0, 0, 0, 0, 0, 0, 0, 0;
+	// e->A << 1, 0, 0, dt, 0, 0, 0, 0, 0,
+	// 	 0, 1, 0, 0, dt, 0, 0, 0, 0,
+	// 	 0, 0, 1, 0, 0, dt, 0, 0, 0,
+	// 	 0, 0, 0, 1, 0, 0, 0, 0, 0,
+	// 	 0, 0, 0, 0, 1, 0, 0, 0, 0,
+	// 	 0, 0, 0, 0, 0, 1, 0, 0, 0,
+	// 	 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	// 	 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	// 	 0, 0, 0, 0, 0, 0, 0, 0, 0;
 
 	// prediction update
     e->mu_p = e->A * e->mu;
