@@ -499,14 +499,12 @@ int Quadrotor::runMission(
     // modify setpoint and robot pose as we use GPS or AprilTag
     // swap robot pose with setpoint, since we are using AprilTag as
     // world origin, so now if
-    //
-    // this is now NED
-    fake_robot_pose.x = 0.0;
-    fake_robot_pose.y = 0.0;
-    fake_robot_pose.z = 0.0 + robot_pose.z;  // don't desend this needs to be made a variable or something
+    fake_robot_pose.x = -tag_position.x;
+    fake_robot_pose.y = -tag_position.y;
+    fake_robot_pose.z = robot_pose.z;  // don't desend
 
-    tag_origin.x = tag_position.x;
-    tag_origin.y = tag_position.y;
+    tag_origin.x = 0.0f;
+    tag_origin.y = 0.0f;
     tag_origin.z = tag_position.z;
 
     if (landing_zone.detected) {

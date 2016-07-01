@@ -25,7 +25,6 @@ FIND_PACKAGE(
     message_generation
     image_transport
     cv_bridge
-    tf
 )
 FIND_PACKAGE(OpenCV REQUIRED)
 FIND_PACKAGE(Boost REQUIRED)
@@ -75,14 +74,7 @@ ADD_LIBRARY(
     src/estimator.cpp
 )
 
-SET(Awesomo_libs
-    libawesomo
-    apriltags
-    yaml-cpp
-    flycapture
-    ${OpenCV_LIBS}
-    ${catkin_LIBRARIES}
-)
+
 
 
 
@@ -93,7 +85,12 @@ SET(Awesomo_libs
 ADD_EXECUTABLE(awesomo src/ros/awesomo.cpp)
 TARGET_LINK_LIBRARIES(
     awesomo
-    ${Awesomo_libs}
+    libawesomo
+    apriltags
+    yaml-cpp
+    flycapture
+    ${OpenCV_LIBS}
+    ${catkin_LIBRARIES}
 )
 INSTALL(
     TARGETS awesomo
@@ -103,7 +100,12 @@ INSTALL(
 ADD_EXECUTABLE(awesomo_landing_target src/ros/awesomo_landing_target.cpp)
 TARGET_LINK_LIBRARIES(
     awesomo_landing_target
-    ${Awesomo_libs}
+    libawesomo
+    apriltags
+    yaml-cpp
+    flycapture
+    ${OpenCV_LIBS}
+    ${catkin_LIBRARIES}
 )
 INSTALL(
     TARGETS awesomo_landing_target
@@ -126,7 +128,12 @@ INSTALL(
 ADD_EXECUTABLE(awesomo_quadrotor_test tests/quadrotor_test.cpp)
 TARGET_LINK_LIBRARIES(
     awesomo_quadrotor_test
-    ${Awesomo_libs}
+    libawesomo
+    apriltags
+    yaml-cpp
+    flycapture
+    ${OpenCV_LIBS}
+    ${catkin_LIBRARIES}
 )
 INSTALL(
     TARGETS awesomo_quadrotor_test
@@ -137,7 +144,12 @@ INSTALL(
 ADD_EXECUTABLE(awesomo_estimator_test tests/estimator_test.cpp)
 TARGET_LINK_LIBRARIES(
     awesomo_estimator_test
-    ${Awesomo_libs}
+    libawesomo
+    apriltags
+    yaml-cpp
+    flycapture
+    ${OpenCV_LIBS}
+    ${catkin_LIBRARIES}
 )
 INSTALL(
     TARGETS awesomo_estimator_test
