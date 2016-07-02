@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <launch>
     <!-- ATIM -->
+    <param
         name="camera_config_path"
 	    value="$(find atim)/configs/pointgrey_firefly" />
 	<node

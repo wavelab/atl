@@ -82,12 +82,12 @@ void LandingTarget::cameraRBTCallback(const atim::AtimPoseStamped &msg)
             this->FC_local_pose.yaw * 0, // do not correct for yaw (body planar frame)
             this->landing_target_position
         );
-        ROS_INFO(
-            "target pose in NED, body planar: %f\t%f\t%f",
-            this->landing_target_position.x,
-            this->landing_target_position.y,
-            this->landing_target_position.z
-        );
+        // ROS_INFO(
+        //     "target pose in NED, body planar: %f\t%f\t%f",
+        //     this->landing_target_position.x,
+        //     this->landing_target_position.y,
+        //     this->landing_target_position.z
+        // );
 
         // Apply translation required due to camera mount
         // in NED
