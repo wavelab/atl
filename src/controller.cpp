@@ -232,7 +232,13 @@ static void pid_calculate(struct pid *p, float input, float dt)
     p->prev_error = error;
 }
 
-void PositionController::calculate(Position setpoint, Pose robot, float dt)
+void PositionController::calculate(
+        Position setpoint,
+        Pose robot,
+        float yaw_setpoint,
+        float dt,
+        int global_frame
+    )
 {
     float roll;
     float pitch;
@@ -243,37 +249,43 @@ void PositionController::calculate(Position setpoint, Pose robot, float dt)
 
     // Note: Position Controller is (x - roll, y - pitch, T - thrust)
     // This position controller assumes yaw is aligned with the world x axis
-    this->x.setpoint = setpoint.y;
-    this->y.setpoint = setpoint.x;
+    this->x.setpoint = -1 * setpoint.y;
+    this->y.setpoint = -1 * setpoint.x;
     this->T.setpoint = setpoint.z;
 
     pid_calculate(&this->x, robot.y, dt);
     pid_calculate(&this->y, robot.x, dt);
     pid_calculate(&this->T, robot.z, dt);
 
-    roll = -this->x.output;
-    pitch = this->y.output;
+    roll =  this->x.output;
+    pitch =  this->y.output;
     throttle = this->T.output;
 
-    // adjust roll and pitch according to yaw
     if (robot.yaw < 0) {
         // make sure yaw is within 0 - 360
         robot.yaw += 2 * M_PI;
     }
-    roll_adjusted = cos(robot.yaw) * roll - sin(robot.yaw) * pitch;
-    pitch_adjusted = sin(robot.yaw) * roll + cos(robot.yaw) * pitch;
 
     // throttle
     throttle_adjusted = this->hover_throttle + throttle;
-    throttle_adjusted /= fabs(cos(roll_adjusted) * cos(pitch_adjusted));
+    throttle_adjusted /= fabs(cos(roll) * cos(pitch));
     if (throttle_adjusted > 1.0) {
         throttle_adjusted = 1.0;
     }
 
     // update position controller
-    this->roll = roll_adjusted;
-    this->pitch = pitch_adjusted;
-    this->rpy_quat = euler2quat(roll_adjusted, pitch_adjusted, 0);
+    // this->roll = roll_adjusted;
+    if (global_frame == 1){
+    // adjust roll and pitch according to yaw
+        this->roll = cos(robot.yaw) * roll - sin(robot.yaw) * pitch;
+        this->pitch = sin(robot.yaw) * roll + cos(robot.yaw) * pitch;
+        this->rpy_quat = euler2quat(this->roll, this->pitch, yaw_setpoint);
+    } else{
+
+        this->roll = roll;
+        this->pitch = pitch;
+        this->rpy_quat = euler2quat(this->roll, this->pitch, yaw_setpoint);
+    }
     this->throttle = throttle_adjusted;
 }
 

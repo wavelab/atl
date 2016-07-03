@@ -96,7 +96,13 @@ public:
 
     PositionController(const std::string config_file);
     void loadConfig(const std::string config_file);
-    void calculate(Position setpoint, Pose robot, float dt);
+    void calculate(
+            Position setpoint,
+            Pose robot,
+            float yaw_setpoint,
+            float dt,
+            int global_frame
+    );
 };
 
 class LandingController

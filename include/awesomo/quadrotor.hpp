@@ -21,6 +21,9 @@
 #define TRACKING_MODE 5
 #define LANDING_MODE 6
 
+// FRAMES
+#define GLOBAL_FRAME 1
+#define BODY_PLANAR_FRAME 2
 
 class HoverPoint
 {
@@ -88,7 +91,9 @@ public:
 
     // state
     int mission_state;
-    Pose pose;
+    Pose global_pose;
+    Pose body_planar_frame_target_pose;
+
     HoverPoint *hover_point;
     int landing_zone_belief;
     time_t tracking_start;
@@ -108,8 +113,11 @@ public:
     Attitude positionControllerCalculate(
         Position setpoint,
         Pose robot_pose,
-        float dt
+        float yaw,
+        float dt,
+        int frame
     );
+
     void updatePose(Pose p);
     void resetPositionController(void);
     void runIdleMode(Pose robot_pose);
@@ -120,8 +128,7 @@ public:
         Pose robot_pose,
         LandingTargetPosition landing_zone
     );
-    Position runTrackingMode(
-        Pose robot_pose,
+    Position runTrackingModeBPF(
         LandingTargetPosition landing_zone,
         float dt
     );

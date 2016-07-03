@@ -4,9 +4,9 @@
 #include "awesomo/quadrotor.hpp"
 
 // CONFIGS
-#define QUADROTOR_CONFIG "configs/quadrotor/config.yaml"
-#define POSITION_CONTROLLER_CONFIG "configs/position_controller/config.yaml"
-#define CARROT_CONTROLLER_CONFIG "configs/carrot_controller/config.yaml"
+#define QUADROTOR_CONFIG "/home/stan/catkin_ws/src/awesomo/configs/quadrotor/config.yaml"
+#define POSITION_CONTROLLER_CONFIG "/home/stan/catkin_ws/src/awesomo/configs/position_controller/config.yaml"
+#define CARROT_CONTROLLER_CONFIG "/home/stan/catkin_ws/src/awesomo/configs/carrot_controller/config.yaml"
 
 
 // TESTS
@@ -20,7 +20,7 @@ int testQuadrotorRunHoverMode(void);
 int testQuadrotorInitializeCarrotController(void);
 int testQuadrotorRunCarrotMode(void);
 int testQuadrotorRunDiscoveryMode(void);
-int testQuadrotorRunTrackingMode(void);
+int testQuadrotorRunTrackingModeBPF(void);
 int testQuadrotorRunLandingMode(void);
 int testQuadrotorRunMission(void);
 
@@ -49,9 +49,9 @@ int testQuadrotor(void)
 	// assert
 	mu_check(quad->mission_state == IDLE_MODE);
 
-	mu_check(quad->pose.x == 0);
-	mu_check(quad->pose.y == 0);
-	mu_check(quad->pose.z == 0);
+	mu_check(quad->global_pose.x == 0);
+	mu_check(quad->global_pose.y == 0);
+	mu_check(quad->global_pose.z == 0);
 
 	mu_check(quad->hover_point->initialized == false);
 	mu_check(fltcmp(quad->hover_point->x, 0.0) == 0);
@@ -118,7 +118,7 @@ int testQuadrotorPositionControllerCalculate(void)
 	dt = 0.1;
 
 	// test no correction
-	quad->positionControllerCalculate(setpoint, p, dt);
+	quad->positionControllerCalculate(setpoint, p, 0, dt, GLOBAL_FRAME);
 	mu_check(fltcmp(quad->position_controller->roll, 0.0f) == 0);
 	mu_check(fltcmp(quad->position_controller->pitch, 0.0f) == 0);
 
@@ -131,7 +131,7 @@ int testQuadrotorPositionControllerCalculate(void)
 	setpoint.y = 1.0;
 	setpoint.z = 3.0;
 
-	quad->positionControllerCalculate(setpoint, p, dt);
+	quad->positionControllerCalculate(setpoint, p, 0, dt, GLOBAL_FRAME);
 	mu_check(fltcmp(quad->position_controller->roll, 0.0f) != 0);
 	mu_check(fltcmp(quad->position_controller->pitch, 0.0f) == 0);
 
@@ -358,7 +358,7 @@ int testQuadrotorRunDiscoveryMode(void)
     return 0;
 }
 
-int testQuadrotorRunTrackingMode(void)
+int testQuadrotorRunTrackingModeBPF(void)
 {
     Quadrotor *quad;
     float dt;
@@ -371,39 +371,33 @@ int testQuadrotorRunTrackingMode(void)
 	dt = 0.1;
 
 	// test tracking mode - time step 1
-	robot_pose.x = 1.0;
-	robot_pose.y = 2.0;
-	robot_pose.z = 3.0;
-
 	landing_zone.detected = true;
-	landing_zone.x = 0.0;
-	landing_zone.y = 0.0;
-	landing_zone.z = 0.0;
+    robot_pose.x = 0.0;
+    robot_pose.y = 0.0;
+    robot_pose.z = 0.0;
+
+    landing_zone.x = 1.0;
+	landing_zone.y = 2.0;
+	landing_zone.z = 3.0;
 
 	quad->runDiscoverMode(robot_pose, landing_zone);
-	cmd = quad->runTrackingMode(robot_pose, landing_zone, dt);
+	cmd = quad->runTrackingModeBPF(landing_zone, dt);
     mu_print("cmd: %f %f %f\n", cmd.x, cmd.y, cmd.z);
 
 	// test tracking mode - time step 2
-	robot_pose.x = 1.1;
-	robot_pose.y = 2.0;
-	robot_pose.z = 3.0;
+	landing_zone.x = 1.1;
+	landing_zone.y = 2.0;
+	landing_zone.z = 3.0;
 
-	landing_zone.x = 0.0;
-	landing_zone.y = 0.0;
-	landing_zone.z = 0.0;
-	cmd = quad->runTrackingMode(robot_pose, landing_zone, dt);
+	cmd = quad->runTrackingModeBPF(landing_zone, dt);
     mu_print("cmd: %f %f %f\n", cmd.x, cmd.y, cmd.z);
 
 	// test tracking mode - time step 3
-	robot_pose.x = 1.2;
-	robot_pose.y = 2.0;
-	robot_pose.z = 3.0;
+	landing_zone.x = 1.2;
+	landing_zone.y = 2.0;
+	landing_zone.z = 3.0;
 
-	landing_zone.x = 0.0;
-	landing_zone.y = 0.0;
-	landing_zone.z = 0.0;
-	cmd = quad->runTrackingMode(robot_pose, landing_zone, dt);
+	cmd = quad->runTrackingModeBPF(landing_zone, dt);
     mu_print("cmd: %f %f %f\n", cmd.x, cmd.y, cmd.z);
 
     return 0;
@@ -532,7 +526,7 @@ void testSuite(void)
     mu_add_test(testQuadrotorInitializeCarrotController);
     mu_add_test(testQuadrotorRunCarrotMode);
     mu_add_test(testQuadrotorRunDiscoveryMode);
-    mu_add_test(testQuadrotorRunTrackingMode);
+    mu_add_test(testQuadrotorRunTrackingModeBPF);
     mu_add_test(testQuadrotorRunLandingMode);
     mu_add_test(testQuadrotorRunMission);
 }

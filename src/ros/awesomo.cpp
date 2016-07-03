@@ -398,24 +398,24 @@ void Awesomo::publishPositionControllerStats(int seq, ros::Time time)
     msg.header.frame_id = "awesomo_position_controller";
 
     // roll
-    msg.pitch_p_error = this->quad->position_controller->x.p_error;
-    msg.pitch_i_error = this->quad->position_controller->x.i_error;
-    msg.pitch_d_error = this->quad->position_controller->x.d_error;
-    msg.pitch_output = this->quad->position_controller->x.output * M_PI / 180;
-    msg.pitch_setpoint  = this->quad->position_controller->x.setpoint;
+    msg.roll_p_error = this->quad->position_controller->x.p_error;
+    msg.roll_i_error = this->quad->position_controller->x.i_error;
+    msg.roll_d_error = this->quad->position_controller->x.d_error;
+    msg.roll_output = this->quad->position_controller->roll *  180 / M_PI;
+    msg.roll_setpoint  = this->quad->position_controller->x.setpoint;
 
     // pitch
-    msg.roll_p_error = this->quad->position_controller->y.p_error;
-    msg.roll_i_error = this->quad->position_controller->y.i_error;
-    msg.roll_d_error = this->quad->position_controller->y.d_error;
-    msg.roll_output = this->quad->position_controller->y.output * M_PI / 180;
-    msg.roll_setpoint  = this->quad->position_controller->y.setpoint;
+    msg.pitch_p_error = this->quad->position_controller->y.p_error;
+    msg.pitch_i_error = this->quad->position_controller->y.i_error;
+    msg.pitch_d_error = this->quad->position_controller->y.d_error;
+    msg.pitch_output = this->quad->position_controller->y.output *  180 / M_PI;
+    msg.pitch_setpoint  = this->quad->position_controller->pitch;
 
     // thrust
     msg.throttle_p_error = this->quad->position_controller->T.p_error;
     msg.throttle_i_error = this->quad->position_controller->T.i_error;
     msg.throttle_d_error = this->quad->position_controller->T.d_error;
-    msg.throttle_output = this->quad->position_controller->T.output * M_PI / 180;
+    msg.throttle_output = this->quad->position_controller->T.output;
     msg.throttle_setpoint = this->quad->position_controller->T.setpoint;
 
     this->position_controller_stats_publisher.publish(msg);
@@ -595,6 +595,7 @@ int Awesomo::run(
     if (this->quad->runMission(this->pose, this->landing_zone, dt)) {
         this->publishPositionControllerMessage(msg, seq, ros::Time::now());
         this->publishPositionControllerStats(seq, ros::Time::now());
+        this->publishKFStatsForPlotting(seq, ros::Time::now());
         return 1;
 
     } else {
@@ -610,7 +611,7 @@ int main(int argc, char **argv)
     // setup
     ros::init(argc, argv, "awesomo");
     ros::NodeHandle node_handle;
-    ros::Rate rate(100.0);
+    ros::Rate rate(40.0);
     ros::Time last_request;
     geometry_msgs::PoseStamped msg;
 
