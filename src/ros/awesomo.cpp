@@ -408,7 +408,7 @@ void Awesomo::publishPositionControllerStats(int seq, ros::Time time)
     msg.pitch_p_error = this->quad->position_controller->y.p_error;
     msg.pitch_i_error = this->quad->position_controller->y.i_error;
     msg.pitch_d_error = this->quad->position_controller->y.d_error;
-    msg.pitch_output = this->quad->position_controller->y.output *  180 / M_PI;
+    msg.pitch_output = this->quad->position_controller->pitch *  180 / M_PI;
     msg.pitch_setpoint  = this->quad->position_controller->pitch;
 
     // thrust
