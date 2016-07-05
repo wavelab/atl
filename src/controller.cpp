@@ -249,16 +249,16 @@ void PositionController::calculate(
 
     // Note: Position Controller is (x - roll, y - pitch, T - thrust)
     // This position controller assumes yaw is aligned with the world x axis
-    this->x.setpoint = -1 * setpoint.y;
-    this->y.setpoint = -1 * setpoint.x;
+    this->x.setpoint = setpoint.y;
+    this->y.setpoint = setpoint.x;
     this->T.setpoint = setpoint.z;
 
     pid_calculate(&this->x, robot.y, dt);
     pid_calculate(&this->y, robot.x, dt);
     pid_calculate(&this->T, robot.z, dt);
 
-    roll =  this->x.output;
-    pitch =  this->y.output;
+    roll =  -this->x.output;
+    pitch = this->y.output;
     throttle = this->T.output;
 
     if (robot.yaw < 0) {
@@ -278,9 +278,8 @@ void PositionController::calculate(
         this->pitch = sin(robot.yaw) * roll + cos(robot.yaw) * pitch;
         this->rpy_quat = euler2quat(this->roll, this->pitch, yaw_setpoint);
     } else{
-
         this->roll = roll;
-        this->pitch = pitch;
+        this->pitch = -pitch;
         this->rpy_quat = euler2quat(this->roll, this->pitch, yaw_setpoint);
     }
 
