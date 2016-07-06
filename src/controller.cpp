@@ -265,11 +265,11 @@ void PositionController::calculate(
         // make sure yaw is within 0 - 360
         robot.yaw += 2 * M_PI;
     }
-    if (yaw_setpoint < 0) {
-        // make sure yaw is within 0 - 360
-        yaw_setpoint += 2 * M_PI;
-    }
-
+    // if (yaw_setpoint < 0) {
+    //     // make sure yaw is within 0 - 360
+    //     yaw_setpoint += 2 * M_PI;
+    // }
+    yaw_setpoint = 0.0;
 
     // update position controller
     if (global_frame == 1){
@@ -278,8 +278,8 @@ void PositionController::calculate(
         this->pitch = sin(robot.yaw) * roll + cos(robot.yaw) * pitch;
         this->rpy_quat = euler2quat(this->roll, this->pitch, yaw_setpoint);
     } else{
-        this->roll = roll;
-        this->pitch = -pitch;
+        this->roll = -roll;
+        this->pitch = pitch;
         this->rpy_quat = euler2quat(this->roll, this->pitch, yaw_setpoint);
     }
 
