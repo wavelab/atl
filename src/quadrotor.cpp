@@ -516,13 +516,25 @@ int Quadrotor::runMission(
     tag_origin.z = tag_position.z;
 
     if (landing_zone.detected) {
-        if (target_lost_elasped < 2){
+        if (target_lost_elasped < 2) {
             commanded_yaw = this->global_pose.yaw;
         }
-        this->positionControllerCalculate(tag_origin, fake_robot_pose, commanded_yaw, dt, BODY_PLANAR_FRAME);
+        this->positionControllerCalculate(
+            tag_origin,
+            fake_robot_pose,
+            commanded_yaw,
+            dt,
+            BODY_PLANAR_FRAME
+        );
 
     } else if (target_lost_elasped < 2){
-        this->positionControllerCalculate(tag_origin, fake_robot_pose, commanded_yaw, dt, BODY_PLANAR_FRAME);
+        this->positionControllerCalculate(
+            tag_origin,
+            fake_robot_pose,
+            commanded_yaw,
+            dt,
+            BODY_PLANAR_FRAME
+        );
 
     } else {
         this->runHoverMode(robot_pose, dt);

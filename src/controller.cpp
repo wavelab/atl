@@ -233,12 +233,12 @@ static void pid_calculate(struct pid *p, float input, float dt)
 }
 
 void PositionController::calculate(
-        Position setpoint,
-        Pose robot,
-        float yaw_setpoint,
-        float dt,
-        int global_frame
-    )
+    Position setpoint,
+    Pose robot,
+    float yaw_setpoint,
+    float dt,
+    int global_frame
+)
 {
     float roll;
     float pitch;
@@ -272,12 +272,12 @@ void PositionController::calculate(
     yaw_setpoint = 0.0;
 
     // update position controller
-    if (global_frame == 1){
-    // adjust roll and pitch according to yaw
+    if (global_frame == 1) {
+        // adjust roll and pitch according to yaw
         this->roll = cos(robot.yaw) * roll - sin(robot.yaw) * pitch;
         this->pitch = sin(robot.yaw) * roll + cos(robot.yaw) * pitch;
         this->rpy_quat = euler2quat(this->roll, this->pitch, yaw_setpoint);
-    } else{
+    } else {
         this->roll = -roll;
         this->pitch = pitch;
         this->rpy_quat = euler2quat(this->roll, this->pitch, yaw_setpoint);
