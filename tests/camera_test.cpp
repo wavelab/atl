@@ -55,8 +55,6 @@ int testCameraConfigApplyRBTtoPosition(void)
 {
     CameraMountRBT config;
     config.initialize(M_PI/2, M_PI/2, 0, -2, 0, 0);
-    // config.initializeMirrorMtx(-1, 1, 1);
-
     std::cout << config.camRotation << std::endl;
 
     LandingTargetPosition position1;

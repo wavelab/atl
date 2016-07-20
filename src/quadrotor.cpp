@@ -516,7 +516,8 @@ int Quadrotor::runMission(
     tag_origin.z = tag_position.z;
 
     if (landing_zone.detected) {
-        if (target_lost_elasped < 2) {
+        // if the target has not been lost, set the global yaw?
+        if (target_lost_elasped < TARGET_LOST_TIMEOUT) {
             commanded_yaw = this->global_pose.yaw;
         }
         this->positionControllerCalculate(
@@ -526,8 +527,9 @@ int Quadrotor::runMission(
             dt,
             BODY_PLANAR_FRAME
         );
-
-    } else if (target_lost_elasped < 2){
+    // target is not currently detected, but has not been lost for
+    // more then two seconds
+    } else if (target_lost_elasped < TARGET_LOST_TIMEOUT){
         this->positionControllerCalculate(
             tag_origin,
             fake_robot_pose,

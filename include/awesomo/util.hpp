@@ -111,6 +111,7 @@ int euler2Quaternion(
     const double yaw,
     Eigen::Quaterniond &q
 );
+
 int euler2RotationMatrix(
     const double roll,
     const double pitch,
@@ -132,6 +133,7 @@ int applyRotationToPosition(
     double w,
     LandingTargetPosition &position
 );
+
 
 tf::Quaternion euler2quat(double roll, double pitch, double yaw);
 void quat2euler(

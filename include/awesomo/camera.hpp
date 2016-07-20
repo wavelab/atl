@@ -3,18 +3,13 @@
 
 # include "awesomo/util.hpp"
 
-
-
-class CameraMountRBT
+class CameraMount
 {
 public:
     Eigen::Matrix3d camRotation;
     Eigen::Vector3d camTranslation;
-    Eigen::Matrix4d camMirroring;  // apply a mirroring around an axis
-    Eigen::Matrix4d camRBT;  // Rigid Body Transformation matrix
-    int mirror_initialized = 0;
 
-    CameraMountRBT(){};
+    CameraMount(){};
     int initialize(
         double camRoll,
         double camPitch,
@@ -24,22 +19,18 @@ public:
         double camTranslationZ
     );
 
-    int initializeMirrorMtx(
-        double camMirrorX,
-        double camMirrorY,
-        double camMirrorZ
+
+    int getAtimTargetPositionBodyFrame(
+        Position target_position,
+        Position &target_positionBodyFrame
     );
-    int convertPoseToMtx(
-        Pose &poseIn,
-        Eigen::Matrix4d &poseMtxOut
+
+    int getAtimTargetPositionBPF(
+        Position target_position,
+        Eigen::Quaterniond IMU_quat,
+        Position &target_positionBPF
     );
-    int convertPositionToVector(
-        LandingTargetPosition &positionIn,
-        Eigen::Vector4d &positionVectorOut
-    );
-    int applyMirrorToPoseMtx(Eigen::Matrix4d &poseIn);
-    int applyMirrorToPositionVector(Eigen::Vector4d &positionIn);
-    int applyRBTtoPosition(LandingTargetPosition &positionIn);
 };
+
 
 #endif

@@ -25,6 +25,10 @@
 #define GLOBAL_FRAME 1
 #define BODY_PLANAR_FRAME 2
 
+// TIMEOUTS
+#define TARGET_LOST_TIMEOUT 2 // run on kalman estimate until this time
+#define LANDING_DELAY 5  // observe the target before landing
+
 class HoverPoint
 {
 public:
