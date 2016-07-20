@@ -101,15 +101,15 @@ INSTALL(
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-ADD_EXECUTABLE(awesomo_landing_target src/ros/awesomo_landing_target.cpp)
-TARGET_LINK_LIBRARIES(
-    awesomo_landing_target
-    ${Awesomo_libs}
-)
-INSTALL(
-    TARGETS awesomo_landing_target
-    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+# ADD_EXECUTABLE(awesomo_landing_target src/ros/awesomo_landing_target.cpp)
+# TARGET_LINK_LIBRARIES(
+#     awesomo_landing_target
+#     ${Awesomo_libs}
+# )
+# INSTALL(
+#     TARGETS awesomo_landing_target
+#     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+# )
 
 
 

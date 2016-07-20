@@ -1,7 +1,7 @@
 #include "awesomo/camera.hpp"
 
 
-int CameraMount::initialize(
+int cameraMount::initialize(
     double camRoll,
     double camPitch,
     double camYaw,
@@ -25,7 +25,7 @@ int CameraMount::initialize(
     return 0;
 }
 
-int getAtimTargetPositionBodyFrame(
+int cameraMount::getAtimTargetPositionBodyFrame(
     Position target_position,
     Position &target_positionBodyFrame
 )
@@ -33,9 +33,9 @@ int getAtimTargetPositionBodyFrame(
     Eigen::Vector3d target_vec;
     Eigen::Vector3d target_BF_vec;
 
-    target_vec << target_position.x
-               << target_position.y
-               << target_position.z;
+    target_vec << target_position.x,
+                target_position.y,
+                target_position.z;
 
     target_BF_vec = this->camRotation * target_vec + camTranslation;
 
@@ -47,7 +47,7 @@ int getAtimTargetPositionBodyFrame(
 }
 
 
-int getAtimTargetPositionBPF(
+int cameraMount::getAtimTargetPositionBPF(
     Position target_position,
     Eigen::Quaterniond IMU_quat,
     Position &target_position_BPF
@@ -57,12 +57,12 @@ int getAtimTargetPositionBPF(
     Eigen::Vector3d target_BPF_vec;
     Eigen::Quaterniond imu_inverse;
 
-    target_vec << target_position.x
-               << target_position.y
-               << target_position.z;
+    target_vec << target_position.x,
+               target_position.y,
+               target_position.z;
     imu_inverse = IMU_quat.inverse();
 
-    target_BFP_vec = this->camRotation * target_vec + camTranslation;
+    target_BPF_vec = this->camRotation * target_vec + camTranslation;
     target_BPF_vec = imu_inverse.toRotationMatrix() * target_BPF_vec;
 
     return 0;

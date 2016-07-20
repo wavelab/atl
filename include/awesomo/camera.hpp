@@ -3,13 +3,13 @@
 
 # include "awesomo/util.hpp"
 
-class CameraMount
+class cameraMount
 {
 public:
     Eigen::Matrix3d camRotation;
     Eigen::Vector3d camTranslation;
 
-    CameraMount(){};
+    cameraMount(){};
     int initialize(
         double camRoll,
         double camPitch,
