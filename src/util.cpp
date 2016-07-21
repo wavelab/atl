@@ -1,5 +1,38 @@
 #include "awesomo/util.hpp"
 
+Pose::Pose(void)
+{
+    Eigen::Quaterniond q;
+
+    this->q = q.setIdentity();
+    this->position = Eigen::Vector3d::Zero(3,1);
+}
+
+
+Pose::Pose(
+    float roll,
+    float pitch,
+    float yaw,
+    float x,
+    float y,
+    float z
+)
+{
+    euler2Quaternion(roll, pitch, yaw, this->q);
+    this->position << x, y, z;
+}
+
+Pose::Pose(Eigen::Quaterniond q, Eigen::Vector3d position)
+{
+    this->q = q;
+    this->position = position;
+}
+
+Eigen::Matrix3d Pose::rotationMatrix(void)
+{
+    return this->q.toRotationMatrix();
+}
+
 
 double deg2rad(double d)
 {
@@ -48,71 +81,6 @@ int euler2RotationMatrix(
     Eigen::Quaterniond q_normalized;
     euler2Quaternion(roll, pitch, yaw, q_normalized);
     rot = q_normalized.toRotationMatrix();
-    return 0;
-}
-
-tf::Quaternion euler2quat(double roll, double pitch, double yaw)
-{
-    return tf::createQuaternionFromRPY(roll, pitch, yaw);
-}
-
-void quat2euler(
-    const geometry_msgs::Quaternion &q,
-    double *roll,
-    double *pitch,
-    double *yaw
-)
-{
-    tf::Quaternion quat(q.x, q.y, q.z, q.w);
-    tf::Matrix3x3 m(quat);
-    m.getRPY(*roll, *pitch, *yaw);
-}
-
-int applyRotationToPosition(
-    double roll,
-    double pitch,
-    double yaw,
-    LandingTargetPosition &position
-)
-{
-    Eigen::Matrix3d rotation;
-    Eigen::Vector3d position_temp;
-
-    euler2RotationMatrix(
-        roll,
-        pitch,
-        yaw,
-        rotation
-    );
-    position_temp << position.x, position.y, position.z;
-    position_temp = rotation * position_temp;
-    position.x = position_temp[0];
-    position.y = position_temp[1];
-    position.z = position_temp[2];
-
-    return 0;
-}
-
-int applyRotationToPosition(
-    double x,
-    double y,
-    double z,
-    double w,
-    LandingTargetPosition &position
-)
-{
-    Eigen::Quaterniond quat(w, x, y, z);
-    Eigen::Matrix3d rotation;
-    Eigen::Vector3d position_temp;
-
-    quat.normalize();
-    rotation = quat.toRotationMatrix();
-    position_temp << position.x, position.y, position.z;
-    position_temp = rotation * position_temp;
-    position.x = position_temp[0];
-    position.y = position_temp[1];
-    position.z = position_temp[2];
-
     return 0;
 }
 

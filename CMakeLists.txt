@@ -69,10 +69,10 @@ ADD_LIBRARY(
     libawesomo
     STATIC
     src/util.cpp
-    src/camera.cpp
-    src/controller.cpp
-    src/quadrotor.cpp
-    src/estimator.cpp
+    # src/camera.cpp
+    # src/controller.cpp
+    # src/quadrotor.cpp
+    # src/estimator.cpp
 )
 
 SET(Awesomo_libs
@@ -90,16 +90,16 @@ SET(Awesomo_libs
 # EXECUTABLES
 ## ROS NODE EXECUTABLES
 # quadrotor_node
-ADD_EXECUTABLE(awesomo src/ros/awesomo.cpp)
-ADD_DEPENDENCIES(awesomo ${PROJECT_NAME}_gencpp)
-TARGET_LINK_LIBRARIES(
-    awesomo
-    ${Awesomo_libs}
-)
-INSTALL(
-    TARGETS awesomo
-    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+# ADD_EXECUTABLE(awesomo src/ros/awesomo.cpp)
+# ADD_DEPENDENCIES(awesomo ${PROJECT_NAME}_gencpp)
+# TARGET_LINK_LIBRARIES(
+#     awesomo
+#     ${Awesomo_libs}
+# )
+# INSTALL(
+#     TARGETS awesomo
+#     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+# )
 
 # ADD_EXECUTABLE(awesomo_landing_target src/ros/awesomo_landing_target.cpp)
 # TARGET_LINK_LIBRARIES(
@@ -116,34 +116,34 @@ INSTALL(
 
 ## UNIT TESTS
 # tests/controller_test
-ADD_EXECUTABLE(awesomo_controller_test tests/controller_test.cpp)
-TARGET_LINK_LIBRARIES(awesomo_controller_test libawesomo yaml-cpp)
-INSTALL(
-    TARGETS awesomo_controller_test
-    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-
-# tests/quadrotor_test
-ADD_EXECUTABLE(awesomo_quadrotor_test tests/quadrotor_test.cpp)
-TARGET_LINK_LIBRARIES(
-    awesomo_quadrotor_test
-    ${Awesomo_libs}
-)
-INSTALL(
-    TARGETS awesomo_quadrotor_test
-    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-
-# tests/estimator_test
-ADD_EXECUTABLE(awesomo_estimator_test tests/estimator_test.cpp)
-TARGET_LINK_LIBRARIES(
-    awesomo_estimator_test
-    ${Awesomo_libs}
-)
-INSTALL(
-    TARGETS awesomo_estimator_test
-    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+# ADD_EXECUTABLE(awesomo_controller_test tests/controller_test.cpp)
+# TARGET_LINK_LIBRARIES(awesomo_controller_test libawesomo yaml-cpp)
+# INSTALL(
+#     TARGETS awesomo_controller_test
+#     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+# )
+#
+# # tests/quadrotor_test
+# ADD_EXECUTABLE(awesomo_quadrotor_test tests/quadrotor_test.cpp)
+# TARGET_LINK_LIBRARIES(
+#     awesomo_quadrotor_test
+#     ${Awesomo_libs}
+# )
+# INSTALL(
+#     TARGETS awesomo_quadrotor_test
+#     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+# )
+#
+# # tests/estimator_test
+# ADD_EXECUTABLE(awesomo_estimator_test tests/estimator_test.cpp)
+# TARGET_LINK_LIBRARIES(
+#     awesomo_estimator_test
+#     ${Awesomo_libs}
+# )
+# INSTALL(
+#     TARGETS awesomo_estimator_test
+#     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+# )
 
 # tests/util_test
 ADD_EXECUTABLE(awesomo_util_test tests/util_test.cpp)
@@ -153,10 +153,10 @@ INSTALL(
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-# tests/camera_mount_config_test
-ADD_EXECUTABLE(awesomo_camera_test tests/camera_test.cpp)
-TARGET_LINK_LIBRARIES(awesomo_camera_test libawesomo yaml-cpp)
-INSTALL(TARGETS awesomo_camera_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+# # tests/camera_mount_config_test
+# ADD_EXECUTABLE(awesomo_camera_test tests/camera_test.cpp)
+# TARGET_LINK_LIBRARIES(awesomo_camera_test libawesomo yaml-cpp)
+# INSTALL(TARGETS awesomo_camera_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 
 # LAUNCH AND CONFIG FILES

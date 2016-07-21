@@ -3,11 +3,94 @@
 
 
 // TESTS
+int test_Pose_class(void);
 int test_deg2rad_and_rad2deg(void);
-int test_euler2Quaternion(void);
-int test_euler2quat_and_quat2euler(void);
 int test_euler2RotationMatrix(void);
+int test_euler2Quaternion(void);
 
+int test_Pose_class(void)
+{
+    Pose testPose;
+    Eigen::Quaterniond q_test;
+    Eigen::Vector3d position_test;
+    Eigen::Matrix3d rotation_mtx;
+    Eigen::Matrix3d rotation_mtx_test;
+
+    float roll;
+    float pitch;
+    float yaw;
+    float x;
+    float y;
+    float z;
+
+    // check Pose with no arguments (q = identity, position = 0);
+    mu_check(fltcmp(testPose.q.x(), 0) == 0);
+    mu_check(fltcmp(testPose.q.y(), 0) == 0);
+    mu_check(fltcmp(testPose.q.z(), 0) == 0);
+    mu_check(fltcmp(testPose.q.w(), 1) == 0);
+
+    mu_check(fltcmp(testPose.position(0), 0) == 0);
+    mu_check(fltcmp(testPose.position(1), 0) == 0);
+    mu_check(fltcmp(testPose.position(2), 0) == 0);
+
+    // test initalizeing with floats,
+    roll = 0.0;
+    pitch = 0.0;
+    yaw = 0.0;
+    x = 2;
+    y = 3;
+    z = 22;
+
+    testPose = Pose(roll, pitch, yaw, x, y, z);
+    mu_check(fltcmp(testPose.q.x(), 0) == 0);
+    mu_check(fltcmp(testPose.q.y(), 0) == 0);
+    mu_check(fltcmp(testPose.q.z(), 0) == 0);
+    mu_check(fltcmp(testPose.q.w(), 1) == 0);
+
+    mu_check(fltcmp(testPose.position(0), x) == 0);
+    mu_check(fltcmp(testPose.position(1), y) == 0);
+    mu_check(fltcmp(testPose.position(2), z) == 0);
+
+    // test initializing non zero roll, pitch, yaw
+    roll = 10.0;
+    pitch = 15.0;
+    yaw = -90.0;
+
+    euler2Quaternion(roll, pitch, yaw, q_test);
+    testPose = Pose(roll, pitch, yaw, x, y, z);
+
+    mu_check(fltcmp(testPose.q.x(), q_test.x()) == 0);
+    mu_check(fltcmp(testPose.q.y(), q_test.y()) == 0);
+    mu_check(fltcmp(testPose.q.z(), q_test.z()) == 0);
+    mu_check(fltcmp(testPose.q.w(), q_test.w()) == 0);
+
+    mu_check(fltcmp(testPose.position(0), x) == 0);
+    mu_check(fltcmp(testPose.position(1), y) == 0);
+    mu_check(fltcmp(testPose.position(2), z) == 0);
+
+    // test inializing with quaterion and a postion vector
+    testPose = Pose(q_test, Eigen::Vector3d(x, y, z));
+    mu_check(fltcmp(testPose.q.x(), q_test.x()) == 0);
+    mu_check(fltcmp(testPose.q.y(), q_test.y()) == 0);
+    mu_check(fltcmp(testPose.q.z(), q_test.z()) == 0);
+    mu_check(fltcmp(testPose.q.w(), q_test.w()) == 0);
+
+    mu_check(fltcmp(testPose.position(0), x) == 0);
+    mu_check(fltcmp(testPose.position(1), y) == 0);
+    mu_check(fltcmp(testPose.position(2), z) == 0);
+
+    // test that rotation matrix makes sense
+    roll = M_PI / 2;
+    pitch = 0.0;
+    yaw = M_PI / 2;
+
+    testPose = Pose(roll, pitch, yaw, x, y, z);
+    rotation_mtx = testPose.rotationMatrix();
+    euler2Quaternion(roll, pitch, yaw, q_test);
+    mu_check(rotation_mtx == q_test.toRotationMatrix());
+
+    return 0;
+}
 
 int test_deg2rad_and_rad2deg(void)
 {
@@ -23,36 +106,34 @@ int test_deg2rad_and_rad2deg(void)
 
 int test_euler2Quaternion(void)
 {
-    // testing the Eigen implemenation of euler to quad
-    double roll = 0.0;
-    double pitch = 0.0;
-    double yaw = 0.0;
-
-    double x;
-    double y;
-    double z;
-    double w;
-
+    float roll;
+    float pitch;
+    float yaw;
     Eigen::Quaterniond q;
 
-    // Test rolling, pitching and yawing
-    roll = M_PI ;
-    pitch = M_PI/4;
-    yaw = M_PI/3;
+    // check identity quat is returned
+    roll = 0;
+    pitch = 0;
+    yaw = 0;
 
     euler2Quaternion(roll, pitch, yaw, q);
-    x = q.x();
-    y = q.y();
-    z = q.z();
-    w = q.w();
+    mu_check(fltcmp(q.x(), 0) == 0);
+    mu_check(fltcmp(q.y(), 0) == 0);
+    mu_check(fltcmp(q.z(), 0) == 0);
+    mu_check(fltcmp(q.w(), 1) == 0);
 
-    mu_check(fltcmp(x, 0.800103) == 0);
-    mu_check(fltcmp(y, 0.46194) == 0);
-    mu_check(fltcmp(z, 0.331414*-1) == 0);
-    mu_check(fltcmp(w, 0.191342) == 0);
+    roll = M_PI / 2 ;
+    pitch = M_PI;
+    yaw = -M_PI / 2;
 
+    euler2Quaternion(roll, pitch, yaw, q);
+    mu_check(fltcmp(q.x(), 0.5) == 0);
+    mu_check(fltcmp(q.y(), 0.5) == 0);
+    mu_check(fltcmp(q.z(), -0.5) == 0);
+    mu_check(fltcmp(q.w(), -0.5) == 0);
     return 0;
 }
+
 
 int test_euler2RotationMatrix(void)
 {
@@ -166,7 +247,7 @@ int test_euler2RotationMatrix(void)
     yaw = M_PI/3;
 
     euler2RotationMatrix(roll, pitch, yaw, rot);
-    std::cout << rot << std::endl;
+    // std::cout << rot << std::endl;
     r01 = 0;
     r02 = 0.866025;
     r03 = 0.5;
@@ -192,38 +273,13 @@ int test_euler2RotationMatrix(void)
     return 0;
 }
 
-int test_euler2quat_and_quat2euler(void)
-{
-    double roll;
-    double pitch;
-    double yaw;
-    tf::Quaternion tf_q;
-    geometry_msgs::Quaternion geo_q;
-
-    tf_q = euler2quat(
-        deg2rad(10),
-        deg2rad(20),
-        deg2rad(30)
-    );
-    geo_q.x = tf_q.x();
-    geo_q.y = tf_q.y();
-    geo_q.z = tf_q.z();
-    geo_q.w = tf_q.w();
-
-    quat2euler(geo_q, &roll, &pitch, &yaw);
-    mu_check(fltcmp(roll, deg2rad(10)) == 0);
-    mu_check(fltcmp(pitch, deg2rad(20)) == 0);
-    mu_check(fltcmp(yaw, deg2rad(30)) == 0);
-
-    return 0;
-}
 
 void test_suite(void)
 {
+    mu_add_test(test_Pose_class);
+    mu_add_test(test_deg2rad_and_rad2deg);
     mu_add_test(test_euler2Quaternion);
     mu_add_test(test_euler2RotationMatrix);
-    mu_add_test(test_deg2rad_and_rad2deg);
-    mu_add_test(test_euler2quat_and_quat2euler);
 }
 
 mu_run_tests(test_suite)
