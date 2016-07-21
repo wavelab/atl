@@ -53,10 +53,27 @@ int testCameraConfigAtimToBodyFrame(void)
         target_position,
         target_position_BF
     );
-    std::cout << target_position_BF.z << std::endl;
+    // std::cout << target_position_BF.z << std::endl;
     mu_check(fltcmp(target_position_BF.z, 1) == 0);
 
 
+    // to do: test all possible configs
+
+
+    // target_position.x = 0.0;
+    // target_position.y = 0.0;
+    // target_position.z = 1.0;
+    //
+    // config.getAtimTargetPositionBodyFrame(
+    //     target_position,
+    //     target_position_BF
+    // );
+    //
+    // std::cout << target_position_BF.x << "\t"
+    //           << target_position_BF.y << "\t"
+    //           << target_position_BF.z << "\t"
+    //           << std::endl;
+    return 0;
 }
 
 
