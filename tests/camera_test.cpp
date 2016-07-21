@@ -53,7 +53,7 @@ int testCameraConfigAtimToBodyFrame(void)
         target_position,
         target_position_BF
     );
-
+    std::cout << target_position_BF.z << std::endl;
     mu_check(fltcmp(target_position_BF.z, 1) == 0);
 
 
