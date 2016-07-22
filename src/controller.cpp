@@ -233,7 +233,7 @@ static void pid_calculate(struct pid *p, float input, float dt)
 }
 
 void PositionController::calculate(
-    Position setpoint,
+    Eigen::Vector3d setpoint,
     Pose robot,
     float yaw_setpoint,
     float dt,
@@ -249,15 +249,15 @@ void PositionController::calculate(
 
     // Note: Position Controller is (x - roll, y - pitch, T - thrust)
     // This position controller assumes yaw is aligned with the world x axis
-    this->x.setpoint = setpoint.y;
-    this->y.setpoint = setpoint.x;
-    this->T.setpoint = setpoint.z;
+    this->x.setpoint = setpoint(1);
+    this->y.setpoint = setpoint(0);
+    this->T.setpoint = setpoint.(2);
 
-    pid_calculate(&this->x, robot.y, dt);
-    pid_calculate(&this->y, robot.x, dt);
-    pid_calculate(&this->T, robot.z, dt);
+    pid_calculate(&this->x, robot.position(1), dt);
+    pid_calculate(&this->y, robot.position(0), dt);
+    pid_calculate(&this->T, robot.position(2), dt);
 
-    roll =  -this->x.output;
+    roll =  this->x.output;
     pitch = this->y.output;
     throttle = this->T.output;
 
@@ -272,16 +272,11 @@ void PositionController::calculate(
     yaw_setpoint = 0.0;
 
     // update position controller
-    if (global_frame == 1) {
-        // adjust roll and pitch according to yaw
-        this->roll = cos(robot.yaw) * roll - sin(robot.yaw) * pitch;
-        this->pitch = sin(robot.yaw) * roll + cos(robot.yaw) * pitch;
-        this->rpy_quat = euler2quat(this->roll, this->pitch, yaw_setpoint);
-    } else {
-        this->roll = -roll;
-        this->pitch = pitch;
-        this->rpy_quat = euler2quat(this->roll, this->pitch, yaw_setpoint);
-    }
+    // adjust roll and pitch according to yaw
+    this->roll = cos(robot.yaw) * roll - sin(robot.yaw) * pitch;
+    this->pitch = sin(robot.yaw) * roll + cos(robot.yaw) * pitch;
+    // this is now Eigen
+    this->rpy_quat = euler2quat(this->roll, this->pitch, yaw_setpoint);
 
     // throttle
     throttle_adjusted = this->hover_throttle + throttle;

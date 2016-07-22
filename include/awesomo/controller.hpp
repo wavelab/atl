@@ -97,7 +97,7 @@ public:
     PositionController(const std::string config_file);
     void loadConfig(const std::string config_file);
     void calculate(
-            Position setpoint,
+            Eigen::Vector3d setpoint,
             Pose robot,
             float yaw_setpoint,
             float dt,
