@@ -69,7 +69,7 @@ ADD_LIBRARY(
     libawesomo
     STATIC
     src/util.cpp
-    # src/camera.cpp
+    src/camera_mount.cpp
     # src/controller.cpp
     # src/quadrotor.cpp
     # src/estimator.cpp
@@ -153,10 +153,10 @@ INSTALL(
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-# # tests/camera_mount_config_test
-# ADD_EXECUTABLE(awesomo_camera_test tests/camera_test.cpp)
-# TARGET_LINK_LIBRARIES(awesomo_camera_test libawesomo yaml-cpp)
-# INSTALL(TARGETS awesomo_camera_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+# tests/camera_mount_config_test
+ADD_EXECUTABLE(awesomo_camera_mount_test tests/camera_mount_test.cpp)
+TARGET_LINK_LIBRARIES(awesomo_camera_mount_test libawesomo yaml-cpp)
+INSTALL(TARGETS awesomo_camera_mount_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 
 # LAUNCH AND CONFIG FILES
