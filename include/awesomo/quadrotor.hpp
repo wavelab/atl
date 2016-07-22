@@ -22,9 +22,6 @@
 #define TRACKING_MODE 5
 #define LANDING_MODE 6
 
-// FRAMES
-#define GLOBAL_FRAME 1
-#define BODY_PLANAR_FRAME 2
 
 // TIMEOUTS
 #define TARGET_LOST_TIMEOUT 2 // run on kalman estimate until this time
@@ -35,32 +32,14 @@ class HoverPoint
 public:
     // hover point properties
     bool initialized;
-    float x;
-    float y;
-    float z;
+    Eigen::Vector3d position;
+    float hover_height;
 
-    // constructor
-    HoverPoint(void):
-        initialized(false),
-        x(0),
-        y(0),
-        z(0) {}
+    // constructors
+    HoverPoint();
+    HoverPoint(float x, float y, float z);
 };
 
-class TrackingConfig
-{
-public:
-    // position offsets
-    float offset_x;
-    float offset_y;
-    float offset_z;
-
-    // constructor
-    TrackingConfig(void):
-        offset_x(0),
-        offset_y(0),
-        offset_z(0) {}
-};
 
 class LandingConfig
 {
@@ -71,33 +50,30 @@ public:
     float recover_multiplier;
 
     // disarm conditions
-    float x_cutoff;
-    float y_cutoff;
-    float z_cutoff;
-    int belief_threshold;
+    float belief_threshold;
+    Eigen::Vector3d cutoff_position;
 
     // constructor
-    LandingConfig(void):
-        period(0),
-        descend_multiplier(0),
-        recover_multiplier(0),
-        x_cutoff(0),
-        y_cutoff(0),
-        z_cutoff(0),
-        belief_threshold(0) {}
+    LandingConfig(void);
+    LandingConfig(
+        float period,
+        float desend_multiplier,
+        float recover_multiplier,
+        float belief_threshold,
+        Eigen::Vector3d cutoff_position
+);
+
 };
 
 class Quadrotor
 {
 public:
     // configs
-    TrackingConfig *tracking_config;
     LandingConfig *landing_config;
 
     // state
     int mission_state;
     Pose global_pose;
-    Pose body_planar_frame_target_pose;
 
     HoverPoint *hover_point;
     int landing_zone_belief;
@@ -116,28 +92,27 @@ public:
     Quadrotor(std::map<std::string, std::string> configs);
     int loadConfig(std::string config_file_path);
     Attitude positionControllerCalculate(
-        Position setpoint,
+        Eigen::Vector3d setpoint,
         Pose robot_pose,
         float yaw,
-        float dt,
-        int frame
+        float dt
     );
 
-    void updatePose(Pose p);
+    // void updatePose(Pose p);
     void resetPositionController(void);
     void runIdleMode(Pose robot_pose);
-    Position runHoverMode(Pose robot_pose, float dt);
+    Eigen::Vector3d runHoverMode(Pose robot_pose, float dt);
     void initializeCarrotController(void);
-    Position runCarrotMode(Pose robot_pose, float dt);
-    Position runDiscoverMode(
+    Eigen::Vector3d runCarrotMode(Pose robot_pose, float dt);
+    Eigen::Vector3d runDiscoverMode(
         Pose robot_pose,
         LandingTargetPosition landing_zone
     );
-    Position runTrackingModeBPF(
+    Eigen::Vector3d runTrackingModeBPF(
         LandingTargetPosition landing_zone,
         float dt
     );
-    Position runLandingMode(
+    Eigen::Vector3d runLandingMode(
         Pose robot_pose,
         LandingTargetPosition landing_zone,
         float dt
