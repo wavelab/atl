@@ -92,7 +92,8 @@ public:
     float pitch;
     float throttle;
     float hover_throttle;
-    tf::Quaternion rpy_quat;
+    // tf::Quaternion rpy_quat;
+    Eigen::Quaterniondd command_quat;
 
     PositionController(const std::string config_file);
     void loadConfig(const std::string config_file);

@@ -265,22 +265,19 @@ void PositionController::calculate(
         // make sure yaw is within 0 - 360
         robot.yaw += 2 * M_PI;
     }
-    // if (yaw_setpoint < 0) {
-    //     // make sure yaw is within 0 - 360
-    //     yaw_setpoint += 2 * M_PI;
-    // }
+    // ensure the yaw setpoint is always zero
     yaw_setpoint = 0.0;
 
     // update position controller
     // adjust roll and pitch according to yaw
     this->roll = cos(robot.yaw) * roll - sin(robot.yaw) * pitch;
     this->pitch = sin(robot.yaw) * roll + cos(robot.yaw) * pitch;
-    // this is now Eigen
+
     this->rpy_quat = euler2quat(this->roll, this->pitch, yaw_setpoint);
 
     // throttle
     throttle_adjusted = this->hover_throttle + throttle;
-    throttle_adjusted /= fabs(cos(roll) * cos(pitch));
+    throttle_adjusted /= fabs(cos(roll) * cos(pitch)); // extra thottle due to tilting
     if (throttle_adjusted > 1.0) {
         throttle_adjusted = 1.0;
     }
