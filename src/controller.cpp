@@ -236,8 +236,7 @@ void PositionController::calculate(
     Eigen::Vector3d setpoint,
     Pose robot,
     float yaw_setpoint,
-    float dt,
-    int global_frame
+    float dt
 )
 {
     float roll;
@@ -251,29 +250,26 @@ void PositionController::calculate(
     // This position controller assumes yaw is aligned with the world x axis
     this->x.setpoint = setpoint(1);
     this->y.setpoint = setpoint(0);
-    this->T.setpoint = setpoint.(2);
+    this->T.setpoint = setpoint(2);
 
     pid_calculate(&this->x, robot.position(1), dt);
     pid_calculate(&this->y, robot.position(0), dt);
     pid_calculate(&this->T, robot.position(2), dt);
 
-    roll =  this->x.output;
-    pitch = this->y.output;
-    throttle = this->T.output;
+    this->roll =  this->x.output;
+    this->pitch = this->y.output;
+    this->throttle = this->T.output;
 
-    if (robot.yaw < 0) {
-        // make sure yaw is within 0 - 360
-        robot.yaw += 2 * M_PI;
-    }
-    // ensure the yaw setpoint is always zero
     yaw_setpoint = 0.0;
 
     // update position controller
     // adjust roll and pitch according to yaw
-    this->roll = cos(robot.yaw) * roll - sin(robot.yaw) * pitch;
-    this->pitch = sin(robot.yaw) * roll + cos(robot.yaw) * pitch;
 
-    this->rpy_quat = euler2quat(this->roll, this->pitch, yaw_setpoint);
+    // Figure out how to do this?
+    // this->roll = cos(robot.yaw) * roll - sin(robot.yaw) * pitch;
+    // this->pitch = sin(robot.yaw) * roll + cos(robot.yaw) * pitch;
+
+    euler2Quaternion(this->roll, this->pitch, yaw_setpoint, this->command_quat);
 
     // throttle
     throttle_adjusted = this->hover_throttle + throttle;
@@ -284,7 +280,33 @@ void PositionController::calculate(
     this->throttle = throttle_adjusted;
 }
 
+void PositionController::reset(void)
+{
+    this->roll = 0;
+    this->pitch = 0;
+    this->throttle = 0;
 
+    this->x.output = 0.0f;
+    this->x.prev_error = 0.0f;
+    this->x.sum_error = 0.0f;
+    this->x.p_error = 0.0f;
+    this->x.i_error = 0.0f;
+    this->x.d_error = 0.0f;
+
+    this->y.output = 0.0f;
+    this->y.prev_error = 0.0f;
+    this->y.sum_error = 0.0f;
+    this->y.p_error = 0.0f;
+    this->y.i_error = 0.0f;
+    this->y.d_error = 0.0f;
+
+    this->T.output = 0.0f;
+    this->T.prev_error = 0.0f;
+    this->T.sum_error = 0.0f;
+    this->T.p_error = 0.0f;
+    this->T.i_error = 0.0f;
+    this->T.d_error = 0.0f;
+}
 
 // LANDING CONTROLLER
 LandingController::LandingController(const std::string config_file)

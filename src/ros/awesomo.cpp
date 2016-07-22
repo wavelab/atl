@@ -587,21 +587,26 @@ int Awesomo::run(
 )
 {
     float dt;
+    int retval;
 
     // calculate attitude from position controller
     dt = (ros::Time::now() - last_request).toSec();
 
     // run mission
-    if (this->quad->runMission(this->pose, this->landing_zone, dt)) {
+    retval = this->quad->runMission(this->pose, this->landing_zone, dt);
+    if (retval == MISSION_ACCOMPLISHED) {
+        this->disarm();
+        return 0;
+
+    } else if (retval == TARGET_LOST) {
+        // publish mavros position command instad of attitute command
+        return 1;
+
+    } else {
         this->publishPositionControllerMessage(msg, seq, ros::Time::now());
         this->publishPositionControllerStats(seq, ros::Time::now());
         this->publishKFStatsForPlotting(seq, ros::Time::now());
         return 1;
-
-    } else {
-        this->disarm();
-        return 0;
-
     }
 
 }

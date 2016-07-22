@@ -542,6 +542,5 @@ int Quadrotor::runMission(
         this->runHoverMode(robot_pose, dt);
     }
 
-    return 1;
-
+    return this->mission_state;
 }

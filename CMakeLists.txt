@@ -70,7 +70,7 @@ ADD_LIBRARY(
     STATIC
     src/util.cpp
     src/camera_mount.cpp
-    # src/controller.cpp
+    src/controller.cpp
     # src/quadrotor.cpp
     # src/estimator.cpp
 )
@@ -116,12 +116,12 @@ SET(Awesomo_libs
 
 ## UNIT TESTS
 # tests/controller_test
-# ADD_EXECUTABLE(awesomo_controller_test tests/controller_test.cpp)
-# TARGET_LINK_LIBRARIES(awesomo_controller_test libawesomo yaml-cpp)
-# INSTALL(
-#     TARGETS awesomo_controller_test
-#     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+ADD_EXECUTABLE(awesomo_controller_test tests/controller_test.cpp)
+TARGET_LINK_LIBRARIES(awesomo_controller_test libawesomo yaml-cpp)
+INSTALL(
+    TARGETS awesomo_controller_test
+    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 #
 # # tests/quadrotor_test
 # ADD_EXECUTABLE(awesomo_quadrotor_test tests/quadrotor_test.cpp)

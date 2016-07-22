@@ -5,7 +5,6 @@
 #include <deque>
 
 #include <Eigen/Dense>
-#include <tf/transform_datatypes.h>
 #include <yaml-cpp/yaml.h>
 
 #include "awesomo/util.hpp"
@@ -93,7 +92,7 @@ public:
     float throttle;
     float hover_throttle;
     // tf::Quaternion rpy_quat;
-    Eigen::Quaterniondd command_quat;
+    Eigen::Quaterniond command_quat;
 
     PositionController(const std::string config_file);
     void loadConfig(const std::string config_file);
@@ -101,9 +100,9 @@ public:
             Eigen::Vector3d setpoint,
             Pose robot,
             float yaw_setpoint,
-            float dt,
-            int global_frame
+            float dt
     );
+    void reset(void);
 };
 
 class LandingController

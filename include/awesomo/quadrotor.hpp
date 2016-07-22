@@ -12,6 +12,7 @@
 #define LZ_THRESHOLD 0
 
 // STATES
+#define TARGET_LOST -2
 #define MISSION_ACCOMPLISHED -1
 #define IDLE_MODE 0
 #define HOVER_MODE 1
