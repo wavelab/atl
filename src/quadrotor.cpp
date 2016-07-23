@@ -143,7 +143,6 @@ Attitude Quadrotor::positionControllerCalculate(
 )
 {
     Attitude a;
-
     this->position_controller->calculate(setpoint, robot_pose, yaw, dt);
 
     a.x = this->position_controller->command_quat.x();
@@ -535,6 +534,7 @@ int Quadrotor::runMission(
     fake_robot_pose.position(2) = 0.0 + robot_pose.position(2);
     // don't desend this needs to be made a variable or something
 
+    // there landing mode is not coded at the momeent? ??
     tag_origin = tag_position;
 
     if (landing_zone.detected) {
