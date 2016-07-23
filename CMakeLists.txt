@@ -69,6 +69,7 @@ ADD_LIBRARY(
     libawesomo
     STATIC
     src/util.cpp
+    src/ros/ros_util.cpp
     src/camera_mount.cpp
     src/controller.cpp
     src/quadrotor.cpp
@@ -90,16 +91,16 @@ SET(Awesomo_libs
 # EXECUTABLES
 ## ROS NODE EXECUTABLES
 # quadrotor_node
-# ADD_EXECUTABLE(awesomo src/ros/awesomo.cpp)
-# ADD_DEPENDENCIES(awesomo ${PROJECT_NAME}_gencpp)
-# TARGET_LINK_LIBRARIES(
-#     awesomo
-#     ${Awesomo_libs}
-# )
-# INSTALL(
-#     TARGETS awesomo
-#     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+ADD_EXECUTABLE(awesomo src/ros/awesomo.cpp)
+ADD_DEPENDENCIES(awesomo ${PROJECT_NAME}_gencpp)
+TARGET_LINK_LIBRARIES(
+    awesomo
+    ${Awesomo_libs}
+)
+INSTALL(
+    TARGETS awesomo
+    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 # ADD_EXECUTABLE(awesomo_landing_target src/ros/awesomo_landing_target.cpp)
 # TARGET_LINK_LIBRARIES(

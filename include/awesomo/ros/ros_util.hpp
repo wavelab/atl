@@ -6,7 +6,7 @@
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <geometry_msgs/TwistStamped.h>
 #include <tf/transform_broadcaster.h>
-
+#include <Eigen/Geometry>
 
 
 int geoMessageQuatToEigenQuat(

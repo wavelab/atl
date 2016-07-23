@@ -1,15 +1,11 @@
 #include "awesomo/ros/ros_util.hpp"
 
-
 int geoMessageQuatToEigenQuat(
     const geometry_msgs::Quaternion &q,
     Eigen::Quaterniond &eigen_quat
 )
 {
-    eigen_quat.w = q.w;
-    eigen_quat.x = q.x;
-    eigen_quat.y = q.y;
-    eigen_quat.z = q.z;
+    eigen_quat = Eigen::Quaterniond(q.w, q.x, q.y, q.z);
 }
 
 int tfQuatToEigenQuat(
@@ -17,8 +13,5 @@ int tfQuatToEigenQuat(
     Eigen::Quaterniond &eigen_quat
 )
 {
-    eigen_quat.w = q.w;
-    eigen_quat.x = q.x;
-    eigen_quat.y = q.y;
-    eigen_quat.z = q.z;
+    eigen_quat = Eigen::Quaterniond(q.w(), q.x(), q.y(), q.z());
 }
