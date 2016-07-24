@@ -2,8 +2,8 @@
 #include "awesomo/controller.hpp"
 
 
-#define CARROT_CONTROLLER_CONFIG "/home/stan/Projects/awesomo/configs/carrot_controller/config.yaml"
-#define POSITION_CONTROLLER_CONFIG "/home/stan/Projects/awesomo/configs/position_controller/config.yaml"
+#define CARROT_CONTROLLER_CONFIG "configs/carrot_controller/config.yaml"
+#define POSITION_CONTROLLER_CONFIG "configs/position_controller/config.yaml"
 
 
 // TESTS
