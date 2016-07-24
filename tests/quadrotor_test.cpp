@@ -4,9 +4,9 @@
 #include "awesomo/quadrotor.hpp"
 
 // CONFIGS
-#define QUADROTOR_CONFIG "/home/stan/catkin_ws/src/awesomo/configs/quadrotor/config.yaml"
-#define POSITION_CONTROLLER_CONFIG "/home/stan/catkin_ws/src/awesomo/configs/position_controller/config.yaml"
-#define CARROT_CONTROLLER_CONFIG "/home/stan/catkin_ws/src/awesomo/configs/carrot_controller/config.yaml"
+#define QUADROTOR_CONFIG "configs/quadrotor/config.yaml"
+#define POSITION_CONTROLLER_CONFIG "configs/position_controller/config.yaml"
+#define CARROT_CONTROLLER_CONFIG "configs/carrot_controller/config.yaml"
 
 
 // TESTS
