@@ -1,32 +1,30 @@
 #ifndef __UTIL_H__
 #define __UTIL_H__
 
-#include <tf/transform_datatypes.h>
 #include <geometry_msgs/Quaternion.h>
-
+#include <sys/time.h>
 #include <Eigen/Geometry>
-
 
 
 // CLASSES
 class Pose
 {
 public:
-    double x;
-    double y;
-    double z;
+    Eigen::Quaterniond q;
+    Eigen::Vector3d position;
 
-    double roll;
-    double pitch;
-    double yaw;
+    Pose(void);
+    Pose(
+        float roll,
+        float pitch,
+        float yaw,
+        float x,
+        float y,
+        float z
+    );
 
-    Pose(void):
-        x(0),
-        y(0),
-        z(0),
-        roll(0),
-        pitch(0),
-        yaw(0) {}
+    Pose(Eigen::Quaterniond q, Eigen::Vector3d position);
+    Eigen::Matrix3d rotationMatrix(void);
 };
 
 class Velocity
@@ -71,32 +69,16 @@ public:
         yaw(0) {}
 };
 
-class Position
-{
-public:
-    double x;
-    double y;
-    double z;
-
-    Position(void):
-        x(0),
-        y(0),
-        z(0) {}
-};
 
 class LandingTargetPosition
 {
 public:
     bool detected;
-    float x;
-    float y;
-    float z;
+    Eigen::Vector3d position;
 
     LandingTargetPosition(void):
         detected(false),
-        x(0),
-        y(0),
-        z(0) {}
+        position(0, 0, 0) {}
 };
 
 
@@ -111,6 +93,7 @@ int euler2Quaternion(
     const double yaw,
     Eigen::Quaterniond &q
 );
+
 int euler2RotationMatrix(
     const double roll,
     const double pitch,
@@ -118,27 +101,5 @@ int euler2RotationMatrix(
     Eigen::Matrix3d &rot
 );
 
-int applyRotationToPosition(
-    double roll,
-    double pitch,
-    double yaw,
-    LandingTargetPosition &position
-);
-
-int applyRotationToPosition(
-    double x,
-    double y,
-    double z,
-    double w,
-    LandingTargetPosition &position
-);
-
-tf::Quaternion euler2quat(double roll, double pitch, double yaw);
-void quat2euler(
-    const geometry_msgs::Quaternion &q,
-    double *roll,
-    double *pitch,
-    double *yaw
-);
 
 #endif

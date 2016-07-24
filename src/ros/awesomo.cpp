@@ -166,33 +166,38 @@ Awesomo::Awesomo(std::map<std::string, std::string> configs)
 
 void Awesomo::poseCallback(const geometry_msgs::PoseStamped &msg)
 {
-    // ENU coordinates
-    this->pose.x = msg.pose.position.x;
-    this->pose.y = msg.pose.position.y;
-    this->pose.z = msg.pose.position.z;
+    Eigen::Quaterniond quat;
+    Eigen::Vector3d position;
 
-    quat2euler(
-        msg.pose.orientation,
-        &this->pose.roll,
-        &this->pose.pitch,
-        &this->pose.yaw
+    quat = Eigen::Quaterniond(
+        msg.pose.orientation.w,
+        msg.pose.orientation.x,
+        msg.pose.orientation.y,
+        msg.pose.orientation.z
     );
+
+    position << msg.pose.position.x,
+                msg.pose.position.y,
+                msg.pose.position.z;
+
+    // ENU coordinates
+    this->pose = Pose(quat, position);
 
     this->world_imu_tf.setOrigin(
         tf::Vector3(
-            this->pose.x,
-            this->pose.y,
-            this->pose.z
+            this->pose.position(0),
+            this->pose.position(1),
+            this->pose.position(2)
         )
     );
 
     // for display in rviz, serves no other function
     this->world_imu_tf.setRotation(
         tf::Quaternion(
+            msg.pose.orientation.w,
             msg.pose.orientation.x,
             msg.pose.orientation.y,
-            msg.pose.orientation.z,
-            msg.pose.orientation.w
+            msg.pose.orientation.z
         )
     );
 
@@ -214,17 +219,21 @@ void Awesomo::velocityCallback(const geometry_msgs::TwistStamped &msg)
 void Awesomo::mocapCallback(const geometry_msgs::PoseStamped &msg)
 {
     // mocap position
-    this->mocap_pose.x = msg.pose.position.x;
-    this->mocap_pose.y = msg.pose.position.y;
-    this->mocap_pose.z = msg.pose.position.z;
+    Eigen::Quaterniond quat;
+    Eigen::Vector3d position;
 
-    // mocap orientation
-    quat2euler(
-        msg.pose.orientation,
-        &this->mocap_pose.roll,
-        &this->mocap_pose.pitch,
-        &this->mocap_pose.yaw
+    quat = Eigen::Quaterniond(
+        msg.pose.orientation.w,
+        msg.pose.orientation.x,
+        msg.pose.orientation.y,
+        msg.pose.orientation.z
     );
+
+    position << msg.pose.position.x,
+                msg.pose.position.y,
+                msg.pose.position.z;
+
+    this->mocap_pose = Pose(quat, position);
 }
 
 void Awesomo::stateCallback(const mavros_msgs::State::ConstPtr &msg)
@@ -242,23 +251,26 @@ void Awesomo::radioCallback(const mavros_msgs::RCIn &msg)
 void Awesomo::landingCallback(const atim::AtimPoseStamped &msg)
 {
     this->landing_zone.detected = msg.tag_detected;
-    this->landing_zone.x = msg.pose.position.x;
-    this->landing_zone.y = msg.pose.position.y;
-    this->landing_zone.z = msg.pose.position.z;
+    this->landing_zone.position << msg.pose.position.x, msg.pose.position.y, msg.pose.position.z;
 }
 
 void Awesomo::gpsCallback(const geometry_msgs::PoseWithCovarianceStamped &msg)
 {
-    this->gps_pose.x = msg.pose.pose.position.x;
-    this->gps_pose.y = msg.pose.pose.position.y;
-    this->gps_pose.z = msg.pose.pose.position.z;
+    Eigen::Quaterniond quat;
+    Eigen::Vector3d position;
 
-    quat2euler(
-        msg.pose.pose.orientation,
-        &this->gps_pose.roll,
-        &this->gps_pose.pitch,
-        &this->gps_pose.yaw
-    );
+    // quat = Eigen::Quaterniond(
+    //     msg.pose.orientation.w,
+    //     msg.pose.orientation.x,
+    //     msg.pose.orientation.y,
+    //     msg.pose.orientation.z
+    // );
+
+    position << msg.pose.pose.position.x,
+                msg.pose.pose.position.y,
+                msg.pose.pose.position.z;
+
+    this->gps_pose = Pose(quat, position);
 }
 
 void Awesomo::waitForConnection(void)
@@ -397,6 +409,7 @@ void Awesomo::publishPositionControllerStats(int seq, ros::Time time)
     msg.header.stamp = time;
     msg.header.frame_id = "awesomo_position_controller";
 
+    // CHECK THIS TO SEE IF IT IS CORRECT!!!@
     // roll
     msg.roll_p_error = this->quad->position_controller->x.p_error;
     msg.roll_i_error = this->quad->position_controller->x.i_error;
@@ -437,10 +450,10 @@ void Awesomo::publishPositionControllerMessage(
     attitude.pose.position.x = 0;
     attitude.pose.position.y = 0;
     attitude.pose.position.z = 0;
-    attitude.pose.orientation.x = this->quad->position_controller->rpy_quat.x();
-    attitude.pose.orientation.y = this->quad->position_controller->rpy_quat.y();
-    attitude.pose.orientation.z = this->quad->position_controller->rpy_quat.z();
-    attitude.pose.orientation.w = this->quad->position_controller->rpy_quat.w();
+    attitude.pose.orientation.x = this->quad->position_controller->command_quat.x();
+    attitude.pose.orientation.y = this->quad->position_controller->command_quat.y();
+    attitude.pose.orientation.z = this->quad->position_controller->command_quat.z();
+    attitude.pose.orientation.w = this->quad->position_controller->command_quat.w();
     this->attitude_publisher.publish(attitude);
 
     // throttle command
@@ -587,21 +600,26 @@ int Awesomo::run(
 )
 {
     float dt;
+    int retval;
 
     // calculate attitude from position controller
     dt = (ros::Time::now() - last_request).toSec();
 
     // run mission
-    if (this->quad->runMission(this->pose, this->landing_zone, dt)) {
+    retval = this->quad->runMission(this->pose, this->landing_zone, dt);
+    if (retval == MISSION_ACCOMPLISHED) {
+        this->disarm();
+        return 0;
+
+    } else if (retval == TARGET_LOST) {
+        // publish mavros position command instad of attitute command
+        return 1;
+
+    } else {
         this->publishPositionControllerMessage(msg, seq, ros::Time::now());
         this->publishPositionControllerStats(seq, ros::Time::now());
         this->publishKFStatsForPlotting(seq, ros::Time::now());
         return 1;
-
-    } else {
-        this->disarm();
-        return 0;
-
     }
 
 }
@@ -651,7 +669,6 @@ int main(int argc, char **argv)
             }
 
         }
-
 
 		// end
 		seq++;

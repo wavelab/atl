@@ -64,7 +64,7 @@ LandingTarget::LandingTarget(CameraMountRBT &cam_rbt)
     );
 }
 
-void LandingTarget::cameraRBTCallback(const atim::AtimPoseStamped &msg)
+void LandingTarget::cameraRCallback(const atim::AtimPoseStamped &msg)
 {
     bool tag_detected;
 
@@ -74,27 +74,34 @@ void LandingTarget::cameraRBTCallback(const atim::AtimPoseStamped &msg)
         this->landing_target_position.z = msg.pose.position.z;
         this->landing_target_position.detected = msg.tag_detected;
 
-        this->cam_rbt.applyRBTtoPosition(this->landing_target_position);
-        // negate the rotation using the imu
-        applyRotationToPosition(
-            this->FC_local_pose.roll,
-            this->FC_local_pose.pitch * -1,
-            this->FC_local_pose.yaw * 0, // do not correct for yaw (body planar frame)
-            this->landing_target_position
+        this->cam_rbt.getAtimTargetPositionBPF(
+                this->landing_target_position,
+                this->IMU_quat,
+                this->landing_target_position
         );
-        // ROS_INFO(
-        //     "target pose in NED, body planar: %f\t%f\t%f",
-        //     this->landing_target_position.x,
-        //     this->landing_target_position.y,
-        //     this->landing_target_position.z
+
+
+        // this->cam_rbt.applyRBTtoPosition(this->landing_target_position);
+        // // negate the rotation using the imu
+        // applyRotationToPosition(
+        //     this->FC_local_pose.roll,
+        //     this->FC_local_pose.pitch * -1,
+        //     this->FC_local_pose.yaw * 0, // do not correct for yaw (body planar frame)
+        //     this->landing_target_position
         // );
-
-        // Apply translation required due to camera mount
-        // in NED
-        this->landing_target_position.x += -0.07;
-        this->landing_target_position.y += 0.00;
-        this->landing_target_position.z += 0.08;
-
+        // // ROS_INFO(
+        // //     "target pose in NED, body planar: %f\t%f\t%f",
+        // //     this->landing_target_position.x,
+        // //     this->landing_target_position.y,
+        // //     this->landing_target_position.z
+        // // );
+        //
+        // // Apply translation required due to camera mount
+        // // in NED
+        // this->landing_target_position.x += -0.07;
+        // this->landing_target_position.y += 0.00;
+        // this->landing_target_position.z += 0.08;
+        //
         this->body_planner_target_location_tf.setOrigin(
             tf::Vector3(
                 this->landing_target_position.x,

@@ -13,6 +13,7 @@ int testCarrotControllerCalculateCarrotPoint(void);
 int testCarrotControllerWaypointReached(void);
 int testCarrotControllerUpdate(void);
 int testPositionControllerLoadConfig(void);
+int testPositionControllerPidCalculate(void);
 
 
 int testCarrotController(void)
@@ -200,6 +201,81 @@ int testPositionControllerLoadConfig(void)
     return 0;
 }
 
+int testPositionControllerPidCalculate(void)
+{
+    PositionController *controller;
+    controller = new PositionController(POSITION_CONTROLLER_CONFIG);
+
+    Eigen::Vector3d setpoint;
+    Pose robot_pose;
+    float yaw_setpoint;
+    float dt;
+
+
+    // check hovering PID output
+    setpoint << 0, 0, 0;
+    robot_pose = Pose(0, 0, 0, 0, 0, 0);
+    yaw_setpoint = 0;
+    dt = 0.1;
+
+    controller->calculate(setpoint, robot_pose, yaw_setpoint, dt);
+
+    std::cout << controller->roll << "\t"
+              << controller->pitch << "\t"
+              << controller->T.output << std::endl;
+
+    mu_check(controller->roll == 0);
+    mu_check(controller->pitch == 0.);
+    mu_check(fltcmp(controller->throttle, controller->hover_throttle) == 1);
+
+
+    // check moving towards and x location
+    setpoint << 1, 0, 0;
+    robot_pose = Pose(0, 0, 0, 0, 0, 0);
+    yaw_setpoint = 0;
+    dt = 0.1;
+
+    controller->reset();
+    controller->calculate(setpoint, robot_pose, yaw_setpoint, dt);
+    mu_check(controller->roll == 0.0);
+    mu_check(controller->pitch > 0.1);
+    mu_check(controller->throttle > controller->hover_throttle);
+
+    // check moving towards and x and y location
+    setpoint << 1, -1, 0;
+    robot_pose = Pose(0, 0, 0, 0, 0, 0);
+    yaw_setpoint = 0;
+    dt = 0.1;
+
+
+    controller->reset();
+    controller->calculate(setpoint, robot_pose, yaw_setpoint, dt);
+    mu_check(controller->roll < -0.1);
+    mu_check(controller->pitch > 0.0);
+    mu_check(controller->throttle > controller->hover_throttle);
+
+    // check moving towards and x and y location
+    setpoint << 0, 0, 0;
+    robot_pose = Pose(10, 2, 20, 10, 10, 20);
+    yaw_setpoint = 0;
+    dt = 0.1;
+
+
+    controller->reset();
+    controller->calculate(setpoint, robot_pose, yaw_setpoint, dt);
+    mu_check(controller->roll < -0.1);
+    mu_check(controller->pitch < 0.0);
+    mu_check(controller->throttle > controller->hover_throttle);
+    std::cout << controller->roll << "\t"
+              << controller->pitch << "\t"
+              << controller->hover_throttle << std::endl;
+
+    return 0;
+}
+
+
+
+
 void testSuite(void)
 {
     mu_add_test(testCarrotController);
@@ -208,6 +284,7 @@ void testSuite(void)
     mu_add_test(testCarrotControllerWaypointReached);
     mu_add_test(testCarrotControllerUpdate);
     mu_add_test(testPositionControllerLoadConfig);
+    mu_add_test(testPositionControllerPidCalculate);
 }
 
 mu_run_tests(testSuite)
