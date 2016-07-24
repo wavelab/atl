@@ -1,4 +1,4 @@
-# awesomo [![Build Status](https://travis-ci.com/chutsu/awesomo.svg?token=rBkanLVcBxG4QLrq8ybE&branch=master)][1]
+# awesomo [![Build Status](https://travis-ci.com/wavelab/awesomo.svg?token=rBkanLVcBxG4QLrq8ybE&branch=master)][1]
 
 Landing a quadrotor on a moving platform.
 
@@ -8,7 +8,7 @@ Landing a quadrotor on a moving platform.
 The following instructions assumes you have installed ROS.
 
     cd <your catkin workspace>/src
-    git clone https://github.com/chutsu/awesomo
+    git clone https://github.com/wavelab/awesomo
     catkin_build
 
 In short the above navigates to your catkin workspace's `src`, clones `awesomo`
@@ -33,4 +33,4 @@ You should have received a copy of the GNU General Public License along with
 this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-[1]: https://travis-ci.com/chutsu/awesomo
+[1]: https://travis-ci.com/wavelab/awesomo
