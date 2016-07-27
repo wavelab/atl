@@ -75,7 +75,7 @@ public:
     Pose world_pose;
 
     float hover_height;
-    int landing_zone_belief;
+    int landing_belief;
     time_t tracking_start;
     time_t target_last_updated;
     time_t height_last_updated;
@@ -86,7 +86,7 @@ public:
 
     // estimators
     bool estimator_initialized;
-    struct kf apriltag_estimator;
+    struct kf tag_estimator;
 
     Quadrotor(std::map<std::string, std::string> configs);
     int loadConfig(std::string config_file_path);
@@ -101,27 +101,19 @@ public:
     void resetPositionController(void);
     void initializeCarrotController(void);
     Eigen::Vector3d runCarrotMode(Pose robot_pose, float dt);
-    void runDiscoverMode(
-        Pose robot_pose,
-        LandingTargetPosition landing_zone
-    );
-    void runTrackingModeBPF(
-        LandingTargetPosition landing_zone,
-        float dt
-    );
-    Eigen::Vector3d runLandingMode(
-        Pose robot_pose,
-        LandingTargetPosition landing_zone,
-        float dt
-    );
+    void runDiscoverMode(LandingTargetPosition landing);
+    void runTrackingModeBPF(LandingTargetPosition landing, float dt);
+    bool withinLandingZone(Eigen::Vector3d &m, Eigen::Vector3d &e);
+    bool withinLandingZone(Eigen::Vector3d &m);
+    void runLandingMode(LandingTargetPosition landing, float dt);
     // int followWaypoints(
     //     Pose robot_pose,
-    //     LandingTargetPosition landing_zone,
+    //     LandingTargetPosition landing,
     //     float dt
     // );
     int runMission(
         Pose robot_pose,
-        LandingTargetPosition landing_zone,
+        LandingTargetPosition landing,
         float dt
     );
 };

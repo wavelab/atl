@@ -1,21 +1,12 @@
 #include "awesomo/camera_mount.hpp"
 
 
-CameraMount::CameraMount(
-    float roll,
-    float pitch,
-    float yaw,
-    float x,
-    float y,
-    float z
-)
+CameraMount::CameraMount(float roll, float pitch, float yaw, float x, float y, float z)
 {
     this->pose = Pose(roll, pitch, yaw, x, y, z);
 }
 
-Eigen::Vector3d CameraMount::getTargetPositionBFrame(
-    Eigen::Vector3d target_position
-)
+Eigen::Vector3d CameraMount::getTargetPositionBFrame(Eigen::Vector3d target_position)
 {
     return (this->pose.rotationMatrix() * target_position
             + this->pose.position);

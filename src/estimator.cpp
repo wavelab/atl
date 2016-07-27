@@ -80,7 +80,7 @@ void apriltag_kf_setup(struct kf *e, Eigen::VectorXd mu)
 
 void apriltag_kf_estimate(struct kf *e, Eigen::VectorXd y, float dt, bool tag_detected)
 {
-	// adjust transition matrix (assuming constant acceleration)
+	// transition matrix (constant acceleration)
 	e->A <<
 	     1, 0, 0, dt, 0, 0, pow(dt, 2) / 2.0, 0, 0,
 		 0, 1, 0, 0, dt, 0, 0, pow(dt, 2) / 2.0, 0,
@@ -92,7 +92,7 @@ void apriltag_kf_estimate(struct kf *e, Eigen::VectorXd y, float dt, bool tag_de
 		 0, 0, 0, 0, 0, 0, 0, 0.99, 0,
 		 0, 0, 0, 0, 0, 0, 0, 0, 1.0;
 
-    // hack
+	// transition matrix (constant velocity)
 	// e->A << 1, 0, 0, dt, 0, 0, 0, 0, 0,
 	// 	 0, 1, 0, 0, dt, 0, 0, 0, 0,
 	// 	 0, 0, 1, 0, 0, dt, 0, 0, 0,

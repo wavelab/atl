@@ -3,7 +3,6 @@
 
 
 // TESTS
-// void createCamConfig(CameraMountRBT &mount);
 int testCameraMountContstuctor(void);
 int testCameraMountToBodyFrame(void);
 int testCameraMountToBPFrame(void);
