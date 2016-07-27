@@ -256,7 +256,7 @@ void PositionController::calculate(
     pid_calculate(&this->y, robot.position(0), dt);
     pid_calculate(&this->T, robot.position(2), dt);
 
-    this->roll =  this->x.output;
+    this->roll = this->x.output;
     this->pitch = this->y.output;
     this->throttle = this->T.output;
 

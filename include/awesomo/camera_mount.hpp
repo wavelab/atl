@@ -9,14 +9,7 @@ public:
     Pose pose;
 
     CameraMount(){};
-    CameraMount(
-        float roll,
-        float pitch,
-        float yaw,
-        float x,
-        float y,
-        float z
-    );
+    CameraMount(float roll, float pitch, float yaw, float x, float y, float z);
 
     Eigen::Vector3d getTargetPositionBFrame(
         Eigen::Vector3d target_position
@@ -24,7 +17,7 @@ public:
 
     Eigen::Vector3d getTargetPositionBPFrame(
         Eigen::Vector3d target_position,
-        Eigen::Quaterniond &IMU_quat
+        Eigen::Quaterniond &imu
     );
 
 };

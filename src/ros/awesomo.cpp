@@ -50,7 +50,8 @@ public:
     ros::NodeHandle node;
     mavros_msgs::State state;
 
-    Pose pose;
+    Pose world_pose;
+    Pose hover_point;
     Velocity velocity;
     Pose mocap_pose;
     Pose gps_pose;
@@ -63,7 +64,7 @@ public:
     ros::ServiceClient arming_client;
 
     ros::Subscriber mocap_subscriber;
-    ros::Subscriber pose_subscriber;
+    ros::Subscriber world_pose_subscriber;
     ros::Subscriber velocity_subscriber;
     ros::Subscriber radio_subscriber;
     ros::Subscriber landing_subscriber;
@@ -99,6 +100,7 @@ public:
     void subscribeToRadioIn(void);
     void subscribeToLanding(void);
     void subscribeToGPS(void);
+    void publishHoverCommand(int seq, ros::Time time);
     void publishPositionControllerStats(int seq, ros::Time time);
     void publishPositionControllerMessage(
         geometry_msgs::PoseStamped &msg,
@@ -181,13 +183,13 @@ void Awesomo::poseCallback(const geometry_msgs::PoseStamped &msg)
                 msg.pose.position.z;
 
     // ENU coordinates
-    this->pose = Pose(quat, position);
+    this->world_pose = Pose(quat, position);
 
     this->world_imu_tf.setOrigin(
         tf::Vector3(
-            this->pose.position(0),
-            this->pose.position(1),
-            this->pose.position(2)
+            this->world_pose.position(0),
+            this->world_pose.position(1),
+            this->world_pose.position(2)
         )
     );
 
@@ -337,7 +339,7 @@ int Awesomo::setOffboardModeOn(void)
 void Awesomo::subscribeToPose(void)
 {
     ROS_INFO("subcribing to [POSE]");
-    this->pose_subscriber = this->node.subscribe(
+    this->world_pose_subscriber = this->node.subscribe(
         POSE_TOPIC,
         50,
         &Awesomo::poseCallback,
@@ -398,6 +400,27 @@ void Awesomo::subscribeToGPS(void)
         &Awesomo::gpsCallback,
         this
     );
+}
+
+void Awesomo::publishHoverCommand(int seq, ros::Time time)
+{
+	geometry_msgs::PoseStamped hover_cmd;
+
+    // msg header
+    hover_cmd.header.seq = seq;
+    hover_cmd.header.stamp = time;
+    hover_cmd.header.frame_id = "awesomo_hover_position";
+
+    // set pose
+    hover_cmd.pose.position.x = this->hover_point.position(0);
+    hover_cmd.pose.position.y = this->hover_point.position(1);
+    hover_cmd.pose.position.z = this->hover_point.position(2);
+    hover_cmd.pose.orientation.x = this->hover_point.q.x();
+    hover_cmd.pose.orientation.y = this->hover_point.q.y();
+    hover_cmd.pose.orientation.z = this->hover_point.q.z();
+    hover_cmd.pose.orientation.w = this->hover_point.q.w();
+
+    this->position_publisher.publish(hover_cmd);
 }
 
 void Awesomo::publishPositionControllerStats(int seq, ros::Time time)
@@ -606,13 +629,13 @@ int Awesomo::run(
     dt = (ros::Time::now() - last_request).toSec();
 
     // run mission
-    retval = this->quad->runMission(this->pose, this->landing_zone, dt);
+    retval = this->quad->runMission(this->world_pose, this->landing_zone, dt);
     if (retval == MISSION_ACCOMPLISHED) {
         this->disarm();
         return 0;
 
-    } else if (retval == TARGET_LOST) {
-        // publish mavros position command instad of attitute command
+    } else if (retval == TARGET_LOST || retval == DISCOVER_MODE || retval == HOVER_MODE) {
+        this->publishHoverCommand(seq, ros::Time::now());
         return 1;
 
     } else {
@@ -659,8 +682,9 @@ int main(int argc, char **argv)
     while (ros::ok()){
         // check if offboard switch has been turned on
         if (awesomo->rc_in[6] < 1500) {
-            awesomo->quad->resetPositionController();
             throttle.data = 0.0;
+            awesomo->hover_point = awesomo->world_pose;
+            awesomo->quad->resetPositionController();
             awesomo->throttle_publisher.publish(throttle);
 
         } else {

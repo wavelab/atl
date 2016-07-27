@@ -1,5 +1,4 @@
-hover_point:
-    height: 5.01
+hover_height: 5.01
 
 tracking:
     position_offset:

@@ -61,8 +61,7 @@ public:
         float recover_multiplier,
         float belief_threshold,
         Eigen::Vector3d cutoff_position
-);
-
+    );
 };
 
 class Quadrotor
@@ -73,9 +72,9 @@ public:
 
     // state
     int mission_state;
-    Pose global_pose;
+    Pose world_pose;
 
-    HoverPoint *hover_point;
+    float hover_height;
     int landing_zone_belief;
     time_t tracking_start;
     time_t target_last_updated;
@@ -100,15 +99,13 @@ public:
 
     // void updatePose(Pose p);
     void resetPositionController(void);
-    void runIdleMode(Pose robot_pose);
-    Eigen::Vector3d runHoverMode(Pose robot_pose, float dt);
     void initializeCarrotController(void);
     Eigen::Vector3d runCarrotMode(Pose robot_pose, float dt);
     Eigen::Vector3d runDiscoverMode(
         Pose robot_pose,
         LandingTargetPosition landing_zone
     );
-    Eigen::Vector3d runTrackingModeBPF(
+    void runTrackingModeBPF(
         LandingTargetPosition landing_zone,
         float dt
     );
@@ -117,11 +114,11 @@ public:
         LandingTargetPosition landing_zone,
         float dt
     );
-    int followWaypoints(
-        Pose robot_pose,
-        LandingTargetPosition landing_zone,
-        float dt
-    );
+    // int followWaypoints(
+    //     Pose robot_pose,
+    //     LandingTargetPosition landing_zone,
+    //     float dt
+    // );
     int runMission(
         Pose robot_pose,
         LandingTargetPosition landing_zone,

@@ -14,14 +14,7 @@ public:
     Eigen::Vector3d position;
 
     Pose(void);
-    Pose(
-        float roll,
-        float pitch,
-        float yaw,
-        float x,
-        float y,
-        float z
-    );
+    Pose(float roll, float pitch, float yaw, float x, float y, float z);
 
     Pose(Eigen::Quaterniond q, Eigen::Vector3d position);
     Eigen::Matrix3d rotationMatrix(void);
@@ -100,6 +93,5 @@ int euler2RotationMatrix(
     const double yaw,
     Eigen::Matrix3d &rot
 );
-
 
 #endif

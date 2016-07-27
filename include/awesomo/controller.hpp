@@ -91,16 +91,15 @@ public:
     float pitch;
     float throttle;
     float hover_throttle;
-    // tf::Quaternion rpy_quat;
     Eigen::Quaterniond command_quat;
 
     PositionController(const std::string config_file);
     void loadConfig(const std::string config_file);
     void calculate(
-            Eigen::Vector3d setpoint,
-            Pose robot,
-            float yaw_setpoint,
-            float dt
+        Eigen::Vector3d setpoint,
+        Pose robot,
+        float yaw_setpoint,
+        float dt
     );
     void reset(void);
 };
