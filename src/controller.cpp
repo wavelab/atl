@@ -239,9 +239,6 @@ void PositionController::calculate(
     float dt
 )
 {
-    float roll;
-    float pitch;
-    float throttle;
     float roll_adjusted;
     float pitch_adjusted;
     float throttle_adjusted;
@@ -257,22 +254,19 @@ void PositionController::calculate(
     pid_calculate(&this->T, robot.position(2), dt);
 
     this->roll = this->x.output;
-    this->pitch = this->y.output;
+    this->pitch = -this->y.output;
     this->throttle = this->T.output;
-
-    yaw_setpoint = 0.0;
 
     // update position controller
     // adjust roll and pitch according to yaw
-
     // Figure out how to do this?
+    // yaw_setpoint = 0.0;
     // this->roll = cos(robot.yaw) * roll - sin(robot.yaw) * pitch;
     // this->pitch = sin(robot.yaw) * roll + cos(robot.yaw) * pitch;
-
     euler2Quaternion(this->roll, this->pitch, yaw_setpoint, this->command_quat);
 
     // throttle
-    throttle_adjusted = this->hover_throttle + throttle;
+    throttle_adjusted = this->hover_throttle + this->throttle;
     throttle_adjusted /= fabs(cos(roll) * cos(pitch)); // extra thottle due to tilting
     if (throttle_adjusted > 1.0) {
         throttle_adjusted = 1.0;

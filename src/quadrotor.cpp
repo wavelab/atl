@@ -26,7 +26,6 @@ LandingConfig::LandingConfig(
     this->belief_threshold = belief_threshold;
 }
 
-
 Quadrotor::Quadrotor(std::map<std::string, std::string> configs)
 {
     std::string config_path;
@@ -40,7 +39,7 @@ Quadrotor::Quadrotor(std::map<std::string, std::string> configs)
     this->landing_config = new LandingConfig();
 
     // intialize state
-    this->mission_state = IDLE_MODE;
+    this->mission_state = DISCOVER_MODE;
     this->world_pose.position << 0.0, 0.0, 0.0;
 
     // landing state
@@ -101,6 +100,7 @@ int Quadrotor::loadConfig(std::string config_file_path)
             landing["belief_threshold"].as<float>();
 
     } catch (YAML::BadFile &ex) {
+        printf("ERROR! invalid quadrotor configuration file!\n");
         throw;
     }
 
@@ -124,7 +124,7 @@ Attitude Quadrotor::positionControllerCalculate(
 
     a.roll = this->position_controller->roll;
     a.pitch = this->position_controller->pitch;
-    a.yaw = 0;
+    a.yaw = yaw;
 
     return a;
 }
@@ -203,9 +203,8 @@ Eigen::Vector3d Quadrotor::runCarrotMode(Pose robot_pose, float dt)
     return carrot;
 }
 
-Eigen::Vector3d Quadrotor::runDiscoverMode(Pose robot_pose, LandingTargetPosition landing_zone)
+void Quadrotor::runDiscoverMode(Pose robot_pose, LandingTargetPosition landing_zone)
 {
-    Eigen::Vector3d cmd_position;
 	Eigen::VectorXd mu(9);
 
     if (landing_zone.detected == true) {
@@ -223,10 +222,7 @@ Eigen::Vector3d Quadrotor::runDiscoverMode(Pose robot_pose, LandingTargetPositio
         this->mission_state = TRACKING_MODE;
         this->tracking_start = time(NULL);
     }
-
-    return cmd_position;
 }
-
 
 void Quadrotor::runTrackingModeBPF(
     LandingTargetPosition landing_zone,
@@ -258,11 +254,16 @@ void Quadrotor::runTrackingModeBPF(
     }
 
     // update position controller
-    setpoint << 0.0, 0.0, 0.0;
-    // robot_pose <<
-    //     -this->apriltag_estimator.mu(0),
-    //     -this->apriltag_estimator.mu(1),
-    //     this->hover_height;
+    setpoint <<
+        this->apriltag_estimator.mu(0),
+        this->apriltag_estimator.mu(1),
+        this->hover_height;
+
+    robot_pose.position(0) = 0.0;
+    robot_pose.position(1) = 0.0;
+    robot_pose.position(2) = this->world_pose.position(2);
+    robot_pose.q = this->world_pose.q;
+
     this->positionControllerCalculate(setpoint, robot_pose, 0, dt);
 }
 
@@ -380,13 +381,13 @@ Eigen::Vector3d Quadrotor::runLandingMode(
 // }
 
 int Quadrotor::runMission(
-    Pose robot_pose,
+    Pose world_pose,
     LandingTargetPosition landing_zone,
     float dt
 )
 {
     // update pose
-    this->world_pose = robot_pose;
+    this->world_pose = world_pose;
 
     // mission
     switch (this->mission_state) {
@@ -395,7 +396,7 @@ int Quadrotor::runMission(
         return this->mission_state;
 
     case DISCOVER_MODE:
-        this->runDiscoverMode(robot_pose, landing_zone);
+        this->runDiscoverMode(world_pose, landing_zone);
         return this->mission_state;
 
     case TRACKING_MODE:
@@ -403,7 +404,7 @@ int Quadrotor::runMission(
         break;
 
     case LANDING_MODE:
-        this->runLandingMode(robot_pose, landing_zone, dt);
+        this->runLandingMode(world_pose, landing_zone, dt);
         break;
 
     case MISSION_ACCOMPLISHED:

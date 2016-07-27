@@ -15,8 +15,8 @@ public:
 
     Pose(void);
     Pose(float roll, float pitch, float yaw, float x, float y, float z);
-
     Pose(Eigen::Quaterniond q, Eigen::Vector3d position);
+
     Eigen::Matrix3d rotationMatrix(void);
 };
 

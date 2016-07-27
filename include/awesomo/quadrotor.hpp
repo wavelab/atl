@@ -101,7 +101,7 @@ public:
     void resetPositionController(void);
     void initializeCarrotController(void);
     Eigen::Vector3d runCarrotMode(Pose robot_pose, float dt);
-    Eigen::Vector3d runDiscoverMode(
+    void runDiscoverMode(
         Pose robot_pose,
         LandingTargetPosition landing_zone
     );
