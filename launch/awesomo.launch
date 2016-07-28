@@ -10,13 +10,6 @@
 	    name="atim"
 	    output="screen" />
 
-    <!-- LANDING TARGET -->
-	<node
-	    pkg="awesomo"
-	    type="awesomo_landing_target"
-	    name="awesomo_landing_target"
-	    output="screen" />
-
     <!-- CONTROLLER -->
 	<param
         name="quadrotor"

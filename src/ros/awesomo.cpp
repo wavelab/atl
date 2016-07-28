@@ -19,6 +19,7 @@
 #include <atim/AtimPoseStamped.h>
 
 #include "awesomo/util.hpp"
+#include "awesomo/camera_mount.hpp"
 #include "awesomo/controller.hpp"
 #include "awesomo/quadrotor.hpp"
 #include "awesomo/PositionControllerStats.h"
@@ -40,8 +41,8 @@
 #define KF_ESTIMATION_TOPIC "/awesomo/kf_estimation/stats"
 #define KF_ESTIMATION_PLOTTING_TOPIC "/awesomo/kf_estimation/states"
 #define RADIO_TOPIC "/mavros/rc/in"
-#define LANDING_TOPIC "/awesomo/landing_target/pose"
 #define GPS_TOPIC "/mavros/global_position/local"
+#define ATIM_POSE_TOPIC "/atim/pose"
 
 
 class Awesomo
@@ -58,7 +59,9 @@ public:
     LandingTargetPosition landing_zone;
     bool landing_zone_detected;
     int rc_in[16];
+
     Quadrotor *quad;
+    CameraMount *camera_mount;
 
     ros::ServiceClient mode_client;
     ros::ServiceClient arming_client;
@@ -84,7 +87,7 @@ public:
     void velocityCallback(const geometry_msgs::TwistStamped &msg);
     void mocapCallback(const geometry_msgs::PoseStamped &msg);
     void radioCallback(const mavros_msgs::RCIn &msg);
-    void landingCallback(const atim::AtimPoseStamped &msg);
+    void atimCallback(const atim::AtimPoseStamped &msg);
     void gpsCallback(const geometry_msgs::PoseWithCovarianceStamped &msg);
     void stateCallback(const mavros_msgs::State::ConstPtr &msg);
     void waitForConnection(void);
@@ -98,7 +101,7 @@ public:
     void subscribeToVelocity(void);
     void subscribeToMocap(void);
     void subscribeToRadioIn(void);
-    void subscribeToLanding(void);
+    void subscribeToAtim(void);
     void subscribeToGPS(void);
     void publishHoverCommand(int seq, ros::Time time);
     void publishPositionControllerStats(int seq, ros::Time time);
@@ -124,7 +127,9 @@ Awesomo::Awesomo(std::map<std::string, std::string> configs)
     for (int i = 0; i < 16; i++) {
         this->rc_in[i] = 0.0f;
     }
-    quad = new Quadrotor(configs);
+
+    this->quad = new Quadrotor(configs);
+    this->camera_mount = new CameraMount(0.0, deg2rad(-90), 0.0, 0.0, 0.0, 0.0);
 
     // wait till connected to FCU
     this->waitForConnection();
@@ -137,7 +142,7 @@ Awesomo::Awesomo(std::map<std::string, std::string> configs)
 	this->subscribeToPose();
 	this->subscribeToVelocity();
 	this->subscribeToRadioIn();
-	this->subscribeToLanding();
+	this->subscribeToAtim();
 
     // initialize publishers
     this->position_publisher = this->node.advertise<geometry_msgs::PoseStamped>(
@@ -250,10 +255,20 @@ void Awesomo::radioCallback(const mavros_msgs::RCIn &msg)
     }
 }
 
-void Awesomo::landingCallback(const atim::AtimPoseStamped &msg)
+void Awesomo::atimCallback(const atim::AtimPoseStamped &msg)
 {
+    Eigen::Vector3d tag;
+    Eigen::Vector3d tag_BPF;
+    Eigen::Quaterniond imu;
+    geometry_msgs::Quaternion q;
+
+    tag << msg.pose.position.x, msg.pose.position.y, msg.pose.position.z;
+    q = msg.pose.orientation;
+    imu = Eigen::Quaterniond(q.w, q.x, q.y, q.z);
+    tag_BPF = this->camera_mount->getTargetPositionBPFrame(tag, imu);
+
     this->landing_zone.detected = msg.tag_detected;
-    this->landing_zone.position << msg.pose.position.x, msg.pose.position.y, msg.pose.position.z;
+    this->landing_zone.position << tag_BPF(0), tag_BPF(1), tag_BPF(2);
 }
 
 void Awesomo::gpsCallback(const geometry_msgs::PoseWithCovarianceStamped &msg)
@@ -380,13 +395,13 @@ void Awesomo::subscribeToRadioIn(void)
      );
 }
 
-void Awesomo::subscribeToLanding(void)
+void Awesomo::subscribeToAtim(void)
 {
-    ROS_INFO("subcribing to [Landing Zone]");
+    ROS_INFO("subcribing to [ATIM]");
     this->landing_subscriber = this->node.subscribe(
-        LANDING_TOPIC,
+        ATIM_POSE_TOPIC,
         50,
-        &Awesomo::landingCallback,
+        &Awesomo::atimCallback,
         this
     );
 }
@@ -415,10 +430,10 @@ void Awesomo::publishHoverCommand(int seq, ros::Time time)
     hover_cmd.pose.position.x = this->hover_point.position(0);
     hover_cmd.pose.position.y = this->hover_point.position(1);
     hover_cmd.pose.position.z = this->hover_point.position(2);
+    hover_cmd.pose.orientation.w = this->hover_point.q.w();
     hover_cmd.pose.orientation.x = this->hover_point.q.x();
     hover_cmd.pose.orientation.y = this->hover_point.q.y();
     hover_cmd.pose.orientation.z = this->hover_point.q.z();
-    hover_cmd.pose.orientation.w = this->hover_point.q.w();
 
     this->position_publisher.publish(hover_cmd);
 }
