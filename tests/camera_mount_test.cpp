@@ -9,7 +9,7 @@ int testCameraMountGetTargetPositionBPFrame(void);
 
 static void print_target_relative_to_quad(Eigen::Vector3d &target)
 {
-    printf("target position (relative to quad): ");
+    printf("target position (relative to quad in body planar frame): ");
     printf("%f, ", target(0));
     printf("%f, ", target(1));
     printf("%f\n", target(2));
@@ -130,26 +130,79 @@ int testCameraMountGetTargetPositionBPFrame(void)
     float dz = 0.0;
 
     // setup
+    target << 10.0, 0.0, 0.0;  // let tag be directly infront of camera
     mount = CameraMount(roll, pitch, yaw, dx, dy, dz);
 
-    // target is front of camera
-    target << 10.0, 0.0, 0.0;
-    euler2Quaternion(0, deg2rad(-10), 0, imu);
+    // pitch forwards
+    euler2Quaternion(0.0, deg2rad(-10), 0.0, imu);
     target_BPF = mount.getTargetPositionBPFrame(target, imu);
-    // mu_check(fltcmp(target_BPF(0), 0.0) == 0);
-    // mu_check(fltcmp(target_BPF(1), 0.0) == 0);
-    // mu_check(fltcmp(target_BPF(2), 1.0) == 0);
-    printf("front of camera\n");
+    mu_check(target_BPF(0) < 0.0);
+    mu_check(fltcmp(target_BPF(1), 0.0) == 0);
+    mu_check(target_BPF(2) < 10.0);
+    printf("pitch forwards\n");
     print_target_relative_to_quad(target_BPF);
 
-    // target left of camera
-    target << 0.0, -10.0, 0.0;
-    euler2Quaternion(0, deg2rad(-10), 0, imu);
+    // pitch backwards
+    euler2Quaternion(0.0, deg2rad(10), 0.0, imu);
     target_BPF = mount.getTargetPositionBPFrame(target, imu);
-    // mu_check(fltcmp(target_BPF(0), 0.0) == 0);
-    // mu_check(fltcmp(target_BPF(1), 0.0) == 0);
-    // mu_check(fltcmp(target_BPF(2), 1.0) == 0);
-    printf("left of camera\n");
+    mu_check(target_BPF(0) > 0.0);
+    mu_check(fltcmp(target_BPF(1), 0.0) == 0);
+    mu_check(target_BPF(2) < 10.0);
+    printf("pitch backwards\n");
+    print_target_relative_to_quad(target_BPF);
+
+    // roll left
+    euler2Quaternion(deg2rad(-10), 0.0, 0.0, imu);
+    target_BPF = mount.getTargetPositionBPFrame(target, imu);
+    mu_check(fltcmp(target_BPF(0), 0.0) == 0);
+    mu_check(target_BPF(1) > 0.0);
+    mu_check(target_BPF(2) < 10.0);
+    printf("roll left\n");
+    print_target_relative_to_quad(target_BPF);
+
+    // roll right
+	euler2Quaternion(deg2rad(10), 0.0, 0.0, imu);
+    target_BPF = mount.getTargetPositionBPFrame(target, imu);
+    mu_check(fltcmp(target_BPF(0), 0.0) == 0);
+    mu_check(target_BPF(1) < 0.0);
+    mu_check(target_BPF(2) < 10.0);
+    printf("roll right\n");
+    print_target_relative_to_quad(target_BPF);
+
+    // pitch forward, roll left
+	euler2Quaternion(deg2rad(-10), deg2rad(-10), 0.0, imu);
+    target_BPF = mount.getTargetPositionBPFrame(target, imu);
+    mu_check(target_BPF(0) < 0.0);
+    mu_check(target_BPF(1) > 0.0);
+    mu_check(target_BPF(2) < 10.0);
+    printf("pitch forward, roll left\n");
+    print_target_relative_to_quad(target_BPF);
+
+    // pitch forward, roll right
+	euler2Quaternion(deg2rad(10), deg2rad(-10), 0.0, imu);
+    target_BPF = mount.getTargetPositionBPFrame(target, imu);
+    mu_check(target_BPF(0) < 0.0);
+    mu_check(target_BPF(1) < 0.0);
+    mu_check(target_BPF(2) < 10.0);
+    printf("pitch forward, roll right\n");
+    print_target_relative_to_quad(target_BPF);
+
+    // pitch backwards, roll left
+	euler2Quaternion(deg2rad(-10), deg2rad(10), 0.0, imu);
+    target_BPF = mount.getTargetPositionBPFrame(target, imu);
+    mu_check(target_BPF(0) > 0.0);
+    mu_check(target_BPF(1) > 0.0);
+    mu_check(target_BPF(2) < 10.0);
+    printf("pitch backwards, roll left\n");
+    print_target_relative_to_quad(target_BPF);
+
+    // pitch backwards, roll right
+	euler2Quaternion(deg2rad(10), deg2rad(10), 0.0, imu);
+    target_BPF = mount.getTargetPositionBPFrame(target, imu);
+    mu_check(target_BPF(0) > 0.0);
+    mu_check(target_BPF(1) < 0.0);
+    mu_check(target_BPF(2) < 10.0);
+    printf("pitch backwards, roll right\n");
     print_target_relative_to_quad(target_BPF);
 
     return 0;

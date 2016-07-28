@@ -15,14 +15,6 @@ Eigen::Vector3d CameraMount::getTargetPositionBPFrame(
     Eigen::Vector3d target,
     Eigen::Quaterniond &imu
 )
-{   Eigen::Quaterniond imu_inv;
-    Eigen::Matrix3d imu_inv_rot;
-    Eigen::Vector3d posInBPF;
-
-    imu_inv = imu.inverse();
-    imu_inv_rot = imu_inv.toRotationMatrix();
-    posInBPF = this->pose.rotationMatrix() * target + this->pose.position;
-    posInBPF = imu_inv_rot * posInBPF;
-
-    return posInBPF;
+{
+    return imu.toRotationMatrix() * this->getTargetPositionBFrame(target);
 }
