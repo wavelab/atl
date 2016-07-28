@@ -75,11 +75,10 @@ void LandingTarget::cameraRCallback(const atim::AtimPoseStamped &msg)
         this->landing_target_position.detected = msg.tag_detected;
 
         this->cam_rbt.getAtimTargetPositionBPF(
-                this->landing_target_position,
-                this->IMU_quat,
-                this->landing_target_position
+            this->landing_target_position,
+            this->IMU_quat,
+            this->landing_target_position
         );
-
 
         // this->cam_rbt.applyRBTtoPosition(this->landing_target_position);
         // // negate the rotation using the imu
@@ -128,7 +127,6 @@ void LandingTarget::cameraRCallback(const atim::AtimPoseStamped &msg)
         this->landing_target_position.detected = msg.tag_detected;
     }
 }
-
 
 void LandingTarget::localPoseCallback(const geometry_msgs::PoseStamped &input)
 {

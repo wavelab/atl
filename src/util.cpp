@@ -68,6 +68,7 @@ int euler2Quaternion(
 
     q = yawAngle * pitchAngle * rollAngle;
     q.normalize();
+
     return 0;
 }
 

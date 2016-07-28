@@ -6,26 +6,23 @@ CameraMount::CameraMount(float roll, float pitch, float yaw, float x, float y, f
     this->pose = Pose(roll, pitch, yaw, x, y, z);
 }
 
-Eigen::Vector3d CameraMount::getTargetPositionBFrame(Eigen::Vector3d target_position)
+Eigen::Vector3d CameraMount::getTargetPositionBFrame(Eigen::Vector3d target)
 {
-    return (this->pose.rotationMatrix() * target_position
-            + this->pose.position);
+    return (this->pose.rotationMatrix() * target + this->pose.position);
 }
 
 Eigen::Vector3d CameraMount::getTargetPositionBPFrame(
-    Eigen::Vector3d target_position,
-    Eigen::Quaterniond &IMU_quat
+    Eigen::Vector3d target,
+    Eigen::Quaterniond &imu
 )
-{   Eigen::Quaterniond IMU_inv;
-    Eigen::Matrix3d IMU_inv_rot;
+{   Eigen::Quaterniond imu_inv;
+    Eigen::Matrix3d imu_inv_rot;
     Eigen::Vector3d posInBPF;
 
-    IMU_inv = IMU_quat.inverse();
-    IMU_inv_rot = IMU_inv.toRotationMatrix();
-    posInBPF = this->pose.rotationMatrix() * target_position
-        + this->pose.position;
-    posInBPF = IMU_inv_rot * posInBPF;
+    imu_inv = imu.inverse();
+    imu_inv_rot = imu_inv.toRotationMatrix();
+    posInBPF = this->pose.rotationMatrix() * target + this->pose.position;
+    posInBPF = imu_inv_rot * posInBPF;
 
     return posInBPF;
 }
-

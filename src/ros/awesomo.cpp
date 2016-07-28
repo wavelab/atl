@@ -634,11 +634,12 @@ int Awesomo::run(
         this->disarm();
         return 0;
 
-    } else if (retval == TARGET_LOST || retval == DISCOVER_MODE || retval == HOVER_MODE) {
+    } else if (retval == DISCOVER_MODE) {
         this->publishHoverCommand(seq, ros::Time::now());
         return 1;
 
     } else {
+        this->hover_point = this->world_pose;  // keep track of hover point
         this->publishPositionControllerMessage(msg, seq, ros::Time::now());
         this->publishPositionControllerStats(seq, ros::Time::now());
         this->publishKFStatsForPlotting(seq, ros::Time::now());
