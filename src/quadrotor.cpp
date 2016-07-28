@@ -356,7 +356,7 @@ void Quadrotor::runLandingMode(LandingTargetPosition landing, float dt)
 
     // kill engines (landed?)
     if (this->withinLandingZone(tag_mea, tag_est)) {
-        if (this->landing_belief > 5) {
+        if (this->landing_belief > this->landing_config->belief_threshold) {
             printf("MISSION ACCOMPLISHED!\n");
             this->mission_state = MISSION_ACCOMPLISHED;
         } else {
@@ -413,11 +413,11 @@ int Quadrotor::runMission(
     switch (this->mission_state) {
     case IDLE_MODE:
         this->resetPositionController();
-        return this->mission_state;
+        break;
 
     case DISCOVER_MODE:
         this->runDiscoverMode(landing);
-        return this->mission_state;
+        break;
 
     case TRACKING_MODE:
         this->runTrackingModeBPF(landing, dt);
@@ -430,7 +430,6 @@ int Quadrotor::runMission(
     case MISSION_ACCOMPLISHED:
         return 0;
         break;
-
     }
 
     return this->mission_state;
