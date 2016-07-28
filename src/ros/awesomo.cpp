@@ -185,7 +185,16 @@ void Awesomo::poseCallback(const geometry_msgs::PoseStamped &msg)
 
     position << msg.pose.position.x,
                 msg.pose.position.y,
-                msg.pose.position.z;
+                msg.pose.position.z + this->quad->height_offset;
+
+    // set height offset
+    // NOTE: this assumes the quadrotor starts off from the ground
+    if (this->quad->height_offset_initialized == false) {
+        this->quad->height_offset = 0.0 - msg.pose.position.z;
+        this->quad->height_offset_initialized = true;
+        printf("ASSUMING QUADROTOR IS ON THE GROUND!!!\n");
+        printf("height_offset: %f\n", this->quad->height_offset);
+    }
 
     // ENU coordinates
     this->world_pose = Pose(quat, position);
@@ -447,19 +456,18 @@ void Awesomo::publishPositionControllerStats(int seq, ros::Time time)
     msg.header.stamp = time;
     msg.header.frame_id = "awesomo_position_controller";
 
-    // CHECK THIS TO SEE IF IT IS CORRECT!!!@
     // roll
     msg.roll_p_error = this->quad->position_controller->x.p_error;
     msg.roll_i_error = this->quad->position_controller->x.i_error;
     msg.roll_d_error = this->quad->position_controller->x.d_error;
-    msg.roll_output = this->quad->position_controller->roll *  180 / M_PI;
+    msg.roll_output = this->quad->position_controller->roll * 180 / M_PI;
     msg.roll_setpoint  = this->quad->position_controller->x.setpoint;
 
     // pitch
     msg.pitch_p_error = this->quad->position_controller->y.p_error;
     msg.pitch_i_error = this->quad->position_controller->y.i_error;
     msg.pitch_d_error = this->quad->position_controller->y.d_error;
-    msg.pitch_output = this->quad->position_controller->pitch *  180 / M_PI;
+    msg.pitch_output = this->quad->position_controller->pitch * 180 / M_PI;
     msg.pitch_setpoint  = this->quad->position_controller->pitch;
 
     // thrust
@@ -650,6 +658,7 @@ int Awesomo::run(
         return 0;
 
     } else if (retval == DISCOVER_MODE) {
+        this->quad->resetPositionController();
         this->publishHoverCommand(seq, ros::Time::now());
         return 1;
 
@@ -700,8 +709,10 @@ int main(int argc, char **argv)
         if (awesomo->rc_in[6] < 1500) {
             throttle.data = 0.0;
             awesomo->hover_point = awesomo->world_pose;
+            awesomo->quad->mission_state = DISCOVER_MODE;
             awesomo->quad->resetPositionController();
             awesomo->throttle_publisher.publish(throttle);
+            ROS_INFO("idle...");
 
         } else {
             if (awesomo->run(msg, seq, last_request) == 0) {

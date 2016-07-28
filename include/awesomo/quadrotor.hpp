@@ -74,7 +74,12 @@ public:
     int mission_state;
     Pose world_pose;
 
+    bool height_offset_initialized;
+    float height_offset;
+
+    float hover_height_original;
     float hover_height;
+
     int landing_belief;
     time_t tracking_start;
     time_t target_last_updated;

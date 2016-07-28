@@ -79,7 +79,12 @@ int Quadrotor::loadConfig(std::string config_file_path)
         // load config
         config = YAML::LoadFile(config_file_path);
 
+        // height offset
+        this->height_offset_initialized = false;
+        this->height_offset = 0.0f;
+
         // load hover height config
+        this->hover_height_original = config["hover_height"].as<float>();
         this->hover_height = config["hover_height"].as<float>();
 
         // load landing config
@@ -238,7 +243,7 @@ void Quadrotor::runTrackingModeBPF(LandingTargetPosition landing, float dt)
     elasped = difftime(time(NULL), this->target_last_updated);
     if (landing.detected == true) {
         this->target_last_updated = time(NULL);
-    } else if (elasped > 2) {
+    } else if (elasped > 1) {
         printf("Target losted transitioning back to DISCOVER MODE!\n");
         this->mission_state = DISCOVER_MODE;
     }
@@ -247,6 +252,7 @@ void Quadrotor::runTrackingModeBPF(LandingTargetPosition landing, float dt)
     tag_x = this->tag_estimator.mu(0);
     tag_y = this->tag_estimator.mu(1);
     setpoint << tag_x, tag_y, this->hover_height;
+    // printf("tag_estimated: %f\t %f\n", tag_x, tag_y);
 
     // robot pose
     robot_pose.position(0) = 0.0;
@@ -262,6 +268,7 @@ void Quadrotor::runTrackingModeBPF(LandingTargetPosition landing, float dt)
     if (elasped > 10) {
         printf("Transitioning to LANDING MODE!\n");
         this->mission_state = LANDING_MODE;
+        this->height_last_updated = time(NULL);
     }
 }
 
@@ -325,6 +332,7 @@ void Quadrotor::runLandingMode(LandingTargetPosition landing, float dt)
     Eigen::Vector3d tag_est;
 	Eigen::VectorXd mu(9);
     Eigen::Vector3d threshold;
+    Pose robot_pose;
     double elasped;
 
     // estimate tag position
@@ -334,8 +342,13 @@ void Quadrotor::runLandingMode(LandingTargetPosition landing, float dt)
     tag_est << mu(0), mu(1), this->hover_height;
 
     // keep track of target position
+    elasped = difftime(time(NULL), this->target_last_updated);
     if (landing.detected == true) {
         this->target_last_updated = time(NULL);
+    } else if (elasped > 1) {
+        printf("Target losted transitioning back to DISCOVER MODE!\n");
+        this->mission_state = DISCOVER_MODE;
+        this->hover_height = this->hover_height_original;
     }
 
     // landing - lower height or increase height
@@ -363,6 +376,15 @@ void Quadrotor::runLandingMode(LandingTargetPosition landing, float dt)
             this->landing_belief++;
         }
     }
+
+    // robot pose
+    robot_pose.position(0) = 0.0;
+    robot_pose.position(1) = 0.0;
+    robot_pose.position(2) = this->world_pose.position(2);
+    robot_pose.q = this->world_pose.q;
+
+    // update position controller
+    this->positionControllerCalculate(tag_est, robot_pose, 0, dt);
 }
 
 // int Quadrotor::followWaypoints(

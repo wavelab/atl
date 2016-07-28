@@ -272,6 +272,8 @@ void PositionController::calculate(
         throttle_adjusted = 1.0;
     }
     this->throttle = throttle_adjusted;
+
+    printf("roll: %f \t pitch: %f\n", this->roll, this->pitch);
 }
 
 void PositionController::reset(void)
