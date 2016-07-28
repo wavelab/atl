@@ -3,7 +3,7 @@
     <!-- ATIM -->
     <param
         name="camera_config_path"
-	    value="$(find atim)/configs/pointgrey_firefly" />
+	    value="$(find atim)/configs/ximea_camera" />
 	<node
 	    pkg="atim"
 	    type="atim"
