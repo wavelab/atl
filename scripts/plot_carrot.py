@@ -2,6 +2,7 @@
 import time
 import matplotlib.pylab as plt
 
+
 if __name__ == "__main__":
     data_file = open("update.dat", "r")
 

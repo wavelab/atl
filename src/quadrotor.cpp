@@ -223,6 +223,10 @@ void Quadrotor::runDiscoverMode(LandingTargetPosition landing)
         printf("Transitioning to TRACKER MODE!\n");
         this->mission_state = TRACKING_MODE;
         this->tracking_start = time(NULL);
+
+        // reset position controller softly so not initially violent
+        this->position_controller->x.prev_error = landing.position(1);
+        this->position_controller->y.prev_error = landing.position(0);
     }
 }
 
@@ -345,10 +349,15 @@ void Quadrotor::runLandingMode(LandingTargetPosition landing, float dt)
     elasped = difftime(time(NULL), this->target_last_updated);
     if (landing.detected == true) {
         this->target_last_updated = time(NULL);
+
     } else if (elasped > 1) {
         printf("Target losted transitioning back to DISCOVER MODE!\n");
         this->mission_state = DISCOVER_MODE;
+
+        // reset hover height and landing belief
         this->hover_height = this->hover_height_original;
+        this->landing_belief = 0;
+
     }
 
     // landing - lower height or increase height
@@ -369,7 +378,7 @@ void Quadrotor::runLandingMode(LandingTargetPosition landing, float dt)
 
     // kill engines (landed?)
     if (this->withinLandingZone(tag_mea, tag_est)) {
-        if (this->landing_belief > this->landing_config->belief_threshold) {
+        if (this->landing_belief >= this->landing_config->belief_threshold) {
             printf("MISSION ACCOMPLISHED!\n");
             this->mission_state = MISSION_ACCOMPLISHED;
         } else {

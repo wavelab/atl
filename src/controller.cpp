@@ -218,7 +218,8 @@ static void pid_calculate(struct pid *p, float input, float dt)
     // calculate output
     p->p_error = p->k_p * error;
     p->i_error = p->k_i * p->sum_error;
-    p->d_error = p->k_d * (error - p->prev_error) / dt;
+    // p->d_error = p->k_d * (error - p->prev_error) / dt;
+    p->d_error = p->k_d * (error - p->prev_error) / (1.0 / 100.0);
     p->output = p->p_error + p->i_error + p->d_error;
 
     // limit boundaries
@@ -267,13 +268,11 @@ void PositionController::calculate(
 
     // throttle
     throttle_adjusted = this->hover_throttle + this->throttle;
-    throttle_adjusted /= fabs(cos(roll) * cos(pitch)); // extra thottle due to tilting
+    throttle_adjusted /= fabs(cos(roll) * cos(pitch)); // adjust due to tilting
     if (throttle_adjusted > 1.0) {
         throttle_adjusted = 1.0;
     }
     this->throttle = throttle_adjusted;
-
-    printf("roll: %f \t pitch: %f\n", this->roll, this->pitch);
 }
 
 void PositionController::reset(void)
@@ -317,15 +316,19 @@ void LandingController::loadConfig(const std::string config_file)
 
         // thrust controller
         this->thrust.setpoint = config["thrust_controller"]["setpoint"].as<float>();
+
         this->thrust.output = 0.0f;
         this->thrust.prev_error = 0.0f;
         this->thrust.sum_error = 0.0f;
+
         this->thrust.p_error = 0.0f;
         this->thrust.i_error = 0.0f;
         this->thrust.d_error = 0.0f;
+
         this->thrust.k_p = config["thrust_controller"]["k_p"].as<float>();
         this->thrust.k_i = config["thrust_controller"]["k_i"].as<float>();
         this->thrust.k_d = config["thrust_controller"]["k_d"].as<float>();
+
         this->thrust.dead_zone = config["thrust_controller"]["deadzone"].as<float>();
         this->thrust.min = config["thrust_controller"]["min"].as<float>();
         this->thrust.max = config["thrust_controller"]["max"].as<float>();

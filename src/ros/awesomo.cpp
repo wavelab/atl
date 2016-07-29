@@ -285,12 +285,12 @@ void Awesomo::gpsCallback(const geometry_msgs::PoseWithCovarianceStamped &msg)
     Eigen::Quaterniond quat;
     Eigen::Vector3d position;
 
-    // quat = Eigen::Quaterniond(
-    //     msg.pose.orientation.w,
-    //     msg.pose.orientation.x,
-    //     msg.pose.orientation.y,
-    //     msg.pose.orientation.z
-    // );
+    quat = Eigen::Quaterniond(
+        msg.pose.pose.orientation.w,
+        msg.pose.pose.orientation.x,
+        msg.pose.pose.orientation.y,
+        msg.pose.pose.orientation.z
+    );
 
     position << msg.pose.pose.position.x,
                 msg.pose.pose.position.y,
@@ -429,6 +429,10 @@ void Awesomo::subscribeToGPS(void)
 void Awesomo::publishHoverCommand(int seq, ros::Time time)
 {
 	geometry_msgs::PoseStamped hover_cmd;
+	float adjusted_height;
+
+	// setup
+	adjusted_height = this->quad->hover_height + this->quad->height_offset;
 
     // msg header
     hover_cmd.header.seq = seq;
@@ -438,7 +442,7 @@ void Awesomo::publishHoverCommand(int seq, ros::Time time)
     // set pose
     hover_cmd.pose.position.x = this->hover_point.position(0);
     hover_cmd.pose.position.y = this->hover_point.position(1);
-    hover_cmd.pose.position.z = this->hover_point.position(2);
+    hover_cmd.pose.position.z = adjusted_height;
     hover_cmd.pose.orientation.w = this->hover_point.q.w();
     hover_cmd.pose.orientation.x = this->hover_point.q.x();
     hover_cmd.pose.orientation.y = this->hover_point.q.y();
@@ -488,6 +492,10 @@ void Awesomo::publishPositionControllerMessage(
 {
 	geometry_msgs::PoseStamped attitude;
     std_msgs::Float64 throttle;
+    PositionController *position_controller;
+
+    // setup
+    position_controller = this->quad->position_controller;
 
     // atitude command
     attitude.header.seq = seq;
@@ -496,10 +504,10 @@ void Awesomo::publishPositionControllerMessage(
     attitude.pose.position.x = 0;
     attitude.pose.position.y = 0;
     attitude.pose.position.z = 0;
-    attitude.pose.orientation.x = this->quad->position_controller->command_quat.x();
-    attitude.pose.orientation.y = this->quad->position_controller->command_quat.y();
-    attitude.pose.orientation.z = this->quad->position_controller->command_quat.z();
-    attitude.pose.orientation.w = this->quad->position_controller->command_quat.w();
+    attitude.pose.orientation.x = position_controller->command_quat.x();
+    attitude.pose.orientation.y = position_controller->command_quat.y();
+    attitude.pose.orientation.z = position_controller->command_quat.z();
+    attitude.pose.orientation.w = position_controller->command_quat.w();
     this->attitude_publisher.publish(attitude);
 
     // throttle command
@@ -677,7 +685,7 @@ int main(int argc, char **argv)
     // setup
     ros::init(argc, argv, "awesomo");
     ros::NodeHandle node_handle;
-    ros::Rate rate(40.0);
+    ros::Rate rate(100.0);
     ros::Time last_request;
     geometry_msgs::PoseStamped msg;
 
@@ -712,7 +720,6 @@ int main(int argc, char **argv)
             awesomo->quad->mission_state = DISCOVER_MODE;
             awesomo->quad->resetPositionController();
             awesomo->throttle_publisher.publish(throttle);
-            ROS_INFO("idle...");
 
         } else {
             if (awesomo->run(msg, seq, last_request) == 0) {
