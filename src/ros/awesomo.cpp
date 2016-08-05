@@ -129,7 +129,7 @@ Awesomo::Awesomo(std::map<std::string, std::string> configs)
     }
 
     this->quad = new Quadrotor(configs);
-    this->camera_mount = new CameraMount(0.0, deg2rad(-90), 0.0, 0.0, 0.0, 0.0);
+    this->camera_mount = new CameraMount(0.0, deg2rad(-90), deg2rad(180), 0.0, 0.0, 0.0);
 
     // wait till connected to FCU
     this->waitForConnection();
@@ -274,7 +274,8 @@ void Awesomo::atimCallback(const atim::AtimPoseStamped &msg)
     tag << msg.pose.position.x, msg.pose.position.y, msg.pose.position.z;
     q = msg.pose.orientation;
     imu = Eigen::Quaterniond(q.w, q.x, q.y, q.z);
-    tag_BPF = this->camera_mount->getTargetPositionBPFrame(tag, imu);
+    // tag_BPF = this->camera_mount->getTargetPositionBPFrame(tag, imu);
+    tag_BPF = this->camera_mount->getTargetPositionBFrame(tag);
 
     this->landing_zone.detected = msg.tag_detected;
     this->landing_zone.position << tag_BPF(0), tag_BPF(1), tag_BPF(2);
