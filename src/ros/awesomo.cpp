@@ -7,6 +7,7 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <geometry_msgs/TwistStamped.h>
+#include <sensor_msgs/Imu.h>
 #include <tf/transform_broadcaster.h>
 
 #define MAVLINK_DIALECT common
@@ -25,6 +26,7 @@
 #include "awesomo/PositionControllerStats.h"
 #include "awesomo/KFStats.h"
 #include "awesomo/KFPlotting.h"
+#include "awesomo/GimbalSetPoint.h"
 
 
 
@@ -40,10 +42,11 @@
 #define POSITION_CONTROLLER_TOPIC "/awesomo/position_controller/stats"
 #define KF_ESTIMATION_TOPIC "/awesomo/kf_estimation/stats"
 #define KF_ESTIMATION_PLOTTING_TOPIC "/awesomo/kf_estimation/states"
+#define GIMBAL_SETPOINT_TOPIC "/awesomo/gimbal_setpoint"
 #define RADIO_TOPIC "/mavros/rc/in"
 #define GPS_TOPIC "/mavros/global_position/local"
 #define ATIM_POSE_TOPIC "/atim/pose"
-
+#define GIMBAL_IMU_TOPIC "/gimbal/imu"
 
 class Awesomo
 {
@@ -56,8 +59,10 @@ public:
     Velocity velocity;
     Pose mocap_pose;
     Pose gps_pose;
+    Eigen::Quaterniond gimbal_imu_quat;
+    Eigen::Vector3d gimbal_setpoint;
     LandingTargetPosition landing_zone;
-    bool landing_zone_detected;
+    bool landing_zone_detectedx ;
     int rc_in[16];
 
     Quadrotor *quad;
@@ -72,6 +77,7 @@ public:
     ros::Subscriber radio_subscriber;
     ros::Subscriber landing_subscriber;
     ros::Subscriber gps_subscriber;
+    ros::Subscriber gimbal_imu_subscriber;
 
     ros::Publisher position_publisher;
     ros::Publisher attitude_publisher;
@@ -79,6 +85,7 @@ public:
     ros::Publisher position_controller_stats_publisher;
     ros::Publisher kf_estimator_stats_publisher;
     ros::Publisher kf_estimator_stats_plotting_publisher;
+    ros::Publisher gimbal_setpoint_publisher;
 
     tf::TransformBroadcaster world_imu_tf_broadcaster;
     tf::Transform world_imu_tf;
@@ -89,6 +96,7 @@ public:
     void radioCallback(const mavros_msgs::RCIn &msg);
     void atimCallback(const atim::AtimPoseStamped &msg);
     void gpsCallback(const geometry_msgs::PoseWithCovarianceStamped &msg);
+    void gimbalIMUCallback(const sensor_msgs::Imu &msg);
     void stateCallback(const mavros_msgs::State::ConstPtr &msg);
     void waitForConnection(void);
     void imuCallback(const geometry_msgs::PoseStamped &msg);
@@ -103,6 +111,7 @@ public:
     void subscribeToRadioIn(void);
     void subscribeToAtim(void);
     void subscribeToGPS(void);
+    void subscribeToGimbalIMU(void);
     void publishHoverCommand(int seq, ros::Time time);
     void publishPositionControllerStats(int seq, ros::Time time);
     void publishPositionControllerMessage(
@@ -112,6 +121,7 @@ public:
     );
     void publishKFStats(int seq, ros::Time time);
     void publishKFStatsForPlotting(int seq, ros::Time time);
+    void publishGimbalSetpoints(int seq, ros::Time time);
     int run(
         geometry_msgs::PoseStamped &msg,
         int seq,
@@ -128,8 +138,10 @@ Awesomo::Awesomo(std::map<std::string, std::string> configs)
         this->rc_in[i] = 0.0f;
     }
 
+    this->gimbal_setpoint << 0, 0, 0;
+
     this->quad = new Quadrotor(configs);
-    this->camera_mount = new CameraMount(0.0, deg2rad(-90), deg2rad(180), 0.0, 0.0, 0.0);
+    this->camera_mount = new CameraMount(configs);
 
     // wait till connected to FCU
     this->waitForConnection();
@@ -168,6 +180,11 @@ Awesomo::Awesomo(std::map<std::string, std::string> configs)
     this->kf_estimator_stats_plotting_publisher = this->node.advertise<awesomo::KFPlotting>(
         KF_ESTIMATION_PLOTTING_TOPIC,
         50
+    );
+
+    this->gimbal_setpoint_publisher = this->node.advertise<awesomo::GimbalSetPoint>(
+        GIMBAL_SETPOINT_TOPIC,
+        60
     );
 }
 
@@ -268,17 +285,23 @@ void Awesomo::atimCallback(const atim::AtimPoseStamped &msg)
 {
     Eigen::Vector3d tag;
     Eigen::Vector3d tag_BPF;
-    Eigen::Quaterniond imu;
+    Eigen::Quaterniond frame_imu_quat;
     geometry_msgs::Quaternion q;
 
     tag << msg.pose.position.x, msg.pose.position.y, msg.pose.position.z;
     q = msg.pose.orientation;
-    imu = Eigen::Quaterniond(q.w, q.x, q.y, q.z);
-    // tag_BPF = this->camera_mount->getTargetPositionBPFrame(tag, imu);
-    tag_BPF = this->camera_mount->getTargetPositionBFrame(tag);
+    // atim records the FC imu message when creating a pose message
+    frame_imu_quat = Eigen::Quaterniond(q.w, q.x, q.y, q.z);
+    // now need to use the gimbal imu to do the BPF calculation
+    tag_BPF = this->camera_mount->getTargetPositionBPFrame(tag, this->gimbal_imu_quat);
+    // tag_BPF = this->camera_mount->getTargetPositionBFrame(tag);
 
     this->landing_zone.detected = msg.tag_detected;
     this->landing_zone.position << tag_BPF(0), tag_BPF(1), tag_BPF(2);
+    this->camera_mount->calcRollAndPitchSetpoints(tag_BPF,
+        frame_imu_quat,
+        this->gimbal_setpoint
+    );
 }
 
 void Awesomo::gpsCallback(const geometry_msgs::PoseWithCovarianceStamped &msg)
@@ -299,6 +322,21 @@ void Awesomo::gpsCallback(const geometry_msgs::PoseWithCovarianceStamped &msg)
 
     this->gps_pose = Pose(quat, position);
 }
+
+void Awesomo::gimbalIMUCallback(const sensor_msgs::Imu &msg)
+{
+    Eigen::Quaterniond quat;
+
+    quat = Eigen::Quaterniond(
+        msg.orientation.w,
+        msg.orientation.x,
+        msg.orientation.y,
+        msg.orientation.z
+    );
+
+    this->gimbal_imu_quat = quat;
+}
+
 
 void Awesomo::waitForConnection(void)
 {
@@ -372,6 +410,7 @@ void Awesomo::subscribeToPose(void)
     );
 }
 
+
 void Awesomo::subscribeToVelocity(void)
 {
     ROS_INFO("subcribing to [VELOCITY]");
@@ -423,6 +462,17 @@ void Awesomo::subscribeToGPS(void)
         GPS_TOPIC,
         50,
         &Awesomo::gpsCallback,
+        this
+    );
+}
+
+void Awesomo::subscribeToGimbalIMU(void)
+{
+    ROS_INFO("subcribing to [Gimbal imu]");
+    this->gimbal_imu_subscriber = this->node.subscribe(
+        GIMBAL_IMU_TOPIC,
+        60,
+        &Awesomo::gimbalIMUCallback,
         this
     );
 }
@@ -648,6 +698,21 @@ void Awesomo::publishKFStatsForPlotting(int seq, ros::Time time)
     }
 }
 
+void Awesomo::publishGimbalSetpoints(int seq, ros::Time time)
+{
+    awesomo::GimbalSetPoint msg;
+    msg.header.seq = seq;
+    msg.header.stamp = time;
+    msg.header.frame_id = "gimbal_setpoint";
+
+    msg.roll_setpoint = this->gimbal_setpoint(0);
+    msg.pitch_setpoint = this->gimbal_setpoint(1);
+    msg.yaw_setpoint = this->gimbal_setpoint(2);
+
+    this->gimbal_setpoint_publisher.publish(msg);
+}
+
+
 int Awesomo::run(
     geometry_msgs::PoseStamped &msg,
     int seq,
@@ -656,7 +721,6 @@ int Awesomo::run(
 {
     float dt;
     int retval;
-
     // calculate attitude from position controller
     dt = (ros::Time::now() - last_request).toSec();
 
@@ -669,6 +733,7 @@ int Awesomo::run(
     } else if (retval == DISCOVER_MODE) {
         this->quad->resetPositionController();
         this->publishHoverCommand(seq, ros::Time::now());
+        this->publishGimbalSetpoints(seq, ros::Time::now());
         return 1;
 
     } else {
@@ -676,6 +741,7 @@ int Awesomo::run(
         this->publishPositionControllerMessage(msg, seq, ros::Time::now());
         this->publishPositionControllerStats(seq, ros::Time::now());
         this->publishKFStatsForPlotting(seq, ros::Time::now());
+        this->publishGimbalSetpoints(seq, ros::Time::now());
         return 1;
     }
 
@@ -696,6 +762,7 @@ int main(int argc, char **argv)
     std::string quadrotor_config;
     std::string position_controller_config;
     std::string carrot_controller_config;
+    std::string camera_mount_config;
     std::map<std::string, std::string> configs;
     std_msgs::Float64 throttle;
 
@@ -703,9 +770,11 @@ int main(int argc, char **argv)
 	node_handle.getParam("/quadrotor", quadrotor_config);
 	node_handle.getParam("/position_controller", position_controller_config);
 	node_handle.getParam("/carrot_controller", carrot_controller_config);
+	node_handle.getParam("/camera_mount", camera_mount_config);
 	configs["quadrotor"] = quadrotor_config;
 	configs["position_controller"] = position_controller_config;
 	configs["carrot_controller"] = carrot_controller_config;
+	configs["camera_mount"] = camera_mount_config;
 
 	// setup awesomo
     seq = 1;

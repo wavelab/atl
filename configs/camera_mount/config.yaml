@@ -4,8 +4,8 @@ camera_mount:
         y: 0.0
         z: 0.0
         roll: 0.0
-        pitch: 0.0
-        yaw: 0.0
+        pitch: -90.0
+        yaw: 180.0
     
     gimbal_limits:
         roll_upper_limit: 20.0

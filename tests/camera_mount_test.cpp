@@ -1,6 +1,8 @@
 #include "awesomo/munit.h"
 #include "awesomo/camera_mount.hpp"
 
+// CONFIGS
+#define CAMERA_MOUNT_CONFIG "configs/camera_mount/config.yaml"
 
 // TESTS
 int testCameraMountGetTargetPositionBFrame(void);
@@ -15,6 +17,27 @@ static void print_target_relative_to_quad(Eigen::Vector3d &target)
     printf("%f\n", target(2));
     printf("\n");
 }
+
+CameraMount *testSetup(void)
+{
+    CameraMount *cam_mount;
+    std::map<std::string, std::string> configs;
+    configs["camera_mount"] = CAMERA_MOUNT_CONFIG;
+    cam_mount = new CameraMount(configs);
+
+    return cam_mount;
+}
+
+int testCameraMount(void)
+{
+    CameraMount *cam_mount;
+    // setup
+    cam_mount = testSetup();
+
+    std::cout << cam_mount->gimbal_limits.pitch_limits << std::endl;
+    // Todo: make a sample config and check values
+}
+
 
 int testCameraMountGetTargetPositionBFrame(void)
 {
@@ -210,6 +233,7 @@ int testCameraMountGetTargetPositionBPFrame(void)
 
 void test_suite(void)
 {
+    mu_add_test(testCameraMount);
     mu_add_test(testCameraMountGetTargetPositionBFrame);
     mu_add_test(testCameraMountGetTargetPositionBPFrame);
 }

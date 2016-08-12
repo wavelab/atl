@@ -3,7 +3,7 @@
     <!-- ATIM -->
     <param
         name="camera_config_path"
-	    value="$(find atim)/configs/ximea_camera" />
+	    value="$(find atim)/configs/pointgrey_firefly" />
 	<node
 	    pkg="atim"
 	    type="atim"
@@ -20,9 +20,20 @@
 	<param
         name="carrot_controller"
         value="$(find awesomo)/configs/carrot_controller/config.yaml" />
+	<param
+        name="camera_mount"
+        value="$(find awesomo)/configs/camera_mount/config.yaml" />
 	<node
 	    pkg="awesomo"
 	    type="awesomo"
 	    name="awesomo"
-	    output="screen" />
+        output="screen" />
+
+    <!-- Gimbal Driver -->
+    <node
+        pkg="bgc_driver"
+        type="bgc_driver_node"
+        name="bgc_driver_node"
+        output="screen" />
+
 </launch>

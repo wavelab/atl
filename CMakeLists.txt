@@ -53,6 +53,7 @@ ADD_MESSAGE_FILES(
     PositionControllerStats.msg
     KFStats.msg
     KFPlotting.msg
+    GimbalSetPoint.msg
 )
 GENERATE_MESSAGES(DEPENDENCIES std_msgs)
 

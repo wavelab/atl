@@ -6,6 +6,7 @@
 #include "awesomo/util.hpp"
 #include "awesomo/controller.hpp"
 #include "awesomo/estimator.hpp"
+#include <yaml-cpp/yaml.h>
 
 
 // CONSTANTS
