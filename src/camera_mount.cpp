@@ -122,7 +122,6 @@ int CameraMount::checkSetPointLimits(
 }
 
 
-
 int CameraMount::calcRollAndPitchSetpoints(
     Eigen::Vector3d target_position,
     Eigen::Quaterniond &imu,
@@ -134,14 +133,17 @@ int CameraMount::calcRollAndPitchSetpoints(
     float roll_setpoint;
     float pitch_setpoint;
     float yaw_setpoint;
+    float dist;
 
     frame_rot_mtx = imu.toRotationMatrix();
     frame_rpy = frame_rot_mtx.eulerAngles(0, 1, 2);
+    dist = target_position.norm();
 
     // if (abs(target_position(2)) > 0.05){ // handle case when camera is really close
     if (true){
-        roll_setpoint = tan(target_position(1) / target_position(2));
-        pitch_setpoint = tan(target_position(0) / target_position(2));
+        roll_setpoint = asin(target_position(1) / dist);
+        pitch_setpoint = asin(target_position(0) / dist);
+
     } else {
         roll_setpoint = 0.0;
         pitch_setpoint = 0.0;
@@ -149,6 +151,7 @@ int CameraMount::calcRollAndPitchSetpoints(
 
     yaw_setpoint = 0.0; // unused at the moment
 
+    std::cout << "target position \n" << target_position << std::endl;
     //this needs to be fixed. it over limits at the moment
     //this->checkSetPointLimits(frame_rpy, roll_setpoint, pitch_setpoint, yaw_setpoint);
 

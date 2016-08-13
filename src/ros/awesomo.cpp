@@ -155,6 +155,7 @@ Awesomo::Awesomo(std::map<std::string, std::string> configs)
 	this->subscribeToVelocity();
 	this->subscribeToRadioIn();
 	this->subscribeToAtim();
+	this->subscribeToGimbalIMU();
 
     // initialize publishers
     this->position_publisher = this->node.advertise<geometry_msgs::PoseStamped>(
@@ -334,6 +335,7 @@ void Awesomo::gimbalIMUCallback(const sensor_msgs::Imu &msg)
         msg.orientation.z
     );
 
+    // printf("quaterion: x: %f y: %f z: %f ", quat.x(), quat.y(), quat.z());
     this->gimbal_imu_quat = quat;
 }
 
