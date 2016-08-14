@@ -43,20 +43,12 @@ int SBGC::sendCommand(SBGCCommand &cmd)
 
     // header
     this->serial.write(&start, 1);
-
-    // command
     this->serial.write(&cmd.cmd_id, 1);
-
-    // size
     this->serial.write(&cmd.data_size, 1);
 
-    // header checksum
+    // body
     this->serial.write(&cmd.header_checksum, 1);
-
-    // data
     this->serial.write(cmd.data, (size_t) cmd.data_size);
-
-    // data checksum
     this->serial.write(&cmd.data_checksum, 1);
 
     return 0;
@@ -119,6 +111,9 @@ int SBGC::setAngle(double roll, double pitch, double yaw)
 	this->sendCommand(cmd);
 	usleep(30000);
 	this->serial.flushInput();
+
+	// clean up
+	free(cmd.data);
 
     return 0;
 }
