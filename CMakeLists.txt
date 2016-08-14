@@ -75,6 +75,8 @@ ADD_LIBRARY(
     src/controller.cpp
     src/quadrotor.cpp
     src/estimator.cpp
+    src/estimator.cpp
+    src/sbgc.cpp
 )
 
 SET(Awesomo_libs
@@ -82,6 +84,7 @@ SET(Awesomo_libs
     apriltags
     yaml-cpp
     flycapture
+    serial
     ${OpenCV_LIBS}
     ${catkin_LIBRARIES}
 )
@@ -114,7 +117,7 @@ INSTALL(
     TARGETS awesomo_controller_test
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
-#
+
 # tests/quadrotor_test
 ADD_EXECUTABLE(awesomo_quadrotor_test tests/quadrotor_test.cpp)
 TARGET_LINK_LIBRARIES(
@@ -125,7 +128,7 @@ INSTALL(
     TARGETS awesomo_quadrotor_test
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
-#
+
 # tests/estimator_test
 ADD_EXECUTABLE(awesomo_estimator_test tests/estimator_test.cpp)
 TARGET_LINK_LIBRARIES(
@@ -134,6 +137,17 @@ TARGET_LINK_LIBRARIES(
 )
 INSTALL(
     TARGETS awesomo_estimator_test
+    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+# tests/sbgc_test
+ADD_EXECUTABLE(awesomo_sbgc_test tests/sbgc_test.cpp)
+TARGET_LINK_LIBRARIES(
+    awesomo_sbgc_test
+    ${Awesomo_libs}
+)
+INSTALL(
+    TARGETS awesomo_quadrotor_test
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

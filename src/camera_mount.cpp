@@ -16,7 +16,7 @@ CameraMount::CameraMount(std::map<std::string, std::string> configs)
     YAML::Node camera_pose;
     YAML::Node gimbal_limit;
 
-    //precheck
+    // precheck
     if (configs.count("camera_mount") == 0){
         std::cout << "ERROR! camera_mount_config not found" << std::endl;
     }
@@ -24,7 +24,7 @@ CameraMount::CameraMount(std::map<std::string, std::string> configs)
     // load config
     config = YAML::LoadFile(configs["camera_mount"]);
 
-    //camera pose;
+    // camera pose;
     this->pose = Pose(0, 0, 0, 0, 0, 0);
 
     // load camera RBT (Pose) config
@@ -50,8 +50,6 @@ CameraMount::CameraMount(std::map<std::string, std::string> configs)
         deg2rad(gimbal_limit["yaw_lower_limit"].as<float>())
     );
 }
-
-
 
 Eigen::Vector3d CameraMount::getTargetPositionBFrame(Eigen::Vector3d target)
 {
@@ -88,7 +86,7 @@ int CameraMount::checkLimits(float &value, Eigen::Vector2d limits)
     // upper limit
     if (value > limits(0)){
         value = limits(0);
-    } else if (value < limits(1)){ //lower limits
+    } else if (value < limits(1)){ // lower limits
         value = limits(1);
     }
     return 0;
@@ -152,20 +150,9 @@ int CameraMount::calcRollAndPitchSetpoints(
     yaw_setpoint = 0.0; // unused at the moment
 
     std::cout << "target position \n" << target_position << std::endl;
-    //this needs to be fixed. it over limits at the moment
-    //this->checkSetPointLimits(frame_rpy, roll_setpoint, pitch_setpoint, yaw_setpoint);
+    // this needs to be fixed. it over limits at the moment
+    // this->checkSetPointLimits(frame_rpy, roll_setpoint, pitch_setpoint, yaw_setpoint);
 
     imu_setpoint_rpy << roll_setpoint, pitch_setpoint, yaw_setpoint;
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
