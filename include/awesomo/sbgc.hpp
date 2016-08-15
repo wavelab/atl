@@ -8,11 +8,10 @@
 #include <serial/serial.h>
 
 
-#define FRAME_ANG_CONV 0.02197265625  // deg per bit
-
 // GENERAL
 #define SBGC_CMD_MAX_BYTES 255
 #define SBGC_CMD_PAYLOAD_BYTES 5
+#define FRAME_ANG_CONV 0.02197265625  // deg per bit
 
 
 // CMD ID
@@ -36,7 +35,7 @@
 #define CMD_EXECUTE_MENU 69
 #define CMD_GET_ANGLES  73
 #define CMD_CONFIRM  67
-// Board v3.x only
+// board v3.x only
 #define CMD_BOARD_INFO_3  20
 #define CMD_READ_PARAMS_3 21
 #define CMD_WRITE_PARAMS_3 22
@@ -66,6 +65,11 @@
 #define CMD_BOOT_MODE_3 51
 
 
+// CMD FRAME SIZE
+#define MIN_FRAME_SIZE 5  // 4 bytes for header + 1 body checksum
+#define CMD_BOARD_INFO_FRAME_SIZE 5 + 18
+
+
 // CMD CONTROL
 #define MODE_NO_CONTROL 0
 #define MODE_SPEED 1
@@ -79,20 +83,23 @@
 class SBGCFrame
 {
 public:
-	// header
     uint8_t cmd_id;
     uint8_t data_size;
 	uint8_t header_checksum;
-
-	// body
     uint8_t *data;
     uint8_t data_checksum;
+
+    void printFrame(void);
 
     void buildDataChecksum(void);
     void buildHeader(uint8_t cmd_id, uint8_t data_size);
     void buildBody(uint8_t *data);
-    void buildCommand(int cmd_id, uint8_t *data, int data_size);
-    void buildCommand(int cmd_id);
+    void buildFrame(int cmd_id, uint8_t *data, int data_size);
+    void buildFrame(int cmd_id);
+
+	int parseHeader(uint8_t *data);
+	int parseBody(uint8_t *data);
+	int parseFrame(uint8_t *data);
 };
 
 class SBGC
@@ -103,13 +110,21 @@ public:
     serial::Timeout timeout;
     serial::Serial serial;
 
+	uint8_t board_version;
+	uint16_t firmware_version;
+	uint8_t debug_mode;
+	uint16_t board_features;
+	uint8_t connection_flags;
+
     SBGC(std::string port, unsigned long baudrate, int timeout);
     int init(void);
-    int sendCommand(SBGCFrame &cmd);
+    int sendFrame(SBGCFrame &cmd);
+	int readFrame(uint8_t read_length, SBGCFrame &frame);
     int on(void);
     int off(void);
     int reset(void);
     int getBoardInfo(void);
+    int getImuData(void);
     int setAngle(double roll, double pitch, double yaw);
 };
 

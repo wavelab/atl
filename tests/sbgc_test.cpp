@@ -4,8 +4,9 @@
 
 // TEST FUNCTIONS
 int testSBGCConnection(void);
+int testSBGCSendFrame(void);
+int testSBGCReadFrame(void);
 int testSBGCGetBoardInfo(void);
-int testSBGCSendCommand(void);
 
 
 int testSBGCConnection(void)
@@ -18,28 +19,49 @@ int testSBGCConnection(void)
     return 0;
 }
 
-int testSBGCSendCommand(void)
+int testSBGCSendFrame(void)
 {
     int retval;
-	SBGCFrame cmd;
+	SBGCFrame frame;
     SBGC sbgc("/dev/ttyUSB0", 115200, 500);
 
     // setup
     sbgc.init();
 
     // turn motors on
-    cmd.buildCommand(CMD_MOTORS_ON);
-	retval = sbgc.sendCommand(cmd);
+    frame.buildFrame(CMD_MOTORS_ON);
+	retval = sbgc.sendFrame(frame);
 	mu_check(retval == 0);
 	sleep(1);
 
     // turn motors off
-    cmd.buildCommand(CMD_MOTORS_OFF);
-	retval = sbgc.sendCommand(cmd);
+    frame.buildFrame(CMD_MOTORS_OFF);
+	retval = sbgc.sendFrame(frame);
 	mu_check(retval == 0);
 	sleep(1);
 
     return 0;
+}
+
+int testSBGCReadFrame(void)
+{
+	int retval;
+	SBGCFrame frame;
+    SBGC sbgc("/dev/ttyUSB0", 115200, 500);
+
+    // setup
+    sbgc.init();
+
+	// read frame
+    frame.buildFrame(CMD_BOARD_INFO);
+	sbgc.sendFrame(frame);
+	retval = sbgc.readFrame(23, frame);
+
+    // assert
+	mu_check(frame.data_size == 18);
+	mu_check(retval == 0);
+
+	return 0;
 }
 
 int testSBGCGetBoardInfo(void)
@@ -52,15 +74,16 @@ int testSBGCGetBoardInfo(void)
     return 0;
 }
 
-
 int testSBGCSetAngle(void)
 {
     SBGC sbgc("/dev/ttyUSB0", 115200, 500);
 
 	sbgc.init();
 	sbgc.on();
+
 	sbgc.setAngle(0, 10, 0);
-	sleep(5);
+	sleep(2);
+
 	sbgc.off();
 
 	return 0;
@@ -70,9 +93,10 @@ int testSBGCSetAngle(void)
 void testSuite(void)
 {
     // mu_add_test(testSBGCConnection);
-    mu_add_test(testSBGCSendCommand);
+    // mu_add_test(testSBGCSendFrame);
+    mu_add_test(testSBGCReadFrame);
     // mu_add_test(testSBGCGetBoardInformation);
-    mu_add_test(testSBGCSetAngle);
+    // mu_add_test(testSBGCSetAngle);
 }
 
 mu_run_tests(testSuite)

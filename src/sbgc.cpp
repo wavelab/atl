@@ -1,6 +1,23 @@
 #include "awesomo/sbgc.hpp"
 
 
+void SBGCFrame::printFrame(void)
+{
+    int i;
+
+    // print header
+    printf("[%d]: %c\n", 0, '>');
+    printf("[%d]: %c\n", 1, this->cmd_id);
+    printf("[%d]: %d\n", 2, this->data_size);
+    printf("[%d]: %d\n", 3, this->header_checksum);
+
+    // print body
+    for (i = 4; i < (this->data_size + 4); i++) {
+        printf("[%d]: %d\n", i, this->data[i]);
+    }
+    printf("[%d]: %d\n", i, this->data_checksum);
+}
+
 void SBGCFrame::buildHeader(uint8_t cmd_id, uint8_t data_size)
 {
 	this->cmd_id = cmd_id;
@@ -23,16 +40,89 @@ void SBGCFrame::buildBody(uint8_t *data)
 	this->buildDataChecksum();
 }
 
-void SBGCFrame::buildCommand(int cmd_id, uint8_t *data, int data_size)
+void SBGCFrame::buildFrame(int cmd_id, uint8_t *data, int data_size)
 {
     this->buildHeader((uint8_t) cmd_id, (uint8_t) data_size);
     this->buildBody(data);
 }
 
-void SBGCFrame::buildCommand(int cmd_id)
+void SBGCFrame::buildFrame(int cmd_id)
 {
     this->buildHeader((uint8_t) cmd_id, (uint8_t) 0);
+    this->buildBody(NULL);
 }
+
+int SBGCFrame::parseHeader(uint8_t *data)
+{
+	uint8_t expected_checksum;
+
+	// pre-check
+	if (data[0] != '>') {
+		return -1;
+	}
+
+	// parse header
+	this->cmd_id = data[1];
+	this->data_size = data[2];
+	this->header_checksum = data[3];
+
+	// check the header checksum
+	expected_checksum = (this->cmd_id + this->data_size) % 256;
+	if (this->header_checksum != expected_checksum) {
+		return -1;
+	}
+
+	return 0;
+}
+
+int SBGCFrame::parseBody(uint8_t *data)
+{
+	uint8_t i;
+	uint8_t expected_checksum;
+
+	// setup
+	expected_checksum = 0x0;
+	this->data = (uint8_t *) malloc(sizeof(uint8_t) * this->data_size);
+
+	// parse body
+	for (i = 0; i < this->data_size; i++) {
+		this->data[i] = data[4 + i];  // +4 because header is 4 bytes
+		expected_checksum += data[4 + i];
+	}
+	this->data_checksum = data[4 + i];
+
+	// check the body checksum
+	expected_checksum = expected_checksum % 256;
+	if (this->data_checksum != expected_checksum) {
+		std::cout << "failed body checksum!" << std::endl;
+		free(this->data);
+		return -1;
+	}
+
+	return 0;
+}
+
+int SBGCFrame::parseFrame(uint8_t *data)
+{
+	int retval;
+
+	// header
+	retval = this->parseHeader(data);
+	if (retval == -1) {
+		std::cout << "failed to parse header!" << std::endl;
+		return -1;
+	}
+
+	// body
+	retval = this->parseBody(data);
+	if (retval == -1) {
+		std::cout << "failed to parse body!" << std::endl;
+		return -1;
+	}
+
+	return 0;
+}
+
 
 
 
@@ -52,16 +142,16 @@ int SBGC::init(void)
 	this->serial.open();
 
     if (this->serial.isOpen()) {
-        std::cout << "connected to sbgc!" << std::endl;
+        std::cout << "connected to SBGC!" << std::endl;
     } else {
-        std::cout << "failed to connect to sbgc!" << std::endl;
+        std::cout << "failed to connect to SBGC!" << std::endl;
         return -1;
     }
 
     return 0;
 }
 
-int SBGC::sendCommand(SBGCFrame &cmd)
+int SBGC::sendFrame(SBGCFrame &cmd)
 {
     uint8_t start;
     int data_size_limit;
@@ -71,9 +161,6 @@ int SBGC::sendCommand(SBGCFrame &cmd)
     if (cmd.data_size >= data_size_limit) {
         return -1;
     }
-
-    // flush input
-	this->serial.flushInput();
 
     // header
     start = 0x3E;  // ">" character
@@ -86,8 +173,32 @@ int SBGC::sendCommand(SBGCFrame &cmd)
     this->serial.write(cmd.data, (size_t) cmd.data_size);
     this->serial.write(&cmd.data_checksum, 1);
 
-    // flush output
-	this->serial.flushOutput();
+    // flush
+	this->serial.flush();
+
+    return 0;
+}
+
+int SBGC::readFrame(uint8_t read_length, SBGCFrame &frame)
+{
+	int retval;
+    uint8_t byte;
+    int16_t nb_bytes;
+    uint8_t buffer[150];
+
+	// pre-check
+	this->serial.flush();
+    nb_bytes = this->serial.read(buffer, read_length);
+    if (nb_bytes <= 0 || nb_bytes != read_length){
+		std::cout << "failed to read SBGC frame!" << std::endl;
+        return -1;
+    }
+
+	// parse sbgc frame
+	retval = frame.parseFrame(buffer);
+	if (retval == -1) {
+		std::cout << "failed to parse SBGC frame!" << std::endl;
+	}
 
     return 0;
 }
@@ -95,8 +206,8 @@ int SBGC::sendCommand(SBGCFrame &cmd)
 int SBGC::on(void)
 {
 	SBGCFrame cmd;
-    cmd.buildCommand(CMD_MOTORS_ON);
-	return this->sendCommand(cmd);
+    cmd.buildFrame(CMD_MOTORS_ON);
+	return this->sendFrame(cmd);
 }
 
 int SBGC::off(void)
@@ -110,15 +221,15 @@ int SBGC::off(void)
 	for (int i = 1; i < 13; i++) {
         data[i] = 0;
     }
-    cmd.buildCommand(CMD_CONTROL, data, 13);
-	retval = this->sendCommand(cmd);
+    cmd.buildFrame(CMD_CONTROL, data, 13);
+	retval = this->sendFrame(cmd);
 	if (retval != 0) {
         std::cout << "failed to turn motor control off!" << std::endl;
 	}
 
     // turn off motors
-    cmd.buildCommand(CMD_MOTORS_OFF);
-	retval = this->sendCommand(cmd);
+    cmd.buildFrame(CMD_MOTORS_OFF);
+	retval = this->sendFrame(cmd);
 	if (retval != 0) {
         std::cout << "failed to turn motor control off!" << std::endl;
 	}
@@ -131,7 +242,7 @@ int SBGC::reset(void)
     int retval;
 
     if (this->off() || this->on()) {
-        std::cout << "failed to reset sbgc!" << std::endl;
+        std::cout << "failed to reset SBGC!" << std::endl;
         return -1;
     }
 
@@ -140,15 +251,46 @@ int SBGC::reset(void)
 
 int SBGC::getBoardInfo(void)
 {
+	int retval;
+	SBGCFrame frame;
 
+	// send read command
+    frame.buildFrame(CMD_BOARD_INFO);
+	retval = this->sendFrame(frame);
+	if (retval == -1) {
+		return -1;
+	}
+
+	// read board info
+	retval = this->readFrame(CMD_BOARD_INFO_FRAME_SIZE, frame);
+	if (retval == -1) {
+		return -1;
+	}
+
+	// set object board info
+	this->board_version = frame.data[0];
+	this->firmware_version = (frame.data[2] << 8) | (frame.data[1] & 0xff);
+	this->debug_mode = frame.data[3];
+	this->board_features = (frame.data[5] << 8) | (frame.data[4] & 0xff);
+	this->connection_flags = frame.data[6];
 
     return 0;
 }
 
+int SBGC::getImuData(void)
+{
+	SBGCFrame frame;
+
+    frame.buildFrame(CMD_BOARD_INFO);
+	this->sendFrame(frame);
+	this->readFrame(18, frame);
+
+	return 0;
+}
 
 int SBGC::setAngle(double roll, double pitch, double yaw)
 {
-	SBGCFrame cmd;
+	SBGCFrame frame;
 	int16_t roll_adjusted;
 	int16_t pitch_adjusted;
 	int16_t yaw_adjusted;
@@ -187,8 +329,8 @@ int SBGC::setAngle(double roll, double pitch, double yaw)
 	data[12] = ((yaw_adjusted >> 0) & 0xff);
 
     // build frame and send
-    cmd.buildCommand(CMD_CONTROL, data, 13);
-	this->sendCommand(cmd);
+    frame.buildFrame(CMD_CONTROL, data, 13);
+	this->sendFrame(frame);
 
     return 0;
 }
