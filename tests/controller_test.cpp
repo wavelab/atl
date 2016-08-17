@@ -9,9 +9,11 @@
 // TESTS
 int testCarrotController(void);
 int testCarrotControllerClosestPoint(void);
+int testCarrotControllerInitializeWaypoints(void);
 int testCarrotControllerCalculateCarrotPoint(void);
 int testCarrotControllerWaypointReached(void);
 int testCarrotControllerUpdate(void);
+
 int testPositionControllerLoadConfig(void);
 int testPositionControllerPidCalculate(void);
 
@@ -21,10 +23,34 @@ int testCarrotController(void)
     CarrotController *controller;
 
     controller = new CarrotController(CARROT_CONTROLLER_CONFIG);
-    mu_check(controller->initialized != 0);
+    mu_check(controller->initialized == 0);
     mu_check(controller->look_ahead_dist != 0);
     mu_check(controller->wp_threshold != 0);
-    mu_check(controller->waypoints.size() != 0);
+    mu_check(controller->waypoints.size() == 0);
+
+    return 0;
+}
+
+int testCarrotControllerInitializeWaypoints(void)
+{
+    CarrotController *controller;
+    std::vector<Eigen::Vector3d> waypoints;
+    Eigen::Vector3d point;
+
+    // setup
+    controller = new CarrotController(CARROT_CONTROLLER_CONFIG);
+    point << 0.0, 0.0, 3.0;
+    waypoints.push_back(point);
+    point << 0.0, 0.0, 3.0;
+    waypoints.push_back(point);
+    point << 0.0, 0.0, 3.0;
+    waypoints.push_back(point);
+
+    // test and assert
+    controller->initializeWaypoints(waypoints);
+    std::cout << controller->waypoints.size() << std::endl;
+    mu_check(controller->waypoints.size() == 3);
+    mu_check(controller->initialized == 1);
 
     return 0;
 }
@@ -48,8 +74,6 @@ int testCarrotControllerClosestPoint(void)
     point = controller.closestPoint(position, wp_start, wp_end);
     mu_check(point == expected);
 
-    // std::cout << point << std::endl;
-    // std::cout << expected << std::endl;
     return 0;
 }
 
@@ -69,7 +93,7 @@ int testCarrotControllerCalculateCarrotPoint(void)
     wp_start << 1, 1, 0;
     wp_end << 10, 10, 0;
     position << 5, 8, 0;
-    expected << 6.5, 6.5, 0.0;
+    expected << 7.91421, 7.91421, 0.0;
 
     // test and assert
     carrot_point = controller.calculateCarrotPoint(
@@ -78,11 +102,9 @@ int testCarrotControllerCalculateCarrotPoint(void)
         wp_start,
         wp_end
     );
-    // mu_check(point == expected);
-
-    std::cout << carrot_point << std::endl;
-    // std::cout << expected << std::endl;
-
+    mu_check(fltcmp(carrot_point(0), expected(0)) == 0);
+    mu_check(fltcmp(carrot_point(1), expected(1)) == 0);
+    mu_check(fltcmp(carrot_point(2), expected(2)) == 0);
 
     return 0;
 }
@@ -135,7 +157,7 @@ int testCarrotControllerUpdate(void)
 
     // test and assert
     std::ofstream outfile;
-    outfile.open("update.dat");
+    outfile.open("/tmp/carrot_controller.dat");
 
     for (int i = 0; i < 40; i++) {
         // carrot update
@@ -222,12 +244,11 @@ int testPositionControllerPidCalculate(void)
 
     std::cout << controller->roll << "\t"
               << controller->pitch << "\t"
-              << controller->T.output << std::endl;
+              << controller->throttle << std::endl;
 
     mu_check(controller->roll == 0);
     mu_check(controller->pitch == 0.);
-    mu_check(fltcmp(controller->throttle, controller->hover_throttle) == 1);
-
+    mu_check(fltcmp(controller->throttle, controller->hover_throttle) == 0);
 
     // check moving towards and x location
     setpoint << 1, 0, 0;
@@ -238,7 +259,7 @@ int testPositionControllerPidCalculate(void)
     controller->reset();
     controller->calculate(setpoint, robot_pose, yaw_setpoint, dt);
     mu_check(controller->roll == 0.0);
-    mu_check(controller->pitch > 0.1);
+    mu_check(controller->pitch < 0.0);
     mu_check(controller->throttle > controller->hover_throttle);
 
     // check moving towards and x and y location
@@ -247,42 +268,24 @@ int testPositionControllerPidCalculate(void)
     yaw_setpoint = 0;
     dt = 0.1;
 
-
     controller->reset();
     controller->calculate(setpoint, robot_pose, yaw_setpoint, dt);
-    mu_check(controller->roll < -0.1);
-    mu_check(controller->pitch > 0.0);
-    mu_check(controller->throttle > controller->hover_throttle);
-
-    // check moving towards and x and y location
-    setpoint << 0, 0, 0;
-    robot_pose = Pose(10, 2, 20, 10, 10, 20);
-    yaw_setpoint = 0;
-    dt = 0.1;
-
-
-    controller->reset();
-    controller->calculate(setpoint, robot_pose, yaw_setpoint, dt);
-    mu_check(controller->roll < -0.1);
+    mu_check(controller->roll < 0.0);
     mu_check(controller->pitch < 0.0);
     mu_check(controller->throttle > controller->hover_throttle);
-    std::cout << controller->roll << "\t"
-              << controller->pitch << "\t"
-              << controller->hover_throttle << std::endl;
 
     return 0;
 }
 
-
-
-
 void testSuite(void)
 {
     mu_add_test(testCarrotController);
+    mu_add_test(testCarrotControllerInitializeWaypoints);
     mu_add_test(testCarrotControllerClosestPoint);
     mu_add_test(testCarrotControllerCalculateCarrotPoint);
     mu_add_test(testCarrotControllerWaypointReached);
     mu_add_test(testCarrotControllerUpdate);
+
     mu_add_test(testPositionControllerLoadConfig);
     mu_add_test(testPositionControllerPidCalculate);
 }

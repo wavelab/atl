@@ -35,9 +35,24 @@ CarrotController::CarrotController(std::string config_file_path)
 
         this->waypoints.push_back(position);
     }
-    if (waypoints.size() > 0) {
+    if (this->waypoints.size() > 0) {
         this->initialized = 1;
     }
+}
+
+int CarrotController::initializeWaypoints(std::vector<Eigen::Vector3d> waypoints)
+{
+    Eigen::Vector3d wp;
+
+    for (int i = 0; i < waypoints.size(); i++) {
+        wp = waypoints[i];
+        this->waypoints.push_back(wp);
+    }
+    if (this->waypoints.size() > 0) {
+        this->initialized = 1;
+    }
+
+    return 0;
 }
 
 Eigen::Vector3d CarrotController::closestPoint(

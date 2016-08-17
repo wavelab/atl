@@ -61,6 +61,7 @@ public:
         double wp_threshold
     );
     CarrotController(std::string config_file_path);
+    int initializeWaypoints(std::vector<Eigen::Vector3d> waypoints);
     Eigen::Vector3d closestPoint(
         Eigen::Vector3d position,
         Eigen::Vector3d wp_start,

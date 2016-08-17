@@ -4,7 +4,7 @@ import matplotlib.pylab as plt
 
 
 if __name__ == "__main__":
-    data_file = open("update.dat", "r")
+    data_file = open("/tmp/carrot_controller.dat", "r")
 
     wp_start = []
     wp_end = []
