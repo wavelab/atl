@@ -76,10 +76,10 @@ ADD_LIBRARY(
     src/quadrotor.cpp
     src/estimator.cpp
     src/estimator.cpp
+    src/planner.cpp
     src/sbgc.cpp
 )
-
-SET(Awesomo_libs
+SET(AWESOMO_DEPS
     libawesomo
     apriltags
     yaml-cpp
@@ -88,24 +88,18 @@ SET(Awesomo_libs
     ${OpenCV_LIBS}
     ${catkin_LIBRARIES}
 )
+SET(BIN_DEST ${CATKIN_PACKAGE_BIN_DESTINATION})
+SET(SHARE_DEST ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
 
 
 
-# EXECUTABLES
-## ROS NODE EXECUTABLES
+## ROS NODES
 # quadrotor_node
 ADD_EXECUTABLE(awesomo src/ros/awesomo.cpp)
 ADD_DEPENDENCIES(awesomo ${PROJECT_NAME}_gencpp)
-TARGET_LINK_LIBRARIES(
-    awesomo
-    ${Awesomo_libs}
-)
-INSTALL(
-    TARGETS awesomo
-    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-
+TARGET_LINK_LIBRARIES(awesomo ${AWESOMO_DEPS})
+INSTALL(TARGETS awesomo RUNTIME DESTINATION BIN_DEST)
 
 
 
@@ -113,65 +107,40 @@ INSTALL(
 # tests/controller_test
 ADD_EXECUTABLE(awesomo_controller_test tests/controller_test.cpp)
 TARGET_LINK_LIBRARIES(awesomo_controller_test libawesomo yaml-cpp)
-INSTALL(
-    TARGETS awesomo_controller_test
-    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+INSTALL(TARGETS awesomo_controller_test RUNTIME DESTINATION BIN_DEST)
 
 # tests/quadrotor_test
 ADD_EXECUTABLE(awesomo_quadrotor_test tests/quadrotor_test.cpp)
-TARGET_LINK_LIBRARIES(
-    awesomo_quadrotor_test
-    ${Awesomo_libs}
-)
-INSTALL(
-    TARGETS awesomo_quadrotor_test
-    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+TARGET_LINK_LIBRARIES(awesomo_quadrotor_test ${AWESOMO_DEPS})
+INSTALL(TARGETS awesomo_quadrotor_test RUNTIME DESTINATION BIN_DEST)
 
 # tests/estimator_test
 ADD_EXECUTABLE(awesomo_estimator_test tests/estimator_test.cpp)
-TARGET_LINK_LIBRARIES(
-    awesomo_estimator_test
-    ${Awesomo_libs}
-)
-INSTALL(
-    TARGETS awesomo_estimator_test
-    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+TARGET_LINK_LIBRARIES(awesomo_estimator_test ${AWESOMO_DEPS})
+INSTALL(TARGETS awesomo_estimator_test RUNTIME DESTINATION BIN_DEST)
+
+# tests/planner_test
+ADD_EXECUTABLE(awesomo_planner_test tests/planner_test.cpp)
+TARGET_LINK_LIBRARIES(awesomo_planner_test ${AWESOMO_DEPS})
+INSTALL(TARGETS awesomo_quadrotor_test RUNTIME DESTINATION BIN_DEST)
 
 # tests/sbgc_test
 ADD_EXECUTABLE(awesomo_sbgc_test tests/sbgc_test.cpp)
-TARGET_LINK_LIBRARIES(
-    awesomo_sbgc_test
-    ${Awesomo_libs}
-)
-INSTALL(
-    TARGETS awesomo_quadrotor_test
-    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+TARGET_LINK_LIBRARIES(awesomo_sbgc_test ${AWESOMO_DEPS})
+INSTALL(TARGETS awesomo_quadrotor_test RUNTIME DESTINATION BIN_DEST)
 
 # tests/util_test
 ADD_EXECUTABLE(awesomo_util_test tests/util_test.cpp)
 TARGET_LINK_LIBRARIES(awesomo_util_test libawesomo)
-INSTALL(
-    TARGETS awesomo_util_test
-    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+INSTALL(TARGETS awesomo_util_test RUNTIME DESTINATION BIN_DEST)
 
 # tests/camera_mount_config_test
 ADD_EXECUTABLE(awesomo_camera_mount_test tests/camera_mount_test.cpp)
 TARGET_LINK_LIBRARIES(awesomo_camera_mount_test libawesomo yaml-cpp)
-INSTALL(TARGETS awesomo_camera_mount_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+INSTALL(TARGETS awesomo_camera_mount_test RUNTIME DESTINATION BIN_DEST)
+
 
 
 # LAUNCH AND CONFIG FILES
-INSTALL(
-    DIRECTORY configs/
-    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/configs
-)
-
-INSTALL(
-    DIRECTORY launch/
-    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
-)
+INSTALL(DIRECTORY configs/ DESTINATION SHARE_DEST/configs)
+INSTALL(DIRECTORY launch/ DESTINATION SHARE_DEST/launch)

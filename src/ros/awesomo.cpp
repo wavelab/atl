@@ -158,35 +158,13 @@ Awesomo::Awesomo(std::map<std::string, std::string> configs)
 	this->subscribeToGimbalIMU();
 
     // initialize publishers
-    this->position_publisher = this->node.advertise<geometry_msgs::PoseStamped>(
-        POSITION_TOPIC,
-        50
-    );
-    this->attitude_publisher = this->node.advertise<geometry_msgs::PoseStamped>(
-        ATTITUDE_TOPIC,
-        50
-    );
-    this->throttle_publisher = this->node.advertise<std_msgs::Float64>(
-        THROTTLE_TOPIC,
-        50
-    );
-    this->position_controller_stats_publisher = this->node.advertise<awesomo::PositionControllerStats>(
-        POSITION_CONTROLLER_TOPIC,
-        50
-    );
-    this->kf_estimator_stats_publisher = this->node.advertise<awesomo::KFStats>(
-        KF_ESTIMATION_TOPIC,
-        50
-    );
-    this->kf_estimator_stats_plotting_publisher = this->node.advertise<awesomo::KFPlotting>(
-        KF_ESTIMATION_PLOTTING_TOPIC,
-        50
-    );
-
-    this->gimbal_setpoint_publisher = this->node.advertise<awesomo::GimbalSetPoint>(
-        GIMBAL_SETPOINT_TOPIC,
-        60
-    );
+    this->position_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_TOPIC, 50);
+    this->attitude_publisher = this->node.advertise<geometry_msgs::PoseStamped>(ATTITUDE_TOPIC, 50);
+    this->throttle_publisher = this->node.advertise<std_msgs::Float64>(THROTTLE_TOPIC, 50);
+    this->position_controller_stats_publisher = this->node.advertise<awesomo::PositionControllerStats>(POSITION_CONTROLLER_TOPIC, 50);
+    this->kf_estimator_stats_publisher = this->node.advertise<awesomo::KFStats>(KF_ESTIMATION_TOPIC, 50);
+    this->kf_estimator_stats_plotting_publisher = this->node.advertise<awesomo::KFPlotting>(KF_ESTIMATION_PLOTTING_TOPIC, 50);
+    this->gimbal_setpoint_publisher = this->node.advertise<awesomo::GimbalSetPoint>(GIMBAL_SETPOINT_TOPIC, 60);
 }
 
 void Awesomo::poseCallback(const geometry_msgs::PoseStamped &msg)
@@ -787,7 +765,7 @@ int main(int argc, char **argv)
     while (ros::ok()){
         // check if offboard switch has been turned on
         if (awesomo->rc_in[6] < 1500) {
-            throttle.data = 0.0;
+            throttle.data = 0.1;
             awesomo->hover_point = awesomo->world_pose;
             awesomo->quad->mission_state = DISCOVER_MODE;
             awesomo->quad->resetPositionController();

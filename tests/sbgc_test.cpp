@@ -3,18 +3,18 @@
 
 
 // TEST FUNCTIONS
-int testSBGCConnection(void);
+int testSBGCConnectDisconnect(void);
 int testSBGCSendFrame(void);
 int testSBGCReadFrame(void);
 int testSBGCGetBoardInfo(void);
+int testSBGCGetRealtimeData(void);
 
 
-int testSBGCConnection(void)
+int testSBGCConnectDisconnect(void)
 {
     SBGC sbgc("/dev/ttyUSB0", 115200, 500);
-
-
-    mu_check(sbgc.init() == 1);
+    mu_check(sbgc.connect() == 0);
+    mu_check(sbgc.disconnect() == 0);
 
     return 0;
 }
@@ -26,7 +26,7 @@ int testSBGCSendFrame(void)
     SBGC sbgc("/dev/ttyUSB0", 115200, 500);
 
     // setup
-    sbgc.init();
+    sbgc.connect();
 
     // turn motors on
     frame.buildFrame(CMD_MOTORS_ON);
@@ -50,12 +50,12 @@ int testSBGCReadFrame(void)
     SBGC sbgc("/dev/ttyUSB0", 115200, 500);
 
     // setup
-    sbgc.init();
+    sbgc.connect();
 
 	// read frame
     frame.buildFrame(CMD_BOARD_INFO);
 	sbgc.sendFrame(frame);
-	retval = sbgc.readFrame(23, frame);
+	retval = sbgc.readFrame(CMD_BOARD_INFO_FRAME_SIZE, frame);
 
     // assert
 	mu_check(frame.data_size == 18);
@@ -68,8 +68,38 @@ int testSBGCGetBoardInfo(void)
 {
     SBGC sbgc("/dev/ttyUSB0", 115200, 500);
 
-    mu_check(sbgc.init() == 1);
+    // setup
+    sbgc.connect();
+
+    // test get board info
     sbgc.getBoardInfo();
+    printf("board version: %d\n", sbgc.board_version);
+    printf("firmware version: %d\n", sbgc.firmware_version);
+    printf("debug mode: %d\n", sbgc.debug_mode);
+    printf("board features: %d\n", sbgc.board_features);
+    printf("connection flags: %d\n", sbgc.connection_flags);
+
+    mu_check(sbgc.board_version == 30);
+    mu_check(sbgc.firmware_version == 2569);
+
+    return 0;
+}
+
+int testSBGCGetRealtimeData(void)
+{
+    SBGC sbgc("/dev/ttyUSB0", 115200, 500);
+
+    // setup
+    sbgc.connect();
+
+    // test get imu data
+	sbgc.on();
+	sleep(1);
+	sbgc.setAngle(10, 30, 0);
+	sleep(3);
+    sbgc.getRealtimeData();
+	sleep(1);
+	sbgc.off();
 
     return 0;
 }
@@ -78,7 +108,7 @@ int testSBGCSetAngle(void)
 {
     SBGC sbgc("/dev/ttyUSB0", 115200, 500);
 
-	sbgc.init();
+	sbgc.connect();
 	sbgc.on();
 
 	sbgc.setAngle(0, 10, 0);
@@ -92,10 +122,11 @@ int testSBGCSetAngle(void)
 
 void testSuite(void)
 {
-    // mu_add_test(testSBGCConnection);
+    // mu_add_test(testSBGCConnectDisconnect);
     // mu_add_test(testSBGCSendFrame);
-    mu_add_test(testSBGCReadFrame);
-    // mu_add_test(testSBGCGetBoardInformation);
+    // mu_add_test(testSBGCReadFrame);
+    // mu_add_test(testSBGCGetBoardInfo);
+    mu_add_test(testSBGCGetRealtimeData);
     // mu_add_test(testSBGCSetAngle);
 }
 

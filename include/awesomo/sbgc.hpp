@@ -6,12 +6,15 @@
 #include <iostream>
 
 #include <serial/serial.h>
+#include <Eigen/Geometry>
 
 
 // GENERAL
 #define SBGC_CMD_MAX_BYTES 255
 #define SBGC_CMD_PAYLOAD_BYTES 5
 #define FRAME_ANG_CONV 0.02197265625  // deg per bit
+#define ACC_UNIT (1.0 / 512.0) // G
+#define GYRO_UNIT 0.06103701895 // deg per sec
 
 
 // CMD ID
@@ -68,6 +71,7 @@
 // CMD FRAME SIZE
 #define MIN_FRAME_SIZE 5  // 4 bytes for header + 1 body checksum
 #define CMD_BOARD_INFO_FRAME_SIZE 5 + 18
+#define CMD_REALTIME_DATA_3_FRAME_SIZE 5 + 63
 
 
 // CMD CONTROL
@@ -78,6 +82,27 @@
 #define MODE_RC 4
 #define MODE_ANGLE_REL_FRAME 5
 
+// SYSTEM ERRORS
+// ERR_NO_SENSOR (1<<0)
+// ERR_CALIB_ACC (1<<1)
+// ERR_SET_POWER (1<<2)
+// ERR_CALIB_POLES (1<<3)
+// ERR_PROTECTION (1<<4)
+// ERR_SERIAL (1<<5)
+// Beside that, extended error contains bits:
+// ERR_LOW_BAT1 (1<<6)
+// ERR_LOW_BAT2 (1<<7)
+// ERR_GUI_VERSION (1<<8)
+// ERR_MISS_STEPS (1<<9)
+// ERR_SYSTEM (1<<10)
+// ERR_EMERGENCY_STOP (1<<11)
+
+// MACROS
+#define S16BIT(DATA, HI_BYTE, LOW_BYTE) \
+    (int16_t) ((DATA[HI_BYTE] << 8) | (DATA[LOW_BYTE] & 0xff))
+
+#define U16BIT(DATA, HI_BYTE, LOW_BYTE) \
+    (uint16_t) ((DATA[HI_BYTE] << 8) | (DATA[LOW_BYTE] & 0xff))
 
 
 class SBGCFrame
@@ -102,6 +127,24 @@ public:
 	int parseFrame(uint8_t *data);
 };
 
+class SBGCRealtimeData
+{
+public:
+    Eigen::Vector3d accel;
+    Eigen::Vector3d gyro;
+
+    Eigen::Vector3d camera_angles;
+    Eigen::Vector3d frame_angles;
+    Eigen::Vector3d rc_angles;
+
+    int cycle_time;
+    int i2c_error_count;
+    int system_error;
+    int battery_level;
+
+	void printData(void);
+};
+
 class SBGC
 {
 public:
@@ -117,14 +160,15 @@ public:
 	uint8_t connection_flags;
 
     SBGC(std::string port, unsigned long baudrate, int timeout);
-    int init(void);
+    int connect(void);
+    int disconnect(void);
     int sendFrame(SBGCFrame &cmd);
 	int readFrame(uint8_t read_length, SBGCFrame &frame);
     int on(void);
     int off(void);
     int reset(void);
     int getBoardInfo(void);
-    int getImuData(void);
+    int getRealtimeData(void);
     int setAngle(double roll, double pitch, double yaw);
 };
 
