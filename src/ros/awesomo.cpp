@@ -765,7 +765,7 @@ int main(int argc, char **argv)
     while (ros::ok()){
         // check if offboard switch has been turned on
         if (awesomo->rc_in[6] < 1500) {
-            throttle.data = 0.1;
+            throttle.data = 0.0;
             awesomo->hover_point = awesomo->world_pose;
             awesomo->quad->mission_state = DISCOVER_MODE;
             awesomo->quad->resetPositionController();
