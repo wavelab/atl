@@ -161,7 +161,6 @@ void Quadrotor::initializeCarrotController(void)
     wp(0) = p(0) + 5;
     wp(1) = p(1);
     wp(2) = p(2);
-
     this->carrot_controller->wp_end = wp;
     this->carrot_controller->waypoints.push_back(wp);
 
@@ -421,7 +420,7 @@ void Quadrotor::runLandingMode(LandingTargetPosition landing, float dt)
 //         break;
 //
 //     case MISSION_ACCOMPLISHED:
-//         return 1;
+//         return 0;
 //         break;
 //     }
 //

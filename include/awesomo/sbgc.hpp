@@ -12,7 +12,8 @@
 // GENERAL
 #define SBGC_CMD_MAX_BYTES 255
 #define SBGC_CMD_PAYLOAD_BYTES 5
-#define FRAME_ANG_CONV 0.02197265625  // deg per bit
+#define DEG_PER_BIT 0.02197265625  // deg per bit
+#define DEG_SEC_PER_BIT 0.1220740379 // deg/sec per bit
 #define ACC_UNIT (1.0 / 512.0) // G
 #define GYRO_UNIT 0.06103701895 // deg per sec
 
@@ -170,6 +171,14 @@ public:
     int getBoardInfo(void);
     int getRealtimeData(void);
     int setAngle(double roll, double pitch, double yaw);
+    int setSpeedAngle(
+        double roll,
+        double pitch,
+        double yaw,
+        double roll_speed,
+        double pitch_speed,
+        double yaw_speed
+    );
 };
 
 #endif

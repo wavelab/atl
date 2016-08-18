@@ -93,13 +93,7 @@ int testSBGCGetRealtimeData(void)
     sbgc.connect();
 
     // test get imu data
-	sbgc.on();
-	sleep(1);
-	sbgc.setAngle(10, 30, 0);
-	sleep(3);
     sbgc.getRealtimeData();
-	sleep(1);
-	sbgc.off();
 
     return 0;
 }
@@ -108,11 +102,26 @@ int testSBGCSetAngle(void)
 {
     SBGC sbgc("/dev/ttyUSB0", 115200, 500);
 
-	sbgc.connect();
+	mu_check(sbgc.connect() == 0);
 	sbgc.on();
 
-	sbgc.setAngle(0, 10, 0);
-	sleep(2);
+	sbgc.setAngle(-20, 20, 0);
+	sleep(5);
+
+	sbgc.off();
+
+	return 0;
+}
+
+int testSBGCSetSpeedAngle(void)
+{
+    SBGC sbgc("/dev/ttyUSB0", 115200, 500);
+
+	mu_check(sbgc.connect() == 0);
+	sbgc.on();
+
+	sbgc.setSpeedAngle(-10, 10, 0, 10, 10, 0);
+	sleep(5);
 
 	sbgc.off();
 
@@ -126,8 +135,9 @@ void testSuite(void)
     // mu_add_test(testSBGCSendFrame);
     // mu_add_test(testSBGCReadFrame);
     // mu_add_test(testSBGCGetBoardInfo);
-    mu_add_test(testSBGCGetRealtimeData);
+    // mu_add_test(testSBGCGetRealtimeData);
     // mu_add_test(testSBGCSetAngle);
+    mu_add_test(testSBGCSetSpeedAngle);
 }
 
 mu_run_tests(testSuite)

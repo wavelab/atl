@@ -119,6 +119,7 @@ int SBGCFrame::parseFrame(uint8_t *data)
     retval = this->parseBody(data);
     if (retval == -1) {
         std::cout << "failed to parse body!" << std::endl;
+        free(this->data);
         return -1;
     }
 
@@ -183,14 +184,20 @@ SBGC::SBGC(std::string port, unsigned long baudrate, int timeout)
 
 int SBGC::connect(void)
 {
-    this->serial.open();
+    try{
+        this->serial.open();
 
-    if (this->serial.isOpen()) {
-        std::cout << "connected to SBGC!" << std::endl;
-        return 0;
-    } else {
-        std::cout << "failed to connect to SBGC!" << std::endl;
-        return -1;
+        if (this->serial.isOpen()) {
+            std::cout << "connected to SBGC!" << std::endl;
+            return 0;
+        } else {
+            std::cout << "failed to connect to SBGC!" << std::endl;
+            return -1;
+        }
+
+    } catch (serial::IOException) {
+        return -2;
+
     }
 }
 
@@ -229,7 +236,7 @@ int SBGC::sendFrame(SBGCFrame &cmd)
     this->serial.write(cmd.data, (size_t) cmd.data_size);
     this->serial.write(&cmd.data_checksum, 1);
 
-    // flush
+    // flush and wait for 20ms (as specified in docs)
     this->serial.flush();
     usleep(20 * 1000);
 
@@ -245,6 +252,8 @@ int SBGC::readFrame(uint8_t read_length, SBGCFrame &frame)
 
     // pre-check
     nb_bytes = this->serial.read(buffer, read_length);
+    printf("nb_bytes: %d\n", nb_bytes);
+    printf("read_length: %d\n", read_length);
     if (nb_bytes <= 0 || nb_bytes != read_length){
         std::cout << "failed to read SBGC frame!" << std::endl;
         return -1;
@@ -254,6 +263,7 @@ int SBGC::readFrame(uint8_t read_length, SBGCFrame &frame)
     retval = frame.parseFrame(buffer);
     if (retval == -1) {
         std::cout << "failed to parse SBGC frame!" << std::endl;
+        return -1;
     }
 
     return 0;
@@ -347,7 +357,7 @@ int SBGC::getRealtimeData(void)
 	SBGCRealtimeData data;
 
     // request real time data
-    frame.buildFrame(CMD_REALTIME_DATA_3);
+    frame.buildFrame(CMD_REALTIME_DATA_4);
     retval = this->sendFrame(frame);
     if (retval == -1) {
         std::cout << "failed to request SBGC realtime data!" << std::endl;
@@ -355,7 +365,7 @@ int SBGC::getRealtimeData(void)
     }
 
     // obtain real time data
-    retval = this->readFrame(68, frame);
+    retval = this->readFrame(129, frame);
     if (retval == -1) {
         std::cout << "failed to parse SBGC frame for realtime data!" << std::endl;
         return -1;
@@ -391,17 +401,17 @@ int SBGC::getRealtimeData(void)
 	data.rc_angles(1) = S16BIT(frame.data, 47, 45);
 	data.rc_angles(2) = S16BIT(frame.data, 49, 46);
 
-	data.camera_angles(0) = (FRAME_ANG_CONV) * data.camera_angles(0);
-	data.camera_angles(1) = (FRAME_ANG_CONV) * data.camera_angles(1);
-	data.camera_angles(2) = (FRAME_ANG_CONV) * data.camera_angles(2);
+	data.camera_angles(0) = (DEG_PER_BIT) * data.camera_angles(0);
+	data.camera_angles(1) = (DEG_PER_BIT) * data.camera_angles(1);
+	data.camera_angles(2) = (DEG_PER_BIT) * data.camera_angles(2);
 
-	data.frame_angles(0) = (FRAME_ANG_CONV) * data.frame_angles(0);
-	data.frame_angles(1) = (FRAME_ANG_CONV) * data.frame_angles(1);
-	data.frame_angles(2) = (FRAME_ANG_CONV) * data.frame_angles(2);
+	data.frame_angles(0) = (DEG_PER_BIT) * data.frame_angles(0);
+	data.frame_angles(1) = (DEG_PER_BIT) * data.frame_angles(1);
+	data.frame_angles(2) = (DEG_PER_BIT) * data.frame_angles(2);
 
-	data.rc_angles(0) = (FRAME_ANG_CONV) * data.rc_angles(0);
-	data.rc_angles(1) = (FRAME_ANG_CONV) * data.rc_angles(1);
-	data.rc_angles(2) = (FRAME_ANG_CONV) * data.rc_angles(2);
+	data.rc_angles(0) = (DEG_PER_BIT) * data.rc_angles(0);
+	data.rc_angles(1) = (DEG_PER_BIT) * data.rc_angles(1);
+	data.rc_angles(2) = (DEG_PER_BIT) * data.rc_angles(2);
 
 	// misc
     data.cycle_time = U16BIT(frame.data, 51, 50);
@@ -423,9 +433,9 @@ int SBGC::setAngle(double roll, double pitch, double yaw)
     uint8_t data[13];
 
     // adjust roll, pitch and yaw
-    roll_adjusted = (int16_t) (roll / FRAME_ANG_CONV);
-    pitch_adjusted = (int16_t) (pitch / FRAME_ANG_CONV);
-    yaw_adjusted = (int16_t) (yaw / FRAME_ANG_CONV);
+    roll_adjusted = (int16_t) (roll / DEG_PER_BIT);
+    pitch_adjusted = (int16_t) (pitch / DEG_PER_BIT);
+    yaw_adjusted = (int16_t) (yaw / DEG_PER_BIT);
 
     // control mode
     data[0] = MODE_ANGLE;
@@ -449,6 +459,66 @@ int SBGC::setAngle(double roll, double pitch, double yaw)
     // speed yaw
     data[9] = 0;
     data[10] = 0;
+
+    // angle yaw
+    data[11] = ((yaw_adjusted >> 0) & 0xff);
+    data[12] = ((yaw_adjusted >> 8) & 0xff);
+
+    // build frame and send
+    frame.buildFrame(CMD_CONTROL, data, 13);
+    this->sendFrame(frame);
+
+    return 0;
+}
+
+int SBGC::setSpeedAngle(
+    double roll,
+    double pitch,
+    double yaw,
+    double roll_speed,
+    double pitch_speed,
+    double yaw_speed
+)
+{
+    SBGCFrame frame;
+    int16_t roll_adjusted;
+    int16_t pitch_adjusted;
+    int16_t yaw_adjusted;
+    int16_t roll_speed_adjusted;
+    int16_t pitch_speed_adjusted;
+    int16_t yaw_speed_adjusted;
+    uint8_t data[13];
+
+    // adjust roll, pitch and yaw
+    roll_adjusted = (int16_t) (roll / DEG_PER_BIT);
+    pitch_adjusted = (int16_t) (pitch / DEG_PER_BIT);
+    yaw_adjusted = (int16_t) (yaw / DEG_PER_BIT);
+    roll_speed_adjusted = (int16_t) (roll_speed / DEG_SEC_PER_BIT);
+    pitch_speed_adjusted = (int16_t) (pitch_speed / DEG_SEC_PER_BIT);
+    yaw_speed_adjusted = (int16_t) (yaw_speed / DEG_SEC_PER_BIT);
+
+    // control mode
+    data[0] = MODE_SPEED_ANGLE;
+
+    // speed roll
+    data[1] = ((roll_speed_adjusted >> 0) & 0xff);
+    data[2] = ((roll_speed_adjusted >> 8) & 0xff);
+
+    // angle roll
+    data[3] = ((roll_adjusted >> 0) & 0xff);
+    data[4] = ((roll_adjusted >> 8) & 0xff);
+
+    // speed pitch
+    data[5] = ((pitch_speed_adjusted >> 0) & 0xff);
+    data[6] = ((pitch_speed_adjusted >> 8) & 0xff);
+
+    // angle pitch
+    data[7] = ((pitch_adjusted >> 0) & 0xff);
+    data[8] = ((pitch_adjusted >> 8) & 0xff);
+
+    // speed yaw
+    data[9] = ((yaw_speed_adjusted >> 0) & 0xff);
+    data[10] = ((yaw_speed_adjusted >> 8) & 0xff);
 
     // angle yaw
     data[11] = ((yaw_adjusted >> 0) & 0xff);
