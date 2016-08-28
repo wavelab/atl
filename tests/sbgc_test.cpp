@@ -87,13 +87,19 @@ int testSBGCGetBoardInfo(void)
 
 int testSBGCGetRealtimeData(void)
 {
-    SBGC sbgc("/dev/ttyUSB0", 115200, 500);
+    SBGC sbgc("/dev/ttyUSB0", 115200, 10);
 
     // setup
     sbgc.connect();
 
     // test get imu data
-    sbgc.getRealtimeData();
+    for (int i = 0; i < 100; ++i){
+        sbgc.getRealtimeData();
+        sbgc.data.printData();
+        // printf("roll %f \n", sbgc.data.rc_angles(0));
+        // printf("pitch %f \n", sbgc.data.rc_angles(1));
+        // printf("yaw %f \n", sbgc.data.rc_angles(2));
+    }
 
     return 0;
 }
@@ -137,8 +143,8 @@ void testSuite(void)
     // mu_add_test(testSBGCSendFrame);
     // mu_add_test(testSBGCReadFrame);
     // mu_add_test(testSBGCGetBoardInfo);
-    // mu_add_test(testSBGCGetRealtimeData);
-    mu_add_test(testSBGCSetAngle);
+    mu_add_test(testSBGCGetRealtimeData);
+    // mu_add_test(testSBGCSetAngle);
     // mu_add_test(testSBGCSetSpeedAngle);
 }
 

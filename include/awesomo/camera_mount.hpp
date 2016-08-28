@@ -58,6 +58,8 @@ public:
         Eigen::Vector3d target_position,
         Eigen::Quaterniond &imu
     );
+
+    int setGimbalAngles(double roll, double pitch, double yaw);
 };
 
 

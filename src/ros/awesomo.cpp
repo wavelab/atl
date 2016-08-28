@@ -708,6 +708,9 @@ int main(int argc, char **argv)
     awesomo = new Awesomo(configs);
     last_request = ros::Time::now();
 
+    // initial gimbal settings
+    awesomo->camera_mount->setGimbalAngles(0, -45, 0);
+
     while (ros::ok()){
         // check if offboard switch has been turned on
         if (awesomo->rc_in[6] < 1500) {

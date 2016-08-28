@@ -66,8 +66,6 @@ int SBGCFrame::parseHeader(uint8_t *data)
     this->data_size = data[2];
     this->header_checksum = data[3];
 
-    printf("data_size: %d\n", data[2]);
-
     // check the header checksum
     expected_checksum = (this->cmd_id + this->data_size) % 256;
     if (this->header_checksum != expected_checksum) {
@@ -111,14 +109,14 @@ int SBGCFrame::parseFrame(uint8_t *data)
     // header
     retval = this->parseHeader(data);
     if (retval == -1) {
-        std::cout << "failed to parse header!" << std::endl;
+        // std::cout << "failed to parse header!" << std::endl;
         return -1;
     }
 
     // body
     retval = this->parseBody(data);
     if (retval == -1) {
-        std::cout << "failed to parse body!" << std::endl;
+        // std::cout << "failed to parse body!" << std::endl;
         free(this->data);
         return -1;
     }
@@ -252,8 +250,6 @@ int SBGC::readFrame(uint8_t read_length, SBGCFrame &frame)
 
     // pre-check
     nb_bytes = this->serial.read(buffer, read_length);
-    printf("nb_bytes: %d\n", nb_bytes);
-    printf("read_length: %d\n", read_length);
     if (nb_bytes <= 0 || nb_bytes != read_length){
         std::cout << "failed to read SBGC frame!" << std::endl;
         return -1;

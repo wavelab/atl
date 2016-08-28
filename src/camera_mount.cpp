@@ -74,8 +74,14 @@ Eigen::Vector3d CameraMount::getTargetPositionBPFGimbal(
     Eigen::Vector3d target
 )
 {
+    int retval;
     Eigen::Quaterniond gimbal_imu;
-    this->sbgc->getRealtimeData();
+
+    retval = this->sbgc->getRealtimeData();
+    if (retval == 0) {
+        this->sbgc->data.printData();
+    }
+
     euler2Quaternion(
         this->sbgc->data.rc_angles(0),
         this->sbgc->data.rc_angles(1),
@@ -175,3 +181,11 @@ int CameraMount::calcRollAndPitchSetpoints(
 
     return 0;
 }
+
+int CameraMount::setGimbalAngles(double roll, double pitch, double yaw)
+{
+    this->sbgc->setAngle(roll, pitch, yaw);
+};
+
+
+
