@@ -61,6 +61,7 @@ int testQuadrotor(void)
     mu_check(quad->world_pose.position(0) == 0);
     mu_check(quad->world_pose.position(1) == 0);
     mu_check(quad->world_pose.position(2) == 0);
+    mu_check(fltcmp(quad->yaw, 0.0) == 0);
 
     // landing state
     mu_check(quad->landing_belief == 0);

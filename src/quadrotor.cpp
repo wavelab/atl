@@ -41,6 +41,7 @@ Quadrotor::Quadrotor(std::map<std::string, std::string> configs)
     // intialize state
     this->mission_state = DISCOVER_MODE;
     this->world_pose.position << 0.0, 0.0, 0.0;
+	this->yaw = 0;
 
     // landing state
     this->landing_belief = 0;
@@ -120,7 +121,11 @@ Attitude Quadrotor::positionControllerCalculate(
 )
 {
     Attitude a;
+#ifdef YAW_CONTROL_ON
     this->position_controller->calculate(setpoint, robot_pose, yaw, dt);
+#else
+    this->position_controller->calculate(setpoint, robot_pose, 0.0, dt);
+#endif
 
     a.x = this->position_controller->command_quat.x();
     a.y = this->position_controller->command_quat.y();
@@ -265,6 +270,7 @@ void Quadrotor::runDiscoverMode(LandingTargetPosition landing)
 			printf("Landing target yaw is: %.2f\n", lt_yaw);
 
 			// set quadrotor yaw
+			this->yaw = lt_yaw;
 
             // clear landing target history
             lt_history.clear();
@@ -327,7 +333,7 @@ void Quadrotor::runTrackingModeBPF(LandingTargetPosition landing, float dt)
     robot_pose.q = this->world_pose.q;
 
     // update position controller
-    this->positionControllerCalculate(setpoint, robot_pose, 0, dt);
+    this->positionControllerCalculate(setpoint, robot_pose, this->yaw, dt);
 
     // transition to landing
     elasped = difftime(time(NULL), this->tracking_start);
@@ -455,7 +461,7 @@ void Quadrotor::runLandingMode(LandingTargetPosition landing, float dt)
     robot_pose.q = this->world_pose.q;
 
     // update position controller
-    this->positionControllerCalculate(tag_est, robot_pose, 0, dt);
+    this->positionControllerCalculate(tag_est, robot_pose, this->yaw, dt);
 }
 
 // int Quadrotor::followWaypoints(
