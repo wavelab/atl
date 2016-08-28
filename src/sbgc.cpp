@@ -1,6 +1,65 @@
 #include "awesomo/sbgc.hpp"
 
 
+
+int set_interface_attribs(int fd, int speed, int parity)
+{
+	struct termios tty;
+	memset (&tty, 0, sizeof tty);
+	if (tcgetattr(fd, &tty) != 0) {
+		printf("error %d from tcgetattr", errno);
+		return -1;
+	}
+
+	cfsetospeed(&tty, speed);
+	cfsetispeed(&tty, speed);
+
+	tty.c_cflag = (tty.c_cflag & ~CSIZE) | CS8;     // 8-bit chars
+	// disable IGNBRK for mismatched speed tests; otherwise receive break
+	// as \000 chars
+	tty.c_iflag &= ~IGNBRK;         // disable break processing
+	tty.c_lflag = 0;                // no signaling chars, no echo,
+	// no canonical processing
+	tty.c_oflag = 0;                // no remapping, no delays
+	tty.c_cc[VMIN]  = 0;            // read doesn't block
+	tty.c_cc[VTIME] = 5;            // 0.5 seconds read timeout
+
+	tty.c_iflag &= ~(IXON | IXOFF | IXANY); // shut off xon/xoff ctrl
+
+	tty.c_cflag |= (CLOCAL | CREAD);// ignore modem controls,
+	// enable reading
+	tty.c_cflag &= ~(PARENB | PARODD);      // shut off parity
+	tty.c_cflag |= parity;
+	tty.c_cflag &= ~CSTOPB;
+	tty.c_cflag &= ~CRTSCTS;
+
+	if (tcsetattr(fd, TCSANOW, &tty) != 0) {
+		printf("error %d from tcsetattr", errno);
+		return -1;
+	}
+
+	return 0;
+}
+
+void set_blocking(int fd, int should_block)
+{
+	struct termios tty;
+
+	memset(&tty, 0, sizeof tty);
+	if (tcgetattr(fd, &tty) != 0) {
+		printf("error %d from tggetattr", errno);
+		return;
+	}
+
+	tty.c_cc[VMIN] = should_block ? 1 : 0;
+	tty.c_cc[VTIME] = 5; // 0.5 seconds read timeout
+
+	if (tcsetattr(fd, TCSANOW, &tty) != 0) {
+		printf("error %d setting term attributes", errno);
+	}
+}
+
+
 void SBGCFrame::printFrame(void)
 {
     int i;
@@ -164,48 +223,41 @@ void SBGCRealtimeData::printData(void)
     printf("cycle_time: %d\n", this->cycle_time);
     printf("i2c_error_count: %d\n", this->i2c_error_count);
     printf("system_error: %d\n", this->system_error);
-	printf("battery_level: %d\n", this->battery_level);
+	printf("battery_level: %d\n\n", this->battery_level);
 }
 
 
 
 
-SBGC::SBGC(std::string port, unsigned long baudrate, int timeout)
+SBGC::SBGC(std::string port)
 {
     this->port = port;
-    this->baudrate = baudrate;
-    this->timeout = serial::Timeout::simpleTimeout(timeout);
-    this->serial.setTimeout(this->timeout);
-    this->serial.setPort(this->port);
-    this->serial.setBaudrate(this->baudrate);
 }
 
 int SBGC::connect(void)
 {
-    try{
-        this->serial.open();
+	// open serial port
+	this->serial = open(this->port.c_str(), O_RDWR | O_NOCTTY | O_SYNC);
+	if (this->serial < 0) {
+		std::cout << "failed to connect to SBGC!" << std::endl;
+		return -1;
+	}
 
-        if (this->serial.isOpen()) {
-            std::cout << "connected to SBGC!" << std::endl;
-            return 0;
-        } else {
-            std::cout << "failed to connect to SBGC!" << std::endl;
-            return -1;
-        }
+	// configure serial commnication
+	set_interface_attribs(this->serial, B115200, 0);
+	set_blocking(this->serial, 1);
 
-    } catch (serial::IOException) {
-        return -2;
+	std::cout << "connected to SBGC!" << std::endl;
 
-    }
+	return 0;
 }
 
 int SBGC::disconnect(void)
 {
-    this->serial.close();
-
-    if (this->serial.isOpen()) {
+	if (close(this->serial) != 0) {
         std::cout << "failed to disconnect from SBGC!" << std::endl;
         return -1;
+
     } else {
         std::cout << "disconnected from SBGC!" << std::endl;
         return 0;
@@ -225,17 +277,14 @@ int SBGC::sendFrame(SBGCFrame &cmd)
 
     // header
     start = 0x3E;  // ">" character
-    this->serial.write(&start, 1);
-    this->serial.write(&cmd.cmd_id, 1);
-    this->serial.write(&cmd.data_size, 1);
+	write(this->serial, &start, 1);
+	write(this->serial, &cmd.cmd_id, 1);
+	write(this->serial, &cmd.data_size, 1);
 
     // body
-    this->serial.write(&cmd.header_checksum, 1);
-    this->serial.write(cmd.data, (size_t) cmd.data_size);
-    this->serial.write(&cmd.data_checksum, 1);
-
-    // flush and wait for 20ms (as specified in docs)
-    this->serial.flush();
+    write(this->serial, &cmd.header_checksum, 1);
+    write(this->serial, cmd.data, cmd.data_size);
+    write(this->serial, &cmd.data_checksum, 1);
     usleep(20 * 1000);
 
     return 0;
@@ -249,7 +298,7 @@ int SBGC::readFrame(uint8_t read_length, SBGCFrame &frame)
     uint8_t buffer[150];
 
     // pre-check
-    nb_bytes = this->serial.read(buffer, read_length);
+	nb_bytes = read(this->serial, buffer, read_length);
     if (nb_bytes <= 0 || nb_bytes != read_length){
         std::cout << "failed to read SBGC frame!" << std::endl;
         return -1;

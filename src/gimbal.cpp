@@ -40,7 +40,7 @@ Gimbal::Gimbal(std::map<std::string, std::string> configs)
 
     // load gimbal stuff
     gimbal_dev_path = config["gimbal_dev_path"].as<std::string>();
-    this->sbgc = new SBGC(gimbal_dev_path, 115200, 500);
+    this->sbgc = new SBGC(gimbal_dev_path);
     this->sbgc->connect();
     this->sbgc->on();
 

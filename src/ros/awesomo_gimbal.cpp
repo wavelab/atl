@@ -25,7 +25,7 @@ int main(int argc, char **argv)
     last_request = ros::Time::now();
 
     // gimbal->setGimbalAngles(0, -20, 0);
-    SBGC *sbgc = new SBGC("/dev/ttyUSB0", 115200, 500);
+    SBGC *sbgc = new SBGC("/dev/ttyUSB0");
     sbgc->connect();
     sbgc->on();
 

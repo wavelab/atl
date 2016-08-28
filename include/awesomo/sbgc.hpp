@@ -1,6 +1,10 @@
 #ifndef __SBGC_HPP__
 #define __SBGC_HPP__
 
+#include <errno.h>
+#include <fcntl.h>
+#include <string.h>
+#include <termios.h>
 #include <unistd.h>
 
 #include <iostream>
@@ -111,7 +115,7 @@ class SBGCFrame
 public:
     uint8_t cmd_id;
     uint8_t data_size;
-	uint8_t header_checksum;
+    uint8_t header_checksum;
     uint8_t *data;
     uint8_t data_checksum;
 
@@ -123,9 +127,9 @@ public:
     void buildFrame(int cmd_id, uint8_t *data, int data_size);
     void buildFrame(int cmd_id);
 
-	int parseHeader(uint8_t *data);
-	int parseBody(uint8_t *data);
-	int parseFrame(uint8_t *data);
+    int parseHeader(uint8_t *data);
+    int parseBody(uint8_t *data);
+    int parseFrame(uint8_t *data);
 };
 
 class SBGCRealtimeData
@@ -143,7 +147,7 @@ public:
     int system_error;
     int battery_level;
 
-	void printData(void);
+    void printData(void);
 };
 
 class SBGC
@@ -151,21 +155,19 @@ class SBGC
 public:
     SBGCRealtimeData data;
     std::string port;
-    unsigned long baudrate;
-    serial::Timeout timeout;
-    serial::Serial serial;
+	int serial;
 
-	uint8_t board_version;
-	uint16_t firmware_version;
-	uint8_t debug_mode;
-	uint16_t board_features;
-	uint8_t connection_flags;
+    uint8_t board_version;
+    uint16_t firmware_version;
+    uint8_t debug_mode;
+    uint16_t board_features;
+    uint8_t connection_flags;
 
-    SBGC(std::string port, unsigned long baudrate, int timeout);
+    SBGC(std::string port);
     int connect(void);
     int disconnect(void);
     int sendFrame(SBGCFrame &cmd);
-	int readFrame(uint8_t read_length, SBGCFrame &frame);
+    int readFrame(uint8_t read_length, SBGCFrame &frame);
     int on(void);
     int off(void);
     int reset(void);
