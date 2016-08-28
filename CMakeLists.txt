@@ -26,7 +26,6 @@ FIND_PACKAGE(
     image_transport
     cv_bridge
     tf
-    serial
 )
 FIND_PACKAGE(OpenCV REQUIRED)
 FIND_PACKAGE(Boost REQUIRED)
@@ -85,6 +84,7 @@ SET(AWESOMO_DEPS
     apriltags
     yaml-cpp
     flycapture
+    serial
     ${OpenCV_LIBS}
     ${catkin_LIBRARIES}
 )

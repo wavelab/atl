@@ -1,3 +1,7 @@
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+
 #include <iostream>
 #include <cmath>
 #include <unistd.h>
@@ -142,10 +146,10 @@ Awesomo::Awesomo(std::map<std::string, std::string> configs)
     this->arming_client = this->node.serviceClient<mavros_msgs::CommandBool>(ARM_TOPIC);
 
     // initialize subscribers
-	this->subscribeToPose();
-	this->subscribeToVelocity();
-	this->subscribeToRadioIn();
-	this->subscribeToAtim();
+    this->subscribeToPose();
+    this->subscribeToVelocity();
+    this->subscribeToRadioIn();
+    this->subscribeToAtim();
 
     // initialize publishers
     this->position_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_TOPIC, 50);
@@ -421,11 +425,11 @@ void Awesomo::subscribeToGPS(void)
 
 void Awesomo::publishHoverCommand(int seq, ros::Time time)
 {
-	geometry_msgs::PoseStamped hover_cmd;
-	float adjusted_height;
+    geometry_msgs::PoseStamped hover_cmd;
+    float adjusted_height;
 
-	// setup
-	adjusted_height = this->quad->hover_height + this->quad->height_offset;
+    // setup
+    adjusted_height = this->quad->hover_height + this->quad->height_offset;
 
     // msg header
     hover_cmd.header.seq = seq;
@@ -446,7 +450,7 @@ void Awesomo::publishHoverCommand(int seq, ros::Time time)
 
 void Awesomo::publishPositionControllerStats(int seq, ros::Time time)
 {
-	awesomo::PositionControllerStats msg;
+    awesomo::PositionControllerStats msg;
 
     // msg header
     msg.header.seq = seq;
@@ -483,7 +487,7 @@ void Awesomo::publishPositionControllerMessage(
     ros::Time time
 )
 {
-	geometry_msgs::PoseStamped attitude;
+    geometry_msgs::PoseStamped attitude;
     std_msgs::Float64 throttle;
     PositionController *position_controller;
 
@@ -510,11 +514,11 @@ void Awesomo::publishPositionControllerMessage(
 
 void Awesomo::publishKFStats(int seq, ros::Time time)
 {
-	awesomo::KFStats msg;
-	struct kf *estimator;
+    awesomo::KFStats msg;
+    struct kf *estimator;
 
-	// setup
-	estimator = &this->quad->tag_estimator;
+    // setup
+    estimator = &this->quad->tag_estimator;
 
     // message header
     msg.header.seq = seq;
@@ -673,6 +677,13 @@ int Awesomo::run(
 
 }
 
+void *thread(void *arg)
+{
+    CameraMount *camera_mount;
+    camera_mount->sbgc->getRealtimeData();
+    camera_mount->sbgc->data.printData();
+}
+
 int main(int argc, char **argv)
 {
     // setup
@@ -682,8 +693,8 @@ int main(int argc, char **argv)
     ros::Time last_request;
     geometry_msgs::PoseStamped msg;
 
-	float dt;
-	int seq;
+    float dt;
+    int seq;
     Awesomo *awesomo;
     std::string quadrotor_config;
     std::string position_controller_config;
@@ -693,20 +704,23 @@ int main(int argc, char **argv)
     std_msgs::Float64 throttle;
 
     // get configuration paths
-	node_handle.getParam("/quadrotor", quadrotor_config);
-	node_handle.getParam("/position_controller", position_controller_config);
-	node_handle.getParam("/carrot_controller", carrot_controller_config);
-	node_handle.getParam("/camera_mount", camera_mount_config);
-	configs["quadrotor"] = quadrotor_config;
-	configs["position_controller"] = position_controller_config;
-	configs["carrot_controller"] = carrot_controller_config;
-	configs["camera_mount"] = camera_mount_config;
+    node_handle.getParam("/quadrotor", quadrotor_config);
+    node_handle.getParam("/position_controller", position_controller_config);
+    node_handle.getParam("/carrot_controller", carrot_controller_config);
+    node_handle.getParam("/camera_mount", camera_mount_config);
+    configs["quadrotor"] = quadrotor_config;
+    configs["position_controller"] = position_controller_config;
+    configs["carrot_controller"] = carrot_controller_config;
+    configs["camera_mount"] = camera_mount_config;
 
-	// setup awesomo
+    // setup awesomo
     seq = 1;
     ROS_INFO("running ...");
     awesomo = new Awesomo(configs);
     last_request = ros::Time::now();
+
+    pthread_t t;
+    pthread_create(&t, NULL, &thread, awesomo->camera_mount);
 
     // initial gimbal settings
     awesomo->camera_mount->setGimbalAngles(0, -45, 0);
@@ -727,11 +741,11 @@ int main(int argc, char **argv)
 
         }
 
-		// end
-		seq++;
+        // end
+        seq++;
         last_request = ros::Time::now();
-		ros::spinOnce();
-		rate.sleep();
+        ros::spinOnce();
+        rate.sleep();
     }
 
     return 0;
