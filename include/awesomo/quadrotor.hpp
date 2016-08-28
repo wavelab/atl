@@ -74,6 +74,7 @@ public:
     // state
     int mission_state;
     Pose world_pose;
+	double yaw;
 
     bool height_offset_initialized;
     float height_offset;
@@ -85,6 +86,7 @@ public:
     time_t tracking_start;
     time_t target_last_updated;
     time_t height_last_updated;
+    std::vector<Eigen::Vector2d> lt_history;
 
     // controllers
     CarrotController *carrot_controller;
@@ -105,6 +107,7 @@ public:
 
     // void updatePose(Pose p);
     void resetPositionController(void);
+	int calculateLandingTargetYaw(double *yaw);
     void initializeCarrotController(void);
     Eigen::Vector3d runCarrotMode(Pose robot_pose, float dt);
     void runDiscoverMode(LandingTargetPosition landing);

@@ -46,13 +46,13 @@ double rad2deg(double d)
 
 int fltcmp(double f1, double f2)
 {
-	if (fabs(f1 - f2) <= 0.0001) {
-		return 0;
-	} else if (f1 > f2) {
-		return 1;
-	} else {
-		return -1;
-	}
+    if (fabs(f1 - f2) <= 0.0001) {
+        return 0;
+    } else if (f1 > f2) {
+        return 1;
+    } else {
+        return -1;
+    }
 }
 
 int euler2Quaternion(
@@ -85,9 +85,51 @@ int euler2RotationMatrix(
     return 0;
 }
 
-static double tic(void)
+inline static double sqr(double x)
 {
-    struct timeval t;
-    gettimeofday(&t, NULL);
-    return ((double) t.tv_sec + ((double) t.tv_usec) / 1000000.0);
+	return x * x;
+}
+
+int linreg(std::vector<Eigen::Vector2d> pts, double *m, double *c, double *r)
+{
+	// linear regression of form: y = mx + c
+	Eigen::Vector2d p;
+	double sumx = 0.0;   /* sum of x */
+	double sumx2 = 0.0;  /* sum of x^2 */
+	double sumxy = 0.0;  /* sum of x * y */
+	double sumy = 0.0;   /* sum of y */
+	double sumy2 = 0.0;  /* sum of y^2 */
+
+	for (int i = 0; i < pts.size(); i++) {
+		p = pts[i];
+		sumx += p(0);
+		sumx2 += sqr(p(0));
+		sumxy += p(0) * p(1);
+		sumy += p(1);
+		sumy2 += sqr(p(1));
+	}
+
+	double denom = (pts.size() * sumx2 - sqr(sumx));
+	if (denom == 0) {
+		// singular matrix. can't solve the problem.
+		*m = 0;
+		*c = 0;
+		if (r) {
+			*r = 0;
+		}
+		return -1;
+	}
+
+	*m = (pts.size() * sumxy  -  sumx * sumy) / denom;
+	*c = (sumy * sumx2  -  sumx * sumxy) / denom;
+	/* compute correlation coeff */
+	if (r != NULL) {
+		*r = (sumxy - sumx * sumy / pts.size());
+		*r /= sqrt(
+			(sumx2 - sqr(sumx) / pts.size())
+			* (sumy2 - sqr(sumy) / pts.size())
+		);
+	}
+
+    return 0;
 }
