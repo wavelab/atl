@@ -28,7 +28,7 @@ Gimbal::Gimbal(std::map<std::string, std::string> configs)
     this->pose = Pose(0, 0, 0, 0, 0, 0);
 
     // load camera RBT (Pose) config
-    camera_pose = config["gimbal"]["RBT_between_cam_and_FC"];
+    camera_pose = config["RBT_between_cam_and_FC"];
     this->pose = Pose(
         deg2rad(camera_pose["roll"].as<float>()),
         deg2rad(camera_pose["pitch"].as<float>()),
@@ -39,14 +39,14 @@ Gimbal::Gimbal(std::map<std::string, std::string> configs)
     );
 
     // load gimbal stuff
-    gimbal_dev_path = config["gimbal"]["gimbal_dev_path"].as<std::string>();
+    gimbal_dev_path = config["gimbal_dev_path"].as<std::string>();
     this->sbgc = new SBGC(gimbal_dev_path, 115200, 500);
     this->sbgc->connect();
     this->sbgc->on();
 
     // load gimbal_limits
     this->setGimbalLimits(0, 0, 0, 0, 0, 0);
-    gimbal_limit = config["gimbal"]["gimbal_limits"];
+    gimbal_limit = config["gimbal_limits"];
     this->setGimbalLimits(
         deg2rad(gimbal_limit["roll_upper_limit"].as<float>()),
         deg2rad(gimbal_limit["roll_lower_limit"].as<float>()),
@@ -186,6 +186,3 @@ int Gimbal::setGimbalAngles(double roll, double pitch, double yaw)
 {
     this->sbgc->setAngle(roll, pitch, yaw);
 };
-
-
-

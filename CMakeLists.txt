@@ -101,6 +101,12 @@ ADD_DEPENDENCIES(awesomo ${PROJECT_NAME}_gencpp)
 TARGET_LINK_LIBRARIES(awesomo ${AWESOMO_DEPS})
 INSTALL(TARGETS awesomo RUNTIME DESTINATION BIN_DEST)
 
+# gimbal_node
+ADD_EXECUTABLE(awesomo_gimbal src/ros/awesomo_gimbal.cpp)
+ADD_DEPENDENCIES(awesomo_gimbal ${PROJECT_NAME}_gencpp)
+TARGET_LINK_LIBRARIES(awesomo_gimbal ${AWESOMO_DEPS})
+INSTALL(TARGETS awesomo_gimbal RUNTIME DESTINATION BIN_DEST)
+
 
 
 ## UNIT TESTS

@@ -1,7 +1,3 @@
-#include <pthread.h>
-#include <stdio.h>
-#include <stdlib.h>
-
 #include <iostream>
 #include <cmath>
 #include <unistd.h>
@@ -68,7 +64,6 @@ public:
     int rc_in[16];
 
     Quadrotor *quad;
-    Gimbal *gimbal;
 
     ros::ServiceClient mode_client;
     ros::ServiceClient arming_client;
@@ -134,9 +129,7 @@ Awesomo::Awesomo(std::map<std::string, std::string> configs)
         this->rc_in[i] = 0.0f;
     }
 
-
     this->quad = new Quadrotor(configs);
-    this->gimbal = new Gimbal(configs);
 
     // wait till connected to FCU
     this->waitForConnection();
@@ -265,14 +258,14 @@ void Awesomo::atimCallback(const atim::AtimPoseStamped &msg)
     frame_imu_quat = Eigen::Quaterniond(q.w, q.x, q.y, q.z);
     // now need to use the gimbal imu to do the BPF calculation
     // tag_BPF = this->gimbal->getTargetPositionBPFrame(tag, this->gimbal_imu_quat);
-    tag_BPF = this->gimbal->getTargetPositionBPFGimbal(tag);
+    // tag_BPF = this->gimbal->getTargetPositionBPFGimbal(tag);
     // tag_BPF = this->gimbal->getTargetPositionBFrame(tag);
 
     this->landing_zone.detected = msg.tag_detected;
     this->landing_zone.position << tag_BPF(0), tag_BPF(1), tag_BPF(2);
-    this->gimbal->calcRollAndPitchSetpoints(tag_BPF,
-        frame_imu_quat
-    );
+    // this->gimbal->calcRollAndPitchSetpoints(tag_BPF,
+    //     frame_imu_quat
+    // );
 }
 
 void Awesomo::gpsCallback(const geometry_msgs::PoseWithCovarianceStamped &msg)
@@ -677,13 +670,6 @@ int Awesomo::run(
 
 }
 
-void *thread(void *arg)
-{
-    Gimbal *gimbal;
-    gimbal->sbgc->getRealtimeData();
-    gimbal->sbgc->data.printData();
-}
-
 int main(int argc, char **argv)
 {
     // setup
@@ -718,12 +704,6 @@ int main(int argc, char **argv)
     ROS_INFO("running ...");
     awesomo = new Awesomo(configs);
     last_request = ros::Time::now();
-
-    pthread_t t;
-    pthread_create(&t, NULL, &thread, awesomo->gimbal);
-
-    // initial gimbal settings
-    awesomo->gimbal->setGimbalAngles(0, -45, 0);
 
     while (ros::ok()){
         // check if offboard switch has been turned on
