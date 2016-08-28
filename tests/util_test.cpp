@@ -7,6 +7,7 @@ int test_Pose_class(void);
 int test_deg2rad_and_rad2deg(void);
 int test_euler2RotationMatrix(void);
 int test_euler2Quaternion(void);
+int test_linreg(void);
 
 int test_Pose_class(void)
 {
@@ -273,6 +274,34 @@ int test_euler2RotationMatrix(void)
     return 0;
 }
 
+int test_linreg(void)
+{
+    Eigen::Vector2d p;
+    std::vector<Eigen::Vector2d> points;
+    double m;
+    double c;
+    double r;
+
+    p << 1, 4;
+    points.push_back(p);
+    p << 2, 6;
+    points.push_back(p);
+    p << 4, 12;
+    points.push_back(p);
+    p << 5, 15;
+    points.push_back(p);
+    p << 10, 34;
+    points.push_back(p);
+    p << 20, 68;
+    points.push_back(p);
+
+    linreg(points, &m, &c, &r);
+    std::cout << "m: " << m << std::endl;
+    std::cout << "c: " << c << std::endl;
+    std::cout << "r: " << r << std::endl;
+
+    return 0;
+}
 
 void test_suite(void)
 {
@@ -280,6 +309,7 @@ void test_suite(void)
     mu_add_test(test_deg2rad_and_rad2deg);
     mu_add_test(test_euler2Quaternion);
     mu_add_test(test_euler2RotationMatrix);
+    mu_add_test(test_linreg);
 }
 
 mu_run_tests(test_suite)

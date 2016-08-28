@@ -14,12 +14,13 @@ Quadrotor *testSetup(void);
 int testQuadrotor(void);
 int testQuadrotorPositionControllerCalculate(void);
 int testQuadrotorResetPositionController(void);
+int testQuadrotorCalculateLandingTargetYaw(void);
 // int testQuadrotorResetPositionController(void);
 // int testQuadrotorInitializeCarrotController(void);
 // int testQuadrotorRunCarrotMode(void);
-int testQuadrotorRunDiscoveryMode(void);
-int testQuadrotorRunTrackingModeBPF(void);
-int testQuadrotorWithinLandingZone(void);
+// int testQuadrotorRunDiscoveryMode(void);
+// int testQuadrotorRunTrackingModeBPF(void);
+// int testQuadrotorWithinLandingZone(void);
 // int testQuadrotorRunLandingMode(void);
 // int testQuadrotorRunMission(void);
 
@@ -60,6 +61,7 @@ int testQuadrotor(void)
     mu_check(quad->world_pose.position(0) == 0);
     mu_check(quad->world_pose.position(1) == 0);
     mu_check(quad->world_pose.position(2) == 0);
+    mu_check(fltcmp(quad->yaw, 0.0) == 0);
 
     // landing state
     mu_check(quad->landing_belief == 0);
@@ -270,6 +272,73 @@ int testQuadrotorResetPositionController(void)
     return 0;
 }
 
+int testQuadrotorCalculateLandingTargetYaw(void)
+{
+    Quadrotor *quad;
+    double yaw;
+	Eigen::Vector2d p;
+
+    // setup
+    quad = testSetup();
+
+    // test - quadrant I
+    p << 0, 0;
+    quad->lt_history.push_back(p);
+    p << 1, 1;
+    quad->lt_history.push_back(p);
+
+    quad->calculateLandingTargetYaw(&yaw);
+	yaw = yaw * 180.0 / M_PI;
+	mu_print("yaw (degrees): %f\n", yaw);
+	quad->lt_history.clear();
+
+    // test - quadrant II
+    p << 0, 0;
+    quad->lt_history.push_back(p);
+    p << -1, 1;
+    quad->lt_history.push_back(p);
+
+    quad->calculateLandingTargetYaw(&yaw);
+	yaw = yaw * 180.0 / M_PI;
+	mu_print("yaw (degrees): %f\n", yaw);
+	quad->lt_history.clear();
+
+    // test - quadrant III
+    p << 0, 0;
+    quad->lt_history.push_back(p);
+    p << -1, -1;
+    quad->lt_history.push_back(p);
+
+    quad->calculateLandingTargetYaw(&yaw);
+	yaw = yaw * 180.0 / M_PI;
+	mu_print("yaw (degrees): %f\n", yaw);
+	quad->lt_history.clear();
+
+    // test - quadrant IV
+    p << 0, 0;
+    quad->lt_history.push_back(p);
+    p << 1, -1;
+    quad->lt_history.push_back(p);
+
+    quad->calculateLandingTargetYaw(&yaw);
+	yaw = yaw * 180.0 / M_PI;
+	mu_print("yaw (degrees): %f\n", yaw);
+	quad->lt_history.clear();
+
+	// test - over 360
+	quad->yaw = 358.0 * M_PI / 180.0;
+    p << 0, 0;
+    quad->lt_history.push_back(p);
+    p << 1, -1;
+    quad->lt_history.push_back(p);
+
+    quad->calculateLandingTargetYaw(&yaw);
+	yaw = yaw * 180.0 / M_PI;
+	mu_print("yaw (degrees): %f\n", yaw);
+	quad->lt_history.clear();
+
+    return 0;
+}
 
 int testQuadrotorInitializeCarrotController(void)
 {
@@ -634,13 +703,14 @@ void testSuite(void)
     mu_add_test(testQuadrotor);
     mu_add_test(testQuadrotorPositionControllerCalculate);
     mu_add_test(testQuadrotorResetPositionController);
+    mu_add_test(testQuadrotorCalculateLandingTargetYaw);
     // mu_add_test(testQuadrotorInitializeCarrotController);
     // mu_add_test(testQuadrotorRunCarrotMode);
-    mu_add_test(testQuadrotorRunDiscoveryMode);
-    mu_add_test(testQuadrotorRunTrackingModeBPF);
-    mu_add_test(testQuadrotorWithinLandingZone);
-    mu_add_test(testQuadrotorRunLandingMode);
-    mu_add_test(testQuadrotorRunMission);
+    // mu_add_test(testQuadrotorRunDiscoveryMode);
+    // mu_add_test(testQuadrotorRunTrackingModeBPF);
+    // mu_add_test(testQuadrotorWithinLandingZone);
+    // mu_add_test(testQuadrotorRunLandingMode);
+    // mu_add_test(testQuadrotorRunMission);
 }
 
 mu_run_tests(testSuite)

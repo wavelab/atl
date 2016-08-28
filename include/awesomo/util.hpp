@@ -85,12 +85,12 @@ int euler2Quaternion(
     const double yaw,
     Eigen::Quaterniond &q
 );
-
 int euler2RotationMatrix(
     const double roll,
     const double pitch,
     const double yaw,
     Eigen::Matrix3d &rot
 );
+int linreg(std::vector<Eigen::Vector2d> pts, double *m, double *b, double *r);
 
 #endif

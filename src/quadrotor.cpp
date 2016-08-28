@@ -41,6 +41,7 @@ Quadrotor::Quadrotor(std::map<std::string, std::string> configs)
     // intialize state
     this->mission_state = DISCOVER_MODE;
     this->world_pose.position << 0.0, 0.0, 0.0;
+	this->yaw = 0;
 
     // landing state
     this->landing_belief = 0;
@@ -120,7 +121,11 @@ Attitude Quadrotor::positionControllerCalculate(
 )
 {
     Attitude a;
+#ifdef YAW_CONTROL_ON
     this->position_controller->calculate(setpoint, robot_pose, yaw, dt);
+#else
+    this->position_controller->calculate(setpoint, robot_pose, 0.0, dt);
+#endif
 
     a.x = this->position_controller->command_quat.x();
     a.y = this->position_controller->command_quat.y();
@@ -137,6 +142,41 @@ Attitude Quadrotor::positionControllerCalculate(
 void Quadrotor::resetPositionController(void)
 {
     this->position_controller->reset();
+}
+
+int Quadrotor::calculateLandingTargetYaw(double *yaw)
+{
+	int retval;
+	double m;
+	double c;
+	double r;
+	double x;
+	double y;
+	double relative_yaw;
+	Eigen::Vector2d p;
+
+	// perform linear regression to obtain line equation of
+	// landing target of form: y = mx + c
+	retval = linreg(this->lt_history, &m, &c, &r);
+	if (retval == -1) {
+		return -1;
+	}
+
+	// obtain relative yaw angle to quad
+	p = this->lt_history[this->lt_history.size() - 1];
+	y = p(1);
+	x = (y - c) / m;
+	relative_yaw = atan2(y, x);
+
+	// convert relative yaw to global yaw
+	*yaw = this->yaw + relative_yaw;
+	if (*yaw < 0) {
+		*yaw += 2 * M_PI;
+	} else if (*yaw > 2 * M_PI) {
+		*yaw -= 2 * M_PI;
+	}
+
+	return 0;
 }
 
 void Quadrotor::initializeCarrotController(void)
@@ -206,27 +246,56 @@ Eigen::Vector3d Quadrotor::runCarrotMode(Pose robot_pose, float dt)
 
 void Quadrotor::runDiscoverMode(LandingTargetPosition landing)
 {
-	Eigen::VectorXd mu(9);
+    Eigen::VectorXd mu(9);
+    Eigen::Vector2d lt_pos;
+	double lt_yaw;
+	int retval;
+	bool transition_state;
 
+	// setup
+	transition_state = false;
+
+	// obtain landing target yaw
     if (landing.detected == true) {
-        // initialize kalman filter
-        mu << landing.position(0),  // pos_x relative to quad
-              landing.position(1),  // pos_y relative to quad
-              landing.position(2),  // pos_z relative to quad
-              0.0, 0.0, 0.0,  // vel_x, vel_y, vel_z
-              0.0, 0.0, 0.0;  // acc_x, acc_y, acc_z
-        apriltag_kf_setup(&this->tag_estimator, mu);
-        this->estimator_initialized = true;
+        if (lt_history.size() < 5) {
+            lt_pos << landing.position(0), landing.position(1);
+            lt_history.push_back(lt_pos);
 
-        // transition to tracker mode
-        printf("Transitioning to TRACKER MODE!\n");
-        this->mission_state = TRACKING_MODE;
-        this->tracking_start = time(NULL);
+        } else if (lt_history.size() == 5) {
+			// calculate landing target yaw
+			retval = this->calculateLandingTargetYaw(&lt_yaw);
+			if (retval == 0) {
+				transition_state = true;
+			}
+			printf("Landing target yaw is: %.2f\n", lt_yaw);
 
-        // reset position controller softly so not initially violent
-        this->position_controller->x.prev_error = landing.position(1);
-        this->position_controller->y.prev_error = landing.position(0);
+			// set quadrotor yaw
+			this->yaw = lt_yaw;
+
+            // clear landing target history
+            lt_history.clear();
+        }
     }
+
+	// initialize landing target estimator
+	if (transition_state) {
+		mu << landing.position(0),  // pos_x relative to quad
+			landing.position(1),  // pos_y relative to quad
+			landing.position(2),  // pos_z relative to quad
+			0.0, 0.0, 0.0,  // vel_x, vel_y, vel_z
+			0.0, 0.0, 0.0;  // acc_x, acc_y, acc_z
+		apriltag_kf_setup(&this->tag_estimator, mu);
+		this->estimator_initialized = true;
+
+		// transition to tracker mode
+		printf("Transitioning to TRACKER MODE!\n");
+		this->mission_state = TRACKING_MODE;
+		this->tracking_start = time(NULL);
+
+		// reset position controller softly so not initially violent
+		this->position_controller->x.prev_error = landing.position(1);
+		this->position_controller->y.prev_error = landing.position(0);
+	}
 }
 
 void Quadrotor::runTrackingModeBPF(LandingTargetPosition landing, float dt)
@@ -264,7 +333,7 @@ void Quadrotor::runTrackingModeBPF(LandingTargetPosition landing, float dt)
     robot_pose.q = this->world_pose.q;
 
     // update position controller
-    this->positionControllerCalculate(setpoint, robot_pose, 0, dt);
+    this->positionControllerCalculate(setpoint, robot_pose, this->yaw, dt);
 
     // transition to landing
     elasped = difftime(time(NULL), this->tracking_start);
@@ -333,7 +402,7 @@ void Quadrotor::runLandingMode(LandingTargetPosition landing, float dt)
 {
     Eigen::Vector3d tag_mea;
     Eigen::Vector3d tag_est;
-	Eigen::VectorXd mu(9);
+    Eigen::VectorXd mu(9);
     Eigen::Vector3d threshold;
     Pose robot_pose;
     double elasped;
@@ -392,7 +461,7 @@ void Quadrotor::runLandingMode(LandingTargetPosition landing, float dt)
     robot_pose.q = this->world_pose.q;
 
     // update position controller
-    this->positionControllerCalculate(tag_est, robot_pose, 0, dt);
+    this->positionControllerCalculate(tag_est, robot_pose, this->yaw, dt);
 }
 
 // int Quadrotor::followWaypoints(
