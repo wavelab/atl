@@ -398,6 +398,15 @@ bool Quadrotor::withinLandingZone(Eigen::Vector3d &m)
     }
 }
 
+int Quadrotor::checkLandingTargetEstimation(Eigen::Vector3d &est)
+{
+	if (est(0) > 5.0 || est(1) > 5.0) {
+		return -1;
+	}
+
+	return 0;
+}
+
 void Quadrotor::runLandingMode(LandingTargetPosition landing, float dt)
 {
     Eigen::Vector3d tag_mea;
@@ -412,6 +421,16 @@ void Quadrotor::runLandingMode(LandingTargetPosition landing, float dt)
     apriltag_kf_estimate(&this->tag_estimator, tag_mea, dt, landing.detected);
     mu = this->tag_estimator.mu;
     tag_est << mu(0), mu(1), this->hover_height;
+
+	// check landing target estimation
+	if (this->checkLandingTargetEstimation(tag_est) == -1) {
+        printf("Target losted transitioning back to DISCOVER MODE!\n");
+        this->mission_state = DISCOVER_MODE;
+
+        // reset hover height and landing belief
+        this->hover_height = this->hover_height_original;
+        this->landing_belief = 0;
+	}
 
     // keep track of target position
     elasped = difftime(time(NULL), this->target_last_updated);

@@ -114,6 +114,7 @@ public:
     void initializeCarrotController(void);
     Eigen::Vector3d runCarrotMode(Pose robot_pose, float dt);
     void runDiscoverMode(LandingTargetPosition landing);
+	int checkLandingTargetEstimation(Eigen::Vector3d &est);
     void runTrackingModeBPF(LandingTargetPosition landing, float dt);
     bool withinLandingZone(Eigen::Vector3d &m, Eigen::Vector3d &e);
     bool withinLandingZone(Eigen::Vector3d &m);
