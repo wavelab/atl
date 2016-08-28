@@ -71,7 +71,7 @@ ADD_LIBRARY(
     STATIC
     src/util.cpp
     src/ros/ros_util.cpp
-    src/camera_mount.cpp
+    src/gimbal.cpp
     src/controller.cpp
     src/quadrotor.cpp
     src/estimator.cpp
@@ -134,10 +134,10 @@ ADD_EXECUTABLE(awesomo_util_test tests/util_test.cpp)
 TARGET_LINK_LIBRARIES(awesomo_util_test ${AWESOMO_DEPS})
 INSTALL(TARGETS awesomo_util_test RUNTIME DESTINATION BIN_DEST)
 
-# tests/camera_mount_config_test
-ADD_EXECUTABLE(awesomo_camera_mount_test tests/camera_mount_test.cpp)
-TARGET_LINK_LIBRARIES(awesomo_camera_mount_test ${AWESOMO_DEPS})
-INSTALL(TARGETS awesomo_camera_mount_test RUNTIME DESTINATION BIN_DEST)
+# tests/gimbal_test
+ADD_EXECUTABLE(awesomo_gimbal_test tests/gimbal_test.cpp)
+TARGET_LINK_LIBRARIES(awesomo_gimbal_test ${AWESOMO_DEPS})
+INSTALL(TARGETS awesomo_gimbal_test RUNTIME DESTINATION BIN_DEST)
 
 
 

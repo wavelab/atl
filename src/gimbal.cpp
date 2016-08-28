@@ -1,13 +1,13 @@
-#include "awesomo/camera_mount.hpp"
+#include "awesomo/gimbal.hpp"
 
 
-CameraMount::CameraMount(float roll, float pitch, float yaw, float x, float y, float z)
+Gimbal::Gimbal(float roll, float pitch, float yaw, float x, float y, float z)
 {
     this->pose = Pose(roll, pitch, yaw, x, y, z);
     this->setGimbalLimits(0, 0, 0, 0, 0, 0); // make sure gimbal limits are initalized
 }
 
-CameraMount::CameraMount(std::map<std::string, std::string> configs)
+Gimbal::Gimbal(std::map<std::string, std::string> configs)
 {
 
     std::string config_path;
@@ -17,18 +17,18 @@ CameraMount::CameraMount(std::map<std::string, std::string> configs)
     YAML::Node gimbal_limit;
 
     // precheck
-    if (configs.count("camera_mount") == 0){
-        std::cout << "ERROR! camera_mount_config not found" << std::endl;
+    if (configs.count("gimbal") == 0){
+        std::cout << "ERROR! gimbal_config not found" << std::endl;
     }
 
     // load config
-    config = YAML::LoadFile(configs["camera_mount"]);
+    config = YAML::LoadFile(configs["gimbal"]);
 
     // camera pose;
     this->pose = Pose(0, 0, 0, 0, 0, 0);
 
     // load camera RBT (Pose) config
-    camera_pose = config["camera_mount"]["RBT_between_cam_and_FC"];
+    camera_pose = config["gimbal"]["RBT_between_cam_and_FC"];
     this->pose = Pose(
         deg2rad(camera_pose["roll"].as<float>()),
         deg2rad(camera_pose["pitch"].as<float>()),
@@ -39,14 +39,14 @@ CameraMount::CameraMount(std::map<std::string, std::string> configs)
     );
 
     // load gimbal stuff
-    gimbal_dev_path = config["camera_mount"]["gimbal_dev_path"].as<std::string>();
+    gimbal_dev_path = config["gimbal"]["gimbal_dev_path"].as<std::string>();
     this->sbgc = new SBGC(gimbal_dev_path, 115200, 500);
     this->sbgc->connect();
     this->sbgc->on();
 
     // load gimbal_limits
     this->setGimbalLimits(0, 0, 0, 0, 0, 0);
-    gimbal_limit = config["camera_mount"]["gimbal_limits"];
+    gimbal_limit = config["gimbal"]["gimbal_limits"];
     this->setGimbalLimits(
         deg2rad(gimbal_limit["roll_upper_limit"].as<float>()),
         deg2rad(gimbal_limit["roll_lower_limit"].as<float>()),
@@ -57,12 +57,12 @@ CameraMount::CameraMount(std::map<std::string, std::string> configs)
     );
 }
 
-Eigen::Vector3d CameraMount::getTargetPositionBFrame(Eigen::Vector3d target)
+Eigen::Vector3d Gimbal::getTargetPositionBFrame(Eigen::Vector3d target)
 {
     return (this->pose.rotationMatrix() * target + this->pose.position);
 }
 
-Eigen::Vector3d CameraMount::getTargetPositionBPFrame(
+Eigen::Vector3d Gimbal::getTargetPositionBPFrame(
     Eigen::Vector3d target,
     Eigen::Quaterniond &imu
 )
@@ -70,7 +70,7 @@ Eigen::Vector3d CameraMount::getTargetPositionBPFrame(
     return imu.toRotationMatrix() * this->getTargetPositionBFrame(target);
 }
 
-Eigen::Vector3d CameraMount::getTargetPositionBPFGimbal(
+Eigen::Vector3d Gimbal::getTargetPositionBPFGimbal(
     Eigen::Vector3d target
 )
 {
@@ -92,7 +92,7 @@ Eigen::Vector3d CameraMount::getTargetPositionBPFGimbal(
     return gimbal_imu.toRotationMatrix() * this->getTargetPositionBFrame(target);
 }
 
-int CameraMount::setGimbalLimits(
+int Gimbal::setGimbalLimits(
     float roll_upper,
     float roll_lower,
     float pitch_upper,
@@ -108,7 +108,7 @@ int CameraMount::setGimbalLimits(
     return 0;
 }
 
-int CameraMount::checkLimits(float &value, Eigen::Vector2d limits)
+int Gimbal::checkLimits(float &value, Eigen::Vector2d limits)
 {
     // upper limit
     if (value > limits(0)){
@@ -119,7 +119,7 @@ int CameraMount::checkLimits(float &value, Eigen::Vector2d limits)
     return 0;
 }
 
-int CameraMount::checkSetPointLimits(
+int Gimbal::checkSetPointLimits(
     Eigen::Vector3d frame_rpy,
     float &roll,
     float &pitch,
@@ -146,7 +146,7 @@ int CameraMount::checkSetPointLimits(
     return 0;
 }
 
-int CameraMount::calcRollAndPitchSetpoints(
+int Gimbal::calcRollAndPitchSetpoints(
     Eigen::Vector3d target_position,
     Eigen::Quaterniond &imu
 )
@@ -182,7 +182,7 @@ int CameraMount::calcRollAndPitchSetpoints(
     return 0;
 }
 
-int CameraMount::setGimbalAngles(double roll, double pitch, double yaw)
+int Gimbal::setGimbalAngles(double roll, double pitch, double yaw)
 {
     this->sbgc->setAngle(roll, pitch, yaw);
 };
