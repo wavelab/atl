@@ -105,9 +105,11 @@ int testSBGCSetAngle(void)
 	mu_check(sbgc.connect() == 0);
 	sbgc.on();
 
-	sbgc.setAngle(-20, 20, 0);
-	sleep(5);
-
+   	sbgc.setAngle(0, -90, 0);
+   	sleep(2);
+    for (int angle = -95; angle < 20; angle += 3){
+    	sbgc.setAngle(0, angle, 0);
+    }
 	sbgc.off();
 
 	return 0;
@@ -120,8 +122,8 @@ int testSBGCSetSpeedAngle(void)
 	mu_check(sbgc.connect() == 0);
 	sbgc.on();
 
-	sbgc.setSpeedAngle(-10, 10, 0, 10, 10, 0);
-	sleep(5);
+	sbgc.setSpeedAngle(0, 10, 0, 0, -200, 0);
+	sleep(3);
 
 	sbgc.off();
 
@@ -136,8 +138,8 @@ void testSuite(void)
     // mu_add_test(testSBGCReadFrame);
     // mu_add_test(testSBGCGetBoardInfo);
     // mu_add_test(testSBGCGetRealtimeData);
-    // mu_add_test(testSBGCSetAngle);
-    mu_add_test(testSBGCSetSpeedAngle);
+    mu_add_test(testSBGCSetAngle);
+    // mu_add_test(testSBGCSetSpeedAngle);
 }
 
 mu_run_tests(testSuite)

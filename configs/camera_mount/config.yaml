@@ -7,6 +7,8 @@ camera_mount:
         pitch: -90.0
         yaw: 180.0
     
+    gimbal_dev_path: /dev/ttyUSB0
+
     gimbal_limits:
         roll_upper_limit: 20.0
         roll_lower_limit: -20.0

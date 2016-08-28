@@ -354,7 +354,7 @@ int SBGC::getRealtimeData(void)
 {
     int retval;
     SBGCFrame frame;
-	SBGCRealtimeData data;
+	// SBGCRealtimeData data;
 
     // request real time data
     frame.buildFrame(CMD_REALTIME_DATA_4);
@@ -373,53 +373,53 @@ int SBGC::getRealtimeData(void)
 
     // parse real time data
 	// accelerometer and gyroscope
-	data.accel(0) = S16BIT(frame.data, 1, 0);
-	data.gyro(0) = S16BIT(frame.data, 3, 2);
-	data.accel(1) = S16BIT(frame.data, 5, 4);
-	data.gyro(1) = S16BIT(frame.data, 7, 6);
-	data.accel(2) = S16BIT(frame.data, 9, 8);
-	data.gyro(2) = S16BIT(frame.data, 11, 10);
+	this->data.accel(0) = S16BIT(frame.data, 1, 0);
+	this->data.gyro(0) = S16BIT(frame.data, 3, 2);
+	this->data.accel(1) = S16BIT(frame.data, 5, 4);
+	this->data.gyro(1) = S16BIT(frame.data, 7, 6);
+	this->data.accel(2) = S16BIT(frame.data, 9, 8);
+	this->data.gyro(2) = S16BIT(frame.data, 11, 10);
 
-	data.accel(0) = (ACC_UNIT) * data.accel(0);
-	data.accel(1) = (ACC_UNIT) * data.accel(1);
-	data.accel(2) = (ACC_UNIT) * data.accel(2);
+	this->data.accel(0) = (ACC_UNIT) * this->data.accel(0);
+	this->data.accel(1) = (ACC_UNIT) * this->data.accel(1);
+	this->data.accel(2) = (ACC_UNIT) * this->data.accel(2);
 
-	data.gyro(0) = (GYRO_UNIT) * data.gyro(0);
-	data.gyro(1) = (GYRO_UNIT) * data.gyro(1);
-	data.gyro(2) = (GYRO_UNIT) * data.gyro(2);
+	this->data.gyro(0) = (GYRO_UNIT) * this->data.gyro(0);
+	this->data.gyro(1) = (GYRO_UNIT) * this->data.gyro(1);
+	this->data.gyro(2) = (GYRO_UNIT) * this->data.gyro(2);
 
 	// angles
-	data.camera_angles(0) = S16BIT(frame.data, 33, 32);
-	data.camera_angles(1) = S16BIT(frame.data, 35, 34);
-	data.camera_angles(2) = S16BIT(frame.data, 37, 36);
+	this->data.camera_angles(0) = S16BIT(frame.data, 33, 32);
+	this->data.camera_angles(1) = S16BIT(frame.data, 35, 34);
+	this->data.camera_angles(2) = S16BIT(frame.data, 37, 36);
 
-	data.frame_angles(0) = S16BIT(frame.data, 39, 38);
-	data.frame_angles(1) = S16BIT(frame.data, 41, 40);
-	data.frame_angles(2) = S16BIT(frame.data, 43, 42);
+	this->data.frame_angles(0) = S16BIT(frame.data, 39, 38);
+	this->data.frame_angles(1) = S16BIT(frame.data, 41, 40);
+	this->data.frame_angles(2) = S16BIT(frame.data, 43, 42);
 
-	data.rc_angles(0) = S16BIT(frame.data, 45, 44);
-	data.rc_angles(1) = S16BIT(frame.data, 47, 45);
-	data.rc_angles(2) = S16BIT(frame.data, 49, 46);
+	this->data.rc_angles(0) = S16BIT(frame.data, 45, 44);
+	this->data.rc_angles(1) = S16BIT(frame.data, 47, 45);
+	this->data.rc_angles(2) = S16BIT(frame.data, 49, 46);
 
-	data.camera_angles(0) = (DEG_PER_BIT) * data.camera_angles(0);
-	data.camera_angles(1) = (DEG_PER_BIT) * data.camera_angles(1);
-	data.camera_angles(2) = (DEG_PER_BIT) * data.camera_angles(2);
+	this->data.camera_angles(0) = (DEG_PER_BIT) * this->data.camera_angles(0);
+	this->data.camera_angles(1) = (DEG_PER_BIT) * this->data.camera_angles(1);
+	this->data.camera_angles(2) = (DEG_PER_BIT) * this->data.camera_angles(2);
 
-	data.frame_angles(0) = (DEG_PER_BIT) * data.frame_angles(0);
-	data.frame_angles(1) = (DEG_PER_BIT) * data.frame_angles(1);
-	data.frame_angles(2) = (DEG_PER_BIT) * data.frame_angles(2);
+	this->data.frame_angles(0) = (DEG_PER_BIT) * this->data.frame_angles(0);
+	this->data.frame_angles(1) = (DEG_PER_BIT) * this->data.frame_angles(1);
+	this->data.frame_angles(2) = (DEG_PER_BIT) * this->data.frame_angles(2);
 
-	data.rc_angles(0) = (DEG_PER_BIT) * data.rc_angles(0);
-	data.rc_angles(1) = (DEG_PER_BIT) * data.rc_angles(1);
-	data.rc_angles(2) = (DEG_PER_BIT) * data.rc_angles(2);
+	this->data.rc_angles(0) = (DEG_PER_BIT) * this->data.rc_angles(0);
+	this->data.rc_angles(1) = (DEG_PER_BIT) * this->data.rc_angles(1);
+	this->data.rc_angles(2) = (DEG_PER_BIT) * this->data.rc_angles(2);
 
 	// misc
-    data.cycle_time = U16BIT(frame.data, 51, 50);
-    data.i2c_error_count = U16BIT(frame.data, 53, 52);
-    data.system_error = U16BIT(frame.data, 15, 14);
-	data.battery_level = U16BIT(frame.data, 56, 55);
+    this->data.cycle_time = U16BIT(frame.data, 51, 50);
+    this->data.i2c_error_count = U16BIT(frame.data, 53, 52);
+    this->data.system_error = U16BIT(frame.data, 15, 14);
+	this->data.battery_level = U16BIT(frame.data, 56, 55);
 
-	data.printData();
+	// this->data.printData();
 
     return 0;
 }

@@ -149,6 +149,7 @@ public:
 class SBGC
 {
 public:
+    SBGCRealtimeData data;
     std::string port;
     unsigned long baudrate;
     serial::Timeout timeout;

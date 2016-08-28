@@ -106,7 +106,7 @@ INSTALL(TARGETS awesomo RUNTIME DESTINATION BIN_DEST)
 ## UNIT TESTS
 # tests/controller_test
 ADD_EXECUTABLE(awesomo_controller_test tests/controller_test.cpp)
-TARGET_LINK_LIBRARIES(awesomo_controller_test libawesomo yaml-cpp)
+TARGET_LINK_LIBRARIES(awesomo_controller_test ${AWESOMO_DEPS})
 INSTALL(TARGETS awesomo_controller_test RUNTIME DESTINATION BIN_DEST)
 
 # tests/quadrotor_test
@@ -131,12 +131,12 @@ INSTALL(TARGETS awesomo_quadrotor_test RUNTIME DESTINATION BIN_DEST)
 
 # tests/util_test
 ADD_EXECUTABLE(awesomo_util_test tests/util_test.cpp)
-TARGET_LINK_LIBRARIES(awesomo_util_test libawesomo)
+TARGET_LINK_LIBRARIES(awesomo_util_test ${AWESOMO_DEPS})
 INSTALL(TARGETS awesomo_util_test RUNTIME DESTINATION BIN_DEST)
 
 # tests/camera_mount_config_test
 ADD_EXECUTABLE(awesomo_camera_mount_test tests/camera_mount_test.cpp)
-TARGET_LINK_LIBRARIES(awesomo_camera_mount_test libawesomo yaml-cpp)
+TARGET_LINK_LIBRARIES(awesomo_camera_mount_test ${AWESOMO_DEPS})
 INSTALL(TARGETS awesomo_camera_mount_test RUNTIME DESTINATION BIN_DEST)
 
 

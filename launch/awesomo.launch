@@ -29,11 +29,4 @@
 	    name="awesomo"
         output="screen" />
 
-    <!-- Gimbal Driver -->
-    <node
-        pkg="bgc_driver"
-        type="bgc_driver_node"
-        name="bgc_driver_node"
-        output="screen" />
-
 </launch>

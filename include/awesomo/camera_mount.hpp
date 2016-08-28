@@ -1,11 +1,15 @@
 #ifndef __CAMERA_MOUNT_HPP__
 #define __CAMERA_MOUNT_HPP__
 
-# include <iostream>
-# include <math.h>
-# include <map>
-# include <yaml-cpp/yaml.h>
-# include "awesomo/util.hpp"
+#include <iostream>
+#include <math.h>
+#include <map>
+#include <yaml-cpp/yaml.h>
+
+#include "awesomo/util.hpp"
+#include "awesomo/sbgc.hpp"
+
+
 struct GimbalLimit
 {
     Eigen::Vector2d roll_limits;
@@ -16,6 +20,7 @@ struct GimbalLimit
 class CameraMount
 {
 public:
+    SBGC *sbgc;
     Pose pose;
     struct GimbalLimit gimbal_limits;
 
@@ -27,6 +32,9 @@ public:
     Eigen::Vector3d getTargetPositionBPFrame(
         Eigen::Vector3d target_position,
         Eigen::Quaterniond &imu
+    );
+    Eigen::Vector3d getTargetPositionBPFGimbal(
+        Eigen::Vector3d target_position
     );
 
     int setGimbalLimits(
@@ -48,8 +56,7 @@ public:
 
     int calcRollAndPitchSetpoints(
         Eigen::Vector3d target_position,
-        Eigen::Quaterniond &imu,
-        Eigen::Vector3d &imu_setpoint_rpy
+        Eigen::Quaterniond &imu
     );
 };
 

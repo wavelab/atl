@@ -7,11 +7,11 @@ CameraMount::CameraMount(float roll, float pitch, float yaw, float x, float y, f
     this->setGimbalLimits(0, 0, 0, 0, 0, 0); // make sure gimbal limits are initalized
 }
 
-
 CameraMount::CameraMount(std::map<std::string, std::string> configs)
 {
 
     std::string config_path;
+    std::string gimbal_dev_path;
     YAML::Node config;
     YAML::Node camera_pose;
     YAML::Node gimbal_limit;
@@ -37,6 +37,12 @@ CameraMount::CameraMount(std::map<std::string, std::string> configs)
         camera_pose["y"].as<float>(),
         camera_pose["z"].as<float>()
     );
+
+    // load gimbal stuff
+    gimbal_dev_path = config["camera_mount"]["gimbal_dev_path"].as<std::string>();
+    this->sbgc = new SBGC(gimbal_dev_path, 115200, 500);
+    this->sbgc->connect();
+    this->sbgc->on();
 
     // load gimbal_limits
     this->setGimbalLimits(0, 0, 0, 0, 0, 0);
@@ -64,6 +70,22 @@ Eigen::Vector3d CameraMount::getTargetPositionBPFrame(
     return imu.toRotationMatrix() * this->getTargetPositionBFrame(target);
 }
 
+Eigen::Vector3d CameraMount::getTargetPositionBPFGimbal(
+    Eigen::Vector3d target
+)
+{
+    Eigen::Quaterniond gimbal_imu;
+    this->sbgc->getRealtimeData();
+    euler2Quaternion(
+        this->sbgc->data.rc_angles(0),
+        this->sbgc->data.rc_angles(1),
+        this->sbgc->data.rc_angles(2),
+        gimbal_imu
+    );
+
+    return gimbal_imu.toRotationMatrix() * this->getTargetPositionBFrame(target);
+}
+
 int CameraMount::setGimbalLimits(
     float roll_upper,
     float roll_lower,
@@ -79,7 +101,6 @@ int CameraMount::setGimbalLimits(
 
     return 0;
 }
-
 
 int CameraMount::checkLimits(float &value, Eigen::Vector2d limits)
 {
@@ -119,26 +140,24 @@ int CameraMount::checkSetPointLimits(
     return 0;
 }
 
-
 int CameraMount::calcRollAndPitchSetpoints(
     Eigen::Vector3d target_position,
-    Eigen::Quaterniond &imu,
-    Eigen::Vector3d &imu_setpoint_rpy
+    Eigen::Quaterniond &imu
 )
 {
     Eigen::Matrix3d frame_rot_mtx;
     Eigen::Vector3d frame_rpy;
-    float roll_setpoint;
-    float pitch_setpoint;
-    float yaw_setpoint;
-    float dist;
+    double roll_setpoint;
+    double pitch_setpoint;
+    double yaw_setpoint;
+    double dist;
 
     frame_rot_mtx = imu.toRotationMatrix();
     frame_rpy = frame_rot_mtx.eulerAngles(0, 1, 2);
     dist = target_position.norm();
 
     // if (abs(target_position(2)) > 0.05){ // handle case when camera is really close
-    if (true){
+    if (true) {
         roll_setpoint = asin(target_position(1) / dist);
         pitch_setpoint = asin(target_position(0) / dist);
 
@@ -149,10 +168,10 @@ int CameraMount::calcRollAndPitchSetpoints(
 
     yaw_setpoint = 0.0; // unused at the moment
 
-    std::cout << "target position \n" << target_position << std::endl;
+    // std::cout << "target position \n" << target_position << std::endl;
     // this needs to be fixed. it over limits at the moment
     // this->checkSetPointLimits(frame_rpy, roll_setpoint, pitch_setpoint, yaw_setpoint);
+    this->sbgc->setAngle(roll_setpoint, pitch_setpoint, yaw_setpoint);
 
-    imu_setpoint_rpy << roll_setpoint, pitch_setpoint, yaw_setpoint;
     return 0;
 }
