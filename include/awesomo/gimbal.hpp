@@ -38,6 +38,11 @@ public:
         Eigen::Vector3d target,
         Eigen::Vector3d &transformed_position
     );
+    int transformTargetPositionToBPFGimbal2(
+        Eigen::Vector3d target,
+        Eigen::Quaterniond frame_imu,
+        Eigen::Vector3d &transformed_position
+    );
     int setGimbalLimits(
         float roll_upper,
         float roll_lower,

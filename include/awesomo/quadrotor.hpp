@@ -108,7 +108,6 @@ public:
         float dt
     );
 
-    // void updatePose(Pose p);
     void resetPositionController(void);
     int calculateLandingTargetYaw(double *yaw);
     void initializeCarrotController(void);
@@ -119,11 +118,6 @@ public:
     bool withinLandingZone(Eigen::Vector3d &m, Eigen::Vector3d &e);
     bool withinLandingZone(Eigen::Vector3d &m);
     void runLandingMode(LandingTargetPosition landing, float dt);
-    // int followWaypoints(
-    //     Pose robot_pose,
-    //     LandingTargetPosition landing,
-    //     float dt
-    // );
     int runMission(
         Pose robot_pose,
         LandingTargetPosition landing,

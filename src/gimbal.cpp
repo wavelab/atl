@@ -98,6 +98,39 @@ int Gimbal::transformTargetPositionToBPFGimbal(
     return 0;
 }
 
+int Gimbal::transformTargetPositionToBPFGimbal2(
+    Eigen::Vector3d target,
+    Eigen::Quaterniond frame_imu,
+    Eigen::Vector3d &transformed_position
+)
+{
+    int retval;
+    Eigen::Vector3d tmp;
+    Eigen::Quaterniond gimbal_imu;
+
+    // get data from SimpleBGC
+    retval = this->sbgc->getRealtimeData();
+    if (retval != 0) {
+        return -1;
+    }
+
+    // convert sbgc gimbal angle to quaternion
+    euler2Quaternion(
+        this->sbgc->data.camera_angles(0) * M_PI / 180.0,
+        this->sbgc->data.camera_angles(1) * M_PI / 180.0,
+        0.0,
+        gimbal_imu
+    );
+
+    // transform tag in camera frame to quadrotor frame to global frame
+    tmp = gimbal_imu.toRotationMatrix() * this->getTargetPositionBPFrame(target, frame_imu);
+    transformed_position(0) = tmp(0);
+    transformed_position(1) = tmp(1);
+    transformed_position(2) = tmp(2);
+
+    return 0;
+}
+
 int Gimbal::setGimbalLimits(
     float roll_min,
     float roll_max,
@@ -176,7 +209,7 @@ int Gimbal::trackTarget(Eigen::Vector3d target, Eigen::Quaterniond &imu)
     // this->sbgc->setAngle(roll_setpoint, pitch_setpoint, yaw_setpoint);
 
     // printf("roll_setpoint: %f\n", -roll_setpoint * 180 / M_PI);
-    printf("pitch_setpoint: %f\n", -pitch_setpoint * 180 / M_PI);
+    // printf("pitch_setpoint: %f\n", -pitch_setpoint * 180 / M_PI);
 
     this->sbgc->setAngle(-roll_setpoint * 180 / M_PI, -pitch_setpoint * 180 / M_PI, 0);
     // this->sbgc->setAngle(-roll_setpoint * 180 / M_PI, 0, 0);
