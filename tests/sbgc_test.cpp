@@ -22,7 +22,7 @@ int testSBGCConnectDisconnect(void)
 int testSBGCSendFrame(void)
 {
     int retval;
-	SBGCFrame frame;
+    SBGCFrame frame;
     SBGC sbgc("/dev/ttyUSB0");
 
     // setup
@@ -30,38 +30,38 @@ int testSBGCSendFrame(void)
 
     // turn motors on
     frame.buildFrame(CMD_MOTORS_ON);
-	retval = sbgc.sendFrame(frame);
-	mu_check(retval == 0);
-	sleep(1);
+    retval = sbgc.sendFrame(frame);
+    mu_check(retval == 0);
+    sleep(1);
 
     // turn motors off
     frame.buildFrame(CMD_MOTORS_OFF);
-	retval = sbgc.sendFrame(frame);
-	mu_check(retval == 0);
-	sleep(1);
+    retval = sbgc.sendFrame(frame);
+    mu_check(retval == 0);
+    sleep(1);
 
     return 0;
 }
 
 int testSBGCReadFrame(void)
 {
-	int retval;
-	SBGCFrame frame;
+    int retval;
+    SBGCFrame frame;
     SBGC sbgc("/dev/ttyUSB0");
 
     // setup
     sbgc.connect();
 
-	// read frame
+    // read frame
     frame.buildFrame(CMD_BOARD_INFO);
-	sbgc.sendFrame(frame);
-	retval = sbgc.readFrame(CMD_BOARD_INFO_FRAME_SIZE, frame);
+    sbgc.sendFrame(frame);
+    retval = sbgc.readFrame(CMD_BOARD_INFO_FRAME_SIZE, frame);
 
     // assert
-	mu_check(frame.data_size == 18);
-	mu_check(retval == 0);
+    mu_check(frame.data_size == 18);
+    mu_check(retval == 0);
 
-	return 0;
+    return 0;
 }
 
 int testSBGCGetBoardInfo(void)
@@ -108,32 +108,32 @@ int testSBGCSetAngle(void)
 {
     SBGC sbgc("/dev/ttyUSB0");
 
-	mu_check(sbgc.connect() == 0);
-	sbgc.on();
+    mu_check(sbgc.connect() == 0);
+    sbgc.on();
 
-	sbgc.setAngle(0, -90, 0);
-	sleep(2);
+    sbgc.setAngle(0, -90, 0);
+    sleep(2);
     for (int angle = -95; angle < 20; angle += 3){
-		sbgc.setAngle(0, angle, 0);
+        sbgc.setAngle(0, angle, 0);
     }
-	sbgc.off();
+    sbgc.off();
 
-	return 0;
+    return 0;
 }
 
 int testSBGCSetSpeedAngle(void)
 {
     SBGC sbgc("/dev/ttyUSB0");
 
-	mu_check(sbgc.connect() == 0);
-	sbgc.on();
+    mu_check(sbgc.connect() == 0);
+    sbgc.on();
 
-	sbgc.setSpeedAngle(0, 10, 0, 0, -2, 0);
-	sleep(3);
+    sbgc.setSpeedAngle(0, 10, 0, 0, -2, 0);
+    sleep(3);
 
-	sbgc.off();
+    sbgc.off();
 
-	return 0;
+    return 0;
 }
 
 

@@ -42,7 +42,6 @@ Gimbal::Gimbal(std::map<std::string, std::string> configs)
     this->sbgc->on();
 
     // load gimbal_limits
-    this->setGimbalLimits(0, 0, 0, 0, 0, 0);
     gimbal_limit = config["gimbal_limits"];
     this->setGimbalLimits(
         deg2rad(gimbal_limit["roll_upper_limit"].as<float>()),
@@ -68,48 +67,49 @@ Eigen::Vector3d Gimbal::getTargetPositionBPFrame(
 }
 
 int Gimbal::transformTargetPositionToBPFGimbal(
-    Eigen::Vector3d target_position,
+    Eigen::Vector3d target,
     Eigen::Vector3d &transformed_position
 )
 {
     int retval;
-    Eigen::Quaterniond gimbal_imu;
     Eigen::Vector3d tmp;
+    Eigen::Quaterniond gimbal_imu;
 
+    // get data from SimpleBGC
     retval = this->sbgc->getRealtimeData();
-    if (retval == 0) {
-        this->sbgc->data.printData();
-
-        euler2Quaternion(
-            this->sbgc->data.rc_angles(0),
-            this->sbgc->data.rc_angles(1),
-            this->sbgc->data.rc_angles(2),
-            gimbal_imu
-        );
-
-        tmp = gimbal_imu.toRotationMatrix() * this->getTargetPositionBFrame(target_position);
-        transformed_position(0) = tmp(0);
-        transformed_position(1) = tmp(1);
-        transformed_position(2) = tmp(2);
-
-        return 0;
+    if (retval != 0) {
+        return -1;
     }
 
-    return -1;
+    // convert sbgc gimbal angle to quaternion
+    euler2Quaternion(
+        this->sbgc->data.camera_angles(0) * M_PI / 180.0,
+        this->sbgc->data.camera_angles(1) * M_PI / 180.0,
+        0.0,
+        gimbal_imu
+    );
+
+    // transform tag in camera frame to quadrotor frame to global frame
+    tmp = gimbal_imu.toRotationMatrix() * this->getTargetPositionBFrame(target);
+    transformed_position(0) = tmp(0);
+    transformed_position(1) = tmp(1);
+    transformed_position(2) = tmp(2);
+
+    return 0;
 }
 
 int Gimbal::setGimbalLimits(
-    float roll_upper,
-    float roll_lower,
-    float pitch_upper,
-    float pitch_lower,
-    float yaw_upper,
-    float yaw_lower
+    float roll_min,
+    float roll_max,
+    float pitch_min,
+    float pitch_max,
+    float yaw_min,
+    float yaw_max
 )
 {
-    this->gimbal_limits.roll_limits << roll_upper, roll_lower;
-    this->gimbal_limits.pitch_limits << pitch_upper, pitch_lower;
-    this->gimbal_limits.yaw_limits << yaw_upper, yaw_lower;
+    this->gimbal_limits.roll_limits << roll_min, roll_max;
+    this->gimbal_limits.pitch_limits << pitch_min, pitch_max;
+    this->gimbal_limits.yaw_limits << yaw_min, yaw_max;
 
     return 0;
 }
@@ -152,10 +152,7 @@ int Gimbal::checkSetPointLimits(
     return 0;
 }
 
-int Gimbal::calcRollAndPitchSetpoints(
-    Eigen::Vector3d target_position,
-    Eigen::Quaterniond &imu
-)
+int Gimbal::trackTarget(Eigen::Vector3d target, Eigen::Quaterniond &imu)
 {
     Eigen::Matrix3d frame_rot_mtx;
     Eigen::Vector3d frame_rpy;
@@ -166,33 +163,29 @@ int Gimbal::calcRollAndPitchSetpoints(
 
     frame_rot_mtx = imu.toRotationMatrix();
     frame_rpy = frame_rot_mtx.eulerAngles(0, 1, 2);
-    dist = target_position.norm();
+    dist = target.norm();
 
-    // if (abs(target_position(2)) > 0.05){ // handle case when camera is really close
-    if (true) {
-        roll_setpoint = asin(target_position(1) / dist);
-        pitch_setpoint = asin(target_position(0) / dist);
-
-    } else {
-        roll_setpoint = 0.0;
-        pitch_setpoint = 0.0;
-    }
+    roll_setpoint = asin(target(1) / dist);
+    pitch_setpoint = asin(target(0) / dist);
 
     yaw_setpoint = 0.0; // unused at the moment
 
-    // std::cout << "target position \n" << target_position << std::endl;
+    // std::cout << "target position \n" << target << std::endl;
     // this needs to be fixed. it over limits at the moment
     // this->checkSetPointLimits(frame_rpy, roll_setpoint, pitch_setpoint, yaw_setpoint);
     // this->sbgc->setAngle(roll_setpoint, pitch_setpoint, yaw_setpoint);
 
-    printf("roll_setpoint: %f\n", roll_setpoint);
-    this->sbgc->setAngle(roll_setpoint, pitch_setpoint, yaw_setpoint);
-    // this->sbgc->setAngle(0, -20, 0);
+    // printf("roll_setpoint: %f\n", -roll_setpoint * 180 / M_PI);
+    printf("pitch_setpoint: %f\n", -pitch_setpoint * 180 / M_PI);
+
+    this->sbgc->setAngle(-roll_setpoint * 180 / M_PI, -pitch_setpoint * 180 / M_PI, 0);
+    // this->sbgc->setAngle(-roll_setpoint * 180 / M_PI, 0, 0);
+    // this->sbgc->setAngle(0, 0, 0);
 
     return 0;
 }
 
 int Gimbal::setGimbalAngles(double roll, double pitch, double yaw)
 {
-    this->sbgc->setAngle(roll, pitch, yaw);
-};
+    return this->sbgc->setAngle(roll, pitch, yaw);
+}

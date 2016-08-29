@@ -124,7 +124,6 @@ int SBGCFrame::parseHeader(uint8_t *data)
     this->cmd_id = data[1];
     this->data_size = data[2];
     this->header_checksum = data[3];
-    printf("data size: %d\n", this->data_size);
 
     // check the header checksum
     expected_checksum = (this->cmd_id + this->data_size) % 256;
@@ -286,6 +285,7 @@ int SBGC::sendFrame(SBGCFrame &cmd)
     write(this->serial, &cmd.header_checksum, 1);
     write(this->serial, cmd.data, cmd.data_size);
     write(this->serial, &cmd.data_checksum, 1);
+    tcflush(this->serial, TCIOFLUSH);  // very critical
     usleep(20 * 1000);
 
     return 0;
@@ -411,7 +411,7 @@ int SBGC::getRealtimeData(void)
     }
 
     // obtain real time data
-    retval = this->readFrame(129, frame);
+    retval = this->readFrame(68, frame);
     if (retval == -1) {
         std::cout << "failed to parse SBGC frame for realtime data!" << std::endl;
         return -1;
