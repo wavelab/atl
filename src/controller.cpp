@@ -65,16 +65,16 @@ Eigen::Vector3d CarrotController::closestPoint(
     Eigen::Vector3d v1;
     Eigen::Vector3d v2;
 
-	// calculate closest point
-	v1 = position - wp_start;
-	v2 = wp_end - wp_start;
-	t = v1.dot(v2) / v2.squaredNorm();
+    // calculate closest point
+    v1 = position - wp_start;
+    v2 = wp_end - wp_start;
+    t = v1.dot(v2) / v2.squaredNorm();
 
     // make sure the point is between wp_start and wp_end
-	if (t < 0) {
-		return wp_start;
+    if (t < 0) {
+        return wp_start;
     } else if (t > 1) {
-		return wp_end;
+        return wp_end;
     }
 
     // result
@@ -149,6 +149,7 @@ int CarrotController::update(Eigen::Vector3d position, Eigen::Vector3d &carrot)
         this->wp_start,
         this->wp_end
     );
+    this->carrot_prev = carrot;
 
     return 1;
 }

@@ -389,13 +389,13 @@ int testQuadrotorInitializeCarrotController(void)
     // test and assert
     quad->initializeCarrotController();
     // std::cout << "carrot wp start \t " << quad->carrot_controller->wp_start(2) << std::endl;
-    mu_check(fltcmp(quad->carrot_controller->wp_start(0), p.position(0) == 0));
-    mu_check(fltcmp(quad->carrot_controller->wp_start(1), p.position(1) == 0));
-    mu_check(fltcmp(quad->carrot_controller->wp_start(2), p.position(2) + 3) == 0);
+    mu_check(fltcmp(quad->carrot_controller->wp_start(0), 0.0) == 0);
+    mu_check(fltcmp(quad->carrot_controller->wp_start(1), 0.0) == 0);
+    mu_check(fltcmp(quad->carrot_controller->wp_start(2), quad->hover_height) == 0);
 
-    mu_check(fltcmp(quad->carrot_controller->wp_end(0), p.position(0) + 5) == 0);
-    mu_check(fltcmp(quad->carrot_controller->wp_end(1), p.position(1)) == 0);
-    mu_check(fltcmp(quad->carrot_controller->wp_end(2), p.position(2) + 3) == 0);
+    mu_check(fltcmp(quad->carrot_controller->wp_end(0), 0.0) == 0);
+    mu_check(fltcmp(quad->carrot_controller->wp_end(1), 0.0) == 0);
+    mu_check(fltcmp(quad->carrot_controller->wp_end(2), quad->hover_height * 0.8) == 0);
 
     mu_check(quad->carrot_controller->waypoints.size() == 5);
     mu_check(quad->carrot_controller->initialized == 1);
@@ -738,7 +738,7 @@ void testSuite(void)
     mu_add_test(testQuadrotorPositionControllerCalculate);
     mu_add_test(testQuadrotorResetPositionController);
     mu_add_test(testQuadrotorCalculateLandingTargetYaw);
-    // mu_add_test(testQuadrotorInitializeCarrotController);
+    mu_add_test(testQuadrotorInitializeCarrotController);
     // mu_add_test(testQuadrotorRunCarrotMode);
     mu_add_test(testQuadrotorRunDiscoveryMode);
     mu_add_test(testQuadrotorRunTrackingModeBPF);

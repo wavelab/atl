@@ -53,6 +53,7 @@ public:
     double wp_threshold;
     Eigen::Vector3d wp_start;
     Eigen::Vector3d wp_end;
+    Eigen::Vector3d carrot_prev;
 
     CarrotController();
     CarrotController(

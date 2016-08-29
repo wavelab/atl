@@ -190,7 +190,7 @@ void Quadrotor::initializeCarrotController(void)
     std::cout << "Initializing Carrot Controller!" << std::endl;
 
     // current position
-    p = this->world_pose.position;
+    p << 0.0, 0.0, this->hover_height;
 
     // waypoint 1
     wp = p;
@@ -198,32 +198,32 @@ void Quadrotor::initializeCarrotController(void)
     this->carrot_controller->waypoints.push_back(wp);
 
     // waypoint 2
-    wp(0) = p(0) + 5;
+    wp(0) = p(0);
     wp(1) = p(1);
-    wp(2) = p(2);
+    wp(2) = p(2) * 0.8;
     this->carrot_controller->wp_end = wp;
     this->carrot_controller->waypoints.push_back(wp);
 
     // waypoint 3
-    wp(0) = p(0) + 5;
-    wp(1) = p(1) + 5;
-    wp(2) = p(2);
+    wp(0) = p(0);
+    wp(1) = p(1);
+    wp(2) = p(2) * 0.6;
     this->carrot_controller->waypoints.push_back(wp);
 
     // waypoint 4
     wp(0) = p(0);
-    wp(1) = p(1) + 5;
-    wp(2) = p(2);
+    wp(1) = p(1);
+    wp(2) = p(2) * 0.4;
     this->carrot_controller->waypoints.push_back(wp);
 
-    // back to waypoint 1
-    wp = p;
+    // waypoint 5
+    wp(0) = p(0);
+    wp(1) = p(1);
+    wp(2) = p(2) * 0.2;
     this->carrot_controller->waypoints.push_back(wp);
 
     // initialize carrot controller
     this->carrot_controller->initialized = 1;
-    this->mission_state = CARROT_MODE;
-    std::cout << "Transitioning to Carrot Controller Mode!" << std::endl;
 }
 
 Eigen::Vector3d Quadrotor::runCarrotMode(Pose robot_pose, float dt)
@@ -237,8 +237,7 @@ Eigen::Vector3d Quadrotor::runCarrotMode(Pose robot_pose, float dt)
     // calculate new carrot point
     if (this->carrot_controller->update(position, carrot)) {
         std::cout << "No more waypoints!" << std::endl;
-        std::cout << "Transitioning to Hover Mode!" << std::endl;
-        this->mission_state = HOVER_MODE;
+        return this->carrot_controller->carrot_prev;
     }
 
     return carrot;

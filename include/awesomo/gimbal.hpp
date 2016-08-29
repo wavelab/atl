@@ -33,8 +33,10 @@ public:
         Eigen::Vector3d target_position,
         Eigen::Quaterniond &imu
     );
-    Eigen::Vector3d getTargetPositionBPFGimbal(
-        Eigen::Vector3d target_position
+
+    int transformTargetPositionToBPFGimbal(
+        Eigen::Vector3d target_position,
+        Eigen::Vector3d &transformed_position
     );
 
     int setGimbalLimits(
