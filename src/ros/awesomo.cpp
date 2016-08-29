@@ -1,7 +1,3 @@
-#include <pthread.h>
-#include <stdio.h>
-#include <stdlib.h>
-
 #include <iostream>
 #include <cmath>
 #include <unistd.h>
@@ -24,7 +20,7 @@
 #include <atim/AtimPoseStamped.h>
 
 #include "awesomo/util.hpp"
-#include "awesomo/camera_mount.hpp"
+#include "awesomo/gimbal.hpp"
 #include "awesomo/controller.hpp"
 #include "awesomo/quadrotor.hpp"
 #include "awesomo/PositionControllerStats.h"
@@ -64,11 +60,11 @@ public:
     Pose mocap_pose;
     Pose gps_pose;
     LandingTargetPosition landing_zone;
-    bool landing_zone_detectedx ;
+    bool landing_zone_detected;
     int rc_in[16];
 
     Quadrotor *quad;
-    CameraMount *camera_mount;
+    Gimbal *gimbal;
 
     ros::ServiceClient mode_client;
     ros::ServiceClient arming_client;
@@ -134,9 +130,8 @@ Awesomo::Awesomo(std::map<std::string, std::string> configs)
         this->rc_in[i] = 0.0f;
     }
 
-
     this->quad = new Quadrotor(configs);
-    this->camera_mount = new CameraMount(configs);
+    this->gimbal = new Gimbal(configs);
 
     // wait till connected to FCU
     this->waitForConnection();
@@ -264,15 +259,15 @@ void Awesomo::atimCallback(const atim::AtimPoseStamped &msg)
     // atim records the FC imu message when creating a pose message
     frame_imu_quat = Eigen::Quaterniond(q.w, q.x, q.y, q.z);
     // now need to use the gimbal imu to do the BPF calculation
-    // tag_BPF = this->camera_mount->getTargetPositionBPFrame(tag, this->gimbal_imu_quat);
-    tag_BPF = this->camera_mount->getTargetPositionBPFGimbal(tag);
-    // tag_BPF = this->camera_mount->getTargetPositionBFrame(tag);
+    // tag_BPF = this->gimbal->getTargetPositionBPFrame(tag, this->gimbal_imu_quat);
+    tag_BPF = this->gimbal->getTargetPositionBPFGimbal(tag);
+    // tag_BPF = this->gimbal->getTargetPositionBFrame(tag);
 
     this->landing_zone.detected = msg.tag_detected;
     this->landing_zone.position << tag_BPF(0), tag_BPF(1), tag_BPF(2);
-    this->camera_mount->calcRollAndPitchSetpoints(tag_BPF,
-        frame_imu_quat
-    );
+    // this->gimbal->calcRollAndPitchSetpoints(tag_BPF,
+    //     frame_imu_quat
+    // );
 }
 
 void Awesomo::gpsCallback(const geometry_msgs::PoseWithCovarianceStamped &msg)
@@ -406,7 +401,7 @@ void Awesomo::subscribeToAtim(void)
     ROS_INFO("subcribing to [ATIM]");
     this->landing_subscriber = this->node.subscribe(
         ATIM_POSE_TOPIC,
-        50,
+        1,
         &Awesomo::atimCallback,
         this
     );
@@ -677,19 +672,12 @@ int Awesomo::run(
 
 }
 
-void *thread(void *arg)
-{
-    CameraMount *camera_mount;
-    camera_mount->sbgc->getRealtimeData();
-    camera_mount->sbgc->data.printData();
-}
-
 int main(int argc, char **argv)
 {
     // setup
     ros::init(argc, argv, "awesomo");
     ros::NodeHandle node_handle;
-    ros::Rate rate(100.0);
+    ros::Rate rate(1.0);
     ros::Time last_request;
     geometry_msgs::PoseStamped msg;
 
@@ -699,7 +687,7 @@ int main(int argc, char **argv)
     std::string quadrotor_config;
     std::string position_controller_config;
     std::string carrot_controller_config;
-    std::string camera_mount_config;
+    std::string gimbal_config;
     std::map<std::string, std::string> configs;
     std_msgs::Float64 throttle;
 
@@ -707,25 +695,26 @@ int main(int argc, char **argv)
     node_handle.getParam("/quadrotor", quadrotor_config);
     node_handle.getParam("/position_controller", position_controller_config);
     node_handle.getParam("/carrot_controller", carrot_controller_config);
-    node_handle.getParam("/camera_mount", camera_mount_config);
+    node_handle.getParam("/gimbal", gimbal_config);
     configs["quadrotor"] = quadrotor_config;
     configs["position_controller"] = position_controller_config;
     configs["carrot_controller"] = carrot_controller_config;
-    configs["camera_mount"] = camera_mount_config;
+    configs["gimbal"] = gimbal_config;
 
     // setup awesomo
     seq = 1;
     ROS_INFO("running ...");
     awesomo = new Awesomo(configs);
     last_request = ros::Time::now();
-
-    pthread_t t;
-    pthread_create(&t, NULL, &thread, awesomo->camera_mount);
-
-    // initial gimbal settings
-    awesomo->camera_mount->setGimbalAngles(0, -45, 0);
+    awesomo->gimbal->setGimbalAngles(0, 0, 0);
 
     while (ros::ok()){
+        printf("seq: %d\n", seq);
+
+        // if (awesomo->gimbal->sbgc->getRealtimeData() == 0) {
+        //  awesomo->gimbal->sbgc->data.printData();
+        // }
+
         // check if offboard switch has been turned on
         if (awesomo->rc_in[6] < 1500) {
             throttle.data = 0.0;

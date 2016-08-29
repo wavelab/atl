@@ -8,6 +8,7 @@ int test_deg2rad_and_rad2deg(void);
 int test_euler2RotationMatrix(void);
 int test_euler2Quaternion(void);
 int test_linreg(void);
+int test_tic_toc(void);
 
 int test_Pose_class(void)
 {
@@ -303,6 +304,18 @@ int test_linreg(void)
     return 0;
 }
 
+int test_tic_toc(void)
+{
+    struct timespec start;
+
+    tic(&start);
+    usleep(10 * 1000);
+    printf("%f\n", toc(&start));
+    printf("%f\n", mtoc(&start));
+
+    return 0;
+}
+
 void test_suite(void)
 {
     mu_add_test(test_Pose_class);
@@ -310,6 +323,7 @@ void test_suite(void)
     mu_add_test(test_euler2Quaternion);
     mu_add_test(test_euler2RotationMatrix);
     mu_add_test(test_linreg);
+    mu_add_test(test_tic_toc);
 }
 
 mu_run_tests(test_suite)

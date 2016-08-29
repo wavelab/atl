@@ -92,5 +92,8 @@ int euler2RotationMatrix(
     Eigen::Matrix3d &rot
 );
 int linreg(std::vector<Eigen::Vector2d> pts, double *m, double *b, double *r);
+void tic(struct timespec *tic);
+float toc(struct timespec *tic);
+float mtoc(struct timespec *tic);
 
 #endif

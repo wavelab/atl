@@ -12,7 +12,7 @@ int testSBGCGetRealtimeData(void);
 
 int testSBGCConnectDisconnect(void)
 {
-    SBGC sbgc("/dev/ttyUSB0", 115200, 500);
+    SBGC sbgc("/dev/ttyUSB0");
     mu_check(sbgc.connect() == 0);
     mu_check(sbgc.disconnect() == 0);
 
@@ -23,7 +23,7 @@ int testSBGCSendFrame(void)
 {
     int retval;
 	SBGCFrame frame;
-    SBGC sbgc("/dev/ttyUSB0", 115200, 500);
+    SBGC sbgc("/dev/ttyUSB0");
 
     // setup
     sbgc.connect();
@@ -47,7 +47,7 @@ int testSBGCReadFrame(void)
 {
 	int retval;
 	SBGCFrame frame;
-    SBGC sbgc("/dev/ttyUSB0", 115200, 500);
+    SBGC sbgc("/dev/ttyUSB0");
 
     // setup
     sbgc.connect();
@@ -66,7 +66,7 @@ int testSBGCReadFrame(void)
 
 int testSBGCGetBoardInfo(void)
 {
-    SBGC sbgc("/dev/ttyUSB0", 115200, 500);
+    SBGC sbgc("/dev/ttyUSB0");
 
     // setup
     sbgc.connect();
@@ -87,7 +87,7 @@ int testSBGCGetBoardInfo(void)
 
 int testSBGCGetRealtimeData(void)
 {
-    SBGC sbgc("/dev/ttyUSB0", 115200, 10);
+    SBGC sbgc("/dev/ttyUSB0");
 
     // setup
     sbgc.connect();
@@ -106,15 +106,15 @@ int testSBGCGetRealtimeData(void)
 
 int testSBGCSetAngle(void)
 {
-    SBGC sbgc("/dev/ttyUSB0", 115200, 500);
+    SBGC sbgc("/dev/ttyUSB0");
 
 	mu_check(sbgc.connect() == 0);
 	sbgc.on();
 
-   	sbgc.setAngle(0, -90, 0);
-   	sleep(2);
+	sbgc.setAngle(0, -90, 0);
+	sleep(2);
     for (int angle = -95; angle < 20; angle += 3){
-    	sbgc.setAngle(0, angle, 0);
+		sbgc.setAngle(0, angle, 0);
     }
 	sbgc.off();
 
@@ -123,12 +123,12 @@ int testSBGCSetAngle(void)
 
 int testSBGCSetSpeedAngle(void)
 {
-    SBGC sbgc("/dev/ttyUSB0", 115200, 500);
+    SBGC sbgc("/dev/ttyUSB0");
 
 	mu_check(sbgc.connect() == 0);
 	sbgc.on();
 
-	sbgc.setSpeedAngle(0, 10, 0, 0, -200, 0);
+	sbgc.setSpeedAngle(0, 10, 0, 0, -2, 0);
 	sleep(3);
 
 	sbgc.off();

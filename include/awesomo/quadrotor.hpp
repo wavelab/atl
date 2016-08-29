@@ -77,7 +77,7 @@ public:
     // state
     int mission_state;
     Pose world_pose;
-	double yaw;
+    double yaw;
 
     bool height_offset_initialized;
     float height_offset;
@@ -86,9 +86,9 @@ public:
     float hover_height;
 
     int landing_belief;
-    time_t tracking_start;
-    time_t target_last_updated;
-    time_t height_last_updated;
+    struct timespec tracking_start;
+    struct timespec target_last_updated;
+    struct timespec height_last_updated;
     std::vector<Eigen::Vector2d> lt_history;
 
     // controllers
@@ -110,11 +110,11 @@ public:
 
     // void updatePose(Pose p);
     void resetPositionController(void);
-	int calculateLandingTargetYaw(double *yaw);
+    int calculateLandingTargetYaw(double *yaw);
     void initializeCarrotController(void);
     Eigen::Vector3d runCarrotMode(Pose robot_pose, float dt);
     void runDiscoverMode(LandingTargetPosition landing);
-	int checkLandingTargetEstimation(Eigen::Vector3d &est);
+    int checkLandingTargetEstimation(Eigen::Vector3d &est);
     void runTrackingModeBPF(LandingTargetPosition landing, float dt);
     bool withinLandingZone(Eigen::Vector3d &m, Eigen::Vector3d &e);
     bool withinLandingZone(Eigen::Vector3d &m);

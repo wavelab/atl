@@ -21,8 +21,8 @@
         name="carrot_controller"
         value="$(find awesomo)/configs/carrot_controller/config.yaml" />
 	<param
-        name="camera_mount"
-        value="$(find awesomo)/configs/camera_mount/config.yaml" />
+        name="gimbal"
+        value="$(find awesomo)/configs/gimbal/config.yaml" />
 	<node
 	    pkg="awesomo"
 	    type="awesomo"

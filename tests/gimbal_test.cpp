@@ -1,12 +1,12 @@
 #include "awesomo/munit.h"
-#include "awesomo/camera_mount.hpp"
+#include "awesomo/gimbal.hpp"
 
 // CONFIGS
-#define CAMERA_MOUNT_CONFIG "configs/camera_mount/config.yaml"
+#define GIMBAL_CONFIG "configs/gimbal/config.yaml"
 
 // TESTS
-int testCameraMountGetTargetPositionBFrame(void);
-int testCameraMountGetTargetPositionBPFrame(void);
+int testGimbalGetTargetPositionBFrame(void);
+int testGimbalGetTargetPositionBPFrame(void);
 
 
 static void print_target_relative_to_quad(Eigen::Vector3d &target)
@@ -18,19 +18,19 @@ static void print_target_relative_to_quad(Eigen::Vector3d &target)
     printf("\n");
 }
 
-CameraMount *testSetup(void)
+Gimbal *testSetup(void)
 {
-    CameraMount *cam_mount;
+    Gimbal *cam_mount;
     std::map<std::string, std::string> configs;
-    configs["camera_mount"] = CAMERA_MOUNT_CONFIG;
-    cam_mount = new CameraMount(configs);
+    configs["gimbal"] = GIMBAL_CONFIG;
+    cam_mount = new Gimbal(configs);
 
     return cam_mount;
 }
 
-int testCameraMount(void)
+int testGimbal(void)
 {
-    CameraMount *cam_mount;
+    Gimbal *cam_mount;
     // setup
     cam_mount = testSetup();
 
@@ -39,9 +39,9 @@ int testCameraMount(void)
 }
 
 
-int testCameraMountGetTargetPositionBFrame(void)
+int testGimbalGetTargetPositionBFrame(void)
 {
-    CameraMount mount;
+    Gimbal mount;
     Eigen::Vector3d target;
     Eigen::Vector3d target_BF;
 
@@ -52,7 +52,7 @@ int testCameraMountGetTargetPositionBFrame(void)
     float dy = 0.0;
     float dz = 0.0;
 
-    mount = CameraMount(roll, pitch, yaw, dx, dy, dz);
+    mount = Gimbal(roll, pitch, yaw, dx, dy, dz);
 
     // target is front of camera
     target << 1.0, 0.0, 0.0;
@@ -138,9 +138,9 @@ int testCameraMountGetTargetPositionBFrame(void)
     return 0;
 }
 
-int testCameraMountGetTargetPositionBPFrame(void)
+int testGimbalGetTargetPositionBPFrame(void)
 {
-    CameraMount mount;
+    Gimbal mount;
     Eigen::Vector3d target;
     Eigen::Quaterniond imu;
     Eigen::Vector3d target_BPF;
@@ -154,7 +154,7 @@ int testCameraMountGetTargetPositionBPFrame(void)
 
     // setup
     target << 10.0, 0.0, 0.0;  // let tag be directly infront of camera
-    mount = CameraMount(roll, pitch, yaw, dx, dy, dz);
+    mount = Gimbal(roll, pitch, yaw, dx, dy, dz);
 
     // pitch forwards
     euler2Quaternion(0.0, deg2rad(-10), 0.0, imu);
@@ -184,7 +184,7 @@ int testCameraMountGetTargetPositionBPFrame(void)
     print_target_relative_to_quad(target_BPF);
 
     // roll right
-	euler2Quaternion(deg2rad(10), 0.0, 0.0, imu);
+    euler2Quaternion(deg2rad(10), 0.0, 0.0, imu);
     target_BPF = mount.getTargetPositionBPFrame(target, imu);
     mu_check(fltcmp(target_BPF(0), 0.0) == 0);
     mu_check(target_BPF(1) < 0.0);
@@ -193,7 +193,7 @@ int testCameraMountGetTargetPositionBPFrame(void)
     print_target_relative_to_quad(target_BPF);
 
     // pitch forward, roll left
-	euler2Quaternion(deg2rad(-10), deg2rad(-10), 0.0, imu);
+    euler2Quaternion(deg2rad(-10), deg2rad(-10), 0.0, imu);
     target_BPF = mount.getTargetPositionBPFrame(target, imu);
     mu_check(target_BPF(0) < 0.0);
     mu_check(target_BPF(1) > 0.0);
@@ -202,7 +202,7 @@ int testCameraMountGetTargetPositionBPFrame(void)
     print_target_relative_to_quad(target_BPF);
 
     // pitch forward, roll right
-	euler2Quaternion(deg2rad(10), deg2rad(-10), 0.0, imu);
+    euler2Quaternion(deg2rad(10), deg2rad(-10), 0.0, imu);
     target_BPF = mount.getTargetPositionBPFrame(target, imu);
     mu_check(target_BPF(0) < 0.0);
     mu_check(target_BPF(1) < 0.0);
@@ -211,7 +211,7 @@ int testCameraMountGetTargetPositionBPFrame(void)
     print_target_relative_to_quad(target_BPF);
 
     // pitch backwards, roll left
-	euler2Quaternion(deg2rad(-10), deg2rad(10), 0.0, imu);
+    euler2Quaternion(deg2rad(-10), deg2rad(10), 0.0, imu);
     target_BPF = mount.getTargetPositionBPFrame(target, imu);
     mu_check(target_BPF(0) > 0.0);
     mu_check(target_BPF(1) > 0.0);
@@ -220,7 +220,7 @@ int testCameraMountGetTargetPositionBPFrame(void)
     print_target_relative_to_quad(target_BPF);
 
     // pitch backwards, roll right
-	euler2Quaternion(deg2rad(10), deg2rad(10), 0.0, imu);
+    euler2Quaternion(deg2rad(10), deg2rad(10), 0.0, imu);
     target_BPF = mount.getTargetPositionBPFrame(target, imu);
     mu_check(target_BPF(0) > 0.0);
     mu_check(target_BPF(1) < 0.0);
@@ -233,9 +233,9 @@ int testCameraMountGetTargetPositionBPFrame(void)
 
 void test_suite(void)
 {
-    mu_add_test(testCameraMount);
-    mu_add_test(testCameraMountGetTargetPositionBFrame);
-    mu_add_test(testCameraMountGetTargetPositionBPFrame);
+    mu_add_test(testGimbal);
+    mu_add_test(testGimbalGetTargetPositionBFrame);
+    mu_add_test(testGimbalGetTargetPositionBPFrame);
 }
 
 mu_run_tests(test_suite)

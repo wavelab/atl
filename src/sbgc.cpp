@@ -1,6 +1,65 @@
 #include "awesomo/sbgc.hpp"
 
 
+
+int set_interface_attribs(int fd, int speed, int parity)
+{
+    struct termios tty;
+    memset (&tty, 0, sizeof tty);
+    if (tcgetattr(fd, &tty) != 0) {
+        printf("error %d from tcgetattr", errno);
+        return -1;
+    }
+
+    cfsetospeed(&tty, speed);
+    cfsetispeed(&tty, speed);
+
+    tty.c_cflag = (tty.c_cflag & ~CSIZE) | CS8;     // 8-bit chars
+    // disable IGNBRK for mismatched speed tests; otherwise receive break
+    // as \000 chars
+    tty.c_iflag &= ~IGNBRK;         // disable break processing
+    tty.c_lflag = 0;                // no signaling chars, no echo,
+    // no canonical processing
+    tty.c_oflag = 0;                // no remapping, no delays
+    tty.c_cc[VMIN]  = 0;            // read doesn't block
+    tty.c_cc[VTIME] = 5;            // 0.5 seconds read timeout
+
+    tty.c_iflag &= ~(IXON | IXOFF | IXANY); // shut off xon/xoff ctrl
+
+    tty.c_cflag |= (CLOCAL | CREAD);// ignore modem controls,
+    // enable reading
+    tty.c_cflag &= ~(PARENB | PARODD);      // shut off parity
+    tty.c_cflag |= parity;
+    tty.c_cflag &= ~CSTOPB;
+    tty.c_cflag &= ~CRTSCTS;
+
+    if (tcsetattr(fd, TCSANOW, &tty) != 0) {
+        printf("error %d from tcsetattr", errno);
+        return -1;
+    }
+
+    return 0;
+}
+
+void set_blocking(int fd, int should_block)
+{
+    struct termios tty;
+
+    memset(&tty, 0, sizeof tty);
+    if (tcgetattr(fd, &tty) != 0) {
+        printf("error %d from tggetattr", errno);
+        return;
+    }
+
+    tty.c_cc[VMIN] = should_block ? 1 : 0;
+    tty.c_cc[VTIME] = 5; // 0.5 seconds read timeout
+
+    if (tcsetattr(fd, TCSANOW, &tty) != 0) {
+        printf("error %d setting term attributes", errno);
+    }
+}
+
+
 void SBGCFrame::printFrame(void)
 {
     int i;
@@ -128,84 +187,77 @@ int SBGCFrame::parseFrame(uint8_t *data)
 
 void SBGCRealtimeData::printData(void)
 {
-	// ACCELEROMOETER AND GYROSCOPE
-	printf(
-		"accelerometer: %.2f\t%.2f\t%.2f\n",
-		this->accel(0),
-		this->accel(1),
-		this->accel(2)
-	);
-	printf(
-		"gyroscope: %.2f\t%.2f\t%.2f\n",
-		this->gyro(0),
-		this->gyro(1),
-		this->gyro(2)
-	);
-	printf("\n");
+    // ACCELEROMOETER AND GYROSCOPE
+    printf(
+        "accelerometer: %.2f\t%.2f\t%.2f\n",
+        this->accel(0),
+        this->accel(1),
+        this->accel(2)
+    );
+    printf(
+        "gyroscope: %.2f\t%.2f\t%.2f\n",
+        this->gyro(0),
+        this->gyro(1),
+        this->gyro(2)
+    );
+    printf("\n");
 
-	// ANGLES
+    // ANGLES
     printf("camera_angles: %.2f\t%.2f\t%.2f\n",
-		this->camera_angles(0),
-		this->camera_angles(1),
-		this->camera_angles(2)
-	);
+        this->camera_angles(0),
+        this->camera_angles(1),
+        this->camera_angles(2)
+    );
     printf("frame_angles: %.2f\t%.2f\t%.2f\n",
-		this->frame_angles(0),
-		this->frame_angles(1),
-		this->frame_angles(2)
-	);
+        this->frame_angles(0),
+        this->frame_angles(1),
+        this->frame_angles(2)
+    );
     printf("rc_angles: %.2f\t%.2f\t%.2f\n",
-		this->rc_angles(0),
-		this->rc_angles(1),
-		this->rc_angles(2)
-	);
+        this->rc_angles(0),
+        this->rc_angles(1),
+        this->rc_angles(2)
+    );
 
-	// MISC
+    // MISC
     printf("cycle_time: %d\n", this->cycle_time);
     printf("i2c_error_count: %d\n", this->i2c_error_count);
     printf("system_error: %d\n", this->system_error);
-	printf("battery_level: %d\n", this->battery_level);
+    printf("battery_level: %d\n\n", this->battery_level);
 }
 
 
 
 
-SBGC::SBGC(std::string port, unsigned long baudrate, int timeout)
+SBGC::SBGC(std::string port)
 {
     this->port = port;
-    this->baudrate = baudrate;
-    this->timeout = serial::Timeout::simpleTimeout(timeout);
-    this->serial.setTimeout(this->timeout);
-    this->serial.setPort(this->port);
-    this->serial.setBaudrate(this->baudrate);
 }
 
 int SBGC::connect(void)
 {
-    try{
-        this->serial.open();
-
-        if (this->serial.isOpen()) {
-            std::cout << "connected to SBGC!" << std::endl;
-            return 0;
-        } else {
-            std::cout << "failed to connect to SBGC!" << std::endl;
-            return -1;
-        }
-
-    } catch (serial::IOException) {
-        return -2;
-
+    // open serial port
+    this->serial = open(this->port.c_str(), O_RDWR | O_NOCTTY | O_SYNC);
+    if (this->serial < 0) {
+        std::cout << "failed to connect to SBGC!" << std::endl;
+        return -1;
     }
+
+    // configure serial commnication
+    set_interface_attribs(this->serial, B115200, 0);
+    set_blocking(this->serial, 1);
+
+    std::cout << "connected to SBGC!" << std::endl;
+
+    return 0;
 }
 
 int SBGC::disconnect(void)
 {
-    this->serial.close();
-
-    if (this->serial.isOpen()) {
+    if (close(this->serial) != 0) {
         std::cout << "failed to disconnect from SBGC!" << std::endl;
         return -1;
+
     } else {
         std::cout << "disconnected from SBGC!" << std::endl;
         return 0;
@@ -225,17 +277,14 @@ int SBGC::sendFrame(SBGCFrame &cmd)
 
     // header
     start = 0x3E;  // ">" character
-    this->serial.write(&start, 1);
-    this->serial.write(&cmd.cmd_id, 1);
-    this->serial.write(&cmd.data_size, 1);
+    write(this->serial, &start, 1);
+    write(this->serial, &cmd.cmd_id, 1);
+    write(this->serial, &cmd.data_size, 1);
 
     // body
-    this->serial.write(&cmd.header_checksum, 1);
-    this->serial.write(cmd.data, (size_t) cmd.data_size);
-    this->serial.write(&cmd.data_checksum, 1);
-
-    // flush and wait for 20ms (as specified in docs)
-    this->serial.flush();
+    write(this->serial, &cmd.header_checksum, 1);
+    write(this->serial, cmd.data, cmd.data_size);
+    write(this->serial, &cmd.data_checksum, 1);
     usleep(20 * 1000);
 
     return 0;
@@ -249,16 +298,16 @@ int SBGC::readFrame(uint8_t read_length, SBGCFrame &frame)
     uint8_t buffer[150];
 
     // pre-check
-    nb_bytes = this->serial.read(buffer, read_length);
+    nb_bytes = read(this->serial, buffer, read_length);
     if (nb_bytes <= 0 || nb_bytes != read_length){
-        std::cout << "failed to read SBGC frame!" << std::endl;
+        // std::cout << "failed to read SBGC frame!" << std::endl;
         return -1;
     }
 
     // parse sbgc frame
     retval = frame.parseFrame(buffer);
     if (retval == -1) {
-        std::cout << "failed to parse SBGC frame!" << std::endl;
+        // std::cout << "failed to parse SBGC frame!" << std::endl;
         return -1;
     }
 
@@ -350,7 +399,7 @@ int SBGC::getRealtimeData(void)
 {
     int retval;
     SBGCFrame frame;
-	// SBGCRealtimeData data;
+    // SBGCRealtimeData data;
 
     // request real time data
     frame.buildFrame(CMD_REALTIME_DATA_4);
@@ -368,54 +417,54 @@ int SBGC::getRealtimeData(void)
     }
 
     // parse real time data
-	// accelerometer and gyroscope
-	this->data.accel(0) = S16BIT(frame.data, 1, 0);
-	this->data.gyro(0) = S16BIT(frame.data, 3, 2);
-	this->data.accel(1) = S16BIT(frame.data, 5, 4);
-	this->data.gyro(1) = S16BIT(frame.data, 7, 6);
-	this->data.accel(2) = S16BIT(frame.data, 9, 8);
-	this->data.gyro(2) = S16BIT(frame.data, 11, 10);
+    // accelerometer and gyroscope
+    this->data.accel(0) = S16BIT(frame.data, 1, 0);
+    this->data.gyro(0) = S16BIT(frame.data, 3, 2);
+    this->data.accel(1) = S16BIT(frame.data, 5, 4);
+    this->data.gyro(1) = S16BIT(frame.data, 7, 6);
+    this->data.accel(2) = S16BIT(frame.data, 9, 8);
+    this->data.gyro(2) = S16BIT(frame.data, 11, 10);
 
-	this->data.accel(0) = (ACC_UNIT) * this->data.accel(0);
-	this->data.accel(1) = (ACC_UNIT) * this->data.accel(1);
-	this->data.accel(2) = (ACC_UNIT) * this->data.accel(2);
+    this->data.accel(0) = (ACC_UNIT) * this->data.accel(0);
+    this->data.accel(1) = (ACC_UNIT) * this->data.accel(1);
+    this->data.accel(2) = (ACC_UNIT) * this->data.accel(2);
 
-	this->data.gyro(0) = (GYRO_UNIT) * this->data.gyro(0);
-	this->data.gyro(1) = (GYRO_UNIT) * this->data.gyro(1);
-	this->data.gyro(2) = (GYRO_UNIT) * this->data.gyro(2);
+    this->data.gyro(0) = (GYRO_UNIT) * this->data.gyro(0);
+    this->data.gyro(1) = (GYRO_UNIT) * this->data.gyro(1);
+    this->data.gyro(2) = (GYRO_UNIT) * this->data.gyro(2);
 
-	// angles
-	this->data.camera_angles(0) = S16BIT(frame.data, 33, 32);
-	this->data.camera_angles(1) = S16BIT(frame.data, 35, 34);
-	this->data.camera_angles(2) = S16BIT(frame.data, 37, 36);
+    // angles
+    this->data.camera_angles(0) = S16BIT(frame.data, 33, 32);
+    this->data.camera_angles(1) = S16BIT(frame.data, 35, 34);
+    this->data.camera_angles(2) = S16BIT(frame.data, 37, 36);
 
-	this->data.frame_angles(0) = S16BIT(frame.data, 39, 38);
-	this->data.frame_angles(1) = S16BIT(frame.data, 41, 40);
-	this->data.frame_angles(2) = S16BIT(frame.data, 43, 42);
+    this->data.frame_angles(0) = S16BIT(frame.data, 39, 38);
+    this->data.frame_angles(1) = S16BIT(frame.data, 41, 40);
+    this->data.frame_angles(2) = S16BIT(frame.data, 43, 42);
 
-	this->data.rc_angles(0) = S16BIT(frame.data, 45, 44);
-	this->data.rc_angles(1) = S16BIT(frame.data, 47, 45);
-	this->data.rc_angles(2) = S16BIT(frame.data, 49, 46);
+    this->data.rc_angles(0) = S16BIT(frame.data, 45, 44);
+    this->data.rc_angles(1) = S16BIT(frame.data, 47, 45);
+    this->data.rc_angles(2) = S16BIT(frame.data, 49, 46);
 
-	this->data.camera_angles(0) = (DEG_PER_BIT) * this->data.camera_angles(0);
-	this->data.camera_angles(1) = (DEG_PER_BIT) * this->data.camera_angles(1);
-	this->data.camera_angles(2) = (DEG_PER_BIT) * this->data.camera_angles(2);
+    this->data.camera_angles(0) = (DEG_PER_BIT) * this->data.camera_angles(0);
+    this->data.camera_angles(1) = (DEG_PER_BIT) * this->data.camera_angles(1);
+    this->data.camera_angles(2) = (DEG_PER_BIT) * this->data.camera_angles(2);
 
-	this->data.frame_angles(0) = (DEG_PER_BIT) * this->data.frame_angles(0);
-	this->data.frame_angles(1) = (DEG_PER_BIT) * this->data.frame_angles(1);
-	this->data.frame_angles(2) = (DEG_PER_BIT) * this->data.frame_angles(2);
+    this->data.frame_angles(0) = (DEG_PER_BIT) * this->data.frame_angles(0);
+    this->data.frame_angles(1) = (DEG_PER_BIT) * this->data.frame_angles(1);
+    this->data.frame_angles(2) = (DEG_PER_BIT) * this->data.frame_angles(2);
 
-	this->data.rc_angles(0) = (DEG_PER_BIT) * this->data.rc_angles(0);
-	this->data.rc_angles(1) = (DEG_PER_BIT) * this->data.rc_angles(1);
-	this->data.rc_angles(2) = (DEG_PER_BIT) * this->data.rc_angles(2);
+    this->data.rc_angles(0) = (DEG_PER_BIT) * this->data.rc_angles(0);
+    this->data.rc_angles(1) = (DEG_PER_BIT) * this->data.rc_angles(1);
+    this->data.rc_angles(2) = (DEG_PER_BIT) * this->data.rc_angles(2);
 
-	// misc
+    // misc
     this->data.cycle_time = U16BIT(frame.data, 51, 50);
     this->data.i2c_error_count = U16BIT(frame.data, 53, 52);
     this->data.system_error = U16BIT(frame.data, 15, 14);
-	this->data.battery_level = U16BIT(frame.data, 56, 55);
+    this->data.battery_level = U16BIT(frame.data, 56, 55);
 
-	// this->data.printData();
+    // this->data.printData();
 
     return 0;
 }

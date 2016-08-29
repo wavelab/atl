@@ -1,5 +1,5 @@
-#ifndef __CAMERA_MOUNT_HPP__
-#define __CAMERA_MOUNT_HPP__
+#ifndef __GIMBAL_HPP__
+#define __GIMBAL_HPP__
 
 #include <iostream>
 #include <math.h>
@@ -17,16 +17,16 @@ struct GimbalLimit
     Eigen::Vector2d yaw_limits;
 };
 
-class CameraMount
+class Gimbal
 {
 public:
     SBGC *sbgc;
     Pose pose;
     struct GimbalLimit gimbal_limits;
 
-    CameraMount(){};
-    CameraMount(float roll, float pitch, float yaw, float x, float y, float z);
-    CameraMount(std::map<std::string, std::string> configs);
+    Gimbal(){};
+    Gimbal(float roll, float pitch, float yaw, float x, float y, float z);
+    Gimbal(std::map<std::string, std::string> configs);
 
     Eigen::Vector3d getTargetPositionBFrame(Eigen::Vector3d target_position);
     Eigen::Vector3d getTargetPositionBPFrame(
