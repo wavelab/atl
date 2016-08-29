@@ -9,7 +9,6 @@
 
 #include <iostream>
 
-#include <serial/serial.h>
 #include <Eigen/Geometry>
 
 
@@ -155,7 +154,7 @@ class SBGC
 public:
     SBGCRealtimeData data;
     std::string port;
-	int serial;
+    int serial;
 
     uint8_t board_version;
     uint16_t firmware_version;

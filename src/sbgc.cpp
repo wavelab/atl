@@ -300,14 +300,14 @@ int SBGC::readFrame(uint8_t read_length, SBGCFrame &frame)
     // pre-check
 	nb_bytes = read(this->serial, buffer, read_length);
     if (nb_bytes <= 0 || nb_bytes != read_length){
-        std::cout << "failed to read SBGC frame!" << std::endl;
+        // std::cout << "failed to read SBGC frame!" << std::endl;
         return -1;
     }
 
     // parse sbgc frame
     retval = frame.parseFrame(buffer);
     if (retval == -1) {
-        std::cout << "failed to parse SBGC frame!" << std::endl;
+        // std::cout << "failed to parse SBGC frame!" << std::endl;
         return -1;
     }
 

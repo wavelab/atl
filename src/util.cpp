@@ -87,49 +87,78 @@ int euler2RotationMatrix(
 
 inline static double sqr(double x)
 {
-	return x * x;
+    return x * x;
 }
 
 int linreg(std::vector<Eigen::Vector2d> pts, double *m, double *c, double *r)
 {
-	// linear regression of form: y = mx + c
-	Eigen::Vector2d p;
-	double sumx = 0.0;   /* sum of x */
-	double sumx2 = 0.0;  /* sum of x^2 */
-	double sumxy = 0.0;  /* sum of x * y */
-	double sumy = 0.0;   /* sum of y */
-	double sumy2 = 0.0;  /* sum of y^2 */
+    // linear regression of form: y = mx + c
+    Eigen::Vector2d p;
+    double sumx = 0.0;   /* sum of x */
+    double sumx2 = 0.0;  /* sum of x^2 */
+    double sumxy = 0.0;  /* sum of x * y */
+    double sumy = 0.0;   /* sum of y */
+    double sumy2 = 0.0;  /* sum of y^2 */
 
-	for (int i = 0; i < pts.size(); i++) {
-		p = pts[i];
-		sumx += p(0);
-		sumx2 += sqr(p(0));
-		sumxy += p(0) * p(1);
-		sumy += p(1);
-		sumy2 += sqr(p(1));
-	}
+    for (int i = 0; i < pts.size(); i++) {
+        p = pts[i];
+        sumx += p(0);
+        sumx2 += sqr(p(0));
+        sumxy += p(0) * p(1);
+        sumy += p(1);
+        sumy2 += sqr(p(1));
+    }
 
-	double denom = (pts.size() * sumx2 - sqr(sumx));
-	if (denom == 0) {
-		// singular matrix. can't solve the problem.
-		*m = 0;
-		*c = 0;
-		if (r) {
-			*r = 0;
-		}
-		return -1;
-	}
+    double denom = (pts.size() * sumx2 - sqr(sumx));
+    if (denom == 0) {
+        // singular matrix. can't solve the problem.
+        *m = 0;
+        *c = 0;
+        if (r) {
+            *r = 0;
+        }
+        return -1;
+    }
 
-	*m = (pts.size() * sumxy  -  sumx * sumy) / denom;
-	*c = (sumy * sumx2  -  sumx * sumxy) / denom;
-	/* compute correlation coeff */
-	if (r != NULL) {
-		*r = (sumxy - sumx * sumy / pts.size());
-		*r /= sqrt(
-			(sumx2 - sqr(sumx) / pts.size())
-			* (sumy2 - sqr(sumy) / pts.size())
-		);
-	}
+    *m = (pts.size() * sumxy  -  sumx * sumy) / denom;
+    *c = (sumy * sumx2  -  sumx * sumxy) / denom;
+    /* compute correlation coeff */
+    if (r != NULL) {
+        *r = (sumxy - sumx * sumy / pts.size());
+        *r /= sqrt(
+            (sumx2 - sqr(sumx) / pts.size())
+            * (sumy2 - sqr(sumy) / pts.size())
+        );
+    }
 
     return 0;
+}
+
+void tic(struct timespec *tic)
+{
+    clock_gettime(CLOCK_MONOTONIC, tic);
+}
+
+float toc(struct timespec *tic)
+{
+    struct timespec toc;
+    float time_elasped;
+
+    clock_gettime(CLOCK_MONOTONIC, &toc);
+    time_elasped = (toc.tv_sec - tic->tv_sec);
+    time_elasped += (toc.tv_nsec - tic->tv_nsec) / 1000000000.0;
+
+    return time_elasped;
+}
+
+float mtoc(struct timespec *tic)
+{
+    struct timespec toc;
+    float time_elasped;
+
+    clock_gettime(CLOCK_MONOTONIC, &toc);
+    time_elasped = (toc.tv_sec - tic->tv_sec);
+    time_elasped += (toc.tv_nsec - tic->tv_nsec) / 1000000.0;
+
+    return time_elasped;
 }

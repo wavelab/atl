@@ -60,10 +60,11 @@ public:
     Pose mocap_pose;
     Pose gps_pose;
     LandingTargetPosition landing_zone;
-    bool landing_zone_detectedx ;
+    bool landing_zone_detected;
     int rc_in[16];
 
     Quadrotor *quad;
+    Gimbal *gimbal;
 
     ros::ServiceClient mode_client;
     ros::ServiceClient arming_client;
@@ -130,6 +131,7 @@ Awesomo::Awesomo(std::map<std::string, std::string> configs)
     }
 
     this->quad = new Quadrotor(configs);
+    this->gimbal = new Gimbal(configs);
 
     // wait till connected to FCU
     this->waitForConnection();
@@ -258,7 +260,7 @@ void Awesomo::atimCallback(const atim::AtimPoseStamped &msg)
     frame_imu_quat = Eigen::Quaterniond(q.w, q.x, q.y, q.z);
     // now need to use the gimbal imu to do the BPF calculation
     // tag_BPF = this->gimbal->getTargetPositionBPFrame(tag, this->gimbal_imu_quat);
-    // tag_BPF = this->gimbal->getTargetPositionBPFGimbal(tag);
+    tag_BPF = this->gimbal->getTargetPositionBPFGimbal(tag);
     // tag_BPF = this->gimbal->getTargetPositionBFrame(tag);
 
     this->landing_zone.detected = msg.tag_detected;
@@ -399,7 +401,7 @@ void Awesomo::subscribeToAtim(void)
     ROS_INFO("subcribing to [ATIM]");
     this->landing_subscriber = this->node.subscribe(
         ATIM_POSE_TOPIC,
-        50,
+        1,
         &Awesomo::atimCallback,
         this
     );
@@ -675,7 +677,7 @@ int main(int argc, char **argv)
     // setup
     ros::init(argc, argv, "awesomo");
     ros::NodeHandle node_handle;
-    ros::Rate rate(100.0);
+    ros::Rate rate(1.0);
     ros::Time last_request;
     geometry_msgs::PoseStamped msg;
 
@@ -704,8 +706,15 @@ int main(int argc, char **argv)
     ROS_INFO("running ...");
     awesomo = new Awesomo(configs);
     last_request = ros::Time::now();
+    awesomo->gimbal->setGimbalAngles(0, 0, 0);
 
     while (ros::ok()){
+        printf("seq: %d\n", seq);
+
+        // if (awesomo->gimbal->sbgc->getRealtimeData() == 0) {
+        //  awesomo->gimbal->sbgc->data.printData();
+        // }
+
         // check if offboard switch has been turned on
         if (awesomo->rc_in[6] < 1500) {
             throttle.data = 0.0;

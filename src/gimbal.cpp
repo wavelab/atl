@@ -177,7 +177,12 @@ int Gimbal::calcRollAndPitchSetpoints(
     // std::cout << "target position \n" << target_position << std::endl;
     // this needs to be fixed. it over limits at the moment
     // this->checkSetPointLimits(frame_rpy, roll_setpoint, pitch_setpoint, yaw_setpoint);
-    this->sbgc->setAngle(roll_setpoint, pitch_setpoint, yaw_setpoint);
+    // this->sbgc->setAngle(roll_setpoint, pitch_setpoint, yaw_setpoint);
+
+	if (this->sbgc->data.battery_level > 1500 && this->sbgc->data.battery_level < 1700) {
+		printf("roll_setpoint: %f\n", roll_setpoint);
+		this->sbgc->setAngle(roll_setpoint, pitch_setpoint, yaw_setpoint);
+	}
 
     return 0;
 }

@@ -11,6 +11,8 @@
 
 // TESTS
 Quadrotor *testSetup(void);
+void transitionQuadrotorToTrackingMode(Quadrotor *quad);
+void print_position_controller_adjustment(const char *title, Quadrotor *quad);
 int testQuadrotor(void);
 int testQuadrotorPositionControllerCalculate(void);
 int testQuadrotorResetPositionController(void);
@@ -39,7 +41,26 @@ Quadrotor *testSetup(void)
     return quad;
 }
 
-static void print_position_controller_adjustment(const char *title, Quadrotor *quad)
+void transitionQuadrotorToTrackingMode(Quadrotor *quad)
+{
+    LandingTargetPosition landing_zone;
+
+    landing_zone.detected = true;
+    landing_zone.position(0) = 0.0;
+    landing_zone.position(1) = 0.0;
+    landing_zone.position(2) = 3.0;
+    quad->runDiscoverMode(landing_zone);
+
+    for (int i = 0; i < 5; i++) {
+        landing_zone.detected = true;
+        landing_zone.position(0) = 1.0;
+        landing_zone.position(1) = 2.0;
+        landing_zone.position(2) = 3.0;
+        quad->runDiscoverMode(landing_zone);
+    }
+}
+
+void print_position_controller_adjustment(const char *title, Quadrotor *quad)
 {
     mu_print("%s\n", title);
     mu_print("roll: %f\n", quad->position_controller->roll);
@@ -276,7 +297,7 @@ int testQuadrotorCalculateLandingTargetYaw(void)
 {
     Quadrotor *quad;
     double yaw;
-	Eigen::Vector2d p;
+    Eigen::Vector2d p;
 
     // setup
     quad = testSetup();
@@ -288,9 +309,9 @@ int testQuadrotorCalculateLandingTargetYaw(void)
     quad->lt_history.push_back(p);
 
     quad->calculateLandingTargetYaw(&yaw);
-	yaw = yaw * 180.0 / M_PI;
-	mu_print("yaw (degrees): %f\n", yaw);
-	quad->lt_history.clear();
+    yaw = yaw * 180.0 / M_PI;
+    mu_print("yaw (degrees): %f\n", yaw);
+    quad->lt_history.clear();
 
     // test - quadrant II
     p << 0, 0;
@@ -299,9 +320,9 @@ int testQuadrotorCalculateLandingTargetYaw(void)
     quad->lt_history.push_back(p);
 
     quad->calculateLandingTargetYaw(&yaw);
-	yaw = yaw * 180.0 / M_PI;
-	mu_print("yaw (degrees): %f\n", yaw);
-	quad->lt_history.clear();
+    yaw = yaw * 180.0 / M_PI;
+    mu_print("yaw (degrees): %f\n", yaw);
+    quad->lt_history.clear();
 
     // test - quadrant III
     p << 0, 0;
@@ -310,9 +331,9 @@ int testQuadrotorCalculateLandingTargetYaw(void)
     quad->lt_history.push_back(p);
 
     quad->calculateLandingTargetYaw(&yaw);
-	yaw = yaw * 180.0 / M_PI;
-	mu_print("yaw (degrees): %f\n", yaw);
-	quad->lt_history.clear();
+    yaw = yaw * 180.0 / M_PI;
+    mu_print("yaw (degrees): %f\n", yaw);
+    quad->lt_history.clear();
 
     // test - quadrant IV
     p << 0, 0;
@@ -321,21 +342,21 @@ int testQuadrotorCalculateLandingTargetYaw(void)
     quad->lt_history.push_back(p);
 
     quad->calculateLandingTargetYaw(&yaw);
-	yaw = yaw * 180.0 / M_PI;
-	mu_print("yaw (degrees): %f\n", yaw);
-	quad->lt_history.clear();
+    yaw = yaw * 180.0 / M_PI;
+    mu_print("yaw (degrees): %f\n", yaw);
+    quad->lt_history.clear();
 
-	// test - over 360
-	quad->yaw = 358.0 * M_PI / 180.0;
+    // test - over 360
+    quad->yaw = 358.0 * M_PI / 180.0;
     p << 0, 0;
     quad->lt_history.push_back(p);
     p << 1, -1;
     quad->lt_history.push_back(p);
 
     quad->calculateLandingTargetYaw(&yaw);
-	yaw = yaw * 180.0 / M_PI;
-	mu_print("yaw (degrees): %f\n", yaw);
-	quad->lt_history.clear();
+    yaw = yaw * 180.0 / M_PI;
+    mu_print("yaw (degrees): %f\n", yaw);
+    quad->lt_history.clear();
 
     return 0;
 }
@@ -460,12 +481,7 @@ int testQuadrotorRunDiscoveryMode(void)
     quad->runDiscoverMode(landing_zone);
 
     // test transition to tracking mode
-    landing_zone.detected = true;
-    landing_zone.position(0) = 1.0;
-    landing_zone.position(1) = 2.0;
-    landing_zone.position(2) = 3.0;
-
-    quad->runDiscoverMode(landing_zone);
+    transitionQuadrotorToTrackingMode(quad);
 
     mu_check(quad->estimator_initialized == true);
     mu_check(fltcmp(quad->tag_estimator.mu(0), 1.0) == 0);
@@ -504,7 +520,23 @@ int testQuadrotorRunTrackingModeBPF(void)
     world_pose.position << 0.0, 0.0, 0.0;
 
     quad->world_pose = world_pose;
+
+    // transition to tracking mode
+    landing_zone.detected = true;
+    landing_zone.position(0) = 0.0;
+    landing_zone.position(1) = 0.0;
+    landing_zone.position(2) = 3.0;
     quad->runDiscoverMode(landing_zone);
+
+    for (int i = 0; i < 5; i++) {
+        landing_zone.detected = true;
+        landing_zone.position(0) = 1.0;
+        landing_zone.position(1) = 2.0;
+        landing_zone.position(2) = 3.0;
+        quad->runDiscoverMode(landing_zone);
+    }
+
+    // test tracking
     quad->runTrackingModeBPF(landing_zone, dt);
     print_position_controller_adjustment("Gain altitude", quad);
 
@@ -608,8 +640,10 @@ int testQuadrotorRunLandingMode(void)
     landing_zone.position(2) = 4.0;
 
     quad->runDiscoverMode(landing_zone);
+    transitionQuadrotorToTrackingMode(quad);
+
     quad->mission_state = LANDING_MODE;
-    quad->landing_config->period = 1.0;
+    quad->landing_config->period = 2000.0;
     quad->landing_config->descend_multiplier = 0.8;
     quad->landing_config->recover_multiplier = 1.2;
     quad->landing_config->cutoff_position << 0.5, 0.5, 0.2;
@@ -617,26 +651,28 @@ int testQuadrotorRunLandingMode(void)
     quad->hover_height= 6.0;
 
     // test - lower height
-    quad->height_last_updated = time(NULL) - 2;
+    tic(&quad->height_last_updated);
+    quad->height_last_updated.tv_nsec -= (2000 * 1000000);
     quad->runLandingMode(landing_zone, dt);
     mu_check(fltcmp(quad->hover_height, 4.8) == 0);
 
     // test - do not lower height
-    quad->height_last_updated = time(NULL);
+    tic(&quad->height_last_updated);
     landing_zone.position(0) = 0.3;
     landing_zone.position(1) = 0.3;
     quad->runLandingMode(landing_zone, dt);
     mu_check(fltcmp(quad->hover_height, 4.8) == 0);
 
     // test - increase height
-    quad->height_last_updated = time(NULL) - 2;
+    tic(&quad->height_last_updated);
+    quad->height_last_updated.tv_nsec -= (2000 * 1000000);
     landing_zone.position(0) = 0.51;
     landing_zone.position(1) = 0.51;
     quad->runLandingMode(landing_zone, dt);
     mu_check(fltcmp(quad->hover_height, 4.8 * 1.2) == 0);
 
     // test - do not increase height
-    quad->height_last_updated = time(NULL);
+    tic(&quad->height_last_updated);
     landing_zone.position(0) = 0.51;
     landing_zone.position(1) = 0.51;
     quad->runLandingMode(landing_zone, dt);
@@ -667,12 +703,12 @@ int testQuadrotorRunMission(void)
     landing_zone.position(0) = 0.0f;
     landing_zone.position(1) = 0.0f;
     landing_zone.position(2) = 0.0f;
-
     dt = 0.1;
 
     // test IDLE_MODE
     mu_check(quad->mission_state == DISCOVER_MODE);
     quad->runMission(robot_pose, landing_zone, dt);
+    transitionQuadrotorToTrackingMode(quad);
     mu_check(quad->mission_state == TRACKING_MODE);
 
     // test TRACKER_MODE
@@ -709,7 +745,7 @@ void testSuite(void)
     // mu_add_test(testQuadrotorRunDiscoveryMode);
     // mu_add_test(testQuadrotorRunTrackingModeBPF);
     // mu_add_test(testQuadrotorWithinLandingZone);
-    // mu_add_test(testQuadrotorRunLandingMode);
+    mu_add_test(testQuadrotorRunLandingMode);
     // mu_add_test(testQuadrotorRunMission);
 }
 
