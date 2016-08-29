@@ -1,22 +1,5 @@
 <?xml version="1.0"?>
 <launch>
-    <!-- ATIM 
-    <param
-        name="camera_config_path"
-	    value="$(find atim)/configs/pointgrey_firefly" />
-	<node
-	    pkg="atim"
-	    type="atim"
-	    name="atim"
-	    output="screen" />
-    -->
-    <!-- LANDING TARGET -->
-	<node
-	    pkg="awesomo"
-	    type="awesomo_landing_target"
-	    name="awesomo_landing_target"
-	    output="screen" />
-
     <!-- CONTROLLER -->
 	<param
         name="quadrotor"
@@ -27,9 +10,12 @@
 	<param
         name="carrot_controller"
         value="$(find awesomo)/configs/carrot_controller/config.yaml" />
+	<param
+        name="gimbal"
+        value="$(find awesomo)/configs/gimbal/config.yaml" />
 	<node
 	    pkg="awesomo"
 	    type="awesomo"
 	    name="awesomo"
-	    output="screen" />
+        output="screen" />
 </launch>

@@ -75,15 +75,15 @@ int Gimbal::transformTargetPositionToBPFGimbal(
     int retval;
     Eigen::Quaterniond gimbal_imu;
     Eigen::Vector3d tmp;
+    Eigen::Vector3d tmp_target_position;
 
     retval = this->sbgc->getRealtimeData();
     if (retval == 0) {
-        this->sbgc->data.printData();
-
         euler2Quaternion(
-            this->sbgc->data.rc_angles(0),
-            this->sbgc->data.rc_angles(1),
-            this->sbgc->data.rc_angles(2),
+            this->sbgc->data.camera_angles(0) * M_PI / 180.0,
+            this->sbgc->data.camera_angles(1) * M_PI / 180.0,
+            0.0,
+            // this->sbgc->data.camera_angles(2) * M_PI / 180.0,
             gimbal_imu
         );
 
@@ -91,6 +91,16 @@ int Gimbal::transformTargetPositionToBPFGimbal(
         transformed_position(0) = tmp(0);
         transformed_position(1) = tmp(1);
         transformed_position(2) = tmp(2);
+
+
+        tmp_target_position = this->getTargetPositionBFrame(target_position);
+        printf("target_position_in Body frame: %f, %f, %f\n", tmp_target_position(0), tmp_target_position(1), tmp_target_position(2));
+        printf("transformed: %f, %f, %f\n", tmp(0), tmp(1), tmp(2));
+        printf("measured angles: %f, %f, %f\n",
+            this->sbgc->data.camera_angles(0),
+            this->sbgc->data.camera_angles(1),
+            this->sbgc->data.camera_angles(2)
+        );
 
         return 0;
     }
@@ -185,9 +195,10 @@ int Gimbal::calcRollAndPitchSetpoints(
     // this->checkSetPointLimits(frame_rpy, roll_setpoint, pitch_setpoint, yaw_setpoint);
     // this->sbgc->setAngle(roll_setpoint, pitch_setpoint, yaw_setpoint);
 
-    printf("roll_setpoint: %f\n", roll_setpoint);
-    this->sbgc->setAngle(roll_setpoint, pitch_setpoint, yaw_setpoint);
-    // this->sbgc->setAngle(0, -20, 0);
+    printf("roll_setpoint: %f\n", roll_setpoint * 180 / M_PI);
+    // this->sbgc->setAngle(roll_setpoint * 180 / M_PI, -pitch_setpoint * 180 / M_PI, yaw_setpoint);
+    this->sbgc->setAngle(-roll_setpoint * 180 / M_PI, -pitch_setpoint * 180 / M_PI, 0);
+    // this->sbgc->setAngle(0, 0, 0);
 
     return 0;
 }

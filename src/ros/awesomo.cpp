@@ -261,10 +261,12 @@ void Awesomo::atimCallback(const atim::AtimPoseStamped &msg)
     // tag_BPF = this->gimbal->getTargetPositionBPFrame(tag, this->gimbal_imu_quat);
     // tag_BPF = this->gimbal->getTargetPositionBFrame(tag);
 
-    if (this->gimbal->transformTargetPositionToBPFGimbal(tag, tag_BPF) == 0) {
-        this->landing_zone.detected = msg.tag_detected;
-        this->landing_zone.position << tag_BPF(0), tag_BPF(1), tag_BPF(2);
-        this->gimbal->calcRollAndPitchSetpoints(tag_BPF, frame_imu_quat);
+    if (msg.tag_detected) {
+        if (this->gimbal->transformTargetPositionToBPFGimbal(tag, tag_BPF) == 0) {
+            this->landing_zone.detected = msg.tag_detected;
+            this->landing_zone.position << tag_BPF(0), tag_BPF(1), tag_BPF(2);
+            this->gimbal->calcRollAndPitchSetpoints(tag_BPF, frame_imu_quat);
+        }
     }
 }
 
@@ -675,7 +677,7 @@ int main(int argc, char **argv)
     // setup
     ros::init(argc, argv, "awesomo");
     ros::NodeHandle node_handle;
-    ros::Rate rate(1.0);
+    ros::Rate rate(100.0);
     ros::Time last_request;
     geometry_msgs::PoseStamped msg;
 
@@ -704,16 +706,8 @@ int main(int argc, char **argv)
     ROS_INFO("running ...");
     awesomo = new Awesomo(configs);
     last_request = ros::Time::now();
-    awesomo->gimbal->setGimbalAngles(0, 0, 0);
-    sleep(2);
 
     while (ros::ok()){
-        printf("seq: %d\n", seq);
-
-        // if (awesomo->gimbal->sbgc->getRealtimeData() == 0) {
-        //  awesomo->gimbal->sbgc->data.printData();
-        // }
-
         // check if offboard switch has been turned on
         if (awesomo->rc_in[6] < 1500) {
             throttle.data = 0.0;
