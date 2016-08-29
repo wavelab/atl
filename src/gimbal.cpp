@@ -24,9 +24,6 @@ Gimbal::Gimbal(std::map<std::string, std::string> configs)
     // load config
     config = YAML::LoadFile(configs["gimbal"]);
 
-    // camera pose;
-    this->pose = Pose(0, 0, 0, 0, 0, 0);
-
     // load camera RBT (Pose) config
     camera_pose = config["RBT_between_cam_and_FC"];
     this->pose = Pose(
@@ -70,26 +67,35 @@ Eigen::Vector3d Gimbal::getTargetPositionBPFrame(
     return imu.toRotationMatrix() * this->getTargetPositionBFrame(target);
 }
 
-Eigen::Vector3d Gimbal::getTargetPositionBPFGimbal(
-    Eigen::Vector3d target
+int Gimbal::transformTargetPositionToBPFGimbal(
+    Eigen::Vector3d target_position,
+    Eigen::Vector3d &transformed_position
 )
 {
     int retval;
     Eigen::Quaterniond gimbal_imu;
+    Eigen::Vector3d tmp;
 
     retval = this->sbgc->getRealtimeData();
     if (retval == 0) {
         this->sbgc->data.printData();
+
+        euler2Quaternion(
+            this->sbgc->data.rc_angles(0),
+            this->sbgc->data.rc_angles(1),
+            this->sbgc->data.rc_angles(2),
+            gimbal_imu
+        );
+
+        tmp = gimbal_imu.toRotationMatrix() * this->getTargetPositionBFrame(target_position);
+        transformed_position(0) = tmp(0);
+        transformed_position(1) = tmp(1);
+        transformed_position(2) = tmp(2);
+
+        return 0;
     }
 
-    euler2Quaternion(
-        this->sbgc->data.rc_angles(0),
-        this->sbgc->data.rc_angles(1),
-        this->sbgc->data.rc_angles(2),
-        gimbal_imu
-    );
-
-    return gimbal_imu.toRotationMatrix() * this->getTargetPositionBFrame(target);
+    return -1;
 }
 
 int Gimbal::setGimbalLimits(
@@ -179,10 +185,9 @@ int Gimbal::calcRollAndPitchSetpoints(
     // this->checkSetPointLimits(frame_rpy, roll_setpoint, pitch_setpoint, yaw_setpoint);
     // this->sbgc->setAngle(roll_setpoint, pitch_setpoint, yaw_setpoint);
 
-	if (this->sbgc->data.battery_level > 1500 && this->sbgc->data.battery_level < 1700) {
-		printf("roll_setpoint: %f\n", roll_setpoint);
-		this->sbgc->setAngle(roll_setpoint, pitch_setpoint, yaw_setpoint);
-	}
+    printf("roll_setpoint: %f\n", roll_setpoint);
+    this->sbgc->setAngle(roll_setpoint, pitch_setpoint, yaw_setpoint);
+    // this->sbgc->setAngle(0, -20, 0);
 
     return 0;
 }

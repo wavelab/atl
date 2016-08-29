@@ -124,6 +124,7 @@ int SBGCFrame::parseHeader(uint8_t *data)
     this->cmd_id = data[1];
     this->data_size = data[2];
     this->header_checksum = data[3];
+    printf("data size: %d\n", this->data_size);
 
     // check the header checksum
     expected_checksum = (this->cmd_id + this->data_size) % 256;
@@ -402,7 +403,7 @@ int SBGC::getRealtimeData(void)
     // SBGCRealtimeData data;
 
     // request real time data
-    frame.buildFrame(CMD_REALTIME_DATA_4);
+    frame.buildFrame(CMD_REALTIME_DATA_3);
     retval = this->sendFrame(frame);
     if (retval == -1) {
         std::cout << "failed to request SBGC realtime data!" << std::endl;
