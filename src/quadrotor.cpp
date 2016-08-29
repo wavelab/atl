@@ -482,41 +482,6 @@ void Quadrotor::runLandingMode(LandingTargetPosition landing, float dt)
     this->positionControllerCalculate(tag_est, robot_pose, this->yaw, dt);
 }
 
-// int Quadrotor::followWaypoints(
-//     Pose robot_pose,
-//     LandingTargetPosition landing,
-//     float dt
-// )
-// {
-//     Eigen::Vector3d setpoint;
-//     Pose pose;
-//     float commanded_yaw = 0.0;
-//
-//     // update pose
-//     this->world_pose = robot_pose;
-//
-//     // mission
-//     switch (this->mission_state) {
-//     case CARROT_INITIALIZE_MODE:
-//         this->initializeCarrotController();
-//         setpoint = this->runHoverMode(robot_pose, dt);
-//         break;
-//
-//     case CARROT_MODE:
-//         setpoint = this->runCarrotMode(robot_pose, dt);
-//         break;
-//
-//     case MISSION_ACCOMPLISHED:
-//         return 0;
-//         break;
-//     }
-//
-//     // position controller calculate
-//     this->positionControllerCalculate(setpoint, robot_pose, commanded_yaw,  dt);
-//
-//     return 0;
-// }
-
 int Quadrotor::runMission(
     Pose world_pose,
     LandingTargetPosition landing,

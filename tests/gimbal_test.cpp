@@ -7,6 +7,7 @@
 // TESTS
 int testGimbalGetTargetPositionBFrame(void);
 int testGimbalGetTargetPositionBPFrame(void);
+int testGimbalGetTargetPositionGimbal(void);
 
 
 static void print_target_relative_to_quad(Eigen::Vector3d &target)
@@ -231,11 +232,45 @@ int testGimbalGetTargetPositionBPFrame(void)
     return 0;
 }
 
+int testGimbalGetTargetPositionGimbal(void)
+{
+    Gimbal gimbal;
+    Eigen::Vector3d target;
+    Eigen::Quaterniond imu_quat;
+    Eigen::Quaterniond gimbal_quat;
+    Eigen::Vector3d target_BPF;
+
+    float roll = 0.0;
+    float pitch = deg2rad(-90);
+    float yaw = 0.0;
+    float dx = 0.0;
+    float dy = 0.0;
+    float dz = 0.0;
+
+    // setup
+    target << 10.0, 0.0, 1.0;  // let tag be directly infront of camera
+    gimbal = Gimbal(roll, pitch, yaw, dx, dy, dz);
+
+    // world to body planar frame
+    euler2Quaternion(deg2rad(10.0), deg2rad(0), 0.0, imu_quat);
+    target_BPF = gimbal.getTargetPositionBPFrame(target, imu_quat);
+    printf("x: %f\t y: %f\t z: %f\n", target_BPF(0), target_BPF(1), target_BPF(2));
+
+    // body planar frame to gimbal
+    euler2Quaternion(deg2rad(-10.0), deg2rad(0.0), 0.0, gimbal_quat);
+    target_BPF = gimbal_quat.toRotationMatrix() * target_BPF;
+    printf("x: %f\t y: %f\t z: %f\n", target_BPF(0), target_BPF(1), target_BPF(2));
+
+
+    return 0;
+}
+
 void test_suite(void)
 {
-    mu_add_test(testGimbal);
-    mu_add_test(testGimbalGetTargetPositionBFrame);
-    mu_add_test(testGimbalGetTargetPositionBPFrame);
+    // mu_add_test(testGimbal);
+    // mu_add_test(testGimbalGetTargetPositionBFrame);
+    // mu_add_test(testGimbalGetTargetPositionBPFrame);
+    mu_add_test(testGimbalGetTargetPositionGimbal);
 }
 
 mu_run_tests(test_suite)
