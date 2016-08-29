@@ -9,14 +9,7 @@ Pose::Pose(void)
 }
 
 
-Pose::Pose(
-    float roll,
-    float pitch,
-    float yaw,
-    float x,
-    float y,
-    float z
-)
+Pose::Pose(float roll, float pitch, float yaw, float x, float y, float z)
 {
     euler2Quaternion(roll, pitch, yaw, this->q);
     this->position << x, y, z;

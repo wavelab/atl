@@ -494,8 +494,6 @@ int testQuadrotorRunDiscoveryMode(void)
     mu_check(fltcmp(quad->tag_estimator.mu(7), 0.0) == 0);
     mu_check(fltcmp(quad->tag_estimator.mu(8), 0.0) == 0);
     mu_check(quad->mission_state == TRACKING_MODE);
-    mu_check(quad->tracking_start <= time(NULL));
-    mu_check(quad->tracking_start >= time(NULL) - 2);
 
     return 0;
 }
@@ -652,7 +650,7 @@ int testQuadrotorRunLandingMode(void)
 
     // test - lower height
     tic(&quad->height_last_updated);
-    quad->height_last_updated.tv_nsec -= (2000 * 1000000);
+    quad->height_last_updated.tv_sec -= 2 * 1000;
     quad->runLandingMode(landing_zone, dt);
     mu_check(fltcmp(quad->hover_height, 4.8) == 0);
 
@@ -665,7 +663,7 @@ int testQuadrotorRunLandingMode(void)
 
     // test - increase height
     tic(&quad->height_last_updated);
-    quad->height_last_updated.tv_nsec -= (2000 * 1000000);
+    quad->height_last_updated.tv_sec -= 2 * 1000;
     landing_zone.position(0) = 0.51;
     landing_zone.position(1) = 0.51;
     quad->runLandingMode(landing_zone, dt);
@@ -717,7 +715,7 @@ int testQuadrotorRunMission(void)
     mu_check(quad->hover_height > 0);
 
     // emulate tracking for 11 seconds
-    quad->tracking_start = quad->tracking_start - 11;
+    quad->tracking_start.tv_sec -= 11 * 1000;
     quad->runMission(robot_pose, landing_zone, dt);
     mu_check(quad->mission_state == LANDING_MODE);
 
@@ -742,11 +740,11 @@ void testSuite(void)
     mu_add_test(testQuadrotorCalculateLandingTargetYaw);
     // mu_add_test(testQuadrotorInitializeCarrotController);
     // mu_add_test(testQuadrotorRunCarrotMode);
-    // mu_add_test(testQuadrotorRunDiscoveryMode);
-    // mu_add_test(testQuadrotorRunTrackingModeBPF);
-    // mu_add_test(testQuadrotorWithinLandingZone);
+    mu_add_test(testQuadrotorRunDiscoveryMode);
+    mu_add_test(testQuadrotorRunTrackingModeBPF);
+    mu_add_test(testQuadrotorWithinLandingZone);
     mu_add_test(testQuadrotorRunLandingMode);
-    // mu_add_test(testQuadrotorRunMission);
+    mu_add_test(testQuadrotorRunMission);
 }
 
 mu_run_tests(testSuite)

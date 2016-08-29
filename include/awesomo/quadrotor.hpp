@@ -86,8 +86,8 @@ public:
     float hover_height;
 
     int landing_belief;
-    time_t tracking_start;
-    time_t target_last_updated;
+    struct timespec tracking_start;
+    struct timespec target_last_updated;
     struct timespec height_last_updated;
     std::vector<Eigen::Vector2d> lt_history;
 

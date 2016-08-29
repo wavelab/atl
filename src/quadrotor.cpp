@@ -290,7 +290,8 @@ void Quadrotor::runDiscoverMode(LandingTargetPosition landing)
         // transition to tracker mode
         printf("Transitioning to TRACKER MODE!\n");
         this->mission_state = TRACKING_MODE;
-        this->tracking_start = time(NULL);
+        tic(&this->tracking_start);
+        tic(&this->target_last_updated);
 
         // reset position controller softly so not initially violent
         this->position_controller->x.prev_error = landing.position(1);
@@ -305,17 +306,17 @@ void Quadrotor::runTrackingModeBPF(LandingTargetPosition landing, float dt)
     Pose robot_pose;
     float tag_x;
     float tag_y;
-    double elasped;
+    float elasped;
 
     // estimate tag position
     tag_mea = landing.position;
     apriltag_kf_estimate(&this->tag_estimator, tag_mea, dt, landing.detected);
 
     // keep track of target position
-    elasped = difftime(time(NULL), this->target_last_updated);
+    elasped = mtoc(&this->target_last_updated);
     if (landing.detected == true) {
-        this->target_last_updated = time(NULL);
-    } else if (elasped > 1) {
+        tic(&this->target_last_updated);
+    } else if (elasped > 1000) {
         printf("Target losted transitioning back to DISCOVER MODE!\n");
         this->mission_state = DISCOVER_MODE;
     }
@@ -335,8 +336,8 @@ void Quadrotor::runTrackingModeBPF(LandingTargetPosition landing, float dt)
     this->positionControllerCalculate(setpoint, robot_pose, this->yaw, dt);
 
     // transition to landing
-    elasped = difftime(time(NULL), this->tracking_start);
-    if (elasped > 10) {
+    elasped = mtoc(&this->tracking_start);
+    if (elasped > (10 * 1000)) {  // track for 10 seconds then land
         printf("Transitioning to LANDING MODE!\n");
         this->mission_state = LANDING_MODE;
         tic(&this->height_last_updated);
@@ -432,11 +433,11 @@ void Quadrotor::runLandingMode(LandingTargetPosition landing, float dt)
     }
 
     // keep track of target position
-    elasped = difftime(time(NULL), this->target_last_updated);
+    elasped = mtoc(&this->target_last_updated);
     if (landing.detected == true) {
-        this->target_last_updated = time(NULL);
+        tic(&this->target_last_updated);
 
-    } else if (elasped > 1) {
+    } else if (elasped > 1000.0) {
         printf("Target losted transitioning back to DISCOVER MODE!\n");
         this->mission_state = DISCOVER_MODE;
 
