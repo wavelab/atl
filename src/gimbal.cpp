@@ -196,6 +196,7 @@ int Gimbal::trackTarget(Eigen::Vector3d target, Eigen::Quaterniond &imu)
 
     frame_rot_mtx = imu.toRotationMatrix();
     frame_rpy = frame_rot_mtx.eulerAngles(0, 1, 2);
+
     // dist = target.norm();
 
     // calculate roll pitch yaw setpoints
@@ -210,12 +211,11 @@ int Gimbal::trackTarget(Eigen::Vector3d target, Eigen::Quaterniond &imu)
     // this needs to be fixed. it over limits at the moment
     // this->checkSetPointLimits(frame_rpy, roll_setpoint, pitch_setpoint, yaw_setpoint);
 
-
     // convert setpoints to degrees
-    roll_setpoint = -1.0 * roll_setpoint * 180.0 / M_PI;
+    roll_setpoint = 1.0 * roll_setpoint * 180.0 / M_PI;
     pitch_setpoint = -1.0 * pitch_setpoint * 180.0 / M_PI;
 
-    // printf("roll setpoint: %f\n", roll_setpoint);
+    // printf("roll setpoint: %f\t", roll_setpoint);
     // printf("pitch_setpoint: %f\t", pitch_setpoint);
     // printf("target: \t");
     // printf("x: %f\t", target(0));
@@ -223,7 +223,7 @@ int Gimbal::trackTarget(Eigen::Vector3d target, Eigen::Quaterniond &imu)
     // printf("z: %f\n", target(2));
 
     // set angle
-    this->sbgc->setAngle(0, pitch_setpoint, 0);
+    this->sbgc->setAngle(roll_setpoint, pitch_setpoint, 0);
     // this->sbgc->setAngle(0, 0, 0);
 
     return 0;
