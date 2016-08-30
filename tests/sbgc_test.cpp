@@ -143,8 +143,8 @@ void testSuite(void)
     // mu_add_test(testSBGCSendFrame);
     // mu_add_test(testSBGCReadFrame);
     // mu_add_test(testSBGCGetBoardInfo);
-    mu_add_test(testSBGCGetRealtimeData);
-    // mu_add_test(testSBGCSetAngle);
+    // mu_add_test(testSBGCGetRealtimeData);
+    mu_add_test(testSBGCSetAngle);
     // mu_add_test(testSBGCSetSpeedAngle);
 }
 

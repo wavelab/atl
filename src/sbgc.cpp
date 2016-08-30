@@ -176,7 +176,6 @@ int SBGCFrame::parseFrame(uint8_t *data)
     retval = this->parseBody(data);
     if (retval == -1) {
         // std::cout << "failed to parse body!" << std::endl;
-        free(this->data);
         return -1;
     }
 
