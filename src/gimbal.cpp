@@ -75,6 +75,11 @@ int Gimbal::transformTargetPositionToBPFGimbal(
     Eigen::Vector3d tmp;
     Eigen::Quaterniond gimbal_imu;
 
+    // printf("target: \t");
+    // printf("x: %f\t", target(0));
+    // printf("y: %f\t", target(1));
+    // printf("z: %f\n", target(2));
+
     // get data from SimpleBGC
     retval = this->sbgc->getRealtimeData();
     if (retval != 0) {
@@ -83,14 +88,15 @@ int Gimbal::transformTargetPositionToBPFGimbal(
 
     // convert sbgc gimbal angle to quaternion
     euler2Quaternion(
-        this->sbgc->data.camera_angles(0) * M_PI / 180.0,
-        this->sbgc->data.camera_angles(1) * M_PI / 180.0,
+        deg2rad(this->sbgc->data.camera_angles(0)),
+        deg2rad(this->sbgc->data.camera_angles(1)),
         0.0,
         gimbal_imu
     );
 
     // transform tag in camera frame to quadrotor frame to global frame
-    tmp = gimbal_imu.toRotationMatrix() * this->getTargetPositionBFrame(target);
+    // tmp = gimbal_imu.toRotationMatrix() * this->getTargetPositionBFrame(target);
+    tmp = gimbal_imu.toRotationMatrix() * this->pose.rotationMatrix() * target + this->pose.position;
     transformed_position(0) = tmp(0);
     transformed_position(1) = tmp(1);
     transformed_position(2) = tmp(2);
@@ -116,8 +122,8 @@ int Gimbal::transformTargetPositionToBPFGimbal2(
 
     // convert sbgc gimbal angle to quaternion
     euler2Quaternion(
-        this->sbgc->data.camera_angles(0) * M_PI / 180.0,
-        this->sbgc->data.camera_angles(1) * M_PI / 180.0,
+        deg2rad(this->sbgc->data.camera_angles(0)),
+        deg2rad(this->sbgc->data.camera_angles(1)),
         0.0,
         gimbal_imu
     );
@@ -196,23 +202,36 @@ int Gimbal::trackTarget(Eigen::Vector3d target, Eigen::Quaterniond &imu)
 
     frame_rot_mtx = imu.toRotationMatrix();
     frame_rpy = frame_rot_mtx.eulerAngles(0, 1, 2);
-    dist = target.norm();
 
+    dist = target.norm();
+    printf("dist: %f\n", dist);
+
+    // calculate roll pitch yaw setpoints
+    // dist = sqrt(pow(target(1), 2) + pow(target(2), 2));
     roll_setpoint = asin(target(1) / dist);
+
+    // dist = sqrt(pow(target(0), 2) + pow(target(2), 2));
     pitch_setpoint = asin(target(0) / dist);
 
     yaw_setpoint = 0.0; // unused at the moment
 
-    // std::cout << "target position \n" << target << std::endl;
     // this needs to be fixed. it over limits at the moment
     // this->checkSetPointLimits(frame_rpy, roll_setpoint, pitch_setpoint, yaw_setpoint);
-    // this->sbgc->setAngle(roll_setpoint, pitch_setpoint, yaw_setpoint);
 
-    // printf("roll_setpoint: %f\n", -roll_setpoint * 180 / M_PI);
-    // printf("pitch_setpoint: %f\n", -pitch_setpoint * 180 / M_PI);
+    // convert setpoints to degrees
+    roll_setpoint = rad2deg(-1.0 * roll_setpoint);
+    pitch_setpoint = rad2deg(1.0 * pitch_setpoint);
 
-    this->sbgc->setAngle(-roll_setpoint * 180 / M_PI, -pitch_setpoint * 180 / M_PI, 0);
-    // this->sbgc->setAngle(-roll_setpoint * 180 / M_PI, 0, 0);
+    // printf("roll setpoint: %f\t", roll_setpoint);
+    // printf("pitch_setpoint: %f\t", pitch_setpoint);
+    printf("target: \t");
+    printf("x: %f\t", target(0));
+    printf("y: %f\t", target(1));
+    printf("z: %f\n", target(2));
+
+    // set angle
+    // this->sbgc->setAngle(roll_setpoint, pitch_setpoint, 0);
+    this->sbgc->setAngle(roll_setpoint, 0, 0);
     // this->sbgc->setAngle(0, 0, 0);
 
     return 0;

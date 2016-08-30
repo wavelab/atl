@@ -251,23 +251,23 @@ void Awesomo::atimCallback(const atim::AtimPoseStamped &msg)
 {
     Eigen::Vector3d tag;
     Eigen::Vector3d tag_BPF;
-    Eigen::Quaterniond frame_imu_quat;
+    Eigen::Quaterniond frame_imu;
     geometry_msgs::Quaternion q;
 
     // parse tag position and FCU orientation
     tag << msg.pose.position.x, msg.pose.position.y, msg.pose.position.z;
     q = msg.pose.orientation;
-    frame_imu_quat = Eigen::Quaterniond(q.w, q.x, q.y, q.z);
+    frame_imu = Eigen::Quaterniond(q.w, q.x, q.y, q.z);
 
     // tag_BPF = this->gimbal->getTargetPositionBPFrame(tag, this->gimbal_imu_quat);
     // tag_BPF = this->gimbal->getTargetPositionBFrame(tag);
 
     if (msg.tag_detected) {
-        // if (this->gimbal->transformTargetPositionToBPFGimbal(tag, tag_BPF) == 0) {
-        if (this->gimbal->transformTargetPositionToBPFGimbal2(tag, frame_imu_quat, tag_BPF) == 0) {
+        if (this->gimbal->transformTargetPositionToBPFGimbal(tag, tag_BPF) == 0) {
+        // if (this->gimbal->transformTargetPositionToBPFGimbal2(tag, frame_imu, tag_BPF) == 0) {
             this->landing_zone.detected = msg.tag_detected;
             this->landing_zone.position << tag_BPF(0), tag_BPF(1), tag_BPF(2);
-            this->gimbal->trackTarget(tag_BPF, frame_imu_quat);
+            this->gimbal->trackTarget(tag_BPF, frame_imu);
         }
     }
 }
