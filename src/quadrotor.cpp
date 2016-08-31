@@ -158,7 +158,7 @@ int Quadrotor::calculateLandingTargetYaw(double *yaw)
     for (int i = 0; i < this->lt_history.size(); i++) {
         p = this->lt_history[i];
         x_values.push_back(p(0));
-        y_values.push_back(p(1));
+        y_values.push_back(-1 * p(1));  // -ve because NED y is +ve right
     }
     std::sort(x_values.begin(), x_values.end());
     std::sort(y_values.begin(), y_values.end());
@@ -271,7 +271,7 @@ void Quadrotor::runDiscoverMode(LandingTargetPosition landing)
             // calculate landing target yaw
             this->calculateLandingTargetYaw(&lt_yaw);
             transition_state = true;
-            printf("LANDING TARGET YAW IS: %.2f\n", lt_yaw);
+            printf("LANDING TARGET YAW IS: %.2f deg\n", rad2deg(lt_yaw));
 
             // set quadrotor yaw
             this->yaw = lt_yaw;
@@ -469,7 +469,6 @@ void Quadrotor::runLandingMode(LandingTargetPosition landing, float dt)
 
     // kill engines (landed?)
     tag_est(2) = this->tag_estimator.mu(2);
-    printf("estimated height: %f\n", tag_est(2));
     if (this->withinLandingZone(tag_mea, tag_est)) {
         if (this->landing_belief >= this->landing_config->belief_threshold) {
             printf("MISSION ACCOMPLISHED!\n");
