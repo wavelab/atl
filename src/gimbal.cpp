@@ -82,6 +82,7 @@ int Gimbal::transformTargetPosition(
     }
 
     // convert sbgc gimbal angle to quaternion
+    // (making gimbal angles NED, notice the -ve sign in pitch)
     euler2Quaternion(
         deg2rad(this->sbgc->data.camera_angles(0)),
         deg2rad(-this->sbgc->data.camera_angles(1)),
@@ -89,12 +90,12 @@ int Gimbal::transformTargetPosition(
         gimbal_imu
     );
 
-    // image frame to camera frame
+    // camera frame to camera mount frame
     tmp = this->pose.rotationMatrix().inverse() * target;
     // inverse because we want tag relative to quad
     // without it, results are relative to tag
 
-    // camera frame to body frame
+    // camera mount frame to body planar frame
     tmp = gimbal_imu.toRotationMatrix() * tmp;
     transformed_position(0) = tmp(0);
     transformed_position(1) = tmp(1);

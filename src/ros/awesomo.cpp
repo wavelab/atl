@@ -256,16 +256,20 @@ void Awesomo::atimCallback(const atim::AtimPoseStamped &msg)
 
     // parse tag position and FCU orientation
     tag << msg.pose.position.x, msg.pose.position.y, msg.pose.position.z;
+    tag_BPF << msg.pose.position.x, msg.pose.position.y, msg.pose.position.z;
     q = msg.pose.orientation;
     frame_imu = Eigen::Quaterniond(q.w, q.x, q.y, q.z);
 
+    // track target
     if (msg.tag_detected) {
         if (this->gimbal->transformTargetPosition(tag, tag_BPF) == 0) {
-            this->landing_zone.detected = msg.tag_detected;
-            this->landing_zone.position << tag_BPF(0), tag_BPF(1), tag_BPF(2);
             this->gimbal->trackTarget(tag_BPF, frame_imu);
         }
     }
+
+    // set landing zone
+    this->landing_zone.detected = msg.tag_detected;
+    this->landing_zone.position << tag_BPF(0), tag_BPF(1), tag_BPF(2);
 }
 
 void Awesomo::gpsCallback(const geometry_msgs::PoseWithCovarianceStamped &msg)

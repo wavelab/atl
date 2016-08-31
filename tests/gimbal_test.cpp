@@ -251,12 +251,12 @@ int testGimbalGetTargetPositionGimbal(void)
     target << 10.0, 0.0, 0.0;  // let tag be directly infront of camera (NED)
     gimbal = Gimbal(roll, pitch, yaw, dx, dy, dz);
 
-    // correct image space
+    // camera frame to camera mount frame
     euler2Quaternion(deg2rad(0.0), deg2rad(90.0), 0.0, correction_quat);
     target = correction_quat.toRotationMatrix().inverse() * target;
     printf("x: %f\t y: %f\t z: %f\n", target(0), target(1), target(2));
 
-    // transform to world
+    // camera mount frame to body planar frame
     euler2Quaternion(deg2rad(0.0), deg2rad(-10.0), 0.0, gimbal_quat);
     target = gimbal_quat.toRotationMatrix() * target;
     printf("x: %f\t y: %f\t z: %f\n", target(0), target(1), target(2));
