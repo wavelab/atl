@@ -153,7 +153,7 @@ int SBGCFrame::parseBody(uint8_t *data)
     // check the body checksum
     expected_checksum = expected_checksum % 256;
     if (this->data_checksum != expected_checksum) {
-        std::cout << "failed body checksum!" << std::endl;
+        // std::cout << "failed body checksum!" << std::endl;
         free(this->data);
         return -1;
     }

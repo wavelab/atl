@@ -317,10 +317,10 @@ void Quadrotor::runTrackingModeBPF(LandingTargetPosition landing, float dt)
     apriltag_kf_estimate(&this->tag_estimator, tag_mea, dt, landing.detected);
 
     // keep track of target position
-    elasped = mtoc(&this->target_last_updated);
+    elasped = toc(&this->target_last_updated);
     if (landing.detected == true) {
         tic(&this->target_last_updated);
-    } else if (elasped > 1000) {
+    } else if (elasped > 1.0) {
         printf("Target losted transitioning back to DISCOVER MODE!\n");
         this->mission_state = DISCOVER_MODE;
     }
@@ -340,8 +340,8 @@ void Quadrotor::runTrackingModeBPF(LandingTargetPosition landing, float dt)
     this->positionControllerCalculate(setpoint, robot_pose, this->yaw, dt);
 
     // transition to landing
-    elasped = mtoc(&this->tracking_start);
-    if (elasped > (10 * 1000)) {  // track for 10 seconds then land
+    elasped = toc(&this->tracking_start);
+    if (elasped > 5.0) {  // track for 10 seconds then land
         printf("Transitioning to LANDING MODE!\n");
         this->mission_state = LANDING_MODE;
         tic(&this->height_last_updated);
@@ -437,11 +437,11 @@ void Quadrotor::runLandingMode(LandingTargetPosition landing, float dt)
     }
 
     // keep track of target position
-    elasped = mtoc(&this->target_last_updated);
+    elasped = toc(&this->target_last_updated);
     if (landing.detected == true) {
         tic(&this->target_last_updated);
 
-    } else if (elasped > 1000.0) {
+    } else if (elasped > 1.0) {
         printf("Target losted transitioning back to DISCOVER MODE!\n");
         this->mission_state = DISCOVER_MODE;
 
@@ -452,7 +452,7 @@ void Quadrotor::runLandingMode(LandingTargetPosition landing, float dt)
     }
 
     // landing - lower height or increase height
-    elasped = mtoc(&this->height_last_updated);
+    elasped = toc(&this->height_last_updated);
     threshold = this->landing_config->cutoff_position;
     if (elasped > this->landing_config->period && landing.detected == true) {
         if (tag_mea(0) < threshold(0) && tag_mea(1) < threshold(1)) {

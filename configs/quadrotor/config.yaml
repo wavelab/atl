@@ -8,7 +8,7 @@ tracking:
 
 landing:
     height_update:
-        period: 2000
+        period: 0.5
         multiplier:
             descend: 0.8
             recover: 1.2
