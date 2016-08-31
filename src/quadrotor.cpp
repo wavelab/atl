@@ -147,26 +147,34 @@ void Quadrotor::resetPositionController(void)
 int Quadrotor::calculateLandingTargetYaw(double *yaw)
 {
     int retval;
-    double m;
-    double c;
-    double r;
-    double x;
-    double y;
+    double x_median;
+    double y_median;
     double relative_yaw;
     Eigen::Vector2d p;
+    std::vector<double> x_values;
+    std::vector<double> y_values;
 
-    // perform linear regression to obtain line equation of
-    // landing target of form: y = mx + c
-    retval = linreg(this->lt_history, &m, &c, &r);
-    if (retval == -1) {
-        return -1;
+    // obtain median landing target x, y
+    for (int i = 0; i < this->lt_history.size(); i++) {
+        p = this->lt_history[i];
+        x_values.push_back(p(0));
+        y_values.push_back(p(1));
+    }
+    std::sort(x_values.begin(), x_values.end());
+    std::sort(y_values.begin(), y_values.end());
+
+    if (x_values.size() > 1) {
+        x_median = x_values[x_values.size() / 2];
+        y_median = y_values[y_values.size() / 2];
+
+    } else {
+        x_median = x_values[0];
+        y_median = y_values[0];
+
     }
 
-    // obtain relative yaw angle to quad
-    p = this->lt_history[this->lt_history.size() - 1];
-    y = p(1);
-    x = (y - c) / m;
-    relative_yaw = atan2(y, x);
+    // calculate relative yaw
+    relative_yaw = atan2(y_median, x_median);
 
     // convert relative yaw to global yaw
     *yaw = this->yaw + relative_yaw;
@@ -248,7 +256,6 @@ void Quadrotor::runDiscoverMode(LandingTargetPosition landing)
     Eigen::VectorXd mu(9);
     Eigen::Vector2d lt_pos;
     double lt_yaw;
-    int retval;
     bool transition_state;
 
     // setup
@@ -256,17 +263,15 @@ void Quadrotor::runDiscoverMode(LandingTargetPosition landing)
 
     // obtain landing target yaw
     if (landing.detected == true) {
-        if (lt_history.size() < 5) {
+        if (lt_history.size() < 10) {
             lt_pos << landing.position(0), landing.position(1);
             lt_history.push_back(lt_pos);
 
-        } else if (lt_history.size() == 5) {
+        } else if (lt_history.size() == 10) {
             // calculate landing target yaw
-            retval = this->calculateLandingTargetYaw(&lt_yaw);
-            if (retval == 0) {
-                transition_state = true;
-            }
-            printf("Landing target yaw is: %.2f\n", lt_yaw);
+            this->calculateLandingTargetYaw(&lt_yaw);
+            transition_state = true;
+            printf("LANDING TARGET YAW IS: %.2f\n", lt_yaw);
 
             // set quadrotor yaw
             this->yaw = lt_yaw;

@@ -68,7 +68,7 @@ Eigen::Vector3d Gimbal::getTargetPositionBPFrame(
 
 int Gimbal::transformTargetPosition(
     Eigen::Vector3d target,
-    Eigen::Vector3d &transformed_position
+    Eigen::Vector3d &transformed_target
 )
 {
     int retval;
@@ -97,9 +97,9 @@ int Gimbal::transformTargetPosition(
 
     // camera mount frame to body planar frame
     tmp = gimbal_imu.toRotationMatrix() * tmp;
-    transformed_position(0) = tmp(0);
-    transformed_position(1) = tmp(1);
-    transformed_position(2) = tmp(2);
+    transformed_target(0) = tmp(0);
+    transformed_target(1) = tmp(1);
+    transformed_target(2) = tmp(2);
 
     return 0;
 }
@@ -125,35 +125,38 @@ int Gimbal::checkLimits(float &value, Eigen::Vector2d limits)
     // upper limit
     if (value > limits(0)){
         value = limits(0);
-    } else if (value < limits(1)){ // lower limits
+
+    // lower limit
+    } else if (value < limits(1)){
         value = limits(1);
     }
+
     return 0;
 }
 
 int Gimbal::checkSetPointLimits(
     Eigen::Vector3d frame_rpy,
-    float &roll,
-    float &pitch,
-    float &yaw
+    float roll,
+    float pitch,
+    float yaw
 )
 {
-    Eigen::Vector2d current_roll_limits;
-    Eigen::Vector2d current_pitch_limits;
-    Eigen::Vector2d current_yaw_limits;
+    Eigen::Vector2d roll_limits;
+    Eigen::Vector2d pitch_limits;
+    Eigen::Vector2d yaw_limits;
 
-    current_roll_limits(0) = this->gimbal_limits.roll_limits(0) + frame_rpy(0);
-    current_roll_limits(1) = this->gimbal_limits.roll_limits(1) + frame_rpy(0);
+    roll_limits(0) = this->gimbal_limits.roll_limits(0) + frame_rpy(0);
+    roll_limits(1) = this->gimbal_limits.roll_limits(1) + frame_rpy(0);
 
-    current_pitch_limits(0) = this->gimbal_limits.pitch_limits(0) + frame_rpy(1);
-    current_pitch_limits(1) = this->gimbal_limits.pitch_limits(1) + frame_rpy(1);
+    pitch_limits(0) = this->gimbal_limits.pitch_limits(0) + frame_rpy(1);
+    pitch_limits(1) = this->gimbal_limits.pitch_limits(1) + frame_rpy(1);
 
-    current_yaw_limits(0) = this->gimbal_limits.yaw_limits(0) + frame_rpy(2);
-    current_yaw_limits(1) = this->gimbal_limits.yaw_limits(1) + frame_rpy(2);
+    yaw_limits(0) = this->gimbal_limits.yaw_limits(0) + frame_rpy(2);
+    yaw_limits(1) = this->gimbal_limits.yaw_limits(1) + frame_rpy(2);
 
-    this->checkLimits(roll, current_roll_limits);
-    this->checkLimits(pitch, current_pitch_limits);
-    this->checkLimits(yaw, current_yaw_limits);
+    this->checkLimits(roll, roll_limits);
+    this->checkLimits(pitch, pitch_limits);
+    this->checkLimits(yaw, yaw_limits);
 
     return 0;
 }
@@ -186,10 +189,10 @@ int Gimbal::trackTarget(Eigen::Vector3d target, Eigen::Quaterniond &imu)
 
     // printf("roll setpoint: %f\t", roll_setpoint);
     // printf("pitch_setpoint: %f\t\n", pitch_setpoint);
-    printf("target: ");
-    printf("x: %f\t", target(0));
-    printf("y: %f\t", target(1));
-    printf("z: %f\n", target(2));
+    // printf("target: ");
+    // printf("x: %f\t", target(0));
+    // printf("y: %f\t", target(1));
+    // printf("z: %f\n", target(2));
 
     // set angle
     this->sbgc->setAngle(roll_setpoint, pitch_setpoint, 0);

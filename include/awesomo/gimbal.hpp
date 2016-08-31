@@ -36,7 +36,7 @@ public:
     );
     int transformTargetPosition(
         Eigen::Vector3d target,
-        Eigen::Vector3d &transformed_position
+        Eigen::Vector3d &transformed_target
     );
     int setGimbalLimits(
         float roll_upper,
@@ -49,11 +49,10 @@ public:
     int checkLimits(float &value, Eigen::Vector2d limits);
     int checkSetPointLimits(
         Eigen::Vector3d frame_rpy,
-        float &roll,
-        float &pitch,
-        float &yaw
+        float roll,
+        float pitch,
+        float yaw
     );
-
     int trackTarget(Eigen::Vector3d target, Eigen::Quaterniond &imu);
     int setGimbalAngles(double roll, double pitch, double yaw);
 };
