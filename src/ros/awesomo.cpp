@@ -708,6 +708,13 @@ int main(int argc, char **argv)
     awesomo = new Awesomo(configs);
     last_request = ros::Time::now();
 
+// #define YAW_CONTROL_ON
+#ifndef YAW_CONTROL_ON
+    printf("YAW CONTROL IS OFF!\n");
+#else
+    printf("YAW CONTROL IS ON!\n");
+#endif
+
     while (ros::ok()){
         // check if offboard switch has been turned on
         if (awesomo->rc_in[6] < 1500) {

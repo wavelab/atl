@@ -74,6 +74,7 @@ int Gimbal::transformTargetPositionToBPFGimbal(
     int retval;
     Eigen::Vector3d tmp;
     Eigen::Quaterniond gimbal_imu;
+    Eigen::Quaterniond correction_rot;
 
     // printf("target: \t");
     // printf("x: %f\t", target(0));
@@ -94,9 +95,30 @@ int Gimbal::transformTargetPositionToBPFGimbal(
         gimbal_imu
     );
 
+    euler2Quaternion(
+        deg2rad(0.0),
+        deg2rad(180.0),
+        0.0,
+        correction_rot
+    );
+    // printf("camera_roll: %f\n", this->sbgc->data.camera_angles(0));
+    // printf("camera_pitch: %f\n", this->sbgc->data.camera_angles(1));
+    // printf("camera_yaw: %f\n", this->sbgc->data.camera_angles(2));
+
     // transform tag in camera frame to quadrotor frame to global frame
     // tmp = gimbal_imu.toRotationMatrix() * this->getTargetPositionBFrame(target);
-    tmp = gimbal_imu.toRotationMatrix() * this->pose.rotationMatrix() * target + this->pose.position;
+    // tmp = gimbal_imu.inverse().toRotationMatrix() * this->pose.rotationMatrix() * target + this->pose.position;
+    // transformed_position(0) = -tmp(0);
+    // transformed_position(1) = tmp(1);
+    // transformed_position(2) = -tmp(2);
+
+    // tmp = correction_rot.toRotationMatrix() *
+    //     gimbal_imu.inverse().toRotationMatrix() *
+    //     this->pose.rotationMatrix() * target + this->pose.position;
+
+    tmp = correction_rot.toRotationMatrix() *
+        gimbal_imu.inverse().toRotationMatrix() *
+        this->pose.rotationMatrix() * target + this->pose.position;
     transformed_position(0) = tmp(0);
     transformed_position(1) = tmp(1);
     transformed_position(2) = tmp(2);
@@ -104,38 +126,38 @@ int Gimbal::transformTargetPositionToBPFGimbal(
     return 0;
 }
 
-int Gimbal::transformTargetPositionToBPFGimbal2(
-    Eigen::Vector3d target,
-    Eigen::Quaterniond frame_imu,
-    Eigen::Vector3d &transformed_position
-)
-{
-    int retval;
-    Eigen::Vector3d tmp;
-    Eigen::Quaterniond gimbal_imu;
-
-    // get data from SimpleBGC
-    retval = this->sbgc->getRealtimeData();
-    if (retval != 0) {
-        return -1;
-    }
-
-    // convert sbgc gimbal angle to quaternion
-    euler2Quaternion(
-        deg2rad(this->sbgc->data.camera_angles(0)),
-        deg2rad(this->sbgc->data.camera_angles(1)),
-        0.0,
-        gimbal_imu
-    );
-
-    // transform tag in camera frame to quadrotor frame to global frame
-    tmp = gimbal_imu.toRotationMatrix() * this->getTargetPositionBPFrame(target, frame_imu);
-    transformed_position(0) = tmp(0);
-    transformed_position(1) = tmp(1);
-    transformed_position(2) = tmp(2);
-
-    return 0;
-}
+// int Gimbal::transformTargetPositionToBPFGimbal2(
+//     Eigen::Vector3d target,
+//     Eigen::Quaterniond frame_imu,
+//     Eigen::Vector3d &transformed_position
+// )
+// {
+//     int retval;
+//     Eigen::Vector3d tmp;
+//     Eigen::Quaterniond gimbal_imu;
+//
+//     // get data from SimpleBGC
+//     retval = this->sbgc->getRealtimeData();
+//     if (retval != 0) {
+//         return -1;
+//     }
+//
+//     // convert sbgc gimbal angle to quaternion
+//     euler2Quaternion(
+//         deg2rad(this->sbgc->data.camera_angles(0)),
+//         deg2rad(this->sbgc->data.camera_angles(1)),
+//         0.0,
+//         gimbal_imu
+//     );
+//
+//     // transform tag in camera frame to quadrotor frame to global frame
+//     tmp = gimbal_imu.toRotationMatrix() * this->getTargetPositionBFrame(target, frame_imu);
+//     transformed_position(0) = tmp(0);
+//     transformed_position(1) = tmp(1);
+//     transformed_position(2) = tmp(2);
+//
+//     return 0;
+// }
 
 int Gimbal::setGimbalLimits(
     float roll_min,
@@ -220,18 +242,18 @@ int Gimbal::trackTarget(Eigen::Vector3d target, Eigen::Quaterniond &imu)
 
     // convert setpoints to degrees
     roll_setpoint = rad2deg(-1.0 * roll_setpoint);
-    pitch_setpoint = rad2deg(1.0 * pitch_setpoint);
+    pitch_setpoint = rad2deg(-1.0 * pitch_setpoint);
 
     // printf("roll setpoint: %f\t", roll_setpoint);
-    // printf("pitch_setpoint: %f\t", pitch_setpoint);
-    printf("target: \t");
-    printf("x: %f\t", target(0));
-    printf("y: %f\t", target(1));
-    printf("z: %f\n", target(2));
+    // printf("pitch_setpoint: %f\t\n", pitch_setpoint);
+    // printf("target: \t");
+    // printf("x: %f\t", target(0));
+    // printf("y: %f\t", target(1));
+    // printf("z: %f\n", target(2));
 
     // set angle
-    // this->sbgc->setAngle(roll_setpoint, pitch_setpoint, 0);
-    this->sbgc->setAngle(roll_setpoint, 0, 0);
+    this->sbgc->setAngle(roll_setpoint, pitch_setpoint, 0);
+    // this->sbgc->setAngle(roll_setpoint, 0, 0);
     // this->sbgc->setAngle(0, 0, 0);
 
     return 0;

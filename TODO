@@ -1,15 +1,8 @@
 # TODO
 
-- SBGC features:
-    - read imu
-    - set angles
-    - set speed angles
 - track tag with SBGC code at ultra-fast-speed
-- yaw control
-- estimate target velocity (global and relative)
-- experiment with swathmore apriltag version
 
-- define landing target parameters
 - code up simple 2d simulator with pitch only (ignoring roll for planning)
-- motion planning (with genetic algorithms or others)?
 - contribution scope
+
+- experiment with swathmore apriltag version

@@ -9,8 +9,7 @@
 #include <yaml-cpp/yaml.h>
 
 
-#define YAW_CONTROL_ON
-
+//#define YAW_CONTROL_ON
 
 // CONSTANTS
 #define LZ_THRESHOLD 0
