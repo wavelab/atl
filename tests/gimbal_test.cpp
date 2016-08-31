@@ -236,7 +236,7 @@ int testGimbalGetTargetPositionGimbal(void)
 {
     Gimbal gimbal;
     Eigen::Vector3d target;
-    Eigen::Quaterniond imu_quat;
+    Eigen::Quaterniond correction_quat;
     Eigen::Quaterniond gimbal_quat;
     Eigen::Vector3d target_BPF;
 
@@ -248,18 +248,19 @@ int testGimbalGetTargetPositionGimbal(void)
     float dz = 0.0;
 
     // setup
-    target << 10.0, 0.0, 1.0;  // let tag be directly infront of camera
+    target << 10.0, 0.0, 0.0;  // let tag be directly infront of camera (NED)
     gimbal = Gimbal(roll, pitch, yaw, dx, dy, dz);
 
-    // world to body planar frame
-    euler2Quaternion(deg2rad(10.0), deg2rad(0), 0.0, imu_quat);
-    target_BPF = gimbal.getTargetPositionBPFrame(target, imu_quat);
-    printf("x: %f\t y: %f\t z: %f\n", target_BPF(0), target_BPF(1), target_BPF(2));
+    // correct image space
+    euler2Quaternion(deg2rad(0.0), deg2rad(90.0), 0.0, correction_quat);
+    target = correction_quat.toRotationMatrix().inverse() * target;
+    printf("x: %f\t y: %f\t z: %f\n", target(0), target(1), target(2));
 
-    // body planar frame to gimbal
-    euler2Quaternion(deg2rad(-10.0), deg2rad(0.0), 0.0, gimbal_quat);
-    target_BPF = gimbal_quat.toRotationMatrix() * target_BPF;
-    printf("x: %f\t y: %f\t z: %f\n", target_BPF(0), target_BPF(1), target_BPF(2));
+    // transform to world
+    euler2Quaternion(deg2rad(0.0), deg2rad(-10.0), 0.0, gimbal_quat);
+    target = gimbal_quat.toRotationMatrix() * target;
+    printf("x: %f\t y: %f\t z: %f\n", target(0), target(1), target(2));
+
 
 
     return 0;
