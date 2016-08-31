@@ -261,8 +261,6 @@ int testGimbalGetTargetPositionGimbal(void)
     target = gimbal_quat.toRotationMatrix() * target;
     printf("x: %f\t y: %f\t z: %f\n", target(0), target(1), target(2));
 
-
-
     return 0;
 }
 

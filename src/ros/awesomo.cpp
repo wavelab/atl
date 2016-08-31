@@ -259,12 +259,8 @@ void Awesomo::atimCallback(const atim::AtimPoseStamped &msg)
     q = msg.pose.orientation;
     frame_imu = Eigen::Quaterniond(q.w, q.x, q.y, q.z);
 
-    // tag_BPF = this->gimbal->getTargetPositionBPFrame(tag, this->gimbal_imu_quat);
-    // tag_BPF = this->gimbal->getTargetPositionBFrame(tag);
-
     if (msg.tag_detected) {
-        if (this->gimbal->transformTargetPositionToBPFGimbal(tag, tag_BPF) == 0) {
-        // if (this->gimbal->transformTargetPositionToBPFGimbal2(tag, frame_imu, tag_BPF) == 0) {
+        if (this->gimbal->transformTargetPosition(tag, tag_BPF) == 0) {
             this->landing_zone.detected = msg.tag_detected;
             this->landing_zone.position << tag_BPF(0), tag_BPF(1), tag_BPF(2);
             this->gimbal->trackTarget(tag_BPF, frame_imu);
