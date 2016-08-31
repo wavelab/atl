@@ -106,14 +106,4 @@ public:
     void reset(void);
 };
 
-class LandingController
-{
-public:
-    struct pid thrust;
-
-    LandingController(const std::string config_file);
-    void loadConfig(const std::string config_file);
-    void calculate(float setpoint, Pose robot, float dt);
-};
-
 #endif

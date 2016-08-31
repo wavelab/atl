@@ -265,6 +265,8 @@ void Awesomo::atimCallback(const atim::AtimPoseStamped &msg)
         if (this->gimbal->transformTargetPosition(tag, tag_BPF) == 0) {
             this->gimbal->trackTarget(tag_BPF, frame_imu);
         }
+    } else {
+        this->gimbal->setGimbalAngles(0.0, 0.0, 0.0);
     }
 
     // set landing zone
@@ -708,7 +710,6 @@ int main(int argc, char **argv)
     awesomo = new Awesomo(configs);
     last_request = ros::Time::now();
 
-// #define YAW_CONTROL_ON
 #ifndef YAW_CONTROL_ON
     printf("YAW CONTROL IS OFF!\n");
 #else
