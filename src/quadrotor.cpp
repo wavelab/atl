@@ -158,7 +158,7 @@ int Quadrotor::calculateLandingTargetYaw(double *yaw)
     for (int i = 0; i < this->lt_history.size(); i++) {
         p = this->lt_history[i];
         x_values.push_back(p(0));
-        y_values.push_back(p(1));
+        y_values.push_back(-1 * p(1));  // -ve because NED y is +ve right
     }
     std::sort(x_values.begin(), x_values.end());
     std::sort(y_values.begin(), y_values.end());
@@ -271,7 +271,7 @@ void Quadrotor::runDiscoverMode(LandingTargetPosition landing)
             // calculate landing target yaw
             this->calculateLandingTargetYaw(&lt_yaw);
             transition_state = true;
-            printf("LANDING TARGET YAW IS: %.2f\n", lt_yaw);
+            printf("LANDING TARGET YAW IS: %.2f deg\n", rad2deg(lt_yaw));
 
             // set quadrotor yaw
             this->yaw = lt_yaw;
@@ -317,10 +317,10 @@ void Quadrotor::runTrackingModeBPF(LandingTargetPosition landing, float dt)
     apriltag_kf_estimate(&this->tag_estimator, tag_mea, dt, landing.detected);
 
     // keep track of target position
-    elasped = mtoc(&this->target_last_updated);
+    elasped = toc(&this->target_last_updated);
     if (landing.detected == true) {
         tic(&this->target_last_updated);
-    } else if (elasped > 1000) {
+    } else if (elasped > 1.0) {
         printf("Target losted transitioning back to DISCOVER MODE!\n");
         this->mission_state = DISCOVER_MODE;
     }
@@ -340,8 +340,8 @@ void Quadrotor::runTrackingModeBPF(LandingTargetPosition landing, float dt)
     this->positionControllerCalculate(setpoint, robot_pose, this->yaw, dt);
 
     // transition to landing
-    elasped = mtoc(&this->tracking_start);
-    if (elasped > (10 * 1000)) {  // track for 10 seconds then land
+    elasped = toc(&this->tracking_start);
+    if (elasped > 5.0) {  // track for 10 seconds then land
         printf("Transitioning to LANDING MODE!\n");
         this->mission_state = LANDING_MODE;
         tic(&this->height_last_updated);
@@ -437,11 +437,11 @@ void Quadrotor::runLandingMode(LandingTargetPosition landing, float dt)
     }
 
     // keep track of target position
-    elasped = mtoc(&this->target_last_updated);
+    elasped = toc(&this->target_last_updated);
     if (landing.detected == true) {
         tic(&this->target_last_updated);
 
-    } else if (elasped > 1000.0) {
+    } else if (elasped > 1.0) {
         printf("Target losted transitioning back to DISCOVER MODE!\n");
         this->mission_state = DISCOVER_MODE;
 
@@ -452,7 +452,7 @@ void Quadrotor::runLandingMode(LandingTargetPosition landing, float dt)
     }
 
     // landing - lower height or increase height
-    elasped = mtoc(&this->height_last_updated);
+    elasped = toc(&this->height_last_updated);
     threshold = this->landing_config->cutoff_position;
     if (elasped > this->landing_config->period && landing.detected == true) {
         if (tag_mea(0) < threshold(0) && tag_mea(1) < threshold(1)) {
@@ -468,6 +468,7 @@ void Quadrotor::runLandingMode(LandingTargetPosition landing, float dt)
     }
 
     // kill engines (landed?)
+    tag_est(2) = this->tag_estimator.mu(2);
     if (this->withinLandingZone(tag_mea, tag_est)) {
         if (this->landing_belief >= this->landing_config->belief_threshold) {
             printf("MISSION ACCOMPLISHED!\n");

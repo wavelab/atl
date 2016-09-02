@@ -682,7 +682,6 @@ int main(int argc, char **argv)
     awesomo = new Awesomo(configs);
     last_request = ros::Time::now();
 
-// #define YAW_CONTROL_ON
 #ifndef YAW_CONTROL_ON
     printf("YAW CONTROL IS OFF!\n");
 #else

@@ -274,6 +274,8 @@ void PositionController::calculate(
     this->pitch = -this->y.output;
     this->throttle = this->T.output;
 
+    // printf("roll: %f \t pitch: %f\n", this->roll, this->pitch);
+
     // update position controller
     // adjust roll and pitch according to yaw
     // Figure out how to do this?
@@ -317,41 +319,4 @@ void PositionController::reset(void)
     this->T.p_error = 0.0f;
     this->T.i_error = 0.0f;
     this->T.d_error = 0.0f;
-}
-
-// LANDING CONTROLLER
-LandingController::LandingController(const std::string config_file)
-{
-    this->loadConfig(config_file);
-}
-
-void LandingController::loadConfig(const std::string config_file)
-{
-    try {
-        YAML::Node config = YAML::LoadFile(config_file);
-
-        // thrust controller
-        this->thrust.setpoint = config["thrust_controller"]["setpoint"].as<float>();
-        this->thrust.output = 0.0f;
-        this->thrust.prev_error = 0.0f;
-        this->thrust.sum_error = 0.0f;
-        this->thrust.p_error = 0.0f;
-        this->thrust.i_error = 0.0f;
-        this->thrust.d_error = 0.0f;
-        this->thrust.k_p = config["thrust_controller"]["k_p"].as<float>();
-        this->thrust.k_i = config["thrust_controller"]["k_i"].as<float>();
-        this->thrust.k_d = config["thrust_controller"]["k_d"].as<float>();
-        this->thrust.dead_zone = config["thrust_controller"]["deadzone"].as<float>();
-        this->thrust.min = config["thrust_controller"]["min"].as<float>();
-        this->thrust.max = config["thrust_controller"]["max"].as<float>();
-
-    } catch (YAML::BadFile &ex) {
-        throw;
-    }
-}
-
-void LandingController::calculate(float setpoint, Pose robot, float dt)
-{
-
-
 }
