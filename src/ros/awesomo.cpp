@@ -20,15 +20,11 @@
 #include <atim/AtimPoseStamped.h>
 
 #include "awesomo/util.hpp"
-#include "awesomo/gimbal.hpp"
 #include "awesomo/controller.hpp"
 #include "awesomo/quadrotor.hpp"
 #include "awesomo/PositionControllerStats.h"
 #include "awesomo/KFStats.h"
 #include "awesomo/KFPlotting.h"
-
-#define PIXHAWK_DEV "/dev/pixhawk"
-#define SBGC_DEV "/dev/sgbc_gimbal"
 
 
 // ROS TOPICS
@@ -64,7 +60,6 @@ public:
     int rc_in[16];
 
     Quadrotor *quad;
-    Gimbal *gimbal;
 
     ros::ServiceClient mode_client;
     ros::ServiceClient arming_client;
@@ -131,7 +126,6 @@ Awesomo::Awesomo(std::map<std::string, std::string> configs)
     }
 
     this->quad = new Quadrotor(configs);
-    this->gimbal = new Gimbal(configs);
 
     // wait till connected to FCU
     this->waitForConnection();
@@ -249,27 +243,10 @@ void Awesomo::radioCallback(const mavros_msgs::RCIn &msg)
 
 void Awesomo::atimCallback(const atim::AtimPoseStamped &msg)
 {
-    Eigen::Vector3d tag;
-    Eigen::Vector3d tag_BPF;
-    Eigen::Quaterniond frame_imu;
-    geometry_msgs::Quaternion q;
-
-    // parse tag position and FCU orientation
-    tag << msg.pose.position.x, msg.pose.position.y, msg.pose.position.z;
-    tag_BPF << msg.pose.position.x, msg.pose.position.y, msg.pose.position.z;
-    q = msg.pose.orientation;
-    frame_imu = Eigen::Quaterniond(q.w, q.x, q.y, q.z);
-
-    // track target
-    if (msg.tag_detected) {
-        if (this->gimbal->transformTargetPosition(tag, tag_BPF) == 0) {
-            this->gimbal->trackTarget(tag_BPF, frame_imu);
-        }
-    }
-
-    // set landing zone
     this->landing_zone.detected = msg.tag_detected;
-    this->landing_zone.position << tag_BPF(0), tag_BPF(1), tag_BPF(2);
+    this->landing_zone.position << msg.pose.position.x,
+                                   msg.pose.position.y,
+                                   msg.pose.position.z;
 }
 
 void Awesomo::gpsCallback(const geometry_msgs::PoseWithCovarianceStamped &msg)
@@ -688,7 +665,6 @@ int main(int argc, char **argv)
     std::string quadrotor_config;
     std::string position_controller_config;
     std::string carrot_controller_config;
-    std::string gimbal_config;
     std::map<std::string, std::string> configs;
     std_msgs::Float64 throttle;
 
@@ -696,11 +672,9 @@ int main(int argc, char **argv)
     node_handle.getParam("/quadrotor", quadrotor_config);
     node_handle.getParam("/position_controller", position_controller_config);
     node_handle.getParam("/carrot_controller", carrot_controller_config);
-    node_handle.getParam("/gimbal", gimbal_config);
     configs["quadrotor"] = quadrotor_config;
     configs["position_controller"] = position_controller_config;
     configs["carrot_controller"] = carrot_controller_config;
-    configs["gimbal"] = gimbal_config;
 
     // setup awesomo
     seq = 1;

@@ -5,15 +5,6 @@ IF (CMAKE_COMPILER_IS_GNUCXX)
     ADD_DEFINITIONS(-std=gnu++0x)
 ENDIF()
 
-# OPENMP
-FIND_PACKAGE(OpenMP REQUIRED)
-if (OPENMP_FOUND)
-    message("OPENMP FOUND")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-    set(CAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
-endif()
-
 # DEPENDENCIES
 FIND_PACKAGE(
     catkin
@@ -71,13 +62,11 @@ ADD_LIBRARY(
     STATIC
     src/util.cpp
     src/ros/ros_util.cpp
-    src/gimbal.cpp
     src/controller.cpp
     src/quadrotor.cpp
     src/estimator.cpp
     src/estimator.cpp
     src/planner.cpp
-    src/sbgc.cpp
 )
 SET(AWESOMO_DEPS
     libawesomo
@@ -123,20 +112,10 @@ ADD_EXECUTABLE(awesomo_planner_test tests/planner_test.cpp)
 TARGET_LINK_LIBRARIES(awesomo_planner_test ${AWESOMO_DEPS})
 INSTALL(TARGETS awesomo_quadrotor_test RUNTIME DESTINATION BIN_DEST)
 
-# tests/sbgc_test
-ADD_EXECUTABLE(awesomo_sbgc_test tests/sbgc_test.cpp)
-TARGET_LINK_LIBRARIES(awesomo_sbgc_test ${AWESOMO_DEPS})
-INSTALL(TARGETS awesomo_quadrotor_test RUNTIME DESTINATION BIN_DEST)
-
 # tests/util_test
 ADD_EXECUTABLE(awesomo_util_test tests/util_test.cpp)
 TARGET_LINK_LIBRARIES(awesomo_util_test ${AWESOMO_DEPS})
 INSTALL(TARGETS awesomo_util_test RUNTIME DESTINATION BIN_DEST)
-
-# tests/gimbal_test
-ADD_EXECUTABLE(awesomo_gimbal_test tests/gimbal_test.cpp)
-TARGET_LINK_LIBRARIES(awesomo_gimbal_test ${AWESOMO_DEPS})
-INSTALL(TARGETS awesomo_gimbal_test RUNTIME DESTINATION BIN_DEST)
 
 
 
