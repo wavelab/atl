@@ -468,7 +468,6 @@ void Quadrotor::runLandingMode(LandingTargetPosition landing, float dt)
     }
 
     // kill engines (landed?)
-    tag_est(2) = this->tag_estimator.mu(2);
     if (this->withinLandingZone(tag_mea, tag_est)) {
         if (this->landing_belief >= this->landing_config->belief_threshold) {
             printf("MISSION ACCOMPLISHED!\n");

@@ -4,6 +4,9 @@
     <param
         name="camera_config_path"
 	    value="$(find atim)/configs/pointgrey_firefly" />
+	<param
+        name="gimbal"
+        value="$(find atim)/configs/gimbal/config.yaml" />
 	<node
 	    pkg="atim"
 	    type="atim"
@@ -20,9 +23,6 @@
 	<param
         name="carrot_controller"
         value="$(find awesomo)/configs/carrot_controller/config.yaml" />
-	<param
-        name="gimbal"
-        value="$(find awesomo)/configs/gimbal/config.yaml" />
 	<node
 	    pkg="awesomo"
 	    type="awesomo"
