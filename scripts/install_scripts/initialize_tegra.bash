@@ -12,7 +12,7 @@ add_repositories()
 {
     # add the main, universe and multiverse repo
     sudo add-apt-repository universe
-    sudo add-apt-repository multiverse 
+    sudo add-apt-repository multiverse
     sudo apt-get update
 
     # install git
@@ -22,13 +22,13 @@ add_repositories()
 install_ros()
 {
     # update sources.list and add apt-get keys
-    # echo "deb $ROS_PACKAGES_URL $APT_TARGETS" > $SOURCES_LIST_TARGET 
+    # echo "deb $ROS_PACKAGES_URL $APT_TARGETS" > $SOURCES_LIST_TARGET
     # wget $APT_KEYS_URL -O - | sudo apt-key add -
 
     # update and install ros base
     # apt-get update -qq
     apt-get install ros-indigo-desktop
- 
+
     # initialize rosdep
     rosdep init
     rosdep update
@@ -72,8 +72,8 @@ install_awesomo()
     cd $HOME/catkin_ws/src
     # install awesomo dependensies
     sudo apt-get install ros-indio-mavros-*
-    # install awesomo 
-    git clone https://github.com/wavelab/awesomo.git    
+    # install awesomo
+    git clone https://github.com/wavelab/awesomo.git
     cd $HOME/catkin_ws
     catkin_make install
 }
@@ -84,5 +84,5 @@ install_ros
 setup_catkin
 install_atim
 install_awesomo
-    
-	
+
+
