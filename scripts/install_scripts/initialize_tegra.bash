@@ -78,11 +78,15 @@ install_awesomo()
     catkin_make install
 }
 
+setup_wifi()
+{
+    # connect using the command line interface of network manager
+    nmcli d wifi connect AwesomoTower
+}
 
 add_repositories
 install_ros
 setup_catkin
 install_atim
 install_awesomo
-
-
+setup_wifi
