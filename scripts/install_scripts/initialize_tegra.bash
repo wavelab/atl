@@ -84,6 +84,12 @@ setup_wifi()
     nmcli d wifi connect AwesomoTower
 }
 
+setup_permissions()
+{
+    sudo usermod -a -G px4 ubuntu
+    sudo usermod -a -G tty ubuntu
+}
+
 add_repositories
 install_ros
 setup_catkin
