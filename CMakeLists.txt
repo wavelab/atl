@@ -20,11 +20,13 @@ FIND_PACKAGE(
 )
 FIND_PACKAGE(OpenCV REQUIRED)
 FIND_PACKAGE(Boost REQUIRED)
+FIND_PACKAGE(gazebo REQUIRED)
 
 # LIBS
 LINK_DIRECTORIES(
     /usr/local/lib
     /usr/lib
+    $(GAZEBO_LIBRARY_DIRS)
 )
 
 # INCLUDES
@@ -34,6 +36,7 @@ INCLUDE_DIRECTORIES(
     /usr/include/eigen3
     /usr/include/flycapture
     $(Boost_INCLUDE_DIR)
+    ${GAZEBO_INCLUDE_DIRS}
     ./include
 )
 
@@ -82,12 +85,18 @@ SET(SHARE_DEST ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
 
 
-## ROS NODES
+## ROS
 # quadrotor_node
 ADD_EXECUTABLE(awesomo src/ros/awesomo.cpp)
 ADD_DEPENDENCIES(awesomo ${PROJECT_NAME}_gencpp)
 TARGET_LINK_LIBRARIES(awesomo ${AWESOMO_DEPS})
 INSTALL(TARGETS awesomo RUNTIME DESTINATION BIN_DEST)
+
+
+
+## GAZEBO
+ADD_LIBRARY(sim_plugin src/gazebo/sim_plugin.cpp)
+TARGET_LINK_LIBRARIES(sim_plugin ${GAZEBO_libraries})
 
 
 
