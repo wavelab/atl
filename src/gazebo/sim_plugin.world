@@ -1,6 +1,0 @@
-<?xml version="1.0"?>
-<sdf version="1.4">
-  <world name="default">
-    <plugin name="sim_plugin" filename="libsim_plugin.so"/>
-  </world>
-</sdf>

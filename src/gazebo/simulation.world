@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<sdf version="1.4">
+  <world name="default">
+    <!-- global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <!-- quadrotor model -->
+    <include>
+        <uri>model://quadrotor</uri>
+        <pose>0 0 0.2 0 0 0</pose>
+
+        <!-- plugins -->
+        <plugin name="quadrotor_plugin" filename="libquadrotor_plugin.so"/>
+    </include>
+
+    <!-- box model -->
+    <model name="box">
+        <pose>0 0 0 0 0 0</pose>
+        <link name="link">
+            <collision name="collision">
+                <geometry>
+                    <box>
+                        <size>1 1 0.1</size>
+                    </box>
+                </geometry>
+            </collision>
+
+            <visual name="visual">
+                <geometry>
+                    <box>
+                        <size>1 1 0.1</size>
+                    </box>
+                </geometry>
+            </visual>
+        </link>
+
+        <!-- plugins -->
+        <plugin name="landing_zone_plugin" filename="liblanding_zone_plugin.so"/>
+    </model>
+  </world>
+</sdf>

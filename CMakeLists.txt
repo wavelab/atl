@@ -95,8 +95,11 @@ INSTALL(TARGETS awesomo RUNTIME DESTINATION BIN_DEST)
 
 
 ## GAZEBO
-ADD_LIBRARY(sim_plugin src/gazebo/sim_plugin.cpp)
-TARGET_LINK_LIBRARIES(sim_plugin ${GAZEBO_libraries})
+ADD_LIBRARY(quadrotor_plugin src/gazebo/quadrotor_plugin.cpp)
+TARGET_LINK_LIBRARIES(quadrotor_plugin ${GAZEBO_libraries})
+
+ADD_LIBRARY(landing_zone_plugin src/gazebo/landing_zone_plugin.cpp)
+TARGET_LINK_LIBRARIES(landing_zone_plugin ${GAZEBO_libraries})
 
 
 
