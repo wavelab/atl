@@ -13,7 +13,7 @@ improved with better statistics in comparing PID and LQ controllers.
 
 
 
-## Nonlinear Tracking and Landing Controller for Quadrotor Aerial Robots (Vooset al - 2010)
+## Nonlinear Tracking and Landing Controller for Quadrotor Aerial Robots (Voos et al - 2010)
 
 The contribution of this paper is a new nonlinear control algorithm based upon
 a decomposition of the overall controller into a nested structure of velocity
@@ -22,6 +22,33 @@ implement and the control algorithm has proven stability while taking the
 nonlinearities of the dynamics directly into account. The experiments however
 were all performed in simulation which makes me skeptical about how the control
 algorithm would really perform in the real world.
+
+
+
+## Precision Flight Control For a Multi-vehicle Quadrotor Helicopter testbed (Hoffmann et al - 2011)
+
+Accurate dynamic models for deriving controllers for moderate to high speeds
+have been lacking. This work presents theoretical models of quadrotor
+aerodynamics with non-zero free stream velocities based on helicopter momentum
+and balde elemnt theory, validate with static tests and flight data. Derived
+controller was tested on STARMAC.
+
+Quadrotor dynamics are often modeled as independent of free-stream velocity for
+attitude and latitude control, this assumption is only reasonable at low
+velocities. Even at moderate velocities the impact of the aerodynamic effects
+resulting from variation in air speed is significant.
+
+Two main effects are presented that have each been experimentally observed on
+the STARMAC platform. The first effect is the variation in total thrust from a
+rotor with free-stream velocity and angle of attack, and the second is the
+effect known as "blade flapping" resulting from the differing flow velocities
+experienced by advancing and retreating baldes of a rotor in translational
+flight. Aerodynamic drag was not considered because it is both vehicle design
+dependent and already well known.
+
+
+
+## (Wenzel et al - 2011)
 
 
 
@@ -81,3 +108,37 @@ identifies the red platform the quadrotor converges and lands on the platform.
 Overall it is difficult to see how this paper has done anything new other than
 use a smart phone for its camera, the authors did not compare their method with
 others.
+
+
+
+## Autonomous Quadrotor Flight Using Onboard RGB-D Visual Odometry (Valenti et al - 2014)
+
+Visual odometry algorithm used uses an uncertainty analysis of the depth
+information to align newly observed features against a global sparse model of
+previously detected 3D features. The visual odometry provides updates at
+roughly 30Hz that is fused with 1kHz IMU sensor data via a Kalman Filter. The
+high-rate pose estimation is used as feedback for the controller, enabling
+autonomous flight. The authors developed a 4DOF path planner and implemented a
+real time 3D SLAM where all the system runs on-board.
+
+RGB-D visual odometry has not been widely used for quadrotor control, it uses a
+frame-to-model registration approach to compute the transformation between two
+consecutive camera pose.
+
+First detect features in the captured scene by using Shi-Tomasi algorithm and
+their 3D coordinates in the camera frame, then we align these features against
+a global model of 3D features (previously detected).
+
+Data association and filtering was performed using Gaussian Mixture Model. The
+3D normal distribution model for each feature detected in the incoming RGB-D
+image was extracted.
+
+- AscTec Pelican
+- Intel Core2Duo 1.86Ghz
+- 4GB RAM
+- FCU with 2 ARM7 microcontrollers
+
+- Alpha Beta Filter
+- Kalman Filter
+- SURF features
+- RANSAC on detected features
