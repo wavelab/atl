@@ -1,4 +1,4 @@
-# Autonomous Landing on a Moving Platform (Friis et al - 2009)
+## Autonomous Landing on a Moving Platform (Friis et al - 2009)
 
 The goal of this project is to land a quadrotor onto a moving platform. The
 main emphasis of this project is quadrotor control.The report documents the
@@ -13,7 +13,7 @@ improved with better statistics in comparing PID and LQ controllers.
 
 
 
-# Nonlinear Tracking and Landing Controller for Quadrotor Aerial Robots (Vooset al - 2010)
+## Nonlinear Tracking and Landing Controller for Quadrotor Aerial Robots (Vooset al - 2010)
 
 The contribution of this paper is a new nonlinear control algorithm based upon
 a decomposition of the overall controller into a nested structure of velocity
@@ -25,7 +25,7 @@ algorithm would really perform in the real world.
 
 
 
-# Autonomous Landing of a VTOL UAV on a Moving Platform Using Image-based Visual Servoing (Lee et al - 2012)
+## Autonomous Landing of a VTOL UAV on a Moving Platform Using Image-based Visual Servoing (Lee et al - 2012)
 
 The authors of this paper used a Image-based Visual Servoing (IBVS) to track
 the moving platform in 2D and generate a velocity reference command used as the
@@ -39,7 +39,7 @@ is difficult to evaluate the relative performance of this system.
 
 
 
-# Landing a VTOL Unmanned Aerial Vehicle on a Moving Platform Using Optical Flow (Herisse et al - 2012)
+## Landing a VTOL Unmanned Aerial Vehicle on a Moving Platform Using Optical Flow (Herisse et al - 2012)
 
 This paper introduces the use of optical flow to extract necessary realative
 information, and a nonlinear controller to land of a moving platform, the
@@ -68,7 +68,7 @@ While impressive the convergence rate was very slow as seen in the video.
 
 
 
-# Outdoor Autonomous Landing on a Moving Platform for Quadrotors using an Omnidirectional Camera (Kim et al - 2014)
+## Outdoor Autonomous Landing on a Moving Platform for Quadrotors using an Omnidirectional Camera (Kim et al - 2014)
 
 This paper explores the use of a smartphone (iPhone) to serve as an on-board
 camera and processing unit, where measurements from the omnidirectional camera
