@@ -50,6 +50,16 @@ dependent and already well known.
 
 ## (Wenzel et al - 2011)
 
+Used a Wii remote infrared (IR) camera and worked with an obard 8 bit
+microccontroller. Position and orientation relative to the IR pattern is
+estimated at a frequency of approximately 50Hz.
+
+Controller was PID, the success rate is 90%, failures are mostly due to
+overshooting the tracking cone or to ground effets at departure or landing at
+the small moving platform.
+
+Impressive that it worked at all. But too limited, IR will not work outdoors.
+
 
 
 ## Autonomous Landing of a VTOL UAV on a Moving Platform Using Image-based Visual Servoing (Lee et al - 2012)
@@ -142,3 +152,6 @@ image was extracted.
 - Kalman Filter
 - SURF features
 - RANSAC on detected features
+
+The results section was very bare, no comparison was given therefore it is
+difficult to gauge the robustness of the implementation.
