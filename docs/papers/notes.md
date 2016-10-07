@@ -1,5 +1,4 @@
-Autonomous Landing on a Moving Platform (Friis et al - 2009)
--------------------------------------------------------------------------------
+## Autonomous Landing on a Moving Platform (Friis et al - 2009)
 
 The goal of this project is to land a quadrotor onto a moving platform. The
 main emphasis of this project is quadrotor control.The report documents the
@@ -14,10 +13,7 @@ improved with better statistics in comparing PID and LQ controllers.
 
 
 
-Nonlinear Tracking and Landing Controller for Quadrotor Aerial Robots 
--------------------------------------------------------------------------------
-(Voos et al - 2010)
--------------------
+## Nonlinear Tracking and Landing Controller for Quadrotor Aerial Robots (Voos et al - 2010)
 
 The contribution of this paper is a new nonlinear control algorithm based upon
 a decomposition of the overall controller into a nested structure of velocity
@@ -29,10 +25,7 @@ algorithm would really perform in the real world.
 
 
 
-Precision Flight Control For a Multi-vehicle Quadrotor Helicopter testbed
--------------------------------------------------------------------------------
-(Hoffmann et al - 2011)
------------------------
+## Precision Flight Control For a Multi-vehicle Quadrotor Helicopter testbed (Hoffmann et al - 2011)
 
 Accurate dynamic models for deriving controllers for moderate to high speeds
 have been lacking. This work presents theoretical models of quadrotor
