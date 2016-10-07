@@ -155,3 +155,48 @@ image was extracted.
 
 The results section was very bare, no comparison was given therefore it is
 difficult to gauge the robustness of the implementation.
+
+
+
+## Keyframe-Based Visual-Inertial SLAM Using NonLinear Optimization (Leutenegger et al - 2015)
+
+Most fusion strategies use filtering, the visual robotics community has
+recently turned to non-linear optimization approaches for visal SLAM, which
+comes with significant advantages in quality of performance and computational
+complexity. This paper introduces a method to tightly integrate visual
+measurements with IMU in SLAM. An IMU error term is integrated with the
+landmark reprojection error in fully probabilistic manner, resulting to a joint
+non-linear cost function to be optimized. Employing the powerful concept of
+"keyframes" we partially marginalize old states to maintain a bounded-sized
+optimization window, ensuring real-time operation.
+
+Strasdat et al (Real-time Monocular SLAM: Why filter? 2010), showed that in
+**optimization-based** approaches provide better accuracy for the same
+computational work when compared to filtering approaches for pure visual SLAM.
+Maintaining a relatively sparse graph of keyframes and their associated
+landmarks subject to nonlinear optimization, has become very popular.
+
+Loosely-coupled systems limit the complexity, but disregard correlations
+amongst internal states of different sensors.
+
+Tightly-coupled approaches jointly estimate all sensor states.
+
+This paper advocates a tightly-coupled fusion for maximal exploitation of
+sensing cues and nonlinear estimation whereever possible rather than filtering
+in order to reduce suboptimality due to linearization.
+
+Contributions:
+
+1. Employed a keyframe paradigm for drift-free estimation also when slow or no
+motion at all is present.
+
+2. Provide a fully probabilistic derivation of IMU error terms, including the
+respective information matrix, relating successive image frames without
+explicitly introducing states at IMU-rate.
+
+3. At the system, hardware and algorithms for realtime SLAM, including robust
+keypoint matching and outlier rejection using inertial cues was developed.
+
+Results: They did not have a room to discuss the results but in all cases the tightly-coupled approach yielded the least errro in translation and orientation.
+
+Perhaps it is an overkill for the landing project for now, the improvement is relatively minor. The complexity in implementing this solution could take months.
