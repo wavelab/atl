@@ -56,14 +56,6 @@ Quadrotor::Quadrotor(std::map<std::string, std::string> configs)
         this->position_controller = NULL;
     }
 
-    // initialize carrot controller
-    if (configs.count("carrot_controller")) {
-        config_path = configs["carrot_controller"];
-        this->carrot_controller = new CarrotController(config_path);
-    } else {
-        this->carrot_controller = NULL;
-    }
-
     // load quadrotor configuration
     config_path = configs["quadrotor"];
     this->loadConfig(config_path);
@@ -184,70 +176,6 @@ int Quadrotor::calculateLandingTargetYaw(double *yaw)
     }
 
     return 0;
-}
-
-void Quadrotor::initializeCarrotController(void)
-{
-    Eigen::Vector3d p;
-    Eigen::Vector3d wp;
-    Eigen::Vector3d carrot;
-    Eigen::Vector3d position;
-
-    // setup
-    std::cout << "Initializing Carrot Controller!" << std::endl;
-
-    // current position
-    p << 0.0, 0.0, this->hover_height;
-
-    // waypoint 1
-    wp = p;
-    this->carrot_controller->wp_start = wp;
-    this->carrot_controller->waypoints.push_back(wp);
-
-    // waypoint 2
-    wp(0) = p(0);
-    wp(1) = p(1);
-    wp(2) = p(2) * 0.8;
-    this->carrot_controller->wp_end = wp;
-    this->carrot_controller->waypoints.push_back(wp);
-
-    // waypoint 3
-    wp(0) = p(0);
-    wp(1) = p(1);
-    wp(2) = p(2) * 0.6;
-    this->carrot_controller->waypoints.push_back(wp);
-
-    // waypoint 4
-    wp(0) = p(0);
-    wp(1) = p(1);
-    wp(2) = p(2) * 0.4;
-    this->carrot_controller->waypoints.push_back(wp);
-
-    // waypoint 5
-    wp(0) = p(0);
-    wp(1) = p(1);
-    wp(2) = p(2) * 0.2;
-    this->carrot_controller->waypoints.push_back(wp);
-
-    // initialize carrot controller
-    this->carrot_controller->initialized = 1;
-}
-
-Eigen::Vector3d Quadrotor::runCarrotMode(Pose robot_pose, float dt)
-{
-    Eigen::Vector3d position;
-    Eigen::Vector3d carrot;
-
-    // setup
-    position = robot_pose.position;
-
-    // calculate new carrot point
-    if (this->carrot_controller->update(position, carrot)) {
-        std::cout << "No more waypoints!" << std::endl;
-        return this->carrot_controller->carrot_prev;
-    }
-
-    return carrot;
 }
 
 void Quadrotor::runDiscoverMode(LandingTargetPosition landing)

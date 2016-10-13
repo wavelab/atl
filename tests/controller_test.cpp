@@ -2,193 +2,13 @@
 #include "awesomo/controller.hpp"
 
 
-#define CARROT_CONTROLLER_CONFIG "configs/carrot_controller/config.yaml"
 #define POSITION_CONTROLLER_CONFIG "configs/position_controller/config.yaml"
 
 
 // TESTS
-int testCarrotController(void);
-int testCarrotControllerClosestPoint(void);
-int testCarrotControllerInitializeWaypoints(void);
-int testCarrotControllerCalculateCarrotPoint(void);
-int testCarrotControllerWaypointReached(void);
-int testCarrotControllerUpdate(void);
-
 int testPositionControllerLoadConfig(void);
 int testPositionControllerPidCalculate(void);
 
-
-int testCarrotController(void)
-{
-    CarrotController *controller;
-
-    controller = new CarrotController(CARROT_CONTROLLER_CONFIG);
-    mu_check(controller->initialized == 0);
-    mu_check(controller->look_ahead_dist != 0);
-    mu_check(controller->wp_threshold != 0);
-    mu_check(controller->waypoints.size() == 0);
-
-    return 0;
-}
-
-int testCarrotControllerInitializeWaypoints(void)
-{
-    CarrotController *controller;
-    std::vector<Eigen::Vector3d> waypoints;
-    Eigen::Vector3d point;
-
-    // setup
-    controller = new CarrotController(CARROT_CONTROLLER_CONFIG);
-    point << 0.0, 0.0, 3.0;
-    waypoints.push_back(point);
-    point << 0.0, 0.0, 3.0;
-    waypoints.push_back(point);
-    point << 0.0, 0.0, 3.0;
-    waypoints.push_back(point);
-
-    // test and assert
-    controller->initializeWaypoints(waypoints);
-    std::cout << controller->waypoints.size() << std::endl;
-    mu_check(controller->waypoints.size() == 3);
-    mu_check(controller->initialized == 1);
-
-    return 0;
-}
-
-int testCarrotControllerClosestPoint(void)
-{
-    CarrotController controller;
-    Eigen::Vector3d wp_start;
-    Eigen::Vector3d wp_end;
-    Eigen::Vector3d position;
-    Eigen::Vector3d point;
-    Eigen::Vector3d expected;
-
-    // setup
-    wp_start << 1, 1, 0;
-    wp_end << 10, 10, 0;
-    position << 5, 8, 0;
-    expected << 6.5, 6.5, 0.0;
-
-    // test and assert
-    point = controller.closestPoint(position, wp_start, wp_end);
-    mu_check(point == expected);
-
-    return 0;
-}
-
-int testCarrotControllerCalculateCarrotPoint(void)
-{
-    CarrotController controller;
-
-    double r;
-    Eigen::Vector3d wp_start;
-    Eigen::Vector3d wp_end;
-    Eigen::Vector3d position;
-    Eigen::Vector3d carrot_point;
-    Eigen::Vector3d expected;
-
-    // setup
-    r = 2.0;
-    wp_start << 1, 1, 0;
-    wp_end << 10, 10, 0;
-    position << 5, 8, 0;
-    expected << 7.91421, 7.91421, 0.0;
-
-    // test and assert
-    carrot_point = controller.calculateCarrotPoint(
-        position,
-        r,
-        wp_start,
-        wp_end
-    );
-    mu_check(fltcmp(carrot_point(0), expected(0)) == 0);
-    mu_check(fltcmp(carrot_point(1), expected(1)) == 0);
-    mu_check(fltcmp(carrot_point(2), expected(2)) == 0);
-
-    return 0;
-}
-
-int testCarrotControllerWaypointReached(void)
-{
-    CarrotController controller;
-    int retval;
-    double threshold;
-    Eigen::Vector3d waypoint;
-    Eigen::Vector3d position;
-
-    // setup
-    threshold = 1.0;
-    waypoint << 5, 8, 0;
-    position << 5, 8, 0;
-
-    // test and assert
-    retval = controller.waypointReached(position, waypoint, threshold);
-    mu_check(retval == 1);
-
-    position << 10, 10, 0;
-    retval = controller.waypointReached(position, waypoint, threshold);
-    mu_check(retval == 0);
-
-    return 0;
-}
-
-int testCarrotControllerUpdate(void)
-{
-    CarrotController controller;
-    int retval;
-    Eigen::Vector3d wp;
-    Eigen::Vector3d position;
-    Eigen::Vector3d carrot;
-
-    // setup
-    position << 2, 2, 0;
-    wp << 0, 0, 0;
-    controller.wp_start = wp;
-    controller.waypoints.push_back(wp);
-    wp << 10, 10, 0;
-    controller.wp_end = wp;
-    controller.waypoints.push_back(wp);
-    wp << 15, 10, 0;
-    controller.waypoints.push_back(wp);
-    controller.look_ahead_dist = 1;
-    controller.wp_threshold = 0.1;
-    controller.initialized = 1;
-
-    // test and assert
-    std::ofstream outfile;
-    outfile.open("/tmp/carrot_controller.dat");
-
-    for (int i = 0; i < 40; i++) {
-        // carrot update
-        retval = controller.update(position, carrot);
-        mu_check(retval == 1);
-
-        // record
-        outfile << controller.wp_start(0) << ", ";
-        outfile << controller.wp_start(1) << ", ";
-        outfile << controller.wp_start(2) << std::endl;
-
-        outfile << controller.wp_end(0) << ", ";
-        outfile << controller.wp_end(1) << ", ";
-        outfile << controller.wp_end(2) << std::endl;
-
-        outfile << position(0) << ", ";
-        outfile << position(1) << ", ";
-        outfile << position(2) << std::endl;
-
-        outfile << carrot(0) << ", ";
-        outfile << carrot(1) << ", ";
-        outfile << carrot(2) << std::endl;
-        outfile << std::endl;
-
-        // update position
-        position(0) = position(0) + 0.5;
-        position(1) = position(1) + 0.5;
-    }
-
-    outfile.close();
-}
 
 int testPositionControllerLoadConfig(void)
 {
@@ -279,13 +99,6 @@ int testPositionControllerPidCalculate(void)
 
 void testSuite(void)
 {
-    mu_add_test(testCarrotController);
-    mu_add_test(testCarrotControllerInitializeWaypoints);
-    mu_add_test(testCarrotControllerClosestPoint);
-    mu_add_test(testCarrotControllerCalculateCarrotPoint);
-    mu_add_test(testCarrotControllerWaypointReached);
-    mu_add_test(testCarrotControllerUpdate);
-
     mu_add_test(testPositionControllerLoadConfig);
     mu_add_test(testPositionControllerPidCalculate);
 }
