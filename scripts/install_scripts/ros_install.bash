@@ -28,6 +28,9 @@ install()
 
 	# install ros
 	apt-get install -y python-rosinstall
+	
+	# fix rosdep permissions
+	rosdep fix-permissions
 }
 
 
