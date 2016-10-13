@@ -43,6 +43,7 @@
 #define GPS_TOPIC "/mavros/global_position/local"
 #define ATIM_POSE_TOPIC "/atim/pose"
 
+
 class Awesomo
 {
 public:
@@ -334,7 +335,7 @@ void Awesomo::subscribeToPose(void)
     ROS_INFO("subcribing to [POSE]");
     this->world_pose_subscriber = this->node.subscribe(
         POSE_TOPIC,
-        50,
+        10,
         &Awesomo::poseCallback,
         this
     );
@@ -346,7 +347,7 @@ void Awesomo::subscribeToVelocity(void)
     ROS_INFO("subcribing to [VELOCITY]");
     this->velocity_subscriber = this->node.subscribe(
         VELOCITY_TOPIC,
-        50,
+        10,
         &Awesomo::velocityCallback,
         this
     );
@@ -357,7 +358,7 @@ void Awesomo::subscribeToMocap(void)
     ROS_INFO("subcribing to [MOCAP]");
     this->mocap_subscriber = this->node.subscribe(
         MOCAP_TOPIC,
-        50,
+        10,
         &Awesomo::mocapCallback,
         this
     );
@@ -368,7 +369,7 @@ void Awesomo::subscribeToRadioIn(void)
     ROS_INFO("subscribing to [RADIO_IN]");
     this->radio_subscriber = this->node.subscribe(
         RADIO_TOPIC,
-        50,
+        10,
         &Awesomo::radioCallback,
         this
      );
@@ -379,7 +380,7 @@ void Awesomo::subscribeToAtim(void)
     ROS_INFO("subcribing to [ATIM]");
     this->landing_subscriber = this->node.subscribe(
         ATIM_POSE_TOPIC,
-        1,
+        10,
         &Awesomo::atimCallback,
         this
     );
@@ -390,7 +391,7 @@ void Awesomo::subscribeToGPS(void)
     ROS_INFO("subcribing to [GPS UTM]");
     this->gps_subscriber = this->node.subscribe(
         GPS_TOPIC,
-        50,
+        10,
         &Awesomo::gpsCallback,
         this
     );
@@ -689,19 +690,8 @@ int main(int argc, char **argv)
 #endif
 
     while (ros::ok()){
-        // check if offboard switch has been turned on
-        if (awesomo->rc_in[6] < 1500) {
-            throttle.data = 0.0;
-            awesomo->hover_point = awesomo->world_pose;
-            awesomo->quad->mission_state = DISCOVER_MODE;
-            awesomo->quad->resetPositionController();
-            awesomo->throttle_publisher.publish(throttle);
-
-        } else {
-            if (awesomo->run(msg, seq, last_request) == 0) {
-                return 0;
-            }
-
+        if (awesomo->run(msg, seq, last_request) == 0) {
+            return 0;
         }
 
         // end

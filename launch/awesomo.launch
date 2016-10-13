@@ -4,9 +4,6 @@
     <param
         name="camera_config_path"
 	    value="$(find atim)/configs/pointgrey_firefly" />
-	<param
-        name="gimbal"
-        value="$(find atim)/configs/gimbal/config.yaml" />
 	<node
 	    pkg="atim"
 	    type="atim"

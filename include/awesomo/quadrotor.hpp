@@ -9,7 +9,7 @@
 #include <yaml-cpp/yaml.h>
 
 
-//#define YAW_CONTROL_ON
+#define YAW_CONTROL_ON
 
 // CONSTANTS
 #define LZ_THRESHOLD 0
@@ -29,19 +29,6 @@
 // TIMEOUTS
 #define TARGET_LOST_TIMEOUT 2 // run on kalman estimate until this time
 #define LANDING_DELAY 5  // observe the target before landing
-
-class HoverPoint
-{
-public:
-    // hover point properties
-    bool initialized;
-    Eigen::Vector3d position;
-    float hover_height;
-
-    // constructors
-    HoverPoint();
-    HoverPoint(float x, float y, float z);
-};
 
 
 class LandingConfig
