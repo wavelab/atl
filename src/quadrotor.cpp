@@ -10,7 +10,6 @@ LandingConfig::LandingConfig(void)
     this->belief_threshold = 0;
 }
 
-
 LandingConfig::LandingConfig(
     float period,
     float desend_multiplier,

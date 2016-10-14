@@ -25,6 +25,10 @@ algorithm would really perform in the real world.
 
 
 
+## Real-time Monocular SLAM: Why Filter?
+
+
+
 ## Precision Flight Control For a Multi-vehicle Quadrotor Helicopter testbed (Hoffmann et al - 2011)
 
 Accurate dynamic models for deriving controllers for moderate to high speeds
@@ -48,9 +52,9 @@ dependent and already well known.
 
 
 
-## (Wenzel et al - 2011)
+## Automatic Take Off, Tracking and Landing of a Miniature UAV on a Moving Carrier Vehicle (Wenzel et al - 2011)
 
-Used a Wii remote infrared (IR) camera and worked with an obard 8 bit
+Used a Wii remote infrared (IR) camera and worked with an onboard 8 bit
 microccontroller. Position and orientation relative to the IR pattern is
 estimated at a frequency of approximately 50Hz.
 
@@ -197,6 +201,10 @@ explicitly introducing states at IMU-rate.
 3. At the system, hardware and algorithms for realtime SLAM, including robust
 keypoint matching and outlier rejection using inertial cues was developed.
 
-Results: They did not have a room to discuss the results but in all cases the tightly-coupled approach yielded the least errro in translation and orientation.
+Results: They did not have a room to discuss the results but in all cases the
+tightly-coupled approach yielded the least errro in translation and
+orientation.
 
-Perhaps it is an overkill for the landing project for now, the improvement is relatively minor. The complexity in implementing this solution could take months.
+Perhaps it is an overkill for the landing project for now, the improvement is
+relatively minor. The complexity in implementing this solution could take
+months.

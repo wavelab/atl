@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e # exit on first error
+set -e  # exit on first error
 
 ROS_VERSION="indigo"
 ROS_BASH="opt/ros/$ROS_VERSION/setup.bash"
@@ -7,6 +7,7 @@ ROS_PACKAGES_URL="http://packages.ros.org/ros/ubuntu"
 APT_KEYS_URL="http://packages.ros.org/ros.key"
 APT_TARGETS="$(lsb_release -sc) main universe restricted multiverse"
 SOURCES_LIST_TARGET="/etc/apt/sources.list.d/ros-latest.list"
+
 
 add_repositories()
 {
@@ -38,6 +39,9 @@ install_ros()
 
     # install ros
     apt-get install -y python-rosinstall
+
+    # fix rosdep permissions
+    rosdep fix-permissions
 }
 
 setup_catkin()
@@ -63,6 +67,7 @@ install_atim()
     sudo bash scripts/install_scripts/pointgrey_arm_install.bash
     sudo bash scripts/install_scripts/ximea_install.bash
     sudo bash scripts/install_scripts/swathmore_apriltags.bash
+
     cd $HOME/catkin_ws
     catkin_make install
 }
@@ -70,8 +75,10 @@ install_atim()
 install_awesomo()
 {
     cd $HOME/catkin_ws/src
+
     # install awesomo dependensies
     sudo apt-get install ros-indio-mavros-*
+
     # install awesomo
     git clone https://github.com/wavelab/awesomo.git
     cd $HOME/catkin_ws
@@ -90,6 +97,8 @@ setup_permissions()
     sudo usermod -a -G tty ubuntu
 }
 
+
+# main
 add_repositories
 install_ros
 setup_catkin

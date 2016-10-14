@@ -14,7 +14,7 @@ install()
 	# update sources.list and add apt-keys
 	echo "deb $ROS_PACKAGES_URL $APT_TARGETS" > $SOURCES_LIST_TARGET
 	wget $APT_KEYS_URL -O - | apt-key add -
-	
+
 	# update apt and install ros
 	apt-get update -qq  # -qq makes apt-get less noisy
 	apt-get install -y ros-$ROS_VERSION-desktop-full
@@ -28,6 +28,9 @@ install()
 
 	# install ros
 	apt-get install -y python-rosinstall
+
+	# fix rosdep permissions
+	rosdep fix-permissions
 }
 
 

@@ -710,11 +710,11 @@ int testQuadrotorRunMission(void)
 
 void testSuite(void)
 {
-    // mu_add_test(testQuadrotor);
-    // mu_add_test(testQuadrotorPositionControllerCalculate);
-    // mu_add_test(testQuadrotorResetPositionController);
+    mu_add_test(testQuadrotor);
+    mu_add_test(testQuadrotorPositionControllerCalculate);
+    mu_add_test(testQuadrotorResetPositionController);
     mu_add_test(testQuadrotorCalculateLandingTargetYaw);
-    // mu_add_test(testQuadrotorInitializeCarrotController);
+    mu_add_test(testQuadrotorInitializeCarrotController);
     // mu_add_test(testQuadrotorRunCarrotMode);
     // mu_add_test(testQuadrotorRunDiscoveryMode);
     // mu_add_test(testQuadrotorRunTrackingModeBPF);
