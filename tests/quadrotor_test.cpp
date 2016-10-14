@@ -6,7 +6,6 @@
 // CONFIGS
 #define QUADROTOR_CONFIG "configs/quadrotor/config.yaml"
 #define POSITION_CONTROLLER_CONFIG "configs/position_controller/config.yaml"
-#define CARROT_CONTROLLER_CONFIG "configs/carrot_controller/config.yaml"
 
 
 // TESTS
@@ -18,8 +17,6 @@ int testQuadrotorPositionControllerCalculate(void);
 int testQuadrotorResetPositionController(void);
 int testQuadrotorCalculateLandingTargetYaw(void);
 int testQuadrotorResetPositionController(void);
-int testQuadrotorInitializeCarrotController(void);
-int testQuadrotorRunCarrotMode(void);
 int testQuadrotorRunDiscoveryMode(void);
 int testQuadrotorRunTrackingModeBPF(void);
 int testQuadrotorWithinLandingZone(void);
@@ -35,7 +32,6 @@ Quadrotor *testSetup(void)
     // setup
     configs["quadrotor"] = QUADROTOR_CONFIG;
     configs["position_controller"] = POSITION_CONTROLLER_CONFIG;
-    configs["carrot_controller"] = CARROT_CONTROLLER_CONFIG;
     quad = new Quadrotor(configs);
 
     return quad;
@@ -337,113 +333,6 @@ int testQuadrotorCalculateLandingTargetYaw(void)
     return 0;
 }
 
-int testQuadrotorInitializeCarrotController(void)
-{
-    Quadrotor *quad;
-    Pose p;
-    float x;
-    float y;
-    float z;
-    float roll;
-    float pitch;
-    float yaw;
-
-    // setup
-    quad = testSetup();
-
-    x = 1.0;
-    y = 1.0;
-    z = 3.0;
-    roll = 0.0;
-    pitch = 0.0;
-    yaw = 0.0;
-
-    p = Pose(roll, pitch, yaw, x, y, z);
-
-    quad->world_pose = p;
-
-    // test and assert
-    quad->initializeCarrotController();
-    // std::cout << "carrot wp start \t " << quad->carrot_controller->wp_start(2) << std::endl;
-    mu_check(fltcmp(quad->carrot_controller->wp_start(0), 0.0) == 0);
-    mu_check(fltcmp(quad->carrot_controller->wp_start(1), 0.0) == 0);
-    mu_check(fltcmp(quad->carrot_controller->wp_start(2), quad->hover_height) == 0);
-
-    mu_check(fltcmp(quad->carrot_controller->wp_end(0), 0.0) == 0);
-    mu_check(fltcmp(quad->carrot_controller->wp_end(1), 0.0) == 0);
-    mu_check(fltcmp(quad->carrot_controller->wp_end(2), quad->hover_height * 0.8) == 0);
-
-    mu_check(quad->carrot_controller->waypoints.size() == 5);
-    mu_check(quad->carrot_controller->initialized == 1);
-
-    return 0;
-}
-
-// int testQuadrotorRunCarrotMode(void)
-// {
-//     Quadrotor *quad;
-//     Pose p;
-//     Pose robot_pose;
-//     Eigen::Vector3d cmd_position;
-//     float x_waypoints[5] = {0.0, 5.0, 5.0, 0.0, 0.0};
-//     float y_waypoints[5] = {0.0, 0.0, 5.0, 5.0, 0.0};
-//     float x;
-//     float y;
-//     float z;
-//     float roll;
-//     float pitch;
-//     float yaw;
-//
-//     // setup
-//  quad = testSetup();
-//
-//  x = 0.0;
-//  y = 0.0;
-//  z = 3.0;
-//  roll = 0.0;
-//  pitch = 0.0;
-//  yaw = 0.0;
-//
-//  p = Pose(roll, pitch, yaw, x, y, z);
-//
-//  quad->world_pose = p;
-//  quad->initializeCarrotController();
-//
-//  // test and assert
-//  for (int i = 0; i < 5; i++) {
-//         // (i + 1)-th waypoint
-//         robot_pose.position(0) = x_waypoints[i];
-//         robot_pose.position(1) = y_waypoints[i];
-//         robot_pose.position(2) = 6.0;
-//         cmd_position = quad->runCarrotMode(robot_pose, 0.1);
-//
-//         if (i < 3) {
-//             // check waypoint 2 to 4
-//             mu_check(quad->carrot_controller->waypoints.size() == (5 - i));
-//         } else {
-//             // check waypoint 5
-//             mu_check(quad->carrot_controller->waypoints.size() == 2);
-//         }
-//
-//         mu_print("pos: %f %f %f\n", robot_pose.position(0),
-//             robot_pose.position(1), robot_pose.position(2));
-//         mu_print("cmd_position: %f %f %f\n", cmd_position(0),
-//             cmd_position(1), cmd_position(1));
-//         mu_print("waypoints: %d\n\n", (int) quad->carrot_controller->waypoints.size());
-//  }
-//
-//     // check if hover mode activated
-//  mu_check(quad->mission_state == HOVER_MODE);
-//  mu_check(fltcmp(quad->hover_point->position(0),
-//      quad->carrot_controller->wp_end(0)) == 0);
-//  mu_check(fltcmp(quad->hover_point->position(1),
-//      quad->carrot_controller->wp_end(1)) == 0);
-//  mu_check(fltcmp(quad->hover_height,
-//      quad->carrot_controller->wp_end(2)) == 0);
-//
-//     return 0;
-// }
-
 int testQuadrotorRunDiscoveryMode(void)
 {
     Quadrotor *quad;
@@ -714,8 +603,11 @@ void testSuite(void)
     mu_add_test(testQuadrotorPositionControllerCalculate);
     mu_add_test(testQuadrotorResetPositionController);
     mu_add_test(testQuadrotorCalculateLandingTargetYaw);
+<<<<<<< HEAD
     mu_add_test(testQuadrotorInitializeCarrotController);
     // mu_add_test(testQuadrotorRunCarrotMode);
+=======
+>>>>>>> 85d2cd1cc36110bbb54603e0def9e1c22b84fc80
     // mu_add_test(testQuadrotorRunDiscoveryMode);
     // mu_add_test(testQuadrotorRunTrackingModeBPF);
     // mu_add_test(testQuadrotorWithinLandingZone);
