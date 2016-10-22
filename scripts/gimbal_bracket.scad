@@ -35,5 +35,10 @@ module mounting_plate(num_holes, hole_diam, outter_diam, hole_spacing, thickness
 
 
 // run
-mounting_plate(3, 1.6, 1.6 * 3, 5.5, 2.5, 30);
-
+union()
+{
+    mounting_plate(3, 1.6, 1.6 * 3, 5.5, 2.5, 30);
+    translate([30, 0, 32])
+    rotate([0, 90, 0])
+    mounting_plate(3, 1.6, 1.6 * 4, 13.5, 2.5, 30);
+}
