@@ -3,10 +3,11 @@
 
 #include <iostream>
 
+#include <yaml-cpp/yaml.h>
+
 #include "awesomo/util.hpp"
 #include "awesomo/controller.hpp"
 #include "awesomo/estimator.hpp"
-#include <yaml-cpp/yaml.h>
 
 
 #define YAW_CONTROL_ON
@@ -18,13 +19,9 @@
 #define TARGET_LOST -2
 #define MISSION_ACCOMPLISHED -1
 #define IDLE_MODE 0
-#define HOVER_MODE 1
-#define CARROT_INITIALIZE_MODE 2
-#define CARROT_MODE 3
-#define DISCOVER_MODE 4
-#define TRACKING_MODE 5
-#define LANDING_MODE 6
-
+#define DISCOVER_MODE 1
+#define TRACKING_MODE 2
+#define LANDING_MODE 3
 
 // TIMEOUTS
 #define TARGET_LOST_TIMEOUT 2 // run on kalman estimate until this time
@@ -96,8 +93,6 @@ public:
 
     void resetPositionController(void);
     int calculateLandingTargetYaw(double *yaw);
-    void initializeCarrotController(void);
-    Eigen::Vector3d runCarrotMode(Pose robot_pose, float dt);
     void runDiscoverMode(LandingTargetPosition landing);
     int checkLandingTargetEstimation(Eigen::Vector3d &est);
     void runTrackingModeBPF(LandingTargetPosition landing, float dt);

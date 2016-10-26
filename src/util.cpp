@@ -146,12 +146,5 @@ float toc(struct timespec *tic)
 
 float mtoc(struct timespec *tic)
 {
-    struct timespec toc;
-    float time_elasped;
-
-    clock_gettime(CLOCK_MONOTONIC, &toc);
-    time_elasped = (toc.tv_sec - tic->tv_sec);
-    time_elasped += (toc.tv_nsec - tic->tv_nsec) / 1000000.0;
-
-    return time_elasped;
+    return toc(tic) * 1000.0;
 }

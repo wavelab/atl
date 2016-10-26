@@ -310,8 +310,12 @@ int test_tic_toc(void)
 
     tic(&start);
     usleep(10 * 1000);
-    printf("%f\n", toc(&start));
-    printf("%f\n", mtoc(&start));
+    mu_print("%f\n", toc(&start));
+    mu_print("%f\n", mtoc(&start));
+    mu_check(toc(&start) < 0.011);
+    mu_check(toc(&start) > 0.009);
+    mu_check(mtoc(&start) < 11.0);
+    mu_check(mtoc(&start) > 9.0);
 
     return 0;
 }
