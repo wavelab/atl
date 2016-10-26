@@ -307,28 +307,6 @@ bool Quadrotor::withinLandingZone(Eigen::Vector3d &m, Eigen::Vector3d &e)
     }
 }
 
-bool Quadrotor::withinLandingZone(Eigen::Vector3d &m)
-{
-    Eigen::Vector3d threshold;
-    bool measured_x_ok;
-    bool measured_y_ok;
-    bool measured_z_ok;
-
-    threshold = this->landing_config->cutoff_position;
-    measured_x_ok = (m(0) < threshold(0)) ? true : false;
-    measured_y_ok = (m(1) < threshold(1)) ? true : false;
-    measured_z_ok = (m(2) < threshold(2)) ? true : false;
-
-    // check measured
-    if (measured_x_ok && measured_y_ok && measured_z_ok) {
-        return true;
-
-    // not near landing zone
-    } else {
-        return false;
-    }
-}
-
 int Quadrotor::checkLandingTargetEstimation(Eigen::Vector3d &est)
 {
     if (est(0) > 5.0 || est(1) > 5.0) {

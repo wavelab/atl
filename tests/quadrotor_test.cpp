@@ -3,6 +3,9 @@
 #include "awesomo/munit.h"
 #include "awesomo/quadrotor.hpp"
 
+// #include "prototype/gazebo/clients/quadrotor_client.hpp"
+
+
 // CONFIGS
 #define QUADROTOR_CONFIG "configs/quadrotor/config.yaml"
 #define POSITION_CONTROLLER_CONFIG "configs/position_controller/config.yaml"
@@ -468,17 +471,6 @@ int testQuadrotorWithinLandingZone(void)
     result = quad->withinLandingZone(tag_mea, tag_est);
     mu_check(result == true);
 
-    // test overloaded function
-    quad->landing_config->cutoff_position << 0.5, 0.5, 0.2;
-    tag_mea << 0.2, 0.2, 0.1;
-    result = quad->withinLandingZone(tag_mea);
-    mu_check(result == true);
-
-    quad->landing_config->cutoff_position << 0.5, 0.5, 0.2;
-    tag_mea << 0.6, 0.6, 0.3;
-    result = quad->withinLandingZone(tag_mea);
-    mu_check(result == false);
-
     return 0;
 }
 
@@ -597,22 +589,28 @@ int testQuadrotorRunMission(void)
     return 0;
 }
 
+// int testSandbox(void)
+// {
+//     gazebo::QuadrotorClient client;
+//
+//     client.configure();
+//     client.setPosition(2, 0, 2);
+//
+//     return 0;
+// }
+
 void testSuite(void)
 {
-    mu_add_test(testQuadrotor);
-    mu_add_test(testQuadrotorPositionControllerCalculate);
-    mu_add_test(testQuadrotorResetPositionController);
-    mu_add_test(testQuadrotorCalculateLandingTargetYaw);
-<<<<<<< HEAD
-    mu_add_test(testQuadrotorInitializeCarrotController);
-    // mu_add_test(testQuadrotorRunCarrotMode);
-=======
->>>>>>> 85d2cd1cc36110bbb54603e0def9e1c22b84fc80
+    // mu_add_test(testQuadrotor);
+    // mu_add_test(testQuadrotorPositionControllerCalculate);
+    // mu_add_test(testQuadrotorResetPositionController);
+    // mu_add_test(testQuadrotorCalculateLandingTargetYaw);
     // mu_add_test(testQuadrotorRunDiscoveryMode);
     // mu_add_test(testQuadrotorRunTrackingModeBPF);
     // mu_add_test(testQuadrotorWithinLandingZone);
     // mu_add_test(testQuadrotorRunLandingMode);
     // mu_add_test(testQuadrotorRunMission);
+    // mu_add_test(testSandbox);
 }
 
 mu_run_tests(testSuite)

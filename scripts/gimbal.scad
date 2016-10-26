@@ -38,10 +38,10 @@ module gimbal_bar(width, depth, height, thickness)
     // bottom plate
     cube([depth, width, thickness], center = true);
 
-    // right vertical plate
-    translate([-depth / 2.0, -width / 2.0]) {
-        cube([depth, thickness, height]);
-    }
+    /* // right vertical plate */
+    /* translate([-depth / 2.0, -width / 2.0]) { */
+    /*     cube([depth, thickness, height]); */
+    /* } */
 
     // left vertical plate
     translate([-depth / 2.0, width / 2.0 - thickness]) {
@@ -58,7 +58,7 @@ translate([0, 0, 18]) {
 };
 
 // pitch motor
-translate([0, 57, 18]) {
+translate([0, 37, 18]) {
     rotate([90, 0, 0]) {
         color([0, 1, 0]) {
             gimbal_motor();
@@ -67,7 +67,7 @@ translate([0, 57, 18]) {
 }
 
 // roll motor
-translate([-45, 0, 20]) {
+translate([-45, 0, 18]) {
     rotate([0, 90, 0]) {
         color([0, 1, 0]) {
             gimbal_motor();
@@ -77,12 +77,12 @@ translate([-45, 0, 20]) {
 
 // pitch bar
 translate([0, 0, 0]) {
-    gimbal_bar(100, 50, 40, 5);
+    gimbal_bar(60, 50, 40, 5);
 }
 
 // roll bar
 translate([-35, 6, 20]) {
     rotate([0, 90, 0]) {
-        gimbal_bar(130, 40, 60, 5);
+        gimbal_bar(85, 40, 60, 5);
     }
 }
