@@ -28,7 +28,7 @@
         value="$(find awesomo)/configs/quadrotor/config.yaml" />
 	<param
         name="position_controller"
-        value="$(find awesomo)/configs/position_controller/config.yaml" />
+        value="$(find awesomo)/configs/position_controller/simulation_config.yaml" />
 	<param
         name="carrot_controller"
         value="$(find awesomo)/configs/carrot_controller/config.yaml" />

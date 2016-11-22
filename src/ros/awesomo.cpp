@@ -7,6 +7,7 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <geometry_msgs/TwistStamped.h>
+#include <geometry_msgs/Vector3.h>
 #include <sensor_msgs/Imu.h>
 #include <tf/transform_broadcaster.h>
 
@@ -42,6 +43,7 @@
 #define RADIO_TOPIC "/mavros/rc/in"
 #define GPS_TOPIC "/mavros/global_position/local"
 #define ATIM_POSE_TOPIC "/atim/pose"
+#define ATTITUDE_RPY_TOPIC "/awesomo/setpoint_attitude/attitude_rpy"
 
 
 class Awesomo
@@ -74,6 +76,7 @@ public:
 
     ros::Publisher position_publisher;
     ros::Publisher attitude_publisher;
+    ros::Publisher attitude_rpy_publisher;
     ros::Publisher throttle_publisher;
     ros::Publisher position_controller_stats_publisher;
     ros::Publisher kf_estimator_stats_publisher;
@@ -144,6 +147,7 @@ Awesomo::Awesomo(std::map<std::string, std::string> configs)
     // initialize publishers
     this->position_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_TOPIC, 50);
     this->attitude_publisher = this->node.advertise<geometry_msgs::PoseStamped>(ATTITUDE_TOPIC, 50);
+    this->attitude_rpy_publisher = this->node.advertise<geometry_msgs::Vector3>(ATTITUDE_RPY_TOPIC, 50);
     this->throttle_publisher = this->node.advertise<std_msgs::Float64>(THROTTLE_TOPIC, 50);
     this->position_controller_stats_publisher = this->node.advertise<awesomo::PositionControllerStats>(POSITION_CONTROLLER_TOPIC, 50);
     this->kf_estimator_stats_publisher = this->node.advertise<awesomo::KFStats>(KF_ESTIMATION_TOPIC, 50);
@@ -462,6 +466,7 @@ void Awesomo::publishPositionControllerMessage(
 )
 {
     geometry_msgs::PoseStamped attitude;
+    geometry_msgs::Vector3 attitude_rpy;
     std_msgs::Float64 throttle;
     PositionController *position_controller;
 
@@ -480,6 +485,12 @@ void Awesomo::publishPositionControllerMessage(
     attitude.pose.orientation.z = position_controller->command_quat.z();
     attitude.pose.orientation.w = position_controller->command_quat.w();
     this->attitude_publisher.publish(attitude);
+
+    // rpy attitude -> used for simulator due to difficulty of getting a consistent rpy out of a quaterniond
+    attitude_rpy.x = position_controller->roll;
+    attitude_rpy.y = position_controller->pitch;
+    attitude_rpy.z = 0.0; // zero yaw at the moment, fix later
+    this->attitude_rpy_publisher.publish(attitude_rpy);
 
     // throttle command
     throttle.data = this->quad->position_controller->throttle;
@@ -685,12 +696,10 @@ int main(int argc, char **argv)
 #else
     printf("YAW CONTROL IS ON!\n");
 #endif
-
     while (ros::ok()){
         if (awesomo->run(msg, seq, last_request) == 0) {
             return 0;
         }
-
         // end
         seq++;
         last_request = ros::Time::now();

@@ -127,6 +127,10 @@ ADD_EXECUTABLE(awesomo_util_test tests/util_test.cpp)
 TARGET_LINK_LIBRARIES(awesomo_util_test ${AWESOMO_DEPS})
 INSTALL(TARGETS awesomo_util_test RUNTIME DESTINATION ${BIN_DEST})
 
+# tests/gazebo_tests/april_tag_pose_test
+# ADD_EXECUTABLE(april_tag_pose_test tests/gazebo/april_tag_pose_test.cpp)
+# TARGET_LINK_LIBRARIES(april_tag_pose_test ${AWESOMO_DEPS})
+# INSTALL(TARGETS april_tag_pose_test RUNTIME DESTINATION ${BIN_DEST})
 
 
 # LAUNCH AND CONFIG FILES

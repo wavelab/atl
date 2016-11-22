@@ -82,7 +82,6 @@ static void pid_calculate(struct pid *p, float input, float dt)
     // p->d_error = p->k_d * (error - p->prev_error) / dt;
     p->d_error = p->k_d * (error - p->prev_error) / (1.0 / 100.0);
     p->output = p->p_error + p->i_error + p->d_error;
-
     // limit boundaries
     if (p->output > p->max) {
         p->output = p->max;
