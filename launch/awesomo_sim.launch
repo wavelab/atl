@@ -15,7 +15,7 @@
         value="/gazebo_client/gimbal_cam_image" />
 	<param
         name="gimbal_state_topic"
-        value="/gazebo_client/gimbal_states" />
+        value="/gazebo_client/gimbal/camera_imu" />
 	<node
 	    pkg="atim"
 	    type="atim"
