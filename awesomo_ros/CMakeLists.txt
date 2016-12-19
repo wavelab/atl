@@ -49,6 +49,7 @@ CATKIN_PACKAGE(
 )
 
 SET(DEPS
+    awesomo_core
     ${catkin_LIBRARIES}
     yaml-cpp
 )
@@ -56,7 +57,7 @@ SET(DEPS
 # ROS NODES
 SET(BIN_DEST ${CATKIN_PACKAGE_BIN_DESTINATION})
 ADD_EXECUTABLE(awesomo_node src/ros/awesomo.cpp)
-ADD_DEPENDENCIES(awesomo_node ${PROJECT_NAME}_gencpp)
+ADD_DEPENDENCIES(awesomo_node ${PROJECT_NAME}_gencpp awesomo_core)
 TARGET_LINK_LIBRARIES(awesomo_node ${DEPS})
 INSTALL(TARGETS awesomo_node RUNTIME DESTINATION ${BIN_DEST})
 

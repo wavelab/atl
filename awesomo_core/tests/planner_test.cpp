@@ -1,6 +1,8 @@
 #include "awesomo_core/munit.h"
 #include "awesomo_core/planner.hpp"
 
+namespace awesomo {
+
 // TESTS
 int testBezierCubicCurve(void);
 
@@ -27,8 +29,10 @@ int testBezierCubicCurve(void) {
   return 0;
 }
 
+}  // end of awesomo namepsace
+
 void testSuite(void) {
-  mu_add_test(testBezierCubicCurve);
+  mu_add_test(awesomo::testBezierCubicCurve);
 }
 
 mu_run_tests(testSuite)

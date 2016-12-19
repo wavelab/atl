@@ -3,8 +3,8 @@
 #include "awesomo_core/munit.h"
 #include "awesomo_core/quadrotor.hpp"
 
-// #include "prototype/gazebo/clients/quadrotor_client.hpp"
 
+namespace awesomo {
 
 // CONFIGS
 #define QUADROTOR_CONFIG "tests/configs/quadrotor/config.yaml"
@@ -589,17 +589,19 @@ int testQuadrotorRunMission(void) {
 //     return 0;
 // }
 
+}  // end of awesomo namepsace
+
 void testSuite(void) {
-  mu_add_test(testQuadrotor);
-  // mu_add_test(testQuadrotorPositionControllerCalculate);
-  // mu_add_test(testQuadrotorResetPositionController);
-  // mu_add_test(testQuadrotorCalculateLandingTargetYaw);
-  // mu_add_test(testQuadrotorRunDiscoveryMode);
-  // mu_add_test(testQuadrotorRunTrackingModeBPF);
-  // mu_add_test(testQuadrotorWithinLandingZone);
-  // mu_add_test(testQuadrotorRunLandingMode);
-  // mu_add_test(testQuadrotorRunMission);
-  // mu_add_test(testSandbox);
+  // mu_add_test(awesomo::testQuadrotor);
+  // mu_add_test(awesomo::testQuadrotorPositionControllerCalculate);
+  // mu_add_test(awesomo::testQuadrotorResetPositionController);
+  // mu_add_test(awesomo::testQuadrotorCalculateLandingTargetYaw);
+  // mu_add_test(awesomo::testQuadrotorRunDiscoveryMode);
+  // mu_add_test(awesomo::testQuadrotorRunTrackingModeBPF);
+  // mu_add_test(awesomo::testQuadrotorWithinLandingZone);
+  // mu_add_test(awesomo::testQuadrotorRunLandingMode);
+  // mu_add_test(awesomo::testQuadrotorRunMission);
+  // mu_add_test(awesomo::testSandbox);
 }
 
 mu_run_tests(testSuite)

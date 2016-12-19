@@ -22,14 +22,15 @@ INCLUDE_DIRECTORIES(
 ADD_LIBRARY(
     ${PROJECT_NAME}
     STATIC
-    src/util.cpp
-    src/controller.cpp
+    src/control/controller.cpp
+    src/estimation/estimator.cpp
+    src/planning/planner.cpp
+    src/utils/math.cpp
+    src/utils/data.cpp
+    src/utils/stats.cpp
+    src/utils/time.cpp
     src/quadrotor.cpp
-    src/estimator.cpp
-    src/estimator.cpp
-    src/planner.cpp
 )
-ADD_DEPENDENCIES(${PROJECT_NAME} awesomo_utils)
 SET(DEPS
     ${PROJECT_NAME}
     ${catkin_LIBRARIES}
@@ -37,20 +38,20 @@ SET(DEPS
 )
 
 # UNIT TESTS
-ADD_EXECUTABLE(awesomo_controller_test tests/controller_test.cpp)
-TARGET_LINK_LIBRARIES(awesomo_controller_test ${DEPS})
-
-ADD_EXECUTABLE(awesomo_quadrotor_test tests/quadrotor_test.cpp)
-TARGET_LINK_LIBRARIES(awesomo_quadrotor_test ${DEPS})
-
-ADD_EXECUTABLE(awesomo_estimator_test tests/estimator_test.cpp)
-TARGET_LINK_LIBRARIES(awesomo_estimator_test ${DEPS})
-
-ADD_EXECUTABLE(awesomo_planner_test tests/planner_test.cpp)
-TARGET_LINK_LIBRARIES(awesomo_planner_test ${DEPS})
-
-ADD_EXECUTABLE(awesomo_util_test tests/util_test.cpp)
-TARGET_LINK_LIBRARIES(awesomo_util_test ${DEPS})
+# ADD_EXECUTABLE(awesomo_controller_test tests/controller_test.cpp)
+# TARGET_LINK_LIBRARIES(awesomo_controller_test ${DEPS})
+#
+# ADD_EXECUTABLE(awesomo_quadrotor_test tests/quadrotor_test.cpp)
+# TARGET_LINK_LIBRARIES(awesomo_quadrotor_test ${DEPS})
+#
+# ADD_EXECUTABLE(awesomo_estimator_test tests/estimator_test.cpp)
+# TARGET_LINK_LIBRARIES(awesomo_estimator_test ${DEPS})
+#
+# ADD_EXECUTABLE(awesomo_planner_test tests/planner_test.cpp)
+# TARGET_LINK_LIBRARIES(awesomo_planner_test ${DEPS})
+#
+# ADD_EXECUTABLE(awesomo_util_test tests/util_test.cpp)
+# TARGET_LINK_LIBRARIES(awesomo_util_test ${DEPS})
 
 # INSTALL
 INSTALL(
@@ -64,10 +65,10 @@ INSTALL(
     DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
 )
 
-SET(TEST_DEST ${CATKIN_PACKAGE_BIN_DESTINATION})
-INSTALL(DIRECTORY tests/configs DESTINATION ${TEST_DEST})
-INSTALL(TARGETS awesomo_controller_test RUNTIME DESTINATION ${TEST_DEST})
-INSTALL(TARGETS awesomo_quadrotor_test RUNTIME DESTINATION ${TEST_DEST})
-INSTALL(TARGETS awesomo_estimator_test RUNTIME DESTINATION ${TEST_DEST})
-INSTALL(TARGETS awesomo_quadrotor_test RUNTIME DESTINATION ${TEST_DEST})
-INSTALL(TARGETS awesomo_util_test RUNTIME DESTINATION ${TEST_DEST})
+# SET(TEST_DEST ${CATKIN_PACKAGE_BIN_DESTINATION})
+# INSTALL(DIRECTORY tests/configs DESTINATION ${TEST_DEST})
+# INSTALL(TARGETS awesomo_controller_test RUNTIME DESTINATION ${TEST_DEST})
+# INSTALL(TARGETS awesomo_quadrotor_test RUNTIME DESTINATION ${TEST_DEST})
+# INSTALL(TARGETS awesomo_estimator_test RUNTIME DESTINATION ${TEST_DEST})
+# INSTALL(TARGETS awesomo_quadrotor_test RUNTIME DESTINATION ${TEST_DEST})
+# INSTALL(TARGETS awesomo_util_test RUNTIME DESTINATION ${TEST_DEST})

@@ -5,6 +5,8 @@
 #include "awesomo_core/estimator.hpp"
 
 
+namespace awesomo {
+
 // TESTS
 int test_apriltag_kf_setup(void);
 int test_apriltag_kf_estimate(void);
@@ -98,9 +100,11 @@ int test_apriltag_kf_estimate(void) {
   return 0;
 }
 
+}  // end of awesomo namepsace
+
 void test_suite(void) {
-  mu_add_test(test_apriltag_kf_setup);
-  mu_add_test(test_apriltag_kf_estimate);
+  mu_add_test(awesomo::test_apriltag_kf_setup);
+  mu_add_test(awesomo::test_apriltag_kf_estimate);
 }
 
 mu_run_tests(test_suite)

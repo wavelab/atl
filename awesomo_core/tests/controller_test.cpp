@@ -6,6 +6,8 @@
   "tests/configs/position_controller/config.yaml"
 
 
+namespace awesomo {
+
 // TESTS
 int testPositionControllerLoadConfig(void);
 int testPositionControllerPidCalculate(void);
@@ -95,9 +97,11 @@ int testPositionControllerPidCalculate(void) {
   return 0;
 }
 
+}  // end of awesomo namepsace
+
 void testSuite(void) {
-  mu_add_test(testPositionControllerLoadConfig);
-  mu_add_test(testPositionControllerPidCalculate);
+  mu_add_test(awesomo::testPositionControllerLoadConfig);
+  mu_add_test(awesomo::testPositionControllerPidCalculate);
 }
 
 mu_run_tests(testSuite)

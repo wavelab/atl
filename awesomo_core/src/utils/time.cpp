@@ -1,4 +1,4 @@
-#include "awesomo_utils/utils.hpp"
+#include "awesomo_core/utils/time.hpp"
 
 
 namespace awesomo {
@@ -22,4 +22,4 @@ float mtoc(struct timespec *tic) {
   return toc(tic) * 1000.0;
 }
 
-}  // eof awesomo
+}  // end of awesomo namespace

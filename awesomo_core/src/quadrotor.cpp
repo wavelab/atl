@@ -1,6 +1,8 @@
 #include "awesomo_core/quadrotor.hpp"
 
 
+namespace awesomo {
+
 LandingConfig::LandingConfig(void) {
   this->period = 0;
   this->descend_multiplier = 0;
@@ -402,3 +404,5 @@ int Quadrotor::runMission(Pose world_pose,
 
   return this->mission_state;
 }
+
+}  // end of awesomo namespace

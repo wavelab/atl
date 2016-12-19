@@ -23,9 +23,7 @@
 #include <awesomo_msgs/KFStats.h>
 #include <awesomo_msgs/KFPlotting.h>
 
-#include "awesomo_core/util.hpp"
-#include "awesomo_core/controller.hpp"
-#include "awesomo_core/quadrotor.hpp"
+#include <awesomo_core/awesomo_core.hpp>
 
 
 // ROS TOPICS
@@ -45,6 +43,7 @@
 #define ATIM_POSE_TOPIC "/atim/pose"
 #define ATTITUDE_RPY_TOPIC "/awesomo/setpoint_attitude/attitude_rpy"
 
+namespace awesomo {
 
 class Awesomo {
 public:
@@ -594,6 +593,8 @@ int Awesomo::run(geometry_msgs::PoseStamped &msg,
   }
 }
 
+}  // end of awesomo namespace
+
 int main(int argc, char **argv) {
   // setup
   ros::init(argc, argv, "awesomo");
@@ -604,7 +605,7 @@ int main(int argc, char **argv) {
 
   float dt;
   int seq;
-  Awesomo *awesomo;
+  awesomo::Awesomo *awesomo;
   std::string quadrotor_config;
   std::string position_controller_config;
   std::map<std::string, std::string> configs;
@@ -619,7 +620,7 @@ int main(int argc, char **argv) {
   // setup awesomo
   seq = 1;
   ROS_INFO("running ...");
-  awesomo = new Awesomo(configs);
+  awesomo = new awesomo::Awesomo(configs);
   last_request = ros::Time::now();
 
 #ifndef YAW_CONTROL_ON

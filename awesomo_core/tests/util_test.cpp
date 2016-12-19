@@ -2,6 +2,8 @@
 #include "awesomo_core/util.hpp"
 
 
+namespace awesomo {
+
 // TESTS
 int test_Pose_class(void);
 int test_deg2rad_and_rad2deg(void);
@@ -314,13 +316,16 @@ int test_tic_toc(void) {
   return 0;
 }
 
+}  // end of awesomo namepsace
+
+
 void test_suite(void) {
-  mu_add_test(test_Pose_class);
-  mu_add_test(test_deg2rad_and_rad2deg);
-  mu_add_test(test_euler2Quaternion);
-  mu_add_test(test_euler2RotationMatrix);
-  mu_add_test(test_linreg);
-  mu_add_test(test_tic_toc);
+  mu_add_test(awesomo::test_Pose_class);
+  mu_add_test(awesomo::test_deg2rad_and_rad2deg);
+  mu_add_test(awesomo::test_euler2Quaternion);
+  mu_add_test(awesomo::test_euler2RotationMatrix);
+  mu_add_test(awesomo::test_linreg);
+  mu_add_test(awesomo::test_tic_toc);
 }
 
 mu_run_tests(test_suite)

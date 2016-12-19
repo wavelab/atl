@@ -1,12 +1,8 @@
-#ifndef __AWESOMO_UTILS_UTIL_HPP__
-#define __AWESOMO_UTILS_UTIL_HPP__
+#ifndef __AWESOMO_UTILS_TIME_HPP__
+#define __AWESOMO_UTILS_TIME_HPP__
 
-#include <math.h>
-#include <stdio.h>
-#include <sys/time.h>
 #include <time.h>
-
-#include "awesomo_utils/math.hpp"
+#include <sys/time.h>
 
 namespace awesomo {
 

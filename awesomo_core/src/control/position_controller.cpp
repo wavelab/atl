@@ -1,12 +1,12 @@
-#include "awesomo_core/controller.hpp"
+#include "awesomo_control/position_controller.hpp"
 
 
-// POSITION CONTROLLER
-PositionController::PositionController(const std::string config_file) {
-  this->roll = 0;
-  this->pitch = 0;
-  this->throttle = 0;
-  this->loadConfig(config_file);
+namespace awesomo {
+
+PositionController::PositionController(void) {
+  this->x_controller = PID(0.9, 0.01, 0.33);
+  this->y_controller = PID(0.9, 0.01, 0.33);
+  this->z_controller = PID(3.0, 0.0, 0.5);
 }
 
 void PositionController::loadConfig(const std::string config_file) {
@@ -65,64 +65,38 @@ void PositionController::loadConfig(const std::string config_file) {
   }
 }
 
-static void pid_calculate(struct pid *p, float input, float dt) {
-  float error;
+VecX PositionController::calculate(VecX setpoints,
+                                   VecX actual,
+                                   double yaw,
+                                   double dt) {
+  double max_thrust;
+  double r, p, y, t;
+  VecX outputs(4);
 
-  // calculate errors
-  error = p->setpoint - input;
-  if (fabs(error) > p->dead_zone) {
-    p->sum_error += error * dt;
+  // roll, pitch, yaw and thrust
+  r = -this->y_controller.calculate(setpoints(1), actual(1), dt);
+  p = this->x_controller.calculate(setpoints(0), actual(0), dt);
+  y = yaw;
+  t = 0.5 + this->z_controller.calculate(setpoints(2), actual(2), dt);
+  outputs << r, p, y, t;
+
+  // limit roll, pitch and yaw
+  for (int i = 0; i < 3; i++) {
+    if (outputs(i) > deg2rad(30.0)) {
+      outputs(i) = deg2rad(30.0);
+    } else if (outputs(i) < deg2rad(-30.0)) {
+      outputs(i) = deg2rad(-30.0);
+    }
   }
 
-  // calculate output
-  p->p_error = p->k_p * error;
-  p->i_error = p->k_i * p->sum_error;
-  // p->d_error = p->k_d * (error - p->prev_error) / dt;
-  p->d_error = p->k_d * (error - p->prev_error) / (1.0 / 100.0);
-  p->output = p->p_error + p->i_error + p->d_error;
-  // limit boundaries
-  if (p->output > p->max) {
-    p->output = p->max;
-  } else if (p->output < p->min) {
-    p->output = p->min;
+  // limit thrust
+  if (outputs(3) > 1.0) {
+    outputs(3) = 1.0;
+  } else if (outputs(3) < 0.0) {
+    outputs(3) = 0.0;
   }
 
-  // update error
-  p->prev_error = error;
-}
-
-void PositionController::calculate(Eigen::Vector3d setpoint,
-                                   Pose robot,
-                                   float yaw_setpoint,
-                                   float dt) {
-  float roll_adjusted;
-  float pitch_adjusted;
-  float throttle_adjusted;
-
-  // Note: Position Controller is (x - roll, y - pitch, T - thrust)
-  // This position controller assumes yaw is aligned with the world x axis
-  this->x.setpoint = setpoint(1);
-  this->y.setpoint = setpoint(0);
-  this->T.setpoint = setpoint(2);
-
-  pid_calculate(&this->x, robot.position(1), dt);
-  pid_calculate(&this->y, robot.position(0), dt);
-  pid_calculate(&this->T, robot.position(2), dt);
-
-  this->roll = this->x.output;
-  this->pitch = this->y.output;
-  this->throttle = this->T.output;
-
-  // update position controller
-  euler2Quaternion(this->roll, this->pitch, yaw_setpoint, this->command_quat);
-
-  // throttle
-  throttle_adjusted = this->hover_throttle + this->throttle;
-  throttle_adjusted /= fabs(cos(roll) * cos(pitch));  // adjust due to tilting
-  if (throttle_adjusted > 1.0) {
-    throttle_adjusted = 1.0;
-  }
-  this->throttle = throttle_adjusted;
+  return outputs;
 }
 
 void PositionController::reset(void) {
@@ -151,3 +125,5 @@ void PositionController::reset(void) {
   this->T.i_error = 0.0f;
   this->T.d_error = 0.0f;
 }
+
+}  // end of awesomo namespace

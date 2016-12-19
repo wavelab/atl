@@ -7,8 +7,9 @@
 #include <Eigen/Dense>
 #include <yaml-cpp/yaml.h>
 
-#include "awesomo_core/util.hpp"
+#include "awesomo_core/utils/utils.hpp"
 
+namespace awesomo {
 
 // CONSTANTS
 // #define PID_CONFIG
@@ -94,4 +95,5 @@ public:
   void reset(void);
 };
 
+}  // end of awesomo namespace
 #endif

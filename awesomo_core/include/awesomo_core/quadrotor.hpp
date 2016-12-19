@@ -5,10 +5,11 @@
 
 #include <yaml-cpp/yaml.h>
 
-#include "awesomo_core/util.hpp"
-#include "awesomo_core/controller.hpp"
-#include "awesomo_core/estimator.hpp"
+#include "awesomo_core/utils/utils.hpp"
+#include "awesomo_core/control/controller.hpp"
+#include "awesomo_core/estimation/estimator.hpp"
 
+namespace awesomo {
 
 // #define YAW_CONTROL_ON
 
@@ -96,4 +97,5 @@ public:
   int runMission(Pose robot_pose, LandingTargetPosition landing, float dt);
 };
 
+}  // end of awesomo namespace
 #endif

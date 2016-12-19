@@ -5,6 +5,7 @@
 
 #include <Eigen/Dense>
 
+namespace awesomo {
 
 // FUNCTIONS
 std::vector<Eigen::Vector2d> bezier_cubic_curve(Eigen::Vector2d pt0,
@@ -13,4 +14,5 @@ std::vector<Eigen::Vector2d> bezier_cubic_curve(Eigen::Vector2d pt0,
                                                 Eigen::Vector2d pt3);
 
 
+}  // end of awesomo namespace
 #endif

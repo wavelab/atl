@@ -2,6 +2,7 @@
 #define __AWESOMO_UTILS_MATH_HPP__
 
 #include <Eigen/Dense>
+#include <Eigen/Geometry>
 
 
 namespace awesomo {
@@ -28,6 +29,15 @@ int euler2rot(double phi, double theta, double psi, int euler_seq, Mat3 &R);
 int euler2quat(Vec3 euler, int euler_seq, Quaternion &q);
 int quat2euler(Quaternion q, int euler_seq, Vec3 &euler);
 int quat2rot(Quaternion q, Mat3 &R);
+
+int euler2Quaternion(const double roll,
+                     const double pitch,
+                     const double yaw,
+                     Eigen::Quaterniond &q);
+int euler2RotationMatrix(const double roll,
+                         const double pitch,
+                         const double yaw,
+                         Eigen::Matrix3d &rot);
 
 }  // end of awesomo namespace
 #endif

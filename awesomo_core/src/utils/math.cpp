@@ -1,4 +1,4 @@
-#include "awesomo_utils/math.hpp"
+#include "awesomo_core/utils/math.hpp"
 
 
 namespace awesomo {
@@ -186,6 +186,30 @@ int quat2rot(Quaternion q, Mat3 &R) {
 
   R << R11, R12, R13, R21, R22, R23, R31, R32, R33;
 
+  return 0;
+}
+
+int euler2Quaternion(const double roll,
+                     const double pitch,
+                     const double yaw,
+                     Eigen::Quaterniond &q) {
+  Eigen::AngleAxisd rollAngle(roll, Eigen::Vector3d::UnitX());
+  Eigen::AngleAxisd pitchAngle(pitch, Eigen::Vector3d::UnitY());
+  Eigen::AngleAxisd yawAngle(yaw, Eigen::Vector3d::UnitZ());
+
+  q = yawAngle * pitchAngle * rollAngle;
+  q.normalize();
+
+  return 0;
+}
+
+int euler2RotationMatrix(const double roll,
+                         const double pitch,
+                         const double yaw,
+                         Eigen::Matrix3d &rot) {
+  Eigen::Quaterniond q_normalized;
+  euler2Quaternion(roll, pitch, yaw, q_normalized);
+  rot = q_normalized.toRotationMatrix();
   return 0;
 }
 
