@@ -17,7 +17,7 @@ FIND_PACKAGE(
     image_transport
     cv_bridge
     tf
-    awesomo
+    awesomo_core
     awesomo_msgs
 )
 FIND_PACKAGE(OpenCV REQUIRED)
@@ -32,25 +32,25 @@ LINK_DIRECTORIES(
 # INCLUDES
 INCLUDE_DIRECTORIES(
     ${catkin_INCLUDE_DIRS}
+    include
+    /usr/include
     /usr/local/include
     /usr/include/eigen3
     /usr/include/opencv2
     ${Boost_INCLUDE_DIR}
-    include
 )
 
 # BUILD AS CATKIN PACKAGE
 CATKIN_PACKAGE(
     INCLUDE_DIRS include
-    LIBRARIES awesomo
+    LIBRARIES awesomo_core
     CATKIN_DEPENDS roscpp rospy std_msgs message_runtime
     DEPENDS system_lib
 )
 
 SET(DEPS
-    awesomo
-    yaml-cpp
     ${catkin_LIBRARIES}
+    yaml-cpp
 )
 
 # ROS NODES

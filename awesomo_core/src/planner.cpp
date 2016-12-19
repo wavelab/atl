@@ -1,4 +1,4 @@
-#include "awesomo/planner.hpp"
+#include "awesomo_core/planner.hpp"
 
 
 std::vector<Eigen::Vector2d> bezier_cubic_curve(

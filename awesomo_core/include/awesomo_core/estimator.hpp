@@ -1,6 +1,9 @@
 #ifndef __KF_HPP__
 #define __KF_HPP__
 
+#include <iostream>
+
+
 #include <Eigen/Geometry>
 
 
@@ -46,10 +49,10 @@ struct ekf
 // FUNCTIONS
 void apriltag_kf_setup(struct kf *e, Eigen::VectorXd mu);
 void apriltag_kf_estimate(
-	struct kf *e,
-	Eigen::VectorXd y,
-	float dt,
-	bool tag_detected
+  struct kf *e,
+  Eigen::VectorXd y,
+  float dt,
+  bool tag_detected
 );
 
 void ekf_prediction_update(struct ekf *e, Eigen::VectorXd u, float dt);

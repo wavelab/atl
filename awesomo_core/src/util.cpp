@@ -1,4 +1,4 @@
-#include "awesomo/util.hpp"
+#include "awesomo_core/util.hpp"
 
 Pose::Pose(void)
 {

@@ -23,9 +23,9 @@
 #include <awesomo_msgs/KFStats.h>
 #include <awesomo_msgs/KFPlotting.h>
 
-#include "awesomo/util.hpp"
-#include "awesomo/controller.hpp"
-#include "awesomo/quadrotor.hpp"
+#include "awesomo_core/util.hpp"
+#include "awesomo_core/controller.hpp"
+#include "awesomo_core/quadrotor.hpp"
 
 
 // ROS TOPICS

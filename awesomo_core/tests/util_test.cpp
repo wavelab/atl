@@ -1,5 +1,5 @@
-#include "awesomo/munit.h"
-#include "awesomo/util.hpp"
+#include "awesomo_core/munit.h"
+#include "awesomo_core/util.hpp"
 
 
 // TESTS

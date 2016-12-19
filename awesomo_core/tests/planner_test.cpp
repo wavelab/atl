@@ -1,5 +1,5 @@
-#include "awesomo/munit.h"
-#include "awesomo/planner.hpp"
+#include "awesomo_core/munit.h"
+#include "awesomo_core/planner.hpp"
 
 // TESTS
 int testBezierCubicCurve(void);

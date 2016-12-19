@@ -1,5 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.3)
-PROJECT(awesomo)
+PROJECT(awesomo_core)
 
 IF (CMAKE_COMPILER_IS_GNUCXX)
     ADD_DEFINITIONS(-std=gnu++0x)
@@ -16,13 +16,15 @@ FIND_PACKAGE(
 # INCLUDES
 INCLUDE_DIRECTORIES(
     ${catkin_INCLUDE_DIRS}
-    ./include/
+    include
+    /usr/include
+    /usr/local/include
     /usr/include/eigen3
 )
 
 # LIBRARY
 ADD_LIBRARY(
-    awesomo
+    ${PROJECT_NAME}
     STATIC
     src/util.cpp
     src/controller.cpp
@@ -31,34 +33,34 @@ ADD_LIBRARY(
     src/estimator.cpp
     src/planner.cpp
 )
-SET(AWESOMO_DEPS
-    awesomo
-    yaml-cpp
+SET(DEPS
+    ${PROJECT_NAME}
     ${catkin_LIBRARIES}
+    yaml-cpp
 )
 
 # UNIT TESTS
 ADD_EXECUTABLE(awesomo_controller_test tests/controller_test.cpp)
-TARGET_LINK_LIBRARIES(awesomo_controller_test ${AWESOMO_DEPS})
+TARGET_LINK_LIBRARIES(awesomo_controller_test ${DEPS})
 
 ADD_EXECUTABLE(awesomo_quadrotor_test tests/quadrotor_test.cpp)
-TARGET_LINK_LIBRARIES(awesomo_quadrotor_test ${AWESOMO_DEPS})
+TARGET_LINK_LIBRARIES(awesomo_quadrotor_test ${DEPS})
 
 ADD_EXECUTABLE(awesomo_estimator_test tests/estimator_test.cpp)
-TARGET_LINK_LIBRARIES(awesomo_estimator_test ${AWESOMO_DEPS})
+TARGET_LINK_LIBRARIES(awesomo_estimator_test ${DEPS})
 
 ADD_EXECUTABLE(awesomo_planner_test tests/planner_test.cpp)
-TARGET_LINK_LIBRARIES(awesomo_planner_test ${AWESOMO_DEPS})
+TARGET_LINK_LIBRARIES(awesomo_planner_test ${DEPS})
 
 ADD_EXECUTABLE(awesomo_util_test tests/util_test.cpp)
-TARGET_LINK_LIBRARIES(awesomo_util_test ${AWESOMO_DEPS})
+TARGET_LINK_LIBRARIES(awesomo_util_test ${DEPS})
 
 # BUILD AS CATKIN PACKAGE
-CATKIN_PACKAGE(INCLUDE_DIRS include LIBRARIES awesomo)
+CATKIN_PACKAGE(INCLUDE_DIRS include LIBRARIES ${PROJECT_NAME})
 
 # INSTALL
 INSTALL(
-    TARGETS awesomo
+    TARGETS ${PROJECT_NAME}
     ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}

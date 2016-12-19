@@ -5,9 +5,9 @@
 
 #include <yaml-cpp/yaml.h>
 
-#include "awesomo/util.hpp"
-#include "awesomo/controller.hpp"
-#include "awesomo/estimator.hpp"
+#include "awesomo_core/util.hpp"
+#include "awesomo_core/controller.hpp"
+#include "awesomo_core/estimator.hpp"
 
 
 // #define YAW_CONTROL_ON

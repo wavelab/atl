@@ -1,4 +1,4 @@
-#include "awesomo/controller.hpp"
+#include "awesomo_core/controller.hpp"
 
 
 // POSITION CONTROLLER

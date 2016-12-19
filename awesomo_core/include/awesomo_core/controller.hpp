@@ -7,7 +7,7 @@
 #include <Eigen/Dense>
 #include <yaml-cpp/yaml.h>
 
-#include "awesomo/util.hpp"
+#include "awesomo_core/util.hpp"
 
 
 // CONSTANTS

@@ -1,4 +1,4 @@
-#include "awesomo/quadrotor.hpp"
+#include "awesomo_core/quadrotor.hpp"
 
 
 LandingConfig::LandingConfig(void)

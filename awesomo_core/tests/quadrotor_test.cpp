@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "awesomo/munit.h"
-#include "awesomo/quadrotor.hpp"
+#include "awesomo_core/munit.h"
+#include "awesomo_core/quadrotor.hpp"
 
 // #include "prototype/gazebo/clients/quadrotor_client.hpp"
 

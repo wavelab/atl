@@ -1,5 +1,5 @@
-#include "awesomo/munit.h"
-#include "awesomo/controller.hpp"
+#include "awesomo_core/munit.h"
+#include "awesomo_core/controller.hpp"
 
 
 #define POSITION_CONTROLLER_CONFIG "configs/position_controller/config.yaml"
