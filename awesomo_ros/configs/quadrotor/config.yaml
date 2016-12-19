@@ -8,17 +8,17 @@ tracking:
 
 landing:
     height_update:
-        period: 0.5
+        period: 0.3
         multiplier:
             descend: 0.8
             recover: 1.2
 
     disarm_conditions:
         # x, y ,z disarm conditions from AprilTag center
-        x_cutoff: 0.5
-        y_cutoff: 0.5
+        x_cutoff: 0.15
+        y_cutoff: 0.15
         z_cutoff: 0.15
 
         # num of frames apriltag is detected before disarm
         # this introduces redundancy rejection
-        belief_threshold: 20
+        belief_threshold: 200

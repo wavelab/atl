@@ -3,7 +3,19 @@
     <!-- ATIM -->
     <param
         name="camera_config_path"
-	    value="$(find atim)/configs/pointgrey_firefly" />
+	    value="$(find atim)/configs/gazebo_cam" />
+	<param
+        name="gimbal_config_path"
+	    value="$(find atim)/configs/gimbal/config.yaml" />
+	<param
+        name="run_in_sim_mode"
+	    value="1" />
+	<param
+        name="ros_image_topic"
+        value="/gazebo_client/gimbal_cam_image" />
+	<param
+        name="gimbal_state_topic"
+        value="/gazebo_client/gimbal/camera_imu" />
 	<node
 	    pkg="atim"
 	    type="atim"
@@ -16,7 +28,7 @@
         value="$(find awesomo)/configs/quadrotor/config.yaml" />
 	<param
         name="position_controller"
-        value="$(find awesomo)/configs/position_controller/config.yaml" />
+        value="$(find awesomo)/configs/position_controller/simulation_config.yaml" />
 	<param
         name="carrot_controller"
         value="$(find awesomo)/configs/carrot_controller/config.yaml" />
