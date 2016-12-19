@@ -2,7 +2,7 @@
 #include "awesomo_core/controller.hpp"
 
 
-#define POSITION_CONTROLLER_CONFIG "configs/position_controller/config.yaml"
+#define POSITION_CONTROLLER_CONFIG "tests/configs/position_controller/config.yaml"
 
 
 // TESTS

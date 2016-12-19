@@ -7,8 +7,8 @@
 
 
 // CONFIGS
-#define QUADROTOR_CONFIG "configs/quadrotor/config.yaml"
-#define POSITION_CONTROLLER_CONFIG "configs/position_controller/config.yaml"
+#define QUADROTOR_CONFIG "tests/configs/quadrotor/config.yaml"
+#define POSITION_CONTROLLER_CONFIG "tests/configs/position_controller/config.yaml"
 
 
 // TESTS
