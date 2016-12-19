@@ -18,13 +18,13 @@
 #include <mavros_msgs/RCIn.h>
 
 #include <atim/AtimPoseStamped.h>
+#include <awesomo_msgs/PositionControllerStats.h>
+#include <awesomo_msgs/KFStats.h>
+#include <awesomo_msgs/KFPlotting.h>
 
 #include "awesomo/util.hpp"
 #include "awesomo/controller.hpp"
 #include "awesomo/quadrotor.hpp"
-#include "awesomo/PositionControllerStats.h"
-#include "awesomo/KFStats.h"
-#include "awesomo/KFPlotting.h"
 
 
 // ROS TOPICS
@@ -145,9 +145,9 @@ Awesomo::Awesomo(std::map<std::string, std::string> configs)
     this->position_publisher = this->node.advertise<geometry_msgs::PoseStamped>(POSITION_TOPIC, 50);
     this->attitude_publisher = this->node.advertise<geometry_msgs::PoseStamped>(ATTITUDE_TOPIC, 50);
     this->throttle_publisher = this->node.advertise<std_msgs::Float64>(THROTTLE_TOPIC, 50);
-    this->position_controller_stats_publisher = this->node.advertise<awesomo::PositionControllerStats>(POSITION_CONTROLLER_TOPIC, 50);
-    this->kf_estimator_stats_publisher = this->node.advertise<awesomo::KFStats>(KF_ESTIMATION_TOPIC, 50);
-    this->kf_estimator_stats_plotting_publisher = this->node.advertise<awesomo::KFPlotting>(KF_ESTIMATION_PLOTTING_TOPIC, 50);
+    this->position_controller_stats_publisher = this->node.advertise<awesomo_msgs::PositionControllerStats>(POSITION_CONTROLLER_TOPIC, 50);
+    this->kf_estimator_stats_publisher = this->node.advertise<awesomo_msgs::KFStats>(KF_ESTIMATION_TOPIC, 50);
+    this->kf_estimator_stats_plotting_publisher = this->node.advertise<awesomo_msgs::KFPlotting>(KF_ESTIMATION_PLOTTING_TOPIC, 50);
 }
 
 void Awesomo::poseCallback(const geometry_msgs::PoseStamped &msg)
@@ -424,7 +424,7 @@ void Awesomo::publishHoverCommand(int seq, ros::Time time)
 
 void Awesomo::publishPositionControllerStats(int seq, ros::Time time)
 {
-    awesomo::PositionControllerStats msg;
+  awesomo_msgs::PositionControllerStats msg;
 
     // msg header
     msg.header.seq = seq;
@@ -488,7 +488,7 @@ void Awesomo::publishPositionControllerMessage(
 
 void Awesomo::publishKFStats(int seq, ros::Time time)
 {
-    awesomo::KFStats msg;
+  awesomo_msgs::KFStats msg;
     struct kf *estimator;
 
     // setup
@@ -588,7 +588,7 @@ void Awesomo::publishKFStats(int seq, ros::Time time)
 
 void Awesomo::publishKFStatsForPlotting(int seq, ros::Time time)
 {
-    awesomo::KFPlotting msg;
+  awesomo_msgs::KFPlotting msg;
     struct kf *estimator;
 
     // setup

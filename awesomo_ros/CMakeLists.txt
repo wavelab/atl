@@ -17,6 +17,7 @@ FIND_PACKAGE(
     image_transport
     cv_bridge
     tf
+    awesomo_msgs
 )
 FIND_PACKAGE(OpenCV REQUIRED)
 FIND_PACKAGE(Boost REQUIRED)
@@ -43,16 +44,6 @@ INCLUDE_DIRECTORIES(
     ./include
 )
 
-# ROS MESSAGE
-ADD_MESSAGE_FILES(
-    DIRECTORY msg
-    FILES
-    PositionControllerStats.msg
-    KFStats.msg
-    KFPlotting.msg
-    GimbalSetPoint.msg
-)
-GENERATE_MESSAGES(DEPENDENCIES std_msgs)
 
 # BUILD AS CATKIN PACKAGE
 CATKIN_PACKAGE(
@@ -79,9 +70,9 @@ SET(AWESOMO_DEPS
     apriltags
     yaml-cpp
     flycapture
-    prototype_clients
-    prototype_msgs
-    prototype
+    # prototype_clients
+    # prototype_msgs
+    # prototype
     ${OpenCV_LIBS}
     ${catkin_LIBRARIES}
     ${GAZEBO_LIBRARIES}
