@@ -3,13 +3,13 @@
     <!-- CONTROLLER -->
 	<param
         name="quadrotor"
-        value="$(find awesomo)/configs/quadrotor/config.yaml" />
+        value="$(find awesomo_configs)/configs/quadrotor/config.yaml" />
 	<param
         name="position_controller"
-        value="$(find awesomo)/configs/position_controller/config.yaml" />
+        value="$(find awesomo_configs)/configs/position_controller/config.yaml" />
 	<param
         name="carrot_controller"
-        value="$(find awesomo)/configs/carrot_controller/config.yaml" />
+        value="$(find awesomo_configs)/configs/carrot_controller/config.yaml" />
 	<node
 	    pkg="awesomo"
 	    type="awesomo"

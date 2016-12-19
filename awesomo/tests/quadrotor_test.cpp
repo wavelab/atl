@@ -601,7 +601,7 @@ int testQuadrotorRunMission(void)
 
 void testSuite(void)
 {
-    // mu_add_test(testQuadrotor);
+    mu_add_test(testQuadrotor);
     // mu_add_test(testQuadrotorPositionControllerCalculate);
     // mu_add_test(testQuadrotorResetPositionController);
     // mu_add_test(testQuadrotorCalculateLandingTargetYaw);
