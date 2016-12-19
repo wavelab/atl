@@ -5,15 +5,8 @@ IF (CMAKE_COMPILER_IS_GNUCXX)
     ADD_DEFINITIONS(-std=gnu++0x)
 ENDIF()
 
-# DEPENDENCIES
-FIND_PACKAGE(
-    catkin
-    REQUIRED COMPONENTS
-    roscpp
-    rospy
-)
-
-# BUILD PROJECT AS CATKIN PACKAGE
+# CATKIN
+FIND_PACKAGE(catkin)
 CATKIN_PACKAGE(INCLUDE_DIRS include LIBRARIES ${PROJECT_NAME})
 
 # INCLUDES
@@ -36,6 +29,7 @@ ADD_LIBRARY(
     src/estimator.cpp
     src/planner.cpp
 )
+ADD_DEPENDENCIES(${PROJECT_NAME} awesomo_utils)
 SET(DEPS
     ${PROJECT_NAME}
     ${catkin_LIBRARIES}

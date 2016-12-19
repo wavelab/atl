@@ -9,16 +9,7 @@
 #include <Eigen/Geometry>
 
 
-int geoMessageQuatToEigenQuat(
-    const geometry_msgs::Quaternion &q,
-    Eigen::Quaterniond &eigen_quat
-);
+int geoMessageQuatToEigenQuat(const geometry_msgs::Quaternion &q,
+                              Eigen::Quaterniond &eigen_quat);
 
-int tfQuatToEigenQuat(
-    tf::Quaternion q,
-    Eigen::Quaterniond &eigen_quat
-);
-
-
-
-
+int tfQuatToEigenQuat(tf::Quaternion q, Eigen::Quaterniond &eigen_quat);
