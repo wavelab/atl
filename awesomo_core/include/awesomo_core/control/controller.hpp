@@ -43,37 +43,6 @@ struct pid {
   float max;
 };
 
-
-// CLASSES
-class CarrotController {
-public:
-  std::deque<Eigen::Vector3d> waypoints;
-  int initialized;
-  double look_ahead_dist;
-  double wp_threshold;
-  Eigen::Vector3d wp_start;
-  Eigen::Vector3d wp_end;
-  Eigen::Vector3d carrot_prev;
-
-  CarrotController();
-  CarrotController(std::deque<Eigen::Vector3d> waypoints,
-                   double look_ahead_dist,
-                   double wp_threshold);
-  CarrotController(std::string config_file_path);
-  int initializeWaypoints(std::vector<Eigen::Vector3d> waypoints);
-  Eigen::Vector3d closestPoint(Eigen::Vector3d position,
-                               Eigen::Vector3d wp_start,
-                               Eigen::Vector3d wp_end);
-  Eigen::Vector3d calculateCarrotPoint(Eigen::Vector3d position,
-                                       double r,
-                                       Eigen::Vector3d wp_start,
-                                       Eigen::Vector3d wp_end);
-  int waypointReached(Eigen::Vector3d position,
-                      Eigen::Vector3d waypoint,
-                      double threshold);
-  int update(Eigen::Vector3d position, Eigen::Vector3d &carrot);
-};
-
 class PositionController {
 public:
   struct pid x;

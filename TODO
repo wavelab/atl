@@ -1,8 +1,29 @@
 # TODO
 
-- track tag with SBGC code at ultra-fast-speed
+## core
+- test attitude controller
+- test position controller
+- test pid controller
+- test velocity controller
 
-- code up simple 2d simulator with pitch only (ignoring roll for planning)
-- contribution scope
+- test kf
 
-- experiment with swathmore apriltag version
+- test planning
+
+- test config
+- test math
+- test data
+- test stats
+- test time
+
+- test quadrotor
+
+
+## ros
+
+- subscribe to pose
+- subscribe to velocity
+- subscribe to atim
+- publish world position setpoints
+- publish relative position setpoints
+- publish velocity setpoints

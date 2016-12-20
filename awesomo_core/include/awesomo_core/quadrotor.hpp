@@ -7,7 +7,7 @@
 
 #include "awesomo_core/utils/utils.hpp"
 #include "awesomo_core/control/controller.hpp"
-#include "awesomo_core/estimation/estimator.hpp"
+#include "awesomo_core/estimation/estimation.hpp"
 
 namespace awesomo {
 
@@ -29,26 +29,6 @@ namespace awesomo {
 #define LANDING_DELAY 5        // observe the target before landing
 
 
-class LandingConfig {
-public:
-  // height update
-  float period;
-  float descend_multiplier;
-  float recover_multiplier;
-
-  // disarm conditions
-  float belief_threshold;
-  Eigen::Vector3d cutoff_position;
-
-  // constructor
-  LandingConfig(void);
-  LandingConfig(float period,
-                float desend_multiplier,
-                float recover_multiplier,
-                float belief_threshold,
-                Eigen::Vector3d cutoff_position);
-};
-
 class Quadrotor {
 public:
   // configs
@@ -56,6 +36,7 @@ public:
 
   // state
   int mission_state;
+
   Pose world_pose;
   double yaw;
 
@@ -69,30 +50,29 @@ public:
   struct timespec tracking_start;
   struct timespec target_last_updated;
   struct timespec height_last_updated;
-  std::vector<Eigen::Vector2d> lt_history;
+  std::vector<Vec2> lt_history;
 
   // controllers
-  CarrotController *carrot_controller;
   PositionController *position_controller;
 
   // estimators
   bool estimator_initialized;
-  struct kf tag_estimator;
+  KalmanFilter tag_estimator;
 
+  Quadrotor(void);
   Quadrotor(std::map<std::string, std::string> configs);
   int loadConfig(std::string config_file_path);
-  Attitude positionControllerCalculate(Eigen::Vector3d setpoint,
+  Attitude positionControllerCalculate(Vec3 setpoint,
                                        Pose robot_pose,
                                        float yaw,
                                        float dt);
-
   void resetPositionController(void);
   int calculateLandingTargetYaw(double *yaw);
   void runDiscoverMode(LandingTargetPosition landing);
-  int checkLandingTargetEstimation(Eigen::Vector3d &est);
+  int checkLandingTargetEstimation(Vec3 &est);
   void runTrackingModeBPF(LandingTargetPosition landing, float dt);
-  bool withinLandingZone(Eigen::Vector3d &m, Eigen::Vector3d &e);
-  bool withinLandingZone(Eigen::Vector3d &m);
+  bool withinLandingZone(Vec3 &m, Vec3 &e);
+  bool withinLandingZone(Vec3 &m);
   void runLandingMode(LandingTargetPosition landing, float dt);
   int runMission(Pose robot_pose, LandingTargetPosition landing, float dt);
 };

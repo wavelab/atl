@@ -48,4 +48,13 @@ double PID::calculate(double setpoint, double input, double dt) {
   return output;
 }
 
+void PID::reset(void) {
+  this->error_prev = 0.0;
+  this->error_sum = 0.0;
+
+  this->error_p = 0.0;
+  this->error_i = 0.0;
+  this->error_d = 0.0;
+}
+
 }  // end of awesomo_control namespace

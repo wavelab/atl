@@ -15,6 +15,17 @@ public:
   PID y_controller;
   PID z_controller;
 
+  double roll_limit[2];
+  double pitch_limit[2];
+
+  double setpoint_roll;
+  double setpoint_pitch;
+  double setpoint_throttle;
+
+  double output_roll;
+  double output_pitch;
+  double output_throttle;
+
   PositionController(void);
   void loadConfig(const std::string config_file);
   VecX calculate(VecX setpoints, VecX actual, double yaw, double dt);

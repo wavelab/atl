@@ -6,7 +6,6 @@
 
 
 namespace awesomo {
-namespace control {
 
 class AttitudeController {
 public:
@@ -19,6 +18,5 @@ public:
   VecX calculate(Vec4 psetpoints, Vec4 vsetpoints, Vec4 actual, double dt);
 };
 
-}  // end of control namespace
 }  // end of awesomo namespace
 #endif

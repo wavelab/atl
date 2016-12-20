@@ -23,8 +23,9 @@ ADD_LIBRARY(
     ${PROJECT_NAME}
     STATIC
     src/control/controller.cpp
-    src/estimation/estimator.cpp
+    src/estimation/kf.cpp
     src/planning/planner.cpp
+    src/utils/config.cpp
     src/utils/math.cpp
     src/utils/data.cpp
     src/utils/stats.cpp

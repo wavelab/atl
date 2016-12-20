@@ -7,58 +7,44 @@ PositionController::PositionController(void) {
   this->x_controller = PID(0.9, 0.01, 0.33);
   this->y_controller = PID(0.9, 0.01, 0.33);
   this->z_controller = PID(3.0, 0.0, 0.5);
+
+  roll_limit[0] = 0.0;
+  roll_limit[1] = 0.0;
+
+  pitch_limit[0] = 0.0;
+  pitch_limit[1] = 0.0;
 }
 
 void PositionController::loadConfig(const std::string config_file) {
   try {
     YAML::Node config = YAML::LoadFile(config_file);
 
+    // clang-format off
     // roll controller
-    this->x.setpoint = config["roll_controller"]["setpoint"].as<float>();
-    this->x.output = 0.0f;
-    this->x.prev_error = 0.0f;
-    this->x.sum_error = 0.0f;
-    this->x.p_error = 0.0f;
-    this->x.i_error = 0.0f;
-    this->x.d_error = 0.0f;
-    this->x.k_p = config["roll_controller"]["k_p"].as<float>();
-    this->x.k_i = config["roll_controller"]["k_i"].as<float>();
-    this->x.k_d = config["roll_controller"]["k_d"].as<float>();
-    this->x.dead_zone = config["roll_controller"]["deadzone"].as<float>();
-    this->x.min = config["roll_controller"]["min"].as<float>();
-    this->x.max = config["roll_controller"]["max"].as<float>();
+    this->x_controller = PID(
+      config["x_controller"]["k_p"].as<float>(),
+      config["x_controller"]["k_i"].as<float>(),
+      config["x_controller"]["k_d"].as<float>()
+    );
+    roll_limit[0] = config["roll_controller"]["min"].as<float>();
+    roll_limit[1] = config["roll_controller"]["min"].as<float>();
 
     // pitch controller
-    this->y.setpoint = config["roll_controller"]["setpoint"].as<float>();
-    this->y.output = 0.0f;
-    this->y.prev_error = 0.0f;
-    this->y.sum_error = 0.0f;
-    this->y.p_error = 0.0f;
-    this->y.i_error = 0.0f;
-    this->y.d_error = 0.0f;
-    this->y.k_p = config["roll_controller"]["k_p"].as<float>();
-    this->y.k_i = config["roll_controller"]["k_i"].as<float>();
-    this->y.k_d = config["roll_controller"]["k_d"].as<float>();
-    this->y.dead_zone = config["roll_controller"]["deadzone"].as<float>();
-    this->y.min = config["roll_controller"]["min"].as<float>();
-    this->y.max = config["roll_controller"]["max"].as<float>();
+    this->y_controller = PID(
+      config["y_controller"]["k_p"].as<float>(),
+      config["y_controller"]["k_i"].as<float>(),
+      config["y_controller"]["k_d"].as<float>()
+    );
+    pitch_limit[0] = config["pitch_controller"]["min"].as<float>();
+    pitch_limit[1] = config["pitch_controller"]["min"].as<float>();
 
     // throttle_controller
-    this->hover_throttle =
-      config["throttle_controller"]["hover_throttle"].as<float>();
-    this->T.setpoint = config["throttle_controller"]["setpoint"].as<float>();
-    this->T.output = 0.0f;
-    this->T.prev_error = 0.0f;
-    this->T.sum_error = 0.0f;
-    this->T.p_error = 0.0f;
-    this->T.i_error = 0.0f;
-    this->T.d_error = 0.0f;
-    this->T.k_p = config["throttle_controller"]["k_p"].as<float>();
-    this->T.k_i = config["throttle_controller"]["k_i"].as<float>();
-    this->T.k_d = config["throttle_controller"]["k_d"].as<float>();
-    this->T.dead_zone = config["throttle_controller"]["deadzone"].as<float>();
-    this->T.min = config["throttle_controller"]["min"].as<float>();
-    this->T.max = config["throttle_controller"]["max"].as<float>();
+    this->y_controller = PID(
+      config["z_controller"]["k_p"].as<float>(),
+      config["z_controller"]["k_i"].as<float>(),
+      config["z_controller"]["k_d"].as<float>()
+    );
+    // clang-format on
 
   } catch (YAML::BadFile &ex) {
     throw;
@@ -100,30 +86,9 @@ VecX PositionController::calculate(VecX setpoints,
 }
 
 void PositionController::reset(void) {
-  this->roll = 0;
-  this->pitch = 0;
-  this->throttle = 0;
-
-  this->x.output = 0.0f;
-  this->x.prev_error = 0.0f;
-  this->x.sum_error = 0.0f;
-  this->x.p_error = 0.0f;
-  this->x.i_error = 0.0f;
-  this->x.d_error = 0.0f;
-
-  this->y.output = 0.0f;
-  this->y.prev_error = 0.0f;
-  this->y.sum_error = 0.0f;
-  this->y.p_error = 0.0f;
-  this->y.i_error = 0.0f;
-  this->y.d_error = 0.0f;
-
-  this->T.output = 0.0f;
-  this->T.prev_error = 0.0f;
-  this->T.sum_error = 0.0f;
-  this->T.p_error = 0.0f;
-  this->T.i_error = 0.0f;
-  this->T.d_error = 0.0f;
+  this->x_controller.reset();
+  this->y_controller.reset();
+  this->z_controller.reset();
 }
 
 }  // end of awesomo namespace

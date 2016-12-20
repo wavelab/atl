@@ -3,25 +3,7 @@
 
 namespace awesomo {
 
-LandingConfig::LandingConfig(void) {
-  this->period = 0;
-  this->descend_multiplier = 0;
-  this->recover_multiplier = 0;
-  this->cutoff_position << 0, 0, 0;
-  this->belief_threshold = 0;
-}
-
-LandingConfig::LandingConfig(float period,
-                             float desend_multiplier,
-                             float recover_multiplier,
-                             float belief_threshold,
-                             Eigen::Vector3d cutoff_position) {
-  this->period = period;
-  this->descend_multiplier = descend_multiplier;
-  this->recover_multiplier = recover_multiplier;
-  this->cutoff_position = cutoff_position;
-  this->belief_threshold = belief_threshold;
-}
+Quadrotor::Quadrotor(void) {}
 
 Quadrotor::Quadrotor(std::map<std::string, std::string> configs) {
   std::string config_path;
@@ -98,7 +80,7 @@ int Quadrotor::loadConfig(std::string config_file_path) {
   return 0;
 }
 
-Attitude Quadrotor::positionControllerCalculate(Eigen::Vector3d setpoint,
+Attitude Quadrotor::positionControllerCalculate(Vec3 setpoint,
                                                 Pose robot_pose,
                                                 float yaw,
                                                 float dt) {
@@ -130,7 +112,7 @@ int Quadrotor::calculateLandingTargetYaw(double *yaw) {
   double x_median;
   double y_median;
   double relative_yaw;
-  Eigen::Vector2d p;
+  Vec2 p;
   std::vector<double> x_values;
   std::vector<double> y_values;
 
@@ -167,8 +149,8 @@ int Quadrotor::calculateLandingTargetYaw(double *yaw) {
 }
 
 void Quadrotor::runDiscoverMode(LandingTargetPosition landing) {
-  Eigen::VectorXd mu(9);
-  Eigen::Vector2d lt_pos;
+  VecX mu(9);
+  Vec2 lt_pos;
   double lt_yaw;
   bool transition_state;
 
@@ -202,7 +184,7 @@ void Quadrotor::runDiscoverMode(LandingTargetPosition landing) {
       landing.position(2),      // pos_z relative to quad
       0.0, 0.0, 0.0,            // vel_x, vel_y, vel_z
       0.0, 0.0, 0.0;            // acc_x, acc_y, acc_z
-    apriltag_kf_setup(&this->tag_estimator, mu);
+    this->tag_estimator = KalmanFilter(mu);
     this->estimator_initialized = true;
 
     // transition to tracker mode
@@ -218,8 +200,8 @@ void Quadrotor::runDiscoverMode(LandingTargetPosition landing) {
 }
 
 void Quadrotor::runTrackingModeBPF(LandingTargetPosition landing, float dt) {
-  Eigen::Vector3d tag_mea;
-  Eigen::Vector3d setpoint;
+  Vec3 tag_mea;
+  Vec3 setpoint;
   Pose robot_pose;
   float tag_x;
   float tag_y;
@@ -227,7 +209,7 @@ void Quadrotor::runTrackingModeBPF(LandingTargetPosition landing, float dt) {
 
   // estimate tag position
   tag_mea = landing.position;
-  apriltag_kf_estimate(&this->tag_estimator, tag_mea, dt, landing.detected);
+  this->tag_estimator.estimate(tag_mea, dt, landing.detected);
 
   // keep track of target position
   elasped = toc(&this->target_last_updated);
@@ -261,8 +243,8 @@ void Quadrotor::runTrackingModeBPF(LandingTargetPosition landing, float dt) {
   }
 }
 
-bool Quadrotor::withinLandingZone(Eigen::Vector3d &m, Eigen::Vector3d &e) {
-  Eigen::Vector3d threshold;
+bool Quadrotor::withinLandingZone(Vec3 &m, Vec3 &e) {
+  Vec3 threshold;
   bool measured_x_ok;
   bool measured_y_ok;
   bool measured_z_ok;
@@ -292,7 +274,7 @@ bool Quadrotor::withinLandingZone(Eigen::Vector3d &m, Eigen::Vector3d &e) {
   }
 }
 
-int Quadrotor::checkLandingTargetEstimation(Eigen::Vector3d &est) {
+int Quadrotor::checkLandingTargetEstimation(Vec3 &est) {
   if (est(0) > 5.0 || est(1) > 5.0) {
     return -1;
   }
@@ -301,16 +283,16 @@ int Quadrotor::checkLandingTargetEstimation(Eigen::Vector3d &est) {
 }
 
 void Quadrotor::runLandingMode(LandingTargetPosition landing, float dt) {
-  Eigen::Vector3d tag_mea;
-  Eigen::Vector3d tag_est;
-  Eigen::VectorXd mu(9);
-  Eigen::Vector3d threshold;
+  Vec3 tag_mea;
+  Vec3 tag_est;
+  VecX mu(9);
+  Vec3 threshold;
   Pose robot_pose;
   float elasped;
 
   // estimate tag position
   tag_mea = landing.position;
-  apriltag_kf_estimate(&this->tag_estimator, tag_mea, dt, landing.detected);
+  this->tag_estimator.estimate(tag_mea, dt, landing.detected);
   mu = this->tag_estimator.mu;
   tag_est << mu(0), mu(1), this->hover_height;
 
