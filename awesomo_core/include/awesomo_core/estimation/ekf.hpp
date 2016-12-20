@@ -7,23 +7,25 @@
 namespace awesomo {
 
 class ExtendedKalmanFilter {
+public:
+  bool initialized;
   VecX mu;
-  MatX S;
+
   MatX R;
   MatX Q;
 
+  MatX S;
+  MatX I;
+  MatX K;
+
   VecX mu_p;
   MatX S_p;
-  MatX K;
-  MatX I;
 
-  VecX (*g_function)(VecX &, VecX &, float);
-  MatX (*G_function)(VecX &, VecX &, float);
-  VecX (*h_function)(VecX &, float);
-  MatX (*H_function)(VecX &, float);
-
-  void predictionUpdate(VecX u, float dt);
-  void measurementUpdate(VecX y, float dt);
+  ExtendedKalmanFilter(void);
+  int init(VecX mu, MatX R, MatX Q);
+  int predictionUpdate(VecX g, MatX G);
+  int measurementUpdate(VecX h, MatX H, VecX y);
 };
 
 }  // end of awesomo namespace
+#endif

@@ -199,7 +199,8 @@ int Quadrotor::loadConfig(std::string config_file_path) {
 //   }
 // }
 //
-// void Quadrotor::runTrackingModeBPF(LandingTargetPosition landing, float dt) {
+// void Quadrotor::runTrackingModeBPF(LandingTargetPosition landing, float dt)
+// {
 //   Vec3 tag_mea;
 //   Vec3 setpoint;
 //   Pose robot_pose;

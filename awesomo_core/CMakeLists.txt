@@ -26,6 +26,7 @@ ADD_LIBRARY(
     src/control/pid_controller.cpp
     src/control/position_controller.cpp
     src/control/velocity_controller.cpp
+    src/estimation/ekf.cpp
     src/estimation/kf.cpp
     src/planning/planner.cpp
     src/utils/config.cpp
@@ -56,6 +57,8 @@ TARGET_LINK_LIBRARIES(awesomo_position_controller_test ${DEPS})
 ADD_EXECUTABLE(awesomo_velocity_controller_test tests/control/velocity_controller_test.cpp)
 TARGET_LINK_LIBRARIES(awesomo_velocity_controller_test ${DEPS})
 
+ADD_EXECUTABLE(awesomo_ekf_test tests/estimation/ekf_test.cpp)
+TARGET_LINK_LIBRARIES(awesomo_ekf_test ${DEPS})
 
 # ADD_EXECUTABLE(awesomo_quadrotor_test tests/quadrotor_test.cpp)
 # TARGET_LINK_LIBRARIES(awesomo_quadrotor_test ${DEPS})

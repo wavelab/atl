@@ -33,7 +33,7 @@ VecX AttitudeController::calculate(Vec4 setpoints, Vec4 actual, double dt) {
 
   // thrust
   max_thrust = 5.0;
-  t = max_thrust * setpoints(3);          // convert relative thrust to true thrust
+  t = max_thrust * setpoints(3);  // convert relative thrust to true thrust
   t = (t > max_thrust) ? max_thrust : t;  // limit thrust
   t = (t < 0) ? 0.0 : t;                  // limit thrust
 

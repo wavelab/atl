@@ -1,26 +1,45 @@
+#include "awesomo_core/estimation/ekf.hpp"
 
 
-void ekf_prediction_update(struct ekf *e, Eigen::VectorXd u, float dt) {
-  Eigen::MatrixXd g;
-  Eigen::MatrixXd G;
+namespace awesomo {
 
-  g = e->g_function(u, e->mu, dt);
-  G = e->G_function(u, e->mu, dt);
-
-  e->mu_p = g;
-  e->S_p = G * e->S * G.transpose() + e->R;
+ExtendedKalmanFilter::ExtendedKalmanFilter(void) {
+  this->initialized = false;
 }
 
-void ekf_measurement_update(struct ekf *e, Eigen::VectorXd y, float dt) {
-  Eigen::VectorXd h;
-  Eigen::MatrixXd H;
+int ExtendedKalmanFilter::init(VecX mu, MatX R, MatX Q) {
+  int nb_states;
 
-  h = e->h_function(e->mu_p, dt);
-  H = e->H_function(e->mu_p, dt);
+  nb_states = mu.size();
+  this->initialized = true;
+  this->mu = mu;
 
-  // clang-format off
-  e->K = e->S_p * H.transpose() * (H * e->S_p * H.transpose() + e->Q).inverse();
-  e->mu = e->mu_p + e->K * (y - h);
-  e->S = (e->I - e->K * H) * e->S_p;
-  // clang-format on
+  this->R = R;
+  this->Q = Q;
+
+  this->S = MatX::Identity(nb_states, nb_states);
+  this->I = MatX::Identity(nb_states, nb_states);
+  this->K = MatX::Zero(nb_states, nb_states);
+
+  this->mu_p = VecX::Zero(nb_states);
+  this->S_p = MatX::Zero(nb_states, nb_states);
+
+  return 0;
 }
+
+int ExtendedKalmanFilter::predictionUpdate(VecX g, MatX G) {
+  mu_p = g;
+  S_p = G * S * G.transpose() + R;
+
+  return 0;
+}
+
+int ExtendedKalmanFilter::measurementUpdate(VecX h, MatX H, VecX y) {
+  K = S_p * H.transpose() * (H * S_p * H.transpose() + Q).inverse();
+  mu = mu_p + K * (y - h);
+  S = (I - K * H) * S_p;
+
+  return 0;
+}
+
+}  // end of awesomo namespace

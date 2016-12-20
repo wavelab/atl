@@ -88,15 +88,15 @@ VecX VelocityController::calculate(Vec3 setpoints,
   r = this->vy_controller.calculate(setpoints(1), actual(1), dt);
   p = -this->vx_controller.calculate(setpoints(0), actual(0), dt);
   y = yaw;
-  t = this->hover_throttle + this->vz_controller.calculate(setpoints(2),
-                                                           actual(2),
-                                                           dt);
-  t /= fabs(cos(actual(1)) * cos(actual(0)));  // adjust throttle for roll and pitch
+  t = this->hover_throttle +
+      this->vz_controller.calculate(setpoints(2), actual(2), dt);
+  t /= fabs(cos(actual(1)) *
+            cos(actual(0)));  // adjust throttle for roll and pitch
 
   // limit roll, pitch
-  r = (r < this->roll_limit[0]) ? this->roll_limit[0]: r;
+  r = (r < this->roll_limit[0]) ? this->roll_limit[0] : r;
   r = (r > this->roll_limit[1]) ? this->roll_limit[1] : r;
-  p = (p < this->pitch_limit[0]) ? this->pitch_limit[0]: p;
+  p = (p < this->pitch_limit[0]) ? this->pitch_limit[0] : p;
   p = (p > this->pitch_limit[1]) ? this->pitch_limit[1] : p;
 
   // limit yaw
