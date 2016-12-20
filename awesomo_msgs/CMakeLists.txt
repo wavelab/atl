@@ -12,6 +12,7 @@ FIND_PACKAGE(
     roscpp
     rospy
     std_msgs
+    geometry_msgs
     message_generation
 )
 
@@ -19,12 +20,13 @@ FIND_PACKAGE(
 ADD_MESSAGE_FILES(
     DIRECTORY msgs
     FILES
-    PositionControllerStats.msg
-    KFStats.msg
-    KFPlotting.msg
     GimbalSetPoint.msg
+    KFPlotting.msg
+    KFStats.msg
+    PositionControllerStats.msg
+    TagPoseStamped.msg
 )
-GENERATE_MESSAGES(DEPENDENCIES std_msgs)
+GENERATE_MESSAGES(DEPENDENCIES std_msgs geometry_msgs)
 
 CATKIN_PACKAGE(
     CATKIN_DEPENDS message_generation roscpp std_msgs geometry_msgs
