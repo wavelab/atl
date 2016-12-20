@@ -7,4 +7,14 @@
 #include "awesomo_core/utils/stats.hpp"
 #include "awesomo_core/utils/time.hpp"
 
+#define __FILENAME__ \
+  (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
+
+#define log_err(M, ...)              \
+  fprintf(stderr,                    \
+          "[ERROR] [%s:%d] " M "\n", \
+          __FILENAME__,              \
+          __LINE__,                  \
+          ##__VA_ARGS__)
+
 #endif

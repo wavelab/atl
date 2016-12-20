@@ -21,7 +21,7 @@
 #include <mavros_msgs/CommandBool.h>
 #include <mavros_msgs/RCIn.h>
 
-#include <atim/AtimPoseStamped.h>
+#include <awesomo_msgs/TagPoseStamped.h>
 
 #include <awesomo_msgs/PositionControllerStats.h>
 #include <awesomo_msgs/KFStats.h>
@@ -46,7 +46,7 @@
 #define KF_ESTIMATION_PLOTTING_TOPIC "/awesomo/kf_estimation/states"
 #define RADIO_TOPIC "/mavros/rc/in"
 #define GPS_TOPIC "/mavros/global_position/local"
-#define ATIM_POSE_TOPIC "/atim/pose"
+#define ATIM_POSE_TOPIC "/awesomo_core/vision/pose"
 #define ATTITUDE_RPY_TOPIC "/awesomo/setpoint_attitude/attitude_rpy"
 
 
@@ -96,7 +96,7 @@ public:
   // void velocityCallback(const geometry_msgs::TwistStamped &msg);
   // void mocapCallback(const geometry_msgs::PoseStamped &msg);
   // void radioCallback(const mavros_msgs::RCIn &msg);
-  // void atimCallback(const atim::AtimPoseStamped &msg);
+  // void atimCallback(const awesomo_msgs::TagPoseStamped &msg);
   // void gpsCallback(const geometry_msgs::PoseWithCovarianceStamped &msg);
   // void stateCallback(const mavros_msgs::State::ConstPtr &msg);
   // void waitForConnection(void);

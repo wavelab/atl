@@ -1,4 +1,4 @@
-#include "awesomo_core/planning/planner.hpp"
+#include "awesomo_core/planning/planning.hpp"
 
 
 namespace awesomo {

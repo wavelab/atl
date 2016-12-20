@@ -28,13 +28,16 @@ ADD_LIBRARY(
     src/control/velocity_controller.cpp
     src/estimation/ekf.cpp
     src/estimation/kf.cpp
-    src/planning/planner.cpp
+    src/planning/planning.cpp
     src/utils/config.cpp
     src/utils/math.cpp
     src/utils/data.cpp
     src/utils/stats.cpp
     src/utils/time.cpp
-    src/quadrotor.cpp
+    src/quadrotor/base_mode.cpp
+    src/quadrotor/hover_mode.cpp
+    src/quadrotor/landing_mode.cpp
+    src/quadrotor/quadrotor.cpp
 )
 SET(DEPS
     ${PROJECT_NAME}
@@ -66,14 +69,14 @@ TARGET_LINK_LIBRARIES(awesomo_kf_test ${DEPS})
 ADD_EXECUTABLE(awesomo_planning_test tests/planning/planning_test.cpp)
 TARGET_LINK_LIBRARIES(awesomo_planning_test ${DEPS})
 
-# ADD_EXECUTABLE(awesomo_quadrotor_test tests/quadrotor_test.cpp)
-# TARGET_LINK_LIBRARIES(awesomo_quadrotor_test ${DEPS})
-#
+ADD_EXECUTABLE(awesomo_quadrotor_test tests/quadrotor/quadrotor_test.cpp)
+TARGET_LINK_LIBRARIES(awesomo_quadrotor_test ${DEPS})
+
 # ADD_EXECUTABLE(awesomo_estimator_test tests/estimator_test.cpp)
 # TARGET_LINK_LIBRARIES(awesomo_estimator_test ${DEPS})
 #
-# ADD_EXECUTABLE(awesomo_planner_test tests/planner_test.cpp)
-# TARGET_LINK_LIBRARIES(awesomo_planner_test ${DEPS})
+# ADD_EXECUTABLE(awesomo_planning_test tests/planning_test.cpp)
+# TARGET_LINK_LIBRARIES(awesomo_planning_test ${DEPS})
 #
 # ADD_EXECUTABLE(awesomo_util_test tests/util_test.cpp)
 # TARGET_LINK_LIBRARIES(awesomo_util_test ${DEPS})

@@ -34,6 +34,8 @@ int PositionController::configure(std::string config_file) {
     YAML::Node pitch_controller;
     YAML::Node throttle_controller;
 
+    std::cout << config_file << std::endl;
+
     config = YAML::LoadFile(config_file);
     roll_controller = config["roll_controller"];
     pitch_controller = config["pitch_controller"];
@@ -67,8 +69,8 @@ int PositionController::configure(std::string config_file) {
     this->hover_throttle = throttle_controller["hover_throttle"].as<float>();
     // clang-format on
 
-  } catch (YAML::BadFile &ex) {
-    throw;
+  } catch (std::exception &ex) {
+    std::cout << ex.what();
     return -1;
   }
 

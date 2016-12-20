@@ -12,7 +12,7 @@ AwesomoNode::AwesomoNode(void) {
 int AwesomoNode::configure(std::map<std::string, std::string> configs) {
   std::string config_path;
 
-  this->quad = Quadrotor(configs);
+  // this->quad = Quadrotor(configs);
 
   // // wait till connected to FCU
   // this->waitForConnection();
@@ -122,7 +122,7 @@ int AwesomoNode::configure(std::map<std::string, std::string> configs) {
 //   }
 // }
 //
-// void Awesomo::atimCallback(const atim::AtimPoseStamped &msg) {
+// void Awesomo::atimCallback(const awesomo_msgs::TagPoseStamped &msg) {
 //   this->landing_zone.detected = msg.tag_detected;
 //   this->landing_zone.position << msg.pose.position.x, msg.pose.position.y,
 //     msg.pose.position.z;
