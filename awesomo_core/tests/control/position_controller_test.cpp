@@ -11,6 +11,8 @@ namespace awesomo {
 TEST(PositionController, constructor) {
   PositionController controller;
 
+  ASSERT_FALSE(controller.configured);
+
   ASSERT_FLOAT_EQ(0.0, controller.x_controller.k_p);
   ASSERT_FLOAT_EQ(0.0, controller.x_controller.k_i);
   ASSERT_FLOAT_EQ(0.0, controller.x_controller.k_d);
@@ -44,6 +46,9 @@ TEST(PositionController, configure) {
   PositionController controller;
 
   controller.configure(TEST_CONFIG);
+
+  ASSERT_TRUE(controller.configured);
+
   ASSERT_FLOAT_EQ(0.1, controller.x_controller.k_p);
   ASSERT_FLOAT_EQ(0.2, controller.x_controller.k_i);
   ASSERT_FLOAT_EQ(0.3, controller.x_controller.k_d);

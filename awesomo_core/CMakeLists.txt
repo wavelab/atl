@@ -44,6 +44,9 @@ SET(DEPS
 )
 
 # UNIT TESTS
+ADD_EXECUTABLE(awesomo_attitude_controller_test tests/control/attitude_controller_test.cpp)
+TARGET_LINK_LIBRARIES(awesomo_attitude_controller_test ${DEPS})
+
 ADD_EXECUTABLE(awesomo_pid_controller_test tests/control/pid_controller_test.cpp)
 TARGET_LINK_LIBRARIES(awesomo_pid_controller_test ${DEPS})
 

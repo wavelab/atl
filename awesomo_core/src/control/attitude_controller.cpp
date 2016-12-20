@@ -4,9 +4,21 @@
 namespace awesomo {
 
 AttitudeController::AttitudeController(void) {
-  this->roll_controller = PID(12.0, 0.05, 1.15);
-  this->pitch_controller = PID(12.0, 0.05, 1.15);
-  this->yaw_controller = PID(1.0, 0.0, 0.5);
+  this->configured = false;
+
+  this->roll_controller = PID(0.0, 0.0, 0.0);
+  this->pitch_controller = PID(0.0, 0.0, 0.0);
+  this->yaw_controller = PID(0.0, 0.0, 0.0);
+
+  this->setpoints[0] = 0;
+  this->setpoints[1] = 0;
+  this->setpoints[2] = 0;
+  this->setpoints[3] = 0;
+
+  this->outputs[0] = 0;
+  this->outputs[1] = 0;
+  this->outputs[2] = 0;
+  this->outputs[3] = 0;
 }
 
 VecX AttitudeController::calculate(Vec4 setpoints, Vec4 actual, double dt) {
@@ -21,10 +33,9 @@ VecX AttitudeController::calculate(Vec4 setpoints, Vec4 actual, double dt) {
 
   // thrust
   max_thrust = 5.0;
-  t = max_thrust * setpoints(3);  // convert relative thrust to true thrust
-  t /= fabs(cos(actual(0)) * cos(actual(1)));  // adjust for roll and pitch
-  t = (t > max_thrust) ? max_thrust : t;       // limit thrust
-  t = (t < 0) ? 0.0 : t;                       // limit thrust
+  t = max_thrust * setpoints(3);          // convert relative thrust to true thrust
+  t = (t > max_thrust) ? max_thrust : t;  // limit thrust
+  t = (t < 0) ? 0.0 : t;                  // limit thrust
 
   // map roll, pitch, yaw and thrust to motor outputs
   outputs(0) = -p - y + t;
@@ -39,6 +50,12 @@ VecX AttitudeController::calculate(Vec4 setpoints, Vec4 actual, double dt) {
     } else if (outputs(i) < 0.0) {
       outputs(i) = 0.0;
     }
+  }
+
+  // keep track of setpoints and outputs
+  for (int i = 0; i < 4; i++) {
+    this->setpoints[i] = setpoints(i);
+    this->outputs[i] = outputs(i);
   }
 
   return outputs;

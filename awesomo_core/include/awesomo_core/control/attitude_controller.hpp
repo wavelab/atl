@@ -9,9 +9,14 @@ namespace awesomo {
 
 class AttitudeController {
 public:
+  bool configured;
+
   PID roll_controller;
   PID pitch_controller;
   PID yaw_controller;
+
+  double setpoints[4];
+  double outputs[4];
 
   AttitudeController(void);
   VecX calculate(Vec4 setpoints, Vec4 actual, double dt);

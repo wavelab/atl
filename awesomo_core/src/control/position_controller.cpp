@@ -4,6 +4,8 @@
 namespace awesomo {
 
 PositionController::PositionController(void) {
+  this->configured = false;
+
   this->x_controller = PID(0.0, 0.0, 0.0);
   this->y_controller = PID(0.0, 0.0, 0.0);
   this->z_controller = PID(0.0, 0.0, 0.0);
