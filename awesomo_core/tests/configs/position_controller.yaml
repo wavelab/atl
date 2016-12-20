@@ -12,8 +12,6 @@ pitch_controller:
     k_d: 0.3
 throttle_controller:
     hover_throttle: 0.6
-    min: -0.5
-    max: 0.5
     k_p: 0.1
     k_i: 0.2
     k_d: 0.3

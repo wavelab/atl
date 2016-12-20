@@ -21,7 +21,6 @@ public:
 
   double roll_limit[2];
   double pitch_limit[2];
-  double throttle_limit[2];
 
   double setpoint_x;
   double setpoint_y;

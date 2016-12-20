@@ -16,9 +16,6 @@ PositionController::PositionController(void) {
   pitch_limit[0] = 0.0;
   pitch_limit[1] = 0.0;
 
-  throttle_limit[0] = 0.0;
-  throttle_limit[1] = 0.0;
-
   setpoint_x = 0.0;
   setpoint_y = 0.0;
   setpoint_z = 0.0;
@@ -65,8 +62,6 @@ int PositionController::configure(const std::string config_file) {
       throttle_controller["k_i"].as<float>(),
       throttle_controller["k_d"].as<float>()
     );
-    throttle_limit[0] = throttle_controller["min"].as<float>();
-    throttle_limit[1] = throttle_controller["max"].as<float>();
     hover_throttle = throttle_controller["hover_throttle"].as<float>();
     // clang-format on
 
@@ -93,31 +88,28 @@ VecX PositionController::calculate(VecX setpoints,
   t = this->hover_throttle + this->z_controller.calculate(setpoints(2),
                                                           actual(2),
                                                           dt);
-  outputs << r, p, y, t;
+  t /= fabs(cos(actual(1)) * cos(actual(0)));  // adjust throttle for roll and pitch
 
   // limit roll, pitch
-  for (int i = 0; i < 2; i++) {
-    if (outputs(i) > deg2rad(30.0)) {
-      outputs(i) = deg2rad(30.0);
-    } else if (outputs(i) < deg2rad(-30.0)) {
-      outputs(i) = deg2rad(-30.0);
-    }
-  }
+  r = (r < this->roll_limit[0]) ? this->roll_limit[0]: r;
+  r = (r > this->roll_limit[1]) ? this->roll_limit[1] : r;
+  p = (p < this->pitch_limit[0]) ? this->pitch_limit[0]: p;
+  p = (p > this->pitch_limit[1]) ? this->pitch_limit[1] : p;
 
   // limit yaw
   while (outputs(2) > deg2rad(360)) {
-    outputs(2) -= deg2rad(360);
+    y -= deg2rad(360);
   }
-  while (outputs(2) < 0) {
-    outputs(2) += deg2rad(360);
+  while (y < 0) {
+    y += deg2rad(360);
   }
 
   // limit throttle
-  if (outputs(3) > 1.0) {
-    outputs(3) = 1.0;
-  } else if (outputs(3) < 0.0) {
-    outputs(3) = 0.0;
-  }
+  t = (t < 0) ? 0.0 : t;
+  t = (t > 1.0) ? 1.0 : t;
+
+  // set outputs
+  outputs << r, p, y, t;
 
   // keep track of setpoints and outputs
   this->setpoint_x = setpoints(0);

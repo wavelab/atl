@@ -3,7 +3,7 @@
 #include "awesomo_core/control/position_controller.hpp"
 
 
-#define TEST_CONFIG "tests/configs/position_controller/config.yaml"
+#define TEST_CONFIG "tests/configs/position_controller.yaml"
 
 
 namespace awesomo {
@@ -30,9 +30,6 @@ TEST(PositionController, constructor) {
 
   ASSERT_FLOAT_EQ(0.0, controller.pitch_limit[0]);
   ASSERT_FLOAT_EQ(0.0, controller.pitch_limit[1]);
-
-  ASSERT_FLOAT_EQ(0.0, controller.throttle_limit[0]);
-  ASSERT_FLOAT_EQ(0.0, controller.throttle_limit[1]);
 
   ASSERT_FLOAT_EQ(0.0, controller.setpoint_x);
   ASSERT_FLOAT_EQ(0.0, controller.setpoint_y);
@@ -66,9 +63,6 @@ TEST(PositionController, configure) {
 
   ASSERT_FLOAT_EQ(deg2rad(-50.0), controller.pitch_limit[0]);
   ASSERT_FLOAT_EQ(deg2rad(50.0), controller.pitch_limit[1]);
-
-  ASSERT_FLOAT_EQ(-0.5, controller.throttle_limit[0]);
-  ASSERT_FLOAT_EQ(0.5, controller.throttle_limit[1]);
 
   ASSERT_FLOAT_EQ(0.0, controller.setpoint_x);
   ASSERT_FLOAT_EQ(0.0, controller.setpoint_y);
