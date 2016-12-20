@@ -6,7 +6,7 @@
 #include <yaml-cpp/yaml.h>
 
 #include "awesomo_core/utils/utils.hpp"
-#include "awesomo_core/control/controller.hpp"
+#include "awesomo_core/control/control.hpp"
 #include "awesomo_core/estimation/estimation.hpp"
 
 namespace awesomo {
@@ -53,7 +53,7 @@ public:
   std::vector<Vec2> lt_history;
 
   // controllers
-  PositionController *position_controller;
+  PositionController position_controller;
 
   // estimators
   bool estimator_initialized;

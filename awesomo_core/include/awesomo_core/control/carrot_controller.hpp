@@ -1,6 +1,8 @@
 #ifndef __AWESOMO_CONTROL_CARROT_CONTROLLER_HPP__
 #define __AWESOMO_CONTROL_CARROT_CONTROLLER_HPP__
 
+#include <deque>
+
 #include "awesomo_core/utils/utils.hpp"
 
 

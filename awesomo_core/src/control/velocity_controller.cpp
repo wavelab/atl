@@ -1,4 +1,4 @@
-#include "awesomo_control/position_controller.hpp"
+#include "awesomo_core/control/velocity_controller.hpp"
 
 
 namespace awesomo {

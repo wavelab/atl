@@ -1,4 +1,4 @@
-#include "awesomo_control/control.hpp"
+#include "awesomo_core/control/pid_controller.hpp"
 
 namespace awesomo {
 

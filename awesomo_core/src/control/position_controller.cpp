@@ -1,73 +1,102 @@
-#include "awesomo_control/position_controller.hpp"
+#include "awesomo_core/control/position_controller.hpp"
 
 
 namespace awesomo {
 
 PositionController::PositionController(void) {
-  this->x_controller = PID(0.9, 0.01, 0.33);
-  this->y_controller = PID(0.9, 0.01, 0.33);
-  this->z_controller = PID(3.0, 0.0, 0.5);
+  this->x_controller = PID(0.0, 0.0, 0.0);
+  this->y_controller = PID(0.0, 0.0, 0.0);
+  this->z_controller = PID(0.0, 0.0, 0.0);
+
+  hover_throttle = 0.0;
 
   roll_limit[0] = 0.0;
   roll_limit[1] = 0.0;
 
   pitch_limit[0] = 0.0;
   pitch_limit[1] = 0.0;
+
+  throttle_limit[0] = 0.0;
+  throttle_limit[1] = 0.0;
+
+  setpoint_x = 0.0;
+  setpoint_y = 0.0;
+  setpoint_z = 0.0;
+
+  output_roll = 0.0;
+  output_pitch = 0.0;
+  output_throttle = 0.0;
 }
 
-void PositionController::loadConfig(const std::string config_file) {
+int PositionController::configure(const std::string config_file) {
   try {
-    YAML::Node config = YAML::LoadFile(config_file);
+    YAML::Node config;
+    YAML::Node roll_controller;
+    YAML::Node pitch_controller;
+    YAML::Node throttle_controller;
+
+    config = YAML::LoadFile(config_file);
+    roll_controller = config["roll_controller"];
+    pitch_controller = config["pitch_controller"];
+    throttle_controller = config["throttle_controller"];
 
     // clang-format off
     // roll controller
     this->x_controller = PID(
-      config["x_controller"]["k_p"].as<float>(),
-      config["x_controller"]["k_i"].as<float>(),
-      config["x_controller"]["k_d"].as<float>()
+      roll_controller["k_p"].as<float>(),
+      roll_controller["k_i"].as<float>(),
+      roll_controller["k_d"].as<float>()
     );
-    roll_limit[0] = config["roll_controller"]["min"].as<float>();
-    roll_limit[1] = config["roll_controller"]["min"].as<float>();
+    roll_limit[0] = deg2rad(roll_controller["min"].as<float>());
+    roll_limit[1] = deg2rad(roll_controller["max"].as<float>());
 
     // pitch controller
     this->y_controller = PID(
-      config["y_controller"]["k_p"].as<float>(),
-      config["y_controller"]["k_i"].as<float>(),
-      config["y_controller"]["k_d"].as<float>()
+      pitch_controller["k_p"].as<float>(),
+      pitch_controller["k_i"].as<float>(),
+      pitch_controller["k_d"].as<float>()
     );
-    pitch_limit[0] = config["pitch_controller"]["min"].as<float>();
-    pitch_limit[1] = config["pitch_controller"]["min"].as<float>();
+    pitch_limit[0] = deg2rad(pitch_controller["min"].as<float>());
+    pitch_limit[1] = deg2rad(pitch_controller["max"].as<float>());
 
     // throttle_controller
-    this->y_controller = PID(
-      config["z_controller"]["k_p"].as<float>(),
-      config["z_controller"]["k_i"].as<float>(),
-      config["z_controller"]["k_d"].as<float>()
+    this->z_controller = PID(
+      throttle_controller["k_p"].as<float>(),
+      throttle_controller["k_i"].as<float>(),
+      throttle_controller["k_d"].as<float>()
     );
+    throttle_limit[0] = throttle_controller["min"].as<float>();
+    throttle_limit[1] = throttle_controller["max"].as<float>();
+    hover_throttle = throttle_controller["hover_throttle"].as<float>();
     // clang-format on
 
   } catch (YAML::BadFile &ex) {
     throw;
+    return -1;
   }
+
+  this->configured = true;
+  return 0;
 }
 
 VecX PositionController::calculate(VecX setpoints,
                                    VecX actual,
                                    double yaw,
                                    double dt) {
-  double max_thrust;
   double r, p, y, t;
   VecX outputs(4);
 
-  // roll, pitch, yaw and thrust
-  r = -this->y_controller.calculate(setpoints(1), actual(1), dt);
-  p = this->x_controller.calculate(setpoints(0), actual(0), dt);
+  // roll, pitch, yaw and throttle (assuming ENU frame)
+  r = this->y_controller.calculate(setpoints(1), actual(1), dt);
+  p = -this->x_controller.calculate(setpoints(0), actual(0), dt);
   y = yaw;
-  t = 0.5 + this->z_controller.calculate(setpoints(2), actual(2), dt);
+  t = this->hover_throttle + this->z_controller.calculate(setpoints(2),
+                                                          actual(2),
+                                                          dt);
   outputs << r, p, y, t;
 
-  // limit roll, pitch and yaw
-  for (int i = 0; i < 3; i++) {
+  // limit roll, pitch
+  for (int i = 0; i < 2; i++) {
     if (outputs(i) > deg2rad(30.0)) {
       outputs(i) = deg2rad(30.0);
     } else if (outputs(i) < deg2rad(-30.0)) {
@@ -75,12 +104,29 @@ VecX PositionController::calculate(VecX setpoints,
     }
   }
 
-  // limit thrust
+  // limit yaw
+  while (outputs(2) > deg2rad(360)) {
+    outputs(2) -= deg2rad(360);
+  }
+  while (outputs(2) < 0) {
+    outputs(2) += deg2rad(360);
+  }
+
+  // limit throttle
   if (outputs(3) > 1.0) {
     outputs(3) = 1.0;
   } else if (outputs(3) < 0.0) {
     outputs(3) = 0.0;
   }
+
+  // keep track of setpoints and outputs
+  this->setpoint_x = setpoints(0);
+  this->setpoint_y = setpoints(1);
+  this->setpoint_z = setpoints(2);
+
+  this->output_roll = outputs(0);
+  this->output_pitch = outputs(1);
+  this->output_throttle = outputs(3);
 
   return outputs;
 }

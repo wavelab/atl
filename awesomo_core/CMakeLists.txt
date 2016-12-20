@@ -22,7 +22,10 @@ INCLUDE_DIRECTORIES(
 ADD_LIBRARY(
     ${PROJECT_NAME}
     STATIC
-    src/control/controller.cpp
+    src/control/attitude_controller.cpp
+    src/control/pid_controller.cpp
+    src/control/position_controller.cpp
+    src/control/velocity_controller.cpp
     src/estimation/kf.cpp
     src/planning/planner.cpp
     src/utils/config.cpp
@@ -36,12 +39,14 @@ SET(DEPS
     ${PROJECT_NAME}
     ${catkin_LIBRARIES}
     yaml-cpp
+    gtest
+    pthread
 )
 
 # UNIT TESTS
-# ADD_EXECUTABLE(awesomo_controller_test tests/controller_test.cpp)
-# TARGET_LINK_LIBRARIES(awesomo_controller_test ${DEPS})
-#
+ADD_EXECUTABLE(awesomo_position_controller_test tests/control/position_controller_test.cpp)
+TARGET_LINK_LIBRARIES(awesomo_position_controller_test ${DEPS})
+
 # ADD_EXECUTABLE(awesomo_quadrotor_test tests/quadrotor_test.cpp)
 # TARGET_LINK_LIBRARIES(awesomo_quadrotor_test ${DEPS})
 #

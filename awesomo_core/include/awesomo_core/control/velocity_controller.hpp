@@ -6,7 +6,6 @@
 
 
 namespace awesomo {
-namespace control {
 
 class VelocityController {
 public:
@@ -18,6 +17,5 @@ public:
   VecX calculate(Vec3 setpoints, Vec3 actual, double yaw, double dt);
 };
 
-}  // end of control namespace
 }  // end of awesomo namespace
 #endif

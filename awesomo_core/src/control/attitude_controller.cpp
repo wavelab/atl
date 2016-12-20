@@ -1,4 +1,4 @@
-#include "awesomo_control/attitude_controller.hpp"
+#include "awesomo_core/control/attitude_controller.hpp"
 
 
 namespace awesomo {

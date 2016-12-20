@@ -11,23 +11,28 @@ namespace awesomo {
 
 class PositionController {
 public:
+  bool configured;
+
   PID x_controller;
   PID y_controller;
   PID z_controller;
 
+  double hover_throttle;
+
   double roll_limit[2];
   double pitch_limit[2];
+  double throttle_limit[2];
 
-  double setpoint_roll;
-  double setpoint_pitch;
-  double setpoint_throttle;
+  double setpoint_x;
+  double setpoint_y;
+  double setpoint_z;
 
   double output_roll;
   double output_pitch;
   double output_throttle;
 
   PositionController(void);
-  void loadConfig(const std::string config_file);
+  int configure(const std::string config_file);
   VecX calculate(VecX setpoints, VecX actual, double yaw, double dt);
   void reset(void);
 };
