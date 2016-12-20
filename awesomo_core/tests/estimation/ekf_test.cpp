@@ -9,13 +9,6 @@
 #define TEST_EKF_OUTPUT_FILE "/tmp/estimation_ekf_test.output"
 
 
-// TESTS
-int prepareOutputFile(std::ofstream &output_file, std::string output_path);
-void recordTimeStep(std::ofstream &output_file,
-                    int i,
-                    awesomo::Vec3 mea,
-                    awesomo::Vec3 est);
-
 int prepareOutputFile(std::ofstream &output_file, std::string output_path) {
   output_file.open(output_path);
 

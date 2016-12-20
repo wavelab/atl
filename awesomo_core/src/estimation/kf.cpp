@@ -4,145 +4,56 @@
 namespace awesomo {
 
 KalmanFilter::KalmanFilter(void) {
-  this->A = MatX(9, 9);
-  this->B = MatX(9, 9);
-  this->R = MatX(9, 9);
+  this->initialized = false;
 
-  this->C = MatX(3, 9);
-  this->Q = MatX(3, 3);
+  this->B = MatX::Zero(1, 1);
+  this->R = MatX::Zero(1, 1);
 
-  this->S = MatX(9, 9);
-  this->I = MatX(9, 9);
-  this->K = MatX(9, 9);
+  this->C = MatX::Zero(1, 1);
+  this->Q = MatX::Zero(1, 1);
 
-  this->mu_p = VecX(9);
-  this->S_p = MatX(9, 9);
+  this->S = MatX::Zero(1, 1);
+  this->I = MatX::Zero(1, 1);
+  this->K = MatX::Zero(1, 1);
+
+  this->mu_p = VecX::Zero(1);
+  this->S_p = MatX::Zero(1, 1);
 }
 
-KalmanFilter::KalmanFilter(VecX mu) {
-  MatX A(9, 9);
-  MatX B(9, 9);
-  MatX R(9, 9);
+int KalmanFilter::init(VecX mu, MatX R, MatX C, MatX Q) {
+  int nb_states;
 
-  MatX C(3, 9);
-  MatX Q(3, 3);
-
-  MatX S(9, 9);
-  MatX I(9, 9);
-  MatX K(9, 9);
-
-  VecX mu_p(9);
-  MatX S_p(9, 9);
-
-  // transition matrix (assuming constant acceleration)
-  // clang-format off
-  A << 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-       0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-       0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-       0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-       0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0,
-       0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
-       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0,
-       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0,
-       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0;
-  // clang-format on
-
-  // input matrix
-  B = MatX::Zero(9, 9);
-
-  // motion noise
-  // clang-format off
-  R << 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-       0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-       0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-       0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-       0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0,
-       0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
-       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0,
-       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0,
-       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0;
-  // clang-format on
-
-  // measurement model
-  // clang-format off
-  C << 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-       0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-       0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
-  // clang-format on
-
-  // measurement noise
-  // clang-format off
-  Q << 20.0, 0.0, 0.0,
-       0.0, 20.0, 0.0,
-       0.0, 0.0, 20.0;
-  // clang-format on
-
-  // misc
-  S = MatX::Identity(9, 9) * 100;
-  I = MatX::Identity(9, 9);
-  K = MatX::Zero(9, 9);
-  // mu_p = VecX::Zero(9);
-  S_p = MatX::Zero(9, 9);
-
-  // configure kalman filter
+  nb_states = mu.size();
+  this->initialized = true;
   this->mu = mu;
 
-  this->A = A;
-  this->B = B;
+  this->B = MatX::Zero(nb_states, nb_states);
   this->R = R;
 
   this->C = C;
   this->Q = Q;
 
-  this->S = S;
-  this->I = I;
-  this->K = K;
+  this->S = MatX::Identity(nb_states, nb_states);
+  this->I = MatX::Identity(nb_states, nb_states);
+  this->K = MatX::Zero(nb_states, nb_states);
 
-  this->mu_p = mu_p;
-  this->S_p = S_p;
+  this->mu_p = VecX::Zero(nb_states);
+  this->S_p = MatX::Zero(nb_states, nb_states);
+
+  return 0;
 }
 
-void KalmanFilter::estimate(VecX y, float dt, bool tag_detected) {
-  // transition matrix (constant acceleration)
-  // // clang-format on
-  this->A << 1.0, 0.0, 0.0, dt, 0.0, 0.0, pow(dt, 2) / 2.0, 0.0, 0.0, 0.0,
-    1.0, 0.0, 0.0, dt, 0.0, 0.0, pow(dt, 2) / 2.0, 0.0, 0.0, 0.0, 1.0, 0.0,
-    0.0, dt, 0.0, 0.0, pow(dt, 2) / 2.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, dt,
-    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, dt, 0.0, 0.0, 0.0, 0.0, 0.0,
-    0.0, 1.0, 0.0, 0.0, dt, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
-    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-    0.0, 1.0;
-  // clang-format on
-
-  // transition matrix (constant velocity)
-  // // clang-format off
-  // this->A << 1.0, 0.0, 0.0, dt, 0.0, 0.0, 0.0, 0.0, 0.0,
-  //         0.0, 1.0, 0.0, 0.0, dt, 0.0, 0.0, 0.0, 0.0,
-  //         0.0, 0.0, 1.0, 0.0, 0.0, dt, 0.0, 0.0, 0.0,
-  //         0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-  //         0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0,
-  //         0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
-  //         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-  //         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-  //         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
-  // // clang-format on
-
+int KalmanFilter::estimate(MatX A, VecX y) {
   // prediction update
-  this->mu_p = this->A * this->mu;
-  this->S_p = this->A * this->S * this->A.transpose() + this->R;
+  mu_p = A * mu;
+  S_p = A * S * A.transpose() + R;
 
   // measurement update
-  if (tag_detected) {
-    // clang-format off
-    this->K = this->S_p * this->C.transpose() * (this->C * this->S_p * this->C.transpose() + this->Q).inverse();
-    this->mu = this->mu_p + this->K * (y - this->C * this->mu_p);
-    this->S = (this->I - this->K * this->C) * this->S_p;
-    // clang-format on
+  K = S_p * C.transpose() * (C * S_p * C.transpose() + Q).inverse();
+  mu = mu_p + K * (y - C * mu_p);
+  S = (I - K * C) * S_p;
 
-  } else {
-    this->mu = this->mu_p;
-    this->S = this->S_p;
-  }
+  return 0;
 }
 
 }  // end of awesomo namespace

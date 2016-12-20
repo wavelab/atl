@@ -8,7 +8,10 @@ namespace awesomo {
 
 class KalmanFilter {
 public:
-  MatX A;
+  bool initialized;
+
+  VecX mu;
+
   MatX B;
   MatX R;
 
@@ -19,14 +22,12 @@ public:
   MatX I;
   MatX K;
 
-  VecX mu;
-
   VecX mu_p;
   MatX S_p;
 
   KalmanFilter(void);
-  KalmanFilter(VecX mu);
-  void estimate(VecX y, float dt, bool tag_detected);
+  int init(VecX mu, MatX R, MatX C, MatX Q);
+  int estimate(MatX A, VecX y);
 };
 
 }  // end of awesomo namespace

@@ -60,6 +60,9 @@ TARGET_LINK_LIBRARIES(awesomo_velocity_controller_test ${DEPS})
 ADD_EXECUTABLE(awesomo_ekf_test tests/estimation/ekf_test.cpp)
 TARGET_LINK_LIBRARIES(awesomo_ekf_test ${DEPS})
 
+ADD_EXECUTABLE(awesomo_kf_test tests/estimation/kf_test.cpp)
+TARGET_LINK_LIBRARIES(awesomo_kf_test ${DEPS})
+
 # ADD_EXECUTABLE(awesomo_quadrotor_test tests/quadrotor_test.cpp)
 # TARGET_LINK_LIBRARIES(awesomo_quadrotor_test ${DEPS})
 #
