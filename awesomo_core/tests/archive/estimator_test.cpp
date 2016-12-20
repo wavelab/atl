@@ -39,30 +39,28 @@ int test_apriltag_kf_estimate(void) {
   std::normal_distribution<float> norm_dist_z(0, 0.5);
 
   // setup
+  // clang-format off
   dt = 0.01;
   pos << 0, 0, 0;
   vel << 9, 30, 0;
   acc << 0, -10, 0;
-  mu << 0.0, 0.0, 0.0,  // x, y, z
-    9.0, 30.0, 0.0,     // x_dot, y_dot, z_dot
-    0.0, -10.0, 0.0;    // x_ddot, y_ddot, z_ddot
+  mu << 0.0, 0.0, 0.0,    // x, y, z
+        9.0, 30.0, 0.0,   // x_dot, y_dot, z_dot
+        0.0, -10.0, 0.0;  // x_ddot, y_ddot, z_ddot
   apriltag_kf_setup(&estimator, mu);
+  // clang-format on
 
   // prepare test data file
+  // clang-format off
   test_data.open("estimator_test.dat");
-  test_data << "time_step"
-            << ",";
-  test_data << "x"
-            << ",";
-  test_data << "y"
-            << ",";
-  test_data << "z"
-            << ",";
-  test_data << "bx"
-            << ",";
-  test_data << "by"
-            << ",";
+  test_data << "time_step" << ",";
+  test_data << "x" << ",";
+  test_data << "y" << ",";
+  test_data << "z" << ",";
+  test_data << "bx" << ",";
+  test_data << "by" << ",";
   test_data << "bz" << std::endl;
+  // clang-format on
 
   // estimate
   for (int i = 0; i < 1000; i++) {
