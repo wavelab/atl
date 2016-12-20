@@ -31,7 +31,7 @@ public:
   double output_throttle;
 
   PositionController(void);
-  int configure(const std::string config_file);
+  int configure(std::string config_file);
   VecX calculate(VecX setpoints, VecX actual, double yaw, double dt);
   void reset(void);
 };

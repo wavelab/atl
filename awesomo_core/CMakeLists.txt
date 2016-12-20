@@ -53,6 +53,9 @@ TARGET_LINK_LIBRARIES(awesomo_pid_controller_test ${DEPS})
 ADD_EXECUTABLE(awesomo_position_controller_test tests/control/position_controller_test.cpp)
 TARGET_LINK_LIBRARIES(awesomo_position_controller_test ${DEPS})
 
+ADD_EXECUTABLE(awesomo_velocity_controller_test tests/control/velocity_controller_test.cpp)
+TARGET_LINK_LIBRARIES(awesomo_velocity_controller_test ${DEPS})
+
 
 # ADD_EXECUTABLE(awesomo_quadrotor_test tests/quadrotor_test.cpp)
 # TARGET_LINK_LIBRARIES(awesomo_quadrotor_test ${DEPS})

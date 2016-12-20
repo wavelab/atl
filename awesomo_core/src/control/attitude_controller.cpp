@@ -22,8 +22,8 @@ AttitudeController::AttitudeController(void) {
 }
 
 VecX AttitudeController::calculate(Vec4 setpoints, Vec4 actual, double dt) {
-  double r, p, y, t;
   VecX outputs(4);
+  double r, p, y, t;
   double max_thrust;
 
   // roll pitch yaw

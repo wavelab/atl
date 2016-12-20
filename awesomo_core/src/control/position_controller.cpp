@@ -10,24 +10,24 @@ PositionController::PositionController(void) {
   this->y_controller = PID(0.0, 0.0, 0.0);
   this->z_controller = PID(0.0, 0.0, 0.0);
 
-  hover_throttle = 0.0;
+  this->hover_throttle = 0.0;
 
-  roll_limit[0] = 0.0;
-  roll_limit[1] = 0.0;
+  this->roll_limit[0] = 0.0;
+  this->roll_limit[1] = 0.0;
 
-  pitch_limit[0] = 0.0;
-  pitch_limit[1] = 0.0;
+  this->pitch_limit[0] = 0.0;
+  this->pitch_limit[1] = 0.0;
 
-  setpoint_x = 0.0;
-  setpoint_y = 0.0;
-  setpoint_z = 0.0;
+  this->setpoint_x = 0.0;
+  this->setpoint_y = 0.0;
+  this->setpoint_z = 0.0;
 
-  output_roll = 0.0;
-  output_pitch = 0.0;
-  output_throttle = 0.0;
+  this->output_roll = 0.0;
+  this->output_pitch = 0.0;
+  this->output_throttle = 0.0;
 }
 
-int PositionController::configure(const std::string config_file) {
+int PositionController::configure(std::string config_file) {
   try {
     YAML::Node config;
     YAML::Node roll_controller;
@@ -46,8 +46,8 @@ int PositionController::configure(const std::string config_file) {
       roll_controller["k_i"].as<float>(),
       roll_controller["k_d"].as<float>()
     );
-    roll_limit[0] = deg2rad(roll_controller["min"].as<float>());
-    roll_limit[1] = deg2rad(roll_controller["max"].as<float>());
+    this->roll_limit[0] = deg2rad(roll_controller["min"].as<float>());
+    this->roll_limit[1] = deg2rad(roll_controller["max"].as<float>());
 
     // pitch controller
     this->y_controller = PID(
@@ -55,8 +55,8 @@ int PositionController::configure(const std::string config_file) {
       pitch_controller["k_i"].as<float>(),
       pitch_controller["k_d"].as<float>()
     );
-    pitch_limit[0] = deg2rad(pitch_controller["min"].as<float>());
-    pitch_limit[1] = deg2rad(pitch_controller["max"].as<float>());
+    this->pitch_limit[0] = deg2rad(pitch_controller["min"].as<float>());
+    this->pitch_limit[1] = deg2rad(pitch_controller["max"].as<float>());
 
     // throttle_controller
     this->z_controller = PID(
@@ -64,7 +64,7 @@ int PositionController::configure(const std::string config_file) {
       throttle_controller["k_i"].as<float>(),
       throttle_controller["k_d"].as<float>()
     );
-    hover_throttle = throttle_controller["hover_throttle"].as<float>();
+    this->hover_throttle = throttle_controller["hover_throttle"].as<float>();
     // clang-format on
 
   } catch (YAML::BadFile &ex) {
