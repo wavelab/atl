@@ -1,0 +1,17 @@
+mount_offset:
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    roll: 0.0
+    pitch: 90.0
+    yaw: 0.0
+
+gimbal_dev_path: /dev/ttyUSB0
+
+gimbal_limits:
+    roll_min: -20.0
+    roll_max: 20.0
+    pitch_max: 40.0
+    pitch_min: -40.0
+    yaw_min: 0.0
+    yaw_max: 0.0

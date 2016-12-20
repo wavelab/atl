@@ -1,0 +1,15 @@
+camera_type: "normal"
+camera_index: 0
+camera_imshow: 1
+camera_snapshot: 0
+camera_exposure_value: 0
+camera_gain_value: 0.0
+apriltag_imshow: 0
+
+nb_configs: 1
+config_keys: ["default"]
+config_files: ["ost.yaml"]
+
+nb_apriltags: 2
+apriltag_ids: [0, 5]
+apriltag_sizes: [0.048, 0.343]

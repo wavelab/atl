@@ -1,9 +1,0 @@
-thrust_controller:
-    hover_throttle: 0.5
-    setpoint: 1.0
-    deadzone: 0.0
-    min: -0.4
-    max: 0.4
-    k_p: 0.1
-    k_i: 0.0
-    k_d: 0.05
