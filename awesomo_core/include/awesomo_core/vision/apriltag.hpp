@@ -14,8 +14,8 @@
 #include <apriltags/TagDetector.h>
 #include <apriltags/CameraUtil.h>
 
-#include "awesomo_core/vision/util.hpp"
-#include "awesomo_core/vision/estimator.hpp"
+#include "awesomo_core/utils/utils.hpp"
+// #include "awesomo_core/vision/estimator.hpp"
 
 
 #define _USE_MATH_DEFINES
@@ -25,12 +25,22 @@
 #define TWOPI 2.0 * 3.1415926535897932384626433832795
 #endif
 
-
-// CLASSES
 class TagPose {
 public:
   int id;
-  Eigen::Vector3d translation;
+  bool detected;
+  Eigen::Vector3d position;
+
+  TagPose(void) {
+    this->id = -1;
+    this->detected = false;
+    this->position << 0.0, 0.0, 0.0;
+  };
+  TagPose(int id, bool detected, Eigen::Vector3d position) {
+    this->id = id;
+    this->detected = detected;
+    this->position = position;
+  }
 };
 
 class Detector {
@@ -42,7 +52,7 @@ public:
   int apriltag_imshow;
   cv::Rect roi_rect;
 
-  struct kf tag_estimator;
+  // struct kf tag_estimator;
   bool use_estimator;
   bool estimator_initialized;
 

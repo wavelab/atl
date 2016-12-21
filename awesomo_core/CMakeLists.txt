@@ -30,8 +30,9 @@ ADD_LIBRARY(
     src/estimation/kf.cpp
     src/planning/planning.cpp
     src/utils/config.cpp
-    src/utils/math.cpp
     src/utils/data.cpp
+    src/utils/io.cpp
+    src/utils/math.cpp
     src/utils/stats.cpp
     src/utils/time.cpp
     src/quadrotor/base_mode.cpp
@@ -68,6 +69,9 @@ TARGET_LINK_LIBRARIES(awesomo_kf_test ${DEPS})
 
 ADD_EXECUTABLE(awesomo_planning_test tests/planning/planning_test.cpp)
 TARGET_LINK_LIBRARIES(awesomo_planning_test ${DEPS})
+
+ADD_EXECUTABLE(awesomo_hover_mode_test tests/quadrotor/hover_mode_test.cpp)
+TARGET_LINK_LIBRARIES(awesomo_hover_mode_test ${DEPS})
 
 ADD_EXECUTABLE(awesomo_quadrotor_test tests/quadrotor/quadrotor_test.cpp)
 TARGET_LINK_LIBRARIES(awesomo_quadrotor_test ${DEPS})

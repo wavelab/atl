@@ -8,7 +8,17 @@ namespace awesomo {
 
 class LandingMode : public BaseMode {
 public:
+  // height update
+  float period;
+  float descend_multiplier;
+  float recover_multiplier;
+
+  // disarm conditions
+  float belief_threshold;
+  Vec3 cutoff_position;
+
   LandingMode(void);
+  int configure(std::string config_file);
 };
 
 

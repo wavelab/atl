@@ -5,7 +5,7 @@ namespace awesomo {
 
 Quadrotor::Quadrotor(void) {
   this->configured = false;
-  this->mode = OFF_MODE;
+  this->mode = HOVER_MODE;
 }
 
 int Quadrotor::configure(std::string config_path) {
@@ -20,7 +20,7 @@ int Quadrotor::configure(std::string config_path) {
   return 0;
 
 error:
-  log_err("failed to configure quadrotor!");
+  log_err(FCONFQUAD);
   return -1;
 }
 
@@ -29,11 +29,27 @@ int Quadrotor::configurePositionController(std::string config_file) {
 
   retval = this->position_controller.configure(config_file);
   if (retval != 0) {
-    log_err("failed to configure position controller");
+    log_err(FCONFPCTRL);
     return -1;
   } else {
     return 0;
   }
+}
+
+int Quadrotor::step(void) {
+  switch (this->mode) {
+    case HOVER_MODE:
+      break;
+    case TRACKING_MODE:
+      break;
+    case LANDING_MODE:
+      break;
+    default:
+      log_err(EINVMODE);
+      return -1;
+  }
+
+  return 0;
 }
 
 

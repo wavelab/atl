@@ -35,6 +35,12 @@ int VelocityController::configure(std::string config_file) {
     YAML::Node pitch_controller;
     YAML::Node throttle_controller;
 
+    // pre-check
+    if (file_exists(config_file) == false) {
+      return -1;
+    }
+
+    // setup
     config = YAML::LoadFile(config_file);
     roll_controller = config["roll_controller"];
     pitch_controller = config["pitch_controller"];

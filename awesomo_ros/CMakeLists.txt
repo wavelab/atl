@@ -11,7 +11,6 @@ FIND_PACKAGE(
     REQUIRED COMPONENTS
     roscpp
     rospy
-    atim
     std_msgs
     message_generation
     image_transport

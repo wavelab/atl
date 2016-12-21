@@ -34,8 +34,13 @@ int PositionController::configure(std::string config_file) {
     YAML::Node pitch_controller;
     YAML::Node throttle_controller;
 
-    std::cout << config_file << std::endl;
+    // pre-check
+    if (file_exists(config_file) == false) {
+      log_err("File not found: %s", config_file.c_str());
+      return -1;
+    }
 
+    // setup
     config = YAML::LoadFile(config_file);
     roll_controller = config["roll_controller"];
     pitch_controller = config["pitch_controller"];
@@ -71,7 +76,7 @@ int PositionController::configure(std::string config_file) {
 
   } catch (std::exception &ex) {
     std::cout << ex.what();
-    return -1;
+    return -2;
   }
 
   this->configured = true;

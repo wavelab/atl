@@ -11,13 +11,11 @@
 
 namespace awesomo {
 
-enum Mode {
-  OFF_MODE = 0,
-  HOVER_MODE = 1,
-  DISCOVER_MODE = 2,
-  TRACKING_MODE = 3,
-  LANDING_MODE = 4
-};
+#define EINVMODE "Invalid quadrotor mode!"
+#define FCONFQUAD "Failed to configure quadrotor!"
+#define FCONFPCTRL "Failed to configure position controller"
+
+enum Mode { HOVER_MODE = 1, TRACKING_MODE = 2, LANDING_MODE = 3 };
 
 class Quadrotor {
 public:
@@ -29,6 +27,7 @@ public:
   Quadrotor(void);
   int configure(std::string config_path);
   int configurePositionController(std::string config_file);
+  int step(void);
 };
 
 }  // end of awesomo namespace

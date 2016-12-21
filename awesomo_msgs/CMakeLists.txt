@@ -24,7 +24,7 @@ ADD_MESSAGE_FILES(
     KFPlotting.msg
     KFStats.msg
     PositionControllerStats.msg
-    TagPoseStamped.msg
+    AprilTagPose.msg
 )
 GENERATE_MESSAGES(DEPENDENCIES std_msgs geometry_msgs)
 

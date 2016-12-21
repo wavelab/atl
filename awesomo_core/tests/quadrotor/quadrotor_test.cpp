@@ -8,7 +8,7 @@ TEST(Quadrotor, constructor) {
   awesomo::Quadrotor quadrotor;
 
   ASSERT_FALSE(quadrotor.configured);
-  ASSERT_EQ(awesomo::OFF_MODE, quadrotor.mode);
+  ASSERT_EQ(awesomo::HOVER_MODE, quadrotor.mode);
 }
 
 TEST(Quadrotor, configure) {
@@ -16,7 +16,7 @@ TEST(Quadrotor, configure) {
 
   quadrotor.configure(TEST_CONFIG_PATH);
   ASSERT_TRUE(quadrotor.configured);
-  ASSERT_EQ(awesomo::OFF_MODE, quadrotor.mode);
+  ASSERT_EQ(awesomo::HOVER_MODE, quadrotor.mode);
 }
 
 int main(int argc, char **argv) {

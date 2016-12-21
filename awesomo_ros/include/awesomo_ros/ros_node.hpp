@@ -70,9 +70,9 @@ public:
 
   template <typename M, typename T>
   int registerSubscriber(const std::string &topic,
-                         uint32_t queue_size,
                          void (T::*fp)(M),
-                         T *obj) {
+                         T *obj,
+                         uint32_t queue_size = 100) {
     // pre-check
     if (this->configured == false) {
       return -1;

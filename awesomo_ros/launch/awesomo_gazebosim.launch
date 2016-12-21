@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
 <launch>
-  <param name="config_dir" value="$(find awesomo_configs)/configs/quadrotor/" />
+  <param name="config_dir" value="$(find awesomo_configs)/configs/quadrotor_gazebo_sim" />
   <node pkg="awesomo" type="awesomo_node" name="awesomo" output="screen" />
 </launch>
