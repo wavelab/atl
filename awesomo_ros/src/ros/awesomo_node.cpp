@@ -142,23 +142,13 @@ int AwesomoNode::awesomoLoopCallback(void) {
   dt = (ros::Time::now() - this->ros_last_updated).toSec();
 
   // step
-  switch (this->quadrotor.current_mode) {
-    case HOVER_MODE:
-      this->quadrotor.hover_mode.step(this->world_pose, dt);
-      att_cmd = this->quadrotor.hover_mode.att_cmd;
-      break;
-    case TRACKING_MODE:
-      break;
-    case LANDING_MODE:
-      break;
-    case DISARM_MODE:
-      return -1;
-    default:
-      log_err(EINVMODE);
-      return -1;
+  if (this->quadrotor.step(this->world_pose, dt) != 0) {
+    return -1;
   }
 
   // publish msgs
+  att_cmd = this->quadrotor.att_cmd;
+  att_cmd.print();
   buildAttitudeMsg(seq, ros::Time::now(), att_cmd, att_msg, thr_msg);
   this->ros_pubs[SETPOINT_ATTITUDE_TOPIC].publish(att_msg);
   this->ros_pubs[SETPOINT_THROTTLE_TOPIC].publish(thr_msg);
@@ -195,7 +185,7 @@ void AwesomoNode::publishStats(void) {
 int main(int argc, char **argv) {
   awesomo::AwesomoNode awesomo_node;
 
-  if (awesomo_node.configure(NODE_NAME, NODE_RATE)) {
+  if (awesomo_node.configure(NODE_NAME, NODE_RATE) != 0) {
     ROS_ERROR("Failed to configure AwesomoNode!");
     return -1;
   }

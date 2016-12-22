@@ -22,11 +22,15 @@ void BaseMode::stop(void) {
 }
 
 void BaseMode::update(void) {
-  tic(&this->time_last);
+  if (this->is_running) {
+    this->start();
+  } else {
+    tic(&this->time_last);
+  }
 }
 
-double BaseMode::duration(void) {
-  mtoc(&this->time_start);
+double BaseMode::elasped(void) {
+  return mtoc(&this->time_start);
 }
 
 }  // end of awesomo namespace

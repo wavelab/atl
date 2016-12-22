@@ -74,10 +74,10 @@ void buildAttitudeMsg(int seq,
   msg.pose.position.y = 0;
   msg.pose.position.z = 0;
 
+  msg.pose.orientation.w = att_cmd.q.w();
   msg.pose.orientation.x = att_cmd.q.x();
   msg.pose.orientation.y = att_cmd.q.y();
   msg.pose.orientation.z = att_cmd.q.z();
-  msg.pose.orientation.w = att_cmd.q.w();
 
   // throttle command
   thr_msg.data = att_cmd.throttle;

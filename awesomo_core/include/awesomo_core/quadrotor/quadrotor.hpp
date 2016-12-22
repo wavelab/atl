@@ -47,9 +47,13 @@ public:
   HoverMode hover_mode;
 
   PositionController position_controller;
+  double heading;
+  AttitudeCommand att_cmd;
 
   Quadrotor(void);
   int configure(std::string config_path);
+  int stepHoverMode(Pose pose, double dt);
+  int step(Pose pose, double dt);
 };
 
 }  // end of awesomo namespace

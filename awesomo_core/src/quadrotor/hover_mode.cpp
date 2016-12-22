@@ -33,6 +33,10 @@ int HoverMode::configure(std::string config_file) {
   return 0;
 }
 
+void HoverMode::updateHoverPosition(Vec3 pos) {
+  this->hover_position = pos;
+}
+
 int HoverMode::step(Pose pose, double dt) {
   return 0;
 }

@@ -15,10 +15,10 @@ public:
   bool configured;
   double hover_height;
   Vec3 hover_position;
-  AttitudeCommand att_cmd;
 
   HoverMode(void);
   int configure(std::string config_file);
+  void updateHoverPosition(Vec3 pos);
   int step(Pose pose, double dt);
 };
 

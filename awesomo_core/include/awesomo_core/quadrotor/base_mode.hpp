@@ -17,7 +17,7 @@ public:
   virtual void start(void);
   virtual void stop(void);
   virtual void update(void);
-  double duration(void);
+  double elasped(void);
 };
 
 }  // end of awesomo namespace

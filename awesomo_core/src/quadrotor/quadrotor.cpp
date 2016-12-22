@@ -28,4 +28,50 @@ error:
   return -1;
 }
 
+int Quadrotor::stepHoverMode(Pose pose, double dt) {
+  Vec3 actual;
+  Vec3 setpoint;
+  Vec4 output;
+
+  setpoint = this->hover_mode.hover_position;
+  actual = pose.position;
+
+  // clang-format off
+  output = this->position_controller.calculate(
+    setpoint,
+    actual,
+    this->heading,
+    dt
+  );
+  this->att_cmd = AttitudeCommand(output);
+  // clang-format on
+
+  return 0;
+}
+
+int Quadrotor::step(Pose pose, double dt) {
+  switch (this->current_mode) {
+    case HOVER_MODE:
+      this->stepHoverMode(pose, dt);
+      break;
+
+    case TRACKING_MODE:
+      this->hover_mode.updateHoverPosition(pose.position);
+      break;
+
+    case LANDING_MODE:
+      this->hover_mode.updateHoverPosition(pose.position);
+      break;
+
+    case DISARM_MODE:
+      return -1;
+
+    default:
+      log_err(EINVMODE);
+      return -1;
+  }
+
+  return 0;
+}
+
 }  // end of awesomo namespace

@@ -11,6 +11,29 @@ AttitudeCommand::AttitudeCommand(void) {
   this->throttle = 0.0;
 }
 
+AttitudeCommand::AttitudeCommand(Vec4 command) {
+  Vec3 euler;
+  Quaternion q;
+  double throttle;
+
+  // quaternion
+  euler << command(0), command(1), command(2);  // roll, pitch, yaw
+  euler2quat(euler, 321, this->q);
+
+  // throttle
+  this->throttle = command(3);
+}
+
+void AttitudeCommand::print(void) {
+  Vec3 euler;
+  quat2euler(this->q, 321, euler);
+
+  printf("roll: %f \t", euler(0));
+  printf("pitch: %f \t", euler(1));
+  printf("yaw: %f \t", euler(2));
+  printf("throttle: %f\n", this->throttle);
+}
+
 PositionController::PositionController(void) {
   this->configured = false;
 
@@ -99,13 +122,13 @@ VecX PositionController::calculate(VecX setpoints,
   VecX outputs(4);
 
   // roll, pitch, yaw and throttle (assuming ENU frame)
-  r = this->y_controller.calculate(setpoints(1), actual(1), dt);
-  p = -this->x_controller.calculate(setpoints(0), actual(0), dt);
+  // clang-format off
+  r = -this->y_controller.calculate(setpoints(1), actual(1), dt);
+  p = this->x_controller.calculate(setpoints(0), actual(0), dt);
   y = yaw;
-  t = this->hover_throttle +
-      this->z_controller.calculate(setpoints(2), actual(2), dt);
-  t /= fabs(cos(actual(1)) *
-            cos(actual(0)));  // adjust throttle for roll and pitch
+  t = this->hover_throttle + this->z_controller.calculate(setpoints(2), actual(2), dt);
+  t /= fabs(cos(actual(1)) * cos(actual(0)));  // adjust throttle for roll and pitch
+  // clang-format o
 
   // limit roll, pitch
   r = (r < this->roll_limit[0]) ? this->roll_limit[0] : r;
@@ -114,7 +137,7 @@ VecX PositionController::calculate(VecX setpoints,
   p = (p > this->pitch_limit[1]) ? this->pitch_limit[1] : p;
 
   // limit yaw
-  while (outputs(2) > deg2rad(360)) {
+  while (y > deg2rad(360)) {
     y -= deg2rad(360);
   }
   while (y < 0) {

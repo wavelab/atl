@@ -119,7 +119,7 @@ TEST(PositionController, calculate) {
   // clang-format on
 
   ASSERT_FLOAT_EQ(0.0, controller.output_roll);
-  ASSERT_TRUE(controller.output_pitch < 0.0);
+  ASSERT_TRUE(controller.output_pitch > 0.0);
 
   // CHECK MOVING TOWARDS THE Y LOCATION
   setpoint << 0, 1, 0;
@@ -136,7 +136,7 @@ TEST(PositionController, calculate) {
             << controller.output_throttle << std::endl;
   // clang-format on
 
-  ASSERT_TRUE(controller.output_roll > 0.0);
+  ASSERT_TRUE(controller.output_roll < 0.0);
   ASSERT_FLOAT_EQ(0.0, controller.output_pitch);
 
   // CHECK MOVING TOWARDS THE X AND Y LOCATION
@@ -153,8 +153,8 @@ TEST(PositionController, calculate) {
 
   controller.reset();
   controller.calculate(setpoint, actual, yaw_setpoint, dt);
-  ASSERT_TRUE(controller.output_roll < 0.0);
-  ASSERT_TRUE(controller.output_pitch < 0.0);
+  ASSERT_TRUE(controller.output_roll > 0.0);
+  ASSERT_TRUE(controller.output_pitch > 0.0);
   // ASSERT_TRUE(controller.throttle > controller.hover_throttle);
 }
 
