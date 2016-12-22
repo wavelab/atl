@@ -6,12 +6,13 @@ namespace awesomo {
 HoverMode::HoverMode(void) {
   this->configured = false;
   this->hover_height = 0.0;
+  this->hover_position << 0.0, 0.0, 0.0;
 }
 
 int HoverMode::configure(std::string config_file) {
-  try {
-    YAML::Node config;
+  YAML::Node config;
 
+  try {
     // pre-check
     if (file_exists(config_file) == false) {
       log_err("File not found: %s", config_file.c_str());
@@ -21,6 +22,7 @@ int HoverMode::configure(std::string config_file) {
     // parse configs
     config = YAML::LoadFile(config_file);
     this->hover_height = config["hover_height"].as<double>();
+    this->hover_position = yamlVec3ToVec3(config["hover_position"]);
 
   } catch (std::exception &ex) {
     std::cout << ex.what();
@@ -28,6 +30,10 @@ int HoverMode::configure(std::string config_file) {
   }
 
   this->configured = true;
+  return 0;
+}
+
+int HoverMode::step(Pose pose, double dt) {
   return 0;
 }
 

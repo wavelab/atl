@@ -31,6 +31,10 @@
 #include "awesomo_ros/ros_node.hpp"
 #include "awesomo_ros/ros_msgs.hpp"
 
+// ROS NODE
+#define NODE_NAME "awesomo_node"
+#define NODE_RATE 100
+
 
 // ROS TOPICS
 #define ARM_TOPIC "/mavros/cmd/arming"
@@ -67,7 +71,7 @@ public:
   ros::ServiceClient arming_client;
 
   AwesomoNode(void);
-  int configure(std::string config_path);
+  int configure(std::string node_name, int hz);
   void waitForConnection(void);
   int disarm(void);
   int setOffboardModeOn(void);

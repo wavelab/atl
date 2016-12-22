@@ -12,10 +12,13 @@ public:
   Vec3 position;
 
   Pose(void);
-  Pose(float roll, float pitch, float yaw, float x, float y, float z);
   Pose(Quaternion q, Vec3 position);
-
-  Eigen::Matrix3d rotationMatrix(void);
+  Pose(double roll, double pitch, double yaw, double x, double y, double z);
+  Mat3 rotationMatrix(void);
+  void printPosition(void);
+  void printOrientation(void);
+  void printQuaternion(void);
+  void print(void);
 };
 
 class Velocity {
@@ -28,13 +31,14 @@ public:
   double angular_y;
   double angular_z;
 
-  Velocity(void)
-      : linear_x(0),
-        linear_y(0),
-        linear_z(0),
-        angular_x(0),
-        angular_y(0),
-        angular_z(0) {}
+  Velocity(void) {
+    this->linear_x = 0;
+    this->linear_y = 0;
+    this->linear_z = 0;
+    this->angular_x = 0;
+    this->angular_y = 0;
+    this->angular_z = 0;
+  }
 };
 
 class Attitude {
@@ -48,7 +52,15 @@ public:
   double pitch;
   double yaw;
 
-  Attitude(void) : x(0), y(0), z(0), w(0), roll(0), pitch(0), yaw(0) {}
+  Attitude(void) {
+    this->x = 0;
+    this->y = 0;
+    this->z = 0;
+    this->w = 0;
+    this->roll = 0;
+    this->pitch = 0;
+    this->yaw = 0;
+  }
 };
 
 
@@ -57,7 +69,10 @@ public:
   bool detected;
   Vec3 position;
 
-  LandingTargetPosition(void) : detected(false), position(0, 0, 0) {}
+  LandingTargetPosition(void) {
+    this->detected = false;
+    this->position << 0, 0, 0;
+  }
 };
 
 }  // end of awesomo namespace

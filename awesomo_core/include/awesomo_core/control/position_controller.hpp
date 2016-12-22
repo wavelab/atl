@@ -9,6 +9,14 @@
 
 namespace awesomo {
 
+class AttitudeCommand {
+public:
+  Quaternion q;
+  double throttle;
+
+  AttitudeCommand(void);
+};
+
 class PositionController {
 public:
   bool configured;
@@ -29,6 +37,8 @@ public:
   double output_roll;
   double output_pitch;
   double output_throttle;
+
+  AttitudeCommand att_cmd;
 
   PositionController(void);
   int configure(std::string config_file);

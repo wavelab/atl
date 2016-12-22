@@ -5,6 +5,7 @@
 
 #include "awesomo_core/utils/utils.hpp"
 #include "awesomo_core/quadrotor/base_mode.hpp"
+#include "awesomo_core/control/position_controller.hpp"
 
 
 namespace awesomo {
@@ -13,9 +14,12 @@ class HoverMode : public BaseMode {
 public:
   bool configured;
   double hover_height;
+  Vec3 hover_position;
+  AttitudeCommand att_cmd;
 
   HoverMode(void);
   int configure(std::string config_file);
+  int step(Pose pose, double dt);
 };
 
 }  // end of awesomo namespace

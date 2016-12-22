@@ -60,27 +60,27 @@ void buildPositionControllerStatsMsg(int seq,
 }
 // clang-format on
 
-void buildPositionControllerMsg(int seq,
-                                ros::Time time,
-                                PositionController controller,
-                                geometry_msgs::PoseStamped &msg,
-                                std_msgs::Float64 throttle) {
+void buildAttitudeMsg(int seq,
+                      ros::Time time,
+                      AttitudeCommand att_cmd,
+                      geometry_msgs::PoseStamped &msg,
+                      std_msgs::Float64 &thr_msg) {
   // atitude command
   msg.header.seq = seq;
   msg.header.stamp = time;
-  msg.header.frame_id = "awesomo_pos_controller_cmd";
+  msg.header.frame_id = "awesomo_attitude_cmd";
 
   msg.pose.position.x = 0;
   msg.pose.position.y = 0;
   msg.pose.position.z = 0;
 
-  // msg.pose.orientation.x = controller->command_quat.x();
-  // msg.pose.orientation.y = controller->command_quat.y();
-  // msg.pose.orientation.z = controller->command_quat.z();
-  // msg.pose.orientation.w = controller->command_quat.w();
+  msg.pose.orientation.x = att_cmd.q.x();
+  msg.pose.orientation.y = att_cmd.q.y();
+  msg.pose.orientation.z = att_cmd.q.z();
+  msg.pose.orientation.w = att_cmd.q.w();
 
   // throttle command
-  throttle.data = controller.output_throttle;
+  thr_msg.data = att_cmd.throttle;
 }
 
 void buildKFStatsMsg(int seq,

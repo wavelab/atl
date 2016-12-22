@@ -3,6 +3,14 @@
 
 namespace awesomo {
 
+AttitudeCommand::AttitudeCommand(void) {
+  this->q.w() = 0.0;
+  this->q.x() = 0.0;
+  this->q.y() = 0.0;
+  this->q.z() = 0.0;
+  this->throttle = 0.0;
+}
+
 PositionController::PositionController(void) {
   this->configured = false;
 

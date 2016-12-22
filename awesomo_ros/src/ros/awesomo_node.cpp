@@ -11,8 +11,18 @@ AwesomoNode::AwesomoNode(void) {
   }
 }
 
-int AwesomoNode::configure(std::string config_path) {
-  this->quadrotor.configure(config_path);
+int AwesomoNode::configure(const std::string node_name, int hz) {
+  std::string config_path;
+
+  // ros node
+  ROSNode::configure(node_name, hz);
+
+  // quadrotor
+  this->ros_nh->getParam("/config_dir", config_path);
+  if (this->quadrotor.configure(config_path) != 0) {
+    log_err(FCONFQUAD);
+    return -1;
+  }
 
   // services
   // clang-format off
@@ -38,15 +48,32 @@ int AwesomoNode::configure(std::string config_path) {
   ROSNode::registerPublisher<awesomo_msgs::KFPlotting>(KF_PLOTTING_TOPIC);
   // clang-format on
 
+  // loop callback
+  // clang-format off
+  ROSNode::registerLoopCallback(std::bind(&AwesomoNode::awesomoLoopCallback, this));
+  // clang-format on
+
   // wait till connected to FCU
   this->waitForConnection();
+
   this->configured = true;
   return 0;
 }
 
 void AwesomoNode::waitForConnection(void) {
+  bool sim_mode;
+
+  // pre-check
+  sim_mode = false;
+  this->ros_nh->getParam("/sim_mode", sim_mode);
+  if (sim_mode == true) {
+    ROS_INFO("Running simulation mode!");
+    return;
+  }
+
+  // wait fo FCU
   ROS_INFO("Waiting for FCU ...");
-  while (ros::ok() && this->mavros_state.connected) {
+  while (this->mavros_state.connected != true) {
     ros::spinOnce();
     sleep(1);
   }
@@ -104,30 +131,39 @@ void AwesomoNode::aprilTagCallback(const awesomo_msgs::AprilTagPose &msg) {
 }
 
 int AwesomoNode::awesomoLoopCallback(void) {
+  int seq;
   double dt;
-  int retval;
+  AttitudeCommand att_cmd;
+  std_msgs::Float64 thr_msg;
+  geometry_msgs::PoseStamped att_msg;
 
   // setup
+  seq = this->ros_seq;
   dt = (ros::Time::now() - this->ros_last_updated).toSec();
 
   // step
-  // retval = this->quad->runMission(this->world_pose, this->landing_zone,
-  // dt);
-  // if (retval == MISSION_ACCOMPLISHED) {
-  //   this->disarm();
-  //   return 0;
-  //   } else {
-  //     this->hover_point = this->world_pose;  // keep track of hover point
-  //     this->publishPositionControllerMessage(msg, seq, ros::Time::now());
-  //     this->publishPositionControllerStats(seq, ros::Time::now());
-  //     this->publishKFPlotting(seq, ros::Time::now());
-  //     return 1;
-  //   }
+  switch (this->quadrotor.current_mode) {
+    case HOVER_MODE:
+      this->quadrotor.hover_mode.step(this->world_pose, dt);
+      att_cmd = this->quadrotor.hover_mode.att_cmd;
+      break;
+    case TRACKING_MODE:
+      break;
+    case LANDING_MODE:
+      break;
+    case DISARM_MODE:
+      return -1;
+    default:
+      log_err(EINVMODE);
+      return -1;
+  }
 
-  // buildPositionControllerMsg(seq, time,
-  // this->quadrotor->position_controller,
-  //                                      geometry_msgs::PoseStamped &msg,
-  //                                      std_msgs::Float64 throttle) {
+  // publish msgs
+  buildAttitudeMsg(seq, ros::Time::now(), att_cmd, att_msg, thr_msg);
+  this->ros_pubs[SETPOINT_ATTITUDE_TOPIC].publish(att_msg);
+  this->ros_pubs[SETPOINT_THROTTLE_TOPIC].publish(thr_msg);
+
+  return 0;
 }
 
 void AwesomoNode::publishStats(void) {
@@ -157,11 +193,12 @@ void AwesomoNode::publishStats(void) {
 }  // end of awesomo namespace
 
 int main(int argc, char **argv) {
-  std::string config_path;
   awesomo::AwesomoNode awesomo_node;
 
-  awesomo_node.ros_nh->getParam("/config_dir", config_path);
-  awesomo_node.configure(config_path);
+  if (awesomo_node.configure(NODE_NAME, NODE_RATE)) {
+    ROS_ERROR("Failed to configure AwesomoNode!");
+    return -1;
+  }
   awesomo_node.loop();
 
   return 0;

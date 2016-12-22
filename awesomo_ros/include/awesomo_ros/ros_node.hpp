@@ -30,7 +30,7 @@ public:
     ::ros::shutdown();
   }
 
-  int configure(const std::string &node_name, int hz) {
+  int configure(const std::string node_name, int hz) {
     // clang-format off
     if (::ros::isInitialized() == false) {
       int argc = 0;
@@ -60,9 +60,8 @@ public:
     }
 
     // register publisher
-    printf("publisher [%s] ", topic.c_str());
     publisher = this->ros_nh->advertise<M>(topic, queue_size, latch);
-    printf("running ...\n");
+    ROS_INFO("Publisher [%s] initialized!", topic.c_str());
     this->ros_pubs[topic] = publisher;
 
     return 0;
@@ -80,9 +79,8 @@ public:
 
     // register subscriber
     ::ros::Subscriber subscriber;
-    printf("subscriber [%s] ", topic.c_str());
+    ROS_INFO("Subscriber [%s] initialized!", topic.c_str());
     subscriber = this->ros_nh->subscribe(topic, queue_size, fp, obj);
-    printf("running ...\n");
     this->ros_subs[topic] = subscriber;
 
     return 0;
