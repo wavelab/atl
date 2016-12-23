@@ -28,10 +28,10 @@ void AttitudeCommand::print(void) {
   Vec3 euler;
   quat2euler(this->q, 321, euler);
 
-  printf("roll: %f \t", euler(0));
-  printf("pitch: %f \t", euler(1));
-  printf("yaw: %f \t", euler(2));
-  printf("throttle: %f\n", this->throttle);
+  printf("roll: %.2f\t", euler(0));
+  printf("pitch: %.2f\t", euler(1));
+  printf("yaw: %.2f\t", euler(2));
+  printf("throttle: %.2f\n", this->throttle);
 }
 
 PositionController::PositionController(void) {
@@ -121,7 +121,7 @@ VecX PositionController::calculate(VecX setpoints,
   double r, p, y, t;
   VecX outputs(4);
 
-  // roll, pitch, yaw and throttle (assuming ENU frame)
+  // roll, pitch, yaw and throttle (assuming NWU frame)
   // clang-format off
   r = -this->y_controller.calculate(setpoints(1), actual(1), dt);
   p = this->x_controller.calculate(setpoints(0), actual(0), dt);
@@ -135,14 +135,6 @@ VecX PositionController::calculate(VecX setpoints,
   r = (r > this->roll_limit[1]) ? this->roll_limit[1] : r;
   p = (p < this->pitch_limit[0]) ? this->pitch_limit[0] : p;
   p = (p > this->pitch_limit[1]) ? this->pitch_limit[1] : p;
-
-  // limit yaw
-  while (y > deg2rad(360)) {
-    y -= deg2rad(360);
-  }
-  while (y < 0) {
-    y += deg2rad(360);
-  }
 
   // limit throttle
   t = (t < 0) ? 0.0 : t;
@@ -167,6 +159,12 @@ void PositionController::reset(void) {
   this->x_controller.reset();
   this->y_controller.reset();
   this->z_controller.reset();
+}
+
+void PositionController::printOutput(void) {
+  printf("roll: %.2f\t", rad2deg(this->output_roll));
+  printf("pitch: %.2f\t", rad2deg(this->output_pitch));
+  printf("throttle: %.2f\n", rad2deg(this->output_throttle));
 }
 
 }  // end of awesomo namespace

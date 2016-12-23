@@ -8,10 +8,12 @@ ENDIF()
 # CATKIN
 FIND_PACKAGE(catkin)
 CATKIN_PACKAGE(INCLUDE_DIRS include LIBRARIES ${PROJECT_NAME})
+FIND_PACKAGE(OpenCV REQUIRED)
 
 # INCLUDES
 INCLUDE_DIRECTORIES(
     ${catkin_INCLUDE_DIRS}
+    ${OpenCV_INCLUDE_DIRS}
     include
     /usr/include
     /usr/local/include
@@ -43,6 +45,7 @@ ADD_LIBRARY(
 SET(DEPS
     ${PROJECT_NAME}
     ${catkin_LIBRARIES}
+    ${OpenCV_LIBS}
     yaml-cpp
     gtest
     pthread

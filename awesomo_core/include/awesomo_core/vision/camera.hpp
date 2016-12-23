@@ -1,5 +1,5 @@
-#ifndef __AWESOMO_CAMERA_HPP__
-#define __AWESOMO_CAMERA_HPP__
+#ifndef __AWESOMO_CORE_VISION_CAMERA_HPP__
+#define __AWESOMO_CORE_VISION_CAMERA_HPP__
 
 #include <fstream>
 #include <iostream>
@@ -11,8 +11,6 @@
 #include <memory.h>
 #include <sys/time.h>
 
-#include <ros/console.h>
-
 #include <yaml-cpp/yaml.h>
 
 #include <opencv2/core/core.hpp>
@@ -20,12 +18,11 @@
 #include <opencv2/highgui/highgui.hpp>
 
 #include <FlyCapture2.h>
-#include <m3api/xiApi.h>
 
-#include "awesomo_core/vision/util.hpp"
-#include "awesomo_core/vision/gimbal.hpp"
-#include "awesomo_core/vision/apriltag.hpp"
-#include "awesomo_core/vision/estimator.hpp"
+#include "awesomo_core/utils/utils.hpp"
+// #include "awesomo_core/vision/gimbal.hpp"
+// #include "awesomo_core/vision/apriltag.hpp"
+// #include "awesomo_core/vision/estimator.hpp"
 
 
 // CONSTANTS
@@ -34,13 +31,7 @@
 #define CAMERA_XIMEA 2
 
 
-// MACROS
-#define XIMEA_CHECK(STATE, WHERE)                \
-  if (STATE != XI_OK) {                          \
-    printf("Error after %s (%d)", WHERE, STATE); \
-    goto ximea_error;                            \
-  }
-
+namespace awesomo {
 
 // CLASSES
 class CameraConfig {
@@ -60,16 +51,14 @@ class Camera {
 public:
   Detector *tag_detector;
 
-  int camera_index;
-  int camera_type;
-  int camera_imshow;
-  int camera_snapshot;
-  float camera_exposure_value;
-  float camera_gain_value;
-  std::string camera_mode;
-  float lambda_1;
-  float lambda_2;
-  float lambda_3;
+  int index;
+  int type;
+  int imshow;
+  int snapshot;
+  float exposure_value;
+  float gain_value;
+  std::string mode;
+  Vec3 lambda;
   float alpha;
 
   CameraConfig *config;
@@ -82,32 +71,17 @@ public:
   FlyCapture2::Camera *capture_firefly;
   HANDLE ximea;
 
-  Gimbal *gimbal;
-  struct kf tag_estimator;
-  bool tag_estimator_initialized;
-  struct timespec tag_last_seen;
-  struct timespec tag_estimator_last_updated;
+  Camera(int index, int type);
+  Camera(std::string config_path);
 
-  Camera(int camera_index, int camera_type);
-  Camera(std::string camera_config_path);
-
-  int initWebcam(int image_width, int image_height);
-  int initFirefly(void);
-  int initXimea(void);
-  int initCamera(std::string camera_mode);
-  int initGimbal(std::string config_path);
-
-  CameraConfig *loadConfig(std::string mode, const std::string calib_file);
-  int loadConfig(std::string camera_mode);
+  CameraConfig *loadConfig(std::string mode, std::string calib_file);
+  int loadConfig(std::string mode);
   int setLambdas(float lambda_1, float lambda_2, float lambda_3);
   void adjustMode(std::vector<TagPose> &pose_estimates, int &timeout);
 
   void printConfig(void);
   void printFPS(double &last_tic, int &frame);
 
-  int getFrameWebcam(cv::Mat &image);
-  int getFramePointGrey(cv::Mat &image);
-  int getFrameXimea(cv::Mat &image);
   int getFrame(cv::Mat &image);
 
   int run(void);
@@ -116,4 +90,5 @@ public:
   std::vector<TagPose> step(int &timeout, float dt);
 };
 
+}  // end of awesomo namespace
 #endif

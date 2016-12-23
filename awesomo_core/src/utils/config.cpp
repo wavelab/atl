@@ -41,4 +41,67 @@ MatX yamlMatXToMatX(YAML::Node in) {
   return out;
 }
 
+int yamlCheckMatrix(YAML::Node yaml) {
+  const std::string targets[3] = {"rows", "cols", "data"};
+
+  // pre-check
+  if (yaml == NULL) {
+    return -1;
+  }
+
+  for (int i = 0; i < 3; i++) {
+    if (!yaml[targets[i]]) {
+      return -1;
+    }
+  }
+
+  return 0;
+}
+
+cv::Mat yamlMatToCvMat(YAML::Node matrix_yaml) {
+  int rows;
+  int cols;
+  int index;
+  double value;
+
+  // load matrix
+  rows = matrix_yaml["rows"].as<int>();
+  cols = matrix_yaml["cols"].as<int>();
+  cv::Mat mat(rows, cols, CV_64F);
+
+  index = 0;
+  for (int i = 0; i < rows; i++) {
+    for (int j = 0; j < cols; j++) {
+      value = matrix_yaml["data"][index].as<double>();
+      mat.at<double>(i, j) = value;
+      index++;
+    }
+  }
+
+  return mat;
+}
+
+MatX yamlMat2Mat(YAML::Node yaml) {
+  int rows;
+  int cols;
+  int index;
+  double value;
+
+  // load matrix
+  rows = yaml["rows"].as<int>();
+  cols = yaml["cols"].as<int>();
+  MatX mat(rows, cols);
+
+  index = 0;
+  for (int i = 0; i < rows; i++) {
+    for (int j = 0; j < cols; j++) {
+      value = yaml["data"][index].as<double>();
+      mat(i, j) = value;
+      index++;
+    }
+  }
+
+  return mat;
+}
+
 }  // end of awesomo namespace

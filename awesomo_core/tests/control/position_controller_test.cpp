@@ -92,34 +92,11 @@ TEST(PositionController, calculate) {
   yaw_setpoint = 0;
   dt = 0.1;
   controller.calculate(setpoint, actual, yaw_setpoint, dt);
-
-  // clang-format off
-  std::cout << controller.output_roll << "\t"
-            << controller.output_pitch << "\t"
-            << controller.output_throttle << std::endl;
-  // clang-format on
+  controller.printOutput();
 
   ASSERT_FLOAT_EQ(0.0, controller.output_roll);
   ASSERT_FLOAT_EQ(0.0, controller.output_pitch);
   ASSERT_FLOAT_EQ(controller.hover_throttle, controller.output_throttle);
-
-  // CHECK MOVING TOWARDS THE X LOCATION
-  setpoint << 1, 0, 0;
-  actual << 0, 0, 0;
-  yaw_setpoint = 0;
-  dt = 0.1;
-
-  controller.reset();
-  controller.calculate(setpoint, actual, yaw_setpoint, dt);
-
-  // clang-format off
-  std::cout << controller.output_roll << "\t"
-            << controller.output_pitch << "\t"
-            << controller.output_throttle << std::endl;
-  // clang-format on
-
-  ASSERT_FLOAT_EQ(0.0, controller.output_roll);
-  ASSERT_TRUE(controller.output_pitch > 0.0);
 
   // CHECK MOVING TOWARDS THE Y LOCATION
   setpoint << 0, 1, 0;
@@ -129,33 +106,48 @@ TEST(PositionController, calculate) {
 
   controller.reset();
   controller.calculate(setpoint, actual, yaw_setpoint, dt);
-
-  // clang-format off
-  std::cout << controller.output_roll << "\t"
-            << controller.output_pitch << "\t"
-            << controller.output_throttle << std::endl;
-  // clang-format on
+  controller.printOutput();
 
   ASSERT_TRUE(controller.output_roll < 0.0);
   ASSERT_FLOAT_EQ(0.0, controller.output_pitch);
 
-  // CHECK MOVING TOWARDS THE X AND Y LOCATION
-  setpoint << 1, -1, 0;
+  // CHECK MOVING TOWARDS THE X LOCATION
+  setpoint << 1, 0, 0;
   actual << 0, 0, 0;
   yaw_setpoint = 0;
   dt = 0.1;
 
-  // clang-format off
-  std::cout << controller.output_roll << "\t"
-            << controller.output_pitch << "\t"
-            << controller.output_throttle << std::endl;
-  // clang-format on
+  controller.reset();
+  controller.calculate(setpoint, actual, yaw_setpoint, dt);
+  controller.printOutput();
+
+  ASSERT_FLOAT_EQ(0.0, controller.output_roll);
+  ASSERT_TRUE(controller.output_pitch > 0.0);
+
+  // CHECK MOVING TOWARDS THE X AND Y LOCATION
+  setpoint << 1, 1, 0;
+  actual << 0, 0, 0;
+  yaw_setpoint = 0;
+  dt = 0.1;
 
   controller.reset();
   controller.calculate(setpoint, actual, yaw_setpoint, dt);
-  ASSERT_TRUE(controller.output_roll > 0.0);
+  controller.printOutput();
+
+  ASSERT_TRUE(controller.output_roll < 0.0);
   ASSERT_TRUE(controller.output_pitch > 0.0);
-  // ASSERT_TRUE(controller.throttle > controller.hover_throttle);
+
+  // CHECK MOVING YAW
+  setpoint << 0, 0, 0;
+  actual << 0, 0, 0;
+  yaw_setpoint = deg2rad(90.0);
+  dt = 0.1;
+
+  controller.reset();
+  Vec4 outputs = controller.calculate(setpoint, actual, yaw_setpoint, dt);
+  controller.printOutput();
+
+  ASSERT_FLOAT_EQ(yaw_setpoint, outputs(2));
 }
 
 }  // end of awesomo namepsace

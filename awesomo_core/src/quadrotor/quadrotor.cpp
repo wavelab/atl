@@ -7,6 +7,11 @@ Quadrotor::Quadrotor(void) {
   this->configured = false;
 
   this->current_mode = HOVER_MODE;
+  this->hover_mode = HoverMode();
+
+  this->position_controller = PositionController();
+  this->heading = 0.0;
+  this->att_cmd = AttitudeCommand();
 }
 
 int Quadrotor::configure(std::string config_path) {
