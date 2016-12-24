@@ -9,16 +9,6 @@
 
 namespace awesomo {
 
-class AttitudeCommand {
-public:
-  Quaternion q;
-  double throttle;
-
-  AttitudeCommand(void);
-  AttitudeCommand(Vec4 command);
-  void print(void);
-};
-
 class PositionController {
 public:
   bool configured;

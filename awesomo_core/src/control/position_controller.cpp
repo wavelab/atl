@@ -3,37 +3,6 @@
 
 namespace awesomo {
 
-AttitudeCommand::AttitudeCommand(void) {
-  this->q.w() = 0.0;
-  this->q.x() = 0.0;
-  this->q.y() = 0.0;
-  this->q.z() = 0.0;
-  this->throttle = 0.0;
-}
-
-AttitudeCommand::AttitudeCommand(Vec4 command) {
-  Vec3 euler;
-  Quaternion q;
-  double throttle;
-
-  // quaternion
-  euler << command(0), command(1), command(2);  // roll, pitch, yaw
-  euler2quat(euler, 321, this->q);
-
-  // throttle
-  this->throttle = command(3);
-}
-
-void AttitudeCommand::print(void) {
-  Vec3 euler;
-  quat2euler(this->q, 321, euler);
-
-  printf("roll: %.2f\t", euler(0));
-  printf("pitch: %.2f\t", euler(1));
-  printf("yaw: %.2f\t", euler(2));
-  printf("throttle: %.2f\n", this->throttle);
-}
-
 PositionController::PositionController(void) {
   this->configured = false;
 
