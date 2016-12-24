@@ -27,8 +27,8 @@ int main(int argc, char **argv) {
     cam.getFrame(image);
     cv::resize(image, result, cv::Size(640 / 1, 480 / 1));
     msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", result).toImageMsg();
-    // cv::imshow("the image", image);
-    // cv::waitKey(1);
+    cv::imshow("the image", image);
+    cv::waitKey(1);
 
     // publish and spin
     pub.publish(msg);

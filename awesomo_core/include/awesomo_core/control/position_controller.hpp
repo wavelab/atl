@@ -46,7 +46,9 @@ public:
   int configure(std::string config_file);
   VecX calculate(VecX setpoints, VecX actual, double yaw, double dt);
   void reset(void);
-  void printOutput(void);
+  void printErrors(void);
+  void printInputs(void);
+  void printOutputs(void);
 };
 
 }  // end of awesomo namespace

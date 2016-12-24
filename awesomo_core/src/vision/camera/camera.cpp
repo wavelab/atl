@@ -3,9 +3,11 @@
 
 namespace awesomo {
 
-CameraConfig::CameraConfig(int camera_index, int camera_type) {
-  this->index = camera_index;
-  this->type = camera_type;
+CameraConfig::CameraConfig(void) {
+  this->index = 0;
+  this->image_width = 0;
+  this->image_height = 0;
+
   this->snapshot = 0;
   this->exposure_value = 0;
   this->tag_detector = new Detector();
@@ -14,109 +16,14 @@ CameraConfig::CameraConfig(int camera_index, int camera_type) {
   this->tag_estimator_initialized = false;
 }
 
-CameraConfig::config(std::string config_file) {
-  // int retval;
-  // float dist;
-  // int nb_configs;
-  // int nb_apriltags;
-  // int apriltag_id;
-  // float apriltag_size;
-  // std::string config_key;
-  // std::string config_path;
-  // std::string config_main_path;
-  // YAML::Node camera_config;
-  //
-  // // load camera_config yaml file
-  // config_path = config_path + "/camera_config.yaml";
-  // camera_config = YAML::LoadFile(config_path);
-  // nb_configs = camera_config["nb_configs"].as<int>();
-  //
-  // // camera type
-  // if (camera_config["camera_type"]) {
-  //   if (camera_config["camera_type"].as<std::string>() == "firefly") {
-  //     this->type = CAMERA_FIREFLY;
-  //   } else if (camera_config["camera_type"].as<std::string>() == "ximea") {
-  //     this->type = CAMERA_XIMEA;
-  //   } else {
-  //     this->type = CAMERA_NORMAL;
-  //   }
-  // } else {
-  //   log_err("Opps [camera_type] missing in %s\n", config_path.c_str());
-  // }
-  //
-  // // camera index
-  // if (camera_config["camera_index"]) {
-  //   this->index = camera_config["camera_index"].as<int>();
-  // } else {
-  //   log_err("Opps [camera_index] missing in %s\n", config_path.c_str());
-  // }
-  //
-  // // camera imshow
-  // if (camera_config["camera_imshow"]) {
-  //   this->imshow = camera_config["camera_imshow"].as<int>();
-  // } else {
-  //   log_err("Opps [camera_imshow] missing in %s\n", config_path.c_str());
-  // }
-  //
-  // // camera snapshot
-  // if (camera_config["camera_snapshot"]) {
-  //   this->snapshot = camera_config["camera_snapshot"].as<int>();
-  // } else {
-  //   log_err("Opps [camera_snapshot] missing in %s\n", config_path.c_str());
-  // }
-  //
-  // // camera exposure value
-  // if (camera_config["camera_exposure_value"]) {
-  //   this->exposure_value =
-  //   camera_config["camera_exposure_value"].as<float>();
-  //   // std::cout << this->exposure_value << std::endl;
-  // } else {
-  //   log_err("Opps [camera_exposure_value] missing in %s\n",
-  //           config_path.c_str());
-  // }
-  //
-  // // camera gain value
-  // if (camera_config["camera_gain_value"]) {
-  //   this->gain_value = camera_config["camera_gain_value"].as<float>();
-  // } else {
-  //   log_err("Opps [camera_gain_value] missing in %s\n",
-  //   config_path.c_str());
-  // }
-  //
-  // // tag detector
-  // if (camera_config["apriltag_imshow"]) {
-  //   this->tag_detector =
-  //     new Detector(camera_config["apriltag_imshow"].as<int>());
-  // } else {
-  //   log_err("Opps [apriltag_imshow] missing in %s\n", config_path.c_str());
-  // }
-  //
-  // // load tag parameters
-  // nb_apriltags = camera_config["nb_apriltags"].as<int>();
-  // for (int i = 0; i < nb_apriltags; i++) {
-  //   apriltag_id = camera_config["apriltag_ids"][i].as<int>();
-  //   apriltag_size = camera_config["apriltag_sizes"][i].as<float>();
-  //   this->tag_detector->tag_sizes[apriltag_id] = apriltag_size;
-  // }
-  //
-  // // load different calibration files
-  // for (int i = 0; i < nb_configs; i++) {
-  //   config_key = camera_config["config_keys"][i].as<std::string>();
-  //   config_path = config_path + "/";
-  //   config_path += camera_config["config_files"][i].as<std::string>();
-  //
-  //   this->loadConfig(config_key, config_path);
-  // }
-  //
-  // // load config distances
-  // for (int i = 0; i < (nb_configs - 1); i++) {
-  //   dist = camera_config["config_dists"][i].as<float>();
-  //   this->config_dists.push_back(dist);
-  // }
-  //
-  // // print config
-  // this->print();
-  //
+int CameraConfig::configure(std::string config_file) {
+  // camera index
+  yamlSetInteger(config, "index", this->index);
+  yamlSetInteger(config, "imshow", this->imshow);
+  yamlSetInteger(config, "snapshot", this->snapshot);
+  yamlSetInteger(config, "exposure_value", this->exposure_value);
+  yamlSetInteger(config, "gain_value", this->gain_value);
+
   // // start camera with first calibration file
   // retval = this->initCamera(config["config_keys"][0].as<std::string>());
   // if (retval == -1) {

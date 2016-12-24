@@ -3,37 +3,53 @@
 
 namespace awesomo {
 
-Vec3 yamlVec3ToVec3(YAML::Node in) {
+int yamlIntegerToInteger(YAML::Node yaml) {
+  return yaml.as<int>();
+}
+
+float yamlFloatToFloat(YAML::Node yaml) {
+  return yaml.as<int>();
+}
+
+double yamlDoubleToDouble(YAML::Node yaml) {
+  return yaml.as<double>();
+}
+
+std::string yamlStringToString(YAML::Node yaml) {
+  return yaml.as<std::string>();
+}
+
+Vec3 yamlVec3ToVec3(YAML::Node yaml) {
   Vec3 out;
 
-  out(0) = in[0].as<double>();
-  out(1) = in[1].as<double>();
-  out(2) = in[2].as<double>();
+  out(0) = yaml[0].as<double>();
+  out(1) = yaml[1].as<double>();
+  out(2) = yaml[2].as<double>();
 
   return out;
 }
 
-Vec4 yamlVec4ToVec4(YAML::Node in) {
+Vec4 yamlVec4ToVec4(YAML::Node yaml) {
   Vec4 out;
 
-  out(0) = in[0].as<double>();
-  out(1) = in[1].as<double>();
-  out(2) = in[2].as<double>();
-  out(3) = in[3].as<double>();
+  out(0) = yaml[0].as<double>();
+  out(1) = yaml[1].as<double>();
+  out(2) = yaml[2].as<double>();
+  out(3) = yaml[3].as<double>();
 
   return out;
 }
 
-MatX yamlMatXToMatX(YAML::Node in) {
+MatX yamlMatXToMatX(YAML::Node yaml) {
   MatX out;
   int index;
 
   index = 0;
-  out.resize(in["rows"].as<int>(), in["cols"].as<int>());
+  out.resize(yaml["rows"].as<int>(), yaml["cols"].as<int>());
 
-  for (int i = 0; i < in["rows"].as<int>(); i++) {
-    for (int j = 0; j < in["cols"].as<int>(); j++) {
-      out(i, j) = in["data"][index].as<double>();
+  for (int i = 0; i < yaml["rows"].as<int>(); i++) {
+    for (int j = 0; j < yaml["cols"].as<int>(); j++) {
+      out(i, j) = yaml["data"][index].as<double>();
       index++;
     }
   }
@@ -58,21 +74,21 @@ int yamlCheckMatrix(YAML::Node yaml) {
   return 0;
 }
 
-cv::Mat yamlMatToCvMat(YAML::Node matrix_yaml) {
+cv::Mat yamlMatToCvMat(YAML::Node yaml) {
   int rows;
   int cols;
   int index;
   double value;
 
   // load matrix
-  rows = matrix_yaml["rows"].as<int>();
-  cols = matrix_yaml["cols"].as<int>();
+  rows = yaml["rows"].as<int>();
+  cols = yaml["cols"].as<int>();
   cv::Mat mat(rows, cols, CV_64F);
 
   index = 0;
   for (int i = 0; i < rows; i++) {
     for (int j = 0; j < cols; j++) {
-      value = matrix_yaml["data"][index].as<double>();
+      value = yaml["data"][index].as<double>();
       mat.at<double>(i, j) = value;
       index++;
     }
@@ -102,6 +118,26 @@ MatX yamlMat2Mat(YAML::Node yaml) {
   }
 
   return mat;
+}
+
+int yamlSetInteger(YAML::Node yaml, std::string key, int &x) {
+  if (yaml[key]) {
+    x = yaml[key].as<int>();
+  } else {
+    log_err("Opps [%s] missing in yaml file\n", key.c_str());
+  }
+
+  return 0;
+}
+
+int yamlSetDouble(YAML::Node yaml, std::string key, double &x) {
+  if (yaml[key]) {
+    x = yaml[key].as<double>();
+  } else {
+    log_err("Opps [%s] missing in yaml file\n", key.c_str());
+  }
+
+  return 0;
 }
 
 }  // end of awesomo namespace

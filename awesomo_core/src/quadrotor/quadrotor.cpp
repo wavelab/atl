@@ -7,11 +7,11 @@ Quadrotor::Quadrotor(void) {
   this->configured = false;
 
   this->current_mode = HOVER_MODE;
-  this->hover_mode = HoverMode();
+  // this->hover_mode = HoverMode();
 
-  this->position_controller = PositionController();
+  // this->position_controller = PositionController();
   this->heading = 0.0;
-  this->att_cmd = AttitudeCommand();
+  // this->att_cmd = AttitudeCommand();
 }
 
 int Quadrotor::configure(std::string config_path) {
@@ -38,6 +38,12 @@ int Quadrotor::stepHoverMode(Pose pose, double dt) {
   Vec3 setpoint;
   Vec4 output;
 
+  // pre-check
+  if (this->configured == false) {
+    return -1;
+  }
+
+  // setup
   setpoint = this->hover_mode.hover_position;
   actual = pose.position;
 
@@ -49,12 +55,19 @@ int Quadrotor::stepHoverMode(Pose pose, double dt) {
     dt
   );
   this->att_cmd = AttitudeCommand(output);
+  // this->att_cmd.print();
   // clang-format on
 
   return 0;
 }
 
 int Quadrotor::step(Pose pose, double dt) {
+  // pre-check
+  if (this->configured == false) {
+    return -1;
+  }
+
+  // step
   switch (this->current_mode) {
     case HOVER_MODE:
       this->stepHoverMode(pose, dt);

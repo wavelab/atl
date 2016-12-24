@@ -25,12 +25,6 @@
 // #include "awesomo_core/vision/estimator.hpp"
 
 
-// CONSTANTS
-#define CAMERA_NORMAL 0
-#define CAMERA_FIREFLY 1
-#define CAMERA_XIMEA 2
-
-
 namespace awesomo {
 
 // CLASSES
@@ -40,55 +34,55 @@ public:
   int image_width;
   int image_height;
 
-  cv::Mat camera_matrix;
-  cv::Mat rectification_matrix;
-  cv::Mat distortion_coefficients;
-  cv::Mat projection_matrix;
-  Eigen::Matrix<double, 3, 4> projection_matrix_eigen;
-};
-
-class Camera {
-public:
-  Detector *tag_detector;
-
-  int index;
-  int type;
-  int imshow;
-  int snapshot;
   float exposure_value;
   float gain_value;
   std::string mode;
   Vec3 lambda;
   float alpha;
 
-  CameraConfig *config;
-  std::map<std::string, CameraConfig *> configs;
-  std::vector<std::string> config_keys;
-  std::vector<std::string> config_values;
-  std::vector<float> config_dists;
+  cv::Mat camera_matrix;
+  cv::Mat rectification_matrix;
+  cv::Mat distortion_coefficients;
+  cv::Mat projection_matrix;
+  Eigen::Matrix<double, 3, 4> projection_matrix_eigen;
 
-  cv::VideoCapture *capture;
-  FlyCapture2::Camera *capture_firefly;
-  HANDLE ximea;
+  int imshow;
+  int snapshot;
 
-  Camera(int index, int type);
-  Camera(std::string config_path);
-
-  CameraConfig *loadConfig(std::string mode, std::string calib_file);
-  int loadConfig(std::string mode);
-  int setLambdas(float lambda_1, float lambda_2, float lambda_3);
-  void adjustMode(std::vector<TagPose> &pose_estimates, int &timeout);
-
-  void printConfig(void);
-  void printFPS(double &last_tic, int &frame);
-
-  int getFrame(cv::Mat &image);
-
-  int run(void);
-  void trackTarget(std::vector<TagPose> pose_estimates);
-  std::vector<TagPose> step(int &timeout);
-  std::vector<TagPose> step(int &timeout, float dt);
+  CameraConfig(void);
+  int configure(std::string config_file);
 };
+
+// class Camera {
+// public:
+//   CameraConfig *config;
+//   std::map<std::string, CameraConfig *> configs;
+//   std::vector<std::string> config_keys;
+//   std::vector<std::string> config_values;
+//   std::vector<float> config_dists;
+//
+//   cv::VideoCapture *capture;
+//   FlyCapture2::Camera *capture_firefly;
+//   HANDLE ximea;
+//
+//   Camera(int index, int type);
+//   Camera(std::string config_path);
+//
+//   CameraConfig *loadConfig(std::string mode, std::string calib_file);
+//   int loadConfig(std::string mode);
+//   int setLambdas(float lambda_1, float lambda_2, float lambda_3);
+//   void adjustMode(std::vector<TagPose> &pose_estimates, int &timeout);
+//
+//   void printConfig(void);
+//   void printFPS(double &last_tic, int &frame);
+//
+//   int getFrame(cv::Mat &image);
+//
+//   int run(void);
+//   void trackTarget(std::vector<TagPose> pose_estimates);
+//   std::vector<TagPose> step(int &timeout);
+//   std::vector<TagPose> step(int &timeout, float dt);
+// };
 
 }  // end of awesomo namespace
 #endif

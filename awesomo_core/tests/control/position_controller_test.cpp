@@ -92,7 +92,7 @@ TEST(PositionController, calculate) {
   yaw_setpoint = 0;
   dt = 0.1;
   controller.calculate(setpoint, actual, yaw_setpoint, dt);
-  controller.printOutput();
+  controller.printOutputs();
 
   ASSERT_FLOAT_EQ(0.0, controller.output_roll);
   ASSERT_FLOAT_EQ(0.0, controller.output_pitch);
@@ -106,20 +106,20 @@ TEST(PositionController, calculate) {
 
   controller.reset();
   controller.calculate(setpoint, actual, yaw_setpoint, dt);
-  controller.printOutput();
+  controller.printOutputs();
 
   ASSERT_TRUE(controller.output_roll < 0.0);
   ASSERT_FLOAT_EQ(0.0, controller.output_pitch);
 
   // CHECK MOVING TOWARDS THE X LOCATION
   setpoint << 1, 0, 0;
-  actual << 0, 0, 0;
+  actual << 0.0, 0, 0;
   yaw_setpoint = 0;
-  dt = 0.1;
+  dt = 0.01;
 
   controller.reset();
   controller.calculate(setpoint, actual, yaw_setpoint, dt);
-  controller.printOutput();
+  controller.printOutputs();
 
   ASSERT_FLOAT_EQ(0.0, controller.output_roll);
   ASSERT_TRUE(controller.output_pitch > 0.0);
@@ -132,7 +132,7 @@ TEST(PositionController, calculate) {
 
   controller.reset();
   controller.calculate(setpoint, actual, yaw_setpoint, dt);
-  controller.printOutput();
+  controller.printOutputs();
 
   ASSERT_TRUE(controller.output_roll < 0.0);
   ASSERT_TRUE(controller.output_pitch > 0.0);
@@ -145,7 +145,7 @@ TEST(PositionController, calculate) {
 
   controller.reset();
   Vec4 outputs = controller.calculate(setpoint, actual, yaw_setpoint, dt);
-  controller.printOutput();
+  controller.printOutputs();
 
   ASSERT_FLOAT_EQ(yaw_setpoint, outputs(2));
 }

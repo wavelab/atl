@@ -148,7 +148,6 @@ int AwesomoNode::awesomoLoopCallback(void) {
 
   // publish msgs
   att_cmd = this->quadrotor.att_cmd;
-  att_cmd.print();
   buildAttitudeMsg(seq, ros::Time::now(), att_cmd, att_msg, thr_msg);
   this->ros_pubs[SETPOINT_ATTITUDE_TOPIC].publish(att_msg);
   this->ros_pubs[SETPOINT_THROTTLE_TOPIC].publish(thr_msg);

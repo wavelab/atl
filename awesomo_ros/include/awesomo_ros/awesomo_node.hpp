@@ -33,7 +33,7 @@
 
 // ROS NODE
 #define NODE_NAME "awesomo_node"
-#define NODE_RATE 100
+#define NODE_RATE 1000
 
 
 // ROS TOPICS

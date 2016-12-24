@@ -21,7 +21,7 @@ int HoverMode::configure(std::string config_file) {
 
     // parse configs
     config = YAML::LoadFile(config_file);
-    this->hover_height = config["hover_height"].as<double>();
+    this->hover_height = yamlDoubleToDouble(config["hover_height"]);
     this->hover_position = yamlVec3ToVec3(config["hover_position"]);
 
   } catch (std::exception &ex) {

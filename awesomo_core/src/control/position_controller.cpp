@@ -161,10 +161,33 @@ void PositionController::reset(void) {
   this->z_controller.reset();
 }
 
-void PositionController::printOutput(void) {
+void PositionController::printInputs(void) {
+  // std::cout << "SETPOINTS: " << setpoints.transpose() << std::endl;
+  // std::cout << "ACTUAL: " << actual.transpose() << std::endl;
+  // std::cout << "OUTPUTS: " << outputs.transpose() << std::endl;
+}
+
+void PositionController::printOutputs(void) {
   printf("roll: %.2f\t", rad2deg(this->output_roll));
   printf("pitch: %.2f\t", rad2deg(this->output_pitch));
   printf("throttle: %.2f\n", rad2deg(this->output_throttle));
+}
+
+void PositionController::printErrors(void) {
+  printf("x_controller: \n");
+  printf("\terror_p: %f\t", this->x_controller.error_p);
+  printf("\terror_i: %f\t", this->x_controller.error_i);
+  printf("\terror_d: %f\n", this->x_controller.error_d);
+
+  printf("y_controller: \n");
+  printf("\terror_p: %f\t", this->y_controller.error_p);
+  printf("\terror_i: %f\t", this->y_controller.error_i);
+  printf("\terror_d: %f\t", this->y_controller.error_d);
+
+  printf("z_controller: \n");
+  printf("\terror_p: %f\t", this->z_controller.error_p);
+  printf("\terror_i: %f\t", this->z_controller.error_i);
+  printf("\terror_d: %f\n", this->z_controller.error_d);
 }
 
 }  // end of awesomo namespace

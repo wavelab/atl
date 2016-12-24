@@ -8,15 +8,22 @@
 #include <opencv2/highgui/highgui.hpp>
 
 #include "awesomo_core/utils/math.hpp"
+#include "awesomo_core/utils/logging.hpp"
 
 
 namespace awesomo {
 
-Vec3 yamlVec3ToVec3(YAML::Node in);
-Vec4 yamlVec4ToVec4(YAML::Node in);
-MatX yamlMatXToMatX(YAML::Node in);
+int yamlIntegerToInteger(YAML::Node yaml);
+float yamlFloatToFloat(YAML::Node yaml);
+double yamlDoubleToDouble(YAML::Node yaml);
+std::string yamlStringToString(YAML::Node yaml);
+Vec3 yamlVec3ToVec3(YAML::Node yaml);
+Vec4 yamlVec4ToVec4(YAML::Node yaml);
+MatX yamlMatXToMatX(YAML::Node yaml);
 int yamlCheckMatrix(YAML::Node yaml);
 cv::Mat yamlMatToCvMat(YAML::Node yaml);
+int yamlSetInteger(YAML::Node yaml, std::string key, int &x);
+int yamlSetDouble(YAML::Node yaml, std::string key, double &x);
 
 }  // end of awesomo namespace
 #endif
