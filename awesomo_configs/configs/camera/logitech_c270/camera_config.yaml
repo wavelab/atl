@@ -1,15 +1,26 @@
-camera_type: "normal"
-camera_index: 0
-camera_imshow: 1
-camera_snapshot: 0
-camera_exposure_value: 0
-camera_gain_value: 0.0
-apriltag_imshow: 0
+index: 0
+image_width: 640
+image_height: 480
 
-nb_configs: 1
-config_keys: ["default"]
-config_files: ["ost.yaml"]
+exposure_value: 0
+gain_value: 0.0
 
-nb_apriltags: 2
-apriltag_ids: [0, 5]
-apriltag_sizes: [0.048, 0.343]
+camera_matrix:
+  rows: 3
+  cols: 3
+  data: [871.076232, 0.000000, 290.941412, 0.000000, 818.160674, 296.063453, 0.000000, 0.000000, 1.000000]
+distortion_coefficients:
+  rows: 1
+  cols: 5
+  data: [0.049035, -0.319164, 0.006843, -0.003722, 0.000000]
+rectification_matrix:
+  rows: 3
+  cols: 3
+  data: [1.000000, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000, 0.000000, 1.000000]
+projection_matrix:
+  rows: 3
+  cols: 4
+  data: [870.437805, 0.000000, 288.706059, 0.000000, 0.000000, 816.376526, 297.303185, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000]
+
+imshow: false
+snapshot: false

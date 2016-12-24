@@ -6,6 +6,7 @@
 #include "awesomo_core/utils/io.hpp"
 #include "awesomo_core/utils/logging.hpp"
 #include "awesomo_core/utils/math.hpp"
+#include "awesomo_core/utils/opencv.hpp"
 #include "awesomo_core/utils/stats.hpp"
 #include "awesomo_core/utils/time.hpp"
 

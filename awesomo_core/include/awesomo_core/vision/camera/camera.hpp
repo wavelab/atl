@@ -14,27 +14,28 @@ namespace awesomo {
 
 class CameraConfig {
 public:
+  bool loaded;
+
   int index;
   int image_width;
   int image_height;
 
   float exposure_value;
   float gain_value;
+  Vec3 lambda;
+  float alpha;
 
   cv::Mat camera_matrix;
   cv::Mat rectification_matrix;
   cv::Mat distortion_coefficients;
   cv::Mat projection_matrix;
-  Eigen::Matrix<double, 3, 4> projection_matrix_eigen;
 
-  Vec3 lambda;
-  float alpha;
-
-  int imshow;
-  int snapshot;
+  bool imshow;
+  bool snapshot;
 
   CameraConfig(void);
-  int configure(std::string config_file);
+  int load(std::string config_file);
+  void print(void);
 };
 
 class Camera {
@@ -49,8 +50,8 @@ public:
   int loadMode(std::string mode);
 
   int getFrame(cv::Mat &image);
-  std::vector<TagPose> step(int &timeout);
-  std::vector<TagPose> step(int &timeout, float dt);
+  // std::vector<TagPose> step(int &timeout);
+  // std::vector<TagPose> step(int &timeout, float dt);
   int run(void);
 
   void printConfig(void);

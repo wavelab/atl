@@ -1,448 +1,93 @@
-#include "awesomo_core/vision/camera.hpp"
+#include "awesomo_core/vision/camera/camera.hpp"
 
 
 namespace awesomo {
 
 CameraConfig::CameraConfig(void) {
+  this->loaded = false;
+
   this->index = 0;
   this->image_width = 0;
   this->image_height = 0;
 
-  this->snapshot = 0;
-  this->exposure_value = 0;
-  this->tag_detector = new Detector();
+  this->exposure_value = 0.0;
+  this->gain_value = 0.0;
+  this->lambda << 0.0, 0.0, 0.0;
+  this->alpha = 0.0;
 
-  this->gimbal = NULL;
-  this->tag_estimator_initialized = false;
+  this->camera_matrix;
+  this->rectification_matrix;
+  this->distortion_coefficients;
+  this->projection_matrix;
+
+  this->imshow = false;
+  this->snapshot = false;
 }
 
-int CameraConfig::configure(std::string config_file) {
-  // camera index
-  yamlSetInteger(config, "index", this->index);
-  yamlSetInteger(config, "imshow", this->imshow);
-  yamlSetInteger(config, "snapshot", this->snapshot);
-  yamlSetInteger(config, "exposure_value", this->exposure_value);
-  yamlSetInteger(config, "gain_value", this->gain_value);
+int CameraConfig::load(std::string config_file) {
+  YAML::Node config;
 
-  // // start camera with first calibration file
-  // retval = this->initCamera(config["config_keys"][0].as<std::string>());
-  // if (retval == -1) {
-  //   exit(-1);
-  // } else {
-  //   log_info("Camera is running...\n");
-  // }
+  try {
+    // pre-check
+    if (file_exists(config_file) == false) {
+      log_err("File not found: %s", config_file.c_str());
+      return -1;
+    }
+
+    // setup
+    config = YAML::LoadFile(config_file);
+
+    // parse config
+    // clang-format off
+    if (yamlInteger(config, "index", this->index) != 0) goto error;
+    if (yamlInteger(config, "image_width", this->image_width) != 0) goto error;
+    if (yamlInteger(config, "image_height", this->image_height) != 0) goto error;
+
+    if (yamlFloat(config, "exposure_value", this->exposure_value) != 0) goto error;
+    if (yamlFloat(config, "gain_value", this->gain_value) != 0) goto error;
+    if (yamlVec3(config, "lambda", this->lambda) != 0) goto error;
+    if (yamlFloat(config, "alpha", this->alpha) != 0) goto error;
+
+    if (yamlCvMat(config, "camera_matrix", this->camera_matrix) != 0) goto error;
+    if (yamlCvMat(config, "distortion_coefficients", this->distortion_coefficients) != 0) goto error;
+    if (yamlCvMat(config, "rectification_matrix", this->rectification_matrix) != 0) goto error;
+    if (yamlCvMat(config, "projection_matrix", this->projection_matrix) != 0) goto error;
+
+    if (yamlBool(config, "imshow", this->imshow) != 0) goto error;
+    if (yamlBool(config, "snapshot", this->snapshot) != 0) goto error;
+    // clang-format on
+
+    this->loaded = true;
+
+  } catch (YAML::Exception &ex) {
+    std::cout << ex.what() << std::endl;
+    return -2;
+  }
 
   return 0;
+error:
+  return -1;
 }
 
 void CameraConfig::print(void) {
   // clang-format off
   std::cout << "index: " << this->index << std::endl;
-  std::cout << "type: " << this->type << std::endl;
-  std::cout << "imshow: " << this->imshow << std::endl;
-  std::cout << "snapshot: " << this->snapshot << std::endl;
+  std::cout << "image_width: " << this->image_width << std::endl;
+  std::cout << "image_height: " << this->image_height << std::endl;
+
   std::cout << "exposure_value: " << this->exposure_value << std::endl;
   std::cout << "gain_value: " << this->gain_value << std::endl;
-  std::cout << "mode: " << this->mode << std::endl;
   std::cout << "lambda: " << this->lambda.transpose() << std::endl;
   std::cout << "alpha: " << this->alpha << std::endl;
+
+  std::cout << "camera_matrix: \n" << this->camera_matrix << std::endl;
+  std::cout << "rectification_matrix: \n" << this->rectification_matrix << std::endl;
+  std::cout << "distortion_coefficients: " << this->distortion_coefficients << std::endl;
+  std::cout << "projection_matrix: \n" << this->projection_matrix << std::endl;
+
+  std::cout << "imshow: " << this->imshow << std::endl;
+  std::cout << "snapshot: " << this->snapshot << std::endl;
   // clang-format on
 }
-
-int Camera::initialize(void) {
-  // setup
-  this->capture = cv::VideoCapture(this->index);
-
-  // open
-  if (this->capture.isOpened() == 0) {
-    log_error("ERROR! Failed to open webcam!\n");
-    return -1;
-
-  } else {
-    // this->capture.set(CV_CAP_PROP_FRAME_WIDTH, image_width);
-    // this->capture.set(CV_CAP_PROP_FRAME_HEIGHT, image_height);
-    log_info("Camera initialized!\n");
-    return 0;
-  }
-}
-
-CameraConfig *Camera::loadConfig(std::string mode, std::string calib_file) {
-  CameraConfig *config = new CameraConfig();
-
-  // record config ordering
-  this->config_keys.push_back(mode);
-  this->config_values.push_back(calib_file);
-
-  // load config
-  try {
-    YAML::Node config = YAML::LoadFile(calib_file);
-
-    // image width
-    if (config["image_width"]) {
-      config->image_width = config["image_width"].as<int>();
-    } else {
-      log_error("ERROR! Failed to load image_width\n");
-    }
-
-    // image height
-    if (config["image_height"]) {
-      config->image_height = config["image_height"].as<int>();
-    } else {
-      log_error("ERROR! Failed to load image_height\n");
-    }
-
-    // camera matrix
-    if (config["camera_matrix"]) {
-      config->camera_matrix = yamlMat2Mat(config["camera_matrix"]);
-    } else {
-      log_error("ERROR! Failed to load camera_matrix\n");
-    }
-
-    // distortion coefficients
-    if (config["distortion_coefficients"]) {
-      config->distortion_coefficients =
-        yamlMat2Mat(config["distortion_coefficients"]);
-    } else {
-      log_error("ERROR! Failed to load distortion_coefficients\n");
-    }
-
-    // rectification matrix
-    if (config["rectification_matrix"]) {
-      config->rectification_matrix =
-        yamlMat2Mat(config["rectification_matrix"]);
-    } else {
-      log_error("ERROR! Failed to load rectification_matrix\n");
-    }
-
-    // projection matrix
-    if (config["projection_matrix"]) {
-      config->projection_matrix = yamlMat2Mat(config["projection_matrix"]);
-      config->projection_matrix_eigen =
-        yamlMat2Mat(config["projection_matrix"]);
-    } else {
-      log_error("ERROR! Failed to load projection_matrix\n");
-    }
-
-  } catch (YAML::BadFile &ex) {
-    log_error("ERROR! Failed to load calibration file: %s\n",
-              calib_file.c_str());
-    throw;
-  }
-
-  // add to configs
-  this->configs[mode] = config;
-
-  return config;
-}
-
-int Camera::loadConfig(std::string mode) {
-  // pre-check
-  if (this->mode == mode) {
-    return 0;
-  }
-
-  // load config
-  if (this->configs.find(mode) != this->configs.end()) {
-    this->mode = mode;
-    this->config = this->configs.find(mode)->second;
-    log_info("Loaded config file [%s]\n", mode.c_str());
-
-  } else {
-    log_error("Config file for mode [%s] not found!\n", mode.c_str());
-    return -1;
-  }
-
-  return 0;
-}
-
-int Camera::setLambdas(float lambda_1, float lambda_2, float lambda_3) {
-  // alpha is calculated from:
-  // Maddern et al, 2013, Illumination invarent imaging
-  this->lambda = lambda;
-  this->alpha = (lambda(0) * lambda(2) - lambda(0) * lambda(1)) /
-                (lambda(1) * lambda(2) - lambda(0) * lambda(1));
-
-  return 0;
-}
-
-// void Camera::adjustMode(std::vector<TagPose> &pose_estimates, int &timeout)
-// {
-//   TagPose pose;
-//   std::string config_key;
-//   int config_index;
-//   int config_length;
-//   float config_dist;
-//   float tag_dist;
-//
-//   // pre-check
-//   if (this->config_keys.size() == 1) {
-//     return;
-//   }
-//
-//   // load default resolution if no apriltag detected
-//   if (timeout > 5 && this->mode != this->config_keys.at(0)) {
-//     log_info("timeout!!\n");
-//     this->loadConfig(this->config_keys.at(0));
-//     timeout = 0;
-//     return;
-//   } else if (pose_estimates.size() == 0) {
-//     timeout++;
-//     return;
-//   }
-//
-//   // adjust
-//   pose = pose_estimates[0];
-//   tag_dist = pose.translation[0];
-//   config_length = this->config_keys.size();
-//
-//   // find config mode index
-//   for (config_index = 0; config_index < config_length; config_index++) {
-//     config_key = this->config_keys.at(config_index);
-//     if (this->mode == config_key) {
-//       break;
-//     }
-//   }
-//
-//   // load appropriate camera configuration
-//   // when camera config is currently between largest and smallest config
-//   if (config_index > 0 && config_index < this->config_dists.size()) {
-//     // load larger camera config
-//     if (tag_dist >= this->config_dists.at(config_index - 1)) {
-//       this->loadConfig(this->config_keys.at(config_index - 1));
-//
-//       // load smaller camera config
-//     } else if (tag_dist <= this->config_dists.at(config_index)) {
-//       this->loadConfig(this->config_keys.at(config_index + 1));
-//     }
-//
-//     // when camera config is already at largest
-//   } else if (config_index == 0) {
-//     // load smaller camera config
-//     if (tag_dist <= this->config_dists.at(config_index)) {
-//       this->loadConfig(this->config_keys.at(config_index + 1));
-//     }
-//
-//     // when camera config is already at smallest
-//   } else if (config_index == this->config_dists.size()) {
-//     // load larger camera config
-//     if (tag_dist >= this->config_dists.at(config_index - 1)) {
-//       this->loadConfig(this->config_keys.at(config_index - 1));
-//     }
-//   }
-//   timeout = 0;
-// }
-
-
-void Camera::printFPS(double &last_tic, int &frame) {
-  frame++;
-  if (frame % 10 == 0) {
-    double t = time_now();
-    std::cout << "\t" << 10.0 / (t - last_tic) << " fps" << std::endl;
-    last_tic = t;
-  }
-}
-
-int Camera::getFrame(cv::Mat &image) {
-  this->capture.read(image);
-  return 0;
-}
-
-// int Camera::run(void) {
-//   int timeout;
-//   int frame_index;
-//   double last_tic;
-//   std::vector<TagPose> pose_estimates;
-//
-//   // setup
-//   timeout = 0;
-//   frame_index = 0;
-//   last_tic = time_now();
-//
-//   // read capture device
-//   while (true) {
-//     pose_estimates = this->step(timeout);
-//     this->printFPS(last_tic, frame_index);
-//   }
-//
-//   return 0;
-// }
-
-// static void show_image(cv::Mat &image, int tags_detected) {
-//   int border;
-//   cv::Scalar red;
-//   cv::Scalar green;
-//
-//   // setup
-//   border = 5;
-//   red = cv::Scalar(0, 0, 255);
-//   green = cv::Scalar(0, 255, 0);
-//
-//   // create detection border
-//   if (tags_detected) {
-//     cv::copyMakeBorder(image,
-//                        image,
-//                        border,
-//                        border,
-//                        border,
-//                        border,
-//                        cv::BORDER_CONSTANT,
-//                        green);
-//
-//   } else {
-//     cv::copyMakeBorder(
-//       image, image, border, border, border, border, cv::BORDER_CONSTANT,
-//       red);
-//   }
-//
-//   // show image
-//   cv::imshow("camera", image);
-//   cv::waitKey(1);
-// }
-//
-// static void snapshot(cv::Mat &image, std::vector<TagPose> &pose_estimates)
-// {
-//   TagPose tag;
-//
-//   std::cout << "Saving a new image" << std::endl;
-//   cv::imshow("image capture", image);
-//   cv::imwrite("/tmp/image.png", image);
-//
-//   if (pose_estimates.size()) {
-//     tag = pose_estimates[0];
-//     std::cout << "x: " << tag.translation[0] << std::endl;
-//     std::cout << "y: " << tag.translation[1] << std::endl;
-//     std::cout << "z: " << tag.translation[2] << std::endl;
-//   }
-// }
-
-// static void tag_estimator_init(struct kf *estimator, Eigen::Vector3d tag) {
-//   Eigen::VectorXd mu(9);
-//
-//   mu << tag(0), tag(1), tag(2),  // x, y, z
-//     0.0, 0.0, 0.0,               // velocity x, y, z
-//     0.0, 0.0, 0.0;               // acceleration x, y, z
-//
-//   apriltag_kf_setup(estimator, mu);
-// }
-//
-// void Camera::trackTarget(std::vector<TagPose> pose_estimates) {
-//   double dt;
-//   Eigen::Vector3d tag;
-//   Eigen::Vector3d tag_trans;
-//
-//   if (pose_estimates.size()) {
-//     tag << pose_estimates[0].translation(0),
-//     pose_estimates[0].translation(1),
-//       pose_estimates[0].translation(2);
-//     this->gimbal->transformTargetPosition(tag, tag_trans);
-//
-//     if (this->tag_estimator_initialized == false) {
-//       tag_estimator_init(&this->tag_estimator, tag_trans);
-//       this->tag_estimator_initialized = true;
-//       tic(&this->tag_estimator_last_updated);
-//
-//     } else {
-//       dt = toc(&this->tag_estimator_last_updated);
-//       apriltag_kf_estimate(&this->tag_estimator, tag_trans, dt, true);
-//       tic(&this->tag_estimator_last_updated);
-//     }
-//
-//     tag(0) = this->tag_estimator.mu(0);
-//     tag(1) = this->tag_estimator.mu(1);
-//     tag(2) = this->tag_estimator.mu(2);
-//     this->gimbal->trackTarget(tag);
-//     tic(&this->tag_last_seen);
-//
-//   } else if (this->tag_estimator_initialized) {
-//     if (toc(&this->tag_last_seen) > 2.0) {
-//       this->gimbal->setGimbalAngles(0.0, 0.0, 0.0);
-//
-//     } else {
-//       dt = toc(&this->tag_estimator_last_updated);
-//       apriltag_kf_estimate(&this->tag_estimator, tag_trans, dt, false);
-//       tic(&this->tag_estimator_last_updated);
-//
-//       tag(0) = this->tag_estimator.mu(0);
-//       tag(1) = this->tag_estimator.mu(1);
-//       tag(2) = this->tag_estimator.mu(2);
-//       this->gimbal->trackTarget(tag);
-//     }
-//   }
-// }
-
-// std::vector<TagPose> Camera::step(int &timeout) {
-//   cv::Mat image;
-//   std::vector<TagPose> pose_estimates;
-//
-//   // get frame
-//   if (this->getFrame(image) != 0) {
-//     return pose_estimates;
-//   }
-//
-//   // get apriltag pose estimates
-//   cv::flip(image, image, -1);
-//   pose_estimates = this->tag_detector->processImage(
-//     this->config->camera_matrix, image, timeout);
-//   this->adjustMode(pose_estimates, timeout);
-//
-//   // track target
-//   this->trackTarget(pose_estimates);
-//
-//   // imshow
-//   if (this->imshow && image.empty() == false) {
-//     show_image(image, pose_estimates.size());
-//   }
-//
-//   // snapshot
-//   if (this->snapshot && (char) cv::waitKey(1000) == 's') {
-//     snapshot(image, pose_estimates);
-//   }
-//
-//   return pose_estimates;
-// }
-//
-// std::vector<TagPose> Camera::step(int &timeout, float dt) {
-//   cv::Mat image;
-//   Eigen::Vector3d tag;
-//   Eigen::Vector3d tag_trans;
-//   TagPose tag_pose;
-//   std::vector<TagPose> pose_estimates;
-//
-//   // get frame
-//   if (this->getFrame(image) != 0) {
-//     return pose_estimates;
-//   }
-//
-//   // get apriltag pose estimates
-//   // cv::flip(image, image, -1);
-//   pose_estimates = this->tag_detector->processImage(
-//     this->config->camera_matrix, image, timeout, dt, this->alpha);
-//   this->adjustMode(pose_estimates, timeout);
-//
-//   // track target
-//   this->trackTarget(pose_estimates);
-//   if (pose_estimates.size()) {
-//     tag_pose = pose_estimates[0];
-//     tag << tag_pose.translation(0), tag_pose.translation(1),
-//       tag_pose.translation(2);
-//     this->gimbal->transformTargetPosition(tag, tag_trans);
-//
-//     pose_estimates.clear();
-//     tag_pose.translation = tag_trans;
-//     pose_estimates.push_back(tag_pose);
-//   }
-//
-//   // imshow
-//   if (this->imshow) {
-//     show_image(image, pose_estimates.size());
-//   }
-//
-//   // snapshot
-//   if (this->snapshot && (char) cv::waitKey(1000) == 's') {
-//     snapshot(image, pose_estimates);
-//   }
-//
-//   return pose_estimates;
-// }
 
 }  // end of awesomo namespace

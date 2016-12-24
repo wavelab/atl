@@ -13,17 +13,64 @@
 
 namespace awesomo {
 
-int yamlIntegerToInteger(YAML::Node yaml);
-float yamlFloatToFloat(YAML::Node yaml);
-double yamlDoubleToDouble(YAML::Node yaml);
-std::string yamlStringToString(YAML::Node yaml);
-Vec3 yamlVec3ToVec3(YAML::Node yaml);
-Vec4 yamlVec4ToVec4(YAML::Node yaml);
-MatX yamlMatXToMatX(YAML::Node yaml);
-int yamlCheckMatrix(YAML::Node yaml);
-cv::Mat yamlMatToCvMat(YAML::Node yaml);
-int yamlSetInteger(YAML::Node yaml, std::string key, int &x);
-int yamlSetDouble(YAML::Node yaml, std::string key, double &x);
+#define YAML_PRIMITIVE_RETVAL(X)                               \
+  if (retval == -1) {                                          \
+    if (optional == false) {                                   \
+      log_err("Opps [%s] missing in yaml file!", key.c_str()); \
+      return -1;                                               \
+    } else {                                                   \
+      return 0;                                                \
+    }                                                          \
+  }
+
+#define YAML_VECTOR_RETVAL(X)                                  \
+  if (retval == -1) {                                          \
+    if (optional == false) {                                   \
+      log_err("Opps [%s] missing in yaml file!", key.c_str()); \
+      return -1;                                               \
+    } else {                                                   \
+      return 0;                                                \
+    }                                                          \
+  } else if (retval == -2) {                                   \
+    log_err("Invalid [%s] vector!", key.c_str());              \
+    return -2;                                                 \
+  }
+
+#define YAML_MATRIX_RETVAL(X)                                  \
+  if (retval == -1) {                                          \
+    if (optional == false) {                                   \
+      log_err("Opps [%s] missing in yaml file!", key.c_str()); \
+      return -1;                                               \
+    } else {                                                   \
+      return 0;                                                \
+    }                                                          \
+  } else if (retval == -2) {                                   \
+    log_err("Invalid [%s] matrix!", key.c_str());              \
+    return -2;                                                 \
+  }
+
+// clang-format off
+int yamlCheckKey(YAML::Node yaml, std::string key);
+int yamlCheckVector(YAML::Node yaml, std::string key);
+int yamlCheckMatrix(YAML::Node yaml, std::string key);
+
+int yamlBool(YAML::Node yaml, std::string key, bool &x, bool optional = false);
+int yamlInteger(YAML::Node yaml, std::string key, int &x, bool optional = false);
+int yamlFloat(YAML::Node yaml, std::string key, float &x, bool optional = false);
+int yamlDouble(YAML::Node yaml, std::string key, double &x, bool optional = false);
+int yamlString(YAML::Node yaml, std::string key, std::string &x, bool optional = false);
+
+int yamlVec2(YAML::Node yaml, std::string key, Vec3 &x, bool optional = false);
+int yamlVec3(YAML::Node yaml, std::string key, Vec3 &x, bool optional = false);
+int yamlVec4(YAML::Node yaml, std::string key, Vec4 &x, bool optional = false);
+int yamlVecX(YAML::Node yaml, std::string key, VecX &x, bool optional = false);
+
+int yamlMat2(YAML::Node yaml, std::string key, Mat2 &x, bool optional = false);
+int yamlMat3(YAML::Node yaml, std::string key, Mat3 &x, bool optional = false);
+int yamlMatX(YAML::Node yaml, std::string key, MatX &x, bool optional = false);
+
+int yamlCvMat(YAML::Node yaml, std::string key, cv::Mat &x, bool optional = false);
+// clang-format on
 
 }  // end of awesomo namespace
 #endif
