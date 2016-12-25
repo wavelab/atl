@@ -1,6 +1,9 @@
 #ifndef __AWESOMO_UTILS_DATA_HPP__
 #define __AWESOMO_UTILS_DATA_HPP__
 
+#include <iostream>
+#include <vector>
+
 #include "awesomo_core/utils/math.hpp"
 
 

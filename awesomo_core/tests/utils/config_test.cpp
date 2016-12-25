@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include "awesomo_core/utils/data.hpp"
 #include "awesomo_core/utils/config.hpp"
 
 #define TEST_CONFIG "tests/configs/config.yaml"
@@ -9,7 +10,6 @@ TEST(ConfigParam, constructor) {
   awesomo::ConfigParam param;
 
   ASSERT_EQ(awesomo::TYPE_NOT_SET, param.type);
-  ASSERT_EQ(awesomo::CLASS_NOT_SET, param.type_class);
   ASSERT_EQ("", param.key);
   ASSERT_EQ(false, param.optional);
 
@@ -47,11 +47,11 @@ TEST(ConfigParser, addParam) {
   int i;
   awesomo::ConfigParser parser;
 
-  parser.addParam(awesomo::INT, "integer", &i);
+  parser.addParam(awesomo::INT, "int", &i);
 
   ASSERT_EQ(1, parser.params.size());
   ASSERT_EQ(awesomo::INT, parser.params[0].type);
-  ASSERT_EQ("integer", parser.params[0].key);
+  ASSERT_EQ("int", parser.params[0].key);
   ASSERT_TRUE(parser.params[0].i != NULL);
 }
 
@@ -69,7 +69,7 @@ TEST(ConfigParser, loadPrimitive) {
   // INTEGER
   param.optional = false;
   param.type = awesomo::INT;
-  param.key = "integer";
+  param.key = "int";
   param.i = &i;
   parser.loadPrimitive(param);
   ASSERT_EQ(1, i);
@@ -126,7 +126,7 @@ TEST(ConfigParser, loadArray) {
   // INTEGER
   param.optional = false;
   param.type = awesomo::INT_ARRAY;
-  param.key = "integer_array";
+  param.key = "int_array";
   param.i_array = &i_array;
   parser.loadArray(param);
 
@@ -231,6 +231,7 @@ TEST(ConfigParser, loadMatrix) {
   awesomo::Mat3 mat3;
   awesomo::Mat4 mat4;
   awesomo::MatX matx;
+  cv::Mat cvmat;
   awesomo::ConfigParser parser;
   awesomo::ConfigParam param;
 
@@ -293,6 +294,95 @@ TEST(ConfigParser, loadMatrix) {
       index++;
     }
   }
+
+  // CV MATRIX
+  param.optional = false;
+  param.type = awesomo::CVMAT;
+  param.key = "matrix";
+  param.cvmat = &cvmat;
+  parser.loadMatrix(param);
+
+  index = 0;
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 4; j++) {
+      ASSERT_FLOAT_EQ(index + 1.0, cvmat.at<double>(i, j));
+      index++;
+    }
+  }
+}
+
+TEST(ConfigParser, load) {
+  int retval;
+  bool b;
+  int i;
+  float f;
+  double d;
+  std::string s;
+
+  std::vector<bool> b_array;
+  std::vector<int> i_array;
+  std::vector<float> f_array;
+  std::vector<double> d_array;
+  std::vector<std::string> s_array;
+
+  awesomo::Vec2 vec2;
+  awesomo::Vec3 vec3;
+  awesomo::Vec4 vec4;
+  awesomo::VecX vecx;
+
+  awesomo::Mat2 mat2;
+  awesomo::Mat3 mat3;
+  awesomo::Mat4 mat4;
+  awesomo::MatX matx;
+
+  cv::Mat cvmat;
+  awesomo::ConfigParser parser;
+
+  parser.addParam(awesomo::BOOL, "bool", &b);
+  parser.addParam(awesomo::INT, "int", &i);
+  parser.addParam(awesomo::FLOAT, "float", &f);
+  parser.addParam(awesomo::DOUBLE, "double", &d);
+  parser.addParam(awesomo::STRING, "string", &s);
+
+  parser.addParam(awesomo::BOOL_ARRAY, "bool_array", &b_array);
+  parser.addParam(awesomo::INT_ARRAY, "int_array", &i_array);
+  parser.addParam(awesomo::FLOAT_ARRAY, "float_array", &f_array);
+  parser.addParam(awesomo::DOUBLE_ARRAY, "double_array", &d_array);
+  parser.addParam(awesomo::STRING_ARRAY, "string_array", &s_array);
+
+  parser.addParam(awesomo::VEC2, "vector2", &vec2);
+  parser.addParam(awesomo::VEC3, "vector3", &vec3);
+  parser.addParam(awesomo::VEC4, "vector4", &vec4);
+  parser.addParam(awesomo::VECX, "vector", &vecx);
+
+  parser.addParam(awesomo::MAT2, "matrix2", &mat2);
+  parser.addParam(awesomo::MAT3, "matrix3", &mat3);
+  parser.addParam(awesomo::MAT4, "matrix4", &mat4);
+  parser.addParam(awesomo::MATX, "matrix", &matx);
+
+  retval = parser.load(TEST_CONFIG);
+  if (retval != 0) {
+    FAIL();
+  }
+
+  std::cout << "bool: " << b << std::endl;
+  std::cout << "int: " << i << std::endl;
+  std::cout << "float: " << f << std::endl;
+  std::cout << "double: " << d << std::endl;
+  std::cout << "string: " << s << std::endl;
+  std::cout << std::endl;
+
+  std::cout << "vector2: " << vec2.transpose() << std::endl;
+  std::cout << "vector3: " << vec3.transpose() << std::endl;
+  std::cout << "vector4: " << vec4.transpose() << std::endl;
+  std::cout << "vector: " << vecx.transpose() << std::endl;
+  std::cout << std::endl;
+
+  std::cout << "matrix2: \n" << mat2 << std::endl;
+  std::cout << "matrix3: \n" << mat3 << std::endl;
+  std::cout << "matrix4: \n" << mat4 << std::endl;
+  std::cout << "matrix: \n" << matx << std::endl;
+  std::cout << std::endl;
 }
 
 int main(int argc, char **argv) {

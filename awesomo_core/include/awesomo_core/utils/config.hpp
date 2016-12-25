@@ -97,21 +97,13 @@ enum Type {
   MAT2 = 31,
   MAT3 = 32,
   MAT4 = 33,
-  MATX = 34
-};
-
-enum TypeClass {
-  CLASS_NOT_SET = 0,
-  PRIMITIVE = 1,
-  ARRAY = 2,
-  VECTOR = 3,
-  MARTRIX = 4
+  MATX = 34,
+  CVMAT = 35
 };
 
 class ConfigParam {
 public:
   enum Type type;
-  enum TypeClass type_class;
   std::string key;
   bool optional;
 
@@ -136,10 +128,10 @@ public:
   Mat3 *mat3;
   Mat4 *mat4;
   MatX *matx;
+  cv::Mat *cvmat;
 
   ConfigParam(void) {
     this->type = TYPE_NOT_SET;
-    this->type_class = CLASS_NOT_SET;
     this->key = "";
     this->optional = false;
 
@@ -164,6 +156,7 @@ public:
     this->mat3 = NULL;
     this->mat4 = NULL;
     this->matx = NULL;
+    this->cvmat = NULL;
   }
 };
 

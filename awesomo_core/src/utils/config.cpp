@@ -319,13 +319,28 @@ void ConfigParser::addParam(enum Type type, std::string key, void *out) {
 
   param.type = type;
   param.key = key;
+  param.optional = false;
 
   switch (type) {
     // clang-format off
     case BOOL: param.b = (bool *) out; break;
     case INT: param.i = (int *) out; break;
     case FLOAT: param.f = (float *) out; break;
+    case DOUBLE: param.d = (double *) out; break;
     case STRING: param.s = (std::string *) out; break;
+    case BOOL_ARRAY: param.b_array = (std::vector<bool> *) out; break;
+    case INT_ARRAY: param.i_array = (std::vector<int> *) out; break;
+    case FLOAT_ARRAY: param.f_array = (std::vector<float> *) out; break;
+    case DOUBLE_ARRAY: param.d_array = (std::vector<double> *) out; break;
+    case STRING_ARRAY: param.s_array = (std::vector<std::string> *) out; break;
+    case VEC2: param.vec2 = (Vec2 *) out; break;
+    case VEC3: param.vec3 = (Vec3 *) out; break;
+    case VEC4: param.vec4 = (Vec4 *) out; break;
+    case VECX: param.vecx = (VecX *) out; break;
+    case MAT2: param.mat2 = (Mat2 *) out; break;
+    case MAT3: param.mat3 = (Mat3 *) out; break;
+    case MAT4: param.mat4 = (Mat4 *) out; break;
+    case MATX: param.matx = (MatX *) out; break;
       // clang-format on
   }
 
@@ -354,21 +369,13 @@ int ConfigParser::loadPrimitive(ConfigParam param) {
 
   // parse
   switch (param.type) {
-    case BOOL:
-      *param.b = this->root[param.key].as<bool>();
-      break;
-    case INT:
-      *param.i = this->root[param.key].as<int>();
-      break;
-    case FLOAT:
-      *param.f = this->root[param.key].as<float>();
-      break;
-    case DOUBLE:
-      *param.d = this->root[param.key].as<double>();
-      break;
-    case STRING:
-      *param.s = this->root[param.key].as<std::string>();
-      break;
+    // clang-format off
+    case BOOL: *param.b = this->root[param.key].as<bool>(); break;
+    case INT: *param.i = this->root[param.key].as<int>(); break;
+    case FLOAT: *param.f = this->root[param.key].as<float>(); break;
+    case DOUBLE: *param.d = this->root[param.key].as<double>(); break;
+    case STRING: *param.s = this->root[param.key].as<std::string>(); break;
+      // clang-format on
   }
 
   return 0;
@@ -487,6 +494,7 @@ int ConfigParser::loadMatrix(ConfigParam param) {
   Mat3 &mat3 = *param.mat3;
   Mat4 &mat4 = *param.mat4;
   MatX &matx = *param.matx;
+  cv::Mat &cvmat = *param.cvmat;
 
   // parse
   node = this->root[param.key];
@@ -532,6 +540,15 @@ int ConfigParser::loadMatrix(ConfigParam param) {
         }
       }
       break;
+    case CVMAT:
+      cvmat = cv::Mat(rows, cols, CV_64F);
+      for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+          cvmat.at<double>(i, j) = node["data"][index].as<double>();
+          index++;
+        }
+      }
+      break;
   }
 
   return 0;
@@ -539,7 +556,6 @@ int ConfigParser::loadMatrix(ConfigParam param) {
 
 int ConfigParser::load(std::string config_file) {
   int retval;
-  ConfigParam param;
 
   // pre-check
   if (file_exists(config_file) == false) {
@@ -549,8 +565,45 @@ int ConfigParser::load(std::string config_file) {
 
   // load and parse file
   this->root = YAML::LoadFile(config_file);
-  for (int i = 0; i < params.size(); i++) {
-    param = params[i];
+
+  for (int i = 0; i < this->params.size(); i++) {
+    switch (this->params[i].type) {
+      // PRIMITIVE
+      case BOOL:
+      case INT:
+      case FLOAT:
+      case DOUBLE:
+      case STRING:
+        retval = this->loadPrimitive(this->params[i]);
+        break;
+      // ARRAY
+      case BOOL_ARRAY:
+      case INT_ARRAY:
+      case FLOAT_ARRAY:
+      case DOUBLE_ARRAY:
+      case STRING_ARRAY:
+        retval = this->loadArray(this->params[i]);
+        break;
+      // VECTOR
+      case VEC2:
+      case VEC3:
+      case VEC4:
+      case VECX:
+        retval = this->loadVector(this->params[i]);
+        break;
+      // MAT
+      case MAT2:
+      case MAT3:
+      case MAT4:
+      case MATX:
+      case CVMAT:
+        retval = this->loadMatrix(this->params[i]);
+        break;
+    }
+
+    if (retval != 0) {
+      return retval;
+    }
   }
 
   return 0;
