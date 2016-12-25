@@ -10,23 +10,13 @@ HoverMode::HoverMode(void) {
 }
 
 int HoverMode::configure(std::string config_file) {
-  YAML::Node config;
+  ConfigParser parser;
 
-  try {
-    // pre-check
-    if (file_exists(config_file) == false) {
-      log_err("File not found: %s", config_file.c_str());
-      return -1;
-    }
-
-    // parse configs
-    config = YAML::LoadFile(config_file);
-    yamlDouble(config, "hover_height", this->hover_height);
-    yamlVec3(config, "hover_position", this->hover_position);
-
-  } catch (std::exception &ex) {
-    std::cout << ex.what();
-    return -2;
+  parser.addParam(DOUBLE, "hover_height", &this->hover_height);
+  parser.addParam(VEC3, "hover_position", &this->hover_position);
+  if (parser.load(config_file) != 0) {
+    log_err("Failed to configure HoverMode!");
+    return -1;
   }
 
   this->configured = true;
