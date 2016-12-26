@@ -2,7 +2,7 @@
 
 #include "awesomo_core/quadrotor/quadrotor.hpp"
 
-#define TEST_CONFIG_PATH "tests/configs"
+#define TEST_CONFIG_PATH "tests/configs/quadrotor"
 
 TEST(Quadrotor, constructor) {
   awesomo::Quadrotor quadrotor;

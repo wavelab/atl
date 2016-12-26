@@ -3,17 +3,24 @@
 
 #include <m3api/xiApi.h>
 
+#include "awesomo_core/vision/camera/camera.hpp"
+
 
 namespace awesomo {
 
+#define XIMEA_CHECK(STATE, WHERE)                \
+  if (STATE != XI_OK) {                          \
+    printf("Error after %s (%d)", WHERE, STATE); \
+    goto ximea_error;                            \
+  }
+
 class XimeaCamera : public Camera {
 public:
-  bool configured;
   HANDLE ximea;
 
   XimeaCamera(void);
-  int configure(void);
   int initialize(void);
+  int getFrame(cv::Mat &image);
 };
 
 }  // end of awesomo namespace

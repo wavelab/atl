@@ -3,7 +3,7 @@
 #include "awesomo_core/control/position_controller.hpp"
 
 
-#define TEST_CONFIG "tests/configs/position_controller.yaml"
+#define TEST_CONFIG "tests/configs/control/position_controller.yaml"
 
 
 namespace awesomo {

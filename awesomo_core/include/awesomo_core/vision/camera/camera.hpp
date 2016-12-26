@@ -18,7 +18,7 @@ public:
   bool configured;
   bool initialized;
 
-  CameraConfig *current_config;
+  CameraConfig *config;
   std::vector<std::string> modes;
   std::map<std::string, CameraConfig *> configs;
 

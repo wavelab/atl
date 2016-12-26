@@ -3,7 +3,7 @@
 #include "awesomo_core/control/velocity_controller.hpp"
 
 
-#define TEST_CONFIG "tests/configs/velocity_controller.yaml"
+#define TEST_CONFIG "tests/configs/control/velocity_controller.yaml"
 
 
 namespace awesomo {

@@ -7,7 +7,7 @@ Camera::Camera(void) {
   this->configured = false;
   this->initialized = false;
 
-  this->current_config = NULL;
+  this->config = NULL;
   this->modes.clear();
   this->configs.clear();
 
@@ -55,7 +55,7 @@ int Camera::configure(std::string config_path) {
     this->modes.push_back(camera_modes[i]);
     this->configs[camera_modes[i]] = config;
   }
-  this->current_config = this->configs[camera_modes[0]];
+  this->config = this->configs[camera_modes[0]];
   this->configured = true;
 
   return 0;
@@ -72,9 +72,9 @@ int Camera::initialize(void) {
   }
 
   // setup
-  camera_index = this->current_config->index;
-  image_width = this->current_config->image_width;
-  image_height = this->current_config->image_height;
+  camera_index = this->config->index;
+  image_width = this->config->image_width;
+  image_height = this->config->image_height;
 
   // open
   this->capture = new cv::VideoCapture(camera_index);
@@ -152,7 +152,7 @@ int Camera::showFPS(double &last_tic, int &frame_count) {
   }
 
   frame_count++;
-  if (frame_count % 30 == 0 && this->current_config->showfps) {
+  if (frame_count % 30 == 0 && this->config->showfps) {
     t = time_now();
     fps = 30.0 / (t - last_tic);
     printf("fps: %.2f\n", fps);
@@ -170,7 +170,7 @@ int Camera::showImage(cv::Mat &image) {
   }
 
   // show image
-  if (this->current_config->imshow) {
+  if (this->config->imshow) {
     cv::imshow("Camera", image);
     cv::waitKey(1);
   }

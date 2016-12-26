@@ -2,7 +2,7 @@
 
 #include "awesomo_core/quadrotor/hover_mode.hpp"
 
-#define TEST_CONFIG "tests/configs/hover_mode.yaml"
+#define TEST_CONFIG "tests/configs/quadrotor/hover_mode.yaml"
 
 
 TEST(HoverMode, constructor) {

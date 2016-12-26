@@ -3,7 +3,7 @@
 #include "awesomo_core/utils/data.hpp"
 #include "awesomo_core/utils/config.hpp"
 
-#define TEST_CONFIG "tests/configs/config.yaml"
+#define TEST_CONFIG "tests/configs/config/config.yaml"
 
 
 TEST(ConfigParam, constructor) {

@@ -3,7 +3,7 @@
 #include "awesomo_core/control/tracking_controller.hpp"
 
 
-#define TEST_CONFIG "tests/configs/tracking_controller.yaml"
+#define TEST_CONFIG "tests/configs/control/tracking_controller.yaml"
 
 
 namespace awesomo {

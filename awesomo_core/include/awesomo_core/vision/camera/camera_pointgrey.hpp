@@ -3,17 +3,19 @@
 
 #include <FlyCapture2.h>
 
+#include "awesomo_core/vision/camera/camera_pointgrey.hpp"
+
 
 namespace awesomo {
 
 class PointGreyCamera : public Camera {
 public:
-  bool configured;
-  FlyCapture2::Camera *firefly;
+  FlyCapture2::Camera *pointgrey;
 
   PointGreyCamera(void);
-  int configure(void);
+  ~PointGreyCamera(void);
   int initialize(void);
+  int getFrame(cv::Mat &image);
 };
 
 }  // end of awesomo namespace

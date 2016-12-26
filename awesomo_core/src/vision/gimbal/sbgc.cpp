@@ -25,8 +25,7 @@ int set_interface_attribs(int fd, int speed, int parity) {
   tty.c_cc[VTIME] = 5;  // 0.5 seconds read timeout
 
   tty.c_iflag &= ~(IXON | IXOFF | IXANY);  // shut off xon/xoff ctrl
-
-  tty.c_cflag |= (CLOCAL | CREAD);  // ignore modem controls,
+  tty.c_cflag |= (CLOCAL | CREAD);         // ignore modem controls,
   // enable reading
   tty.c_cflag &= ~(PARENB | PARODD);  // shut off parity
   tty.c_cflag |= parity;

@@ -11,7 +11,7 @@ TEST(Camera, constructor) {
   ASSERT_FALSE(camera.configured);
   ASSERT_FALSE(camera.initialized);
 
-  ASSERT_EQ(NULL, camera.current_config);
+  ASSERT_EQ(NULL, camera.config);
   ASSERT_EQ(0, camera.modes.size());
   ASSERT_EQ(0, camera.configs.size());
 

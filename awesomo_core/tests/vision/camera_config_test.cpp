@@ -3,7 +3,7 @@
 #include "awesomo_core/utils/opencv.hpp"
 #include "awesomo_core/vision/camera/camera_config.hpp"
 
-#define TEST_CONFIG "tests/configs/camera.yaml"
+#define TEST_CONFIG "tests/configs/camera/640x480.yaml"
 
 
 TEST(CameraConfig, constructor) {

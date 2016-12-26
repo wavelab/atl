@@ -1,29 +1,45 @@
+#include "awesomo_core/vision/camera/camera_pointgrey.hpp"
 
-int Camera::initFirefly() {
+
+namespace awesomo {
+
+PointGreyCamera::PointGreyCamera(void) {
+  this->pointgrey = NULL;
+}
+
+~PointGreyCamera(void) {
+  if (initialized) {
+    delete this->pointgrey;
+  }
+}
+
+int PointGreyCamera::initialize() {
+  int camera_index;
   FlyCapture2::Error error;
   FlyCapture2::Property property;
   FlyCapture2::Property gain_property;
 
   // setup
-  this->capture_firefly = new FlyCapture2::Camera();
+  this->pointgrey = new FlyCapture2::Camera();
 
   // connect
-  error = this->capture_firefly->Connect(0);
+  camera_index = this->current_config->index;
+  error = this->pointgrey->Connect(camera_index);
   if (error != FlyCapture2::PGRERROR_OK) {
-    printf("ERROR! Failed to connect to camera!\n");
+    log_err("ERROR! Failed to connect to camera!");
     return -1;
   } else {
-    printf("Firefly camera connected!\n");
+    log_err("Firefly camera connected!");
   }
 
   // set video mode format and frame rate
-  error = this->capture_firefly->SetVideoModeAndFrameRate(
+  error = this->pointgrey->SetVideoModeAndFrameRate(
     FlyCapture2::VIDEOMODE_640x480Y8, FlyCapture2::FRAMERATE_60);
   if (error != FlyCapture2::PGRERROR_OK) {
-    printf("ERROR! Failed to set camera video mode and frame rate!\n");
+    log_err("ERROR! Failed to set camera video mode and frame rate!");
     return -1;
   } else {
-    printf("Firefly camera video mode and frame rate configured!\n");
+    log_err("Firefly camera video mode and frame rate configured!");
   }
 
   // configure exposure
@@ -33,12 +49,12 @@ int Camera::initFirefly() {
   property.absControl = true;
   property.absValue = this->camera_exposure_value;  // exposure value
 
-  error = this->capture_firefly->SetProperty(&property);
+  error = this->pointgrey->SetProperty(&property);
   if (error != FlyCapture2::PGRERROR_OK) {
-    printf("ERROR! Failed to configure camera exposure!\n");
+    log_err("ERROR! Failed to configure camera exposure!");
     return -1;
   } else {
-    printf("Firefly camera exposure configured!\n");
+    log_err("Firefly camera exposure configured!");
   }
 
   // configure gain
@@ -48,38 +64,41 @@ int Camera::initFirefly() {
   property.absControl = true;
   property.absValue = this->camera_gain_value;  // set the gain
 
-  error = this->capture_firefly->SetProperty(&property);
+  error = this->pointgrey->SetProperty(&property);
   if (error != FlyCapture2::PGRERROR_OK) {
-    printf("ERROR! Failed to configure camera gain!\n");
+    log_err("ERROR! Failed to configure camera gain!");
     return -1;
   } else {
-    printf("Firefly camera gain configured!\n");
+    log_err("Firefly camera gain configured!");
   }
 
   // start camera
-  error = this->capture_firefly->StartCapture();
+  error = this->pointgrey->StartCapture();
   if (error != FlyCapture2::PGRERROR_OK) {
-    printf("ERROR! Failed start camera!\n");
+    log_err("ERROR! Failed start camera!");
     return -1;
   } else {
-    printf("Firefly initialized!\n");
+    log_err("Firefly initialized!");
   }
+  this->initialized = true;
 
   return 0;
 }
 
-int Camera::getFramePointGrey(cv::Mat &image) {
+int Camera::getFrame(cv::Mat &image) {
   double data_size;
   double data_rows;
   unsigned int row_bytes;
+  cv::Size image_size;
 
   FlyCapture2::Image raw_img;
   FlyCapture2::Image rgb_img;
   FlyCapture2::Error error;
 
-  error = this->capture_firefly->RetrieveBuffer(&raw_img);
+  // obtain raw image
+  error = this->pointgrey->RetrieveBuffer(&raw_img);
   if (error != FlyCapture2::PGRERROR_OK) {
-    printf("Video capture error!\n");
+    log_err("Failed to obtain raw image from camera!");
     return -1;
   }
 
@@ -87,6 +106,7 @@ int Camera::getFramePointGrey(cv::Mat &image) {
   raw_img.Convert(FlyCapture2::PIXEL_FORMAT_BGR, &rgb_img);
 
   // convert to opencv mat
+  // clang-format off
   data_size = rgb_img.GetReceivedDataSize();
   data_rows = rgb_img.GetRows();
   row_bytes = data_size / data_rows;
@@ -94,13 +114,17 @@ int Camera::getFramePointGrey(cv::Mat &image) {
           rgb_img.GetCols(),
           CV_8UC3,
           rgb_img.GetData(),
-          row_bytes)
-    .copyTo(image);
+          row_bytes).copyTo(image);
+  // clang-format on
 
   // resize the image to reflect camera mode
-  cv::resize(image,
-             image,
-             cv::Size(this->config->image_width, this->config->image_height));
+  // clang-format off
+  image_size = cv::Size(this->current_config->image_width,
+                        this->current_config->image_height);
+  cv::resize(image, image, image_size);
+  // clang-format on
 
   return 0;
 }
+
+}  // end of awesomo namespace

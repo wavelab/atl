@@ -1,17 +1,9 @@
-#include "awesomo_core/vision/camera_firefly.hpp"
+#include "awesomo_core/vision/camera/camera_ximea.hpp"
 
 
 namespace awesomo {
 
-// MACROS
-#define XIMEA_CHECK(STATE, WHERE)                \
-  if (STATE != XI_OK) {                          \
-    printf("Error after %s (%d)", WHERE, STATE); \
-    goto ximea_error;                            \
-  }
-
-
-int XimeaCamera::configure(void) {
+int XimeaCamera::initialize(void) {
   int time_us;
   int ds_type;
   int ds_rate;
@@ -20,10 +12,10 @@ int XimeaCamera::configure(void) {
   XI_RETURN retval;
 
   // setup
-  time_us = this->camera_exposure_value;
+  time_us = this->config->exposure_value;
   ds_type = 0;
   ds_rate = 2;
-  gain_db = this->camera_gain_value;
+  gain_db = this->config->gain_value;
   img_format = XI_RGB24;
 
   this->ximea = NULL;
@@ -31,6 +23,7 @@ int XimeaCamera::configure(void) {
 
   log_info("Starting Ximea Camera\n");
 
+  // clang-format off
   // open camera device
   retval = xiOpenDevice(0, &this->ximea);
   XIMEA_CHECK(retval, "xiOpenDevice");
@@ -62,6 +55,7 @@ int XimeaCamera::configure(void) {
   // start acquisition
   retval = xiStartAcquisition(this->ximea);
   XIMEA_CHECK(retval, "xiStartAcquisition");
+  // clang-format on
 
   // return
   log_info("Ximea Camera Started Successfully\n");
@@ -74,7 +68,7 @@ ximea_error:
   return -1;
 }
 
-int XimeaCamera::getFrameXimea(cv::Mat &image) {
+int XimeaCamera::getFrame(cv::Mat &image) {
   int retval;
   XI_IMG ximea_img;
 
@@ -85,7 +79,7 @@ int XimeaCamera::getFrameXimea(cv::Mat &image) {
   // get the image
   retval = xiGetImage(this->ximea, 1000, &ximea_img);
   if (retval != XI_OK) {
-    log_error("Error after xiGetImage (%d)\n", retval);
+    log_err("Error after xiGetImage (%d)\n", retval);
     return -1;
 
   } else {
