@@ -35,3 +35,4 @@ projection_matrix:
 
 imshow: true
 snapshot: true
+showfps: true

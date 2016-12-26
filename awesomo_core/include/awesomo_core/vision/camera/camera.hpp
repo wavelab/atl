@@ -1,5 +1,5 @@
-#ifndef __AWESOMO_CAMERA_HPP__
-#define __AWESOMO_CAMERA_HPP__
+#ifndef __AWESOMO_VISION_CAMERA_HPP__
+#define __AWESOMO_VISION_CAMERA_HPP__
 
 #include <yaml-cpp/yaml.h>
 
@@ -8,54 +8,32 @@
 #include <opencv2/highgui/highgui.hpp>
 
 #include "awesomo_core/utils/utils.hpp"
+#include "awesomo_core/vision/camera/camera_config.hpp"
 
 
 namespace awesomo {
 
-class CameraConfig {
-public:
-  bool loaded;
-
-  int index;
-  int image_width;
-  int image_height;
-
-  float exposure_value;
-  float gain_value;
-  Vec3 lambda;
-  float alpha;
-
-  cv::Mat camera_matrix;
-  cv::Mat rectification_matrix;
-  cv::Mat distortion_coefficients;
-  cv::Mat projection_matrix;
-
-  bool imshow;
-  bool snapshot;
-
-  CameraConfig(void);
-  int load(std::string config_file);
-  void print(void);
-};
-
 class Camera {
 public:
+  bool configured;
+  bool initialized;
+
   CameraConfig *current_config;
+  std::vector<std::string> modes;
   std::map<std::string, CameraConfig *> configs;
-  cv::VideoCapture capture;
+
+  cv::VideoCapture *capture;
+  double last_tic;
 
   Camera(void);
-  Camera(int index, int type);
-  int configure(std::string config_path);
-  int loadMode(std::string mode);
-
-  int getFrame(cv::Mat &image);
-  // std::vector<TagPose> step(int &timeout);
-  // std::vector<TagPose> step(int &timeout, float dt);
+  ~Camera(void);
+  virtual int configure(std::string config_path);
+  virtual int initialize(void);
+  virtual int shutdown(void);
+  virtual int getFrame(cv::Mat &image);
   int run(void);
-
-  void printConfig(void);
-  void printFPS(double &last_tic, int &frame);
+  int showFPS(double &last_tic, int &frame);
+  int showImage(cv::Mat &image);
 };
 
 }  // end of awesomo namespace

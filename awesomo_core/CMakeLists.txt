@@ -43,6 +43,7 @@ ADD_LIBRARY(
     src/utils/stats.cpp
     src/utils/time.cpp
     src/vision/camera/camera.cpp
+    src/vision/camera/camera_config.cpp
 )
 SET(DEPS
     ${PROJECT_NAME}
@@ -88,6 +89,9 @@ TARGET_LINK_LIBRARIES(awesomo_quadrotor_test ${DEPS})
 # VISION TESTS
 ADD_EXECUTABLE(awesomo_camera_test tests/vision/camera_test.cpp)
 TARGET_LINK_LIBRARIES(awesomo_camera_test ${DEPS})
+
+ADD_EXECUTABLE(awesomo_camera_config_test tests/vision/camera_config_test.cpp)
+TARGET_LINK_LIBRARIES(awesomo_camera_config_test ${DEPS})
 
 # UTIL TESTS
 ADD_EXECUTABLE(awesomo_config_test tests/utils/config_test.cpp)

@@ -3,79 +3,177 @@
 
 namespace awesomo {
 
-CameraConfig::CameraConfig(void) {
-  this->loaded = false;
+Camera::Camera(void) {
+  this->configured = false;
+  this->initialized = false;
 
-  this->index = 0;
-  this->image_width = 0;
-  this->image_height = 0;
+  this->current_config = NULL;
+  this->modes.clear();
+  this->configs.clear();
 
-  this->exposure_value = 0.0;
-  this->gain_value = 0.0;
-  this->lambda << 0.0, 0.0, 0.0;
-  this->alpha = 0.0;
-
-  this->camera_matrix;
-  this->rectification_matrix;
-  this->distortion_coefficients;
-  this->projection_matrix;
-
-  this->imshow = false;
-  this->snapshot = false;
+  this->capture = NULL;
+  this->last_tic = 0.0;
 }
 
-int CameraConfig::load(std::string config_file) {
+Camera::~Camera(void) {
+  CameraConfig *config;
+
+  if (this->configured) {
+    for (int i = 0; i < this->configs.size(); i++) {
+      delete this->configs[this->modes[i]];
+    }
+  }
+
+  if (this->initialized) {
+    this->capture->release();
+    this->capture = NULL;
+  }
+}
+
+int Camera::configure(std::string config_path) {
   ConfigParser parser;
-
-  // config variables
-  // clang-format off
-  parser.addParam(INT, "index", &this->index);
-  parser.addParam(INT, "image_width", &this->image_width);
-  parser.addParam(INT, "image_height", &this->image_height);
-
-  parser.addParam(FLOAT, "exposure_value", &this->exposure_value);
-  parser.addParam(FLOAT, "gain_value", &this->gain_value);
-  parser.addParam(VEC3, "lambda", &this->lambda);
-  parser.addParam(FLOAT, "alpha", &this->alpha);
-
-  parser.addParam(CVMAT, "camera_matrix", &this->camera_matrix);
-  parser.addParam(CVMAT, "distortion_coefficients", &this->distortion_coefficients);
-  parser.addParam(CVMAT, "rectification_matrix", &this->rectification_matrix);
-  parser.addParam(CVMAT, "projection_matrix", &this->projection_matrix);
-
-  parser.addParam(BOOL, "imshow", &this->imshow);
-  parser.addParam(BOOL, "snapshot", &this->snapshot);
-  // clang-format on
+  CameraConfig *config;
+  std::vector<std::string> camera_modes;
+  std::vector<std::string> camera_configs;
 
   // load config
-  if (parser.load(config_file) != 0) {
-    log_err("Failed to configure CameraConfig!");
+  parser.addParam(STRING_ARRAY, "modes", &camera_modes);
+  parser.addParam(STRING_ARRAY, "configs", &camera_configs);
+  if (parser.load(config_path + "/" + "config.yaml") != 0) {
+    log_err("Failed to configure camera!");
     return -1;
   }
 
-  this->loaded = true;
+  // load camera configs
+  for (int i = 0; i < camera_modes.size(); i++) {
+    config = new CameraConfig();
+    if (config->load(config_path + "/" + camera_configs[i]) != 0) {
+      log_err("Failed to configure camera!");
+      return -1;
+    }
+
+    this->modes.push_back(camera_modes[i]);
+    this->configs[camera_modes[i]] = config;
+  }
+  this->current_config = this->configs[camera_modes[0]];
+  this->configured = true;
+
   return 0;
 }
 
-void CameraConfig::print(void) {
-  // clang-format off
-  std::cout << "index: " << this->index << std::endl;
-  std::cout << "image_width: " << this->image_width << std::endl;
-  std::cout << "image_height: " << this->image_height << std::endl;
+int Camera::initialize(void) {
+  int camera_index;
+  int image_width;
+  int image_height;
 
-  std::cout << "exposure_value: " << this->exposure_value << std::endl;
-  std::cout << "gain_value: " << this->gain_value << std::endl;
-  std::cout << "lambda: " << this->lambda.transpose() << std::endl;
-  std::cout << "alpha: " << this->alpha << std::endl;
+  // pre-check
+  if (this->configured == false) {
+    return -1;
+  }
 
-  std::cout << "camera_matrix: \n" << this->camera_matrix << std::endl;
-  std::cout << "rectification_matrix: \n" << this->rectification_matrix << std::endl;
-  std::cout << "distortion_coefficients: " << this->distortion_coefficients << std::endl;
-  std::cout << "projection_matrix: \n" << this->projection_matrix << std::endl;
+  // setup
+  camera_index = this->current_config->index;
+  image_width = this->current_config->image_width;
+  image_height = this->current_config->image_height;
 
-  std::cout << "imshow: " << this->imshow << std::endl;
-  std::cout << "snapshot: " << this->snapshot << std::endl;
-  // clang-format on
+  // open
+  this->capture = new cv::VideoCapture(camera_index);
+  if (this->capture->isOpened() == 0) {
+    log_err("Failed to open camera!\n");
+    return -1;
+
+  } else {
+    this->capture->set(CV_CAP_PROP_FRAME_WIDTH, image_width);
+    this->capture->set(CV_CAP_PROP_FRAME_HEIGHT, image_height);
+    this->initialized = true;
+    log_info("Camera initialized!\n");
+    return 0;
+  }
+}
+
+int Camera::shutdown(void) {
+  if (this->initialized) {
+    this->capture->release();
+    this->capture = NULL;
+    this->initialized = false;
+  }
+}
+
+int Camera::getFrame(cv::Mat &image) {
+  // pre-check
+  if (this->configured == false) {
+    return -1;
+  } else if (this->initialized == false) {
+    return -2;
+  }
+
+  this->capture->read(image);
+  return 0;
+}
+
+int Camera::run(void) {
+  cv::Mat image;
+  int frame_count;
+  double t;
+  double last_tic;
+
+  // pre-check
+  if (this->configured == false) {
+    return -1;
+  } else if (this->initialized == false) {
+    return -2;
+  }
+
+  // setup
+  frame_count = 0;
+  last_tic = time_now();
+
+  // run
+  while (true) {
+    this->getFrame(image);
+
+    // show stats
+    this->showFPS(last_tic, frame_count);
+    this->showImage(image);
+  }
+
+  return 0;
+}
+
+int Camera::showFPS(double &last_tic, int &frame_count) {
+  double t;
+  double fps;
+
+  // pre-check
+  if (this->configured == false) {
+    return -1;
+  } else if (this->initialized == false) {
+    return -2;
+  }
+
+  frame_count++;
+  if (frame_count % 30 == 0 && this->current_config->showfps) {
+    t = time_now();
+    fps = 30.0 / (t - last_tic);
+    printf("fps: %.2f\n", fps);
+    last_tic = t;
+    frame_count = 0;
+  }
+}
+
+int Camera::showImage(cv::Mat &image) {
+  // pre-check
+  if (this->configured == false) {
+    return -1;
+  } else if (this->initialized == false) {
+    return -2;
+  }
+
+  // show image
+  if (this->current_config->imshow) {
+    cv::imshow("Camera", image);
+    cv::waitKey(1);
+  }
 }
 
 }  // end of awesomo namespace
