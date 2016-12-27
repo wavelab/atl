@@ -12,10 +12,10 @@ install:
     - sudo bash scripts/install_scripts/catkin_setup.bash
 
 script:
-    - cd $HOME/catkin_ws/src/
+    - cd ~/catkin_ws/src/
     - git clone https://github.com/wavelab/awesomo.git
-    - cd $HOME/catkin_ws/ && catkin_make
-    - cd $HOME/catkin_ws/src/awesomo_core
+    - cd ~/catkin_ws/ && catkin_make
+    - cd ~/catkin_ws/src/awesomo_core
     - rosrun awesomo_core awesomo_tests
 
 notifications:
