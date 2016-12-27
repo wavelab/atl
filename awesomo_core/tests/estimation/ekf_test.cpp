@@ -9,7 +9,8 @@
 #define TEST_EKF_OUTPUT_FILE "/tmp/estimation_ekf_test.output"
 
 
-int prepareOutputFile(std::ofstream &output_file, std::string output_path) {
+static int prepareOutputFile(std::ofstream &output_file,
+                             std::string output_path) {
   output_file.open(output_path);
 
   // clang-format off
@@ -27,10 +28,10 @@ int prepareOutputFile(std::ofstream &output_file, std::string output_path) {
   return 0;
 }
 
-void recordTimeStep(std::ofstream &output_file,
-                    int i,
-                    awesomo::Vec3 mea,
-                    awesomo::Vec3 est) {
+static void recordTimeStep(std::ofstream &output_file,
+                           int i,
+                           awesomo::Vec3 mea,
+                           awesomo::Vec3 est) {
   // record true state x, y, z
   output_file << i << ",";
   output_file << mea(0) << ",";
@@ -113,9 +114,4 @@ TEST(ExtendedKalmanFilter, estimate) {
     recordTimeStep(output_file, i, x, ekf.mu);
   }
   output_file.close();
-}
-
-int main(int argc, char *argv[]) {
-  testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
 }

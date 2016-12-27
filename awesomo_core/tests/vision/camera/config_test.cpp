@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "awesomo_core/utils/opencv.hpp"
-#include "awesomo_core/vision/camera/camera_config.hpp"
+#include "awesomo_core/vision/camera/config.hpp"
 
 #define TEST_CONFIG "tests/configs/camera/640x480.yaml"
 
@@ -79,9 +79,4 @@ TEST(CameraConfig, load) {
 
   ASSERT_TRUE(config.imshow);
   ASSERT_TRUE(config.snapshot);
-}
-
-int main(int argc, char **argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
 }

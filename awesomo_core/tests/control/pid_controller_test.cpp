@@ -2,6 +2,7 @@
 
 #include "awesomo_core/control/pid_controller.hpp"
 
+
 TEST(PID, constructor) {
   awesomo::PID controller;
 
@@ -66,9 +67,4 @@ TEST(PID, reset) {
   ASSERT_FLOAT_EQ(0.0, controller.error_p);
   ASSERT_FLOAT_EQ(0.0, controller.error_i);
   ASSERT_FLOAT_EQ(0.0, controller.error_d);
-}
-
-int main(int argc, char **argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
 }

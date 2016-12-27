@@ -63,45 +63,36 @@ SET(DEPS
 )
 
 # UNIT TESTS
-# CONTROL TESTS
-ADD_EXECUTABLE(awesomo_attitude_controller_test tests/control/attitude_controller_test.cpp)
-ADD_EXECUTABLE(awesomo_pid_controller_test tests/control/pid_controller_test.cpp)
-ADD_EXECUTABLE(awesomo_position_controller_test tests/control/position_controller_test.cpp)
-ADD_EXECUTABLE(awesomo_velocity_controller_test tests/control/velocity_controller_test.cpp)
-TARGET_LINK_LIBRARIES(awesomo_attitude_controller_test ${DEPS})
-TARGET_LINK_LIBRARIES(awesomo_pid_controller_test ${DEPS})
-TARGET_LINK_LIBRARIES(awesomo_position_controller_test ${DEPS})
-TARGET_LINK_LIBRARIES(awesomo_velocity_controller_test ${DEPS})
-
-# ESTIMATION TESTS
-ADD_EXECUTABLE(awesomo_ekf_test tests/estimation/ekf_test.cpp)
-ADD_EXECUTABLE(awesomo_kf_test tests/estimation/kf_test.cpp)
-TARGET_LINK_LIBRARIES(awesomo_ekf_test ${DEPS})
-TARGET_LINK_LIBRARIES(awesomo_kf_test ${DEPS})
-
-# PLANNING TESTS
-ADD_EXECUTABLE(awesomo_planning_test tests/planning/planning_test.cpp)
-TARGET_LINK_LIBRARIES(awesomo_planning_test ${DEPS})
-
-# QUADROTOR TESTS
-ADD_EXECUTABLE(awesomo_hover_mode_test tests/quadrotor/hover_mode_test.cpp)
-ADD_EXECUTABLE(awesomo_quadrotor_test tests/quadrotor/quadrotor_test.cpp)
-TARGET_LINK_LIBRARIES(awesomo_hover_mode_test ${DEPS})
-TARGET_LINK_LIBRARIES(awesomo_quadrotor_test ${DEPS})
-
-# VISION TESTS
-ADD_EXECUTABLE(awesomo_camera_test tests/vision/camera_test.cpp)
-ADD_EXECUTABLE(awesomo_camera_config_test tests/vision/camera_config_test.cpp)
-TARGET_LINK_LIBRARIES(awesomo_camera_test ${DEPS})
-TARGET_LINK_LIBRARIES(awesomo_camera_config_test ${DEPS})
-
-# UTIL TESTS
-ADD_EXECUTABLE(awesomo_config_test tests/utils/config_test.cpp)
-TARGET_LINK_LIBRARIES(awesomo_config_test ${DEPS})
-
-# TESTS
-ADD_EXECUTABLE(awesomo_test tests/test_runner.cpp)
-TARGET_LINK_LIBRARIES(awesomo_test ${DEPS})
+ADD_EXECUTABLE(
+    awesomo_tests
+    # CONTROL
+    tests/control/attitude_controller_test.cpp
+    tests/control/pid_controller_test.cpp
+    tests/control/position_controller_test.cpp
+    tests/control/velocity_controller_test.cpp
+    # ESTIMATION
+    tests/estimation/ekf_test.cpp
+    tests/estimation/kf_test.cpp
+    # PLANNING
+    tests/planning/planning_test.cpp
+    # QUADROTOR
+    tests/quadrotor/hover_mode_test.cpp
+    tests/quadrotor/quadrotor_test.cpp
+    # VISION TESTS
+    tests/vision/camera/camera_test.cpp
+    tests/vision/camera/config_test.cpp
+    # UTIL TESTS
+    tests/utils/config_test.cpp
+    tests/utils/data_test.cpp
+    tests/utils/io_test.cpp
+    tests/utils/math_test.cpp
+    tests/utils/opencv_test.cpp
+    tests/utils/stats_test.cpp
+    tests/utils/time_test.cpp
+    # TEST RUNNER
+    tests/test_runner.cpp
+)
+TARGET_LINK_LIBRARIES(awesomo_tests ${DEPS})
 
 # INSTALL
 INSTALL(

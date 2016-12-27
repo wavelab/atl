@@ -2,7 +2,6 @@
 
 #include "awesomo_core/control/tracking_controller.hpp"
 
-
 #define TEST_CONFIG "tests/configs/control/tracking_controller.yaml"
 
 
@@ -151,8 +150,3 @@ TEST(TrackingController, calculate) {
 }
 
 }  // end of awesomo namepsace
-
-int main(int argc, char *argv[]) {
-  testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}

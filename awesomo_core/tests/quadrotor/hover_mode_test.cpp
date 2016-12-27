@@ -2,7 +2,7 @@
 
 #include "awesomo_core/quadrotor/hover_mode.hpp"
 
-#define TEST_CONFIG "tests/configs/quadrotor/hover_mode.yaml"
+#define TEST_CONFIG "tests/configs/quadrotor/modes/hover_mode.yaml"
 
 
 TEST(HoverMode, constructor) {
@@ -24,9 +24,4 @@ TEST(HoverMode, configure) {
   ASSERT_FLOAT_EQ(1.0, mode.hover_position[0]);
   ASSERT_FLOAT_EQ(2.0, mode.hover_position[1]);
   ASSERT_FLOAT_EQ(3.0, mode.hover_position[2]);
-}
-
-int main(int argc, char **argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
 }

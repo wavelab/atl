@@ -73,7 +73,6 @@ int ConfigParser::checkMatrix(std::string key, bool optional) {
   return 0;
 }
 
-
 int ConfigParser::loadPrimitive(ConfigParam param) {
   int retval;
 

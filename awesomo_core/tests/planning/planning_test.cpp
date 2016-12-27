@@ -23,8 +23,3 @@ TEST(BezierCubicCurve, test) {
     ASSERT_TRUE(bezier_points[i](1) < bezier_points[i - 1](1));
   }
 }
-
-int main(int argc, char **argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}

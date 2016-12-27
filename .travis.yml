@@ -7,11 +7,16 @@ language:
 cache:
     - apt
 
-before_install:
+install:
     - sudo bash scripts/install_scripts/ros_install.bash
+    - sudo bash scripts/install_scripts/catkin_setup.bash
 
 script:
-    - echo "Done :)"
+    - cd $HOME/catkin_ws/src/
+    - git clone https://github.com/wavelab/awesomo.git
+    - cd $HOME/catkin_ws/ && catkin_make
+    - cd $HOME/catkin_ws/src/awesomo_core
+    - rosrun awesomo_core awesomo_tests
 
 notifications:
     recipients:

@@ -9,8 +9,8 @@
 #define TEST_KF_OUTPUT_FILE "/tmp/estimation_kf_test.output"
 
 
-// TESTS
-int prepareOutputFile(std::ofstream &output_file, std::string output_path) {
+static int prepareOutputFile(std::ofstream &output_file,
+                             std::string output_path) {
   // clang-format off
   output_file.open(output_path);
 
@@ -28,10 +28,10 @@ int prepareOutputFile(std::ofstream &output_file, std::string output_path) {
   return 0;
 }
 
-void recordTimeStep(std::ofstream &output_file,
-                    int i,
-                    awesomo::Vec3 mea,
-                    awesomo::Vec3 est) {
+static void recordTimeStep(std::ofstream &output_file,
+                           int i,
+                           awesomo::Vec3 mea,
+                           awesomo::Vec3 est) {
   // record true state x, y, z
   output_file << i << ",";
   output_file << mea(0) << ",";
@@ -116,9 +116,4 @@ TEST(KalmanFilter, estimate) {
     recordTimeStep(output_file, i, mea, est);
   }
   output_file.close();
-}
-
-int main(int argc, char *argv[]) {
-  testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
 }

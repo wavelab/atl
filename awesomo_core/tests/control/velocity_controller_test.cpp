@@ -2,7 +2,6 @@
 
 #include "awesomo_core/control/velocity_controller.hpp"
 
-
 #define TEST_CONFIG "tests/configs/control/velocity_controller.yaml"
 
 
@@ -153,8 +152,3 @@ TEST(VelocityController, calculate) {
 }
 
 }  // end of awesomo namepsace
-
-int main(int argc, char *argv[]) {
-  testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}

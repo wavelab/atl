@@ -18,8 +18,3 @@ TEST(Quadrotor, configure) {
   ASSERT_TRUE(quadrotor.configured);
   ASSERT_EQ(awesomo::HOVER_MODE, quadrotor.current_mode);
 }
-
-int main(int argc, char **argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}
