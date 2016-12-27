@@ -10,11 +10,11 @@ cache:
 install:
     - sudo bash scripts/install_scripts/ros_install.bash
     - sudo bash scripts/install_scripts/catkin_setup.bash
-
-script:
     - cd ~/catkin_ws/src/
     - git clone https://github.com/wavelab/awesomo.git
     - cd ~/catkin_ws/ && catkin_make
+
+script:
     - cd ~/catkin_ws/src/awesomo_core
     - rosrun awesomo_core awesomo_tests
 
