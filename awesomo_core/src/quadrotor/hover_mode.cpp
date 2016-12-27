@@ -12,8 +12,8 @@ HoverMode::HoverMode(void) {
 int HoverMode::configure(std::string config_file) {
   ConfigParser parser;
 
-  parser.addParam(DOUBLE, "hover_height", &this->hover_height);
-  parser.addParam(VEC3, "hover_position", &this->hover_position);
+  parser.addParam<double>("hover_height", &this->hover_height);
+  parser.addParam<Vec3>("hover_position", &this->hover_position);
   if (parser.load(config_file) != 0) {
     log_err("Failed to configure HoverMode!");
     return -1;

@@ -1,6 +1,8 @@
 #ifndef __AWESOMO_UTILS_CONFIG_HPP__
 #define __AWESOMO_UTILS_CONFIG_HPP__
 
+#include <type_traits>
+
 #include <yaml-cpp/yaml.h>
 
 #include <opencv2/core/core.hpp>
@@ -14,7 +16,7 @@
 
 namespace awesomo {
 
-enum Type {
+enum ConfigDataType {
   TYPE_NOT_SET = 0,
   // PRIMITIVES
   BOOL = 1,
@@ -43,7 +45,7 @@ enum Type {
 
 class ConfigParam {
 public:
-  enum Type type;
+  enum ConfigDataType type;
   std::string key;
   bool optional;
 
@@ -109,7 +111,92 @@ public:
   std::vector<ConfigParam> params;
 
   ConfigParser(void);
-  void addParam(enum Type type, std::string key, void *out);
+
+  template <typename T>
+  void addParam(std::string key, T *out, bool optional = false) {
+    ConfigParam param;
+
+    // setup
+    param.key = key;
+    param.optional = optional;
+
+    // primitives
+    if (std::is_same<T, bool>::value) {
+      param.type = BOOL;
+      param.b = (bool *) out;
+    } else if (std::is_same<T, int>::value) {
+      param.type = INT;
+      param.i = (int *) out;
+    } else if (std::is_same<T, float>::value) {
+      param.type = FLOAT;
+      param.f = (float *) out;
+    } else if (std::is_same<T, double>::value) {
+      param.type = DOUBLE;
+      param.d = (double *) out;
+    } else if (std::is_same<T, std::string>::value) {
+      param.type = STRING;
+      param.s = (std::string *) out;
+    }
+
+    // arrays
+    if (std::is_same<T, std::vector<bool>>::value) {
+      param.type = BOOL_ARRAY;
+      param.b_array = (std::vector<bool> *) out;
+    } else if (std::is_same<T, std::vector<int>>::value) {
+      param.type = INT_ARRAY;
+      param.i_array = (std::vector<int> *) out;
+    } else if (std::is_same<T, std::vector<float>>::value) {
+      param.type = FLOAT_ARRAY;
+      param.f_array = (std::vector<float> *) out;
+    } else if (std::is_same<T, std::vector<double>>::value) {
+      param.type = DOUBLE_ARRAY;
+      param.d_array = (std::vector<double> *) out;
+    } else if (std::is_same<T, std::vector<std::string>>::value) {
+      param.type = STRING_ARRAY;
+      param.s_array = (std::vector<std::string> *) out;
+    }
+
+    // vectors
+    if (std::is_same<T, Vec2>::value) {
+      param.type = VEC2;
+      param.vec2 = (Vec2 *) out;
+    } else if (std::is_same<T, Vec3>::value) {
+      param.type = VEC3;
+      param.vec3 = (Vec3 *) out;
+    } else if (std::is_same<T, Vec4>::value) {
+      param.type = VEC4;
+      param.vec4 = (Vec4 *) out;
+    } else if (std::is_same<T, VecX>::value) {
+      param.type = VECX;
+      param.vecx = (VecX *) out;
+    }
+
+    // matrix
+    if (std::is_same<T, Mat2>::value) {
+      param.type = MAT2;
+      param.mat2 = (Mat2 *) out;
+    } else if (std::is_same<T, Mat3>::value) {
+      param.type = MAT3;
+      param.mat3 = (Mat3 *) out;
+    } else if (std::is_same<T, Mat4>::value) {
+      param.type = MAT4;
+      param.mat4 = (Mat4 *) out;
+    } else if (std::is_same<T, MatX>::value) {
+      param.type = MATX;
+      param.matx = (MatX *) out;
+    } else if (std::is_same<T, cv::Mat>::value) {
+      param.type = CVMAT;
+      param.cvmat = (cv::Mat *) out;
+    }
+
+    // add params
+    if (param.type == TYPE_NOT_SET) {
+      log_err("TYPE [%s] HAS NOT BEEN IMPLEMENTED YET!", typeid(T).name());
+    } else {
+      this->params.push_back(param);
+    }
+  }
+
   int checkKey(std::string key, bool optional);
   int checkVector(std::string key, bool optional);
   int checkMatrix(std::string key, bool optional);

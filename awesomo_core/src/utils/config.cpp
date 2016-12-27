@@ -8,40 +8,6 @@ ConfigParser::ConfigParser(void) {
   this->loaded = false;
 }
 
-void ConfigParser::addParam(enum Type type, std::string key, void *out) {
-  ConfigParam param;
-
-  param.type = type;
-  param.key = key;
-  param.optional = false;
-
-  switch (type) {
-    // clang-format off
-    case BOOL: param.b = (bool *) out; break;
-    case INT: param.i = (int *) out; break;
-    case FLOAT: param.f = (float *) out; break;
-    case DOUBLE: param.d = (double *) out; break;
-    case STRING: param.s = (std::string *) out; break;
-    case BOOL_ARRAY: param.b_array = (std::vector<bool> *) out; break;
-    case INT_ARRAY: param.i_array = (std::vector<int> *) out; break;
-    case FLOAT_ARRAY: param.f_array = (std::vector<float> *) out; break;
-    case DOUBLE_ARRAY: param.d_array = (std::vector<double> *) out; break;
-    case STRING_ARRAY: param.s_array = (std::vector<std::string> *) out; break;
-    case VEC2: param.vec2 = (Vec2 *) out; break;
-    case VEC3: param.vec3 = (Vec3 *) out; break;
-    case VEC4: param.vec4 = (Vec4 *) out; break;
-    case VECX: param.vecx = (VecX *) out; break;
-    case MAT2: param.mat2 = (Mat2 *) out; break;
-    case MAT3: param.mat3 = (Mat3 *) out; break;
-    case MAT4: param.mat4 = (Mat4 *) out; break;
-    case MATX: param.matx = (MatX *) out; break;
-    case CVMAT: param.cvmat = (cv::Mat *) out; break;
-      // clang-format on
-  }
-
-  this->params.push_back(param);
-}
-
 int ConfigParser::checkKey(std::string key, bool optional) {
   if (!this->root[key] && optional == false) {
     log_err("Opps [%s] missing in yaml file!", key.c_str());

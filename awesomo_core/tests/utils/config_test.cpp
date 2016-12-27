@@ -44,15 +44,58 @@ TEST(ConfigParser, constructor) {
 }
 
 TEST(ConfigParser, addParam) {
+  bool b;
   int i;
+  float f;
+  double d;
+  std::string s;
+
+  std::vector<bool> b_array;
+  std::vector<int> i_array;
+  std::vector<float> f_array;
+  std::vector<double> d_array;
+  std::vector<std::string> s_array;
+
+  awesomo::Vec2 vec2;
+  awesomo::Vec3 vec3;
+  awesomo::Vec4 vec4;
+  awesomo::VecX vecx;
+
+  awesomo::Mat2 mat2;
+  awesomo::Mat3 mat3;
+  awesomo::Mat4 mat4;
+  awesomo::MatX matx;
+  cv::Mat cvmat;
+
   awesomo::ConfigParser parser;
 
-  parser.addParam(awesomo::INT, "int", &i);
+  parser.addParam<bool>("bool", &b);
+  parser.addParam<int>("int", &i);
+  parser.addParam<float>("float", &f);
+  parser.addParam<double>("double", &d);
+  parser.addParam<std::string>("string", &s);
 
-  ASSERT_EQ(1, parser.params.size());
-  ASSERT_EQ(awesomo::INT, parser.params[0].type);
-  ASSERT_EQ("int", parser.params[0].key);
-  ASSERT_TRUE(parser.params[0].i != NULL);
+  parser.addParam<std::vector<bool>>("bool_array", &b_array);
+  parser.addParam<std::vector<int>>("int_array", &i_array);
+  parser.addParam<std::vector<float>>("float_array", &f_array);
+  parser.addParam<std::vector<double>>("double_array", &d_array);
+  parser.addParam<std::vector<std::string>>("string_array", &s_array);
+
+  parser.addParam<awesomo::Vec2>("vector2", &vec2);
+  parser.addParam<awesomo::Vec3>("vector3", &vec3);
+  parser.addParam<awesomo::Vec4>("vector4", &vec4);
+  parser.addParam<awesomo::VecX>("vector", &vecx);
+
+  parser.addParam<awesomo::Mat2>("matrix2", &mat2);
+  parser.addParam<awesomo::Mat3>("matrix3", &mat3);
+  parser.addParam<awesomo::Mat4>("matrix4", &mat4);
+  parser.addParam<awesomo::MatX>("matrix", &matx);
+  parser.addParam<cv::Mat>("matrix", &cvmat);
+
+  ASSERT_EQ(19, parser.params.size());
+  ASSERT_EQ(awesomo::BOOL, parser.params[0].type);
+  ASSERT_EQ("bool", parser.params[0].key);
+  ASSERT_TRUE(parser.params[0].b != NULL);
 }
 
 TEST(ConfigParser, loadPrimitive) {
@@ -334,31 +377,32 @@ TEST(ConfigParser, load) {
   awesomo::Mat3 mat3;
   awesomo::Mat4 mat4;
   awesomo::MatX matx;
-
   cv::Mat cvmat;
+
   awesomo::ConfigParser parser;
 
-  parser.addParam(awesomo::BOOL, "bool", &b);
-  parser.addParam(awesomo::INT, "int", &i);
-  parser.addParam(awesomo::FLOAT, "float", &f);
-  parser.addParam(awesomo::DOUBLE, "double", &d);
-  parser.addParam(awesomo::STRING, "string", &s);
+  parser.addParam<bool>("bool", &b);
+  parser.addParam<int>("int", &i);
+  parser.addParam<float>("float", &f);
+  parser.addParam<double>("double", &d);
+  parser.addParam<std::string>("string", &s);
 
-  parser.addParam(awesomo::BOOL_ARRAY, "bool_array", &b_array);
-  parser.addParam(awesomo::INT_ARRAY, "int_array", &i_array);
-  parser.addParam(awesomo::FLOAT_ARRAY, "float_array", &f_array);
-  parser.addParam(awesomo::DOUBLE_ARRAY, "double_array", &d_array);
-  parser.addParam(awesomo::STRING_ARRAY, "string_array", &s_array);
+  parser.addParam<std::vector<bool>>("bool_array", &b_array);
+  parser.addParam<std::vector<int>>("int_array", &i_array);
+  parser.addParam<std::vector<float>>("float_array", &f_array);
+  parser.addParam<std::vector<double>>("double_array", &d_array);
+  parser.addParam<std::vector<std::string>>("string_array", &s_array);
 
-  parser.addParam(awesomo::VEC2, "vector2", &vec2);
-  parser.addParam(awesomo::VEC3, "vector3", &vec3);
-  parser.addParam(awesomo::VEC4, "vector4", &vec4);
-  parser.addParam(awesomo::VECX, "vector", &vecx);
+  parser.addParam<awesomo::Vec2>("vector2", &vec2);
+  parser.addParam<awesomo::Vec3>("vector3", &vec3);
+  parser.addParam<awesomo::Vec4>("vector4", &vec4);
+  parser.addParam<awesomo::VecX>("vector", &vecx);
 
-  parser.addParam(awesomo::MAT2, "matrix2", &mat2);
-  parser.addParam(awesomo::MAT3, "matrix3", &mat3);
-  parser.addParam(awesomo::MAT4, "matrix4", &mat4);
-  parser.addParam(awesomo::MATX, "matrix", &matx);
+  parser.addParam<awesomo::Mat2>("matrix2", &mat2);
+  parser.addParam<awesomo::Mat3>("matrix3", &mat3);
+  parser.addParam<awesomo::Mat4>("matrix4", &mat4);
+  parser.addParam<awesomo::MatX>("matrix", &matx);
+  parser.addParam<cv::Mat>("matrix", &cvmat);
 
   retval = parser.load(TEST_CONFIG);
   if (retval != 0) {
@@ -382,6 +426,7 @@ TEST(ConfigParser, load) {
   std::cout << "matrix3: \n" << mat3 << std::endl;
   std::cout << "matrix4: \n" << mat4 << std::endl;
   std::cout << "matrix: \n" << matx << std::endl;
+  std::cout << "cvmatrix: \n" << cvmat << std::endl;
   std::cout << std::endl;
 }
 

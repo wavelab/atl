@@ -1,4 +1,4 @@
-#include "awesomo_core/vision/camera/camera_config.hpp"
+#include "awesomo_core/vision/camera/config.hpp"
 
 
 namespace awesomo {
@@ -29,23 +29,23 @@ int CameraConfig::load(std::string config_file) {
 
   // config variables
   // clang-format off
-  parser.addParam(INT, "index", &this->index);
-  parser.addParam(INT, "image_width", &this->image_width);
-  parser.addParam(INT, "image_height", &this->image_height);
+  parser.addParam<int>("index", &this->index);
+  parser.addParam<int>("image_width", &this->image_width);
+  parser.addParam<int>("image_height", &this->image_height);
 
-  parser.addParam(FLOAT, "exposure_value", &this->exposure_value);
-  parser.addParam(FLOAT, "gain_value", &this->gain_value);
-  parser.addParam(VEC3, "lambda", &this->lambda);
-  parser.addParam(FLOAT, "alpha", &this->alpha);
+  parser.addParam<float>("exposure_value", &this->exposure_value);
+  parser.addParam<float>("gain_value", &this->gain_value);
+  parser.addParam<Vec3>("lambda", &this->lambda);
+  parser.addParam<float>("alpha", &this->alpha);
 
-  parser.addParam(CVMAT, "camera_matrix", &this->camera_matrix);
-  parser.addParam(CVMAT, "distortion_coefficients", &this->distortion_coefficients);
-  parser.addParam(CVMAT, "rectification_matrix", &this->rectification_matrix);
-  parser.addParam(CVMAT, "projection_matrix", &this->projection_matrix);
+  parser.addParam<cv::Mat>("camera_matrix", &this->camera_matrix);
+  parser.addParam<cv::Mat>("distortion_coefficients", &this->distortion_coefficients);
+  parser.addParam<cv::Mat>("rectification_matrix", &this->rectification_matrix);
+  parser.addParam<cv::Mat>("projection_matrix", &this->projection_matrix);
 
-  parser.addParam(BOOL, "imshow", &this->imshow);
-  parser.addParam(BOOL, "snapshot", &this->snapshot);
-  parser.addParam(BOOL, "showfps", &this->showfps);
+  parser.addParam<bool>("imshow", &this->imshow);
+  parser.addParam<bool>("snapshot", &this->snapshot);
+  parser.addParam<bool>("showfps", &this->showfps);
   // clang-format on
 
   // load config

@@ -8,7 +8,7 @@
 #include <opencv2/highgui/highgui.hpp>
 
 #include "awesomo_core/utils/utils.hpp"
-#include "awesomo_core/vision/camera/camera_config.hpp"
+#include "awesomo_core/vision/camera/config.hpp"
 
 
 namespace awesomo {

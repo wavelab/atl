@@ -37,8 +37,8 @@ int Camera::configure(std::string config_path) {
   std::vector<std::string> camera_configs;
 
   // load config
-  parser.addParam(STRING_ARRAY, "modes", &camera_modes);
-  parser.addParam(STRING_ARRAY, "configs", &camera_configs);
+  parser.addParam<std::vector<std::string>>("modes", &camera_modes);
+  parser.addParam<std::vector<std::string>>("configs", &camera_configs);
   if (parser.load(config_path + "/" + "config.yaml") != 0) {
     log_err("Failed to configure camera!");
     return -1;
