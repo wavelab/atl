@@ -7,6 +7,11 @@ REPO_PATH=$(dirname "$SCRIPT_PATH")
 # refresh permission
 sudo -v
 
+# intall dependencies
+sudo bash ximea_install.bash
+sudo bash pointgrey_install.bash
+sudo bash swathmore_apriltags.bash
+
 # link repo to catkin workspace
 ln -sfn "$REPO_PATH" "$CATKIN_PATH/src/awesomo"
 
