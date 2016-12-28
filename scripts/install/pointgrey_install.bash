@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e  # halt on first error
 
-PACKAGE_DIR=$PWD/deps
+PACKAGE_DIR=$PWD/awesomo_deps
 PACKAGE_NAME=flycapture2-2.8.3.1-amd64
 PACKAGE_EXT=.zip
 
@@ -18,6 +18,7 @@ install_pointgrey_drivers()
         -y
 
     # unzip and install flycapture
+    mkdir -p $PACKAGE_DIR
     cd $PACKAGE_DIR
     unzip ${PACKAGE_NAME}${PACAKGE_EXT}
     cd $PACKAGE_NAME
@@ -29,7 +30,7 @@ y
 y
 n
 EOF
-    cd -
+    cd ..
     rm -rf $PACAKGE_NAME
 }
 
@@ -41,3 +42,4 @@ install_coriander()
 
 install_pointgrey_drivers
 install_coriander
+echo "Installed PointGrey Drivers!"

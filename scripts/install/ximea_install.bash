@@ -1,11 +1,12 @@
 #!/bin/bash
 set -e  # halt on first error
 
-PACKAGE_DIR=$PWD/deps
+PACKAGE_DIR=$PWD/awesomo_deps
 PACKAGE_NAME=XIMEA_Linux_SP.tgz
 
 install_ximea_drivers()
 {
+    mkdir -p $PACKAGE_DIR
     cd $PACKAGE_DIR
     wget http://www.ximea.com/downloads/recent/XIMEA_Linux_SP.tgz
     tar xzf $PACKAGE_NAME
@@ -15,3 +16,4 @@ install_ximea_drivers()
 }
 
 install_ximea_drivers
+echo "Installed Ximea Drivers!"

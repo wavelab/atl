@@ -47,3 +47,4 @@ install_coriander()
 
 install_pointgrey_drivers
 install_coriander
+echo "Installed PointGrey Drivers!"

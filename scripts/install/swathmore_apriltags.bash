@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e  # halt on first error
-BUILD_PATH="$PWD/deps"
+BUILD_PATH="$PWD/awesomo_deps"
 
 
 install_dependencies()
@@ -26,11 +26,11 @@ install_apriltags()
     # As of Aug 31st 2016 they don't have a install target
     # installing manually
     sudo cp libapriltags.a /usr/local/lib
-    sudo mkdir /usr/local/include/apriltags/
+    sudo mkdir -p /usr/local/include/apriltags/
     sudo cp ../src/*.h /usr/local/include/apriltags/
 
     # remove apriltags repo
-    #rm -rf $BUILD_PATH/apriltags-cpp
+    rm -rf $BUILD_PATH/apriltags-cpp
 }
 
 uninstall_apriltags()
