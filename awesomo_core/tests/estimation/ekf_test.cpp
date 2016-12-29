@@ -2,8 +2,7 @@
 #include <fstream>
 #include <iostream>
 
-#include <gtest/gtest.h>
-
+#include "awesomo_core/awesomo_test.hpp"
 #include "awesomo_core/estimation/ekf.hpp"
 
 #define TEST_EKF_OUTPUT_FILE "/tmp/estimation_ekf_test.output"

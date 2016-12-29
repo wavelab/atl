@@ -1,5 +1,4 @@
-#include <gtest/gtest.h>
-
+#include "awesomo_core/awesomo_test.hpp"
 #include "awesomo_core/control/tracking_controller.hpp"
 
 #define TEST_CONFIG "tests/configs/control/tracking_controller.yaml"

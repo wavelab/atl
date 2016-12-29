@@ -2,8 +2,7 @@
 #include <fstream>
 #include <iostream>
 
-#include <gtest/gtest.h>
-
+#include "awesomo_core/awesomo_test.hpp"
 #include "awesomo_core/estimation/kf.hpp"
 
 #define TEST_KF_OUTPUT_FILE "/tmp/estimation_kf_test.output"

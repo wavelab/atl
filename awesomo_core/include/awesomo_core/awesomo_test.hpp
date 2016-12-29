@@ -1,0 +1,10 @@
+#ifndef __AWESOMO_TEST_HPP__
+#define __AWESOMO_TEST_HPP__
+
+#include <gtest/gtest.h>
+
+#ifdef TEST_OUTPUT_ON
+#define TEST_PRINT(M, ...) fprintf(stdout, M "\n", ##__VA_ARGS__)
+#endif
+
+#endif

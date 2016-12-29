@@ -1,5 +1,4 @@
-#include <gtest/gtest.h>
-
+#include "awesomo_core/awesomo_test.hpp"
 #include "awesomo_core/quadrotor/hover_mode.hpp"
 
 #define TEST_CONFIG "tests/configs/quadrotor/modes/hover_mode.yaml"

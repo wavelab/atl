@@ -1,5 +1,4 @@
-#include <gtest/gtest.h>
-
+#include "awesomo_core/awesomo_test.hpp"
 #include "awesomo_core/control/velocity_controller.hpp"
 
 #define TEST_CONFIG "tests/configs/control/velocity_controller.yaml"
