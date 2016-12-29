@@ -31,12 +31,12 @@ create_catkin_ws()
         mkdir -p "$HOME/catkin_ws/src"
         cd "$HOME/catkin_ws"
         catkin init > /dev/null
-        catkin build --no-status
+        catkin_make
         echo "Catkin workspace created successfully."
     fi
 }
 
 
 # RUN
-install_catkin_tools
+# install_catkin_tools
 create_catkin_ws
