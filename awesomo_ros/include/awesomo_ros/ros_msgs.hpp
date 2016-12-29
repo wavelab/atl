@@ -1,12 +1,19 @@
 #ifndef __AWESOMO_ROS_MSGS_HPP__
 #define __AWESOMO_ROS_MSGS_HPP__
 
+#include <std_msgs/Float64.h>
+
+#include <geometry_msgs/Vector3.h>
 #include <geometry_msgs/Quaternion.h>
+#include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/TwistStamped.h>
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
 
 #include <awesomo_core/awesomo_core.hpp>
 
 #include <awesomo_msgs/KFPlotting.h>
 #include <awesomo_msgs/KFStats.h>
+#include <awesomo_msgs/AprilTagPose.h>
 #include <awesomo_msgs/PositionControllerStats.h>
 
 

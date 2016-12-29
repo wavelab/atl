@@ -1,18 +1,7 @@
 #ifndef __AWESOMO_ROS_AWESOMO_NODE_HPP__
 #define __AWESOMO_ROS_AWESOMO_NODE_HPP__
 
-#include <iostream>
-#include <cmath>
-#include <unistd.h>
-
 #include <ros/ros.h>
-#include <std_msgs/Float64.h>
-#include <geometry_msgs/PoseStamped.h>
-#include <geometry_msgs/PoseWithCovarianceStamped.h>
-#include <geometry_msgs/TwistStamped.h>
-#include <geometry_msgs/Vector3.h>
-#include <sensor_msgs/Imu.h>
-#include <tf/transform_broadcaster.h>
 
 #define MAVLINK_DIALECT common
 #include <mavros/mavros.h>
@@ -31,10 +20,12 @@
 #include "awesomo_ros/ros_node.hpp"
 #include "awesomo_ros/ros_msgs.hpp"
 
+
+namespace awesomo {
+
 // ROS NODE
 #define NODE_NAME "awesomo_node"
 #define NODE_RATE 1000
-
 
 // ROS TOPICS
 #define ARM_TOPIC "/mavros/cmd/arming"
@@ -52,9 +43,6 @@
 #define POS_CONTROLLER_STATS_TOPIC "/awesomo/position_controller/stats"
 #define KF_STATS_TOPIC "/awesomo/kf_estimation/stats"
 #define KF_PLOTTING_TOPIC "/awesomo/kf_estimation/states"
-
-
-namespace awesomo {
 
 class AwesomoNode : public ROSNode {
 public:
