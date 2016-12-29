@@ -10,14 +10,14 @@ Gimbal::Gimbal(
     0, 0, 0, 0, 0, 0);  // make sure gimbal limits are initalized
 }
 
-Gimbal::Gimbal(std::string config_path) {
+Gimbal::Gimbal(std::string config_file) {
   std::string gimbal_dev_path;
   YAML::Node config;
   YAML::Node camera_pose;
   YAML::Node gimbal_limit;
 
   // load config
-  config = YAML::LoadFile(config_path);
+  config = YAML::LoadFile(config_file);
 
   // load camera RBT (Pose) config
   camera_pose = config["mount_offset"];

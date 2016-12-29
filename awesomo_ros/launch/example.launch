@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<launch>
+  <node pkg="awesomo_ros" type="example_node" name="example_node" output="screen" />
+</launch>

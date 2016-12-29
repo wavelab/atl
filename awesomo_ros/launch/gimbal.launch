@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<launch>
+  <param name="config_file" type="str" value="$(find awesomo_configs)/configs/gimbal/config.yaml" />
+  <node pkg="awesomo_ros" type="gimbal_node" name="gimbal_node" output="screen" />
+</launch>

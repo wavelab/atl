@@ -65,6 +65,16 @@ ADD_DEPENDENCIES(camera_node ${PROJECT_NAME}_gencpp awesomo_core)
 TARGET_LINK_LIBRARIES(camera_node ${DEPS})
 INSTALL(TARGETS camera_node RUNTIME DESTINATION ${BIN_DEST})
 
+ADD_EXECUTABLE(example_node src/ros/example_node.cpp)
+ADD_DEPENDENCIES(example_node ${PROJECT_NAME}_gencpp awesomo_core)
+TARGET_LINK_LIBRARIES(example_node ${DEPS})
+INSTALL(TARGETS example_node RUNTIME DESTINATION ${BIN_DEST})
+
+ADD_EXECUTABLE(gimbal_node src/ros/gimbal_node.cpp)
+ADD_DEPENDENCIES(gimbal_node ${PROJECT_NAME}_gencpp awesomo_core)
+TARGET_LINK_LIBRARIES(gimbal_node ${DEPS})
+INSTALL(TARGETS gimbal_node RUNTIME DESTINATION ${BIN_DEST})
+
 # INSTALL LAUNCH FILES
 SET(SHARE_DEST ${CATKIN_PACKAGE_SHARE_DESTINATION})
 INSTALL(DIRECTORY launch/ DESTINATION ${SHARE_DEST}/launch)
