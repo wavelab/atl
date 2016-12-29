@@ -24,6 +24,7 @@ create_catkin_ws()
     # Check if workspace exists
     if [ -e "$CATKIN_DIR/.catkin_workspace" ] || [ -d "$CATKIN_DIR/.catkin_tools" ]; then
         echo "Catkin workspace detected at ~/catkin_ws"
+        rm -rf build devel install logs
     else
         echo "Creating catkin workspace in $HOME/catkin_ws ..."
         source /opt/ros/$ROS_DISTRO/setup.bash
