@@ -21,4 +21,4 @@ ln -sfn "$REPO_PATH" "$CATKIN_PATH/src/awesomo"
 # compile
 cd "$CATKIN_PATH"
 source /opt/ros/indigo/setup.bash
-catkin build
+catkin_make

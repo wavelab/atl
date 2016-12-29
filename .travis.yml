@@ -13,7 +13,7 @@ install:
     - sudo bash scripts/install/awesomo_install.bash
 
 script:
-    - cd ~/catkin_ws/src/awesomo_core
+    - cd ~/catkin_ws/src/awesomo/awesomo_core
     - rosrun awesomo_core awesomo_tests
 
 notifications:
