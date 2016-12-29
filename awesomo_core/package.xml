@@ -10,6 +10,8 @@
 
   <!-- build dependencies -->
   <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>rospy</build_depend>
 
   <!-- license -->
   <license>LGPLv3</license>
