@@ -50,7 +50,7 @@ ADD_LIBRARY(
     # vision
     src/vision/camera/camera.cpp
     src/vision/camera/config.cpp
-    src/vision/camera/ximea.cpp
+    # src/vision/camera/ximea.cpp
     # src/vision/camera/camera_pointgrey.cpp
 )
 SET(DEPS
