@@ -21,7 +21,7 @@ int CameraNode::configure(std::string node_name, int hz) {
 
   // image transport
   image_transport::ImageTransport it(*this->ros_nh);
-  this->img_pub = it.advertise(IMAGE_TOPIC, 10);
+  this->img_pub = it.advertise(CAMERA_IMAGE_TOPIC, 10);
 
   // register loop callback
   this->registerLoopCallback(std::bind(&CameraNode::loopCallback, this));

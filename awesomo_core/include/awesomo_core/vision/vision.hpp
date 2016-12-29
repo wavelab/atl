@@ -3,5 +3,7 @@
 
 #include "awesomo_core/vision/apriltag/apriltag.hpp"
 #include "awesomo_core/vision/camera/camera.hpp"
+#include "awesomo_core/vision/gimbal/gimbal.hpp"
+#include "awesomo_core/vision/gimbal/sbgc.hpp"
 
 #endif

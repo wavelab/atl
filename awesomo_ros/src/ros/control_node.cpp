@@ -26,26 +26,26 @@ int ControlNode::configure(const std::string node_name, int hz) {
 
   // services
   // clang-format off
-  this->mode_client = this->ros_nh->serviceClient<mavros_msgs::SetMode>(MODE_TOPIC);
-  this->arming_client = this->ros_nh->serviceClient<mavros_msgs::CommandBool>(ARM_TOPIC);
+  this->mode_client = this->ros_nh->serviceClient<mavros_msgs::SetMode>(MAVROS_MODE_TOPIC);
+  this->arming_client = this->ros_nh->serviceClient<mavros_msgs::CommandBool>(MAVROS_ARM_TOPIC);
   // clang-format on
 
   // subscribers
   // clang-format off
-  ROSNode::registerSubscriber(STATE_TOPIC, &ControlNode::stateCallback, this);
-  ROSNode::registerSubscriber(POSE_TOPIC, &ControlNode::poseCallback, this);
-  ROSNode::registerSubscriber(RADIO_TOPIC, &ControlNode::radioCallback, this);
-  ROSNode::registerSubscriber(APRILTAG_TOPIC, &ControlNode::aprilTagCallback, this);
+  ROSNode::registerSubscriber(MAVROS_STATE_TOPIC, &ControlNode::stateCallback, this);
+  ROSNode::registerSubscriber(MAVROS_POSE_TOPIC, &ControlNode::poseCallback, this);
+  ROSNode::registerSubscriber(MAVROS_RADIO_TOPIC, &ControlNode::radioCallback, this);
+  ROSNode::registerSubscriber(AWESOMO_APRILTAG_TOPIC, &ControlNode::aprilTagCallback, this);
   // clang-format on
 
   // publishers
   // clang-format off
-  ROSNode::registerPublisher<geometry_msgs::PoseStamped>(SETPOINT_ATTITUDE_TOPIC);
-  ROSNode::registerPublisher<std_msgs::Float64>(SETPOINT_THROTTLE_TOPIC);
-  ROSNode::registerPublisher<geometry_msgs::PoseStamped>(SETPOINT_POSITION_TOPIC);
-  ROSNode::registerPublisher<awesomo_msgs::PositionControllerStats>(POS_CONTROLLER_STATS_TOPIC);
-  ROSNode::registerPublisher<awesomo_msgs::KFStats>(KF_STATS_TOPIC);
-  ROSNode::registerPublisher<awesomo_msgs::KFPlotting>(KF_PLOTTING_TOPIC);
+  ROSNode::registerPublisher<geometry_msgs::PoseStamped>(MAVROS_SETPOINT_ATTITUDE_TOPIC);
+  ROSNode::registerPublisher<std_msgs::Float64>(MAVROS_SETPOINT_THROTTLE_TOPIC);
+  ROSNode::registerPublisher<geometry_msgs::PoseStamped>(MAVROS_SETPOINT_POSITION_TOPIC);
+  ROSNode::registerPublisher<awesomo_msgs::PositionControllerStats>(AWESOMO_POS_CONTROLLER_STATS_TOPIC);
+  ROSNode::registerPublisher<awesomo_msgs::KFStats>(AWESOMO_KF_STATS_TOPIC);
+  ROSNode::registerPublisher<awesomo_msgs::KFPlotting>(AWESOMO_KF_PLOTTING_TOPIC);
   // clang-format on
 
   // loop callback
@@ -149,8 +149,8 @@ int ControlNode::awesomoLoopCallback(void) {
   // publish msgs
   att_cmd = this->quadrotor.att_cmd;
   buildAttitudeMsg(seq, ros::Time::now(), att_cmd, att_msg, thr_msg);
-  this->ros_pubs[SETPOINT_ATTITUDE_TOPIC].publish(att_msg);
-  this->ros_pubs[SETPOINT_THROTTLE_TOPIC].publish(thr_msg);
+  this->ros_pubs[MAVROS_SETPOINT_ATTITUDE_TOPIC].publish(att_msg);
+  this->ros_pubs[MAVROS_SETPOINT_THROTTLE_TOPIC].publish(thr_msg);
 
   return 0;
 }
@@ -174,9 +174,9 @@ void ControlNode::publishStats(void) {
   // clang-format on
 
   // publish
-  this->ros_pubs[POS_CONTROLLER_STATS_TOPIC].publish(pcs_stats_msg);
-  // this->ros_pubs[KF_STATS_TOPIC].publish(kf_stats_msg);
-  // this->ros_pubs[KF_PLOTTING_TOPIC].publish(kf_plot_msg);
+  this->ros_pubs[AWESOMO_POS_CONTROLLER_STATS_TOPIC].publish(pcs_stats_msg);
+  // this->ros_pubs[AWESOMO_KF_STATS_TOPIC].publish(kf_stats_msg);
+  // this->ros_pubs[AWESOMO_KF_PLOTTING_TOPIC].publish(kf_plot_msg);
 }
 
 }  // end of awesomo namespace

@@ -13,12 +13,13 @@ namespace awesomo {
 #define NODE_NAME "gimbal_node"
 #define NODE_RATE 100
 
-#define POSE_TOPIC "/mavros/local_position/pose"
+#define GIMBAL_POSE_TOPIC "/awesomo/gimbal/pose"
+#define GIMBAL_SETPOINT_ANGLE_TOPIC "/awesomo/gimbal/setpoint/angle"
 
 class GimbalNode : public ROSNode {
 public:
   bool configured;
-  // Gimbal gimbal;
+  Gimbal gimbal;
 
   GimbalNode(void);
   int configure(std::string node_name, int hz);

@@ -14,15 +14,14 @@ int GimbalNode::configure(std::string node_name, int hz) {
 
   // gimbal
   this->ros_nh->getParam("/config_file", config_file);
-  // if (this->gimbal.configure(config_file) != 0) {
-  //   return -1;
-  // };
+  if (this->gimbal.configure(config_file) != 0) {
+    return -1;
+  };
 
-  // register loop callback
+  // loop callback
   this->registerLoopCallback(std::bind(&GimbalNode::loopCallback, this));
 
   this->configured = true;
-
   return 0;
 }
 
