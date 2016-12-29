@@ -22,13 +22,13 @@
 
   <run_depend>roscpp</run_depend>
   <run_depend>rospy</run_depend>
+  <run_depend>message_runtime</run_depend>
   <run_depend>std_msgs</run_depend>
   <run_depend>sensor_msgs</run_depend>
-  <run_depend>message_runtime</run_depend>
-  <run_depend>image_transport</run_depend>
-  <run_depend>cv_bridge</run_depend>
   <run_depend>tf</run_depend>
-
+  <run_depend>cv_bridge</run_depend>
+  <run_depend>image_transport</run_depend>
+  <run_depend>awesomo_core</run_depend>
 
   <!-- license -->
   <license>LGPLv3</license>

@@ -26,6 +26,7 @@ FIND_PACKAGE(Boost REQUIRED)
 LINK_DIRECTORIES(
     /usr/lib
     /usr/local/lib
+    ${catkin_LIBRARY_DIRS}
 )
 
 # INCLUDES
@@ -42,9 +43,7 @@ INCLUDE_DIRECTORIES(
 # BUILD AS CATKIN PACKAGE
 CATKIN_PACKAGE(
     INCLUDE_DIRS include
-    LIBRARIES awesomo_core
-    CATKIN_DEPENDS roscpp rospy std_msgs message_runtime
-    DEPENDS system_lib
+    CATKIN_DEPENDS roscpp rospy std_msgs message_runtime awesomo_core
 )
 
 SET(DEPS
