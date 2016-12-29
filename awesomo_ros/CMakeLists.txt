@@ -55,15 +55,15 @@ SET(DEPS
 # ROS NODES
 SET(BIN_DEST ${CATKIN_PACKAGE_BIN_DESTINATION})
 
-ADD_EXECUTABLE(awesomo_node src/ros/awesomo_node.cpp)
-ADD_DEPENDENCIES(awesomo_node ${PROJECT_NAME}_gencpp awesomo_core)
-TARGET_LINK_LIBRARIES(awesomo_node ${DEPS})
-INSTALL(TARGETS awesomo_node RUNTIME DESTINATION ${BIN_DEST})
-
 ADD_EXECUTABLE(camera_node src/ros/camera_node.cpp)
 ADD_DEPENDENCIES(camera_node ${PROJECT_NAME}_gencpp awesomo_core)
 TARGET_LINK_LIBRARIES(camera_node ${DEPS})
 INSTALL(TARGETS camera_node RUNTIME DESTINATION ${BIN_DEST})
+
+ADD_EXECUTABLE(control_node src/ros/control_node.cpp)
+ADD_DEPENDENCIES(control_node ${PROJECT_NAME}_gencpp awesomo_core)
+TARGET_LINK_LIBRARIES(control_node ${DEPS})
+INSTALL(TARGETS control_node RUNTIME DESTINATION ${BIN_DEST})
 
 ADD_EXECUTABLE(example_node src/ros/example_node.cpp)
 ADD_DEPENDENCIES(example_node ${PROJECT_NAME}_gencpp awesomo_core)

@@ -1,5 +1,5 @@
-#ifndef __AWESOMO_ROS_AWESOMO_NODE_HPP__
-#define __AWESOMO_ROS_AWESOMO_NODE_HPP__
+#ifndef __AWESOMO_ROS_CONTROL_NODE_HPP__
+#define __AWESOMO_ROS_CONTROL_NODE_HPP__
 
 #include <ros/ros.h>
 
@@ -44,7 +44,7 @@ namespace awesomo {
 #define KF_STATS_TOPIC "/awesomo/kf_estimation/stats"
 #define KF_PLOTTING_TOPIC "/awesomo/kf_estimation/states"
 
-class AwesomoNode : public ROSNode {
+class ControlNode : public ROSNode {
 public:
   bool configured;
 
@@ -58,7 +58,7 @@ public:
   ros::ServiceClient mode_client;
   ros::ServiceClient arming_client;
 
-  AwesomoNode(void);
+  ControlNode(void);
   int configure(std::string node_name, int hz);
   void waitForConnection(void);
   int disarm(void);

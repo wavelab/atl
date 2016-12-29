@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
 <launch>
   <param name="config_dir" type="str" value="$(find awesomo_configs)/configs/quadrotor_anastasia" />
-  <node pkg="awesomo_ros" type="awesomo_node" name="awesomo_node" output="screen" />
+  <node pkg="awesomo_ros" type="control_node" name="control" output="screen" />
 </launch>

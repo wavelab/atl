@@ -1,9 +1,9 @@
-#include "awesomo_ros/awesomo_node.hpp"
+#include "awesomo_ros/control_node.hpp"
 
 
 namespace awesomo {
 
-AwesomoNode::AwesomoNode(void) {
+ControlNode::ControlNode(void) {
   this->configured = false;
 
   for (int i = 0; i < 16; i++) {
@@ -11,7 +11,7 @@ AwesomoNode::AwesomoNode(void) {
   }
 }
 
-int AwesomoNode::configure(const std::string node_name, int hz) {
+int ControlNode::configure(const std::string node_name, int hz) {
   std::string config_path;
 
   // ros node
@@ -32,10 +32,10 @@ int AwesomoNode::configure(const std::string node_name, int hz) {
 
   // subscribers
   // clang-format off
-  ROSNode::registerSubscriber(STATE_TOPIC, &AwesomoNode::stateCallback, this);
-  ROSNode::registerSubscriber(POSE_TOPIC, &AwesomoNode::poseCallback, this);
-  ROSNode::registerSubscriber(RADIO_TOPIC, &AwesomoNode::radioCallback, this);
-  ROSNode::registerSubscriber(APRILTAG_TOPIC, &AwesomoNode::aprilTagCallback, this);
+  ROSNode::registerSubscriber(STATE_TOPIC, &ControlNode::stateCallback, this);
+  ROSNode::registerSubscriber(POSE_TOPIC, &ControlNode::poseCallback, this);
+  ROSNode::registerSubscriber(RADIO_TOPIC, &ControlNode::radioCallback, this);
+  ROSNode::registerSubscriber(APRILTAG_TOPIC, &ControlNode::aprilTagCallback, this);
   // clang-format on
 
   // publishers
@@ -50,7 +50,7 @@ int AwesomoNode::configure(const std::string node_name, int hz) {
 
   // loop callback
   // clang-format off
-  ROSNode::registerLoopCallback(std::bind(&AwesomoNode::awesomoLoopCallback, this));
+  ROSNode::registerLoopCallback(std::bind(&ControlNode::awesomoLoopCallback, this));
   // clang-format on
 
   // wait till connected to FCU
@@ -60,7 +60,7 @@ int AwesomoNode::configure(const std::string node_name, int hz) {
   return 0;
 }
 
-void AwesomoNode::waitForConnection(void) {
+void ControlNode::waitForConnection(void) {
   bool sim_mode;
 
   // pre-check
@@ -80,7 +80,7 @@ void AwesomoNode::waitForConnection(void) {
   ROS_INFO("Connected to FCU!");
 }
 
-int AwesomoNode::disarm(void) {
+int ControlNode::disarm(void) {
   mavros_msgs::CommandBool msg;
 
   // setup
@@ -97,7 +97,7 @@ int AwesomoNode::disarm(void) {
   }
 }
 
-int AwesomoNode::setOffboardModeOn(void) {
+int ControlNode::setOffboardModeOn(void) {
   mavros_msgs::SetMode msg;
 
   // setup
@@ -112,25 +112,25 @@ int AwesomoNode::setOffboardModeOn(void) {
   }
 }
 
-void AwesomoNode::stateCallback(const mavros_msgs::State::ConstPtr &msg) {
+void ControlNode::stateCallback(const mavros_msgs::State::ConstPtr &msg) {
   this->mavros_state = *msg;
 }
 
-void AwesomoNode::poseCallback(const geometry_msgs::PoseStamped &msg) {
+void ControlNode::poseCallback(const geometry_msgs::PoseStamped &msg) {
   this->world_pose = convertPoseStampedMsg2Pose(msg);
 }
 
-void AwesomoNode::radioCallback(const mavros_msgs::RCIn &msg) {
+void ControlNode::radioCallback(const mavros_msgs::RCIn &msg) {
   for (int i = 0; i < 16; i++) {
     this->rc_in[i] = msg.channels[i];
   }
 }
 
-void AwesomoNode::aprilTagCallback(const awesomo_msgs::AprilTagPose &msg) {
+void ControlNode::aprilTagCallback(const awesomo_msgs::AprilTagPose &msg) {
   this->tag_pose = convertAprilTagPoseMsg2TagPose(msg);
 }
 
-int AwesomoNode::awesomoLoopCallback(void) {
+int ControlNode::awesomoLoopCallback(void) {
   int seq;
   double dt;
   AttitudeCommand att_cmd;
@@ -155,7 +155,7 @@ int AwesomoNode::awesomoLoopCallback(void) {
   return 0;
 }
 
-void AwesomoNode::publishStats(void) {
+void ControlNode::publishStats(void) {
   int seq;
   ros::Time time;
   awesomo_msgs::PositionControllerStats pcs_stats_msg;
@@ -182,10 +182,10 @@ void AwesomoNode::publishStats(void) {
 }  // end of awesomo namespace
 
 int main(int argc, char **argv) {
-  awesomo::AwesomoNode awesomo_node;
+  awesomo::ControlNode awesomo_node;
 
   if (awesomo_node.configure(NODE_NAME, NODE_RATE) != 0) {
-    ROS_ERROR("Failed to configure AwesomoNode!");
+    ROS_ERROR("Failed to configure ControlNode!");
     return -1;
   }
   awesomo_node.loop();

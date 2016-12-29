@@ -2,5 +2,5 @@
 <launch>
   <param name="sim_mode" type="bool" value="true" />
   <param name="config_dir" value="$(find awesomo_configs)/configs/quadrotor_gazebosim" />
-  <node pkg="awesomo_ros" type="awesomo_node" name="awesomo" output="screen" />
+  <node pkg="awesomo_ros" type="control_node" name="control" output="screen" />
 </launch>
