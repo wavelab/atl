@@ -1,4 +1,4 @@
-# awesomo [![Build Status](https://travis-ci.com/wavelab/awesomo.svg?token=vyEJ7ehiK1iW6rTBostS&branch=ros)][1]
+# awesomo [![Build Status](https://travis-ci.com/wavelab/awesomo.svg?token=vyEJ7ehiK1iW6rTBostS&branch=ros)](https://travis-ci.com/wavelab/awesomo)
 
 Landing a quadrotor on a moving platform.
 
@@ -31,6 +31,3 @@ A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
 this program.  If not, see <http://www.gnu.org/licenses/>.
-
-
-[1]: https://travis-ci.com/wavelab/awesomo
