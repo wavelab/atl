@@ -6,46 +6,32 @@
 #include <map>
 #include <yaml-cpp/yaml.h>
 
-#include "awesomo_core/vision/util.hpp"
-#include "awesomo_core/vision/sbgc.hpp"
+#include "awesomo_core/utils/utils.hpp"
+#include "awesomo_core/vision/gimbal/sbgc.hpp"
 
 
-class GimbalLimit {
-public:
-  Eigen::Vector2d roll_limits;
-  Eigen::Vector2d pitch_limits;
-  Eigen::Vector2d yaw_limits;
-};
+namespace awesomo {
 
 class Gimbal {
 public:
-  SBGC *sbgc;
-  Pose pose;
-  GimbalLimit gimbal_limits;
+  bool configured;
+  bool sim_mode;
 
-  Gimbal(void){};
-  Gimbal(float roll, float pitch, float yaw, float x, float y, float z);
-  Gimbal(std::string config_path);
+  SBGC sbgc;
+  Pose camera_offset;
+  double limits[6];
+  Vec3 setpoints;
+  Vec3 target_bpf;
 
-  Eigen::Vector3d getTargetPositionBFrame(Eigen::Vector3d target_position);
-  Eigen::Vector3d getTargetPositionBPFrame(Eigen::Vector3d target_position,
-                                           Eigen::Quaterniond &imu);
-  int transformTargetPosition(Eigen::Vector3d target,
-                              Eigen::Vector3d &transformed_target);
-  int setGimbalLimits(float roll_upper,
-                      float roll_lower,
-                      float pitch_upper,
-                      float pitch_lower,
-                      float yaw_upper,
-                      float yaw_lower);
-  int checkLimits(float &value, Eigen::Vector2d limits);
-  int checkSetPointLimits(Eigen::Vector3d frame_rpy,
-                          float roll,
-                          float pitch,
-                          float yaw);
-  int trackTarget(Eigen::Vector3d target);
-  int setGimbalAngles(double roll, double pitch, double yaw);
+  Gimbal(void);
+  int configure(std::string config_path);
+  Vec3 getTargetPositionInBodyFrame(Vec3 target_cf);
+  Vec3 getTargetPositionInBodyPlanarFrame(Vec3 target_cf, Quaternion &imu_if);
+  int getTargetPositionInBodyPlanarFrame(Vec3 target_cf, Vec3 &target_bpf);
+  int trackTarget(Vec3 target_cf);
+  int setAngle(double roll, double pitch);
+  void printSetpoints(void);
 };
 
-
+}  // end of awesomo namespace
 #endif

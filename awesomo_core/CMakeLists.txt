@@ -52,6 +52,8 @@ ADD_LIBRARY(
     src/vision/camera/config.cpp
     # src/vision/camera/ximea.cpp
     # src/vision/camera/camera_pointgrey.cpp
+    src/vision/gimbal/gimbal.cpp
+    src/vision/gimbal/sbgc.cpp
 )
 SET(DEPS
     ${PROJECT_NAME}
@@ -81,6 +83,7 @@ ADD_EXECUTABLE(
     # VISION TESTS
     tests/vision/camera/camera_test.cpp
     tests/vision/camera/config_test.cpp
+    tests/vision/gimbal/gimbal_test.cpp
     # UTIL TESTS
     tests/utils/config_test.cpp
     tests/utils/data_test.cpp

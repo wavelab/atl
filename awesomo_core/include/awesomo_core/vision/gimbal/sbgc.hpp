@@ -1,5 +1,5 @@
-#ifndef __AWESOMO_SBGC_HPP__
-#define __AWESOMO_SBGC_HPP__
+#ifndef __AWESOMO_VISION_GIMBAL_SBGC_HPP__
+#define __AWESOMO_VISION_GIMBAL_SBGC_HPP__
 
 #include <errno.h>
 #include <fcntl.h>
@@ -150,6 +150,8 @@ public:
 
 class SBGC {
 public:
+  bool configured;
+
   SBGCRealtimeData data;
   std::string port;
   int serial;
@@ -160,6 +162,7 @@ public:
   uint16_t board_features;
   uint8_t connection_flags;
 
+  SBGC(void);
   SBGC(std::string port);
   int connect(void);
   int disconnect(void);

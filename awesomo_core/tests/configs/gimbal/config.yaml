@@ -1,0 +1,16 @@
+sim_mode: false
+device_path: "/dev/ttyUSB0"
+camera_offset:
+    x: 1.0
+    y: 2.0
+    z: 3.0
+    roll: 0.0
+    pitch: 0.0
+    yaw: 0.0
+gimbal_limits:
+    roll_min: 1.0
+    roll_max: 2.0
+    pitch_min: 3.0
+    pitch_max: 4.0
+    yaw_min: 5.0
+    yaw_max: 6.0
