@@ -32,7 +32,7 @@ int CameraNode::configure(std::string node_name, int hz) {
 }
 
 int CameraNode::loopCallback(void) {
-  this-publishImage();
+  this - publishImage();
   return 0;
 }
 

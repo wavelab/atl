@@ -61,14 +61,16 @@ Vec3 Gimbal::getTargetPositionInBodyFrame(Vec3 target_cf) {
   return (R * target_cf + t);
 }
 
-Vec3 Gimbal::getTargetPositionInBodyPlanarFrame(Vec3 target_cf, Quaternion &imu_if) {
+Vec3 Gimbal::getTargetPositionInBodyPlanarFrame(Vec3 target_cf,
+                                                Quaternion &imu_if) {
   Mat3 R = imu_if.toRotationMatrix();
   Vec3 p = this->getTargetPositionInBodyFrame(target_cf);
   this->target_bpf = R * p;
   return this->target_bpf;
 }
 
-int Gimbal::getTargetPositionInBodyPlanarFrame(Vec3 target_cf, Vec3 &target_bpf) {
+int Gimbal::getTargetPositionInBodyPlanarFrame(Vec3 target_cf,
+                                               Vec3 &target_bpf) {
   int retval;
   Vec3 tmp;
   Quaternion gimbal_imu;

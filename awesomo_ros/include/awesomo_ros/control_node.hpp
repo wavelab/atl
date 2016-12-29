@@ -37,10 +37,12 @@ namespace awesomo {
 #define AWESOMO_APRILTAG_TOPIC "/awesomo/vision/pose"
 
 #define MAVROS_SETPOINT_ATTITUDE_TOPIC "/mavros/setpoint_attitude/attitude"
-#define MAVROS_SETPOINT_THROTTLE_TOPIC "/mavros/setpoint_attitude/att_throttle"
+#define MAVROS_SETPOINT_THROTTLE_TOPIC \
+  "/mavros/setpoint_attitude/att_throttle"
 #define MAVROS_SETPOINT_POSITION_TOPIC "/mavros/setpoint_position/local"
 
-#define AWESOMO_POS_CONTROLLER_STATS_TOPIC "/awesomo/position_controller/stats"
+#define AWESOMO_POS_CONTROLLER_STATS_TOPIC \
+  "/awesomo/position_controller/stats"
 #define AWESOMO_KF_STATS_TOPIC "/awesomo/kf_estimation/stats"
 #define AWESOMO_KF_PLOTTING_TOPIC "/awesomo/kf_estimation/states"
 

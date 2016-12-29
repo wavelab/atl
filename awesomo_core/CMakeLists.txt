@@ -7,8 +7,9 @@ ENDIF()
 
 # CATKIN
 FIND_PACKAGE(catkin)
-CATKIN_PACKAGE(INCLUDE_DIRS include LIBRARIES ${PROJECT_NAME})
 FIND_PACKAGE(OpenCV REQUIRED)
+FIND_PACKAGE(CGAL)
+CATKIN_PACKAGE(INCLUDE_DIRS include LIBRARIES ${PROJECT_NAME})
 
 # INCLUDES
 INCLUDE_DIRECTORIES(
@@ -48,6 +49,7 @@ ADD_LIBRARY(
     src/utils/stats.cpp
     src/utils/time.cpp
     # vision
+    src/vision/apriltag/swathmore.cpp
     src/vision/camera/camera.cpp
     src/vision/camera/config.cpp
     # src/vision/camera/ximea.cpp
@@ -59,6 +61,8 @@ SET(DEPS
     ${PROJECT_NAME}
     ${catkin_LIBRARIES}
     ${OpenCV_LIBS}
+    apriltags
+    CGAL
     yaml-cpp
     gtest
     pthread
@@ -81,6 +85,7 @@ ADD_EXECUTABLE(
     tests/quadrotor/hover_mode_test.cpp
     tests/quadrotor/quadrotor_test.cpp
     # VISION TESTS
+    tests/vision/apriltag/swathmore_test.cpp
     tests/vision/camera/camera_test.cpp
     tests/vision/camera/config_test.cpp
     tests/vision/gimbal/gimbal_test.cpp

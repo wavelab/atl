@@ -3,16 +3,15 @@
 
 #define TEST_CONFIG "tests/configs/gimbal/config.yaml"
 
-static void print_target_relative_to_body_frame(awesomo::Vec3 &target)
-{
+static void print_target_relative_to_body_frame(awesomo::Vec3 &target) {
   std::cout << "target position (relative to quad in body frame): ";
   std::cout << std::fixed << std::setprecision(2) << target(0) << " ";
   std::cout << std::fixed << std::setprecision(2) << target(1) << " ";
   std::cout << std::fixed << std::setprecision(2) << target(2) << std::endl;
 }
 
-static void print_target_relative_to_body_planar_frame(awesomo::Vec3 &target)
-{
+static void print_target_relative_to_body_planar_frame(
+  awesomo::Vec3 &target) {
   std::cout << "target position (relative to quad in body planar frame): ";
   std::cout << std::fixed << std::setprecision(2) << target(0) << " ";
   std::cout << std::fixed << std::setprecision(2) << target(1) << " ";
@@ -201,7 +200,8 @@ TEST(Gimbal, getTargetPositionInBodyPlanarFrame) {
   ASSERT_TRUE(target_bpf(2) < 10.0);
 
   // pitch forward, roll left
-  awesomo::euler2Quaternion(awesomo::deg2rad(-10), awesomo::deg2rad(-10), 0.0, imu);
+  awesomo::euler2Quaternion(
+    awesomo::deg2rad(-10), awesomo::deg2rad(-10), 0.0, imu);
   target_bpf = gimbal.getTargetPositionInBodyPlanarFrame(target_cf, imu);
   std::cout << "[quadrotor pitch forward, roll left]\t";
   print_target_relative_to_body_planar_frame(target_bpf);
@@ -210,7 +210,8 @@ TEST(Gimbal, getTargetPositionInBodyPlanarFrame) {
   ASSERT_TRUE(target_bpf(2) < 10.0);
 
   // pitch forward, roll right
-  awesomo::euler2Quaternion(awesomo::deg2rad(10), awesomo::deg2rad(-10), 0.0, imu);
+  awesomo::euler2Quaternion(
+    awesomo::deg2rad(10), awesomo::deg2rad(-10), 0.0, imu);
   target_bpf = gimbal.getTargetPositionInBodyPlanarFrame(target_cf, imu);
   std::cout << "[quadrotor pitch forward, roll right]\t";
   print_target_relative_to_body_planar_frame(target_bpf);
@@ -219,7 +220,8 @@ TEST(Gimbal, getTargetPositionInBodyPlanarFrame) {
   ASSERT_TRUE(target_bpf(2) < 10.0);
 
   // pitch backwards, roll left
-  awesomo::euler2Quaternion(awesomo::deg2rad(-10), awesomo::deg2rad(10), 0.0, imu);
+  awesomo::euler2Quaternion(
+    awesomo::deg2rad(-10), awesomo::deg2rad(10), 0.0, imu);
   target_bpf = gimbal.getTargetPositionInBodyPlanarFrame(target_cf, imu);
   std::cout << "[quadrotor pitch backwards, roll left]\t";
   print_target_relative_to_body_planar_frame(target_bpf);
@@ -228,7 +230,8 @@ TEST(Gimbal, getTargetPositionInBodyPlanarFrame) {
   ASSERT_TRUE(target_bpf(2) < 10.0);
 
   // pitch backwards, roll right
-  awesomo::euler2Quaternion(awesomo::deg2rad(10), awesomo::deg2rad(10), 0.0, imu);
+  awesomo::euler2Quaternion(
+    awesomo::deg2rad(10), awesomo::deg2rad(10), 0.0, imu);
   target_bpf = gimbal.getTargetPositionInBodyPlanarFrame(target_cf, imu);
   std::cout << "[quadrotor pitch backwards, roll right]\t";
   print_target_relative_to_body_planar_frame(target_bpf);
