@@ -29,8 +29,9 @@ create_catkin_ws()
         echo "Creating catkin workspace in $HOME/catkin_ws ..."
         source /opt/ros/$ROS_DISTRO/setup.bash
         mkdir -p "$HOME/catkin_ws/src"
-        cd "$HOME/catkin_ws"
+        cd "$HOME/catkin_ws/src"
         catkin_init_workspace
+        cd "$HOME/catkin_ws"
         catkin_make
         echo "Catkin workspace created successfully."
     fi
