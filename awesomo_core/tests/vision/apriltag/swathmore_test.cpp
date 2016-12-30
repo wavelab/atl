@@ -2,7 +2,7 @@
 #include "awesomo_core/vision/camera/camera.hpp"
 #include "awesomo_core/vision/apriltag/swathmore.hpp"
 
-#define TEST_CONFIG "tests/configs/pointgrey"
+#define TEST_CONFIG "tests/configs/apriltag/config.yaml"
 #define TEST_IMAGE_CENTER "tests/data/center.png"
 #define TEST_IMAGE_TOP "tests/data/top.png"
 #define TEST_IMAGE_BOTTOM "tests/data/bottom.png"
@@ -15,21 +15,6 @@
 
 namespace awesomo {
 
-static std::vector<TagPose> process_image(SwathmoreDetector &detector,
-                                          std::string image_file) {
-  int timeout;
-  cv::Mat image;
-  cv::Mat camera_matrix;
-  std::vector<TagPose> tags;
-
-  // setup
-  timeout = 0;
-  image = cv::imread(image_file, CV_LOAD_IMAGE_COLOR);
-  // tags = detector.processImage(camera_matrix, image, timeout);
-
-  return tags;
-}
-
 TEST(SwathmoreDetector, constructor) {
   SwathmoreDetector detector;
 
@@ -37,7 +22,10 @@ TEST(SwathmoreDetector, constructor) {
 
   ASSERT_EQ(NULL, detector.detector);
 
-  ASSERT_EQ(0.0, detector.tag_sizes.size());
+  ASSERT_EQ(0, detector.tag_configs.size());
+  ASSERT_EQ("", detector.camera_mode);
+  ASSERT_EQ(0, detector.camera_modes.size());
+  ASSERT_EQ(0, detector.camera_configs.size());
   ASSERT_FALSE(detector.imshow);
 }
 
@@ -49,8 +37,21 @@ TEST(SwathmoreDetector, configure) {
 
   ASSERT_FALSE(detector.detector == NULL);
 
-  // ASSERT_EQ(0.0, detector.tag_sizes.size());
-  // ASSERT_FALSE(detector.imshow);
+  ASSERT_EQ(2, detector.tag_configs.size());
+  ASSERT_EQ(detector.camera_modes[0], detector.camera_mode);
+  ASSERT_EQ(1, detector.camera_modes.size());
+  ASSERT_EQ(1, detector.camera_configs.size());
+  ASSERT_TRUE(detector.imshow);
 }
+
+// TEST(SwathmoreDetector, extractTags) {
+//   cv::Mat image;
+//   std::vector<TagPose> tags;
+//   SwathmoreDetector detector;
+//
+//   detector.configure(TEST_CONFIG);
+//   image = cv::imread(TEST_IMAGE_CENTER, CV_LOAD_IMAGE_COLOR);
+//   tags = detector.extractTags(image);
+// }
 
 }  // end of awesomo namespace

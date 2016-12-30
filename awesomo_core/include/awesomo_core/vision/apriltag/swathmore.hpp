@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include <math.h>
+#include <libgen.h>
 #include <sys/time.h>
 
 #include <opencv2/core/core.hpp>
@@ -15,6 +16,7 @@
 #include <apriltags/CameraUtil.h>
 
 #include "awesomo_core/utils/utils.hpp"
+#include "awesomo_core/vision/camera/camera.hpp"
 #include "awesomo_core/vision/apriltag/data.hpp"
 // #include "awesomo_core/vision/estimator.hpp"
 
@@ -27,8 +29,10 @@ public:
 
   TagDetector *detector;
 
-  std::map<int, float> tag_sizes;
-  cv::Mat camera_matrix;
+  std::map<int, float> tag_configs;
+  std::string camera_mode;
+  std::vector<std::string> camera_modes;
+  std::map<std::string, CameraConfig *> camera_configs;
   bool imshow;
 
   SwathmoreDetector(void);

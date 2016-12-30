@@ -33,22 +33,25 @@ Camera::~Camera(void) {
 int Camera::configure(std::string config_path) {
   ConfigParser parser;
   CameraConfig *config;
+  std::string config_file;
   std::vector<std::string> camera_modes;
   std::vector<std::string> camera_configs;
 
   // load config
+  config_file = config_path + "/" + "config.yaml";
   parser.addParam<std::vector<std::string>>("modes", &camera_modes);
   parser.addParam<std::vector<std::string>>("configs", &camera_configs);
-  if (parser.load(config_path + "/" + "config.yaml") != 0) {
-    log_err("Failed to configure camera!");
+  if (parser.load(config_file) != 0) {
+    log_err("Failed to load config file [%s]!", config_file.c_str());
     return -1;
   }
 
   // load camera configs
   for (int i = 0; i < camera_modes.size(); i++) {
     config = new CameraConfig();
-    if (config->load(config_path + "/" + camera_configs[i]) != 0) {
-      log_err("Failed to configure camera!");
+    config_file = config_path + "/" + camera_configs[i];
+    if (config->load(config_file) != 0) {
+      log_err("Failed to load config file [%s]!", config_file.c_str());
       return -1;
     }
 

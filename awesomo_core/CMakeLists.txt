@@ -15,6 +15,7 @@ CATKIN_PACKAGE(INCLUDE_DIRS include LIBRARIES ${PROJECT_NAME})
 INCLUDE_DIRECTORIES(
     ${catkin_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS}
+    ${Boost_INCLUDE_DIR}
     include
     /usr/include
     /usr/local/include
@@ -43,7 +44,7 @@ ADD_LIBRARY(
     # utils
     src/utils/config.cpp
     src/utils/data.cpp
-    src/utils/io.cpp
+    src/utils/filesystem.cpp
     src/utils/math.cpp
     src/utils/opencv.cpp
     src/utils/stats.cpp
@@ -92,7 +93,7 @@ ADD_EXECUTABLE(
     # UTIL TESTS
     tests/utils/config_test.cpp
     tests/utils/data_test.cpp
-    tests/utils/io_test.cpp
+    tests/utils/filesystem_test.cpp
     tests/utils/math_test.cpp
     tests/utils/opencv_test.cpp
     tests/utils/stats_test.cpp
