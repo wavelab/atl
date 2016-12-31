@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+  <param name="sim_mode" type="bool" value="false" />
+  <param name="control_config_dir" type="str" value="$(find awesomo_configs)/configs/quadrotor_anastasia" />
+  <node pkg="awesomo_ros" type="control_node" name="control" output="screen" />
+</launch>

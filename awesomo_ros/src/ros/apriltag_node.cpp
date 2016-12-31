@@ -35,8 +35,8 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
   // publish tag pose
   if (tags.size()) {
     buildAprilTagPoseMsg(tags[0], tag_msg);
-    this->ros_pubs[APRILTAG_POSE_TOPIC].publish(tag_msg);
   }
+  this->ros_pubs[APRILTAG_POSE_TOPIC].publish(tag_msg);
 }
 
 }  // end of awesomo namespace

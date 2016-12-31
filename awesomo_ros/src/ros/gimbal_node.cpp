@@ -13,7 +13,7 @@ int GimbalNode::configure(std::string node_name, int hz) {
   ROSNode::configure(node_name, hz);
 
   // gimbal
-  this->ros_nh->getParam("/config_file", config_file);
+  this->ros_nh->getParam("/gimbal_config", config_file);
   if (this->gimbal.configure(config_file) != 0) {
     return -1;
   };

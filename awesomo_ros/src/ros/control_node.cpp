@@ -18,7 +18,7 @@ int ControlNode::configure(const std::string node_name, int hz) {
   ROSNode::configure(node_name, hz);
 
   // quadrotor
-  this->ros_nh->getParam("/config_dir", config_path);
+  this->ros_nh->getParam("/control_config_dir", config_path);
   if (this->quadrotor.configure(config_path) != 0) {
     log_err(FCONFQUAD);
     return -1;
