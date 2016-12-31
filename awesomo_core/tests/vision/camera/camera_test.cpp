@@ -10,7 +10,7 @@ TEST(Camera, constructor) {
   ASSERT_FALSE(camera.configured);
   ASSERT_FALSE(camera.initialized);
 
-  ASSERT_EQ(NULL, camera.config);
+  ASSERT_FALSE(camera.config.loaded);
   ASSERT_EQ(0, camera.modes.size());
   ASSERT_EQ(0, camera.configs.size());
 
@@ -19,9 +19,11 @@ TEST(Camera, constructor) {
 }
 
 TEST(Camera, configure) {
+  int retval;
   awesomo::Camera camera;
 
-  camera.configure(TEST_CONFIG_PATH);
+  retval = camera.configure(TEST_CONFIG_PATH);
+  ASSERT_EQ(0, retval);
 }
 
 TEST(Camera, getFrame) {

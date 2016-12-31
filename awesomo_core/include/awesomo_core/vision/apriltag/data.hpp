@@ -21,6 +21,18 @@ public:
     this->detected = detected;
     this->position = position;
   }
+  void print(void) {
+    std::cout << "tag ";
+    std::cout << "id: " << this->id << "\t";
+    std::cout << "detected: " << this->detected << "\t";
+    std::cout << "position: ";
+    std::cout << "(";
+    std::cout << this->position(0) << ", ";
+    std::cout << this->position(1) << ", ";
+    std::cout << this->position(2);
+    std::cout << ")";
+    std::cout << std::endl;
+  }
 };
 
 }  // end of awesomo namespace

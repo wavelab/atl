@@ -3,15 +3,15 @@
 #include "awesomo_core/vision/apriltag/swathmore.hpp"
 
 #define TEST_CONFIG "tests/configs/apriltag/config.yaml"
-#define TEST_IMAGE_CENTER "tests/data/center.png"
-#define TEST_IMAGE_TOP "tests/data/top.png"
-#define TEST_IMAGE_BOTTOM "tests/data/bottom.png"
-#define TEST_IMAGE_LEFT "tests/data/left.png"
-#define TEST_IMAGE_RIGHT "tests/data/right.png"
-#define TEST_IMAGE_TOP_LEFT "tests/data/top_left.png"
-#define TEST_IMAGE_BOTTOM_LEFT "tests/data/bottom_left.png"
-#define TEST_IMAGE_TOP_RIGHT "tests/data/top_right.png"
-#define TEST_IMAGE_BOTTOM_RIGHT "tests/data/bottom_right.png"
+#define TEST_IMAGE_CENTER "tests/data/apriltag/center.png"
+#define TEST_IMAGE_TOP "tests/data/apriltag/top.png"
+#define TEST_IMAGE_BOTTOM "tests/data/apriltag/bottom.png"
+#define TEST_IMAGE_LEFT "tests/data/apriltag/left.png"
+#define TEST_IMAGE_RIGHT "tests/data/apriltag/right.png"
+#define TEST_IMAGE_TOP_LEFT "tests/data/apriltag/top_left.png"
+#define TEST_IMAGE_BOTTOM_LEFT "tests/data/apriltag/bottom_left.png"
+#define TEST_IMAGE_TOP_RIGHT "tests/data/apriltag/top_right.png"
+#define TEST_IMAGE_BOTTOM_RIGHT "tests/data/apriltag/bottom_right.png"
 
 namespace awesomo {
 
@@ -39,19 +39,38 @@ TEST(SwathmoreDetector, configure) {
 
   ASSERT_EQ(2, detector.tag_configs.size());
   ASSERT_EQ(detector.camera_modes[0], detector.camera_mode);
-  ASSERT_EQ(1, detector.camera_modes.size());
-  ASSERT_EQ(1, detector.camera_configs.size());
+  ASSERT_EQ(3, detector.camera_modes.size());
+  ASSERT_EQ(3, detector.camera_configs.size());
   ASSERT_TRUE(detector.imshow);
 }
 
-// TEST(SwathmoreDetector, extractTags) {
-//   cv::Mat image;
-//   std::vector<TagPose> tags;
-//   SwathmoreDetector detector;
-//
-//   detector.configure(TEST_CONFIG);
-//   image = cv::imread(TEST_IMAGE_CENTER, CV_LOAD_IMAGE_COLOR);
-//   tags = detector.extractTags(image);
-// }
+TEST(SwathmoreDetector, extractTags) {
+  cv::Mat image;
+  std::vector<TagPose> tags;
+  SwathmoreDetector detector;
+
+  // setup
+  detector.configure(TEST_CONFIG);
+
+  // CENTER
+  image = cv::imread(TEST_IMAGE_CENTER, CV_LOAD_IMAGE_COLOR);
+  tags = detector.extractTags(image);
+  tags[0].print();
+
+  ASSERT_EQ(1, tags.size());
+  ASSERT_NEAR(2.1693, tags[0].position(0), 0.15);
+  ASSERT_NEAR(-0.135304, tags[0].position(1), 0.15);
+  ASSERT_NEAR(-0.131094, tags[0].position(2), 0.15);
+
+  // TOP
+  image = cv::imread(TEST_IMAGE_TOP, CV_LOAD_IMAGE_COLOR);
+  tags = detector.extractTags(image);
+  tags[0].print();
+
+  ASSERT_EQ(1, tags.size());
+  ASSERT_NEAR(2.33787, tags[0].position(0), 0.15);
+  ASSERT_NEAR(-0.131417, tags[0].position(1), 0.15);
+  ASSERT_NEAR(-0.639181, tags[0].position(2), 0.15);
+}
 
 }  // end of awesomo namespace

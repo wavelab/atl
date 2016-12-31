@@ -18,9 +18,9 @@ public:
   bool configured;
   bool initialized;
 
-  CameraConfig *config;
+  CameraConfig config;
   std::vector<std::string> modes;
-  std::map<std::string, CameraConfig *> configs;
+  std::map<std::string, CameraConfig> configs;
 
   cv::VideoCapture *capture;
   double last_tic;

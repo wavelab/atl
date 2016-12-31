@@ -15,12 +15,6 @@ SwathmoreDetector::SwathmoreDetector(void) {
   this->imshow = false;
 }
 
-SwathmoreDetector::~SwathmoreDetector(void) {
-  // delete family_str;
-  // delete family;
-  // delete params;
-}
-
 int SwathmoreDetector::configure(std::string config_file) {
   Camera camera;
   ConfigParser parser;
@@ -96,13 +90,13 @@ std::vector<TagPose> SwathmoreDetector::extractTags(cv::Mat &image) {
 
 int SwathmoreDetector::obtainPose(TagDetection tag, TagPose &tag_pose) {
   cv::Mat R, T;
-  CameraConfig *camera_config;
+  CameraConfig camera_config;
   double fx, fy, tag_size;
 
   // setup
   camera_config = this->camera_configs[this->camera_mode];
-  fx = camera_config->camera_matrix.at<double>(0, 0);
-  fy = camera_config->camera_matrix.at<double>(1, 1);
+  fx = camera_config.camera_matrix.at<double>(0, 0);
+  fy = camera_config.camera_matrix.at<double>(1, 1);
   tag_size = 0.0;
 
   // get tag size according to tag id

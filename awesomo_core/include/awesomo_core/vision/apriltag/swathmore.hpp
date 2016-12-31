@@ -18,7 +18,6 @@
 #include "awesomo_core/utils/utils.hpp"
 #include "awesomo_core/vision/camera/camera.hpp"
 #include "awesomo_core/vision/apriltag/data.hpp"
-// #include "awesomo_core/vision/estimator.hpp"
 
 
 namespace awesomo {
@@ -32,11 +31,10 @@ public:
   std::map<int, float> tag_configs;
   std::string camera_mode;
   std::vector<std::string> camera_modes;
-  std::map<std::string, CameraConfig *> camera_configs;
+  std::map<std::string, CameraConfig> camera_configs;
   bool imshow;
 
   SwathmoreDetector(void);
-  ~SwathmoreDetector(void);
   int configure(std::string config_file);
   int obtainPose(TagDetection tag, TagPose &tag_pose);
   std::vector<TagPose> extractTags(cv::Mat &image);

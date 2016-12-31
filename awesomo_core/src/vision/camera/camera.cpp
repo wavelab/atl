@@ -7,7 +7,7 @@ Camera::Camera(void) {
   this->configured = false;
   this->initialized = false;
 
-  this->config = NULL;
+  this->config = CameraConfig();
   this->modes.clear();
   this->configs.clear();
 
@@ -16,14 +16,6 @@ Camera::Camera(void) {
 }
 
 Camera::~Camera(void) {
-  CameraConfig *config;
-
-  if (this->configured) {
-    for (int i = 0; i < this->configs.size(); i++) {
-      delete this->configs[this->modes[i]];
-    }
-  }
-
   if (this->initialized) {
     this->capture->release();
     this->capture = NULL;
@@ -32,7 +24,7 @@ Camera::~Camera(void) {
 
 int Camera::configure(std::string config_path) {
   ConfigParser parser;
-  CameraConfig *config;
+  CameraConfig config;
   std::string config_file;
   std::vector<std::string> camera_modes;
   std::vector<std::string> camera_configs;
@@ -48,9 +40,9 @@ int Camera::configure(std::string config_path) {
 
   // load camera configs
   for (int i = 0; i < camera_modes.size(); i++) {
-    config = new CameraConfig();
+    config = CameraConfig();
     config_file = config_path + "/" + camera_configs[i];
-    if (config->load(config_file) != 0) {
+    if (config.load(config_file) != 0) {
       log_err("Failed to load config file [%s]!", config_file.c_str());
       return -1;
     }
@@ -75,9 +67,9 @@ int Camera::initialize(void) {
   }
 
   // setup
-  camera_index = this->config->index;
-  image_width = this->config->image_width;
-  image_height = this->config->image_height;
+  camera_index = this->config.index;
+  image_width = this->config.image_width;
+  image_height = this->config.image_height;
 
   // open
   this->capture = new cv::VideoCapture(camera_index);
@@ -155,7 +147,7 @@ int Camera::showFPS(double &last_tic, int &frame_count) {
   }
 
   frame_count++;
-  if (frame_count % 30 == 0 && this->config->showfps) {
+  if (frame_count % 30 == 0 && this->config.showfps) {
     t = time_now();
     fps = 30.0 / (t - last_tic);
     printf("fps: %.2f\n", fps);
@@ -173,7 +165,7 @@ int Camera::showImage(cv::Mat &image) {
   }
 
   // show image
-  if (this->config->imshow) {
+  if (this->config.imshow) {
     cv::imshow("Camera", image);
     cv::waitKey(1);
   }
