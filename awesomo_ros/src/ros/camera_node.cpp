@@ -13,7 +13,7 @@ int CameraNode::configure(std::string node_name, int hz) {
   ROSNode::configure(node_name, hz);
 
   // camera
-  this->ros_nh->getParam("/config_dir", config_path);
+  this->ros_nh->getParam("/camera_config_dir", config_path);
   if (this->camera.configure(config_path) != 0) {
     return -1;
   };
@@ -63,7 +63,7 @@ int main(int argc, char **argv) {
   awesomo::CameraNode node;
 
   // configure and loop
-  if (node.configure(NODE_NAME, NODE_RATE) != 0) {
+  if (node.configure(CAMERA_NODE_NAME, CAMERA_NODE_RATE) != 0) {
     ROS_ERROR("Failed to configure CameraNode!");
     return -1;
   }

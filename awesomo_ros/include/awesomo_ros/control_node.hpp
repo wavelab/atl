@@ -24,8 +24,8 @@
 namespace awesomo {
 
 // ROS NODE
-#define NODE_NAME "awesomo_node"
-#define NODE_RATE 1000
+#define CONTROL_NODE_NAME "awesomo_node"
+#define CONTROL_NODE_RATE 1000
 
 // ROS TOPICS
 #define MAVROS_ARM_TOPIC "/mavros/cmd/arming"

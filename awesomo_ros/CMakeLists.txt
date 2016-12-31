@@ -49,6 +49,9 @@ CATKIN_PACKAGE(
 SET(DEPS
     awesomo_core
     ${catkin_LIBRARIES}
+    ${OpenCV_LIBS}
+    apriltags
+    CGAL
     yaml-cpp
 )
 

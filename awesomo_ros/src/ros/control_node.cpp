@@ -184,7 +184,7 @@ void ControlNode::publishStats(void) {
 int main(int argc, char **argv) {
   awesomo::ControlNode awesomo_node;
 
-  if (awesomo_node.configure(NODE_NAME, NODE_RATE) != 0) {
+  if (awesomo_node.configure(CONTROL_NODE_NAME, CONTROL_NODE_RATE) != 0) {
     ROS_ERROR("Failed to configure ControlNode!");
     return -1;
   }

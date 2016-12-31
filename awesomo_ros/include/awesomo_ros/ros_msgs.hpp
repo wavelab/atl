@@ -132,6 +132,13 @@ void buildKFPlottingMsg(int seq,
   msg.acc_z = estimator.mu(8);
 }
 
+void buildAprilTagPoseMsg(TagPose tag, awesomo_msgs::AprilTagPose &msg) {
+  msg.tag_id = tag.id;
+  msg.tag_detected = tag.detected;
+  msg.tag_position.x = tag.position(0);
+  msg.tag_position.y = tag.position(1);
+  msg.tag_position.z = tag.position(2);
+}
 
 Pose convertPoseStampedMsg2Pose(geometry_msgs::PoseStamped msg) {
   Vec3 p;

@@ -14,8 +14,8 @@
 
 namespace awesomo {
 
-#define NODE_NAME "camera_node"
-#define NODE_RATE 100
+#define CAMERA_NODE_NAME "camera_node"
+#define CAMERA_NODE_RATE 100
 
 #define CAMERA_IMAGE_TOPIC "awesomo/camera/image"
 

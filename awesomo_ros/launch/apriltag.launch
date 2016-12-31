@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<launch>
+    <param name="apriltag_config" type="str" value="$(find awesomo_configs)/configs/apriltag/config.yaml" />
+  <node pkg="awesomo_ros" type="apriltag_node" name="apriltag" output="screen" />
+</launch>

@@ -10,8 +10,8 @@
 
 namespace awesomo {
 
-#define NODE_NAME "gimbal_node"
-#define NODE_RATE 100
+#define GIMBAL_NODE_NAME "gimbal_node"
+#define GIMBAL_NODE_RATE 100
 
 #define GIMBAL_POSE_TOPIC "/awesomo/gimbal/pose"
 #define GIMBAL_SETPOINT_ANGLE_TOPIC "/awesomo/gimbal/setpoint/angle"
