@@ -40,10 +40,13 @@ int ConfigParser::getYamlNode(std::string key, YAML::Node &node) {
 }
 
 int ConfigParser::checkKey(std::string key, bool optional) {
-  if (!this->root[key] && optional == false) {
+  YAML::Node node;
+
+  this->getYamlNode(key, node);
+  if (!node && optional == false) {
     log_err("Opps [%s] missing in yaml file!", key.c_str());
     return -1;
-  } else if (!this->root[key] && optional == true) {
+  } else if (!node && optional == true) {
     return 1;
   }
 

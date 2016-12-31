@@ -16,40 +16,44 @@ Gimbal::Gimbal(void) {
 
 int Gimbal::configure(std::string config_file) {
   std::string device_path;
-  YAML::Node config;
-  YAML::Node camera_offset;
-  YAML::Node gimbal_limit;
+  ConfigParser parser;
+  double roll, pitch, yaw;
+  double x, y, z;
 
-  // load config
-  config = YAML::LoadFile(config_file);
+  // parse config file
+  parser.addParam<bool>("sim_mode", &this->sim_mode, true);
+  parser.addParam<std::string>("device_path", &device_path);
+  parser.addParam<double>("camera_offset.roll", &roll);
+  parser.addParam<double>("camera_offset.pitch", &pitch);
+  parser.addParam<double>("camera_offset.yaw", &yaw);
+  parser.addParam<double>("camera_offset.x", &x);
+  parser.addParam<double>("camera_offset.y", &y);
+  parser.addParam<double>("camera_offset.z", &z);
+  parser.addParam<double>("gimbal_limits.roll_min", &this->limits[0]);
+  parser.addParam<double>("gimbal_limits.roll_max", &this->limits[1]);
+  parser.addParam<double>("gimbal_limits.pitch_min", &this->limits[2]);
+  parser.addParam<double>("gimbal_limits.pitch_max", &this->limits[3]);
+  parser.addParam<double>("gimbal_limits.yaw_min", &this->limits[4]);
+  parser.addParam<double>("gimbal_limits.yaw_max", &this->limits[5]);
+  if (parser.load(config_file) != 0) {
+    log_err("Failed to load config file [%s]!", config_file.c_str());
+    return -1;
+  }
 
-  // load SimpleBGC serial connection
-  if (config["sim_mode"] && config["sim_mode"].as<bool>()) {
-    this->sim_mode = true;
-  } else {
-    device_path = config["device_path"].as<std::string>();
+  // SimpleBGC serial connection
+  if (this->sim_mode == false) {
     this->sbgc = SBGC(device_path);
     this->sbgc.connect();
     this->sbgc.on();
   }
 
-  // load camera mount offsets
-  camera_offset = config["camera_offset"];
-  this->camera_offset = Pose(deg2rad(camera_offset["roll"].as<double>()),
-                             deg2rad(camera_offset["pitch"].as<double>()),
-                             deg2rad(camera_offset["yaw"].as<double>()),
-                             camera_offset["x"].as<double>(),
-                             camera_offset["y"].as<double>(),
-                             camera_offset["z"].as<double>());
+  // camera mount offsets
+  this->camera_offset = Pose(roll, pitch, yaw, x, y, z);
 
-  // load gimbal_limits
-  gimbal_limit = config["gimbal_limits"];
-  this->limits[0] = deg2rad(gimbal_limit["roll_min"].as<double>());
-  this->limits[1] = deg2rad(gimbal_limit["roll_max"].as<double>());
-  this->limits[2] = deg2rad(gimbal_limit["pitch_min"].as<double>());
-  this->limits[3] = deg2rad(gimbal_limit["pitch_max"].as<double>());
-  this->limits[4] = deg2rad(gimbal_limit["yaw_min"].as<double>());
-  this->limits[5] = deg2rad(gimbal_limit["yaw_max"].as<double>());
+  // gimbal limits
+  for (int i = 0; i < 6; i++) {
+    this->limits[i] = deg2rad(this->limits[i]);
+  }
 
   this->configured = true;
   return 0;
