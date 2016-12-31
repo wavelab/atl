@@ -97,6 +97,19 @@ TEST(ConfigParser, addParam) {
   ASSERT_TRUE(parser.params[0].b != NULL);
 }
 
+TEST(ConfigParser, getYamlNode) {
+  YAML::Node node1, node2;
+  awesomo::ConfigParser parser;
+
+  parser.load(TEST_CONFIG);
+
+  parser.getYamlNode("level3.a.b.c", node1);
+  ASSERT_EQ(3, node1.as<int>());
+
+  parser.getYamlNode("float", node2);
+  ASSERT_FLOAT_EQ(2.0, node2.as<float>());
+}
+
 TEST(ConfigParser, loadPrimitive) {
   int i;
   float f;

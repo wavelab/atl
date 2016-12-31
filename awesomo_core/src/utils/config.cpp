@@ -8,6 +8,37 @@ ConfigParser::ConfigParser(void) {
   this->loaded = false;
 }
 
+int ConfigParser::getYamlNode(std::string key, YAML::Node &node) {
+  int end;
+  std::string s;
+  std::vector<std::string> elements;
+  std::vector<YAML::Node> traversal;
+
+  // split key into elements
+  s = "";
+  for (int i = 0; i < key.length(); i++) {
+    if (key[i] == '.') {
+      elements.push_back(s);
+      s = "";
+    } else {
+      s += key[i];
+    }
+  }
+  elements.push_back(s);
+
+  // recurse down config key
+  traversal.push_back(this->root);
+  for (int i = 0; i < elements.size(); i++) {
+    end = (traversal.size() - 1);
+    s = elements[i];
+    traversal.push_back(traversal[end][s]);
+  }
+  end = (traversal.size() - 1);
+  node = traversal[end];
+
+  return 0;
+}
+
 int ConfigParser::checkKey(std::string key, bool optional) {
   if (!this->root[key] && optional == false) {
     log_err("Opps [%s] missing in yaml file!", key.c_str());
@@ -75,6 +106,7 @@ int ConfigParser::checkMatrix(std::string key, bool optional) {
 
 int ConfigParser::loadPrimitive(ConfigParam param) {
   int retval;
+  YAML::Node node;
 
   // pre-check
   retval = this->checkKey(param.key, param.optional);
@@ -83,13 +115,14 @@ int ConfigParser::loadPrimitive(ConfigParam param) {
   }
 
   // parse
+  this->getYamlNode(param.key, node);
   switch (param.type) {
     // clang-format off
-    case BOOL: *param.b = this->root[param.key].as<bool>(); break;
-    case INT: *param.i = this->root[param.key].as<int>(); break;
-    case FLOAT: *param.f = this->root[param.key].as<float>(); break;
-    case DOUBLE: *param.d = this->root[param.key].as<double>(); break;
-    case STRING: *param.s = this->root[param.key].as<std::string>(); break;
+    case BOOL: *param.b = node.as<bool>(); break;
+    case INT: *param.i = node.as<int>(); break;
+    case FLOAT: *param.f = node.as<float>(); break;
+    case DOUBLE: *param.d = node.as<double>(); break;
+    case STRING: *param.s = node.as<std::string>(); break;
       // clang-format on
   }
 
@@ -107,7 +140,7 @@ int ConfigParser::loadArray(ConfigParam param) {
   }
 
   // parse
-  node = this->root[param.key];
+  this->getYamlNode(param.key, node);
   switch (param.type) {
     case BOOL_ARRAY:
       for (int i = 0; i < node.size(); i++) {
@@ -159,7 +192,7 @@ int ConfigParser::loadVector(ConfigParam param) {
   VecX &vecx = *param.vecx;
 
   // parse
-  node = this->root[param.key];
+  this->getYamlNode(param.key, node);
   index = 0;
   rows = node["rows"].as<int>();
   cols = node["cols"].as<int>();
@@ -212,7 +245,7 @@ int ConfigParser::loadMatrix(ConfigParam param) {
   cv::Mat &cvmat = *param.cvmat;
 
   // parse
-  node = this->root[param.key];
+  this->getYamlNode(param.key, node);
   index = 0;
   rows = node["rows"].as<int>();
   cols = node["cols"].as<int>();
