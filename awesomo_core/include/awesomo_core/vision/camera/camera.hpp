@@ -24,8 +24,10 @@ public:
   std::vector<std::string> modes;
   std::map<std::string, CameraConfig> configs;
 
-  cv::VideoCapture *capture;
+  cv::Mat image;
   double last_tic;
+
+  cv::VideoCapture *capture;
 
   Camera(void);
   ~Camera(void);

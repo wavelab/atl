@@ -19,7 +19,8 @@ namespace awesomo {
 
 #define APRILTAG_POSE_TOPIC "awesomo/apriltag/pose"
 
-#define CAMERA_IMAGE_TOPIC "awesomo/camera/image"
+#define CAMERA_IMAGE_TOPIC "prototype/camera/image"
+// #define CAMERA_IMAGE_TOPIC "awesomo/camera/image"
 
 class AprilTagNode : public ROSNode {
 public:

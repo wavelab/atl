@@ -38,8 +38,6 @@ TEST(Camera, changeMode) {
   ASSERT_EQ(480, image.rows);
 
   camera.changeMode("320x240");
-
-  camera.getFrame(image);
   camera.getFrame(image);
   ASSERT_EQ(320, image.cols);
   ASSERT_EQ(240, image.rows);

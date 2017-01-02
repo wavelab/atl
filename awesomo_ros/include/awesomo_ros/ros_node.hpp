@@ -11,6 +11,7 @@ namespace awesomo {
 class ROSNode {
 public:
   bool configured;
+  bool debug_mode;
 
   long long int ros_seq;
   ::ros::NodeHandle *ros_nh;
@@ -22,6 +23,7 @@ public:
 
   ROSNode(void) {
     this->configured = false;
+    this->debug_mode = false;
     this->ros_seq = 0;
     this->ros_rate = NULL;
   }
@@ -44,6 +46,7 @@ public:
     // clang-format on
 
     this->ros_nh = new ::ros::NodeHandle();
+    this->ros_nh->getParam("/debug", this->debug_mode);
     this->ros_rate = new ::ros::Rate(hz);
     this->configured = true;
 

@@ -35,6 +35,10 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
   image_ptr = cv_bridge::toCvCopy(msg);
   tags = this->detector.extractTags(image_ptr->image);
 
+  // // debug
+  // cv::imshow("AprilTag Node Image", image_ptr->image);
+  // cv::waitKey(1);
+
   // publish tag pose
   if (tags.size()) {
     buildAprilTagPoseMsg(tags[0], tag_msg);

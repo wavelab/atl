@@ -11,8 +11,10 @@ Camera::Camera(void) {
   this->modes.clear();
   this->configs.clear();
 
-  this->capture = NULL;
+  this->image = cv::Mat(0, 0, CV_64F);
   this->last_tic = 0.0;
+
+  this->capture = NULL;
 }
 
 Camera::~Camera(void) {
@@ -95,11 +97,15 @@ int Camera::shutdown(void) {
 }
 
 int Camera::changeMode(std::string mode) {
+  // pre-check
   if (this->configs.find(mode) == this->configs.end()) {
     return -1;
   }
 
+  // update camera settings
   this->config = this->configs[mode];
+  this->capture->set(CV_CAP_PROP_FRAME_WIDTH, this->config.image_width);
+  this->capture->set(CV_CAP_PROP_FRAME_HEIGHT, this->config.image_height);
 }
 
 int Camera::getFrame(cv::Mat &image) {
@@ -112,19 +118,13 @@ int Camera::getFrame(cv::Mat &image) {
     return -2;
   }
 
+  // get frame
   this->capture->read(image);
-  if (image.cols != this->config.image_width) {
-    this->capture->set(CV_CAP_PROP_FRAME_WIDTH, this->config.image_width);
-  }
-  if (image.rows != this->config.image_height) {
-    this->capture->set(CV_CAP_PROP_FRAME_HEIGHT, this->config.image_height);
-  }
 
   return 0;
 }
 
 int Camera::run(void) {
-  cv::Mat image;
   int frame_count;
   double t;
   double last_tic;
@@ -142,11 +142,11 @@ int Camera::run(void) {
 
   // run
   while (true) {
-    this->getFrame(image);
+    this->getFrame(this->image);
 
     // show stats
     this->showFPS(last_tic, frame_count);
-    this->showImage(image);
+    this->showImage(this->image);
   }
 
   return 0;
