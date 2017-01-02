@@ -1,0 +1,21 @@
+site_name: awesomo
+site_author: Chris Choi, Stan Brown
+repo_url: https://github.com/wavelab/awesomo
+
+pages:
+- Home: index.md
+- API:
+    - apriltag: api/apriltag.md
+    - camera: api/camera.md
+    - controller: api/controller.md
+    - util: api/util.md
+- Reference:
+    - Odriod:
+        - Flashing: reference/odroid/flashing.md
+        - 'Resize Partition': reference/odroid/resize_partition.md
+    - Pixhawk:
+        - Serial Communication: reference/pixhawk/serial_communication.md
+    - Pointgrey:
+        - Install: reference/pointgrey/install.md
+
+theme: readthedocs
