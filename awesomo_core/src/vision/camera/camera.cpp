@@ -94,7 +94,17 @@ int Camera::shutdown(void) {
   }
 }
 
+int Camera::changeMode(std::string mode) {
+  if (this->configs.find(mode) == this->configs.end()) {
+    return -1;
+  }
+
+  this->config = this->configs[mode];
+}
+
 int Camera::getFrame(cv::Mat &image) {
+  bool change_mode;
+
   // pre-check
   if (this->configured == false) {
     return -1;
@@ -103,6 +113,13 @@ int Camera::getFrame(cv::Mat &image) {
   }
 
   this->capture->read(image);
+  if (image.cols != this->config.image_width) {
+    this->capture->set(CV_CAP_PROP_FRAME_WIDTH, this->config.image_width);
+  }
+  if (image.rows != this->config.image_height) {
+    this->capture->set(CV_CAP_PROP_FRAME_HEIGHT, this->config.image_height);
+  }
+
   return 0;
 }
 

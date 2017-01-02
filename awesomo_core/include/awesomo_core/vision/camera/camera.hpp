@@ -1,6 +1,8 @@
 #ifndef __AWESOMO_VISION_CAMERA_HPP__
 #define __AWESOMO_VISION_CAMERA_HPP__
 
+#include <algorithm>
+
 #include <yaml-cpp/yaml.h>
 
 #include <opencv2/core/core.hpp>
@@ -30,6 +32,7 @@ public:
   virtual int configure(std::string config_path);
   virtual int initialize(void);
   virtual int shutdown(void);
+  virtual int changeMode(std::string mode);
   virtual int getFrame(cv::Mat &image);
   int run(void);
   int showFPS(double &last_tic, int &frame);

@@ -26,6 +26,25 @@ TEST(Camera, configure) {
   ASSERT_EQ(0, retval);
 }
 
+TEST(Camera, changeMode) {
+  cv::Mat image;
+  awesomo::Camera camera;
+
+  camera.configure(TEST_CONFIG_PATH);
+  camera.initialize();
+
+  camera.getFrame(image);
+  ASSERT_EQ(640, image.cols);
+  ASSERT_EQ(480, image.rows);
+
+  camera.changeMode("320x240");
+
+  camera.getFrame(image);
+  camera.getFrame(image);
+  ASSERT_EQ(320, image.cols);
+  ASSERT_EQ(240, image.rows);
+}
+
 TEST(Camera, getFrame) {
   cv::Mat image;
   awesomo::Camera camera;

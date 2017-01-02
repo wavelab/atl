@@ -1,2 +1,2 @@
-modes: ["640x480"]
-configs: ["640x480.yaml"]
+modes: ["640x480", "320x240"]
+configs: ["640x480.yaml", "320x240.yaml"]
