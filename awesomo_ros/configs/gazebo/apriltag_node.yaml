@@ -1,0 +1,5 @@
+ros_node_name: "apriltag_node"
+ros_node_rate: 100
+
+# publish topics
+apriltag_pose_topic: "awesomo/apriltag/pose"

@@ -1,0 +1,20 @@
+ros_node_name: "control_node"
+ros_node_rate: 1000
+
+# publish topics
+awesomo_pos_controller_stats_topic: "/awesomo/position_controller/stats"
+awesomo_kf_stats_topic: "/awesomo/kf_estimation/stats"
+awesomo_kf_plotting_topic: "/awesomo/kf_estimation/states"
+
+# subscribe topics
+mavros_arm_topic: "/mavros/cmd/arming"
+mavros_mode_topic: "/mavros/set_mode"
+
+mavros_state_topic: "/mavros/state"
+mavros_pose_topic: "/mavros/local_position/pose"
+mavros_radio_topic: "/mavros/rc/in"
+awesomo_apriltag_topic: "/awesomo/vision/pose"
+
+mavros_setpoint_attitude_topic: "/mavros/setpoint_attitude/attitude"
+mavros_setpoint_throttle_topic: "/mavros/setpoint_attitude/att_throttle"
+mavros_setpoint_position_topic: "/mavros/setpoint_position/local"
