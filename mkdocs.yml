@@ -4,15 +4,20 @@ repo_url: https://github.com/wavelab/awesomo
 
 pages:
 - Home: index.md
-- API:
-    - apriltag: api/apriltag.md
-    - camera: api/camera.md
-    - controller: api/controller.md
-    - util: api/util.md
+- awesomo_core:
+    - apriltag: awesomo_core/api/apriltag.md
+    - camera: awesomo_core/api/camera.md
+    - controller: awesomo_core/api/controller.md
+    - util: awesomo_core/api/util.md
+- awesomo_ros:
+    - Apriltag Node: awesomo_ros/api/apriltag_node.md
+    - Camera Node: awesomo_ros/api/camera_node.md
+    - Controller Node: awesomo_ros/api/control_node.md
+    - Gimbal Node: awesomo_ros/api/gimbal_node.md
 - Reference:
     - Odriod:
         - Flashing: reference/odroid/flashing.md
-        - 'Resize Partition': reference/odroid/resize_partition.md
+        - Resize Partition: reference/odroid/resize_partition.md
     - Pixhawk:
         - Serial Communication: reference/pixhawk/serial_communication.md
     - Pointgrey:

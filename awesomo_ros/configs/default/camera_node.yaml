@@ -1,5 +1,0 @@
-ros_node_name: "camera_node"
-ros_node_rate: 100
-
-# publish topics
-camera_image_topic: "awesomo/camera/image"

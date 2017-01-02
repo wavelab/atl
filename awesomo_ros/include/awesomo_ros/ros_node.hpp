@@ -46,6 +46,8 @@ public:
     this->ros_nh = new ::ros::NodeHandle();
     this->ros_rate = new ::ros::Rate(hz);
     this->configured = true;
+
+    return 0;
   }
 
   template <typename M>

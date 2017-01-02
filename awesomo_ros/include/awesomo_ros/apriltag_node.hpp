@@ -11,8 +11,6 @@
 #include "awesomo_ros/ros_node.hpp"
 #include "awesomo_ros/ros_msgs.hpp"
 
-#include "awesomo_ros/camera_node.hpp"
-
 
 namespace awesomo {
 
@@ -20,6 +18,8 @@ namespace awesomo {
 #define APRILTAG_NODE_RATE 100
 
 #define APRILTAG_POSE_TOPIC "awesomo/apriltag/pose"
+
+#define CAMERA_IMAGE_TOPIC "awesomo/camera/image"
 
 class AprilTagNode : public ROSNode {
 public:

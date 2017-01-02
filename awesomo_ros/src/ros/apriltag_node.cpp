@@ -3,15 +3,18 @@
 namespace awesomo {
 
 int AprilTagNode::configure(const std::string &node_name, int hz) {
-  std::string config_file;
+  std::string apriltag_config;
 
   // ros node
-  ROSNode::configure(node_name, hz);
+  if (ROSNode::configure(node_name, hz) != 0) {
+    return -1;
+  }
 
   // detector
-  this->ros_nh->getParam("/apriltag_config", config_file);
-  if (this->detector.configure(config_file) != 0) {
-    return -1;
+  this->ros_nh->getParam("/apriltag_config", apriltag_config);
+  if (this->detector.configure(apriltag_config) != 0) {
+    ROS_ERROR("Failed to configure Swathmore Detector!");
+    return -2;
   };
 
   // subscribers and publishers
@@ -43,7 +46,12 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
 
 int main(void) {
   awesomo::AprilTagNode node;
-  node.configure(APRILTAG_NODE_NAME, APRILTAG_NODE_RATE);
+
+  if (node.configure(APRILTAG_NODE_NAME, APRILTAG_NODE_RATE) != 0) {
+    ROS_ERROR("Failed to configure AprilTag Node!");
+    return -1;
+  }
   node.loop();
+
   return 0;
 }

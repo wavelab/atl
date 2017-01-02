@@ -1,6 +1,0 @@
-ros_node_name: "gimbal_node"
-ros_node_rate: 100
-
-# publish topics
-gimbal_pose_topic: "/awesomo/gimbal/pose"
-gimbal_setpoint_attitude_topic: "/awesomo/gimbal/setpoint/attitude"

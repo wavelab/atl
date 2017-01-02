@@ -15,13 +15,15 @@ int ControlNode::configure(const std::string node_name, int hz) {
   std::string config_path;
 
   // ros node
-  ROSNode::configure(node_name, hz);
+  if (ROSNode::configure(node_name, hz) != 0) {
+    return -1;
+  }
 
   // quadrotor
   this->ros_nh->getParam("/control_config_dir", config_path);
   if (this->quadrotor.configure(config_path) != 0) {
-    log_err(FCONFQUAD);
-    return -1;
+    ROS_ERROR(FCONFQUAD);
+    return -2;
   }
 
   // services

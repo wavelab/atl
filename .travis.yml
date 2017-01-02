@@ -17,12 +17,12 @@ script:
     - source ~/catkin_ws/devel/setup.bash
     - rosrun awesomo_core awesomo_tests --gtest_filter=-Camera.getFrame --silence-stdcout
 
-#after_success:
-#    - cd -
-#    - sudo pip install mkdocs
-#    - mkdocs build
-#    - git add site && git commit -m "Update docs"
-#    - git subtree push --prefix site origin gh-pages
+after_success:
+   - cd -
+   - sudo pip install mkdocs
+   - mkdocs build
+   - git add site && git commit -m "Update docs"
+   - git subtree push --prefix site origin gh-pages
 
 notifications:
     recipients:

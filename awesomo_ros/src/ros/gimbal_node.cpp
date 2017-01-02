@@ -10,12 +10,15 @@ int GimbalNode::configure(std::string node_name, int hz) {
   std::string config_file;
 
   // ros node
-  ROSNode::configure(node_name, hz);
+  if (ROSNode::configure(node_name, hz) != 0) {
+    return -1;
+  }
 
   // gimbal
   this->ros_nh->getParam("/gimbal_config", config_file);
   if (this->gimbal.configure(config_file) != 0) {
-    return -1;
+    ROS_ERROR("Failed to configure Gimal!");
+    return -2;
   };
 
   // loop callback
@@ -35,7 +38,6 @@ int GimbalNode::loopCallback(void) {
 int main(int argc, char **argv) {
   awesomo::GimbalNode node;
 
-  // configure and loop
   if (node.configure(GIMBAL_NODE_NAME, GIMBAL_NODE_RATE) != 0) {
     ROS_ERROR("Failed to configure GimbalNode!");
     return -1;
