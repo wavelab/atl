@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta name="author" content="Chris Choi, Stan Brown">
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>controller - awesomo</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/highlight.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "controller";
+    var mkdocs_page_input_path = "api/controller.md";
+    var mkdocs_page_url = "/api/controller/";
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js"></script>
+  <script src="../../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../../js/highlight.pack.js"></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> awesomo</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../..">Home</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <ul class="subnav">
+    <li><span>API</span></li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../apriltag/">apriltag</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../camera/">camera</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 current">
+        <a class="current" href="./">controller</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#controllerhpp">controller.hpp</a></li>
+                
+                    <li><a class="toctree-l4" href="#structures">Structures</a></li>
+                
+                    <li><a class="toctree-l4" href="#classes">Classes</a></li>
+                
+            
+            </ul>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../util/">util</a>
+        
+    </li>
+
+        
+    </ul>
+<li>
+          
+            <li>
+    <ul class="subnav">
+    <li><span>Reference</span></li>
+
+        
+            
+    <ul class="subnav">
+    <li><span>Odriod</span></li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../reference/odroid/flashing/">Flashing</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../reference/odroid/resize_partition/">Resize Partition</a>
+        
+    </li>
+
+        
+    </ul>
+
+        
+            
+    <ul class="subnav">
+    <li><span>Pixhawk</span></li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../reference/pixhawk/serial_communication/">Serial Communication</a>
+        
+    </li>
+
+        
+    </ul>
+
+        
+            
+    <ul class="subnav">
+    <li><span>Pointgrey</span></li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../reference/pointgrey/install/">Install</a>
+        
+    </li>
+
+        
+    </ul>
+
+        
+    </ul>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">awesomo</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>API &raquo;</li>
+        
+      
+    
+    <li>controller</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/wavelab/awesomo/edit/master/docs/api/controller.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="controllerhpp">controller.hpp</h1>
+<ul>
+<li>Structures</li>
+<li>Classes</li>
+</ul>
+<h2 id="structures">Structures</h2>
+<pre><code>struct pid
+{
+    int sample_rate;
+
+    float setpoint;
+    float output;
+
+    float prev_error;
+    float sum_error;
+
+    float p_error;
+    float i_error;
+    float d_error;
+
+    float k_p;
+    float k_i;
+    float k_d;
+
+    float dead_zone;
+    float min;
+    float max;
+};
+</code></pre>
+<h2 id="classes">Classes</h2>
+<ul>
+<li>CarrotController</li>
+<li>PositionController</li>
+</ul>
+<h3 id="carrotcontroller">CarrotController</h3>
+<h4 id="attributes">Attributes</h4>
+<ul>
+<li><code>std::deque&lt;Eigen::Vector3d&gt; waypoints</code></li>
+<li><code>int initialized</code></li>
+<li><code>double look_ahead_dist</code></li>
+<li><code>double wp_threshold</code></li>
+<li><code>Eigen::Vector3d wp_start</code></li>
+<li><code>Eigen::Vector3d wp_end</code></li>
+</ul>
+<h4 id="constructors">Constructors</h4>
+<pre><code>CarrotController();
+CarrotController(
+    std::deque&lt;Eigen::Vector3d&gt; waypoints,
+    double look_ahead_dist,
+    double wp_threshold
+);
+CarrotController(std::string config_file_path);
+</code></pre>
+<h4 id="methods">Methods</h4>
+<pre><code>Eigen::Vector3d closestPoint(
+    Eigen::Vector3d position,
+    Eigen::Vector3d wp_start,
+    Eigen::Vector3d wp_end
+);
+</code></pre>
+<p>Calculates the closest point on the trajectory line formed by <code>wp_start</code> and
+<code>wp_end</code> relative to <code>position</code>.</p>
+<hr />
+<pre><code>Eigen::Vector3d calculateCarrotPoint(
+    Eigen::Vector3d position,
+    double r,
+    Eigen::Vector3d wp_start,
+    Eigen::Vector3d wp_end
+);
+</code></pre>
+<p>Calculate new carrot point based on <code>position</code>, look ahead distance <code>r</code> and
+trajectory line formed by <code>wp_start</code> and <code>wp_end</code>.</p>
+<hr />
+<pre><code>int waypointReached(
+    Eigen::Vector3d position,
+    Eigen::Vector3d waypoint,
+    double threshold
+);
+</code></pre>
+<p>Returns <code>0</code> or <code>1</code> to denote whether waypoint has been reached.</p>
+<hr />
+<pre><code>int update(Eigen::Vector3d position, Eigen::Vector3d &amp;carrot);
+</code></pre>
+<p>This method is meant to be executed within a loop that constantly updates the
+robot's <code>position</code>, where <code>carrot</code> is the carrot point to be updated. Returns
+<code>0</code> or <code>-1</code> for success or failure.</p>
+<hr />
+<h3 id="positioncontroller">PositionController</h3>
+<h4 id="attribute">Attribute</h4>
+<ul>
+<li><code>struct pid x</code></li>
+<li><code>struct pid y</code></li>
+<li><code>struct pid T</code></li>
+<li><code>float roll</code></li>
+<li><code>float pitch</code></li>
+<li><code>float throttle</code></li>
+<li><code>float hover_throttle</code></li>
+<li><code>tf::Quaternion rpy_quat</code></li>
+<li><code>float dt</code></li>
+</ul>
+<h4 id="constructor">Constructor</h4>
+<pre><code>PositionController(const std::string config_file);
+</code></pre>
+<h4 id="methods_1">Methods</h4>
+<pre><code>void loadConfig(const std::string config_file);
+</code></pre>
+<p>Load <code>config_file</code> where it defines the position controller configurations.</p>
+<hr />
+<pre><code>void calculate(Pose p);
+</code></pre>
+<p>Calculates new <code>PositionController::roll</code>, <code>PositionController::pitch</code> and
+<code>PositionController::throttle</code> values for the inner loop (atitude controller),
+based on the robot's current pose <code>p</code>.</p>
+<hr />
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../util/" class="btn btn-neutral float-right" title="util">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../camera/" class="btn btn-neutral" title="camera"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+    
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/wavelab/awesomo" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../camera/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../util/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script src="../../js/theme.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta name="author" content="Chris Choi, Stan Brown">
+  <link rel="shortcut icon" href="../../../img/favicon.ico">
+  <title>Serial Communication - awesomo</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../../../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../../../css/highlight.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Serial Communication";
+    var mkdocs_page_input_path = "reference/pixhawk/serial_communication.md";
+    var mkdocs_page_url = "/reference/pixhawk/serial_communication/";
+  </script>
+  
+  <script src="../../../js/jquery-2.1.1.min.js"></script>
+  <script src="../../../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../../../js/highlight.pack.js"></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="../../.." class="icon icon-home"> awesomo</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../../..">Home</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <ul class="subnav">
+    <li><span>API</span></li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../api/apriltag/">apriltag</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../api/camera/">camera</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../api/controller/">controller</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../api/util/">util</a>
+        
+    </li>
+
+        
+    </ul>
+<li>
+          
+            <li>
+    <ul class="subnav">
+    <li><span>Reference</span></li>
+
+        
+            
+    <ul class="subnav">
+    <li><span>Odriod</span></li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../odroid/flashing/">Flashing</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../odroid/resize_partition/">Resize Partition</a>
+        
+    </li>
+
+        
+    </ul>
+
+        
+            
+    <ul class="subnav">
+    <li><span>Pixhawk</span></li>
+
+        
+            
+    <li class="toctree-l1 current">
+        <a class="current" href="./">Serial Communication</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#pixhawk-serial-communication">Pixhawk Serial Communication</a></li>
+                
+                    <li><a class="toctree-l4" href="#ftdi-to-pixhawk-serial-45-pinout">FTDI to Pixhawk Serial 4/5 pinout</a></li>
+                
+                    <li><a class="toctree-l4" href="#connect-to-pixhawk-via-serial">Connect to Pixhawk via Serial</a></li>
+                
+            
+            </ul>
+        
+    </li>
+
+        
+    </ul>
+
+        
+            
+    <ul class="subnav">
+    <li><span>Pointgrey</span></li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../pointgrey/install/">Install</a>
+        
+    </li>
+
+        
+    </ul>
+
+        
+    </ul>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../..">awesomo</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Reference &raquo;</li>
+        
+      
+        
+          <li>Pixhawk &raquo;</li>
+        
+      
+    
+    <li>Serial Communication</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/wavelab/awesomo/edit/master/docs/reference/pixhawk/serial_communication.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="pixhawk-serial-communication">Pixhawk Serial Communication</h1>
+<p>Pixhawk has a system console allows low-level access to the system, debug
+output and analysis of the system boot process. The most robost method is to
+communicate via serial, by using a USB FTDI (connected to the computer) to
+Pixhawk's serial port (aka UART port; Serial 4/5 port)</p>
+<p><strong>Note: check which version of the pixhawk you have, you can find out by opening
+the enclosure of the pixhawk and find the version number on the PCB. (see image
+below)</strong></p>
+<p><img alt="Pixhawk Version" src="../images/pixhawk_version_example.png" /></p>
+<h2 id="ftdi-to-pixhawk-serial-45-pinout">FTDI to Pixhawk Serial 4/5 pinout</h2>
+<p><img alt="FTDI to Pixhawk Serial 4/5 pinout" src="../images/pixhawk_uart_communication.png" /></p>
+<h2 id="connect-to-pixhawk-via-serial">Connect to Pixhawk via Serial</h2>
+<p>Assuming you are using Linux (which you should), you can communicate via serial
+using the <code>screen</code> command.</p>
+<pre><code># install GNU Screen if you don't have it (Ubuntu/Debian)
+sudo apt-get install screen
+
+# connect to Pixhawk, assuming the FTDI board or cable is connected to
+# /dev/ttyUSB0 with baud rate of 57600 and 8bits No parity
+screen /dev/ttyUSB0 57600 8N1
+</code></pre>
+<p><strong>VERY IMPORTANT NOTE: You may get a blank screen upon successful execution, press the
+"Enter" key three times to activate the USB on the pixhawk, then you
+should get the following output</strong></p>
+<pre><code>nsh &gt;
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../../pointgrey/install/" class="btn btn-neutral float-right" title="Install">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../../odroid/resize_partition/" class="btn btn-neutral" title="Resize Partition"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+    
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/wavelab/awesomo" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../../odroid/resize_partition/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../../pointgrey/install/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script src="../../../js/theme.js"></script>
+
+</body>
+</html>
