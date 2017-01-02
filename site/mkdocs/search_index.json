@@ -21,174 +21,249 @@
             "title": "Licence"
         }, 
         {
-            "location": "/api/apriltag/", 
+            "location": "/awesomo_core/api/apriltag/", 
             "text": "apriltag.hpp\n\n\nClasses\n:\n- TagPose\n- TagDetector\n\n\nTagPose\n\n\nAttributes\n:\n\n\n\n\nint id\n\n\ndouble distance\n\n\ndouble yaw\n\n\ndouble pitch\n\n\ndouble roll\n\n\nEigen::Vector3d translation\n\n\n\n\nTagDetector\n\n\nConstructors\n\n\nTagDetector(void)\nTagDetector(int apriltag_imshow)\n\n\n\nMethods\n\n\nvoid adjustROI(cv::Mat \nimage_gray, AprilTags::TagDetection \ntag)\n\n\n\nAdjust the Region of Interest (ROI) within \nimage_gray\n with \ntag\n detected.\nThis essentially blacks out the whole image apart from the detected Apriltag.\nThe intuition is to decrease the image area where the apriltag library has to\nfind the Apriltag.\n\n\n\n\nstd::vector\nTagPose\n processImage\n    cv::Mat \ncamera_matrix,\n    cv::Mat \nimage,\n    int \ntimeout\n);\n\n\n\nProcess image frame \nimage\n and uses \ncamera_matrix\n to estimate the Apriltags\nif any was detected. The \ntimeout\n argument is used to keep track how many\nimage frames where Apriltags was not detected.\n\n\n\n\nTagPose obtainPose(\n    AprilTags::TagDetection \ndetection,\n    cv::Mat camera_matrix\n)\n\n\n\nObtain Apriltag pose from detected tag \ndetection\n and \ncamera_matrix\n.\n\n\n\n\nvoid printDetection(\n    AprilTags::TagDetection \ndetection,\n    cv::Mat camera_matrix\n)\n\n\n\nPrint detected apriltags.", 
             "title": "apriltag"
         }, 
         {
-            "location": "/api/apriltag/#apriltaghpp", 
+            "location": "/awesomo_core/api/apriltag/#apriltaghpp", 
             "text": "Classes :\n- TagPose\n- TagDetector", 
             "title": "apriltag.hpp"
         }, 
         {
-            "location": "/api/apriltag/#tagpose", 
+            "location": "/awesomo_core/api/apriltag/#tagpose", 
             "text": "Attributes :   int id  double distance  double yaw  double pitch  double roll  Eigen::Vector3d translation", 
             "title": "TagPose"
         }, 
         {
-            "location": "/api/apriltag/#tagdetector", 
+            "location": "/awesomo_core/api/apriltag/#tagdetector", 
             "text": "", 
             "title": "TagDetector"
         }, 
         {
-            "location": "/api/apriltag/#constructors", 
+            "location": "/awesomo_core/api/apriltag/#constructors", 
             "text": "TagDetector(void)\nTagDetector(int apriltag_imshow)", 
             "title": "Constructors"
         }, 
         {
-            "location": "/api/apriltag/#methods", 
+            "location": "/awesomo_core/api/apriltag/#methods", 
             "text": "void adjustROI(cv::Mat  image_gray, AprilTags::TagDetection  tag)  Adjust the Region of Interest (ROI) within  image_gray  with  tag  detected.\nThis essentially blacks out the whole image apart from the detected Apriltag.\nThe intuition is to decrease the image area where the apriltag library has to\nfind the Apriltag.   std::vector TagPose  processImage\n    cv::Mat  camera_matrix,\n    cv::Mat  image,\n    int  timeout\n);  Process image frame  image  and uses  camera_matrix  to estimate the Apriltags\nif any was detected. The  timeout  argument is used to keep track how many\nimage frames where Apriltags was not detected.   TagPose obtainPose(\n    AprilTags::TagDetection  detection,\n    cv::Mat camera_matrix\n)  Obtain Apriltag pose from detected tag  detection  and  camera_matrix .   void printDetection(\n    AprilTags::TagDetection  detection,\n    cv::Mat camera_matrix\n)  Print detected apriltags.", 
             "title": "Methods"
         }, 
         {
-            "location": "/api/camera/", 
+            "location": "/awesomo_core/api/camera/", 
             "text": "camera.hpp\n\n\nClasses\n:\n- CameraConfig\n- Camera\n\n\nCameraConfig\n\n\nThis class is mainly used as a data container to store the camera\nproperties, such as image width, image height, camera matrix, etc.\n\n\nAttributes\n\n\n\n\nint camera_mode\n\n\nint image_width\n\n\nint image_height\n\n\ncv::Mat camera_matrix\n\n\ncv::Mat rectification_matrix\n\n\ncv::Mat distortion_coefficients\n\n\ncv::Mat projection_matrix\n\n\n\n\nCamera\n\n\nThis class provides the functionalty to connect to any normal OpenCV compatible\ncamera as well as a PointGrey FireFly camera. In addition to obtaining camera\naccess it also performs AprilTag detection where the pose estimates are store\nin \nCamera::pose_estimates\n.\n\n\nAttributes\n\n\n\n\nvector\nAprilTags::TagDetection\n apriltags\n\n\nstd::vector\nTagPose\n pose_estimates\n\n\n\n\nConstructor\n\n\n\n\nCamera(int camera_index, int camera_type)\n\n\nCamera(std::string camera_config_path)\n\n\n\n\nMethods\n\n\nint initCamera(std::string camera_mode)\n\n\n\nInitialize Camera to be ready to start getting images from the camera. This\nmethod does not get images from camera yet, for that look at \nCamera::run()\n or\n\nCamera::step()\n.\n\n\nThere are two accepted \ncamera_mode\n values:\n- firefly\n- normal\n\n\n\n\nCameraConfig *loadConfig(std::string mode, const std::string calib_file)\n\n\n\nLoad the configuration into the camera class where \nmode\n is the key or name of\nthe mode, and \ncalib_file\n is the path to the camera calibration file (yaml)\nproduced by ROS's \ncamera_calibration\n package.\n\n\n\n\nint loadConfig(std::string camera_mode)\n\n\n\nThis overloaded method differs from the above method in that this is meant to\nbe called to change the incoming image size dynamically. Where \ncamera_mode\n is\nthe key / name used to load the camera calibration file.\n\n\n\n\nint getFrame(cv::Mat \nimage)\n\n\n\nObtains a single image frame from the camera, the captured image will be set to\n\nimage\n. Returns \n0\n or \n-1\n to denote success or failure.\n\n\n\n\nint run(void)\n\n\n\nRun Camera and attempt to detect any Apriltags. The AprilTags detected will be\nrecorded in \nCamera::apriltags\n.\n\n\n\n\nstd::vector\nTagPose\n step(int \ntimeout)\n\n\n\nStep differs to \nCamera::run()\n where it only obatins a single image frame and\nperforms apriltag detection on that same image frame and returns a vector of\n\nTagPose\n objects if any apriltag is detected. \ntimeout\n is an integer\ndenoting the number of image frames where an apriltag was not detected.", 
             "title": "camera"
         }, 
         {
-            "location": "/api/camera/#camerahpp", 
+            "location": "/awesomo_core/api/camera/#camerahpp", 
             "text": "Classes :\n- CameraConfig\n- Camera", 
             "title": "camera.hpp"
         }, 
         {
-            "location": "/api/camera/#cameraconfig", 
+            "location": "/awesomo_core/api/camera/#cameraconfig", 
             "text": "This class is mainly used as a data container to store the camera\nproperties, such as image width, image height, camera matrix, etc.", 
             "title": "CameraConfig"
         }, 
         {
-            "location": "/api/camera/#attributes", 
+            "location": "/awesomo_core/api/camera/#attributes", 
             "text": "int camera_mode  int image_width  int image_height  cv::Mat camera_matrix  cv::Mat rectification_matrix  cv::Mat distortion_coefficients  cv::Mat projection_matrix", 
             "title": "Attributes"
         }, 
         {
-            "location": "/api/camera/#camera", 
+            "location": "/awesomo_core/api/camera/#camera", 
             "text": "This class provides the functionalty to connect to any normal OpenCV compatible\ncamera as well as a PointGrey FireFly camera. In addition to obtaining camera\naccess it also performs AprilTag detection where the pose estimates are store\nin  Camera::pose_estimates .", 
             "title": "Camera"
         }, 
         {
-            "location": "/api/camera/#attributes_1", 
+            "location": "/awesomo_core/api/camera/#attributes_1", 
             "text": "vector AprilTags::TagDetection  apriltags  std::vector TagPose  pose_estimates", 
             "title": "Attributes"
         }, 
         {
-            "location": "/api/camera/#constructor", 
+            "location": "/awesomo_core/api/camera/#constructor", 
             "text": "Camera(int camera_index, int camera_type)  Camera(std::string camera_config_path)", 
             "title": "Constructor"
         }, 
         {
-            "location": "/api/camera/#methods", 
+            "location": "/awesomo_core/api/camera/#methods", 
             "text": "int initCamera(std::string camera_mode)  Initialize Camera to be ready to start getting images from the camera. This\nmethod does not get images from camera yet, for that look at  Camera::run()  or Camera::step() .  There are two accepted  camera_mode  values:\n- firefly\n- normal   CameraConfig *loadConfig(std::string mode, const std::string calib_file)  Load the configuration into the camera class where  mode  is the key or name of\nthe mode, and  calib_file  is the path to the camera calibration file (yaml)\nproduced by ROS's  camera_calibration  package.   int loadConfig(std::string camera_mode)  This overloaded method differs from the above method in that this is meant to\nbe called to change the incoming image size dynamically. Where  camera_mode  is\nthe key / name used to load the camera calibration file.   int getFrame(cv::Mat  image)  Obtains a single image frame from the camera, the captured image will be set to image . Returns  0  or  -1  to denote success or failure.   int run(void)  Run Camera and attempt to detect any Apriltags. The AprilTags detected will be\nrecorded in  Camera::apriltags .   std::vector TagPose  step(int  timeout)  Step differs to  Camera::run()  where it only obatins a single image frame and\nperforms apriltag detection on that same image frame and returns a vector of TagPose  objects if any apriltag is detected.  timeout  is an integer\ndenoting the number of image frames where an apriltag was not detected.", 
             "title": "Methods"
         }, 
         {
-            "location": "/api/controller/", 
+            "location": "/awesomo_core/api/controller/", 
             "text": "controller.hpp\n\n\n\n\nStructures\n\n\nClasses\n\n\n\n\nStructures\n\n\nstruct pid\n{\n    int sample_rate;\n\n    float setpoint;\n    float output;\n\n    float prev_error;\n    float sum_error;\n\n    float p_error;\n    float i_error;\n    float d_error;\n\n    float k_p;\n    float k_i;\n    float k_d;\n\n    float dead_zone;\n    float min;\n    float max;\n};\n\n\n\nClasses\n\n\n\n\nCarrotController\n\n\nPositionController\n\n\n\n\nCarrotController\n\n\nAttributes\n\n\n\n\nstd::deque\nEigen::Vector3d\n waypoints\n\n\nint initialized\n\n\ndouble look_ahead_dist\n\n\ndouble wp_threshold\n\n\nEigen::Vector3d wp_start\n\n\nEigen::Vector3d wp_end\n\n\n\n\nConstructors\n\n\nCarrotController();\nCarrotController(\n    std::deque\nEigen::Vector3d\n waypoints,\n    double look_ahead_dist,\n    double wp_threshold\n);\nCarrotController(std::string config_file_path);\n\n\n\nMethods\n\n\nEigen::Vector3d closestPoint(\n    Eigen::Vector3d position,\n    Eigen::Vector3d wp_start,\n    Eigen::Vector3d wp_end\n);\n\n\n\nCalculates the closest point on the trajectory line formed by \nwp_start\n and\n\nwp_end\n relative to \nposition\n.\n\n\n\n\nEigen::Vector3d calculateCarrotPoint(\n    Eigen::Vector3d position,\n    double r,\n    Eigen::Vector3d wp_start,\n    Eigen::Vector3d wp_end\n);\n\n\n\nCalculate new carrot point based on \nposition\n, look ahead distance \nr\n and\ntrajectory line formed by \nwp_start\n and \nwp_end\n.\n\n\n\n\nint waypointReached(\n    Eigen::Vector3d position,\n    Eigen::Vector3d waypoint,\n    double threshold\n);\n\n\n\nReturns \n0\n or \n1\n to denote whether waypoint has been reached.\n\n\n\n\nint update(Eigen::Vector3d position, Eigen::Vector3d \ncarrot);\n\n\n\nThis method is meant to be executed within a loop that constantly updates the\nrobot's \nposition\n, where \ncarrot\n is the carrot point to be updated. Returns\n\n0\n or \n-1\n for success or failure.\n\n\n\n\nPositionController\n\n\nAttribute\n\n\n\n\nstruct pid x\n\n\nstruct pid y\n\n\nstruct pid T\n\n\nfloat roll\n\n\nfloat pitch\n\n\nfloat throttle\n\n\nfloat hover_throttle\n\n\ntf::Quaternion rpy_quat\n\n\nfloat dt\n\n\n\n\nConstructor\n\n\nPositionController(const std::string config_file);\n\n\n\nMethods\n\n\nvoid loadConfig(const std::string config_file);\n\n\n\nLoad \nconfig_file\n where it defines the position controller configurations.\n\n\n\n\nvoid calculate(Pose p);\n\n\n\nCalculates new \nPositionController::roll\n, \nPositionController::pitch\n and\n\nPositionController::throttle\n values for the inner loop (atitude controller),\nbased on the robot's current pose \np\n.", 
             "title": "controller"
         }, 
         {
-            "location": "/api/controller/#controllerhpp", 
+            "location": "/awesomo_core/api/controller/#controllerhpp", 
             "text": "Structures  Classes", 
             "title": "controller.hpp"
         }, 
         {
-            "location": "/api/controller/#structures", 
+            "location": "/awesomo_core/api/controller/#structures", 
             "text": "struct pid\n{\n    int sample_rate;\n\n    float setpoint;\n    float output;\n\n    float prev_error;\n    float sum_error;\n\n    float p_error;\n    float i_error;\n    float d_error;\n\n    float k_p;\n    float k_i;\n    float k_d;\n\n    float dead_zone;\n    float min;\n    float max;\n};", 
             "title": "Structures"
         }, 
         {
-            "location": "/api/controller/#classes", 
+            "location": "/awesomo_core/api/controller/#classes", 
             "text": "CarrotController  PositionController", 
             "title": "Classes"
         }, 
         {
-            "location": "/api/controller/#carrotcontroller", 
+            "location": "/awesomo_core/api/controller/#carrotcontroller", 
             "text": "", 
             "title": "CarrotController"
         }, 
         {
-            "location": "/api/controller/#attributes", 
+            "location": "/awesomo_core/api/controller/#attributes", 
             "text": "std::deque Eigen::Vector3d  waypoints  int initialized  double look_ahead_dist  double wp_threshold  Eigen::Vector3d wp_start  Eigen::Vector3d wp_end", 
             "title": "Attributes"
         }, 
         {
-            "location": "/api/controller/#constructors", 
+            "location": "/awesomo_core/api/controller/#constructors", 
             "text": "CarrotController();\nCarrotController(\n    std::deque Eigen::Vector3d  waypoints,\n    double look_ahead_dist,\n    double wp_threshold\n);\nCarrotController(std::string config_file_path);", 
             "title": "Constructors"
         }, 
         {
-            "location": "/api/controller/#methods", 
+            "location": "/awesomo_core/api/controller/#methods", 
             "text": "Eigen::Vector3d closestPoint(\n    Eigen::Vector3d position,\n    Eigen::Vector3d wp_start,\n    Eigen::Vector3d wp_end\n);  Calculates the closest point on the trajectory line formed by  wp_start  and wp_end  relative to  position .   Eigen::Vector3d calculateCarrotPoint(\n    Eigen::Vector3d position,\n    double r,\n    Eigen::Vector3d wp_start,\n    Eigen::Vector3d wp_end\n);  Calculate new carrot point based on  position , look ahead distance  r  and\ntrajectory line formed by  wp_start  and  wp_end .   int waypointReached(\n    Eigen::Vector3d position,\n    Eigen::Vector3d waypoint,\n    double threshold\n);  Returns  0  or  1  to denote whether waypoint has been reached.   int update(Eigen::Vector3d position, Eigen::Vector3d  carrot);  This method is meant to be executed within a loop that constantly updates the\nrobot's  position , where  carrot  is the carrot point to be updated. Returns 0  or  -1  for success or failure.", 
             "title": "Methods"
         }, 
         {
-            "location": "/api/controller/#positioncontroller", 
+            "location": "/awesomo_core/api/controller/#positioncontroller", 
             "text": "", 
             "title": "PositionController"
         }, 
         {
-            "location": "/api/controller/#attribute", 
+            "location": "/awesomo_core/api/controller/#attribute", 
             "text": "struct pid x  struct pid y  struct pid T  float roll  float pitch  float throttle  float hover_throttle  tf::Quaternion rpy_quat  float dt", 
             "title": "Attribute"
         }, 
         {
-            "location": "/api/controller/#constructor", 
+            "location": "/awesomo_core/api/controller/#constructor", 
             "text": "PositionController(const std::string config_file);", 
             "title": "Constructor"
         }, 
         {
-            "location": "/api/controller/#methods_1", 
+            "location": "/awesomo_core/api/controller/#methods_1", 
             "text": "void loadConfig(const std::string config_file);  Load  config_file  where it defines the position controller configurations.   void calculate(Pose p);  Calculates new  PositionController::roll ,  PositionController::pitch  and PositionController::throttle  values for the inner loop (atitude controller),\nbased on the robot's current pose  p .", 
             "title": "Methods"
         }, 
         {
-            "location": "/api/util/", 
+            "location": "/awesomo_core/api/util/", 
             "text": "util.hpp\n\n\nContent\n:\n- Classes\n- Functions\n\n\nClasses\n\n\n\n\nPose\n\n\nPosition\n\n\n\n\nPose\n\n\nAttributes\n\n\n\n\ndouble x\n\n\ndouble y\n\n\ndouble z\n\n\ndouble roll\n\n\ndouble pitch\n\n\ndouble yaw\n\n\n\n\nPosition\n\n\nAttributes\n\n\n\n\ndouble x;\n\n\ndouble y;\n\n\ndouble z;\n\n\n\n\nFunctions\n\n\ndouble deg2rad(double d);\n\n\n\nConvert degrees \nd\n to radians.\n\n\n\n\ndouble rad2deg(double r);\n\n\n\nConvert radians \nr\n to degrees.\n\n\n\n\nint euler2Quaternion(\n    const double roll,\n    const double pitch,\n    const double yaw,\n    Eigen::Quaterniond \nq\n);\n\n\n\nConvert Euler angles in radians to quaternions \nq\n. Returns \n0\n or \n-1\n to\ndenote success or failure.\n\n\n\n\nint euler2RotationMatrix(\n    const double roll,\n    const double pitch,\n    const double yaw,\n    Eigen::Matrix3d \nrot\n);\n\n\n\nConvert Euler angles in radians to rotation matrix \nrot\n. Returns \n0\n or \n-1\n to\ndenote success or failure.\n\n\n\n\ntf::Quaternion euler2quat(double roll, double pitch, double yaw);\n\n\n\nConvert Euler angles in radians to quaternions, the difference to\n\neuler2Quaternion\n is this function returns a \ntf::Quaternion\n instead of\na \nEigen::Quaterniond\n.\n\n\n\n\nvoid quat2euler(\n    const geometry_msgs::Quaternion \nq,\n    double *roll,\n    double *pitch,\n    double *yaw\n);\n\n\n\nConvert quaternion to Euler angles in radians.", 
             "title": "util"
         }, 
         {
-            "location": "/api/util/#utilhpp", 
+            "location": "/awesomo_core/api/util/#utilhpp", 
             "text": "Content :\n- Classes\n- Functions", 
             "title": "util.hpp"
         }, 
         {
-            "location": "/api/util/#classes", 
+            "location": "/awesomo_core/api/util/#classes", 
             "text": "Pose  Position", 
             "title": "Classes"
         }, 
         {
-            "location": "/api/util/#pose", 
+            "location": "/awesomo_core/api/util/#pose", 
             "text": "", 
             "title": "Pose"
         }, 
         {
-            "location": "/api/util/#attributes", 
+            "location": "/awesomo_core/api/util/#attributes", 
             "text": "double x  double y  double z  double roll  double pitch  double yaw", 
             "title": "Attributes"
         }, 
         {
-            "location": "/api/util/#position", 
+            "location": "/awesomo_core/api/util/#position", 
             "text": "", 
             "title": "Position"
         }, 
         {
-            "location": "/api/util/#attributes_1", 
+            "location": "/awesomo_core/api/util/#attributes_1", 
             "text": "double x;  double y;  double z;", 
             "title": "Attributes"
         }, 
         {
-            "location": "/api/util/#functions", 
+            "location": "/awesomo_core/api/util/#functions", 
             "text": "double deg2rad(double d);  Convert degrees  d  to radians.   double rad2deg(double r);  Convert radians  r  to degrees.   int euler2Quaternion(\n    const double roll,\n    const double pitch,\n    const double yaw,\n    Eigen::Quaterniond  q\n);  Convert Euler angles in radians to quaternions  q . Returns  0  or  -1  to\ndenote success or failure.   int euler2RotationMatrix(\n    const double roll,\n    const double pitch,\n    const double yaw,\n    Eigen::Matrix3d  rot\n);  Convert Euler angles in radians to rotation matrix  rot . Returns  0  or  -1  to\ndenote success or failure.   tf::Quaternion euler2quat(double roll, double pitch, double yaw);  Convert Euler angles in radians to quaternions, the difference to euler2Quaternion  is this function returns a  tf::Quaternion  instead of\na  Eigen::Quaterniond .   void quat2euler(\n    const geometry_msgs::Quaternion  q,\n    double *roll,\n    double *pitch,\n    double *yaw\n);  Convert quaternion to Euler angles in radians.", 
             "title": "Functions"
+        }, 
+        {
+            "location": "/awesomo_ros/api/apriltag_node/", 
+            "text": "AprilTag Node\n\n\n\n\nNode Name: \napriltag_node\n\n\nNode Rate: 100 (but actually limited to camera refresh rate)\n\n\n\n\nPublish Topics\n\n\n\n\nawesomo/apriltag/pose\n\n\n\n\nSubscribe Topics\n\n\n\n\nawesomo/camera/image", 
+            "title": "Apriltag Node"
+        }, 
+        {
+            "location": "/awesomo_ros/api/apriltag_node/#apriltag-node", 
+            "text": "Node Name:  apriltag_node  Node Rate: 100 (but actually limited to camera refresh rate)", 
+            "title": "AprilTag Node"
+        }, 
+        {
+            "location": "/awesomo_ros/api/apriltag_node/#publish-topics", 
+            "text": "awesomo/apriltag/pose", 
+            "title": "Publish Topics"
+        }, 
+        {
+            "location": "/awesomo_ros/api/apriltag_node/#subscribe-topics", 
+            "text": "awesomo/camera/image", 
+            "title": "Subscribe Topics"
+        }, 
+        {
+            "location": "/awesomo_ros/api/camera_node/", 
+            "text": "Camera Node\n\n\n\n\nNode Name: \ncamera_node\n\n\nNode Rate: 100 (but actually limited to camera refresh rate)\n\n\n\n\nPublish Topics\n\n\n\n\nawesomo/camera/image", 
+            "title": "Camera Node"
+        }, 
+        {
+            "location": "/awesomo_ros/api/camera_node/#camera-node", 
+            "text": "Node Name:  camera_node  Node Rate: 100 (but actually limited to camera refresh rate)", 
+            "title": "Camera Node"
+        }, 
+        {
+            "location": "/awesomo_ros/api/camera_node/#publish-topics", 
+            "text": "awesomo/camera/image", 
+            "title": "Publish Topics"
+        }, 
+        {
+            "location": "/awesomo_ros/api/control_node/", 
+            "text": "Control Node\n\n\n\n\nNode Name: \ncontrol_node\n\n\nNode Rate: 100\n\n\n\n\nPublish Topics\n\n\n\n\n/mavros/cmd/arming\n\n\n/mavros/set_mode\n\n\n/mavros/setpoint_attitude/attitude\n\n\n/mavros/setpoint_attitude/att_throttle\n\n\n/mavros/setpoint_position/local\n\n\n/awesomo/position_controller/stats\n\n\n/awesomo/kf_estimation/stats\n\n\n/awesomo/kf_estimation/states\n\n\n\n\nSubscribe Topics\n\n\n\n\n/mavros/state\n\n\n/mavros/local_position/pose\n\n\n/mavros/rc/in\n\n\n/awesomo/vision/pose", 
+            "title": "Controller Node"
+        }, 
+        {
+            "location": "/awesomo_ros/api/control_node/#control-node", 
+            "text": "Node Name:  control_node  Node Rate: 100", 
+            "title": "Control Node"
+        }, 
+        {
+            "location": "/awesomo_ros/api/control_node/#publish-topics", 
+            "text": "/mavros/cmd/arming  /mavros/set_mode  /mavros/setpoint_attitude/attitude  /mavros/setpoint_attitude/att_throttle  /mavros/setpoint_position/local  /awesomo/position_controller/stats  /awesomo/kf_estimation/stats  /awesomo/kf_estimation/states", 
+            "title": "Publish Topics"
+        }, 
+        {
+            "location": "/awesomo_ros/api/control_node/#subscribe-topics", 
+            "text": "/mavros/state  /mavros/local_position/pose  /mavros/rc/in  /awesomo/vision/pose", 
+            "title": "Subscribe Topics"
+        }, 
+        {
+            "location": "/awesomo_ros/api/gimbal_node/", 
+            "text": "Gimbal Node\n\n\n\n\nNode Name: \ngimbal_node\n\n\nNode Rate: 100\n\n\n\n\nPublish Topics\n\n\n\n\n/awesomo/gimbal/pose\n\n\n\n\nSubscribe Topics\n\n\n\n\n/awesomo/gimbal/setpoint/angle", 
+            "title": "Gimbal Node"
+        }, 
+        {
+            "location": "/awesomo_ros/api/gimbal_node/#gimbal-node", 
+            "text": "Node Name:  gimbal_node  Node Rate: 100", 
+            "title": "Gimbal Node"
+        }, 
+        {
+            "location": "/awesomo_ros/api/gimbal_node/#publish-topics", 
+            "text": "/awesomo/gimbal/pose", 
+            "title": "Publish Topics"
+        }, 
+        {
+            "location": "/awesomo_ros/api/gimbal_node/#subscribe-topics", 
+            "text": "/awesomo/gimbal/setpoint/angle", 
+            "title": "Subscribe Topics"
         }, 
         {
             "location": "/reference/odroid/flashing/", 
