@@ -15,7 +15,9 @@ install:
 script:
     - cd ~/catkin_ws/src/awesomo/awesomo_core
     - source ~/catkin_ws/devel/setup.bash
-    - rosrun awesomo_core awesomo_tests --gtest_filter=-Camera.getFrame,-Camera.changeMode --silence-stdcout
+    - rosrun awesomo_core awesomo_tests \
+      --gtest_filter=-Camera.getFrame:Camera.changeMode \
+      --silence-stdcout
 
 after_success:
    - cd -
