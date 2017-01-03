@@ -7,6 +7,9 @@
   <!-- publish topics -->
   <param name="camera_image_topic" type="str" value="awesomo/camera/image" />
 
+  <!-- subscribe topics -->
+  <param name="shutdown" type="str" value="awesomo/camera/shutdown" />
+
   <!-- ros node -->
   <node pkg="awesomo_ros" type="camera_node" name="camera" output="screen" />
 </launch>

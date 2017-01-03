@@ -4,11 +4,21 @@
 #include <functional>
 
 #include <ros/ros.h>
+#include <std_msgs/Bool.h>
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/CameraInfo.h>
 #include <image_transport/image_transport.h>
 
 namespace awesomo {
+
+#define INFO_DEBUG_MODE "Running in [DEBUG MODE]!"
+#define INFO_SIM_MODE "Running in [SIM MODE]!"
+#define INFO_NORMAL_MODE "Running..."
+#define INFO_PUB_INIT "Publisher [%s] initialized!"
+#define INFO_SUB_INIT "Subscriber [%s] initialized!"
+
+#define E_TOPIC "TOPIC [%s] not found in launch file!"
+#define E_SHUTDOWN_TOPIC "SHUTDOWN TOPIC [%s] not found in launch file!"
 
 class ROSNode {
 public:
@@ -60,6 +70,12 @@ public:
     return 0;
   }
 
+  void shutdownCallback(const std_msgs::Bool &msg) {
+    if (msg.data) {
+      ::ros::shutdown();
+    }
+  }
+
   int registerTopic(std::string topic_name, std::string &topic_url) {
     bool retval;
 
@@ -72,6 +88,29 @@ public:
     }
   }
 
+  int registerShutdown(std::string topic_name) {
+    bool retval;
+    std::string topic_url;
+    ::ros::Subscriber subscriber;
+
+    // pre-check
+    if (this->configured == false) {
+      return -1;
+    }
+
+    // register topic
+    retval = this->registerTopic(topic_name, topic_url);
+    if (retval != 0) {
+      ROS_ERROR(E_SHUTDOWN_TOPIC, topic_name.c_str());
+      return -1;
+    }
+
+    // register subscriber
+    ROS_INFO(INFO_SUB_INIT, topic_url.c_str());
+    subscriber = this->ros_nh->subscribe(topic_url, 1, &ROSNode::shutdownCallback, this);
+    this->ros_subs[topic_name] = subscriber;
+  }
+
   int registerImagePublisher(const std::string &topic_name) {
     std::string topic_url;
 
@@ -82,7 +121,7 @@ public:
 
     // register topic
     if (this->registerTopic(topic_name, topic_url) != 0) {
-      ROS_ERROR("TOPIC [%s] not found in launch file!", topic_name.c_str());
+      ROS_ERROR(E_TOPIC, topic_name.c_str());
       return -2;
     }
 
@@ -107,13 +146,13 @@ public:
 
     // register topic
     if (this->registerTopic(topic_name, topic_url) != 0) {
-      ROS_ERROR("TOPIC [%s] not found in launch file!", topic_name.c_str());
+      ROS_ERROR(E_TOPIC, topic_name.c_str());
       return -2;
     }
 
     // register publisher
     publisher = this->ros_nh->advertise<M>(topic_url, queue_size, latch);
-    ROS_INFO("Publisher [%s] initialized!", topic_url.c_str());
+    ROS_INFO(INFO_PUB_INIT, topic_url.c_str());
     this->ros_pubs[topic_name] = publisher;
 
     return 0;
@@ -134,12 +173,12 @@ public:
 
     // register topic
     if (this->registerTopic(topic_name, topic_url) != 0) {
-      ROS_ERROR("TOPIC [%s] not found in launch file!", topic_name.c_str());
+      ROS_ERROR(E_TOPIC, topic_name.c_str());
       return -2;
     }
 
     // register subscriber
-    ROS_INFO("Subscriber [%s] initialized!", topic_url.c_str());
+    ROS_INFO(INFO_SUB_INIT, topic_url.c_str());
     subscriber = this->ros_nh->subscribe(topic_url, queue_size, fp, obj);
     this->ros_subs[topic_name] = subscriber;
 
@@ -161,10 +200,13 @@ public:
 
     // print mode
     if (this->debug_mode) {
-      ROS_INFO("Running debug mode!");
+      ROS_INFO(INFO_DEBUG_MODE);
     }
     if (this->sim_mode) {
-      ROS_INFO("Running sim mode!");
+      ROS_INFO(INFO_SIM_MODE);
+    }
+    if (!this->debug_mode && !this->sim_mode) {
+      ROS_INFO(INFO_NORMAL_MODE);
     }
 
     // loop

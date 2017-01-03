@@ -14,6 +14,7 @@
   <param name="kf_plotting_topic" type="str" value="/awesomo/kf_estimation/plotting" />
 
   <!-- subscribe topics -->
+  <param name="shutdown" type="str" value="awesomo/control/shutdown" />
   <param name="mode_topic" type="str" value="/mavros/set_mode" />
   <param name="arm_topic" type="str" value="/mavros/cmd/arming" />
   <param name="apriltag_topic" type="str" value="/awesomo/vision/pose" />

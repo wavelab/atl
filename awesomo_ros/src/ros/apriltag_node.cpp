@@ -20,6 +20,7 @@ int AprilTagNode::configure(const std::string &node_name, int hz) {
   // subscribers and publishers
   // clang-format off
   ROSNode::registerPublisher<awesomo_msgs::AprilTagPose>("apriltag_pose_topic");
+  ROSNode::registerShutdown("shutdown");
   ROSNode::registerSubscriber("camera_pose_topic", &AprilTagNode::imageCallback, this);
   // clang-format on
 

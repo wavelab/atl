@@ -9,7 +9,8 @@
   <param name="apriltag_pose_topic" type="str" value="awesomo/apriltag/pose" />
 
   <!-- subscribe topics -->
-  <param name="camera_pose_topic" type="str" value="prototype/camera/image" />
+  <param name="shutdown" type="str" value="awesomo/apriltag/shutdown" />
+  <param name="camera_pose_topic" type="str" value="awesomo/camera/image" />
 
   <!-- node -->
   <node pkg="awesomo_ros" type="apriltag_node" name="apriltag" output="screen" />

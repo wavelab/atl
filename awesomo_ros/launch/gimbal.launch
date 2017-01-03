@@ -9,6 +9,9 @@
   <param name="gimbal_pose_topic" type="str" value="/awesomo/gimbal/pose" />
   <param name="gimbal_setpoint_attitude_topic" type="str" value="/awesomo/gimbal/setpoint/angle" />
 
+  <!-- subscribe topics -->
+  <param name="shutdown" type="str" value="awesomo/gimbal/shutdown" />
+
   <!-- node -->
   <node pkg="awesomo_ros" type="gimbal_node" name="gimbal" output="screen" />
 </launch>
