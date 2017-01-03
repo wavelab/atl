@@ -13,5 +13,5 @@
   <param name="camera_pose_topic" type="str" value="awesomo/camera/image" />
 
   <!-- node -->
-  <node pkg="awesomo_ros" type="apriltag_node" name="apriltag" output="screen" />
+  <node pkg="awesomo_ros" name="awesomo_apriltag" type="apriltag_node" output="screen" />
 </launch>

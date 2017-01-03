@@ -10,7 +10,7 @@
 
 namespace awesomo {
 
-#define GIMBAL_NODE_NAME "gimbal_node"
+#define GIMBAL_NODE_NAME "awesomo_gimbal"
 #define GIMBAL_NODE_RATE 100
 
 class GimbalNode : public ROSNode {

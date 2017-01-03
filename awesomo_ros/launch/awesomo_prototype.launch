@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- prototype -->
+  <include file="$(find prototype_ros)/launch/quadrotor.launch" />
+
+  <!-- control node -->
+  <include file="$(find awesomo_ros)/launch/control.launch" />
+  <param name="sim_mode" value="true" />
+  <param name="debug_mode" value="false" />
+  <param name="control_config_dir" value="$(find awesomo_configs)/configs/quadrotor_gazebosim" />
+
+  <!-- apriltag node -->
+  <include file="$(find awesomo_ros)/launch/apriltag.launch" />
+  <param name="sim_mode" value="true" />
+  <param name="debug_mode" value="false" />
+  <param name="camera_pose_topic" type="str" value="prototype/camera/image" />
+</launch>

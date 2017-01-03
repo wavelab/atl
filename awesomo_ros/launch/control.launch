@@ -23,5 +23,5 @@
   <param name="setpoint_position_topic" type="str" value="/mavros/setpoint_position/local" />
 
   <!-- node -->
-  <node pkg="awesomo_ros" type="control_node" name="control" output="screen" />
+  <node pkg="awesomo_ros" name="awesomo_control" type="control_node" output="screen" />
 </launch>

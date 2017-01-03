@@ -5,7 +5,6 @@ namespace awesomo {
 
 Gimbal::Gimbal(void) {
   this->configured = false;
-  this->sim_mode = false;
 
   this->sbgc = SBGC();
   this->camera_offset = Pose();
@@ -21,7 +20,6 @@ int Gimbal::configure(std::string config_file) {
   double x, y, z;
 
   // parse config file
-  parser.addParam<bool>("sim_mode", &this->sim_mode, true);
   parser.addParam<std::string>("device_path", &device_path);
   parser.addParam<double>("camera_offset.roll", &roll);
   parser.addParam<double>("camera_offset.pitch", &pitch);
@@ -41,10 +39,9 @@ int Gimbal::configure(std::string config_file) {
   }
 
   // SimpleBGC serial connection
-  if (this->sim_mode == false) {
-    this->sbgc = SBGC(device_path);
-    this->sbgc.connect();
-    this->sbgc.on();
+  this->sbgc = SBGC(device_path);
+  if (this->sbgc.connect() != 0 || this->sbgc.on() != 0) {
+    return -2;
   }
 
   // camera mount offsets
@@ -60,16 +57,39 @@ int Gimbal::configure(std::string config_file) {
 }
 
 Vec3 Gimbal::getTargetPositionInBodyFrame(Vec3 target_cf) {
-  Mat3 R = this->camera_offset.rotationMatrix();
-  Vec3 t = this->camera_offset.position;
-  return (R * target_cf + t);
+  Vec3 target_nwu;
+  Mat3 R;
+  Vec3 t;
+
+  // transform camera frame to NWU frame
+  // camera frame:  (z - forward, x - right, y - down)
+  // NWU frame:  (x - forward, y - left, z - up)
+  target_nwu(0) = target_cf(2);
+  target_nwu(1) = -target_cf(0);
+  target_nwu(2) = -target_cf(1);
+
+  // camera mount offset
+  R = this->camera_offset.rotationMatrix();
+  t = this->camera_offset.position;
+
+  // transform target from camera frame to body frame
+  return (R * target_nwu + t);
 }
 
 Vec3 Gimbal::getTargetPositionInBodyPlanarFrame(Vec3 target_cf,
                                                 Quaternion &imu_if) {
-  Mat3 R = imu_if.toRotationMatrix();
-  Vec3 p = this->getTargetPositionInBodyFrame(target_cf);
+  Vec3 p;
+  Mat3 R;
+
+  // imu is assumed to be NWU frame (same as ROS REP-103)
+  R = imu_if.toRotationMatrix();
+
+  // transform target in camera frame to body frame
+  p = this->getTargetPositionInBodyFrame(target_cf);
+
+  // transform target in camera frame to body planar frame
   this->target_bpf = R * p;
+
   return this->target_bpf;
 }
 
@@ -107,30 +127,29 @@ int Gimbal::getTargetPositionInBodyPlanarFrame(Vec3 target_cf,
   return 0;
 }
 
-int Gimbal::trackTarget(Vec3 target) {
+int Gimbal::trackTarget(Vec3 target_bpf) {
   double dist;
 
   // calculate roll pitch yaw setpoints
-  dist = target.norm();
-  this->setpoints(0) = asin(target(1) / dist);  // roll setpoint
-  this->setpoints(1) = asin(target(0) / dist);  // pitch setpoint
+  dist = target_bpf.norm();
+  this->setpoints(0) = asin(target_bpf(1) / dist);  // roll setpoint
+  this->setpoints(1) = asin(target_bpf(0) / dist);  // pitch setpoint
   this->setpoints(2) = 0.0;  // yaw setpoint - unsupported at the moment
+  // Note: setpoints are assuming Gimbal are in NWU frame
+  // NWU frame: (x - forward, y - left, z - up)
 
-  // check setpoints
-  for (int i = 0; i < 3; i++) {
-    // limit setpoints
-    if (this->setpoints(i) < this->limits[i * 2]) {
-      this->setpoints(i) = this->limits[i * 2];
-    } else if (this->setpoints(i) > this->limits[(i * 2) + 1]) {
-      this->setpoints(i) = this->limits[(i * 2) + 1];
-    }
-
-    // convert setpoints to degrees
-    setpoints(i) = rad2deg(-1.0 * setpoints(i));
-  }
-
-  // set angle
-  this->setAngle(this->setpoints(0), this->setpoints(1));
+  // // check setpoints
+  // for (int i = 0; i < 3; i++) {
+  //   // limit setpoints
+  //   if (this->setpoints(i) < this->limits[i * 2]) {
+  //     this->setpoints(i) = this->limits[i * 2];
+  //   } else if (this->setpoints(i) > this->limits[(i * 2) + 1]) {
+  //     this->setpoints(i) = this->limits[(i * 2) + 1];
+  //   }
+  // }
+  //
+  // // set angle
+  // this->setAngle(this->setpoints(0), this->setpoints(1));
 
   return 0;
 }
@@ -140,11 +159,7 @@ int Gimbal::setAngle(double roll, double pitch) {
   this->setpoints(1) = pitch;
   this->setpoints(2) = 0.0;
 
-  if (this->sim_mode == false) {
-    return this->sbgc.setAngle(roll, pitch, 0.0);
-  } else {
-    return 0;
-  }
+  return this->sbgc.setAngle(roll, pitch, 0.0);
 }
 
 void Gimbal::printSetpoints(void) {

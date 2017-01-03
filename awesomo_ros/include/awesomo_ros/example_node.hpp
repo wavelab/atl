@@ -12,7 +12,7 @@
 
 namespace awesomo {
 
-#define NODE_NAME "example_node"
+#define NODE_NAME "example"
 #define NODE_RATE 1
 
 #define SAY_TOPIC "example_node/say"

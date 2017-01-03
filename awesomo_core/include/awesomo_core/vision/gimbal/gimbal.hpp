@@ -15,7 +15,6 @@ namespace awesomo {
 class Gimbal {
 public:
   bool configured;
-  bool sim_mode;
 
   SBGC sbgc;
   Pose camera_offset;

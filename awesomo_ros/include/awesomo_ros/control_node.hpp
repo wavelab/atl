@@ -24,7 +24,7 @@
 namespace awesomo {
 
 // ROS NODE
-#define CONTROL_NODE_NAME "awesomo_node"
+#define CONTROL_NODE_NAME "awesomo_control"
 #define CONTROL_NODE_RATE 1000
 
 class ControlNode : public ROSNode {

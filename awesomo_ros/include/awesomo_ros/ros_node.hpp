@@ -11,11 +11,12 @@
 
 namespace awesomo {
 
-#define INFO_DEBUG_MODE "Running in [DEBUG MODE]!"
-#define INFO_SIM_MODE "Running in [SIM MODE]!"
-#define INFO_NORMAL_MODE "Running..."
-#define INFO_PUB_INIT "Publisher [%s] initialized!"
-#define INFO_SUB_INIT "Subscriber [%s] initialized!"
+#define INFO_CONFIG "Configuring ROS Node [%s]!"
+#define INFO_PUB_INIT "--> Publisher [%s] initialized!"
+#define INFO_SUB_INIT "--> Subscriber [%s] initialized!"
+#define INFO_DEBUG_MODE "ROS Node [%s] is running in [DEBUG MODE]!"
+#define INFO_SIM_MODE "ROS Node [%s] is running in [SIM MODE]!"
+#define INFO_NORMAL_MODE "ROS Node [%s] is running..."
 
 #define E_TOPIC "TOPIC [%s] not found in launch file!"
 #define E_SHUTDOWN_TOPIC "SHUTDOWN TOPIC [%s] not found in launch file!"
@@ -26,13 +27,16 @@ public:
   bool debug_mode;
   bool sim_mode;
 
+  std::string ros_node_name;
   long long int ros_seq;
   ::ros::NodeHandle *ros_nh;
   ::ros::Rate *ros_rate;
   ::ros::Time ros_last_updated;
+
   std::map<std::string, std::string> ros_topics;
   std::map<std::string, ::ros::Publisher> ros_pubs;
   std::map<std::string, ::ros::Subscriber> ros_subs;
+
   image_transport::Publisher img_pub;
   std::function<int(void)> loop_cb;
 
@@ -40,6 +44,8 @@ public:
     this->configured = false;
     this->debug_mode = false;
     this->sim_mode = false;
+
+    this->ros_node_name = "";
     this->ros_seq = 0;
     this->ros_rate = NULL;
   }
@@ -61,6 +67,7 @@ public:
     }
     // clang-format on
 
+    this->ros_node_name = node_name;
     this->ros_nh = new ::ros::NodeHandle();
     this->ros_nh->getParam("/debug_mode", this->debug_mode);
     this->ros_nh->getParam("/sim_mode", this->sim_mode);
@@ -107,7 +114,8 @@ public:
 
     // register subscriber
     ROS_INFO(INFO_SUB_INIT, topic_url.c_str());
-    subscriber = this->ros_nh->subscribe(topic_url, 1, &ROSNode::shutdownCallback, this);
+    subscriber =
+      this->ros_nh->subscribe(topic_url, 1, &ROSNode::shutdownCallback, this);
     this->ros_subs[topic_name] = subscriber;
   }
 
@@ -200,13 +208,13 @@ public:
 
     // print mode
     if (this->debug_mode) {
-      ROS_INFO(INFO_DEBUG_MODE);
+      ROS_INFO(INFO_DEBUG_MODE, this->ros_node_name.c_str());
     }
     if (this->sim_mode) {
-      ROS_INFO(INFO_SIM_MODE);
+      ROS_INFO(INFO_SIM_MODE, this->ros_node_name.c_str());
     }
     if (!this->debug_mode && !this->sim_mode) {
-      ROS_INFO(INFO_NORMAL_MODE);
+      ROS_INFO(INFO_NORMAL_MODE, this->ros_node_name.c_str());
     }
 
     // loop

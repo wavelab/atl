@@ -14,7 +14,7 @@
 
 namespace awesomo {
 
-#define CAMERA_NODE_NAME "camera_node"
+#define CAMERA_NODE_NAME "awesomo_camera"
 #define CAMERA_NODE_RATE 100
 
 class CameraNode : public ROSNode {

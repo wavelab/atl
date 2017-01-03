@@ -14,7 +14,7 @@
 
 namespace awesomo {
 
-#define APRILTAG_NODE_NAME "apriltag_node"
+#define APRILTAG_NODE_NAME "awesomo_apriltag"
 #define APRILTAG_NODE_RATE 100
 
 class AprilTagNode : public ROSNode {

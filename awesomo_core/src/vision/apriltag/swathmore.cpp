@@ -110,12 +110,11 @@ int SwathmoreDetector::obtainPose(TagDetection tag, TagPose &tag_pose) {
   // caculate pose
   CameraUtil::homographyToPoseCV(fx, fy, tag_size, tag.homography, R, T);
 
-  // convert from camera frame to NED frame
-  // camera frame:  (z - forward, x - right, y -down)
-  // NED frame:     (x - forward, y - right, z -down)
+  // tag is in camera frame
+  // camera frame:  (z - forward, x - right, y - down)
   tag_pose.id = tag.id;
   tag_pose.detected = true;
-  tag_pose.position << T.at<double>(2), T.at<double>(0), T.at<double>(1);
+  tag_pose.position << T.at<double>(0), T.at<double>(1), T.at<double>(2);
 
   return 0;
 }
