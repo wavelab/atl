@@ -1,6 +1,26 @@
 <?xml version="1.0"?>
 <launch>
+  <!-- configs topics -->
+  <param name="debug_mode" type="bool" value="false" />
   <param name="sim_mode" type="bool" value="true" />
   <param name="control_config_dir" value="$(find awesomo_configs)/configs/quadrotor_gazebosim" />
+
+  <!-- publish topics -->
+  <param name="radio_topic" type="str" value="/mavros/rc/in" />
+  <param name="state_topic" type="str" value="/mavros/state" />
+  <param name="pose_topic" type="str" value="/mavros/local_position/pose" />
+  <param name="controller_stats_topic" type="str" value="/awesomo/position_controller/stats" />
+  <param name="kf_stats_topic" type="str" value="/awesomo/kf_estimation/stats" />
+  <param name="kf_plotting_topic" type="str" value="/awesomo/kf_estimation/plotting" />
+
+  <!-- subscribe topics -->
+  <param name="mode_topic" type="str" value="/mavros/set_mode" />
+  <param name="arm_topic" type="str" value="/mavros/cmd/arming" />
+  <param name="apriltag_topic" type="str" value="/awesomo/vision/pose" />
+  <param name="setpoint_attitude_topic" type="str" value="/mavros/setpoint_attitude/attitude" />
+  <param name="setpoint_throttle_topic" type="str" value="/mavros/setpoint_attitude/att_throttle" />
+  <param name="setpoint_position_topic" type="str" value="/mavros/setpoint_position/local" />
+
+  <!-- node -->
   <node pkg="awesomo_ros" type="control_node" name="control" output="screen" />
 </launch>

@@ -1,5 +1,14 @@
 <?xml version="1.0"?>
 <launch>
+  <!-- configs -->
+  <param name="debug_mode" type="bool" value="true" />
+  <param name="sim_mode" type="bool" value="true" />
   <param name="gimbal_config" type="str" value="$(find awesomo_configs)/configs/gimbal/config.yaml" />
+
+  <!-- publish topics -->
+  <param name="gimbal_pose_topic" type="str" value="/awesomo/gimbal/pose" />
+  <param name="gimbal_setpoint_attitude_topic" type="str" value="/awesomo/gimbal/setpoint/angle" />
+
+  <!-- node -->
   <node pkg="awesomo_ros" type="gimbal_node" name="gimbal" output="screen" />
 </launch>

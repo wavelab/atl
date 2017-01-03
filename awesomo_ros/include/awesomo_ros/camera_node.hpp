@@ -17,17 +17,11 @@ namespace awesomo {
 #define CAMERA_NODE_NAME "camera_node"
 #define CAMERA_NODE_RATE 100
 
-#define CAMERA_IMAGE_TOPIC "awesomo/camera/image"
-
 class CameraNode : public ROSNode {
 public:
-  bool configured;
-
   Camera camera;
   cv::Mat image;
-  image_transport::Publisher img_pub;
 
-  CameraNode(void);
   int configure(std::string node_name, int hz);
   int loopCallback(void);
   int publishImage(void);

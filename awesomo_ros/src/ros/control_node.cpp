@@ -4,8 +4,6 @@
 namespace awesomo {
 
 ControlNode::ControlNode(void) {
-  this->configured = false;
-
   for (int i = 0; i < 16; i++) {
     this->rc_in[i] = 0.0f;
   }
@@ -28,26 +26,26 @@ int ControlNode::configure(const std::string node_name, int hz) {
 
   // services
   // clang-format off
-  this->mode_client = this->ros_nh->serviceClient<mavros_msgs::SetMode>(MAVROS_MODE_TOPIC);
-  this->arming_client = this->ros_nh->serviceClient<mavros_msgs::CommandBool>(MAVROS_ARM_TOPIC);
+  this->mode_client = this->ros_nh->serviceClient<mavros_msgs::SetMode>("mode_topic");
+  this->arming_client = this->ros_nh->serviceClient<mavros_msgs::CommandBool>("arm_topic");
   // clang-format on
 
   // subscribers
   // clang-format off
-  ROSNode::registerSubscriber(MAVROS_STATE_TOPIC, &ControlNode::stateCallback, this);
-  ROSNode::registerSubscriber(MAVROS_POSE_TOPIC, &ControlNode::poseCallback, this);
-  ROSNode::registerSubscriber(MAVROS_RADIO_TOPIC, &ControlNode::radioCallback, this);
-  ROSNode::registerSubscriber(AWESOMO_APRILTAG_TOPIC, &ControlNode::aprilTagCallback, this);
+  ROSNode::registerSubscriber("state_topic", &ControlNode::stateCallback, this);
+  ROSNode::registerSubscriber("pose_topic", &ControlNode::poseCallback, this);
+  ROSNode::registerSubscriber("radio_topic", &ControlNode::radioCallback, this);
+  ROSNode::registerSubscriber("apriltag_topic", &ControlNode::aprilTagCallback, this);
   // clang-format on
 
   // publishers
   // clang-format off
-  ROSNode::registerPublisher<geometry_msgs::PoseStamped>(MAVROS_SETPOINT_ATTITUDE_TOPIC);
-  ROSNode::registerPublisher<std_msgs::Float64>(MAVROS_SETPOINT_THROTTLE_TOPIC);
-  ROSNode::registerPublisher<geometry_msgs::PoseStamped>(MAVROS_SETPOINT_POSITION_TOPIC);
-  ROSNode::registerPublisher<awesomo_msgs::PositionControllerStats>(AWESOMO_POS_CONTROLLER_STATS_TOPIC);
-  ROSNode::registerPublisher<awesomo_msgs::KFStats>(AWESOMO_KF_STATS_TOPIC);
-  ROSNode::registerPublisher<awesomo_msgs::KFPlotting>(AWESOMO_KF_PLOTTING_TOPIC);
+  ROSNode::registerPublisher<geometry_msgs::PoseStamped>("setpoint_attitude_topic");
+  ROSNode::registerPublisher<std_msgs::Float64>("setpoint_throttle_topic");
+  ROSNode::registerPublisher<geometry_msgs::PoseStamped>("setpoint_position_topic");
+  ROSNode::registerPublisher<awesomo_msgs::PositionControllerStats>("controller_stats_topic");
+  ROSNode::registerPublisher<awesomo_msgs::KFStats>("kf_stats_topic");
+  ROSNode::registerPublisher<awesomo_msgs::KFPlotting>("kf_plotting_topic");
   // clang-format on
 
   // loop callback
@@ -63,13 +61,8 @@ int ControlNode::configure(const std::string node_name, int hz) {
 }
 
 void ControlNode::waitForConnection(void) {
-  bool sim_mode;
-
   // pre-check
-  sim_mode = false;
-  this->ros_nh->getParam("/sim_mode", sim_mode);
-  if (sim_mode == true) {
-    ROS_INFO("Running simulation mode!");
+  if (this->sim_mode) {
     return;
   }
 
@@ -151,8 +144,8 @@ int ControlNode::awesomoLoopCallback(void) {
   // publish msgs
   att_cmd = this->quadrotor.att_cmd;
   buildAttitudeMsg(seq, ros::Time::now(), att_cmd, att_msg, thr_msg);
-  this->ros_pubs[MAVROS_SETPOINT_ATTITUDE_TOPIC].publish(att_msg);
-  this->ros_pubs[MAVROS_SETPOINT_THROTTLE_TOPIC].publish(thr_msg);
+  this->ros_pubs["setpoint_attitude_topic"].publish(att_msg);
+  this->ros_pubs["setpoint_throttle_topic"].publish(thr_msg);
 
   return 0;
 }
@@ -176,9 +169,9 @@ void ControlNode::publishStats(void) {
   // clang-format on
 
   // publish
-  this->ros_pubs[AWESOMO_POS_CONTROLLER_STATS_TOPIC].publish(pcs_stats_msg);
-  // this->ros_pubs[AWESOMO_KF_STATS_TOPIC].publish(kf_stats_msg);
-  // this->ros_pubs[AWESOMO_KF_PLOTTING_TOPIC].publish(kf_plot_msg);
+  this->ros_pubs["pos_controller_stats_topic"].publish(pcs_stats_msg);
+  // this->ros_pubs["kf_stats_topic"].publish(kf_stats_msg);
+  // this->ros_pubs["kf_plotting_topic"].publish(kf_plot_msg);
 }
 
 }  // end of awesomo namespace

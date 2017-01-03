@@ -1,6 +1,16 @@
 <?xml version="1.0"?>
 <launch>
+  <!-- configs -->
+  <param name="debug_mode" type="bool" value="true" />
   <param name="node_config" type="str" value="$(find awesomo_ros)/configs/default/apriltag_node.yaml" />
   <param name="apriltag_config" type="str" value="$(find awesomo_configs)/configs/apriltag/config.yaml" />
+
+  <!-- publish topics -->
+  <param name="apriltag_pose_topic" type="str" value="awesomo/apriltag/pose" />
+
+  <!-- subscribe topics -->
+  <param name="camera_pose_topic" type="str" value="prototype/camera/image" />
+
+  <!-- node -->
   <node pkg="awesomo_ros" type="apriltag_node" name="apriltag" output="screen" />
 </launch>

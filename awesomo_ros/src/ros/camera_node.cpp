@@ -2,10 +2,6 @@
 
 namespace awesomo {
 
-CameraNode::CameraNode(void) {
-  this->configured = false;
-}
-
 int CameraNode::configure(std::string node_name, int hz) {
   std::string config_path;
 
@@ -23,19 +19,17 @@ int CameraNode::configure(std::string node_name, int hz) {
   this->camera.initialize();
 
   // image transport
-  image_transport::ImageTransport it(*this->ros_nh);
-  this->img_pub = it.advertise(CAMERA_IMAGE_TOPIC, 10);
+  this->registerImagePublisher("camera_image_topic");
 
   // register loop callback
   this->registerLoopCallback(std::bind(&CameraNode::loopCallback, this));
 
   this->configured = true;
-
   return 0;
 }
 
 int CameraNode::loopCallback(void) {
-  this - publishImage();
+  this->publishImage();
   return 0;
 }
 

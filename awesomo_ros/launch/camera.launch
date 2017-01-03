@@ -1,5 +1,12 @@
 <?xml version="1.0"?>
 <launch>
+  <!-- configs -->
+  <param name="debug_mode" type="bool" value="true" />
   <param name="camera_config_dir" type="str" value="$(find awesomo_configs)/configs/camera/logitech_c270" />
+
+  <!-- publish topics -->
+  <param name="camera_image_topic" type="str" value="awesomo/camera/image" />
+
+  <!-- ros node -->
   <node pkg="awesomo_ros" type="camera_node" name="camera" output="screen" />
 </launch>

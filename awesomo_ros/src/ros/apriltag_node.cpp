@@ -19,8 +19,8 @@ int AprilTagNode::configure(const std::string &node_name, int hz) {
 
   // subscribers and publishers
   // clang-format off
-  ROSNode::registerPublisher<awesomo_msgs::AprilTagPose>(APRILTAG_POSE_TOPIC);
-  ROSNode::registerSubscriber(CAMERA_IMAGE_TOPIC, &AprilTagNode::imageCallback, this);
+  ROSNode::registerPublisher<awesomo_msgs::AprilTagPose>("apriltag_pose_topic");
+  ROSNode::registerSubscriber("camera_pose_topic", &AprilTagNode::imageCallback, this);
   // clang-format on
 
   return 0;
@@ -35,15 +35,17 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
   image_ptr = cv_bridge::toCvCopy(msg);
   tags = this->detector.extractTags(image_ptr->image);
 
-  // // debug
-  // cv::imshow("AprilTag Node Image", image_ptr->image);
-  // cv::waitKey(1);
+  // debug
+  if (this->debug_mode) {
+    cv::imshow("AprilTag Node Image", image_ptr->image);
+    cv::waitKey(1);
+  }
 
   // publish tag pose
   if (tags.size()) {
     buildAprilTagPoseMsg(tags[0], tag_msg);
   }
-  this->ros_pubs[APRILTAG_POSE_TOPIC].publish(tag_msg);
+  this->ros_pubs["apriltag_pose_topic"].publish(tag_msg);
 }
 
 }  // end of awesomo namespace

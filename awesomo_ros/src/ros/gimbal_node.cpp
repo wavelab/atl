@@ -2,10 +2,6 @@
 
 namespace awesomo {
 
-GimbalNode::GimbalNode(void) {
-  this->configured = false;
-}
-
 int GimbalNode::configure(std::string node_name, int hz) {
   std::string config_file;
 

@@ -27,25 +27,6 @@ namespace awesomo {
 #define CONTROL_NODE_NAME "awesomo_node"
 #define CONTROL_NODE_RATE 1000
 
-// ROS TOPICS
-// clang-format off
-#define MAVROS_ARM_TOPIC "/mavros/cmd/arming"
-#define MAVROS_MODE_TOPIC "/mavros/set_mode"
-
-#define MAVROS_STATE_TOPIC "/mavros/state"
-#define MAVROS_POSE_TOPIC "/mavros/local_position/pose"
-#define MAVROS_RADIO_TOPIC "/mavros/rc/in"
-#define AWESOMO_APRILTAG_TOPIC "/awesomo/vision/pose"
-
-#define MAVROS_SETPOINT_ATTITUDE_TOPIC "/mavros/setpoint_attitude/attitude"
-#define MAVROS_SETPOINT_THROTTLE_TOPIC "/mavros/setpoint_attitude/att_throttle"
-#define MAVROS_SETPOINT_POSITION_TOPIC "/mavros/setpoint_position/local"
-
-#define AWESOMO_POS_CONTROLLER_STATS_TOPIC "/awesomo/position_controller/stats"
-#define AWESOMO_KF_STATS_TOPIC "/awesomo/kf_estimation/stats"
-#define AWESOMO_KF_PLOTTING_TOPIC "/awesomo/kf_estimation/states"
-// clang-format on
-
 class ControlNode : public ROSNode {
 public:
   bool configured;
