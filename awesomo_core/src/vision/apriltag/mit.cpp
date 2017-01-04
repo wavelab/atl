@@ -1,9 +1,9 @@
-#include "awesomo_core/vision/apriltag/swathmore.hpp"
+#include "awesomo_core/vision/apriltag/mit.hpp"
 
 
 namespace awesomo {
 
-SwathmoreDetector::SwathmoreDetector(void) {
+MITDetector::MITDetector(void) {
   this->configured = false;
 
   this->detector = NULL;
@@ -15,7 +15,7 @@ SwathmoreDetector::SwathmoreDetector(void) {
   this->imshow = false;
 }
 
-int SwathmoreDetector::configure(std::string config_file) {
+int MITDetector::configure(std::string config_file) {
   Camera camera;
   ConfigParser parser;
   std::vector<int> tag_ids;
@@ -31,17 +31,8 @@ int SwathmoreDetector::configure(std::string config_file) {
     return -1;
   }
 
-  // tag family
-  std::string *family_str = new std::string("Tag16h5");
-  TagFamily *family = new TagFamily(*family_str);
-
-  // tag params
-  TagDetectorParams *params = new TagDetectorParams();
-  params->newQuadAlgorithm = true;
-
   // tag detector
-  family->setErrorRecoveryFraction(0.5);
-  this->detector = new TagDetector(*family, *params);
+  this->detector = new AprilTags::TagDetector(AprilTags::tagCodes16h5);
 
   // tag configs
   for (int i = 0; i < tag_ids.size(); i++) {
@@ -62,43 +53,40 @@ int SwathmoreDetector::configure(std::string config_file) {
   return 0;
 }
 
-std::vector<TagPose> SwathmoreDetector::extractTags(cv::Mat &image) {
+std::vector<TagPose> MITDetector::extractTags(cv::Mat &image) {
   TagPose pose;
   cv::Mat image_gray;
-  cv::Point2d optical_center;
-  TagDetectionArray detections;
+  std::vector<AprilTags::TagDetection> detections;
   std::vector<TagPose> pose_estimates;
-
-  // setup
-  optical_center.x = image.cols * 0.5;
-  optical_center.y = image.rows * 0.5;
 
   // extract tags
   cv::cvtColor(image, image_gray, cv::COLOR_BGR2GRAY);
-  this->detector->process(image_gray, optical_center, detections);
+  detections = this->detector->extractTags(image_gray);
 
   // calculate tag pose
   for (int i = 0; i < detections.size(); i++) {
     if (this->obtainPose(detections[i], pose) == 0) {
       pose_estimates.push_back(pose);
-    }
 
-    // only need 1 tag
-    break;
+      // only need 1 tag
+      break;
+    }
   }
 
   return pose_estimates;
 }
 
-int SwathmoreDetector::obtainPose(TagDetection tag, TagPose &tag_pose) {
-  cv::Mat R, T;
+int MITDetector::obtainPose(AprilTags::TagDetection tag, TagPose &tag_pose) {
+  Mat4 transform;
   CameraConfig camera_config;
-  double fx, fy, tag_size;
+  double fx, fy, cx, cy, tag_size;
 
   // setup
   camera_config = this->camera_configs[this->camera_mode];
   fx = camera_config.camera_matrix.at<double>(0, 0);
   fy = camera_config.camera_matrix.at<double>(1, 1);
+  cx = camera_config.camera_matrix.at<double>(0, 2);
+  cy = camera_config.camera_matrix.at<double>(1, 2);
   tag_size = 0.0;
 
   // get tag size according to tag id
@@ -109,19 +97,19 @@ int SwathmoreDetector::obtainPose(TagDetection tag, TagPose &tag_pose) {
     tag_size = this->tag_configs[tag.id];
   }
 
-  // caculate pose
-  CameraUtil::homographyToPoseCV(fx, fy, tag_size, tag.homography, R, T);
+  // recovering the relative transform of a tag:
+  transform = tag.getRelativeTransform(tag_size, fx, fy, cx, cy);
 
   // tag is in camera frame
   // camera frame:  (z - forward, x - right, y - down)
   tag_pose.id = tag.id;
   tag_pose.detected = true;
-  tag_pose.position << T.at<double>(0), T.at<double>(1), T.at<double>(2);
+  tag_pose.position = transform.col(3).head(3);
 
   return 0;
 }
 
-void SwathmoreDetector::printTag(TagPose tag) {
+void MITDetector::printTag(TagPose tag) {
   std::cout << "id: " << tag.id << " ";
   std::cout << "[";
   std::cout << "x= " << tag.position(0) << " ";

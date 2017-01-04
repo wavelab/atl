@@ -140,6 +140,12 @@ void buildAprilTagPoseMsg(TagPose tag, awesomo_msgs::AprilTagPose &msg) {
   msg.tag_position.z = tag.position(2);
 }
 
+void buildAprilTagTrackMsg(TagPose tag, geometry_msgs::Vector3 &msg) {
+  msg.x = tag.position(0);
+  msg.y = tag.position(1);
+  msg.z = tag.position(2);
+}
+
 Pose convertPoseStampedMsg2Pose(geometry_msgs::PoseStamped msg) {
   Vec3 p;
   Quaternion q;

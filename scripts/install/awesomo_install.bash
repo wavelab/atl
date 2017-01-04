@@ -10,13 +10,16 @@ sudo -v
 # intall dependencies
 # sudo bash $SCRIPT_PATH/ximea_install.bash
 sudo bash $SCRIPT_PATH/pointgrey_install.bash
-sudo bash $SCRIPT_PATH/swathmore_apriltags.bash
-sudo apt-get install ros-indigo-mavros \
-                     ros-indigo-mavros-extras \
-                     ros-indigo-mavros-msgs
+sudo $SCRIPT_PATH/apriltags_swathmore_install.bash
+sudo $SCRIPT_PATH/apriltags_mit_install.bash
+sudo apt-get install -y ros-indigo-mavros \
+                        ros-indigo-mavros-extras \
+                        ros-indigo-mavros-msgs
 
 # link repo to catkin workspace
-ln -sfn "$REPO_PATH" "$CATKIN_PATH/src/awesomo"
+if [ ! -d "$CATKIN_PATH/src/awesomo" ]; then
+    ln -sfn "$REPO_PATH" "$CATKIN_PATH/src/awesomo"
+fi
 
 # compile
 cd "$CATKIN_PATH"

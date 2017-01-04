@@ -31,7 +31,7 @@ y
 n
 EOF
     cd ..
-    rm -rf $PACAKGE_NAME
+    rm -rf $PACKAGE_NAME
 }
 
 # install coriander for setting camera configurations

@@ -1,5 +1,5 @@
-#ifndef __AWESOMO_VISION_APRILTAG_SWATHMORE_HPP__
-#define __AWESOMO_VISION_APRILTAG_SWATHMORE_HPP__
+#ifndef __AWESOMO_VISION_APRILTAG_MIT_HPP__
+#define __AWESOMO_VISION_APRILTAG_MIT_HPP__
 
 #include <cmath>
 #include <fstream>
@@ -12,8 +12,8 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-#include <apriltags_swathmore/TagDetector.h>
-#include <apriltags_swathmore/CameraUtil.h>
+#include <apriltags_mit/TagDetector.h>
+#include <apriltags_mit/Tag16h5.h>
 
 #include "awesomo_core/utils/utils.hpp"
 #include "awesomo_core/vision/camera/camera.hpp"
@@ -22,11 +22,11 @@
 
 namespace awesomo {
 
-class SwathmoreDetector {
+class MITDetector {
 public:
   bool configured;
 
-  TagDetector *detector;
+  AprilTags::TagDetector *detector;
 
   std::map<int, float> tag_configs;
   std::string camera_mode;
@@ -34,9 +34,9 @@ public:
   std::map<std::string, CameraConfig> camera_configs;
   bool imshow;
 
-  SwathmoreDetector(void);
+  MITDetector(void);
   int configure(std::string config_file);
-  int obtainPose(TagDetection tag, TagPose &tag_pose);
+  int obtainPose(AprilTags::TagDetection tag, TagPose &tag_pose);
   std::vector<TagPose> extractTags(cv::Mat &image);
   void printTag(TagPose tag);
 };

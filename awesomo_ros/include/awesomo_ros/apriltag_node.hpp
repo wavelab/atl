@@ -19,7 +19,7 @@ namespace awesomo {
 
 class AprilTagNode : public ROSNode {
 public:
-  SwathmoreDetector detector;
+  MITDetector detector;
 
   int configure(const std::string &node_name, int hz);
   void imageCallback(const sensor_msgs::ImageConstPtr &msg);

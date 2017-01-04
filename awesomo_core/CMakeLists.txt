@@ -51,6 +51,7 @@ ADD_LIBRARY(
     src/utils/time.cpp
     # vision
     src/vision/apriltag/swathmore.cpp
+    src/vision/apriltag/mit.cpp
     src/vision/camera/camera.cpp
     src/vision/camera/config.cpp
     # src/vision/camera/ximea.cpp
@@ -62,7 +63,8 @@ SET(DEPS
     ${PROJECT_NAME}
     ${catkin_LIBRARIES}
     ${OpenCV_LIBS}
-    apriltags
+    apriltags_swathmore
+    apriltags_mit
     CGAL
     yaml-cpp
     gtest

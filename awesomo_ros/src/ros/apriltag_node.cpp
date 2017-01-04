@@ -19,8 +19,9 @@ int AprilTagNode::configure(const std::string &node_name, int hz) {
 
   // subscribers and publishers
   // clang-format off
-  ROSNode::registerPublisher<awesomo_msgs::AprilTagPose>("apriltag_pose_topic");
   ROSNode::registerShutdown("shutdown");
+  ROSNode::registerPublisher<awesomo_msgs::AprilTagPose>("apriltag_pose_topic");
+  ROSNode::registerPublisher<geometry_msgs::Vector3>("gimbal_track_topic");
   ROSNode::registerSubscriber("camera_pose_topic", &AprilTagNode::imageCallback, this);
   // clang-format on
 
@@ -30,7 +31,8 @@ int AprilTagNode::configure(const std::string &node_name, int hz) {
 void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
   cv_bridge::CvImagePtr image_ptr;
   std::vector<TagPose> tags;
-  awesomo_msgs::AprilTagPose tag_msg;
+  geometry_msgs::Vector3 track_msg;
+  awesomo_msgs::AprilTagPose pose_msg;
 
   // detect tags
   image_ptr = cv_bridge::toCvCopy(msg);
@@ -44,9 +46,11 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
 
   // publish tag pose
   if (tags.size()) {
-    buildAprilTagPoseMsg(tags[0], tag_msg);
+    buildAprilTagPoseMsg(tags[0], pose_msg);
+    buildAprilTagTrackMsg(tags[0], track_msg);
+    this->ros_pubs["gimbal_track_topic"].publish(track_msg);
   }
-  this->ros_pubs["apriltag_pose_topic"].publish(tag_msg);
+  this->ros_pubs["apriltag_pose_topic"].publish(pose_msg);
 }
 
 }  // end of awesomo namespace
