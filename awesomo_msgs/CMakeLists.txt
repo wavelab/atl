@@ -25,6 +25,8 @@ ADD_MESSAGE_FILES(
     KFStats.msg
     PositionControllerStats.msg
     AprilTagPose.msg
+    PIDSettings.msg
+    PositionControllerSettings.msg
 )
 GENERATE_MESSAGES(DEPENDENCIES std_msgs geometry_msgs)
 

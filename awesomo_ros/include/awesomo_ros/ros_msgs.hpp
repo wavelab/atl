@@ -15,6 +15,7 @@
 #include <awesomo_msgs/KFStats.h>
 #include <awesomo_msgs/AprilTagPose.h>
 #include <awesomo_msgs/PositionControllerStats.h>
+#include <awesomo_msgs/PositionControllerSettings.h>
 
 
 namespace awesomo {
@@ -144,6 +145,27 @@ void buildAprilTagTrackMsg(TagPose tag, geometry_msgs::Vector3 &msg) {
   msg.x = tag.position(0);
   msg.y = tag.position(1);
   msg.z = tag.position(2);
+}
+
+void buildPositionControllerSettingsMsg(
+    PositionController pc,
+    awesomo_msgs::PositionControllerSettings &msg) {
+  msg.roll_controller.min = pc.roll_limit[0];
+  msg.roll_controller.max = pc.roll_limit[1];
+  msg.roll_controller.k_p = pc.x_controller.k_p;
+  msg.roll_controller.k_i = pc.x_controller.k_i;
+  msg.roll_controller.k_d = pc.x_controller.k_d;
+
+  msg.pitch_controller.min = pc.pitch_limit[0];
+  msg.pitch_controller.max = pc.pitch_limit[1];
+  msg.pitch_controller.k_p = pc.y_controller.k_p;
+  msg.pitch_controller.k_i = pc.y_controller.k_i;
+  msg.pitch_controller.k_d = pc.y_controller.k_d;
+
+  msg.throttle_controller.k_p = pc.z_controller.k_p;
+  msg.throttle_controller.k_i = pc.z_controller.k_i;
+  msg.throttle_controller.k_d = pc.z_controller.k_d;
+  msg.hover_throttle = pc.hover_throttle;
 }
 
 Pose convertPoseStampedMsg2Pose(geometry_msgs::PoseStamped msg) {

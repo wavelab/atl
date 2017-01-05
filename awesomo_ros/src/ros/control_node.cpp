@@ -36,6 +36,7 @@ int ControlNode::configure(const std::string node_name, int hz) {
   ROSNode::registerSubscriber("pose_topic", &ControlNode::poseCallback, this);
   ROSNode::registerSubscriber("radio_topic", &ControlNode::radioCallback, this);
   ROSNode::registerSubscriber("apriltag_topic", &ControlNode::aprilTagCallback, this);
+  ROSNode::registerSubscriber("position_controller_set_topic", &ControlNode::positionControllerSetCallback, this);
   // clang-format on
 
   // publishers
@@ -46,11 +47,12 @@ int ControlNode::configure(const std::string node_name, int hz) {
   ROSNode::registerPublisher<awesomo_msgs::PositionControllerStats>("controller_stats_topic");
   ROSNode::registerPublisher<awesomo_msgs::KFStats>("kf_stats_topic");
   ROSNode::registerPublisher<awesomo_msgs::KFPlotting>("kf_plotting_topic");
+  ROSNode::registerPublisher<awesomo_msgs::PositionControllerSettings>("position_controller_get_topic");
   // clang-format on
 
   // loop callback
   // clang-format off
-  ROSNode::registerLoopCallback(std::bind(&ControlNode::awesomoLoopCallback, this));
+  ROSNode::registerLoopCallback(std::bind(&ControlNode::loopCallback, this));
   // clang-format on
 
   // wait till connected to FCU
@@ -125,7 +127,7 @@ void ControlNode::aprilTagCallback(const awesomo_msgs::AprilTagPose &msg) {
   this->tag_pose = convertAprilTagPoseMsg2TagPose(msg);
 }
 
-int ControlNode::awesomoLoopCallback(void) {
+int ControlNode::loopCallback(void) {
   int seq;
   double dt;
   AttitudeCommand att_cmd;
@@ -146,6 +148,7 @@ int ControlNode::awesomoLoopCallback(void) {
   buildAttitudeMsg(seq, ros::Time::now(), att_cmd, att_msg, thr_msg);
   this->ros_pubs["setpoint_attitude_topic"].publish(att_msg);
   this->ros_pubs["setpoint_throttle_topic"].publish(thr_msg);
+  this->publishStats();
 
   return 0;
 }
@@ -154,6 +157,7 @@ void ControlNode::publishStats(void) {
   int seq;
   ros::Time time;
   awesomo_msgs::PositionControllerStats pcs_stats_msg;
+  awesomo_msgs::PositionControllerSettings pcs_settings_msg;
   awesomo_msgs::KFStats kf_stats_msg;
   awesomo_msgs::KFPlotting kf_plot_msg;
 
@@ -163,16 +167,42 @@ void ControlNode::publishStats(void) {
 
   // build msgs
   // clang-format off
-  buildPositionControllerStatsMsg(seq, time, this->quadrotor.position_controller, pcs_stats_msg);
+  // buildPositionControllerStatsMsg(seq, time, this->quadrotor.position_controller, pcs_stats_msg);
+  buildPositionControllerSettingsMsg(this->quadrotor.position_controller, pcs_settings_msg);
   // buildKFStatsMsg(seq, time, this->quadrotor.apriltag_estimator, kf_stats_msg);
   // buildKFPlottingMsg(seq, time, this->quadrotor.apriltag_estimator, kf_plot_msg);
   // clang-format on
 
   // publish
-  this->ros_pubs["pos_controller_stats_topic"].publish(pcs_stats_msg);
+  // this->ros_pubs["controller_stats_topic"].publish(pcs_stats_msg);
+  this->ros_pubs["position_controller_get_topic"].publish(pcs_settings_msg);
   // this->ros_pubs["kf_stats_topic"].publish(kf_stats_msg);
   // this->ros_pubs["kf_plotting_topic"].publish(kf_plot_msg);
 }
+
+void ControlNode::positionControllerSetCallback(const awesomo_msgs::PositionControllerSettings &msg) {
+  PositionController *position_controller;
+
+  position_controller = &this->quadrotor.position_controller;
+
+  position_controller->roll_limit[0] = msg.roll_controller.min;
+  position_controller->roll_limit[1] = msg.roll_controller.max;
+  position_controller->x_controller.k_p = msg.roll_controller.k_p;
+  position_controller->x_controller.k_i = msg.roll_controller.k_i;
+  position_controller->x_controller.k_d = msg.roll_controller.k_d;
+
+  position_controller->pitch_limit[0] = msg.pitch_controller.min;
+  position_controller->pitch_limit[1] = msg.pitch_controller.max;
+  position_controller->y_controller.k_p = msg.pitch_controller.k_p;
+  position_controller->y_controller.k_i = msg.pitch_controller.k_i;
+  position_controller->y_controller.k_d = msg.pitch_controller.k_d;
+
+  position_controller->z_controller.k_p = msg.throttle_controller.k_p;
+  position_controller->z_controller.k_i = msg.throttle_controller.k_i;
+  position_controller->z_controller.k_d = msg.throttle_controller.k_d;
+  position_controller->hover_throttle = msg.hover_throttle;
+}
+
 
 }  // end of awesomo namespace
 

@@ -14,6 +14,7 @@
 #include <awesomo_msgs/KFPlotting.h>
 #include <awesomo_msgs/AprilTagPose.h>
 #include <awesomo_msgs/PositionControllerStats.h>
+#include <awesomo_msgs/PositionControllerSettings.h>
 
 #include <awesomo_core/awesomo_core.hpp>
 
@@ -25,7 +26,7 @@ namespace awesomo {
 
 // ROS NODE
 #define CONTROL_NODE_NAME "awesomo_control"
-#define CONTROL_NODE_RATE 1000
+#define CONTROL_NODE_RATE 100
 
 class ControlNode : public ROSNode {
 public:
@@ -50,7 +51,8 @@ public:
   void poseCallback(const geometry_msgs::PoseStamped &msg);
   void radioCallback(const mavros_msgs::RCIn &msg);
   void aprilTagCallback(const awesomo_msgs::AprilTagPose &msg);
-  int awesomoLoopCallback(void);
+  void positionControllerSetCallback(const awesomo_msgs::PositionControllerSettings &msg);
+  int loopCallback(void);
   void publishStats(void);
 };
 

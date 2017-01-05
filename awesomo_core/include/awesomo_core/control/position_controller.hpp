@@ -13,6 +13,7 @@ class PositionController {
 public:
   bool configured;
 
+  double dt;
   PID x_controller;
   PID y_controller;
   PID z_controller;
