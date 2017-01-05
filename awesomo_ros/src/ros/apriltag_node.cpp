@@ -13,7 +13,7 @@ int AprilTagNode::configure(const std::string &node_name, int hz) {
   // detector
   this->ros_nh->getParam("/apriltag_config", apriltag_config);
   if (this->detector.configure(apriltag_config) != 0) {
-    ROS_ERROR("Failed to configure Swathmore Detector!");
+    ROS_ERROR("Failed to configure AprilTag Detector!");
     return -2;
   };
 
@@ -22,7 +22,7 @@ int AprilTagNode::configure(const std::string &node_name, int hz) {
   ROSNode::registerShutdown("shutdown");
   ROSNode::registerPublisher<awesomo_msgs::AprilTagPose>("apriltag_pose_topic");
   ROSNode::registerPublisher<geometry_msgs::Vector3>("gimbal_track_topic");
-  ROSNode::registerSubscriber("camera_pose_topic", &AprilTagNode::imageCallback, this);
+  ROSNode::registerImageSubscriber("camera_pose_topic", &AprilTagNode::imageCallback, this);
   // clang-format on
 
   return 0;
@@ -40,7 +40,7 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
 
   // debug
   if (this->debug_mode) {
-    cv::imshow("AprilTag Node Image", image_ptr->image);
+    cv::imshow("AprilTagNode Image", image_ptr->image);
     cv::waitKey(1);
   }
 

@@ -38,6 +38,7 @@ public:
   std::map<std::string, ::ros::Subscriber> ros_subs;
 
   image_transport::Publisher img_pub;
+  image_transport::Subscriber img_sub;
   std::function<int(void)> loop_cb;
 
   ROSNode(void) {
@@ -135,7 +136,32 @@ public:
 
     // image transport
     image_transport::ImageTransport it(*this->ros_nh);
-    this->img_pub = it.advertise(topic_url, 100);
+    this->img_pub = it.advertise(topic_url, 1);
+
+    return 0;
+  }
+
+  template <typename M, typename T>
+  int registerImageSubscriber(const std::string &topic_name,
+                              void (T::*fp)(M),
+                              T *obj,
+                              uint32_t queue_size = 1) {
+    std::string topic_url;
+
+    // pre-check
+    if (this->configured == false) {
+      return -1;
+    }
+
+    // register topic
+    if (this->registerTopic(topic_name, topic_url) != 0) {
+      ROS_ERROR(E_TOPIC, topic_name.c_str());
+      return -2;
+    }
+
+    // image transport
+    image_transport::ImageTransport it(*this->ros_nh);
+    this->img_sub = it.subscribe(topic_url, queue_size, fp, obj);
 
     return 0;
   }
