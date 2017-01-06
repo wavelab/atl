@@ -24,16 +24,14 @@ public:
 
   Vec3 setpoints;
   Vec4 outputs;
-
   AttitudeCommand att_cmd;
 
   PositionController(void);
   int configure(std::string config_file);
   Vec4 calculate(Vec3 setpoints, Vec4 actual, double yaw, double dt);
   void reset(void);
-  void printErrors(void);
-  void printInputs(void);
   void printOutputs(void);
+  void printErrors(void);
 };
 
 }  // end of awesomo namespace

@@ -13,18 +13,20 @@ TEST(Utils, deg2radAndrad2deg) {
   ASSERT_FLOAT_EQ(d_deg, rad2deg(d_rad));
 }
 
-TEST(Utils, euler2Quaternion) {
+TEST(Utils, euler2quat) {
   float roll;
   float pitch;
   float yaw;
-  Eigen::Quaterniond q;
+  Vec3 euler;
+  Quaternion q;
 
   // check identity quat is returned
   roll = 0;
   pitch = 0;
   yaw = 0;
 
-  euler2Quaternion(roll, pitch, yaw, q);
+  euler << roll, pitch, yaw;
+  euler2quat(euler, 321, q);
   ASSERT_FLOAT_EQ(0.0, q.x());
   ASSERT_FLOAT_EQ(0.0, q.y());
   ASSERT_FLOAT_EQ(0.0, q.z());
@@ -35,7 +37,8 @@ TEST(Utils, euler2Quaternion) {
   pitch = M_PI;
   yaw = -M_PI / 2;
 
-  euler2Quaternion(roll, pitch, yaw, q);
+  euler << roll, pitch, yaw;
+  euler2quat(euler, 321, q);
   ASSERT_FLOAT_EQ(0.5, q.x());
   ASSERT_FLOAT_EQ(0.5, q.y());
   ASSERT_FLOAT_EQ(-0.5, q.z());
@@ -43,11 +46,12 @@ TEST(Utils, euler2Quaternion) {
 }
 
 
-TEST(Utils, euler2RotationMatrix) {
-  Eigen::Matrix3d rot;
+TEST(Utils, euler2rot) {
   double roll;
   double pitch;
   double yaw;
+  Vec3 euler;
+  Mat3 rot;
 
   double r01, r02, r03;
   double r11, r12, r13;
@@ -57,8 +61,8 @@ TEST(Utils, euler2RotationMatrix) {
   roll = 0.0;
   pitch = 0.0;
   yaw = 0.0;
-
-  euler2RotationMatrix(roll, pitch, yaw, rot);
+  euler << roll, pitch, yaw;
+  euler2rot(euler, 321, rot);
 
   r01 = 1.0;
   r02 = 0.0;
@@ -83,6 +87,28 @@ TEST(Utils, euler2RotationMatrix) {
   ASSERT_FLOAT_EQ(r21, rot(2, 0));
   ASSERT_FLOAT_EQ(r22, rot(2, 1));
   ASSERT_FLOAT_EQ(r23, rot(2, 2));
+}
+
+TEST(Utils, enu2nwu) {
+  Vec3 enu, nwu;
+
+  enu << 1.0, 2.0, 3.0;
+  enu2nwu(enu, nwu);
+
+  ASSERT_FLOAT_EQ(2.0, nwu(0));
+  ASSERT_FLOAT_EQ(-1.0, nwu(1));
+  ASSERT_FLOAT_EQ(3.0, nwu(2));
+}
+
+TEST(Utils, nwu2enu) {
+  Vec3 enu, nwu;
+
+  nwu << 1.0, 2.0, 3.0;
+  nwu2enu(nwu, enu);
+
+  ASSERT_FLOAT_EQ(-2.0, enu(0));
+  ASSERT_FLOAT_EQ(1.0, enu(1));
+  ASSERT_FLOAT_EQ(3.0, enu(2));
 }
 
 }  // end of awesomo namespace

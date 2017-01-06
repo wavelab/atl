@@ -96,7 +96,7 @@ Vec3 Gimbal::getTargetPositionInBodyPlanarFrame(Vec3 target_cf,
 int Gimbal::getTargetPositionInBodyPlanarFrame(Vec3 target_cf,
                                                Vec3 &target_bpf) {
   int retval;
-  Vec3 tmp;
+  Vec3 tmp, euler;
   Quaternion gimbal_imu;
 
   // get data from SimpleBGC
@@ -107,10 +107,10 @@ int Gimbal::getTargetPositionInBodyPlanarFrame(Vec3 target_cf,
 
   // convert sbgc gimbal angle to quaternion
   // (making gimbal angles NED, notice the -ve sign in pitch)
-  euler2Quaternion(deg2rad(this->sbgc.data.camera_angles(0)),
-                   deg2rad(-this->sbgc.data.camera_angles(1)),
-                   0.0,
-                   gimbal_imu);
+  euler(0) = deg2rad(this->sbgc.data.camera_angles(0));
+  euler(1) = deg2rad(this->sbgc.data.camera_angles(1));
+  euler(2) = 0.0;
+  euler2quat(euler, 321, gimbal_imu);
 
   // camera frame to camera mount frame
   tmp = this->camera_offset.rotationMatrix().inverse() * target_cf;

@@ -7,6 +7,7 @@ namespace awesomo {
 TEST(Pose, checkPose) {
   Pose testPose;
   Quaternion q_test;
+  Vec3 euler;
   Vec3 position_test;
   Mat3 rotation_mtx;
   Mat3 rotation_mtx_test;
@@ -47,7 +48,8 @@ TEST(Pose, checkPose) {
   pitch = 15.0;
   yaw = -90.0;
 
-  euler2Quaternion(roll, pitch, yaw, q_test);
+  euler << roll, pitch, yaw;
+  euler2quat(euler, 321, q_test);
   testPose = Pose(roll, pitch, yaw, x, y, z);
 
   ASSERT_FLOAT_EQ(q_test.x(), testPose.q.x());
@@ -77,7 +79,8 @@ TEST(Pose, checkPose) {
 
   testPose = Pose(roll, pitch, yaw, x, y, z);
   rotation_mtx = testPose.rotationMatrix();
-  euler2Quaternion(roll, pitch, yaw, q_test);
+  euler << roll, pitch, yaw;
+  euler2quat(euler, 321, q_test);
   ASSERT_TRUE(rotation_mtx == q_test.toRotationMatrix());
 }
 

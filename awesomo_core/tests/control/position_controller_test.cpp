@@ -11,6 +11,8 @@ TEST(PositionController, constructor) {
 
   ASSERT_FALSE(controller.configured);
 
+  ASSERT_FLOAT_EQ(0.0, controller.dt);
+
   ASSERT_FLOAT_EQ(0.0, controller.x_controller.k_p);
   ASSERT_FLOAT_EQ(0.0, controller.x_controller.k_i);
   ASSERT_FLOAT_EQ(0.0, controller.x_controller.k_d);
@@ -47,6 +49,8 @@ TEST(PositionController, configure) {
   controller.configure(TEST_CONFIG);
 
   ASSERT_TRUE(controller.configured);
+
+  ASSERT_FLOAT_EQ(0.0, controller.dt);
 
   ASSERT_FLOAT_EQ(0.1, controller.x_controller.k_p);
   ASSERT_FLOAT_EQ(0.2, controller.x_controller.k_i);
@@ -116,7 +120,7 @@ TEST(PositionController, calculate) {
   setpoint << 1, 0, 0;
   actual << 0, 0, 0, 0;
   yaw_setpoint = 0;
-  dt = 0.01;
+  dt = 0.1;
 
   controller.reset();
   controller.calculate(setpoint, actual, yaw_setpoint, dt);

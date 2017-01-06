@@ -25,19 +25,12 @@ typedef Eigen::Quaterniond Quaternion;
 int fltcmp(double f1, double f2);
 double deg2rad(double d);
 double rad2deg(double r);
-int euler2rot(double phi, double theta, double psi, int euler_seq, Mat3 &R);
+int euler2rot(Vec3 euler, int euler_seq, Mat3 &R);
 int euler2quat(Vec3 euler, int euler_seq, Quaternion &q);
 int quat2euler(Quaternion q, int euler_seq, Vec3 &euler);
 int quat2rot(Quaternion q, Mat3 &R);
-
-int euler2Quaternion(const double roll,
-                     const double pitch,
-                     const double yaw,
-                     Eigen::Quaterniond &q);
-int euler2RotationMatrix(const double roll,
-                         const double pitch,
-                         const double yaw,
-                         Eigen::Matrix3d &rot);
+void enu2nwu(Vec3 enu, Vec3 &nwu);
+void nwu2enu(Vec3 nwu, Vec3 &enu);
 
 }  // end of awesomo namespace
 #endif

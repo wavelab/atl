@@ -6,6 +6,7 @@ namespace awesomo {
 PositionController::PositionController(void) {
   this->configured = false;
 
+  this->dt = 0.0;
   this->x_controller = PID(0.0, 0.0, 0.0);
   this->y_controller = PID(0.0, 0.0, 0.0);
   this->z_controller = PID(0.0, 0.0, 0.0);
@@ -83,7 +84,7 @@ Vec4 PositionController::calculate(Vec3 setpoints,
                                    double yaw,
                                    double dt) {
   double r, p, y, t;
-  Vec3 errors;
+  Vec3 errors, euler;
   Vec4 outputs;
   Mat3 R;
 
@@ -97,7 +98,8 @@ Vec4 PositionController::calculate(Vec3 setpoints,
   errors(0) = setpoints(0) - actual(0);
   errors(1) = setpoints(1) - actual(1);
   errors(2) = setpoints(2) - actual(2);
-  euler2rot(0.0, 0.0, actual(3), 123, R);
+  euler << 0.0, 0.0, actual(3);
+  euler2rot(euler, 123, R);
   errors = R * errors;
 
   // roll, pitch, yaw and throttle (assuming NWU frame)
@@ -140,12 +142,6 @@ void PositionController::reset(void) {
   this->x_controller.reset();
   this->y_controller.reset();
   this->z_controller.reset();
-}
-
-void PositionController::printInputs(void) {
-  // std::cout << "SETPOINTS: " << setpoints.transpose() << std::endl;
-  // std::cout << "ACTUAL: " << actual.transpose() << std::endl;
-  // std::cout << "OUTPUTS: " << outputs.transpose() << std::endl;
 }
 
 void PositionController::printOutputs(void) {

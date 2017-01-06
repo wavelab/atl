@@ -68,8 +68,13 @@ int euler2quat(Vec3 euler, int euler_seq, Quaternion &q) {
   return 0;
 }
 
-int euler2rot(double phi, double theta, double psi, int euler_seq, Mat3 &R) {
+int euler2rot(Vec3 euler, int euler_seq, Mat3 &R) {
   double R11, R12, R13, R21, R22, R23, R31, R32, R33;
+  double phi, theta, psi;
+
+  phi = euler(0);
+  theta = euler(1);
+  psi = euler(2);
 
   if (euler_seq == 321) {
     // euler 3-2-1
@@ -189,28 +194,16 @@ int quat2rot(Quaternion q, Mat3 &R) {
   return 0;
 }
 
-int euler2Quaternion(const double roll,
-                     const double pitch,
-                     const double yaw,
-                     Eigen::Quaterniond &q) {
-  Eigen::AngleAxisd rollAngle(roll, Eigen::Vector3d::UnitX());
-  Eigen::AngleAxisd pitchAngle(pitch, Eigen::Vector3d::UnitY());
-  Eigen::AngleAxisd yawAngle(yaw, Eigen::Vector3d::UnitZ());
-
-  q = yawAngle * pitchAngle * rollAngle;
-  q.normalize();
-
-  return 0;
+void enu2nwu(Vec3 enu, Vec3 &nwu) {
+  nwu(0) = enu(1);
+  nwu(1) = -enu(0);
+  nwu(2) = enu(2);
 }
 
-int euler2RotationMatrix(const double roll,
-                         const double pitch,
-                         const double yaw,
-                         Eigen::Matrix3d &rot) {
-  Eigen::Quaterniond q_normalized;
-  euler2Quaternion(roll, pitch, yaw, q_normalized);
-  rot = q_normalized.toRotationMatrix();
-  return 0;
+void nwu2enu(Vec3 nwu, Vec3 &enu) {
+  enu(0) = -nwu(1);
+  enu(1) = nwu(0);
+  enu(2) = nwu(2);
 }
 
 }  // eof awesomo

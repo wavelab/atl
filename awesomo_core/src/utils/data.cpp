@@ -56,7 +56,9 @@ Pose::Pose(double roll,
            double x,
            double y,
            double z) {
-  euler2Quaternion(roll, pitch, yaw, this->q);
+  Vec3 euler;
+  euler << roll, pitch, yaw;
+  euler2quat(euler, 321, this->q);
   this->position << x, y, z;
 }
 // clang-format on

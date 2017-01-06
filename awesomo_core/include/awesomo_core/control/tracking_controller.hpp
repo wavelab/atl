@@ -5,40 +5,15 @@
 
 #include "awesomo_core/utils/utils.hpp"
 #include "awesomo_core/control/pid_controller.hpp"
+#include "awesomo_core/control/position_controller.hpp"
 
 
 namespace awesomo {
 
-class TrackingController {
+class TrackingController : public PositionController {
 public:
-  bool configured;
-
-  PID x_controller;
-  PID y_controller;
-  PID z_controller;
-
-  double hover_throttle;
-
-  double roll_limit[2];
-  double pitch_limit[2];
-
-  double setpoint_x;
-  double setpoint_y;
-  double setpoint_z;
-
-  double output_roll;
-  double output_pitch;
-  double output_throttle;
-
-  AttitudeCommand att_cmd;
-
   TrackingController(void);
   int configure(std::string config_file);
-  VecX calculate(VecX setpoints, VecX actual, double yaw, double dt);
-  void reset(void);
-  void printErrors(void);
-  void printInputs(void);
-  void printOutputs(void);
 };
 
 }  // end of awesomo namespace

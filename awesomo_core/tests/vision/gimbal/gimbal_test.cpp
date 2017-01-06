@@ -148,6 +148,7 @@ TEST(Gimbal, getTargetPositionInBodyFrame) {
 TEST(Gimbal, getTargetPositionInBodyPlanarFrame) {
   Gimbal gimbal;
   Quaternion imu;
+  Vec3 euler;
   Vec3 target_cf;
   Vec3 target_bpf;
 
@@ -164,7 +165,8 @@ TEST(Gimbal, getTargetPositionInBodyPlanarFrame) {
   std::cout << "[" << target_cf.transpose() << "]" << std::endl;
 
   // pitch forwards
-  euler2Quaternion(0.0, deg2rad(10), 0.0, imu);
+  euler << 0.0, deg2rad(10), 0.0;
+  euler2quat(euler, 321, imu);
   target_bpf = gimbal.getTargetPositionInBodyPlanarFrame(target_cf, imu);
   std::cout << "[quadrotor pitch forwards]\t\t";
   print_target_relative_to_body_planar_frame(target_bpf);
@@ -173,7 +175,8 @@ TEST(Gimbal, getTargetPositionInBodyPlanarFrame) {
   ASSERT_TRUE(target_bpf(2) < 0.0);
 
   // pitch backwards
-  euler2Quaternion(0.0, deg2rad(-10), 0.0, imu);
+  euler << 0.0, deg2rad(-10), 0.0;
+  euler2quat(euler, 321, imu);
   target_bpf = gimbal.getTargetPositionInBodyPlanarFrame(target_cf, imu);
   std::cout << "[quadrotor pitch backwards]\t\t";
   print_target_relative_to_body_planar_frame(target_bpf);
@@ -182,7 +185,8 @@ TEST(Gimbal, getTargetPositionInBodyPlanarFrame) {
   ASSERT_TRUE(target_bpf(2) < 0.0);
 
   // roll left
-  euler2Quaternion(deg2rad(-10), 0.0, 0.0, imu);
+  euler << deg2rad(-10), 0.0, 0.0;
+  euler2quat(euler, 321, imu);
   target_bpf = gimbal.getTargetPositionInBodyPlanarFrame(target_cf, imu);
   std::cout << "[quadrotor roll left]\t\t\t";
   print_target_relative_to_body_planar_frame(target_bpf);
@@ -191,7 +195,8 @@ TEST(Gimbal, getTargetPositionInBodyPlanarFrame) {
   ASSERT_TRUE(target_bpf(2) < 0.0);
 
   // roll right
-  euler2Quaternion(deg2rad(10), 0.0, 0.0, imu);
+  euler << deg2rad(10), 0.0, 0.0;
+  euler2quat(euler, 321, imu);
   target_bpf = gimbal.getTargetPositionInBodyPlanarFrame(target_cf, imu);
   std::cout << "[quadrotor roll right]\t\t\t";
   print_target_relative_to_body_planar_frame(target_bpf);
@@ -200,7 +205,8 @@ TEST(Gimbal, getTargetPositionInBodyPlanarFrame) {
   ASSERT_TRUE(target_bpf(2) < 0.0);
 
   // pitch forward, roll left
-  euler2Quaternion(deg2rad(-10), deg2rad(10), 0.0, imu);
+  euler << deg2rad(-10), deg2rad(10), 0.0;
+  euler2quat(euler, 321, imu);
   target_bpf = gimbal.getTargetPositionInBodyPlanarFrame(target_cf, imu);
   std::cout << "[quadrotor pitch forward, roll left]\t";
   print_target_relative_to_body_planar_frame(target_bpf);
@@ -209,7 +215,8 @@ TEST(Gimbal, getTargetPositionInBodyPlanarFrame) {
   ASSERT_TRUE(target_bpf(2) < 0.0);
 
   // pitch forward, roll right
-  euler2Quaternion( deg2rad(10), deg2rad(10), 0.0, imu);
+  euler << deg2rad(10), deg2rad(10), 0.0;
+  euler2quat(euler, 321, imu);
   target_bpf = gimbal.getTargetPositionInBodyPlanarFrame(target_cf, imu);
   std::cout << "[quadrotor pitch forward, roll right]\t";
   print_target_relative_to_body_planar_frame(target_bpf);
@@ -218,7 +225,8 @@ TEST(Gimbal, getTargetPositionInBodyPlanarFrame) {
   ASSERT_TRUE(target_bpf(2) < 0.0);
 
   // pitch backwards, roll left
-  euler2Quaternion(deg2rad(-10), deg2rad(-10), 0.0, imu);
+  euler << deg2rad(-10), deg2rad(-10), 0.0;
+  euler2quat(euler, 321, imu);
   target_bpf = gimbal.getTargetPositionInBodyPlanarFrame(target_cf, imu);
   std::cout << "[quadrotor pitch backwards, roll left]\t";
   print_target_relative_to_body_planar_frame(target_bpf);
@@ -227,7 +235,8 @@ TEST(Gimbal, getTargetPositionInBodyPlanarFrame) {
   ASSERT_TRUE(target_bpf(2) < 0.0);
 
   // pitch backwards, roll right
-  euler2Quaternion(deg2rad(10), deg2rad(-10), 0.0, imu);
+  euler << deg2rad(10), deg2rad(-10), 0.0;
+  euler2quat(euler, 321, imu);
   target_bpf = gimbal.getTargetPositionInBodyPlanarFrame(target_cf, imu);
   std::cout << "[quadrotor pitch backwards, roll right]\t";
   print_target_relative_to_body_planar_frame(target_bpf);
@@ -239,6 +248,7 @@ TEST(Gimbal, getTargetPositionInBodyPlanarFrame) {
 TEST(Gimbal, trackTarget) {
   Gimbal gimbal;
   Quaternion imu;
+  Vec3 euler;
   Vec3 target_cf;
   Vec3 target_bpf;
 
@@ -255,7 +265,8 @@ TEST(Gimbal, trackTarget) {
   std::cout << "[" << target_cf.transpose() << "]" << std::endl;
 
   // pitch forwards
-  euler2Quaternion(0.0, deg2rad(10), 0.0, imu);
+  euler << 0.0, deg2rad(10), 0.0;
+  euler2quat(euler, 321, imu);
   target_bpf = gimbal.getTargetPositionInBodyPlanarFrame(target_cf, imu);
   std::cout << "[quadrotor pitch forwards]\t\t";
   print_target_relative_to_body_planar_frame(target_bpf);
