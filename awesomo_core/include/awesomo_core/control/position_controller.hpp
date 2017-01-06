@@ -19,23 +19,17 @@ public:
   PID z_controller;
 
   double hover_throttle;
-
   double roll_limit[2];
   double pitch_limit[2];
 
-  double setpoint_x;
-  double setpoint_y;
-  double setpoint_z;
-
-  double output_roll;
-  double output_pitch;
-  double output_throttle;
+  Vec3 setpoints;
+  Vec4 outputs;
 
   AttitudeCommand att_cmd;
 
   PositionController(void);
   int configure(std::string config_file);
-  VecX calculate(VecX setpoints, VecX actual, double yaw, double dt);
+  Vec4 calculate(Vec3 setpoints, Vec4 actual, double yaw, double dt);
   void reset(void);
   void printErrors(void);
   void printInputs(void);

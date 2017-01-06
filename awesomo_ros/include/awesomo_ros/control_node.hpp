@@ -51,6 +51,7 @@ public:
   void poseCallback(const geometry_msgs::PoseStamped &msg);
   void radioCallback(const mavros_msgs::RCIn &msg);
   void aprilTagCallback(const awesomo_msgs::AprilTagPose &msg);
+  void hoverSetCallback(const geometry_msgs::Vector3 &msg);
   void positionControllerSetCallback(const awesomo_msgs::PositionControllerSettings &msg);
   int loopCallback(void);
   void publishStats(void);

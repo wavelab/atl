@@ -36,13 +36,14 @@ int ControlNode::configure(const std::string node_name, int hz) {
   ROSNode::registerSubscriber("pose_topic", &ControlNode::poseCallback, this);
   ROSNode::registerSubscriber("radio_topic", &ControlNode::radioCallback, this);
   ROSNode::registerSubscriber("apriltag_topic", &ControlNode::aprilTagCallback, this);
+  ROSNode::registerSubscriber("hover_set_topic", &ControlNode::hoverSetCallback, this);
   ROSNode::registerSubscriber("position_controller_set_topic", &ControlNode::positionControllerSetCallback, this);
   // clang-format on
 
   // publishers
   // clang-format off
-  ROSNode::registerPublisher<geometry_msgs::PoseStamped>("setpoint_attitude_topic");
-  ROSNode::registerPublisher<std_msgs::Float64>("setpoint_throttle_topic");
+  ROSNode::registerPublisher<geometry_msgs::PoseStamped>("setpoint_attitude_topic", 1);
+  ROSNode::registerPublisher<std_msgs::Float64>("setpoint_throttle_topic", 1);
   ROSNode::registerPublisher<geometry_msgs::PoseStamped>("setpoint_position_topic");
   ROSNode::registerPublisher<awesomo_msgs::PositionControllerStats>("controller_stats_topic");
   ROSNode::registerPublisher<awesomo_msgs::KFStats>("kf_stats_topic");
@@ -180,22 +181,29 @@ void ControlNode::publishStats(void) {
   // this->ros_pubs["kf_plotting_topic"].publish(kf_plot_msg);
 }
 
+void ControlNode::hoverSetCallback(const geometry_msgs::Vector3 &msg) {
+  this->quadrotor.hover_mode.hover_position(0) = msg.x;
+  this->quadrotor.hover_mode.hover_position(1) = msg.y;
+  this->quadrotor.hover_mode.hover_position(2) = msg.z;
+  this->quadrotor.hover_mode.hover_height = msg.z;
+}
+
 void ControlNode::positionControllerSetCallback(const awesomo_msgs::PositionControllerSettings &msg) {
   PositionController *position_controller;
 
   position_controller = &this->quadrotor.position_controller;
 
-  position_controller->roll_limit[0] = msg.roll_controller.min;
-  position_controller->roll_limit[1] = msg.roll_controller.max;
-  position_controller->x_controller.k_p = msg.roll_controller.k_p;
-  position_controller->x_controller.k_i = msg.roll_controller.k_i;
-  position_controller->x_controller.k_d = msg.roll_controller.k_d;
-
   position_controller->pitch_limit[0] = msg.pitch_controller.min;
   position_controller->pitch_limit[1] = msg.pitch_controller.max;
-  position_controller->y_controller.k_p = msg.pitch_controller.k_p;
-  position_controller->y_controller.k_i = msg.pitch_controller.k_i;
-  position_controller->y_controller.k_d = msg.pitch_controller.k_d;
+  position_controller->x_controller.k_p = msg.pitch_controller.k_p;
+  position_controller->x_controller.k_i = msg.pitch_controller.k_i;
+  position_controller->x_controller.k_d = msg.pitch_controller.k_d;
+
+  position_controller->roll_limit[0] = msg.roll_controller.min;
+  position_controller->roll_limit[1] = msg.roll_controller.max;
+  position_controller->y_controller.k_p = msg.roll_controller.k_p;
+  position_controller->y_controller.k_i = msg.roll_controller.k_i;
+  position_controller->y_controller.k_d = msg.roll_controller.k_d;
 
   position_controller->z_controller.k_p = msg.throttle_controller.k_p;
   position_controller->z_controller.k_i = msg.throttle_controller.k_i;

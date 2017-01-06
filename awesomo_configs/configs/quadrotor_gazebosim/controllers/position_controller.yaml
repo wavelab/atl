@@ -1,19 +1,19 @@
 roll_controller:
     min: -30
     max: 30
-    k_p: 0.6
+    k_p: 0.2
     k_i: 0.0
-    k_d: 0.2
+    k_d: 0.1
 
 pitch_controller:
     min: -30
     max: 30
-    k_p: 0.6
+    k_p: 0.2
     k_i: 0.0
-    k_d: 0.2
+    k_d: 0.1
 
 throttle_controller:
     hover_throttle: 0.5
-    k_p: 0.4
+    k_p: 0.5
     k_i: 0.0
-    k_d: 0.1
+    k_d: 0.4

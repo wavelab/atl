@@ -18,13 +18,8 @@ PositionController::PositionController(void) {
   this->pitch_limit[0] = 0.0;
   this->pitch_limit[1] = 0.0;
 
-  this->setpoint_x = 0.0;
-  this->setpoint_y = 0.0;
-  this->setpoint_z = 0.0;
-
-  this->output_roll = 0.0;
-  this->output_pitch = 0.0;
-  this->output_throttle = 0.0;
+  this->setpoints  << 0.0, 0.0, 0.0;
+  this->outputs << 0.0, 0.0, 0.0, 0.0;
 }
 
 int PositionController::configure(std::string config_file) {
@@ -83,26 +78,35 @@ int PositionController::configure(std::string config_file) {
   return 0;
 }
 
-VecX PositionController::calculate(VecX setpoints,
-                                   VecX actual,
+Vec4 PositionController::calculate(Vec3 setpoints,
+                                   Vec4 actual,
                                    double yaw,
                                    double dt) {
   double r, p, y, t;
-  VecX outputs(4);
+  Vec3 errors;
+  Vec4 outputs;
+  Mat3 R;
 
+  // check rate
   this->dt += dt;
-  if (this->dt < 0.08) {
-    outputs << this->output_roll, this->output_pitch, yaw, this->output_throttle;
-    return outputs;
+  if (this->dt < 0.01) {
+    return this->outputs;
   }
+
+  // calculate RPY errors relative to quadrotor by incorporating yaw
+  errors(0) = setpoints(0) - actual(0);
+  errors(1) = setpoints(1) - actual(1);
+  errors(2) = setpoints(2) - actual(2);
+  euler2rot(0.0, 0.0, actual(3), 123, R);
+  errors = R * errors;
 
   // roll, pitch, yaw and throttle (assuming NWU frame)
   // clang-format off
-  r = -this->y_controller.calculate(setpoints(1), actual(1), this->dt);
-  p = this->x_controller.calculate(setpoints(0), actual(0), this->dt);
+  r = -this->y_controller.calculate(errors(1), 0.0, this->dt);
+  p = this->x_controller.calculate(errors(0), 0.0, this->dt);
   y = yaw;
-  t = this->hover_throttle + this->z_controller.calculate(setpoints(2), actual(2), this->dt);
-  t /= fabs(cos(actual(1)) * cos(actual(0)));  // adjust throttle for roll and pitch
+  t = this->hover_throttle + this->z_controller.calculate(errors(2), 0.0, this->dt);
+  t /= fabs(cos(r) * cos(p));  // adjust throttle for roll and pitch
   // clang-format o
 
   // limit roll, pitch
@@ -116,23 +120,17 @@ VecX PositionController::calculate(VecX setpoints,
   t = (t > 1.0) ? 1.0 : t;
 
   // yaw first if above threshold
-  // if (fabs(yaw - actual(3)) > deg2rad(5)) {
-  //   r = 0;
-  //   p = 0;
-  // }
+  if (fabs(yaw - actual(3)) > deg2rad(10.0)) {
+    r = 0;
+    p = 0;
+  }
 
   // set outputs
   outputs << r, p, y, t;
 
   // keep track of setpoints and outputs
-  this->setpoint_x = setpoints(0);
-  this->setpoint_y = setpoints(1);
-  this->setpoint_z = setpoints(2);
-
-  this->output_roll = outputs(0);
-  this->output_pitch = outputs(1);
-  this->output_throttle = outputs(3);
-
+  this->setpoints = setpoints;
+  this->outputs = outputs;
   this->dt = 0.0;
 
   return outputs;
@@ -151,9 +149,9 @@ void PositionController::printInputs(void) {
 }
 
 void PositionController::printOutputs(void) {
-  printf("roll: %.2f\t", rad2deg(this->output_roll));
-  printf("pitch: %.2f\t", rad2deg(this->output_pitch));
-  printf("throttle: %.2f\n", rad2deg(this->output_throttle));
+  printf("roll: %.2f\t", rad2deg(this->outputs(0)));
+  printf("pitch: %.2f\t", rad2deg(this->outputs(1)));
+  printf("throttle: %.2f\n", rad2deg(this->outputs(3)));
 }
 
 void PositionController::printErrors(void) {

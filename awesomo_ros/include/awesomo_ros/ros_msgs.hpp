@@ -46,25 +46,25 @@ void buildPositionControllerStatsMsg(int seq,
   msg.header.frame_id = "awesomo_pos_controller_stats";
 
   // roll
-  msg.roll_p_error = controller.x_controller.error_p;
-  msg.roll_i_error = controller.x_controller.error_i;
-  msg.roll_d_error = controller.x_controller.error_d;
-  msg.roll_output = controller.output_roll * 180 / M_PI;
-  msg.roll_setpoint = controller.setpoint_x;
+  msg.roll_p_error = controller.y_controller.error_p;
+  msg.roll_i_error = controller.y_controller.error_i;
+  msg.roll_d_error = controller.y_controller.error_d;
+  msg.roll_output = controller.outputs(0) * 180 / M_PI;
+  msg.roll_setpoint = controller.setpoints(0);
 
   // pitch
-  msg.pitch_p_error = controller.y_controller.error_p;
-  msg.pitch_i_error = controller.y_controller.error_i;
-  msg.pitch_d_error = controller.y_controller.error_d;
-  msg.pitch_output = controller.output_pitch * 180 / M_PI;
-  msg.pitch_setpoint = controller.setpoint_y;
+  msg.pitch_p_error = controller.x_controller.error_p;
+  msg.pitch_i_error = controller.x_controller.error_i;
+  msg.pitch_d_error = controller.x_controller.error_d;
+  msg.pitch_output = controller.outputs(1) * 180 / M_PI;
+  msg.pitch_setpoint = controller.setpoints(1);
 
   // thrust
   msg.throttle_p_error = controller.z_controller.error_p;
   msg.throttle_i_error = controller.z_controller.error_i;
   msg.throttle_d_error = controller.z_controller.error_d;
-  msg.throttle_output = controller.output_throttle;
-  msg.throttle_setpoint = controller.setpoint_z;
+  msg.throttle_output = controller.outputs(3);
+  msg.throttle_setpoint = controller.setpoints(2);
 }
 // clang-format on
 

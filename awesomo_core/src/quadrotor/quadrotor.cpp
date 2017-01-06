@@ -48,10 +48,11 @@ int Quadrotor::stepHoverMode(Pose pose, double dt) {
   setpoint = this->hover_mode.hover_position;
   quat2euler(pose.q, 321, euler);
 
+  // transform ENU to NWU
   actual(0) = pose.position(1);
   actual(1) = -pose.position(0);
   actual(2) = pose.position(2);
-  actual(3) = euler(2);
+  actual(3) = euler(2);  // yaw
 
   // clang-format off
   output = this->position_controller.calculate(

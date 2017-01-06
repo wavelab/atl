@@ -22,6 +22,7 @@
   <param name="setpoint_attitude_topic" value="/mavros/setpoint_attitude/attitude" />
   <param name="setpoint_throttle_topic" value="/mavros/setpoint_attitude/att_throttle" />
   <param name="setpoint_position_topic" value="/mavros/setpoint_position/local" />
+  <param name="hover_set_topic" value="/awesomo/control/hover/set" />
   <param name="position_controller_set_topic" value="/awesomo/control/position_controller/set" />
 
   <!-- node -->
