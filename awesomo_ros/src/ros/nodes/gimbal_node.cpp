@@ -1,4 +1,4 @@
-#include "awesomo_ros/gimbal_node.hpp"
+#include "awesomo_ros/nodes/gimbal_node.hpp"
 
 namespace awesomo {
 

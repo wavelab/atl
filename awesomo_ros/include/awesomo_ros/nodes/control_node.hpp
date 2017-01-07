@@ -1,5 +1,5 @@
-#ifndef __AWESOMO_ROS_CONTROL_NODE_HPP__
-#define __AWESOMO_ROS_CONTROL_NODE_HPP__
+#ifndef __AWESOMO_ROS_NODES_CONTROL_NODE_HPP__
+#define __AWESOMO_ROS_NODES_CONTROL_NODE_HPP__
 
 #include <ros/ros.h>
 
@@ -18,8 +18,8 @@
 
 #include <awesomo_core/awesomo_core.hpp>
 
-#include "awesomo_ros/ros_node.hpp"
-#include "awesomo_ros/ros_msgs.hpp"
+#include "awesomo_ros/utils/node.hpp"
+#include "awesomo_ros/utils/msgs.hpp"
 
 
 namespace awesomo {

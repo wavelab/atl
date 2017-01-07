@@ -1,4 +1,4 @@
-#include "awesomo_ros/apriltag_node.hpp"
+#include "awesomo_ros/nodes/apriltag_node.hpp"
 
 namespace awesomo {
 

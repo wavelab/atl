@@ -1,5 +1,5 @@
-#ifndef __AWESOMO_ROS_UTILS_HPP__
-#define __AWESOMO_ROS_UTILS_HPP__
+#ifndef __AWESOMO_ROS_UTILS_MATH_HPP__
+#define __AWESOMO_ROS_UTILS_MATH_HPP__
 
 #include <Eigen/Geometry>
 

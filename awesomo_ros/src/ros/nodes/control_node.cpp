@@ -1,4 +1,4 @@
-#include "awesomo_ros/control_node.hpp"
+#include "awesomo_ros/nodes/control_node.hpp"
 
 
 namespace awesomo {

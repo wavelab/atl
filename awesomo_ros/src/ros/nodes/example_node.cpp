@@ -1,4 +1,4 @@
-#include "awesomo_ros/example_node.hpp"
+#include "awesomo_ros/nodes/example_node.hpp"
 
 namespace awesomo {
 

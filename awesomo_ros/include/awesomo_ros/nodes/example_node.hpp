@@ -6,8 +6,8 @@
 
 #include <awesomo_core/awesomo_core.hpp>
 
-#include "awesomo_ros/ros_node.hpp"
-#include "awesomo_ros/ros_msgs.hpp"
+#include "awesomo_ros/utils/node.hpp"
+#include "awesomo_ros/utils/msgs.hpp"
 
 
 namespace awesomo {

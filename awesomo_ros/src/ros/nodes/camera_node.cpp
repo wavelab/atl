@@ -1,4 +1,4 @@
-#include "awesomo_ros/camera_node.hpp"
+#include "awesomo_ros/nodes/camera_node.hpp"
 
 namespace awesomo {
 

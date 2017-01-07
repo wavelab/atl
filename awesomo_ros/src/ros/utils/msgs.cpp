@@ -1,21 +1,4 @@
-#ifndef __AWESOMO_ROS_MSGS_HPP__
-#define __AWESOMO_ROS_MSGS_HPP__
-
-#include <std_msgs/Float64.h>
-
-#include <geometry_msgs/Vector3.h>
-#include <geometry_msgs/Quaternion.h>
-#include <geometry_msgs/PoseStamped.h>
-#include <geometry_msgs/TwistStamped.h>
-#include <geometry_msgs/PoseWithCovarianceStamped.h>
-
-#include <awesomo_core/awesomo_core.hpp>
-
-#include <awesomo_msgs/KFPlotting.h>
-#include <awesomo_msgs/KFStats.h>
-#include <awesomo_msgs/AprilTagPose.h>
-#include <awesomo_msgs/PositionControllerStats.h>
-#include <awesomo_msgs/PositionControllerSettings.h>
+#include "awesomo_ros/utils/msgs.hpp"
 
 
 namespace awesomo {
@@ -192,7 +175,4 @@ TagPose convertAprilTagPoseMsg2TagPose(awesomo_msgs::AprilTagPose msg) {
   return TagPose(id, detected, p);
 }
 
-
-
 }  // end of awesomo namespace
-#endif
