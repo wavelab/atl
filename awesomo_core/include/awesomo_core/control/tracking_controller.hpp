@@ -10,7 +10,7 @@
 
 namespace awesomo {
 
-class TrackingController : public PositionController {
+class TrackingController {
 public:
   TrackingController(void);
   int configure(std::string config_file);

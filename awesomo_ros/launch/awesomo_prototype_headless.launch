@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <launch>
+  <!-- sync gazebo time with ros -->
   <param name="use_sim_time" value="true" />
 
   <!-- prototype -->
