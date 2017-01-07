@@ -19,10 +19,10 @@ namespace awesomo {
 //   }
 
 // clang-format off
-void buildPositionControllerStatsMsg(int seq,
-                                     ros::Time time,
-                                     PositionController controller,
-                                     awesomo_msgs::PositionControllerStats &msg) {
+void buildPCtrlStatsMsg(int seq,
+                        ros::Time time,
+                        PositionController controller,
+                        awesomo_msgs::PCtrlStats &msg) {
   // msg header
   msg.header.seq = seq;
   msg.header.stamp = time;
@@ -130,9 +130,8 @@ void buildAprilTagTrackMsg(TagPose tag, geometry_msgs::Vector3 &msg) {
   msg.z = tag.position(2);
 }
 
-void buildPositionControllerSettingsMsg(
-    PositionController pc,
-    awesomo_msgs::PositionControllerSettings &msg) {
+void buildPCtrlSettingsMsg(PositionController pc,
+                           awesomo_msgs::PCtrlSettings &msg) {
   msg.roll_controller.min = pc.roll_limit[0];
   msg.roll_controller.max = pc.roll_limit[1];
   msg.roll_controller.k_p = pc.x_controller.k_p;

@@ -12,9 +12,11 @@
 
 namespace awesomo {
 
+// NODE SETTINGS
 #define NODE_NAME "example"
 #define NODE_RATE 1
 
+// PUBLISH TOPIC
 #define SAY_TOPIC "example_node/say"
 
 class ExampleNode : public ROSNode {

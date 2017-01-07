@@ -10,8 +10,14 @@
 
 namespace awesomo {
 
+// NODE SETTINGS
 #define GIMBAL_NODE_NAME "awesomo_gimbal"
 #define GIMBAL_NODE_RATE 100
+
+// PUBLISH TOPICS
+
+// SUBSCRIBE TOPICS
+
 
 class GimbalNode : public ROSNode {
 public:

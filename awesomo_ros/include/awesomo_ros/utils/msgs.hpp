@@ -14,16 +14,16 @@
 #include <awesomo_msgs/KFPlotting.h>
 #include <awesomo_msgs/KFStats.h>
 #include <awesomo_msgs/AprilTagPose.h>
-#include <awesomo_msgs/PositionControllerStats.h>
-#include <awesomo_msgs/PositionControllerSettings.h>
+#include <awesomo_msgs/PCtrlStats.h>
+#include <awesomo_msgs/PCtrlSettings.h>
 
 
 namespace awesomo {
 
-void buildPositionControllerStatsMsg(int seq,
-                                     ros::Time time,
-                                     PositionController controller,
-                                     awesomo_msgs::PositionControllerStats &msg);
+void buildPCtrlStatsMsg(int seq,
+                        ros::Time time,
+                        PositionController controller,
+                        awesomo_msgs::PCtrlStats &msg);
 void buildAttitudeMsg(int seq,
                       ros::Time time,
                       AttitudeCommand att_cmd,
@@ -39,8 +39,8 @@ void buildKFPlottingMsg(int seq,
                         awesomo_msgs::KFPlotting &msg);
 void buildAprilTagPoseMsg(TagPose tag, awesomo_msgs::AprilTagPose &msg);
 void buildAprilTagTrackMsg(TagPose tag, geometry_msgs::Vector3 &msg);
-void buildPositionControllerSettingsMsg(PositionController pc,
-                                        awesomo_msgs::PositionControllerSettings &msg);
+void buildPCtrlSettingsMsg(PositionController pc,
+                           awesomo_msgs::PCtrlSettings &msg);
 Pose convertPoseStampedMsg2Pose(geometry_msgs::PoseStamped msg);
 TagPose convertAprilTagPoseMsg2TagPose(awesomo_msgs::AprilTagPose msg);
 

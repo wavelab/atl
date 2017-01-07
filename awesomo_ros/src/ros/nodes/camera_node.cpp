@@ -18,8 +18,9 @@ int CameraNode::configure(std::string node_name, int hz) {
   };
   this->camera.initialize();
 
-  // image transport
-  this->registerImagePublisher("camera_image_topic");
+  // register publisher and subscribers
+  this->registerImagePublisher(CAMERA_IMAGE_TOPIC);
+  this->registerShutdown(SHUTDOWN_TOPIC);
 
   // register loop callback
   this->registerLoopCallback(std::bind(&CameraNode::loopCallback, this));

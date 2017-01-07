@@ -13,8 +13,8 @@
 #include <awesomo_msgs/KFStats.h>
 #include <awesomo_msgs/KFPlotting.h>
 #include <awesomo_msgs/AprilTagPose.h>
-#include <awesomo_msgs/PositionControllerStats.h>
-#include <awesomo_msgs/PositionControllerSettings.h>
+#include <awesomo_msgs/PCtrlStats.h>
+#include <awesomo_msgs/PCtrlSettings.h>
 
 #include <awesomo_core/awesomo_core.hpp>
 
@@ -24,9 +24,29 @@
 
 namespace awesomo {
 
-// ROS NODE
+// NODE SETTINGS
 #define CONTROL_NODE_NAME "awesomo_control"
 #define CONTROL_NODE_RATE 100
+
+// PUBLISH TOPICS
+#define RADIO_TOPIC "/mavros/rc/in"
+#define STATE_TOPIC "/mavros/state"
+#define POSE_TOPIC "/mavros/local_position/pose"
+#define PCTRL_STATS_TOPIC "/awesomo/position_controller/stats"
+#define KF_STATS_TOPIC "/awesomo/kf_estimation/stats"
+#define KF_PLOT_TOPIC "/awesomo/kf_estimation/plot"
+#define PCTRL_GET_TOPIC "/awesomo/control/position_controller/get"
+
+// SUBSCRIBE TOPICS
+#define SHUTDOWN "/awesomo/control/shutdown"
+#define MODE_TOPIC "/mavros/set_mode"
+#define ARM_TOPIC "/mavros/cmd/arming"
+#define APRILTAG_TOPIC "/awesomo/apriltag/pose"
+#define SETPOINT_ATTITUDE_TOPIC "/mavros/setpoint_attitude/attitude"
+#define SETPOINT_THROTTLE_TOPIC "/mavros/setpoint_attitude/att_throttle"
+#define SETPOINT_POSITION_TOPIC "/mavros/setpoint_position/local"
+#define HOVER_SET_TOPIC "/awesomo/control/hover/set"
+#define PCTRL_SET_TOPIC "/awesomo/control/position_controller/set"
 
 class ControlNode : public ROSNode {
 public:
@@ -52,7 +72,7 @@ public:
   void radioCallback(const mavros_msgs::RCIn &msg);
   void aprilTagCallback(const awesomo_msgs::AprilTagPose &msg);
   void hoverSetCallback(const geometry_msgs::Vector3 &msg);
-  void positionControllerSetCallback(const awesomo_msgs::PositionControllerSettings &msg);
+  void positionControllerSetCallback(const awesomo_msgs::PCtrlSettings &msg);
   int loopCallback(void);
   void publishStats(void);
 };

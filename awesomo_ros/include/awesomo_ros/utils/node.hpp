@@ -33,7 +33,6 @@ public:
   ::ros::Rate *ros_rate;
   ::ros::Time ros_last_updated;
 
-  std::map<std::string, std::string> ros_topics;
   std::map<std::string, ::ros::Publisher> ros_pubs;
   std::map<std::string, ::ros::Subscriber> ros_subs;
 
@@ -45,40 +44,30 @@ public:
   ~ROSNode(void);
   int configure(const std::string node_name, int hz);
   void shutdownCallback(const std_msgs::Bool &msg);
-  int registerTopic(std::string topic_name, std::string &topic_url);
-  int registerShutdown(std::string topic_name);
-  int registerImagePublisher(const std::string &topic_name);
+  int registerShutdown(std::string topic);
+  int registerImagePublisher(const std::string &topic);
 
   template <typename M, typename T>
-  int registerImageSubscriber(const std::string &topic_name,
+  int registerImageSubscriber(const std::string &topic,
                               void (T::*fp)(M),
                               T *obj,
                               uint32_t queue_size = 1) {
-    std::string topic_url;
-
     // pre-check
     if (this->configured == false) {
       return -1;
     }
 
-    // register topic
-    if (this->registerTopic(topic_name, topic_url) != 0) {
-      ROS_ERROR(E_TOPIC, topic_name.c_str());
-      return -2;
-    }
-
     // image transport
     image_transport::ImageTransport it(*this->ros_nh);
-    this->img_sub = it.subscribe(topic_url, queue_size, fp, obj);
+    this->img_sub = it.subscribe(topic, queue_size, fp, obj);
 
     return 0;
   }
 
   template <typename M>
-  int registerPublisher(const std::string &topic_name,
+  int registerPublisher(const std::string &topic,
                         uint32_t queue_size = 100,
                         bool latch = false) {
-    std::string topic_url;
     ::ros::Publisher publisher;
 
     // pre-check
@@ -86,26 +75,19 @@ public:
       return -1;
     }
 
-    // register topic
-    if (this->registerTopic(topic_name, topic_url) != 0) {
-      ROS_ERROR(E_TOPIC, topic_name.c_str());
-      return -2;
-    }
-
     // register publisher
-    publisher = this->ros_nh->advertise<M>(topic_url, queue_size, latch);
-    ROS_INFO(INFO_PUB_INIT, topic_url.c_str());
-    this->ros_pubs[topic_name] = publisher;
+    publisher = this->ros_nh->advertise<M>(topic, queue_size, latch);
+    ROS_INFO(INFO_PUB_INIT, topic.c_str());
+    this->ros_pubs[topic] = publisher;
 
     return 0;
   }
 
   template <typename M, typename T>
-  int registerSubscriber(const std::string &topic_name,
+  int registerSubscriber(const std::string &topic,
                          void (T::*fp)(M),
                          T *obj,
                          uint32_t queue_size = 100) {
-    std::string topic_url;
     ::ros::Subscriber subscriber;
 
     // pre-check
@@ -113,16 +95,10 @@ public:
       return -1;
     }
 
-    // register topic
-    if (this->registerTopic(topic_name, topic_url) != 0) {
-      ROS_ERROR(E_TOPIC, topic_name.c_str());
-      return -2;
-    }
-
     // register subscriber
-    ROS_INFO(INFO_SUB_INIT, topic_url.c_str());
-    subscriber = this->ros_nh->subscribe(topic_url, queue_size, fp, obj);
-    this->ros_subs[topic_name] = subscriber;
+    ROS_INFO(INFO_SUB_INIT, topic.c_str());
+    subscriber = this->ros_nh->subscribe(topic, queue_size, fp, obj);
+    this->ros_subs[topic] = subscriber;
 
     return 0;
   }

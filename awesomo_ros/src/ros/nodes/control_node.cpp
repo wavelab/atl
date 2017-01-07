@@ -26,34 +26,34 @@ int ControlNode::configure(const std::string node_name, int hz) {
 
   // services
   // clang-format off
-  this->mode_client = this->ros_nh->serviceClient<mavros_msgs::SetMode>("mode_topic");
-  this->arming_client = this->ros_nh->serviceClient<mavros_msgs::CommandBool>("arm_topic");
+  this->mode_client = this->ros_nh->serviceClient<mavros_msgs::SetMode>(MODE_TOPIC);
+  this->arming_client = this->ros_nh->serviceClient<mavros_msgs::CommandBool>(ARM_TOPIC);
   // clang-format on
 
   // subscribers
   // clang-format off
-  ROSNode::registerSubscriber("state_topic", &ControlNode::stateCallback, this);
-  ROSNode::registerSubscriber("pose_topic", &ControlNode::poseCallback, this);
-  ROSNode::registerSubscriber("radio_topic", &ControlNode::radioCallback, this);
-  ROSNode::registerSubscriber("apriltag_topic", &ControlNode::aprilTagCallback, this);
-  ROSNode::registerSubscriber("hover_set_topic", &ControlNode::hoverSetCallback, this);
-  ROSNode::registerSubscriber("position_controller_set_topic", &ControlNode::positionControllerSetCallback, this);
+  this->registerSubscriber(STATE_TOPIC, &ControlNode::stateCallback, this);
+  this->registerSubscriber(POSE_TOPIC, &ControlNode::poseCallback, this);
+  this->registerSubscriber(RADIO_TOPIC, &ControlNode::radioCallback, this);
+  this->registerSubscriber(APRILTAG_TOPIC, &ControlNode::aprilTagCallback, this);
+  this->registerSubscriber(HOVER_SET_TOPIC, &ControlNode::hoverSetCallback, this);
+  this->registerSubscriber(PCTRL_SET_TOPIC, &ControlNode::positionControllerSetCallback, this);
   // clang-format on
 
   // publishers
   // clang-format off
-  ROSNode::registerPublisher<geometry_msgs::PoseStamped>("setpoint_attitude_topic", 1);
-  ROSNode::registerPublisher<std_msgs::Float64>("setpoint_throttle_topic", 1);
-  ROSNode::registerPublisher<geometry_msgs::PoseStamped>("setpoint_position_topic");
-  ROSNode::registerPublisher<awesomo_msgs::PositionControllerStats>("controller_stats_topic");
-  ROSNode::registerPublisher<awesomo_msgs::KFStats>("kf_stats_topic");
-  ROSNode::registerPublisher<awesomo_msgs::KFPlotting>("kf_plotting_topic");
-  ROSNode::registerPublisher<awesomo_msgs::PositionControllerSettings>("position_controller_get_topic");
+  this->registerPublisher<geometry_msgs::PoseStamped>(SETPOINT_ATTITUDE_TOPIC, 1);
+  this->registerPublisher<std_msgs::Float64>(SETPOINT_THROTTLE_TOPIC, 1);
+  this->registerPublisher<geometry_msgs::PoseStamped>(SETPOINT_POSITION_TOPIC);
+  this->registerPublisher<awesomo_msgs::PCtrlStats>(PCTRL_STATS_TOPIC);
+  this->registerPublisher<awesomo_msgs::KFStats>(KF_STATS_TOPIC);
+  this->registerPublisher<awesomo_msgs::KFPlotting>(KF_PLOT_TOPIC);
+  this->registerPublisher<awesomo_msgs::PCtrlSettings>(PCTRL_GET_TOPIC);
   // clang-format on
 
   // loop callback
   // clang-format off
-  ROSNode::registerLoopCallback(std::bind(&ControlNode::loopCallback, this));
+  this->registerLoopCallback(std::bind(&ControlNode::loopCallback, this));
   // clang-format on
 
   // wait till connected to FCU
@@ -147,8 +147,8 @@ int ControlNode::loopCallback(void) {
   // publish msgs
   att_cmd = this->quadrotor.att_cmd;
   buildAttitudeMsg(seq, ros::Time::now(), att_cmd, att_msg, thr_msg);
-  this->ros_pubs["setpoint_attitude_topic"].publish(att_msg);
-  this->ros_pubs["setpoint_throttle_topic"].publish(thr_msg);
+  this->ros_pubs[SETPOINT_ATTITUDE_TOPIC].publish(att_msg);
+  this->ros_pubs[SETPOINT_THROTTLE_TOPIC].publish(thr_msg);
   this->publishStats();
 
   return 0;
@@ -157,8 +157,8 @@ int ControlNode::loopCallback(void) {
 void ControlNode::publishStats(void) {
   int seq;
   ros::Time time;
-  awesomo_msgs::PositionControllerStats pcs_stats_msg;
-  awesomo_msgs::PositionControllerSettings pcs_settings_msg;
+  awesomo_msgs::PCtrlStats pcs_stats_msg;
+  awesomo_msgs::PCtrlSettings pcs_settings_msg;
   awesomo_msgs::KFStats kf_stats_msg;
   awesomo_msgs::KFPlotting kf_plot_msg;
 
@@ -168,17 +168,17 @@ void ControlNode::publishStats(void) {
 
   // build msgs
   // clang-format off
-  // buildPositionControllerStatsMsg(seq, time, this->quadrotor.position_controller, pcs_stats_msg);
-  buildPositionControllerSettingsMsg(this->quadrotor.position_controller, pcs_settings_msg);
+  // buildPCtrlStatsMsg(seq, time, this->quadrotor.position_controller, pcs_stats_msg);
+  buildPCtrlSettingsMsg(this->quadrotor.position_controller, pcs_settings_msg);
   // buildKFStatsMsg(seq, time, this->quadrotor.apriltag_estimator, kf_stats_msg);
   // buildKFPlottingMsg(seq, time, this->quadrotor.apriltag_estimator, kf_plot_msg);
   // clang-format on
 
   // publish
-  // this->ros_pubs["controller_stats_topic"].publish(pcs_stats_msg);
-  this->ros_pubs["position_controller_get_topic"].publish(pcs_settings_msg);
-  // this->ros_pubs["kf_stats_topic"].publish(kf_stats_msg);
-  // this->ros_pubs["kf_plotting_topic"].publish(kf_plot_msg);
+  // this->ros_pubs[PCTRL_STATS_TOPIC].publish(pcs_stats_msg);
+  // this->ros_pubs[PCTRL_GET].publish(pcs_settings_msg);
+  // this->ros_pubs[KF_STATS_TOPIC].publish(kf_stats_msg);
+  // this->ros_pubs[KF_PLOT_TOPIC].publish(kf_plot_msg);
 }
 
 void ControlNode::hoverSetCallback(const geometry_msgs::Vector3 &msg) {
@@ -188,7 +188,7 @@ void ControlNode::hoverSetCallback(const geometry_msgs::Vector3 &msg) {
   this->quadrotor.hover_mode.hover_height = msg.z;
 }
 
-void ControlNode::positionControllerSetCallback(const awesomo_msgs::PositionControllerSettings &msg) {
+void ControlNode::positionControllerSetCallback(const awesomo_msgs::PCtrlSettings &msg) {
   PositionController *position_controller;
 
   position_controller = &this->quadrotor.position_controller;

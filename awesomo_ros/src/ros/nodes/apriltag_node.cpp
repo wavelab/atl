@@ -19,10 +19,10 @@ int AprilTagNode::configure(const std::string &node_name, int hz) {
 
   // subscribers and publishers
   // clang-format off
-  ROSNode::registerShutdown("shutdown");
-  ROSNode::registerPublisher<awesomo_msgs::AprilTagPose>("apriltag_pose_topic");
-  ROSNode::registerPublisher<geometry_msgs::Vector3>("gimbal_track_topic");
-  ROSNode::registerImageSubscriber("camera_pose_topic", &AprilTagNode::imageCallback, this);
+  this->registerPublisher<awesomo_msgs::AprilTagPose>(APRILTAG_POSE_TOPIC);
+  this->registerPublisher<geometry_msgs::Vector3>(GIMBAL_TRACK_TOPIC);
+  this->registerImageSubscriber(CAMERA_POSE_TOPIC, &AprilTagNode::imageCallback, this);
+  this->registerShutdown(SHUTDOWN);
   // clang-format on
 
   return 0;
@@ -48,9 +48,9 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
   if (tags.size()) {
     buildAprilTagPoseMsg(tags[0], pose_msg);
     buildAprilTagTrackMsg(tags[0], track_msg);
-    this->ros_pubs["gimbal_track_topic"].publish(track_msg);
+    this->ros_pubs[GIMBAL_TRACK_TOPIC].publish(track_msg);
   }
-  this->ros_pubs["apriltag_pose_topic"].publish(pose_msg);
+  this->ros_pubs[APRILTAG_POSE_TOPIC].publish(pose_msg);
 }
 
 }  // end of awesomo namespace

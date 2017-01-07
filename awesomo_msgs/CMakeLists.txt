@@ -23,10 +23,10 @@ ADD_MESSAGE_FILES(
     GimbalSetPoint.msg
     KFPlotting.msg
     KFStats.msg
-    PositionControllerStats.msg
+    PCtrlStats.msg
     AprilTagPose.msg
     PIDSettings.msg
-    PositionControllerSettings.msg
+    PCtrlSettings.msg
 )
 GENERATE_MESSAGES(DEPENDENCIES std_msgs geometry_msgs)
 

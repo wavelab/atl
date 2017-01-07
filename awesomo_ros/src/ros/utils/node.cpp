@@ -46,21 +46,8 @@ void ROSNode::shutdownCallback(const std_msgs::Bool &msg) {
   }
 }
 
-int ROSNode::registerTopic(std::string topic_name, std::string &topic_url) {
+int ROSNode::registerShutdown(std::string topic) {
   bool retval;
-
-  retval = this->ros_nh->getParam(topic_name, topic_url);
-  if (retval) {
-    this->ros_topics[topic_name] = topic_url;
-    return 0;
-  } else {
-    return -1;
-  }
-}
-
-int ROSNode::registerShutdown(std::string topic_name) {
-  bool retval;
-  std::string topic_url;
   ::ros::Subscriber subscriber;
 
   // pre-check
@@ -68,37 +55,21 @@ int ROSNode::registerShutdown(std::string topic_name) {
     return -1;
   }
 
-  // register topic
-  retval = this->registerTopic(topic_name, topic_url);
-  if (retval != 0) {
-    ROS_ERROR(E_SHUTDOWN_TOPIC, topic_name.c_str());
-    return -1;
-  }
-
   // register subscriber
-  ROS_INFO(INFO_SUB_INIT, topic_url.c_str());
-  subscriber =
-    this->ros_nh->subscribe(topic_url, 1, &ROSNode::shutdownCallback, this);
-  this->ros_subs[topic_name] = subscriber;
+  ROS_INFO(INFO_SUB_INIT, topic.c_str());
+  subscriber = this->ros_nh->subscribe(topic, 1, &ROSNode::shutdownCallback, this);
+  this->ros_subs[topic] = subscriber;
 }
 
-int ROSNode::registerImagePublisher(const std::string &topic_name) {
-  std::string topic_url;
-
+int ROSNode::registerImagePublisher(const std::string &topic) {
   // pre-check
   if (this->configured == false) {
     return -1;
   }
 
-  // register topic
-  if (this->registerTopic(topic_name, topic_url) != 0) {
-    ROS_ERROR(E_TOPIC, topic_name.c_str());
-    return -2;
-  }
-
   // image transport
   image_transport::ImageTransport it(*this->ros_nh);
-  this->img_pub = it.advertise(topic_url, 1);
+  this->img_pub = it.advertise(topic, 1);
 
   return 0;
 }

@@ -14,8 +14,17 @@
 
 namespace awesomo {
 
+// NODE SETTINGS
 #define APRILTAG_NODE_NAME "awesomo_apriltag"
 #define APRILTAG_NODE_RATE 100
+
+// PUBLISH TOPICS
+#define APRILTAG_POSE_TOPIC "/awesomo/apriltag/pose"
+#define GIMBAL_TRACK_TOPIC "/awesomo/gimbal/track"
+
+// SUBSCRIBE TOPICS
+#define CAMERA_POSE_TOPIC "/awesomo/camera/image"
+#define SHUTDOWN "/awesomo/apriltag/shutdown"
 
 class AprilTagNode : public ROSNode {
 public:

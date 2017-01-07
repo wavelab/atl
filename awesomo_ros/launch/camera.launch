@@ -4,12 +4,6 @@
   <param name="debug_mode" value="true" />
   <param name="camera_config_dir" value="$(find awesomo_configs)/configs/camera/logitech_c270" />
 
-  <!-- publish topics -->
-  <param name="camera_image_topic" value="/awesomo/camera/image" />
-
-  <!-- subscribe topics -->
-  <param name="shutdown" value="/awesomo/camera/shutdown" />
-
   <!-- ros node -->
   <node pkg="awesomo_ros" name="awesomo_camera" type="camera_node" output="screen" />
 </launch>
