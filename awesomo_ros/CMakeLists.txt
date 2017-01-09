@@ -44,7 +44,13 @@ LINK_DIRECTORIES(
 # BUILD AS CATKIN PACKAGE
 CATKIN_PACKAGE(
     INCLUDE_DIRS include
-    CATKIN_DEPENDS roscpp rospy std_msgs message_runtime awesomo_core
+    CATKIN_DEPENDS
+        roscpp
+        rospy
+        std_msgs
+        message_runtime
+        awesomo_core
+        awesomo_msgs
 )
 
 # AWESOMO ROS UTILS
