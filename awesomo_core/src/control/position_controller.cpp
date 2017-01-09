@@ -24,56 +24,35 @@ PositionController::PositionController(void) {
 }
 
 int PositionController::configure(std::string config_file) {
-  try {
-    YAML::Node config;
-    YAML::Node roll_controller;
-    YAML::Node pitch_controller;
-    YAML::Node throttle_controller;
+  ConfigParser parser;
 
-    // pre-check
-    if (file_exists(config_file) == false) {
-      log_err("File not found: %s", config_file.c_str());
-      return -1;
-    }
+  // load config
+  parser.addParam<double>("roll_controller.k_p", &this->y_controller.k_p);
+  parser.addParam<double>("roll_controller.k_i", &this->y_controller.k_i);
+  parser.addParam<double>("roll_controller.k_d", &this->y_controller.k_d);
+  parser.addParam<double>("roll_controller.min", &this->roll_limit[0]);
+  parser.addParam<double>("roll_controller.max", &this->roll_limit[1]);
 
-    // setup
-    config = YAML::LoadFile(config_file);
-    roll_controller = config["roll_controller"];
-    pitch_controller = config["pitch_controller"];
-    throttle_controller = config["throttle_controller"];
+  parser.addParam<double>("pitch_controller.k_p", &this->x_controller.k_p);
+  parser.addParam<double>("pitch_controller.k_i", &this->x_controller.k_i);
+  parser.addParam<double>("pitch_controller.k_d", &this->x_controller.k_d);
+  parser.addParam<double>("pitch_controller.min", &this->pitch_limit[0]);
+  parser.addParam<double>("pitch_controller.max", &this->pitch_limit[1]);
 
-    // clang-format off
-    // roll controller
-    this->x_controller = PID(
-      roll_controller["k_p"].as<float>(),
-      roll_controller["k_i"].as<float>(),
-      roll_controller["k_d"].as<float>()
-    );
-    this->roll_limit[0] = deg2rad(roll_controller["min"].as<float>());
-    this->roll_limit[1] = deg2rad(roll_controller["max"].as<float>());
+  parser.addParam<double>("throttle_controller.k_p", &this->z_controller.k_p);
+  parser.addParam<double>("throttle_controller.k_i", &this->z_controller.k_i);
+  parser.addParam<double>("throttle_controller.k_d", &this->z_controller.k_d);
+  parser.addParam<double>("throttle_controller.hover_throttle", &this->hover_throttle);
 
-    // pitch controller
-    this->y_controller = PID(
-      pitch_controller["k_p"].as<float>(),
-      pitch_controller["k_i"].as<float>(),
-      pitch_controller["k_d"].as<float>()
-    );
-    this->pitch_limit[0] = deg2rad(pitch_controller["min"].as<float>());
-    this->pitch_limit[1] = deg2rad(pitch_controller["max"].as<float>());
-
-    // throttle_controller
-    this->z_controller = PID(
-      throttle_controller["k_p"].as<float>(),
-      throttle_controller["k_i"].as<float>(),
-      throttle_controller["k_d"].as<float>()
-    );
-    this->hover_throttle = throttle_controller["hover_throttle"].as<float>();
-    // clang-format on
-
-  } catch (std::exception &ex) {
-    std::cout << ex.what();
-    return -2;
+  if (parser.load(config_file) != 0) {
+    return -1;
   }
+
+  // convert roll and pitch limits from degrees to radians
+  this->roll_limit[0] = deg2rad(this->roll_limit[0]);
+  this->roll_limit[1] = deg2rad(this->roll_limit[1]);
+  this->pitch_limit[0] = deg2rad(this->pitch_limit[0]);
+  this->pitch_limit[1] = deg2rad(this->pitch_limit[1]);
 
   this->configured = true;
   return 0;
