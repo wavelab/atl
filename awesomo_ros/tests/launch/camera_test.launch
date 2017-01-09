@@ -6,7 +6,7 @@
   <!-- target node -->
   <param name="sim_mode" value="false" />
   <param name="debug_mode" value="false" />
-  <param name="apriltag_config" value="$(find awesomo_configs)/configs/apriltag/prototype.yaml" />
+  <param name="camera_config_dir" value="$(find awesomo_configs)/configs/camera/logitech_c270" />
   <node pkg="awesomo_ros" name="awesomo_camera" type="camera_node" output="screen" />
 
   <!-- test node -->

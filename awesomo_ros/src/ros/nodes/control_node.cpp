@@ -187,14 +187,14 @@ void ControlNode::positionControllerSetCallback(const awesomo_msgs::PCtrlSetting
 
   position_controller = &this->quadrotor.position_controller;
 
-  position_controller->pitch_limit[0] = msg.pitch_controller.min;
-  position_controller->pitch_limit[1] = msg.pitch_controller.max;
+  position_controller->pitch_limit[0] = deg2rad(msg.pitch_controller.min);
+  position_controller->pitch_limit[1] = deg2rad(msg.pitch_controller.max);
   position_controller->x_controller.k_p = msg.pitch_controller.k_p;
   position_controller->x_controller.k_i = msg.pitch_controller.k_i;
   position_controller->x_controller.k_d = msg.pitch_controller.k_d;
 
-  position_controller->roll_limit[0] = msg.roll_controller.min;
-  position_controller->roll_limit[1] = msg.roll_controller.max;
+  position_controller->roll_limit[0] = deg2rad(msg.roll_controller.min);
+  position_controller->roll_limit[1] = deg2rad(msg.roll_controller.max);
   position_controller->y_controller.k_p = msg.roll_controller.k_p;
   position_controller->y_controller.k_i = msg.roll_controller.k_i;
   position_controller->y_controller.k_d = msg.roll_controller.k_d;

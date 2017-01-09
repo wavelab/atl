@@ -35,7 +35,6 @@ protected:
     image_transport::ImageTransport it(this->ros_nh);
 
     // clang-format off
-    this->shutdown_pub = this->ros_nh.advertise<std_msgs::Bool>(SHUTDOWN_TOPIC, 1);
     this->image_pub = it.advertise(IMAGE_TOPIC, 1);
     this->pose_sub = this->ros_nh.subscribe(APRILTAG_POSE_TOPIC, 1, &AprilTagNodeTest::poseCallback, this);
     this->track_sub = this->ros_nh.subscribe(GIMBAL_TRACK_TOPIC, 1, &AprilTagNodeTest::trackCallback, this);
@@ -43,12 +42,6 @@ protected:
 
     ros::spinOnce();
     ros::Duration(1.0).sleep();
-  }
-
-  ~AprilTagNodeTest(void) {
-    std_msgs::Bool msg;
-    msg.data = true;
-    this->shutdown_pub.publish(msg);
   }
 
   void poseCallback(const awesomo_msgs::AprilTagPose &msg) {

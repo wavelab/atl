@@ -5,7 +5,7 @@
 
   <!-- prototype -->
   <param name="sim_mode" value="true" />
-  <param name="debug_mode" value="false" />
+  <param name="debug_mode" value="true" />
   <node pkg="prototype_ros" name="prototype_gazebo" type="run_gazebo.sh" output="screen" required="true" />
   <node pkg="prototype_ros" name="prototype_world" type="world_node" output="screen" required="true" />
   <node pkg="prototype_ros" name="prototype_quadrotor" type="quadrotor_node" output="screen" required="true" />

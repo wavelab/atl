@@ -97,6 +97,9 @@ FILE(
 ADD_ROSTEST_GTEST(apriltag_test tests/launch/apriltag_test.launch tests/apriltag_test.cpp)
 target_link_libraries(apriltag_test ${TEST_DEPS})
 
+ADD_ROSTEST_GTEST(camera_test tests/launch/camera_test.launch tests/camera_test.cpp)
+target_link_libraries(camera_test ${TEST_DEPS})
+
 # INSTALL LAUNCH FILES
 SET(SHARE_DEST ${CATKIN_PACKAGE_SHARE_DESTINATION})
 INSTALL(DIRECTORY launch/ DESTINATION ${SHARE_DEST}/launch)
