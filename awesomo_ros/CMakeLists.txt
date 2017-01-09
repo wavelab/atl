@@ -87,17 +87,25 @@ TARGET_LINK_LIBRARIES(example_node ${DEPS})
 ADD_EXECUTABLE(gimbal_node src/ros/nodes/gimbal_node.cpp)
 TARGET_LINK_LIBRARIES(gimbal_node ${DEPS})
 
-# ROS TESTS
+# ROS NODE TESTS
 SET(TEST_DEPS ${catkin_LIBRARIES} ${GTEST_LIBRARIES})
 FILE(
     COPY tests/test_data
     DESTINATION ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-ADD_ROSTEST_GTEST(apriltag_test tests/launch/apriltag_test.launch tests/apriltag_test.cpp)
+ADD_ROSTEST_GTEST(
+    apriltag_test
+    tests/launch/apriltag_test.launch
+    tests/apriltag_test.cpp
+)
 target_link_libraries(apriltag_test ${TEST_DEPS})
 
-ADD_ROSTEST_GTEST(camera_test tests/launch/camera_test.launch tests/camera_test.cpp)
+ADD_ROSTEST_GTEST(
+    camera_test
+    tests/launch/camera_test.launch
+    tests/camera_test.cpp
+)
 target_link_libraries(camera_test ${TEST_DEPS})
 
 # INSTALL LAUNCH FILES

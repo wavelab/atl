@@ -95,10 +95,10 @@ void buildKFStatsMsg(int seq,
 }
 
 // clang-format off
-void buildKFPlottingMsg(int seq,
+void buildKFPlotMsg(int seq,
                         ros::Time time,
                         KalmanFilter estimator,
-                        awesomo_msgs::KFPlotting &msg) {
+                        awesomo_msgs::KFPlot &msg) {
   msg.header.seq = seq;
   msg.header.stamp = time;
   msg.header.frame_id = "awesomo_kf_plotting";

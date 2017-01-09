@@ -41,7 +41,7 @@ int ControlNode::configure(const std::string node_name, int hz) {
   this->registerPublisher<geometry_msgs::PoseStamped>(SETPOINT_POSITION_TOPIC);
   this->registerPublisher<awesomo_msgs::PCtrlStats>(PCTRL_STATS_TOPIC);
   this->registerPublisher<awesomo_msgs::KFStats>(KF_STATS_TOPIC);
-  this->registerPublisher<awesomo_msgs::KFPlotting>(KF_PLOT_TOPIC);
+  this->registerPublisher<awesomo_msgs::KFPlot>(KF_PLOT_TOPIC);
   this->registerPublisher<awesomo_msgs::PCtrlSettings>(PCTRL_GET_TOPIC);
   // clang-format on
 
@@ -154,7 +154,7 @@ void ControlNode::publishStats(void) {
   awesomo_msgs::PCtrlStats pcs_stats_msg;
   awesomo_msgs::PCtrlSettings pcs_settings_msg;
   awesomo_msgs::KFStats kf_stats_msg;
-  awesomo_msgs::KFPlotting kf_plot_msg;
+  awesomo_msgs::KFPlot kf_plot_msg;
 
   // setup
   seq = this->ros_seq;
@@ -165,7 +165,7 @@ void ControlNode::publishStats(void) {
   // buildPCtrlStatsMsg(seq, time, this->quadrotor.position_controller, pcs_stats_msg);
   buildPCtrlSettingsMsg(this->quadrotor.position_controller, pcs_settings_msg);
   // buildKFStatsMsg(seq, time, this->quadrotor.apriltag_estimator, kf_stats_msg);
-  // buildKFPlottingMsg(seq, time, this->quadrotor.apriltag_estimator, kf_plot_msg);
+  // buildKFPlotMsg(seq, time, this->quadrotor.apriltag_estimator, kf_plot_msg);
   // clang-format on
 
   // publish

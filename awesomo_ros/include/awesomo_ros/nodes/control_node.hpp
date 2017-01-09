@@ -11,7 +11,7 @@
 #include <mavros_msgs/RCIn.h>
 
 #include <awesomo_msgs/KFStats.h>
-#include <awesomo_msgs/KFPlotting.h>
+#include <awesomo_msgs/KFPlot.h>
 #include <awesomo_msgs/AprilTagPose.h>
 #include <awesomo_msgs/PCtrlStats.h>
 #include <awesomo_msgs/PCtrlSettings.h>

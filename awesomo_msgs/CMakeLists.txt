@@ -21,7 +21,7 @@ ADD_MESSAGE_FILES(
     DIRECTORY msgs
     FILES
     GimbalSetPoint.msg
-    KFPlotting.msg
+    KFPlot.msg
     KFStats.msg
     PCtrlStats.msg
     AprilTagPose.msg
@@ -30,6 +30,11 @@ ADD_MESSAGE_FILES(
 )
 GENERATE_MESSAGES(DEPENDENCIES std_msgs geometry_msgs)
 
+# CATKIN PACKAGE
 CATKIN_PACKAGE(
-    CATKIN_DEPENDS message_generation roscpp std_msgs geometry_msgs
+    CATKIN_DEPENDS
+      message_generation
+      roscpp
+      std_msgs
+      geometry_msgs
 )

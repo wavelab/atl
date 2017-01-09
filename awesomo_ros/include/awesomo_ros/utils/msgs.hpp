@@ -11,7 +11,7 @@
 
 #include <awesomo_core/awesomo_core.hpp>
 
-#include <awesomo_msgs/KFPlotting.h>
+#include <awesomo_msgs/KFPlot.h>
 #include <awesomo_msgs/KFStats.h>
 #include <awesomo_msgs/AprilTagPose.h>
 #include <awesomo_msgs/PCtrlStats.h>
@@ -33,10 +33,10 @@ void buildKFStatsMsg(int seq,
                      ros::Time time,
                      KalmanFilter estimator,
                      awesomo_msgs::KFStats &msg);
-void buildKFPlottingMsg(int seq,
+void buildKFPlotMsg(int seq,
                         ros::Time time,
                         KalmanFilter estimator,
-                        awesomo_msgs::KFPlotting &msg);
+                        awesomo_msgs::KFPlot &msg);
 void buildAprilTagPoseMsg(TagPose tag, awesomo_msgs::AprilTagPose &msg);
 void buildAprilTagTrackMsg(TagPose tag, geometry_msgs::Vector3 &msg);
 void buildPCtrlSettingsMsg(PositionController pc,
