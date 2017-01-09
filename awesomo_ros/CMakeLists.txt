@@ -59,6 +59,7 @@ ADD_LIBRARY(
     src/ros/utils/msgs.cpp
     src/ros/utils/node.cpp
 )
+ADD_DEPENDENCIES(awesomo_ros_utils awesomo_msgs_gencpp)
 SET(
     DEPS
     awesomo_ros_utils
