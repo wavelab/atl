@@ -19,7 +19,6 @@ namespace awesomo {
 // TEST DATA
 #define TEST_IMAGE "test_data/image.jpg"
 
-
 class AprilTagNodeTest : public ::testing::Test {
 protected:
   ros::NodeHandle ros_nh;
@@ -78,7 +77,7 @@ TEST_F(AprilTagNodeTest, poseMsg){
   ASSERT_NEAR(3.0, this->pose_msg.tag_position.z, 0.2);
 }
 
-}
+}  // end of awesomo namespace
 
 int main(int argc, char** argv){
   testing::InitGoogleTest(&argc, argv);

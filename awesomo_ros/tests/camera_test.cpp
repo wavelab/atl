@@ -49,7 +49,6 @@ TEST_F(CameraNodeTest, poseMsg){
 
 }  // end of awesomo namespace
 
-
 int main(int argc, char** argv){
   testing::InitGoogleTest(&argc, argv);
   ros::init(argc, argv, NODE_NAME);
