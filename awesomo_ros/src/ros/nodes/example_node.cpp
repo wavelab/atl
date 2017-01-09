@@ -27,8 +27,8 @@ void ExampleNode::sayCallback(const std_msgs::String &msg) {
 
 }  // end of awesomo namespace
 
-int main(void) {
-  awesomo::ExampleNode node;
+int main(int argc, char **argv) {
+  awesomo::ExampleNode node(argc, argv);
   node.configure(NODE_NAME, NODE_RATE);
   node.loop();
   return 0;

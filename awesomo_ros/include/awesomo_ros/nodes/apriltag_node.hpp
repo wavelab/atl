@@ -30,6 +30,7 @@ class AprilTagNode : public ROSNode {
 public:
   MITDetector detector;
 
+  AprilTagNode(int argc, char **argv) : ROSNode(argc, argv) {}
   int configure(const std::string &node_name, int hz);
   void imageCallback(const sensor_msgs::ImageConstPtr &msg);
 };

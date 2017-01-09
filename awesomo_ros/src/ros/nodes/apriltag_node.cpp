@@ -55,8 +55,8 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
 
 }  // end of awesomo namespace
 
-int main(void) {
-  awesomo::AprilTagNode node;
+int main(int argc, char **argv) {
+  awesomo::AprilTagNode node(argc, argv);
 
   if (node.configure(APRILTAG_NODE_NAME, APRILTAG_NODE_RATE) != 0) {
     ROS_ERROR("Failed to configure AprilTag Node!");

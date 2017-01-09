@@ -3,12 +3,6 @@
 
 namespace awesomo {
 
-ControlNode::ControlNode(void) {
-  for (int i = 0; i < 16; i++) {
-    this->rc_in[i] = 0.0f;
-  }
-}
-
 int ControlNode::configure(const std::string node_name, int hz) {
   std::string config_path;
 
@@ -215,13 +209,13 @@ void ControlNode::positionControllerSetCallback(const awesomo_msgs::PCtrlSetting
 }  // end of awesomo namespace
 
 int main(int argc, char **argv) {
-  awesomo::ControlNode awesomo_node;
+  awesomo::ControlNode node(argc, argv);
 
-  if (awesomo_node.configure(CONTROL_NODE_NAME, CONTROL_NODE_RATE) != 0) {
+  if (node.configure(CONTROL_NODE_NAME, CONTROL_NODE_RATE) != 0) {
     ROS_ERROR("Failed to configure ControlNode!");
     return -1;
   }
-  awesomo_node.loop();
+  node.loop();
 
   return 0;
 }

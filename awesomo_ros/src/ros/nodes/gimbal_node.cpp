@@ -32,7 +32,7 @@ int GimbalNode::loopCallback(void) {
 
 
 int main(int argc, char **argv) {
-  awesomo::GimbalNode node;
+  awesomo::GimbalNode node(argc, argv);
 
   if (node.configure(GIMBAL_NODE_NAME, GIMBAL_NODE_RATE) != 0) {
     ROS_ERROR("Failed to configure GimbalNode!");

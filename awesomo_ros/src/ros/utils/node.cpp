@@ -3,10 +3,13 @@
 
 namespace awesomo {
 
-ROSNode::ROSNode(void) {
+ROSNode::ROSNode(int argc, char **argv) {
   this->configured = false;
   this->debug_mode = false;
   this->sim_mode = false;
+
+  this->argc = argc;
+  this->argv = argv;
 
   this->ros_node_name = "";
   this->ros_seq = 0;
@@ -20,22 +23,33 @@ ROSNode::~ROSNode(void) {
 int ROSNode::configure(const std::string node_name, int hz) {
   // clang-format off
   if (::ros::isInitialized() == false) {
-    int argc = 0;
-    char **argv = NULL;
-    ::ros::init(argc,
-      argv,
+    ::ros::init(
+      this->argc,
+      this->argv,
       node_name,
       ::ros::init_options::NoSigintHandler
     );
   }
   // clang-format on
 
+  // initialize
   this->ros_node_name = node_name;
   this->ros_nh = new ::ros::NodeHandle();
   this->ros_nh->getParam("/debug_mode", this->debug_mode);
   this->ros_nh->getParam("/sim_mode", this->sim_mode);
   this->ros_rate = new ::ros::Rate(hz);
   this->configured = true;
+
+  // print mode
+  if (this->debug_mode) {
+    ROS_INFO(INFO_DEBUG_MODE, this->ros_node_name.c_str());
+  }
+  if (this->sim_mode) {
+    ROS_INFO(INFO_SIM_MODE, this->ros_node_name.c_str());
+  }
+  if (!this->debug_mode && !this->sim_mode) {
+    ROS_INFO(INFO_NORMAL_MODE, this->ros_node_name.c_str());
+  }
 
   return 0;
 }
@@ -85,17 +99,6 @@ int ROSNode::loop(void) {
   // pre-check
   if (this->configured == false) {
     return -1;
-  }
-
-  // print mode
-  if (this->debug_mode) {
-    ROS_INFO(INFO_DEBUG_MODE, this->ros_node_name.c_str());
-  }
-  if (this->sim_mode) {
-    ROS_INFO(INFO_SIM_MODE, this->ros_node_name.c_str());
-  }
-  if (!this->debug_mode && !this->sim_mode) {
-    ROS_INFO(INFO_NORMAL_MODE, this->ros_node_name.c_str());
   }
 
   // loop

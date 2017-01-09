@@ -2,7 +2,6 @@
 <launch>
   <!-- configs -->
   <param name="debug_mode" value="true" />
-  <param name="node_config" value="$(find awesomo_ros)/configs/default/apriltag_node.yaml" />
   <param name="apriltag_config" value="$(find awesomo_configs)/configs/apriltag/config.yaml" />
 
   <!-- node -->

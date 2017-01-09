@@ -58,7 +58,7 @@ int CameraNode::publishImage(void) {
 
 
 int main(int argc, char **argv) {
-  awesomo::CameraNode node;
+  awesomo::CameraNode node(argc, argv);
 
   if (node.configure(CAMERA_NODE_NAME, CAMERA_NODE_RATE) != 0) {
     ROS_ERROR("Failed to configure CameraNode!");

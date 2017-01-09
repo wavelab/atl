@@ -1,4 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-  <node pkg="awesomo_ros" type="example_node" name="example" output="screen" />
+  <node pkg="awesomo_ros" type="example_node" name="example" output="screen">
+    <remap from="example/say" to="example/hello" />
+  </node>
 </launch>

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- settings -->
+  <param name="use_sim_time" value="false" />
+
+  <!-- target node -->
+  <param name="debug_mode" value="false" />
+  <param name="apriltag_config" value="$(find awesomo_configs)/configs/apriltag/prototype.yaml" />
+  <node pkg="awesomo_ros" name="awesomo_apriltag" type="apriltag_node" output="screen" />
+
+  <!-- test node -->
+  <test pkg="awesomo_ros" test-name="awesomo_apriltag_test" type="apriltag_test" cwd="node"/>
+</launch>

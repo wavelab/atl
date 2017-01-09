@@ -23,6 +23,7 @@ class GimbalNode : public ROSNode {
 public:
   Gimbal gimbal;
 
+  GimbalNode(int argc, char **argv) : ROSNode(argc, argv) {}
   int configure(std::string node_name, int hz);
   int loopCallback(void);
 };

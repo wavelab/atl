@@ -4,7 +4,17 @@
   <param name="use_sim_time" value="true" />
 
   <!-- prototype -->
-  <include file="$(find prototype_ros)/launch/quadrotor.launch" />
+  <param name="sim_mode" value="true" />
+  <param name="debug_mode" value="false" />
+  <node pkg="prototype_ros" name="prototype_gazebo" type="run_gazebo.sh" output="screen" required="true" />
+  <node pkg="prototype_ros" name="prototype_world" type="world_node" output="screen" required="true" />
+  <node pkg="prototype_ros" name="prototype_quadrotor" type="quadrotor_node" output="screen" required="true" />
+  <node pkg="prototype_ros" name="prototype_camera" type="camera_node" output="screen" required="true">
+    <remap from="/prototype/camera/image" to="/awesomo/camera/image" />
+  </node>
+  <node pkg="prototype_ros" name="prototype_gimbal" type="gimbal_node" output="screen" required="true" >
+    <remap from="/prototype/gimbal/track" to="/awesomo/gimbal/track" />
+  </node>
 
   <!-- control node -->
   <include file="$(find awesomo_ros)/launch/control.launch" />
@@ -13,10 +23,8 @@
   <param name="control_config_dir" value="$(find awesomo_configs)/configs/quadrotor_gazebosim" />
 
   <!-- apriltag node -->
-  <include file="$(find awesomo_ros)/launch/apriltag.launch" />
   <param name="sim_mode" value="true" />
-  <param name="debug_mode" value="false" />
+  <param name="debug_mode" value="true" />
   <param name="apriltag_config" type="str" value="$(find awesomo_configs)/configs/apriltag/prototype.yaml" />
-  <param name="gimbal_track_topic" type="str" value="/prototype/gimbal/track" />
-  <param name="camera_pose_topic" type="str" value="/prototype/camera/image" />
+  <node pkg="awesomo_ros" name="awesomo_apriltag" type="apriltag_node" output="screen" />
 </launch>

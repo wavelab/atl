@@ -12,20 +12,20 @@
 namespace awesomo {
 
 #define INFO_CONFIG "Configuring ROS Node [%s]!"
-#define INFO_PUB_INIT "--> Publisher [%s] initialized!"
-#define INFO_SUB_INIT "--> Subscriber [%s] initialized!"
+#define INFO_PUB_INIT "Publisher [%s] initialized!"
+#define INFO_SUB_INIT "Subscriber [%s] initialized!"
 #define INFO_DEBUG_MODE "ROS Node [%s] is running in [DEBUG MODE]!"
 #define INFO_SIM_MODE "ROS Node [%s] is running in [SIM MODE]!"
 #define INFO_NORMAL_MODE "ROS Node [%s] is running..."
-
-#define E_TOPIC "TOPIC [%s] not found in launch file!"
-#define E_SHUTDOWN_TOPIC "SHUTDOWN TOPIC [%s] not found in launch file!"
 
 class ROSNode {
 public:
   bool configured;
   bool debug_mode;
   bool sim_mode;
+
+  int argc;
+  char **argv;
 
   std::string ros_node_name;
   long long int ros_seq;
@@ -40,7 +40,7 @@ public:
   image_transport::Subscriber img_sub;
   std::function<int(void)> loop_cb;
 
-  ROSNode(void);
+  ROSNode(int argc, char **argv);
   ~ROSNode(void);
   int configure(const std::string node_name, int hz);
   void shutdownCallback(const std_msgs::Bool &msg);

@@ -29,6 +29,7 @@ public:
   Camera camera;
   cv::Mat image;
 
+  CameraNode(int argc, char **argv) : ROSNode(argc, argv) {}
   int configure(std::string node_name, int hz);
   int loopCallback(void);
   int publishImage(void);

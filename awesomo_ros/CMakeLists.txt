@@ -11,6 +11,7 @@ FIND_PACKAGE(
     REQUIRED COMPONENTS
     roscpp
     rospy
+    rostest
     std_msgs
     message_generation
     image_transport
@@ -22,22 +23,22 @@ FIND_PACKAGE(
 FIND_PACKAGE(OpenCV REQUIRED)
 FIND_PACKAGE(Boost REQUIRED)
 
-# LIBS
-LINK_DIRECTORIES(
-    /usr/lib
-    /usr/local/lib
-    ${catkin_LIBRARY_DIRS}
-)
-
 # INCLUDES
 INCLUDE_DIRECTORIES(
-    ${catkin_INCLUDE_DIRS}
     include
     /usr/include
     /usr/local/include
     /usr/include/eigen3
     /usr/include/opencv2
     ${Boost_INCLUDE_DIR}
+    ${catkin_INCLUDE_DIRS}
+)
+
+# LIBS
+LINK_DIRECTORIES(
+    /usr/lib
+    /usr/local/lib
+    ${catkin_LIBRARY_DIRS}
 )
 
 # BUILD AS CATKIN PACKAGE
@@ -52,9 +53,10 @@ ADD_LIBRARY(
     src/ros/utils/msgs.cpp
     src/ros/utils/node.cpp
 )
-SET(DEPS
-    awesomo_core
+SET(
+    DEPS
     awesomo_ros_utils
+    awesomo_core
     ${catkin_LIBRARIES}
     ${OpenCV_LIBS}
     apriltags_swathmore
@@ -64,27 +66,30 @@ SET(DEPS
 )
 
 # ROS NODES
-SET(BIN_DEST ${CATKIN_PACKAGE_BIN_DESTINATION})
-
 ADD_EXECUTABLE(apriltag_node src/ros/nodes/apriltag_node.cpp)
 TARGET_LINK_LIBRARIES(apriltag_node ${DEPS})
-INSTALL(TARGETS apriltag_node RUNTIME DESTINATION ${BIN_DEST})
 
 ADD_EXECUTABLE(camera_node src/ros/nodes/camera_node.cpp)
 TARGET_LINK_LIBRARIES(camera_node ${DEPS})
-INSTALL(TARGETS camera_node RUNTIME DESTINATION ${BIN_DEST})
 
 ADD_EXECUTABLE(control_node src/ros/nodes/control_node.cpp)
 TARGET_LINK_LIBRARIES(control_node ${DEPS})
-INSTALL(TARGETS control_node RUNTIME DESTINATION ${BIN_DEST})
 
 ADD_EXECUTABLE(example_node src/ros/nodes/example_node.cpp)
 TARGET_LINK_LIBRARIES(example_node ${DEPS})
-INSTALL(TARGETS example_node RUNTIME DESTINATION ${BIN_DEST})
 
 ADD_EXECUTABLE(gimbal_node src/ros/nodes/gimbal_node.cpp)
 TARGET_LINK_LIBRARIES(gimbal_node ${DEPS})
-INSTALL(TARGETS gimbal_node RUNTIME DESTINATION ${BIN_DEST})
+
+# ROS TESTS
+SET(TEST_DEPS ${catkin_LIBRARIES} ${GTEST_LIBRARIES})
+FILE(
+    COPY tests/test_data
+    DESTINATION ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+ADD_ROSTEST_GTEST(apriltag_test tests/launch/apriltag_test.launch tests/apriltag_test.cpp)
+target_link_libraries(apriltag_test ${TEST_DEPS})
 
 # INSTALL LAUNCH FILES
 SET(SHARE_DEST ${CATKIN_PACKAGE_SHARE_DESTINATION})

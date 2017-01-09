@@ -17,6 +17,6 @@
   <param name="sim_mode" value="true" />
   <param name="debug_mode" value="false" />
   <param name="apriltag_config" type="str" value="$(find awesomo_configs)/configs/apriltag/prototype.yaml" />
-  <param name="gimbal_track_topic" type="str" value="/prototype/gimbal/track" />
-  <param name="camera_pose_topic" type="str" value="/prototype/camera/image" />
+  <remap from="/awesomo/gimbal/track" to="/prototype/gimbal/track" />
+  <remap from="/awesomo/camera/image" to="/prototype/camera/image" />
 </launch>

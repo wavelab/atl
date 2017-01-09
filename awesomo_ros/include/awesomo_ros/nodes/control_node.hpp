@@ -62,7 +62,12 @@ public:
   ros::ServiceClient mode_client;
   ros::ServiceClient arming_client;
 
-  ControlNode(void);
+  ControlNode(int argc, char **argv) : ROSNode(argc, argv) {
+    for (int i = 0; i < 16; i++) {
+      this->rc_in[i] = 0.0f;
+    }
+  }
+
   int configure(std::string node_name, int hz);
   void waitForConnection(void);
   int disarm(void);
