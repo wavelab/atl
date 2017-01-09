@@ -18,9 +18,9 @@ public:
   PID y_controller;
   PID z_controller;
 
-  double hover_throttle;
   double roll_limit[2];
   double pitch_limit[2];
+  double hover_throttle;
 
   Vec3 setpoints;
   Vec4 outputs;

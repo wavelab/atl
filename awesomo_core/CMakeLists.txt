@@ -30,6 +30,7 @@ ADD_LIBRARY(
     src/control/attitude_controller.cpp
     src/control/pid_controller.cpp
     src/control/position_controller.cpp
+    src/control/tracking_controller.cpp
     src/control/velocity_controller.cpp
     # estimation
     src/estimation/ekf.cpp
@@ -78,6 +79,7 @@ ADD_EXECUTABLE(
     tests/control/attitude_controller_test.cpp
     tests/control/pid_controller_test.cpp
     tests/control/position_controller_test.cpp
+    tests/control/tracking_controller_test.cpp
     tests/control/velocity_controller_test.cpp
     # ESTIMATION
     tests/estimation/ekf_test.cpp
