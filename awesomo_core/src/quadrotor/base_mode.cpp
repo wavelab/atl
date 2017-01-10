@@ -22,7 +22,7 @@ void BaseMode::stop(void) {
 }
 
 void BaseMode::update(void) {
-  if (this->is_running) {
+  if (this->is_running != true) {
     this->start();
   } else {
     tic(&this->time_last);

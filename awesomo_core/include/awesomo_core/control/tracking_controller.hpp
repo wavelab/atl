@@ -1,6 +1,8 @@
 #ifndef __AWESOMO_CONTROL_TRACKING_CONTROLLER_HPP__
 #define __AWESOMO_CONTROL_TRACKING_CONTROLLER_HPP__
 
+#include <iomanip>
+
 #include <yaml-cpp/yaml.h>
 
 #include "awesomo_core/utils/utils.hpp"
@@ -28,7 +30,7 @@ public:
 
   TrackingController(void);
   int configure(std::string config_file);
-  Vec4 calculate(Vec3 setpoints, Vec4 actual, double yaw, double dt);
+  Vec4 calculate(Vec3 errors, double yaw, double dt);
   void reset(void);
   void printOutputs(void);
   void printErrors(void);

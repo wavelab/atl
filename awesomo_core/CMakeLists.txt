@@ -40,6 +40,7 @@ ADD_LIBRARY(
     # quadrotor
     src/quadrotor/base_mode.cpp
     src/quadrotor/hover_mode.cpp
+    src/quadrotor/tracking_mode.cpp
     src/quadrotor/landing_mode.cpp
     src/quadrotor/quadrotor.cpp
     # utils
@@ -88,6 +89,7 @@ ADD_EXECUTABLE(
     tests/planning/planning_test.cpp
     # QUADROTOR
     tests/quadrotor/hover_mode_test.cpp
+    tests/quadrotor/tracking_mode_test.cpp
     tests/quadrotor/quadrotor_test.cpp
     # VISION TESTS
     tests/vision/apriltag/swathmore_test.cpp

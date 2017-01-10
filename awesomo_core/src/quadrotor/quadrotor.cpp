@@ -9,8 +9,10 @@ Quadrotor::Quadrotor(void) {
   this->current_mode = HOVER_MODE;
   this->hover_mode = HoverMode();
 
-  this->position_controller = PositionController();
   this->heading = 0.0;
+  this->pose = Pose();
+
+  this->position_controller = PositionController();
   this->att_cmd = AttitudeCommand();
 }
 
@@ -21,9 +23,17 @@ int Quadrotor::configure(std::string config_path) {
   config_file = config_path + "/controllers/" + "position_controller.yaml";
   CONFIGURE_CONTROLLER(this->position_controller, config_file, FCONFPCTRL);
 
+  // position controller
+  config_file = config_path + "/controllers/" + "tracking_controller.yaml";
+  CONFIGURE_CONTROLLER(this->tracking_controller, config_file, FCONFTCTRL);
+
   // hover mode
   config_file = config_path + "/modes/" + "hover_mode.yaml";
   CONFIGURE_MODE(this->hover_mode, config_file, FCONFHMODE);
+
+  // tracking mode
+  config_file = config_path + "/modes/" + "tracking_mode.yaml";
+  CONFIGURE_MODE(this->tracking_mode, config_file, FCONFHMODE);
 
   this->current_mode = HOVER_MODE;
   this->configured = true;
@@ -33,11 +43,37 @@ error:
   return -1;
 }
 
-int Quadrotor::stepHoverMode(Pose pose, double dt) {
-  Vec3 euler;
-  Vec4 actual;
-  Vec3 setpoint;
-  Vec4 output;
+void Quadrotor::setMode(enum Mode mode) {
+  this->current_mode = mode;
+  switch (mode) {
+    case DISARM_MODE: log_info(INFO_KMODE); break;
+    case HOVER_MODE: log_info(INFO_HMODE); break;
+    case DISCOVER_MODE: log_info(INFO_DMODE); break;
+    case TRACKING_MODE: log_info(INFO_TMODE); break;
+    case LANDING_MODE: log_info(INFO_LMODE); break;
+  }
+}
+
+void Quadrotor::setPose(Pose pose) {
+  this->pose = pose;
+}
+
+void Quadrotor::setTargetPosition(Vec3 position, bool detected) {
+  switch (this->current_mode) {
+    case DISCOVER_MODE:
+       this->tracking_mode.updateTargetPosition(position, detected);
+       break;
+    case TRACKING_MODE:
+       this->tracking_mode.updateTargetPosition(position, detected);
+       break;
+    default:
+      break;
+  }
+}
+
+int Quadrotor::stepHoverMode(double dt) {
+  Vec3 euler, setpoint, nwu;
+  Vec4 actual, output;
 
   // pre-check
   if (this->configured == false) {
@@ -45,15 +81,17 @@ int Quadrotor::stepHoverMode(Pose pose, double dt) {
   }
 
   // setup
-  setpoint = this->hover_mode.hover_position;
-  quat2euler(pose.q, 321, euler);
+  setpoint = this->hover_mode.getHoverPosition();
+  quat2euler(this->pose.q, 321, euler);
 
   // transform ENU to NWU
-  actual(0) = pose.position(1);
-  actual(1) = -pose.position(0);
-  actual(2) = pose.position(2);
+  enu2nwu(this->pose.position, nwu);
+  actual(0) = nwu(0);
+  actual(1) = nwu(1);
+  actual(2) = nwu(2);
   actual(3) = euler(2);  // yaw
 
+  // step
   // clang-format off
   output = this->position_controller.calculate(
     setpoint,
@@ -67,7 +105,42 @@ int Quadrotor::stepHoverMode(Pose pose, double dt) {
   return 0;
 }
 
-int Quadrotor::step(Pose pose, double dt) {
+int Quadrotor::stepDiscoverMode(double dt) {
+  // pre-check
+  if (this->configured == false) {
+    return -1;
+  }
+
+  // hover in place
+  this->stepHoverMode(dt);
+
+  return 0;
+}
+
+int Quadrotor::stepTrackingMode(double dt) {
+  Vec3 errors, position;
+  Vec4 output;
+
+  // pre-check
+  if (this->configured == false) {
+    return -1;
+  }
+
+  // setup
+  position = this->pose.position;
+  errors(0) = this->tracking_mode.target_bpf(0);
+  errors(1) = this->tracking_mode.target_bpf(1);
+  errors(2) = this->hover_mode.hover_height - position(2);
+
+  // track target
+  output = this->tracking_controller.calculate(errors, this->heading, dt);
+  this->att_cmd = AttitudeCommand(output);
+  this->hover_mode.updateHoverXYPosition(position(0), position(1));
+
+  return 0;
+}
+
+int Quadrotor::step(double dt) {
   // pre-check
   if (this->configured == false) {
     return -1;
@@ -76,15 +149,21 @@ int Quadrotor::step(Pose pose, double dt) {
   // step
   switch (this->current_mode) {
     case HOVER_MODE:
-      this->stepHoverMode(pose, dt);
+      this->stepHoverMode(dt);
+      this->hover_mode.update();
+      break;
+
+    case DISCOVER_MODE:
+      this->stepHoverMode(dt);
+      this->hover_mode.update();
+      this->tracking_mode.update();
       break;
 
     case TRACKING_MODE:
-      this->hover_mode.updateHoverPosition(pose.position);
+      this->stepTrackingMode(dt);
       break;
 
     case LANDING_MODE:
-      this->hover_mode.updateHoverPosition(pose.position);
       break;
 
     case DISARM_MODE:

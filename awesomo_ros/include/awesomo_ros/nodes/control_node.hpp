@@ -29,19 +29,20 @@ namespace awesomo {
 #define CONTROL_NODE_RATE 100
 
 // PUBLISH TOPICS
-#define RADIO_TOPIC "/mavros/rc/in"
-#define STATE_TOPIC "/mavros/state"
-#define POSE_TOPIC "/mavros/local_position/pose"
 #define PCTRL_STATS_TOPIC "/awesomo/position_controller/stats"
 #define KF_STATS_TOPIC "/awesomo/kf_estimation/stats"
 #define KF_PLOT_TOPIC "/awesomo/kf_estimation/plot"
 #define PCTRL_GET_TOPIC "/awesomo/control/position_controller/get"
 
 // SUBSCRIBE TOPICS
-#define SHUTDOWN "/awesomo/control/shutdown"
 #define MODE_TOPIC "/mavros/set_mode"
 #define ARM_TOPIC "/mavros/cmd/arming"
+#define SHUTDOWN "/awesomo/control/shutdown"
+#define STATE_TOPIC "/mavros/state"
+#define POSE_TOPIC "/mavros/local_position/pose"
+#define RADIO_TOPIC "/mavros/rc/in"
 #define APRILTAG_TOPIC "/awesomo/apriltag/pose"
+#define TARGET_TOPIC "/awesomo/gimbal/target"
 #define SETPOINT_ATTITUDE_TOPIC "/mavros/setpoint_attitude/attitude"
 #define SETPOINT_THROTTLE_TOPIC "/mavros/setpoint_attitude/att_throttle"
 #define SETPOINT_POSITION_TOPIC "/mavros/setpoint_position/local"
@@ -52,17 +53,21 @@ class ControlNode : public ROSNode {
 public:
   bool configured;
 
+  Pose world_pose;
+  TagPose tag_pose;
+  Vec3 target_bpf;
+  int rc_in[16];
   Quadrotor quadrotor;
 
-  Pose world_pose;
   mavros_msgs::State mavros_state;
-  int rc_in[16];
-  TagPose tag_pose;
-
   ros::ServiceClient mode_client;
   ros::ServiceClient arming_client;
 
   ControlNode(int argc, char **argv) : ROSNode(argc, argv) {
+    this->world_pose = Pose();
+    this->tag_pose = TagPose();
+    this->target_bpf = Vec3();
+
     for (int i = 0; i < 16; i++) {
       this->rc_in[i] = 0.0f;
     }
@@ -74,8 +79,9 @@ public:
   int setOffboardModeOn(void);
   void stateCallback(const mavros_msgs::State::ConstPtr &msg);
   void poseCallback(const geometry_msgs::PoseStamped &msg);
-  void radioCallback(const mavros_msgs::RCIn &msg);
   void aprilTagCallback(const awesomo_msgs::AprilTagPose &msg);
+  void targetCallback(const geometry_msgs::Vector3 &msg);
+  void radioCallback(const mavros_msgs::RCIn &msg);
   void hoverSetCallback(const geometry_msgs::Vector3 &msg);
   void positionControllerSetCallback(const awesomo_msgs::PCtrlSettings &msg);
   int loopCallback(void);

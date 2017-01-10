@@ -13,13 +13,14 @@ namespace awesomo {
 class HoverMode : public BaseMode {
 public:
   bool configured;
+  Vec2 hover_position;
   double hover_height;
-  Vec3 hover_position;
 
   HoverMode(void);
   int configure(std::string config_file);
+  void updateHoverXYPosition(double x, double y);
   void updateHoverPosition(Vec3 pos);
-  int step(Pose pose, double dt);
+  Vec3 getHoverPosition(void);
 };
 
 }  // end of awesomo namespace

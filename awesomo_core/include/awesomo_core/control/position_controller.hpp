@@ -1,6 +1,8 @@
 #ifndef __AWESOMO_CONTROL_POSITION_CONTROLLER_HPP__
 #define __AWESOMO_CONTROL_POSITION_CONTROLLER_HPP__
 
+#include <iomanip>
+
 #include <yaml-cpp/yaml.h>
 
 #include "awesomo_core/utils/utils.hpp"

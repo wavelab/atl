@@ -11,16 +11,15 @@ PositionController::PositionController(void) {
   this->y_controller = PID(0.0, 0.0, 0.0);
   this->z_controller = PID(0.0, 0.0, 0.0);
 
-  this->hover_throttle = 0.0;
-
   this->roll_limit[0] = 0.0;
   this->roll_limit[1] = 0.0;
-
   this->pitch_limit[0] = 0.0;
   this->pitch_limit[1] = 0.0;
+  this->hover_throttle = 0.0;
 
   this->setpoints  << 0.0, 0.0, 0.0;
   this->outputs << 0.0, 0.0, 0.0, 0.0;
+  this->att_cmd = AttitudeCommand();
 }
 
 int PositionController::configure(std::string config_file) {
@@ -124,26 +123,46 @@ void PositionController::reset(void) {
 }
 
 void PositionController::printOutputs(void) {
-  printf("roll: %.2f\t", rad2deg(this->outputs(0)));
-  printf("pitch: %.2f\t", rad2deg(this->outputs(1)));
-  printf("throttle: %.2f\n", rad2deg(this->outputs(3)));
+  double r, p, t;
+
+  r = rad2deg(this->outputs(0));
+  p = rad2deg(this->outputs(1));
+  t = this->outputs(3);
+
+  std::cout << "roll: " << std::setprecision(2) << r << "\t";
+  std::cout << "pitch: " << std::setprecision(2) << p << "\t";
+  std::cout << "throttle: " << std::setprecision(2) << t << std::endl;
 }
 
 void PositionController::printErrors(void) {
-  printf("x_controller: \n");
-  printf("\terror_p: %f\t", this->x_controller.error_p);
-  printf("\terror_i: %f\t", this->x_controller.error_i);
-  printf("\terror_d: %f\n", this->x_controller.error_d);
+  double p, i, d;
 
-  printf("y_controller: \n");
-  printf("\terror_p: %f\t", this->y_controller.error_p);
-  printf("\terror_i: %f\t", this->y_controller.error_i);
-  printf("\terror_d: %f\t", this->y_controller.error_d);
+  p = this->x_controller.error_p;
+  i = this->x_controller.error_i;
+  d = this->x_controller.error_d;
 
-  printf("z_controller: \n");
-  printf("\terror_p: %f\t", this->z_controller.error_p);
-  printf("\terror_i: %f\t", this->z_controller.error_i);
-  printf("\terror_d: %f\n", this->z_controller.error_d);
+  std::cout << "x_controller: " << std::endl;
+  std::cout << "\terror_p: " << std::setprecision(2) << p << "\t";
+  std::cout << "\terror_i: " << std::setprecision(2) << i << "\t";
+  std::cout << "\terror_d: " << std::setprecision(2) << i << std::endl;
+
+  p = this->y_controller.error_p;
+  i = this->y_controller.error_i;
+  d = this->y_controller.error_d;
+
+  std::cout << "y_controller: " << std::endl;
+  std::cout << "\terror_p: " << std::setprecision(2) << p << "\t";
+  std::cout << "\terror_i: " << std::setprecision(2) << i << "\t";
+  std::cout << "\terror_d: " << std::setprecision(2) << i << std::endl;
+
+  p = this->z_controller.error_p;
+  i = this->z_controller.error_i;
+  d = this->z_controller.error_d;
+
+  std::cout << "z_controller: " << std::endl;
+  std::cout << "\terror_p: " << std::setprecision(2) << p << "\t";
+  std::cout << "\terror_i: " << std::setprecision(2) << i << "\t";
+  std::cout << "\terror_d: " << std::setprecision(2) << i << std::endl;
 }
 
 }  // end of awesomo namespace

@@ -5,7 +5,7 @@
 
   <!-- prototype -->
   <param name="sim_mode" value="true" />
-  <param name="debug_mode" value="true" />
+  <param name="debug_mode" value="false" />
   <node pkg="prototype_ros" name="prototype_gazebo" type="run_gazebo.sh" output="screen" required="true" />
   <node pkg="prototype_ros" name="prototype_world" type="world_node" output="screen" required="true" />
   <node pkg="prototype_ros" name="prototype_quadrotor" type="quadrotor_node" output="screen" required="true" />
@@ -24,7 +24,7 @@
 
   <!-- apriltag node -->
   <param name="sim_mode" value="true" />
-  <param name="debug_mode" value="true" />
+  <param name="debug_mode" value="false" />
   <param name="apriltag_config" type="str" value="$(find awesomo_configs)/configs/apriltag/prototype.yaml" />
   <node pkg="awesomo_ros" name="awesomo_apriltag" type="apriltag_node" output="screen" />
 </launch>

@@ -9,18 +9,20 @@ class TagPose {
 public:
   int id;
   bool detected;
-  Eigen::Vector3d position;
+  Vec3 position;
 
   TagPose(void) {
     this->id = -1;
     this->detected = false;
     this->position << 0.0, 0.0, 0.0;
   };
-  TagPose(int id, bool detected, Eigen::Vector3d position) {
+
+  TagPose(int id, bool detected, Vec3 pos) {
     this->id = id;
     this->detected = detected;
-    this->position = position;
+    this->position = pos;
   }
+
   void print(void) {
     std::cout << "tag ";
     std::cout << "id: " << this->id << "\t";

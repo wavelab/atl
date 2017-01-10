@@ -1,5 +1,4 @@
-hover_height: 3.0
 hover_position:
-  rows: 1
+  rows: 1 
   cols: 3
   data: [1.0, 2.0, 3.0]
