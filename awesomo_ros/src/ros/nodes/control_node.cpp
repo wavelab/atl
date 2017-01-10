@@ -28,9 +28,8 @@ int ControlNode::configure(const std::string node_name, int hz) {
   // clang-format off
   this->registerSubscriber(STATE_TOPIC, &ControlNode::stateCallback, this);
   this->registerSubscriber(POSE_TOPIC, &ControlNode::poseCallback, this);
-  this->registerSubscriber(TARGET_TOPIC, &ControlNode::targetCallback, this);
-  this->registerSubscriber(APRILTAG_TOPIC, &ControlNode::aprilTagCallback, this);
   this->registerSubscriber(RADIO_TOPIC, &ControlNode::radioCallback, this);
+  this->registerSubscriber(APRILTAG_TOPIC, &ControlNode::aprilTagCallback, this);
   this->registerSubscriber(TARGET_TOPIC, &ControlNode::targetCallback, this);
   this->registerSubscriber(HOVER_SET_TOPIC, &ControlNode::hoverSetCallback, this);
   this->registerSubscriber(PCTRL_SET_TOPIC, &ControlNode::positionControllerSetCallback, this);
@@ -115,21 +114,21 @@ void ControlNode::poseCallback(const geometry_msgs::PoseStamped &msg) {
   this->quadrotor.setPose(this->world_pose);
 }
 
-void ControlNode::targetCallback(const geometry_msgs::Vector3 &msg) {
-  this->target_bpf(0) = msg.x;
-  this->target_bpf(1) = msg.y;
-  this->target_bpf(2) = msg.z;
-  this->quadrotor.setTargetPosition(this->target_bpf, true);
+void ControlNode::radioCallback(const mavros_msgs::RCIn &msg) {
+  for (int i = 0; i < 16; i++) {
+    this->rc_in[i] = msg.channels[i];
+  }
 }
 
 void ControlNode::aprilTagCallback(const awesomo_msgs::AprilTagPose &msg) {
   this->tag_pose = convertAprilTagPoseMsg2TagPose(msg);
 }
 
-void ControlNode::radioCallback(const mavros_msgs::RCIn &msg) {
-  for (int i = 0; i < 16; i++) {
-    this->rc_in[i] = msg.channels[i];
-  }
+void ControlNode::targetCallback(const geometry_msgs::Vector3 &msg) {
+  this->target_bpf(0) = msg.x;
+  this->target_bpf(1) = msg.y;
+  this->target_bpf(2) = msg.z;
+  this->quadrotor.setTargetPosition(this->target_bpf, true);
 }
 
 int ControlNode::loopCallback(void) {
@@ -188,7 +187,7 @@ void ControlNode::publishStats(void) {
 void ControlNode::hoverSetCallback(const geometry_msgs::Vector3 &msg) {
   this->quadrotor.hover_mode.hover_position(0) = msg.x;
   this->quadrotor.hover_mode.hover_position(1) = msg.y;
-  this->quadrotor.hover_mode.hover_position(2) = msg.z;
+  this->quadrotor.hover_mode.hover_height = msg.z;
 }
 
 void ControlNode::positionControllerSetCallback(const awesomo_msgs::PCtrlSettings &msg) {

@@ -7,7 +7,7 @@ TEST(Quadrotor, constructor) {
   awesomo::Quadrotor quadrotor;
 
   ASSERT_FALSE(quadrotor.configured);
-  ASSERT_EQ(awesomo::HOVER_MODE, quadrotor.current_mode);
+  ASSERT_EQ(awesomo::DISCOVER_MODE, quadrotor.current_mode);
 }
 
 TEST(Quadrotor, configure) {
@@ -15,5 +15,5 @@ TEST(Quadrotor, configure) {
 
   quadrotor.configure(TEST_CONFIG_PATH);
   ASSERT_TRUE(quadrotor.configured);
-  ASSERT_EQ(awesomo::HOVER_MODE, quadrotor.current_mode);
+  ASSERT_EQ(awesomo::DISCOVER_MODE, quadrotor.current_mode);
 }

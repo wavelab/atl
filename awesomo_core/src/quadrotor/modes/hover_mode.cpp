@@ -1,4 +1,4 @@
-#include "awesomo_core/quadrotor/hover_mode.hpp"
+#include "awesomo_core/quadrotor/modes/hover_mode.hpp"
 
 
 namespace awesomo {

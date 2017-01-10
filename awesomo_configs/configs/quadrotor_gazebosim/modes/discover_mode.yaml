@@ -1,0 +1,2 @@
+min_discover_time: 5.0
+target_lost_threshold: 1000.0

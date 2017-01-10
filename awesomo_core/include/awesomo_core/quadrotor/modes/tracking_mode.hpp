@@ -1,7 +1,7 @@
-#ifndef __AWESOMO_QUADROTOR_TRACKING_MODE_HPP__
-#define __AWESOMO_QUADROTOR_TRACKING_MODE_HPP__
+#ifndef __AWESOMO_QUADROTOR_MODES_TRACKING_MODE_HPP__
+#define __AWESOMO_QUADROTOR_MODES_TRACKING_MODE_HPP__
 
-#include "awesomo_core/quadrotor/base_mode.hpp"
+#include "awesomo_core/quadrotor/modes/base_mode.hpp"
 
 
 namespace awesomo {
@@ -22,6 +22,7 @@ public:
   int configure(std::string config_file);
   void updateTargetPosition(Vec3 position, bool detected);
   void update(void);
+  void stop(void);
 };
 
 }  // end of awesomo namespace

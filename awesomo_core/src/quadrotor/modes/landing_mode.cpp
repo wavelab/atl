@@ -1,4 +1,4 @@
-#include "awesomo_core/quadrotor/landing_mode.hpp"
+#include "awesomo_core/quadrotor/modes/landing_mode.hpp"
 
 
 namespace awesomo {

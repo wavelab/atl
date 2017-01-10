@@ -1,4 +1,4 @@
 hover_position:
-    cols: 1
-    rows: 3
-    data: [0.0, 0.0, 3.0]
+  rows: 1 
+  cols: 3
+  data: [0.0, 0.0, 3.0]

@@ -101,18 +101,6 @@ TEST(TrackingController, calculate) {
   ASSERT_FLOAT_EQ(0.0, controller.outputs(1));
   ASSERT_FLOAT_EQ(controller.hover_throttle, controller.outputs(3));
 
-  // CHECK MOVING TOWARDS THE Y LOCATION
-  errors << 0, 1, 0;
-  yaw = 0.0;
-  dt = 0.1;
-
-  controller.reset();
-  controller.calculate(errors, yaw, dt);
-  controller.printOutputs();
-
-  ASSERT_TRUE(controller.outputs(0) < 0.0);
-  ASSERT_FLOAT_EQ(0.0, controller.outputs(1));
-
   // CHECK MOVING TOWARDS THE X LOCATION
   errors << 1, 0, 0;
   yaw = 0.0;
@@ -124,6 +112,18 @@ TEST(TrackingController, calculate) {
 
   ASSERT_FLOAT_EQ(0.0, controller.outputs(0));
   ASSERT_TRUE(controller.outputs(1) > 0.0);
+
+  // CHECK MOVING TOWARDS THE Y LOCATION
+  errors << 0, 1, 0;
+  yaw = 0.0;
+  dt = 0.1;
+
+  controller.reset();
+  controller.calculate(errors, yaw, dt);
+  controller.printOutputs();
+
+  ASSERT_TRUE(controller.outputs(0) < 0.0);
+  ASSERT_FLOAT_EQ(0.0, controller.outputs(1));
 
   // CHECK MOVING TOWARDS THE X AND Y LOCATION
   errors << 1, 1, 0;

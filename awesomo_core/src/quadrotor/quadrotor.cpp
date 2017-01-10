@@ -6,8 +6,10 @@ namespace awesomo {
 Quadrotor::Quadrotor(void) {
   this->configured = false;
 
-  this->current_mode = HOVER_MODE;
+  this->current_mode = DISCOVER_MODE;
   this->hover_mode = HoverMode();
+  this->discover_mode = DiscoverMode();
+  this->tracking_mode = TrackingMode();
 
   this->heading = 0.0;
   this->pose = Pose();
@@ -23,7 +25,7 @@ int Quadrotor::configure(std::string config_path) {
   config_file = config_path + "/controllers/" + "position_controller.yaml";
   CONFIGURE_CONTROLLER(this->position_controller, config_file, FCONFPCTRL);
 
-  // position controller
+  // tracking controller
   config_file = config_path + "/controllers/" + "tracking_controller.yaml";
   CONFIGURE_CONTROLLER(this->tracking_controller, config_file, FCONFTCTRL);
 
@@ -31,11 +33,15 @@ int Quadrotor::configure(std::string config_path) {
   config_file = config_path + "/modes/" + "hover_mode.yaml";
   CONFIGURE_MODE(this->hover_mode, config_file, FCONFHMODE);
 
+  // discover mode
+  config_file = config_path + "/modes/" + "discover_mode.yaml";
+  CONFIGURE_MODE(this->discover_mode, config_file, FCONFDMODE);
+
   // tracking mode
   config_file = config_path + "/modes/" + "tracking_mode.yaml";
   CONFIGURE_MODE(this->tracking_mode, config_file, FCONFHMODE);
 
-  this->current_mode = HOVER_MODE;
+  this->current_mode = DISCOVER_MODE;
   this->configured = true;
 
   return 0;
@@ -61,7 +67,7 @@ void Quadrotor::setPose(Pose pose) {
 void Quadrotor::setTargetPosition(Vec3 position, bool detected) {
   switch (this->current_mode) {
     case DISCOVER_MODE:
-       this->tracking_mode.updateTargetPosition(position, detected);
+       this->discover_mode.updateTargetPosition(position, detected);
        break;
     case TRACKING_MODE:
        this->tracking_mode.updateTargetPosition(position, detected);
@@ -100,12 +106,15 @@ int Quadrotor::stepHoverMode(double dt) {
     dt
   );
   this->att_cmd = AttitudeCommand(output);
+  this->hover_mode.update();
   // clang-format on
 
   return 0;
 }
 
 int Quadrotor::stepDiscoverMode(double dt) {
+  enum Mode new_mode;
+
   // pre-check
   if (this->configured == false) {
     return -1;
@@ -113,6 +122,14 @@ int Quadrotor::stepDiscoverMode(double dt) {
 
   // hover in place
   this->stepHoverMode(dt);
+
+  // update
+  this->discover_mode.update();
+  if (this->discover_mode.transition()) {
+    this->setMode(TRACKING_MODE);
+    this->tracking_mode.updateTargetPosition(this->discover_mode.target_bpf, true);
+    this->hover_mode.stop();
+  }
 
   return 0;
 }
@@ -150,13 +167,10 @@ int Quadrotor::step(double dt) {
   switch (this->current_mode) {
     case HOVER_MODE:
       this->stepHoverMode(dt);
-      this->hover_mode.update();
       break;
 
     case DISCOVER_MODE:
-      this->stepHoverMode(dt);
-      this->hover_mode.update();
-      this->tracking_mode.update();
+      this->stepDiscoverMode(dt);
       break;
 
     case TRACKING_MODE:

@@ -1,4 +1,4 @@
-#include "awesomo_core/quadrotor/tracking_mode.hpp"
+#include "awesomo_core/quadrotor/modes/tracking_mode.hpp"
 
 
 namespace awesomo {
@@ -48,6 +48,15 @@ void TrackingMode::update(void) {
   if (mtoc(&this->target_last_seen) > this->target_lost_threshold) {
     this->target_losted = true;
   }
+}
+
+void TrackingMode::stop(void) {
+  BaseMode::stop();
+
+  // reset target data
+  this->target_losted = true;
+  this->target_detected = false;
+  this->target_bpf = Vec3();
 }
 
 }  // end of awesomo namespace

@@ -29,6 +29,9 @@ namespace awesomo {
 #define CONTROL_NODE_RATE 100
 
 // PUBLISH TOPICS
+#define SETPOINT_ATTITUDE_TOPIC "/mavros/setpoint_attitude/attitude"
+#define SETPOINT_THROTTLE_TOPIC "/mavros/setpoint_attitude/att_throttle"
+#define SETPOINT_POSITION_TOPIC "/mavros/setpoint_position/local"
 #define PCTRL_STATS_TOPIC "/awesomo/position_controller/stats"
 #define KF_STATS_TOPIC "/awesomo/kf_estimation/stats"
 #define KF_PLOT_TOPIC "/awesomo/kf_estimation/plot"
@@ -43,9 +46,6 @@ namespace awesomo {
 #define RADIO_TOPIC "/mavros/rc/in"
 #define APRILTAG_TOPIC "/awesomo/apriltag/pose"
 #define TARGET_TOPIC "/awesomo/gimbal/target"
-#define SETPOINT_ATTITUDE_TOPIC "/mavros/setpoint_attitude/attitude"
-#define SETPOINT_THROTTLE_TOPIC "/mavros/setpoint_attitude/att_throttle"
-#define SETPOINT_POSITION_TOPIC "/mavros/setpoint_position/local"
 #define HOVER_SET_TOPIC "/awesomo/control/hover/set"
 #define PCTRL_SET_TOPIC "/awesomo/control/position_controller/set"
 

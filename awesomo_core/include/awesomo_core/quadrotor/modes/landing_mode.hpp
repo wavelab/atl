@@ -1,7 +1,7 @@
-#ifndef __AWESOMO_QUADROTOR_LANDING_MODE_HPP__
-#define __AWESOMO_QUADROTOR_LANDING_MODE_HPP__
+#ifndef __AWESOMO_QUADROTOR_MODES_LANDING_MODE_HPP__
+#define __AWESOMO_QUADROTOR_MODES_LANDING_MODE_HPP__
 
-#include "awesomo_core/quadrotor/base_mode.hpp"
+#include "awesomo_core/quadrotor/modes/base_mode.hpp"
 
 
 namespace awesomo {

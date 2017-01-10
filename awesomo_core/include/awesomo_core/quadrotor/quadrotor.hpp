@@ -8,10 +8,11 @@
 #include "awesomo_core/utils/utils.hpp"
 #include "awesomo_core/control/control.hpp"
 #include "awesomo_core/estimation/estimation.hpp"
-#include "awesomo_core/quadrotor/base_mode.hpp"
-#include "awesomo_core/quadrotor/hover_mode.hpp"
-#include "awesomo_core/quadrotor/tracking_mode.hpp"
-#include "awesomo_core/quadrotor/landing_mode.hpp"
+#include "awesomo_core/quadrotor/modes/base_mode.hpp"
+#include "awesomo_core/quadrotor/modes/discover_mode.hpp"
+#include "awesomo_core/quadrotor/modes/hover_mode.hpp"
+#include "awesomo_core/quadrotor/modes/tracking_mode.hpp"
+#include "awesomo_core/quadrotor/modes/landing_mode.hpp"
 
 namespace awesomo {
 
@@ -25,6 +26,7 @@ namespace awesomo {
 #define FCONFPCTRL "Failed to configure position controller!"
 #define FCONFTCTRL "Failed to configure tracking controller!"
 #define FCONFHMODE "Failed to configure hover mode!"
+#define FCONFDMODE "Failed to configure discover mode!"
 #define FCONFTMODE "Failed to configure tracking mode!"
 
 #define CONFIGURE_CONTROLLER(X, CONF_FILE, ERR_MSG) \
@@ -53,6 +55,7 @@ public:
 
   enum Mode current_mode;
   HoverMode hover_mode;
+  DiscoverMode discover_mode;
   TrackingMode tracking_mode;
 
   double heading;
