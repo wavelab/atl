@@ -46,12 +46,12 @@ public:
   bool configured;
 
   enum Mode current_mode;
-  HoverMode hover_mode;
-  DiscoverMode discover_mode;
-  TrackingMode tracking_mode;
-
   double heading;
   Pose pose;
+  Vec3 hover_position;
+  bool target_losted;
+  bool target_detected;
+  Vec3 target_bpf;
 
   PositionController position_controller;
   TrackingController tracking_controller;

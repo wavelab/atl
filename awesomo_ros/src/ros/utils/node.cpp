@@ -71,7 +71,8 @@ int ROSNode::registerShutdown(std::string topic) {
 
   // register subscriber
   ROS_INFO(INFO_SUB_INIT, topic.c_str());
-  subscriber = this->ros_nh->subscribe(topic, 1, &ROSNode::shutdownCallback, this);
+  subscriber =
+    this->ros_nh->subscribe(topic, 1, &ROSNode::shutdownCallback, this);
   this->ros_subs[topic] = subscriber;
 }
 

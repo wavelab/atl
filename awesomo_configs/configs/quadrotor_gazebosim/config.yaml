@@ -1,0 +1,8 @@
+hover_position:
+    rows: 1
+    cols: 3
+    data: [0.0, 0.0, 3.0]
+
+tracking:
+    min_track_time: 1.0
+    target_lost_threshold: 1.0

@@ -12,8 +12,7 @@ static void print_target_relative_to_body_frame(Vec3 &target) {
   std::cout << std::fixed << std::setprecision(2) << target(2) << std::endl;
 }
 
-static void print_target_relative_to_body_planar_frame(
-  Vec3 &target) {
+static void print_target_relative_to_body_planar_frame(Vec3 &target) {
   std::cout << "target position (relative to quad in body planar frame): ";
   std::cout << std::fixed << std::setprecision(2) << target(0) << " ";
   std::cout << std::fixed << std::setprecision(2) << target(1) << " ";
@@ -274,4 +273,4 @@ TEST(Gimbal, trackTarget) {
   std::cout << gimbal.setpoints.transpose() << std::endl;
 }
 
-} // end of awesomo namespace
+}  // end of awesomo namespace

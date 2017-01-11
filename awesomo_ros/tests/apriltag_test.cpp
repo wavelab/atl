@@ -55,7 +55,7 @@ protected:
   }
 };
 
-TEST_F(AprilTagNodeTest, poseMsg){
+TEST_F(AprilTagNodeTest, poseMsg) {
   sensor_msgs::ImageConstPtr msg;
   cv::Mat image;
 
@@ -79,7 +79,7 @@ TEST_F(AprilTagNodeTest, poseMsg){
 
 }  // end of awesomo namespace
 
-int main(int argc, char** argv){
+int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
   ros::init(argc, argv, NODE_NAME);
   return RUN_ALL_TESTS();

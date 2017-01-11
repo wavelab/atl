@@ -17,7 +17,7 @@ TrackingController::TrackingController(void) {
   this->pitch_limit[1] = 0.0;
   this->hover_throttle = 0.0;
 
-  this->setpoints  << 0.0, 0.0, 0.0;
+  this->setpoints << 0.0, 0.0, 0.0;
   this->outputs << 0.0, 0.0, 0.0, 0.0;
   this->att_cmd = AttitudeCommand();
 }
@@ -41,7 +41,8 @@ int TrackingController::configure(std::string config_file) {
   parser.addParam<double>("throttle_controller.k_p", &this->z_controller.k_p);
   parser.addParam<double>("throttle_controller.k_i", &this->z_controller.k_i);
   parser.addParam<double>("throttle_controller.k_d", &this->z_controller.k_d);
-  parser.addParam<double>("throttle_controller.hover_throttle", &this->hover_throttle);
+  parser.addParam<double>("throttle_controller.hover_throttle",
+                          &this->hover_throttle);
 
   if (parser.load(config_file) != 0) {
     return -1;

@@ -35,7 +35,7 @@ TEST_F(GimbalNodeTest, test) {
 
 }  // end of awesomo namespace
 
-int main(int argc, char** argv){
+int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
   ros::init(argc, argv, NODE_NAME);
   return RUN_ALL_TESTS();

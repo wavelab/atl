@@ -34,9 +34,9 @@ void buildKFStatsMsg(int seq,
                      KalmanFilter estimator,
                      awesomo_msgs::KFStats &msg);
 void buildKFPlotMsg(int seq,
-                        ros::Time time,
-                        KalmanFilter estimator,
-                        awesomo_msgs::KFPlot &msg);
+                    ros::Time time,
+                    KalmanFilter estimator,
+                    awesomo_msgs::KFPlot &msg);
 void buildAprilTagPoseMsg(TagPose tag, awesomo_msgs::AprilTagPose &msg);
 void buildAprilTagTrackMsg(TagPose tag, geometry_msgs::Vector3 &msg);
 void buildPCtrlSettingsMsg(PositionController pc,

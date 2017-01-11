@@ -185,12 +185,13 @@ void ControlNode::publishStats(void) {
 }
 
 void ControlNode::hoverSetCallback(const geometry_msgs::Vector3 &msg) {
-  this->quadrotor.hover_mode.hover_position(0) = msg.x;
-  this->quadrotor.hover_mode.hover_position(1) = msg.y;
-  this->quadrotor.hover_mode.hover_height = msg.z;
+  this->quadrotor.hover_position(0) = msg.x;
+  this->quadrotor.hover_position(1) = msg.y;
+  this->quadrotor.hover_position(2) = msg.z;
 }
 
-void ControlNode::positionControllerSetCallback(const awesomo_msgs::PCtrlSettings &msg) {
+void ControlNode::positionControllerSetCallback(
+  const awesomo_msgs::PCtrlSettings &msg) {
   PositionController *position_controller;
 
   position_controller = &this->quadrotor.position_controller;

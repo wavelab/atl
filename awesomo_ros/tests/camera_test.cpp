@@ -39,7 +39,7 @@ protected:
   }
 };
 
-TEST_F(CameraNodeTest, poseMsg){
+TEST_F(CameraNodeTest, poseMsg) {
   ros::Duration(1.0).sleep();
   ros::spinOnce();
 
@@ -49,7 +49,7 @@ TEST_F(CameraNodeTest, poseMsg){
 
 }  // end of awesomo namespace
 
-int main(int argc, char** argv){
+int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
   ros::init(argc, argv, NODE_NAME);
   return RUN_ALL_TESTS();
