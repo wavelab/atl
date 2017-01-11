@@ -41,14 +41,6 @@ namespace awesomo {
     goto error;                               \
   }
 
-enum Mode {
-  DISARM_MODE = 0,
-  HOVER_MODE = 1,
-  DISCOVER_MODE = 2,
-  TRACKING_MODE = 3,
-  LANDING_MODE = 4
-};
-
 class Quadrotor {
 public:
   bool configured;
@@ -73,6 +65,7 @@ public:
   int stepHoverMode(double dt);
   int stepDiscoverMode(double dt);
   int stepTrackingMode(double dt);
+  int stepLandingMode(double dt);
   int step(double dt);
 };
 

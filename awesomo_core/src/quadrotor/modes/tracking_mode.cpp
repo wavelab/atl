@@ -5,6 +5,8 @@ namespace awesomo {
 
 TrackingMode::TrackingMode(void) {
   this->configured = false;
+  this->prev_mode = DISCOVER_MODE;
+  this->next_mode = LANDING_MODE;
 
   this->min_track_time = 0.0;
   this->target_lost_threshold = 0.0;
@@ -41,6 +43,15 @@ void TrackingMode::updateTargetPosition(Vec3 position, bool detected) {
   }
 }
 
+void TrackingMode::stop(void) {
+  BaseMode::stop();
+
+  // reset target data
+  this->target_losted = true;
+  this->target_detected = false;
+  this->target_bpf = Vec3();
+}
+
 void TrackingMode::update(void) {
   BaseMode::update();
 
@@ -50,13 +61,19 @@ void TrackingMode::update(void) {
   }
 }
 
-void TrackingMode::stop(void) {
-  BaseMode::stop();
+bool TrackingMode::transition(enum Mode &new_mode) {
+  bool min_time_met;
 
-  // reset target data
-  this->target_losted = true;
-  this->target_detected = false;
-  this->target_bpf = Vec3();
+  // setup
+  min_time_met = (this->elasped() / 1000.0) > this->min_track_time;
+
+  // transition
+  if (min_time_met && this->target_losted == false) {
+    new_mode = this->next_mode;
+    return true;
+  }
+
+  return false;
 }
 
 }  // end of awesomo namespace

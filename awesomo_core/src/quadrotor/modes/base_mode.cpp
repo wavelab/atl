@@ -7,6 +7,8 @@ BaseMode::BaseMode(void) {
   this->is_running = false;
   this->time_start = (struct timespec){0};
   this->time_last = (struct timespec){0};
+  this->prev_mode = NOT_SET;
+  this->next_mode = NOT_SET;
 }
 
 void BaseMode::start(void) {

@@ -5,6 +5,7 @@ namespace awesomo {
 
 DiscoverMode::DiscoverMode(void) {
   this->configured = false;
+  this->next_mode = TRACKING_MODE;
 
   this->min_discover_time = 0.0;
   this->target_lost_threshold = 0.0;
@@ -59,8 +60,15 @@ void DiscoverMode::update(void) {
   }
 }
 
-bool DiscoverMode::transition(void) {
-  if ((this->elasped() / 1000.0) > this->min_discover_time) {
+bool DiscoverMode::transition(enum Mode &new_mode) {
+  bool min_time_met;
+
+  // setup
+  min_time_met = (this->elasped() / 1000.0) > this->min_discover_time;
+
+  // transition
+  if (min_time_met && this->target_losted == false) {
+    new_mode = this->next_mode;
     return true;
   }
 

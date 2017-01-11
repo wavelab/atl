@@ -120,14 +120,14 @@ int Quadrotor::stepDiscoverMode(double dt) {
     return -1;
   }
 
-  // hover in place
-  this->stepHoverMode(dt);
-
   // update
+  this->stepHoverMode(dt);
   this->discover_mode.update();
-  if (this->discover_mode.transition()) {
-    this->setMode(TRACKING_MODE);
-    this->tracking_mode.updateTargetPosition(this->discover_mode.target_bpf, true);
+
+  // transition
+  if (this->discover_mode.transition(new_mode)) {
+    this->setMode(new_mode);
+    this->tracking_mode.target_bpf = this->discover_mode.target_bpf;
     this->hover_mode.stop();
   }
 
@@ -135,6 +135,7 @@ int Quadrotor::stepDiscoverMode(double dt) {
 }
 
 int Quadrotor::stepTrackingMode(double dt) {
+  enum Mode new_mode;
   Vec3 errors, position;
   Vec4 output;
 
@@ -154,41 +155,63 @@ int Quadrotor::stepTrackingMode(double dt) {
   this->att_cmd = AttitudeCommand(output);
   this->hover_mode.updateHoverXYPosition(position(0), position(1));
 
+  // transition
+  if (this->tracking_mode.transition(new_mode)) {
+    this->setMode(new_mode);
+  }
+
+  return 0;
+}
+
+int Quadrotor::stepLandingMode(double dt) {
+  enum Mode new_mode;
+  Vec3 errors, position;
+  Vec4 output;
+
+  // pre-check
+  if (this->configured == false) {
+    return -1;
+  }
+
+  // setup
+  position = this->pose.position;
+  errors(0) = this->tracking_mode.target_bpf(0);
+  errors(1) = this->tracking_mode.target_bpf(1);
+  errors(2) = this->hover_mode.hover_height - position(2);
+
+  // track target
+  output = this->tracking_controller.calculate(errors, this->heading, dt);
+  this->att_cmd = AttitudeCommand(output);
+  this->hover_mode.updateHoverXYPosition(position(0), position(1));
+
+  // transition
+  if (this->tracking_mode.transition(new_mode)) {
+    this->setMode(new_mode);
+  }
+
   return 0;
 }
 
 int Quadrotor::step(double dt) {
+  int retval;
   // pre-check
   if (this->configured == false) {
     return -1;
   }
 
   // step
+  // clang-format off
   switch (this->current_mode) {
-    case HOVER_MODE:
-      this->stepHoverMode(dt);
-      break;
-
-    case DISCOVER_MODE:
-      this->stepDiscoverMode(dt);
-      break;
-
-    case TRACKING_MODE:
-      this->stepTrackingMode(dt);
-      break;
-
-    case LANDING_MODE:
-      break;
-
-    case DISARM_MODE:
-      return -1;
-
-    default:
-      log_err(EINVMODE);
-      return -1;
+    case HOVER_MODE: retval = this->stepHoverMode(dt); break;
+    case DISCOVER_MODE: retval = this->stepDiscoverMode(dt); break;
+    case TRACKING_MODE: retval = this->stepTrackingMode(dt); break;
+    case LANDING_MODE: retval = this->stepLandingMode(dt); break;
+    case DISARM_MODE: return -1;
+    default: retval = log_err(EINVMODE); return -1;
   }
+  // clang-format on
 
-  return 0;
+  return retval;
 }
 
 }  // end of awesomo namespace

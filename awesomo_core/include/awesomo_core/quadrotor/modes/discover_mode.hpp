@@ -23,7 +23,7 @@ public:
   void updateTargetPosition(Vec3 position, bool detected);
   void stop(void);
   void update(void);
-  bool transition(void);
+  bool transition(enum Mode &new_mode);
 };
 
 }  // end of awesomo namespace
