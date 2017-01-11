@@ -83,8 +83,8 @@ TEST(PositionController, configure) {
 }
 
 TEST(PositionController, calculate) {
-  Vec3 setpoint;
-  Vec4 actual;
+  Vec3 setpoint_nwu, setpoint_enu;
+  Pose actual;
   float yaw_setpoint, dt;
   PositionController controller;
 
@@ -92,11 +92,12 @@ TEST(PositionController, calculate) {
   controller.configure(TEST_CONFIG);
 
   // CHECK HOVERING PID OUTPUT
-  setpoint << 0, 0, 0;
-  actual << 0, 0, 0, 0;
+  setpoint_nwu << 0, 0, 0;
+  nwu2enu(setpoint_nwu, setpoint_enu);
+  actual.position << 0, 0, 0;
   yaw_setpoint = 0;
   dt = 0.1;
-  controller.calculate(setpoint, actual, yaw_setpoint, dt);
+  controller.calculate(setpoint_enu, actual, yaw_setpoint, dt);
   controller.printOutputs();
 
   ASSERT_FLOAT_EQ(0.0, controller.outputs(0));
@@ -104,55 +105,59 @@ TEST(PositionController, calculate) {
   ASSERT_FLOAT_EQ(controller.hover_throttle, controller.outputs(3));
 
   // CHECK MOVING TOWARDS THE Y LOCATION
-  setpoint << 0, 1, 0;
-  actual << 0, 0, 0, 0;
+  setpoint_nwu << 0, 1, 0;
+  nwu2enu(setpoint_nwu, setpoint_enu);
+  actual.position << 0, 0, 0;
   yaw_setpoint = 0;
   dt = 0.1;
 
   controller.reset();
-  controller.calculate(setpoint, actual, yaw_setpoint, dt);
+  controller.calculate(setpoint_enu, actual, yaw_setpoint, dt);
   controller.printOutputs();
 
   ASSERT_TRUE(controller.outputs(0) < 0.0);
   ASSERT_FLOAT_EQ(0.0, controller.outputs(1));
 
   // CHECK MOVING TOWARDS THE X LOCATION
-  setpoint << 1, 0, 0;
-  actual << 0, 0, 0, 0;
+  setpoint_nwu << 1, 0, 0;
+  nwu2enu(setpoint_nwu, setpoint_enu);
+  actual.position << 0, 0, 0;
   yaw_setpoint = 0;
   dt = 0.1;
 
   controller.reset();
-  controller.calculate(setpoint, actual, yaw_setpoint, dt);
+  controller.calculate(setpoint_enu, actual, yaw_setpoint, dt);
   controller.printOutputs();
 
   ASSERT_FLOAT_EQ(0.0, controller.outputs(0));
   ASSERT_TRUE(controller.outputs(1) > 0.0);
 
   // CHECK MOVING TOWARDS THE X AND Y LOCATION
-  setpoint << 1, 1, 0;
-  actual << 0, 0, 0, 0;
+  setpoint_nwu << 1, 1, 0;
+  nwu2enu(setpoint_nwu, setpoint_enu);
+  actual.position << 0, 0, 0;
   yaw_setpoint = 0;
   dt = 0.1;
 
   controller.reset();
-  controller.calculate(setpoint, actual, yaw_setpoint, dt);
+  controller.calculate(setpoint_enu, actual, yaw_setpoint, dt);
   controller.printOutputs();
 
   ASSERT_TRUE(controller.outputs(0) < 0.0);
   ASSERT_TRUE(controller.outputs(1) > 0.0);
 
   // CHECK MOVING YAW
-  setpoint << 0, 0, 0;
-  actual << 0, 0, 0, 0;
+  setpoint_nwu << 0, 0, 0;
+  nwu2enu(setpoint_nwu, setpoint_enu);
+  actual.position << 0, 0, 0;
   yaw_setpoint = deg2rad(90.0);
   dt = 0.1;
 
   controller.reset();
-  Vec4 outputs = controller.calculate(setpoint, actual, yaw_setpoint, dt);
+  controller.calculate(setpoint_enu, actual, yaw_setpoint, dt);
   controller.printOutputs();
 
-  ASSERT_FLOAT_EQ(yaw_setpoint, outputs(2));
+  ASSERT_FLOAT_EQ(yaw_setpoint, controller.outputs(2));
 }
 
 }  // end of awesomo namepsace

@@ -38,11 +38,7 @@ ADD_LIBRARY(
     # planning
     src/planning/planning.cpp
     # quadrotor
-    src/quadrotor/modes/base_mode.cpp
-    src/quadrotor/modes/discover_mode.cpp
-    src/quadrotor/modes/hover_mode.cpp
-    src/quadrotor/modes/landing_mode.cpp
-    src/quadrotor/modes/tracking_mode.cpp
+    src/quadrotor/landing_target.cpp
     src/quadrotor/quadrotor.cpp
     # utils
     src/utils/config.cpp
@@ -89,9 +85,7 @@ ADD_EXECUTABLE(
     # PLANNING
     tests/planning/planning_test.cpp
     # QUADROTOR
-    tests/quadrotor/modes/discover_mode_test.cpp
-    tests/quadrotor/modes/hover_mode_test.cpp
-    tests/quadrotor/modes/tracking_mode_test.cpp
+    tests/quadrotor/landing_target_test.cpp
     tests/quadrotor/quadrotor_test.cpp
     # VISION TESTS
     tests/vision/apriltag/swathmore_test.cpp

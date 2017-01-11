@@ -3,17 +3,21 @@
 
 #define TEST_CONFIG_PATH "tests/configs/quadrotor"
 
+namespace awesomo {
+
 TEST(Quadrotor, constructor) {
-  awesomo::Quadrotor quadrotor;
+  Quadrotor quadrotor;
 
   ASSERT_FALSE(quadrotor.configured);
-  ASSERT_EQ(awesomo::DISCOVER_MODE, quadrotor.current_mode);
+  ASSERT_EQ(DISCOVER_MODE, quadrotor.current_mode);
 }
 
 TEST(Quadrotor, configure) {
-  awesomo::Quadrotor quadrotor;
+  Quadrotor quadrotor;
 
   quadrotor.configure(TEST_CONFIG_PATH);
   ASSERT_TRUE(quadrotor.configured);
-  ASSERT_EQ(awesomo::DISCOVER_MODE, quadrotor.current_mode);
+  ASSERT_EQ(DISCOVER_MODE, quadrotor.current_mode);
 }
+
+}  // end of awesomo namespace

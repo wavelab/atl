@@ -44,7 +44,6 @@ namespace awesomo {
 #define STATE_TOPIC "/mavros/state"
 #define POSE_TOPIC "/mavros/local_position/pose"
 #define RADIO_TOPIC "/mavros/rc/in"
-#define APRILTAG_TOPIC "/awesomo/apriltag/pose"
 #define TARGET_TOPIC "/awesomo/gimbal/target"
 #define HOVER_SET_TOPIC "/awesomo/control/hover/set"
 #define PCTRL_SET_TOPIC "/awesomo/control/position_controller/set"
@@ -53,9 +52,6 @@ class ControlNode : public ROSNode {
 public:
   bool configured;
 
-  Pose world_pose;
-  TagPose tag_pose;
-  Vec3 target_bpf;
   int rc_in[16];
   Quadrotor quadrotor;
 
@@ -64,10 +60,6 @@ public:
   ros::ServiceClient arming_client;
 
   ControlNode(int argc, char **argv) : ROSNode(argc, argv) {
-    this->world_pose = Pose();
-    this->tag_pose = TagPose();
-    this->target_bpf = Vec3();
-
     for (int i = 0; i < 16; i++) {
       this->rc_in[i] = 0.0f;
     }
@@ -79,7 +71,6 @@ public:
   int setOffboardModeOn(void);
   void stateCallback(const mavros_msgs::State::ConstPtr &msg);
   void poseCallback(const geometry_msgs::PoseStamped &msg);
-  void aprilTagCallback(const awesomo_msgs::AprilTagPose &msg);
   void targetCallback(const geometry_msgs::Vector3 &msg);
   void radioCallback(const mavros_msgs::RCIn &msg);
   void hoverSetCallback(const geometry_msgs::Vector3 &msg);

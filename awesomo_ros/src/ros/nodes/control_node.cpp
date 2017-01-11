@@ -29,7 +29,6 @@ int ControlNode::configure(const std::string node_name, int hz) {
   this->registerSubscriber(STATE_TOPIC, &ControlNode::stateCallback, this);
   this->registerSubscriber(POSE_TOPIC, &ControlNode::poseCallback, this);
   this->registerSubscriber(RADIO_TOPIC, &ControlNode::radioCallback, this);
-  this->registerSubscriber(APRILTAG_TOPIC, &ControlNode::aprilTagCallback, this);
   this->registerSubscriber(TARGET_TOPIC, &ControlNode::targetCallback, this);
   this->registerSubscriber(HOVER_SET_TOPIC, &ControlNode::hoverSetCallback, this);
   this->registerSubscriber(PCTRL_SET_TOPIC, &ControlNode::positionControllerSetCallback, this);
@@ -110,8 +109,9 @@ void ControlNode::stateCallback(const mavros_msgs::State::ConstPtr &msg) {
 }
 
 void ControlNode::poseCallback(const geometry_msgs::PoseStamped &msg) {
-  this->world_pose = convertPoseStampedMsg2Pose(msg);
-  this->quadrotor.setPose(this->world_pose);
+  Pose world_pose;
+  world_pose = convertPoseStampedMsg2Pose(msg);
+  this->quadrotor.setPose(world_pose);
 }
 
 void ControlNode::radioCallback(const mavros_msgs::RCIn &msg) {
@@ -120,15 +120,12 @@ void ControlNode::radioCallback(const mavros_msgs::RCIn &msg) {
   }
 }
 
-void ControlNode::aprilTagCallback(const awesomo_msgs::AprilTagPose &msg) {
-  this->tag_pose = convertAprilTagPoseMsg2TagPose(msg);
-}
-
 void ControlNode::targetCallback(const geometry_msgs::Vector3 &msg) {
-  this->target_bpf(0) = msg.x;
-  this->target_bpf(1) = msg.y;
-  this->target_bpf(2) = msg.z;
-  this->quadrotor.setTargetPosition(this->target_bpf, true);
+  Vec3 target_bpf;
+  target_bpf(0) = msg.x;
+  target_bpf(1) = msg.y;
+  target_bpf(2) = msg.z;
+  this->quadrotor.setTargetPosition(target_bpf, true);
 }
 
 int ControlNode::loopCallback(void) {

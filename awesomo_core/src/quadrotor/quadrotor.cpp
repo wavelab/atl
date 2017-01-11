@@ -6,17 +6,20 @@ namespace awesomo {
 Quadrotor::Quadrotor(void) {
   this->configured = false;
 
-  this->current_mode = HOVER_MODE;
+  this->position_controller = PositionController();
+  this->tracking_controller = TrackingController();
+  this->att_cmd = AttitudeCommand();
 
+  this->min_discover_time = FLT_MAX;
+  this->min_tracking_time = FLT_MAX;
+  this->discover_tic = (struct timespec){0};
+  this->tracking_tic = (struct timespec){0};
+
+  this->current_mode = DISCOVER_MODE;
   this->heading = 0.0;
   this->pose = Pose();
   this->hover_position << 0.0, 0.0, 0.0;
-  this->target_losted = true;
-  this->target_detected = false;
-  this->target_bpf << 0.0, 0.0, 0.0;
-
-  this->position_controller = PositionController();
-  this->att_cmd = AttitudeCommand();
+  this->landing_target = LandingTarget();
 }
 
 int Quadrotor::configure(std::string config_path) {
@@ -32,12 +35,17 @@ int Quadrotor::configure(std::string config_path) {
   CONFIGURE_CONTROLLER(this->tracking_controller, config_file, FCONFTCTRL);
 
   // load config
+  // clang-format off
   parser.addParam<Vec3>("hover_position", &this->hover_position);
+  parser.addParam<double>("target_lost_threshold", &this->landing_target.lost_threshold);
+  parser.addParam<double>("min_discover_time", &this->min_discover_time);
+  parser.addParam<double>("min_track_time", &this->min_tracking_time);
+  // clang-format on
   if (parser.load(config_path + "/config.yaml") != 0) {
     return -1;
   }
 
-  this->current_mode = HOVER_MODE;
+  this->current_mode = DISCOVER_MODE;
   this->configured = true;
 
   return 0;
@@ -71,13 +79,82 @@ void Quadrotor::setPose(Pose pose) {
 }
 
 void Quadrotor::setTargetPosition(Vec3 position, bool detected) {
-  this->target_detected = detected;
-  this->target_bpf = position;
+  this->landing_target.setTargetPosition(position, detected);
+}
+
+void Quadrotor::setHoverXYPosition(Vec3 position) {
+  this->hover_position(0) = position(0);
+  this->hover_position(1) = position(1);
+}
+
+void Quadrotor::setHoverPosition(Vec3 position) {
+  this->hover_position(0) = position(0);
+  this->hover_position(1) = position(1);
+  this->hover_position(2) = position(2);
+}
+
+bool Quadrotor::conditionsMet(bool *conditions, int nb_conditions) {
+  for (int i = 0; i < nb_conditions; i++) {
+    if (conditions[i] == false) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 int Quadrotor::stepHoverMode(double dt) {
-  Vec3 euler, setpoint, nwu;
-  Vec4 actual, output;
+  // pre-check
+  if (this->configured == false) {
+    return -1;
+  }
+
+  // hover
+  // clang-format off
+  this->position_controller.calculate(
+    this->hover_position,
+    this->pose,
+    this->heading,
+    dt
+  );
+  // clang-format on
+  this->att_cmd = AttitudeCommand(this->position_controller.outputs);
+
+  return 0;
+}
+
+int Quadrotor::stepDiscoverMode(double dt) {
+  bool conditions[3];
+
+  // pre-check
+  if (this->configured == false) {
+    return -1;
+  }
+
+  // hover in place
+  this->stepHoverMode(dt);
+  if (this->discover_tic.tv_sec == 0) {
+    tic(&this->discover_tic);
+  }
+
+  // transition
+  conditions[0] = this->landing_target.target_detected;
+  conditions[1] = this->landing_target.target_losted == false;
+  conditions[2] = mtoc(&this->discover_tic) > this->min_discover_time;
+
+  if (this->conditionsMet(conditions, 3)) {
+    // transition to tracking mode
+    this->setMode(TRACKING_MODE);
+    this->discover_tic = (struct timespec){0};
+  }
+
+  return 0;
+}
+
+int Quadrotor::stepTrackingMode(double dt) {
+  Vec3 errors, position;
+  Vec4 output;
+  bool conditions[3];
 
   // pre-check
   if (this->configured == false) {
@@ -85,112 +162,84 @@ int Quadrotor::stepHoverMode(double dt) {
   }
 
   // setup
-  enu2nwu(this->hover_position, setpoint);
+  position = this->pose.position;
+  errors(0) = this->landing_target.target_bpf(0);
+  errors(1) = this->landing_target.target_bpf(1);
+  errors(2) = this->hover_position(2) - position(2);
 
-  // transform ENU to NWU
-  quat2euler(this->pose.q, 321, euler);
-  enu2nwu(this->pose.position, nwu);
-  actual(0) = nwu(0);
-  actual(1) = nwu(1);
-  actual(2) = nwu(2);
-  actual(3) = euler(2);  // yaw
-
-  // step
-  // clang-format off
-  output = this->position_controller.calculate(
-    setpoint,
-    actual,
-    this->heading,
-    dt
-  );
+  // track target
+  output = this->tracking_controller.calculate(errors, this->heading, dt);
   this->att_cmd = AttitudeCommand(output);
-  // clang-format on
+  this->setHoverXYPosition(position);
+  if (this->tracking_tic.tv_sec == 0) {
+    tic(&this->tracking_tic);
+  }
+
+  // transition
+  conditions[0] = this->landing_target.target_detected;
+  conditions[1] = this->landing_target.target_losted == false;
+  conditions[2] = mtoc(&this->tracking_tic) > this->min_tracking_time;
+
+  if (this->conditionsMet(conditions, 3)) {
+    // transition to landing mode
+    this->setMode(LANDING_MODE);
+    this->tracking_tic = (struct timespec){0};
+
+  } else if (this->landing_target.target_losted) {
+    // transition back to discovery mode
+    this->setMode(DISCOVER_MODE);
+    this->tracking_tic = (struct timespec){0};
+  }
 
   return 0;
 }
 
-// int Quadrotor::stepDiscoverMode(double dt) {
-//   enum Mode new_mode;
-//
-//   // pre-check
-//   if (this->configured == false) {
-//     return -1;
-//   }
-//
-//   // update
-//   this->stepHoverMode(dt);
-//   this->discover_mode.update();
-//
-//   // transition
-//   if (this->discover_mode.transition(new_mode)) {
-//     this->setMode(new_mode);
-//     this->tracking_mode.target_bpf = this->discover_mode.target_bpf;
-//     this->hover_mode.stop();
-//   }
-//
-//   return 0;
-// }
-//
-// int Quadrotor::stepTrackingMode(double dt) {
-//   enum Mode new_mode;
-//   Vec3 errors, position;
-//   Vec4 output;
-//
-//   // pre-check
-//   if (this->configured == false) {
-//     return -1;
-//   }
-//
-//   // setup
-//   position = this->pose.position;
-//   errors(0) = this->tracking_mode.target_bpf(0);
-//   errors(1) = this->tracking_mode.target_bpf(1);
-//   errors(2) = this->hover_mode.hover_height - position(2);
-//
-//   // track target
-//   output = this->tracking_controller.calculate(errors, this->heading, dt);
-//   this->att_cmd = AttitudeCommand(output);
-//   this->hover_mode.updateHoverXYPosition(position(0), position(1));
-//
-//   // transition
-//   if (this->tracking_mode.transition(new_mode)) {
-//     this->setMode(new_mode);
-//   }
-//
-//   return 0;
-// }
+int Quadrotor::stepLandingMode(double dt) {
+  Vec3 errors, position;
+  Vec4 output;
+  bool conditions[3];
 
-// int Quadrotor::stepLandingMode(double dt) {
-//   enum Mode new_mode;
-//   Vec3 errors, position;
-//   Vec4 output;
-//
-//   // pre-check
-//   if (this->configured == false) {
-//     return -1;
-//   }
-//
-//   // setup
-//   position = this->pose.position;
-//   errors(0) = this->tracking_mode.target_bpf(0);
-//   errors(1) = this->tracking_mode.target_bpf(1);
-//   errors(2) = this->hover_mode.hover_height - position(2);
-//
-//   // track target
-//   output = this->tracking_controller.calculate(errors, this->heading, dt);
-//   this->att_cmd = AttitudeCommand(output);
-//   this->hover_mode.updateHoverXYPosition(position(0), position(1));
-//
-//   // transition
-//   if (this->tracking_mode.transition(new_mode)) {
-//     this->setMode(new_mode);
-//   }
-//
-//   return 0;
-// }
+  // pre-check
+  if (this->configured == false) {
+    return -1;
+  }
+
+  // setup
+  position = this->pose.position;
+  errors(0) = this->landing_target.target_bpf(0);
+  errors(1) = this->landing_target.target_bpf(1);
+  errors(2) = this->hover_position(2) - position(2);
+
+  // land on target
+  output = this->tracking_controller.calculate(errors, this->heading, dt);
+  this->att_cmd = AttitudeCommand(output);
+  this->setHoverXYPosition(position);
+  if (this->landing_tic.tv_sec == 0) {
+    tic(&this->landing_tic);
+  }
+
+  // // transition
+  // conditions[0] = this->landing_target.target_detected;
+  // conditions[1] = this->landing_target.target_losted == false;
+  //
+  // if (this->conditionsMet(conditions,2)) {
+  //   // transition to disarm mode
+  //   this->setMode(DISARM_MODE);
+  //   this->landing_tic = (struct timespec){0};
+  //
+  // } else if (this->landing_target.target_losted) {
+  //   // transition back to discovery mode
+  //   this->setMode(DISCOVER_MODE);
+  //   this->landing_tic = (struct timespec){0};
+  //
+  // }
+
+  return 0;
+}
 
 int Quadrotor::step(double dt) {
   int retval;
+
   // pre-check
   if (this->configured == false) {
     return -1;
@@ -198,12 +247,25 @@ int Quadrotor::step(double dt) {
 
   // step
   switch (this->current_mode) {
+    case DISARM_MODE:
+      return 1;
+      break;
     case HOVER_MODE:
       retval = this->stepHoverMode(dt);
       break;
+    case DISCOVER_MODE:
+      retval = this->stepDiscoverMode(dt);
+      break;
+    case TRACKING_MODE:
+      retval = this->stepTrackingMode(dt);
+      break;
+    case LANDING_MODE:
+      retval = this->stepLandingMode(dt);
+      break;
     default:
-      retval = log_err(EINVMODE);
-      return -1;
+      log_err(EINVMODE);
+      retval = this->stepHoverMode(dt);
+      break;
   }
 
   return retval;

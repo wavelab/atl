@@ -1,18 +1,12 @@
-#ifndef __QUADROTOR_HPP__
-#define __QUADROTOR_HPP__
+#ifndef __AWESOMO_QUADROTOR_QUADROTOR_HPP__
+#define __AWESOMO_QUADROTOR_QUADROTOR_HPP__
 
 #include <iostream>
-
-#include <yaml-cpp/yaml.h>
 
 #include "awesomo_core/utils/utils.hpp"
 #include "awesomo_core/control/control.hpp"
 #include "awesomo_core/estimation/estimation.hpp"
-#include "awesomo_core/quadrotor/modes/base_mode.hpp"
-#include "awesomo_core/quadrotor/modes/discover_mode.hpp"
-#include "awesomo_core/quadrotor/modes/hover_mode.hpp"
-#include "awesomo_core/quadrotor/modes/tracking_mode.hpp"
-#include "awesomo_core/quadrotor/modes/landing_mode.hpp"
+#include "awesomo_core/quadrotor/landing_target.hpp"
 
 namespace awesomo {
 
@@ -41,27 +35,43 @@ namespace awesomo {
     goto error;                               \
   }
 
+enum Mode {
+  NOT_SET = -1,
+  DISARM_MODE = 0,
+  HOVER_MODE = 1,
+  DISCOVER_MODE = 2,
+  TRACKING_MODE = 3,
+  LANDING_MODE = 4
+};
+
 class Quadrotor {
 public:
   bool configured;
+
+  PositionController position_controller;
+  TrackingController tracking_controller;
+  AttitudeCommand att_cmd;
+
+  double min_discover_time;
+  double min_tracking_time;
+  struct timespec discover_tic;
+  struct timespec tracking_tic;
+  struct timespec landing_tic;
 
   enum Mode current_mode;
   double heading;
   Pose pose;
   Vec3 hover_position;
-  bool target_losted;
-  bool target_detected;
-  Vec3 target_bpf;
-
-  PositionController position_controller;
-  TrackingController tracking_controller;
-  AttitudeCommand att_cmd;
+  LandingTarget landing_target;
 
   Quadrotor(void);
   int configure(std::string config_path);
   void setMode(enum Mode mode);
   void setPose(Pose pose);
   void setTargetPosition(Vec3 position, bool detected);
+  void setHoverXYPosition(Vec3 position);
+  void setHoverPosition(Vec3 position);
+  bool conditionsMet(bool *conditions, int nb_conditions);
   int stepHoverMode(double dt);
   int stepDiscoverMode(double dt);
   int stepTrackingMode(double dt);

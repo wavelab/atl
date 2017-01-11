@@ -26,5 +26,5 @@
   <param name="sim_mode" value="true" />
   <param name="debug_mode" value="false" />
   <param name="apriltag_config" type="str" value="$(find awesomo_configs)/configs/apriltag/prototype.yaml" />
-  <node pkg="awesomo_ros" name="awesomo_apriltag" type="apriltag_node" output="screen" />
+  <node pkg="awesomo_ros" name="awesomo_apriltag" type="apriltag_node" output="screen" required="true"/>
 </launch>

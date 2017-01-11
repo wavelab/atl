@@ -30,7 +30,7 @@ public:
 
   PositionController(void);
   int configure(std::string config_file);
-  Vec4 calculate(Vec3 setpoints, Vec4 actual, double yaw, double dt);
+  Vec4 calculate(Vec3 setpoints, Pose robot_pose, double yaw, double dt);
   void reset(void);
   void printOutputs(void);
   void printErrors(void);

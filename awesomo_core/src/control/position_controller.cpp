@@ -59,12 +59,12 @@ int PositionController::configure(std::string config_file) {
 }
 
 Vec4 PositionController::calculate(Vec3 setpoints,
-                                   Vec4 actual,
+                                   Pose robot_pose,
                                    double yaw,
                                    double dt) {
   double r, p, y, t;
-  Vec3 errors, euler;
-  Vec4 outputs;
+  Vec3 setpoints_nwu, robot_nwu, errors, euler;
+  Vec4 actual, outputs;
   Mat3 R;
 
   // check rate
@@ -73,11 +73,18 @@ Vec4 PositionController::calculate(Vec3 setpoints,
     return this->outputs;
   }
 
+  // transform setpoints from ENU to NWU
+  enu2nwu(setpoints, setpoints_nwu);
+
+  // transform robot position ENU to NWU
+  enu2nwu(robot_pose.position, robot_nwu);
+  quat2euler(robot_pose.q, 321, euler);
+
   // calculate RPY errors relative to quadrotor by incorporating yaw
-  errors(0) = setpoints(0) - actual(0);
-  errors(1) = setpoints(1) - actual(1);
-  errors(2) = setpoints(2) - actual(2);
-  euler << 0.0, 0.0, actual(3);
+  errors(0) = setpoints_nwu(0) - robot_nwu(0);
+  errors(1) = setpoints_nwu(1) - robot_nwu(1);
+  errors(2) = setpoints_nwu(2) - robot_nwu(2);
+  euler << 0.0, 0.0, euler(2);
   euler2rot(euler, 123, R);
   errors = R * errors;
 
