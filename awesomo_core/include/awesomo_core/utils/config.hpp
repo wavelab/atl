@@ -199,7 +199,7 @@ public:
 
   int getYamlNode(std::string key, YAML::Node &node);
   int checkKey(std::string key, bool optional);
-  int checkVector(std::string key, bool optional);
+  int checkVector(std::string key, enum ConfigDataType type, bool optional);
   int checkMatrix(std::string key, bool optional);
   int loadPrimitive(ConfigParam param);
   int loadArray(ConfigParam param);

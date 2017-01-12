@@ -53,9 +53,11 @@ int ConfigParser::checkKey(std::string key, bool optional) {
   return 0;
 }
 
-int ConfigParser::checkVector(std::string key, bool optional) {
+int ConfigParser::checkVector(std::string key,
+                              enum ConfigDataType type,
+                              bool optional) {
   int retval;
-  const std::string targets[3] = {"rows", "cols", "data"};
+  int vector_size;
 
   // check key
   retval = this->checkKey(key, optional);
@@ -63,21 +65,24 @@ int ConfigParser::checkVector(std::string key, bool optional) {
     return retval;
   }
 
-  // check fields
-  for (int i = 0; i < 3; i++) {
-    if (!this->root[key][targets[i]]) {
-      log_err("Key [%s] is missing for vector[%s]!",
-              targets[i].c_str(),
-              key.c_str());
-      return -2;
-    }
+  // clang-format off
+  switch (type) {
+    case VEC2: vector_size = 2; break;
+    case VEC3: vector_size = 3; break;
+    case VEC4: vector_size = 4; break;
+    default: return 0;
   }
+  // clang-format on
 
-  // check number of rows
-  if (this->root[key]["rows"].as<int>() != 1) {
-    log_err("Vector [%s] has %d rows!",
-            key.c_str(),
-            this->root[key]["rows"].as<int>());
+  // check number of values
+  if (this->root[key].size() != vector_size) {
+    // clang-format off
+    log_err("Vector [%s] should have %d values but config has %d!",
+      key.c_str(),
+      vector_size,
+      (int) this->root[key].size()
+    );
+    // clang-format on
     return -3;
   }
 
@@ -177,13 +182,10 @@ int ConfigParser::loadArray(ConfigParam param) {
 
 int ConfigParser::loadVector(ConfigParam param) {
   int retval;
-  int index;
-  int rows;
-  int cols;
   YAML::Node node;
 
-  // pre-check
-  retval = this->checkVector(param.key, param.optional);
+  // check
+  retval = this->checkVector(param.key, param.type, param.optional);
   if (retval != 0) {
     return retval;
   }
@@ -196,30 +198,27 @@ int ConfigParser::loadVector(ConfigParam param) {
 
   // parse
   this->getYamlNode(param.key, node);
-  index = 0;
-  rows = node["rows"].as<int>();
-  cols = node["cols"].as<int>();
 
   switch (param.type) {
     case VEC2:
-      vec2(0) = node["data"][0].as<double>();
-      vec2(1) = node["data"][1].as<double>();
+      vec2(0) = node[0].as<double>();
+      vec2(1) = node[1].as<double>();
       break;
     case VEC3:
-      vec3(0) = node["data"][0].as<double>();
-      vec3(1) = node["data"][1].as<double>();
-      vec3(2) = node["data"][2].as<double>();
+      vec3(0) = node[0].as<double>();
+      vec3(1) = node[1].as<double>();
+      vec3(2) = node[2].as<double>();
       break;
     case VEC4:
-      vec4(0) = node["data"][0].as<double>();
-      vec4(1) = node["data"][1].as<double>();
-      vec4(2) = node["data"][2].as<double>();
-      vec4(3) = node["data"][3].as<double>();
+      vec4(0) = node[0].as<double>();
+      vec4(1) = node[1].as<double>();
+      vec4(2) = node[2].as<double>();
+      vec4(3) = node[3].as<double>();
       break;
     case VECX:
-      vecx = VecX(cols);
-      for (int i = 0; i < cols; i++) {
-        vecx(i) = node["data"][i].as<double>();
+      vecx = VecX((int) node.size());
+      for (int i = 0; i < node.size(); i++) {
+        vecx(i) = node[i].as<double>();
       }
       break;
   }

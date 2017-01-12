@@ -4,10 +4,7 @@ image_height: 480
 
 exposure_value: 1.0
 gain_value: 2.0
-lambda:
- rows: 1
- cols: 3
- data: [1.0, 2.0, 3.0]
+lambda: [0.0, 0.0, 0.0]
 alpha: 4.0
 
 camera_matrix:
