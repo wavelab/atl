@@ -15,7 +15,6 @@ LandingTarget::LandingTarget(void) {
 
 bool LandingTarget::isTargetLosted(void) {
   if (mtoc(&this->last_seen) > lost_threshold) {
-    log_info("Landing Target is losted!");
     this->reset();
     return true;
   }

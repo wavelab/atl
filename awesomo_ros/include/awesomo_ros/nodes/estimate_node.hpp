@@ -12,15 +12,15 @@ namespace awesomo {
 
 // NODE SETTINGS
 #define NODE_NAME "awesomo_estimate"
-#define NODE_RATE 1000
+#define NODE_RATE 50
 
 // PUBLISH TOPICS
 #define LT_WORLD_TOPIC "/awesomo/estimate/landing_target/world"
 #define LT_LOCAL_TOPIC "/awesomo/estimate/landing_target/local"
 
 // SUBSCRIBE TOPICS
-#define GIMBAL_TARGET_TOPIC "/awesomo/gimbal/target"
-#define LT_INIT_TOPIC "/awesomo/estimate/landing_target/init"
+#define QUAD_POSE_TOPIC "/mavros/local_position/pose"
+#define GIMBAL_TARGET_WORLD_TOPIC "/awesomo/gimbal/target/world"
 
 class EstimateNode : public ROSNode {
 public:
@@ -28,12 +28,25 @@ public:
 
   Pose quad_pose;
   bool target_detected;
-  Vec3 target_bpf;
+  Vec3 target_wpf;
+  struct timespec target_last_updated;
+  double target_lost_threshold;
 
-  EstimateNode(int argc, char **argv) : ROSNode(argc, argv) {}
+  EstimateNode(int argc, char **argv) : ROSNode(argc, argv) {
+    this->lt_kf = KalmanFilter();
+
+    this->quad_pose = Pose();
+    this->target_detected = false;
+    this->target_wpf << 0.0, 0.0, 0.0;
+    this->target_last_updated = (struct timespec){0};
+    this->target_lost_threshold = 1000.0;
+  }
+
   int configure(std::string node_name, int hz);
-  void gimbalTargetCallback(const geometry_msgs::Vector3 &msg);
-  void initLTKFCallback(const std_msgs::Bool &msg);
+  void initLTKF(Vec3 target_wpf);
+  void resetLTKF(Vec3 target_wpf);
+  void quadPoseCallback(const geometry_msgs::PoseStamped &msg);
+  void gimbalTargetWorldCallback(const geometry_msgs::Vector3 &msg);
   void publishLTKFWorldEstimate(void);
   void publishLTKFLocalEstimate(void);
   int loopCallback(void);

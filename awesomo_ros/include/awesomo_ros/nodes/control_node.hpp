@@ -44,7 +44,7 @@ namespace awesomo {
 #define STATE_TOPIC "/mavros/state"
 #define POSE_TOPIC "/mavros/local_position/pose"
 #define RADIO_TOPIC "/mavros/rc/in"
-#define TARGET_LOCAL_TOPIC "/awesomo/gimbal/target/local"
+#define TARGET_LOCAL_TOPIC "/awesomo/estimate/landing_target/local"
 #define HOVER_SET_TOPIC "/awesomo/control/hover/set"
 #define PCTRL_SET_TOPIC "/awesomo/control/position_controller/set"
 

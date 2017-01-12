@@ -14,36 +14,22 @@ int EstimateNode::configure(std::string node_name, int hz) {
   // clang-format off
   this->registerPublisher<geometry_msgs::Vector3>(LT_WORLD_TOPIC);
   this->registerPublisher<geometry_msgs::Vector3>(LT_LOCAL_TOPIC);
-  this->registerSubscriber(GIMBAL_TARGET_TOPIC, &EstimateNode::gimbalTargetCallback, this);
-  this->registerSubscriber(LT_INIT_TOPIC, &EstimateNode::initLTKFCallback, this);
+  this->registerSubscriber(QUAD_POSE_TOPIC, &EstimateNode::quadPoseCallback, this);
+  this->registerSubscriber(GIMBAL_TARGET_WORLD_TOPIC, &EstimateNode::gimbalTargetWorldCallback, this);
+  this->registerLoopCallback(std::bind(&EstimateNode::loopCallback, this));
   // clang-format on
 
   this->configured = true;
   return 0;
 }
 
-void EstimateNode::quadPoseCallback(const geometry_msgs::PoseStamped &msg) {
-  this->quad_pose = convertPoseStampedMsg2Pose(msg);
-}
-
-void EstimateNode::gimbalTargetCallback(const geometry_msgs::Vector3 &msg) {
-  this->target_bpf = convertVector3Msg2Vec3(msg);
-}
-
-void EstimateNode::initLTKFCallback(const std_msgs::Bool &msg) {
+void EstimateNode::initLTKF(Vec3 target_wpf) {
   VecX mu(9);
   MatX R(9, 9), C(3, 9), Q(3, 3);
 
-  // pre-check
-  if (msg.data == false) {
-    return;
-  }
-
   // initialize landing target kalman filter
   // clang-format off
-  mu << this->quad_pose.position(0),
-        this->quad_pose.position(1),
-        this->quad_pose.position(2),
+  mu << target_wpf(0), target_wpf(1), target_wpf(2),
         0.0, 0.0, 0.0,
         0.0, 0.0, 0.0;
 
@@ -70,36 +56,79 @@ void EstimateNode::initLTKFCallback(const std_msgs::Bool &msg) {
   this->lt_kf.init(mu, R, C, Q);
 }
 
+void EstimateNode::resetLTKF(Vec3 target_wpf) {
+  this->initLTKF(target_wpf);
+}
+
+void EstimateNode::quadPoseCallback(const geometry_msgs::PoseStamped &msg) {
+  this->quad_pose = convertPoseStampedMsg2Pose(msg);
+}
+
+void EstimateNode::gimbalTargetWorldCallback(
+  const geometry_msgs::Vector3 &msg) {
+  bool lt_kf_reset;
+
+  // check if estimator needs resetting
+  if (mtoc(&this->target_last_updated) > this->target_lost_threshold) {
+    lt_kf_reset = true;
+  } else {
+    lt_kf_reset = false;
+  }
+
+  // update target
+  this->target_detected = true;
+  this->target_wpf = convertVector3Msg2Vec3(msg);
+  tic(&this->target_last_updated);
+
+  // initialize or reset estimator
+  if (this->lt_kf.initialized == false || lt_kf_reset) {
+    this->initLTKF(this->target_wpf);
+  }
+}
+
 void EstimateNode::publishLTKFWorldEstimate(void) {
   geometry_msgs::Vector3 msg;
   Vec3 estimate;
 
   estimate << this->lt_kf.mu(0), this->lt_kf.mu(1), this->lt_kf.mu(2);
-  buildVector3Msg(etimate, msg);
+  buildVector3Msg(estimate, msg);
 
   this->ros_pubs[LT_WORLD_TOPIC].publish(msg);
 }
 
 void EstimateNode::publishLTKFLocalEstimate(void) {
   geometry_msgs::Vector3 msg;
-  Vec3 estimate;
+  Vec3 estimate_enu, estimate_nwu;
 
+  // transform from world to body frame
   // clang-format off
-  estimate << this->quad_pose.position(0) - this->lt_kf.mu(0),
-              this->quad_pose.position(1) - this->lt_kf.mu(1),
-              this->quad_pose.position(2) - this->lt_kf.mu(2);
+  estimate_enu << this->lt_kf.mu(0) - this->quad_pose.position(0),
+                  this->lt_kf.mu(1) - this->quad_pose.position(1),
+                  this->lt_kf.mu(2) - this->quad_pose.position(2);
   // clang-format on
-  buildVector3Msg(estimate, msg);
+
+  // transform from ENU to NWU
+  estimate_nwu(0) = estimate_enu(1);
+  estimate_nwu(1) = -estimate_enu(0);
+  estimate_nwu(2) = estimate_enu(2);
+
+  buildVector3Msg(estimate_nwu, msg);
 
   this->ros_pubs[LT_LOCAL_TOPIC].publish(msg);
 }
 
 int EstimateNode::loopCallback(void) {
   MatX A(9, 9), C(3, 9);
-  Vec3 target_wpf;
+  double dt;
+
+  // pre-check
+  if (this->lt_kf.initialized == false) {
+    return 0;
+  }
 
   // transition matrix - constant acceleration
   // clang-format off
+  dt = (ros::Time::now() - this->ros_last_updated).toSec();
   A << 1.0, 0.0, 0.0, dt, 0.0, 0.0, pow(dt, 2.0) / 2.0, 0.0, 0.0,
        0.0, 1.0, 0.0, 0.0, dt, 0.0, 0.0, pow(dt, 2.0) / 2.0, 0.0,
        0.0, 0.0, 1.0, 0.0, 0.0, dt, 0.0, 0.0, pow(dt, 2.0) / 2.0,
@@ -117,7 +146,6 @@ int EstimateNode::loopCallback(void) {
     C << 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
-    target_wpf << 0.0, 0.0, 0.0;
     // clang-format on
 
   } else {
@@ -125,13 +153,18 @@ int EstimateNode::loopCallback(void) {
     C << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
-    target_wpf << 0.0, 0.0, 0.0;
     // clang-format on
   }
 
   // estimate
   this->lt_kf.C = C;
-  this->lt_kf.estimate(A, target_wpf);
+  this->lt_kf.estimate(A, this->target_wpf);
+  this->target_detected = false;
+  this->target_wpf << 0.0, 0.0, 0.0;
+
+  // publish
+  this->publishLTKFWorldEstimate();
+  this->publishLTKFLocalEstimate();
 
   return 0;
 }
