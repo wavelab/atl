@@ -150,6 +150,12 @@ void buildPCtrlSettingsMsg(PositionController pc,
   msg.hover_throttle = pc.hover_throttle;
 }
 
+void buildVector3Msg(Vec3 vec, geometry_msgs::Vector3 &msg) {
+  msg.x = vec(0);
+  msg.y = vec(1);
+  msg.z = vec(2);
+}
+
 Pose convertPoseStampedMsg2Pose(geometry_msgs::PoseStamped msg) {
   Vec3 p;
   Quaternion q;
@@ -160,6 +166,12 @@ Pose convertPoseStampedMsg2Pose(geometry_msgs::PoseStamped msg) {
   p << msg.pose.position.x, msg.pose.position.y, msg.pose.position.z;
 
   return Pose(q, p);
+}
+
+Vec3 convertVector3Msg2Vec3(geometry_msgs::Vector3 msg) {
+  Vec3 v;
+  v << msg.x, msg.y, msg.z;
+  return v;
 }
 
 TagPose convertAprilTagPoseMsg2TagPose(awesomo_msgs::AprilTagPose msg) {

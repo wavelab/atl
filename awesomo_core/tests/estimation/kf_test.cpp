@@ -57,39 +57,42 @@ TEST(KalmanFilter, estimate) {
 
   // setup
   // clang-format off
-    dt = 0.1;
-    pos << 0, 0, 0;
-    vel << 9, 30, 0;
-    acc << 0, -10, 0;
-    mu << 0.0, 0.0, 0.0,    // x, y, z
-          9.0, 30.0, 0.0,   // x_dot, y_dot, z_dot
-          0.0, -10.0, 0.0;  // x_ddot, y_ddot, z_ddot
-    R << 0.5, 0, 0, 0, 0, 0, 0, 0, 0,
-         0, 0.5, 0, 0, 0, 0, 0, 0, 0,
-         0, 0, 0.5, 0, 0, 0, 0, 0, 0,
-         0, 0, 0, 1.0, 0, 0, 0, 0, 0,
-         0, 0, 0, 0, 1.0, 0, 0, 0, 0,
-         0, 0, 0, 0, 0, 1.0, 0, 0, 0,
-         0, 0, 0, 0, 0, 0, 1.0, 0, 0,
-         0, 0, 0, 0, 0, 0, 0, 1.0, 0,
-         0, 0, 0, 0, 0, 0, 0, 0, 1.0;
-    C << 1, 0, 0, 0, 0, 0, 0, 0, 0,
-         0, 1, 0, 0, 0, 0, 0, 0, 0,
-         0, 0, 1, 0, 0, 0, 0, 0, 0;
-    Q << 20, 0, 0,
-         0, 20, 0,
-         0, 0, 20;
-    kf.init(mu, R, C, Q);
-    prepareOutputFile(output_file, TEST_KF_OUTPUT_FILE);
+  dt = 0.1;
+  pos << 0, 0, 0;
+  vel << 9, 30, 0;
+  acc << 0, -10, 0;
+  mu << 0.0, 0.0, 0.0,    // x, y, z
+        9.0, 30.0, 0.0,   // x_dot, y_dot, z_dot
+        0.0, -10.0, 0.0;  // x_ddot, y_ddot, z_ddot
+  R << 0.5, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0.5, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0.5, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 1.0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 1.0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 1.0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 1.0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 1.0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 1.0;
+  C << 1, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 1, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 1, 0, 0, 0, 0, 0, 0;
+  Q << 20, 0, 0,
+        0, 20, 0,
+        0, 0, 20;
+  kf.init(mu, R, C, Q);
+  prepareOutputFile(output_file, TEST_KF_OUTPUT_FILE);
   // clang-format on
 
   // estimate
   for (int i = 0; i < 20; i++) {
     // update true state
+    // clang-format off
     vel = vel + acc * dt;
     pos = pos + vel * dt;
-    state << pos(0), pos(1), pos(2), vel(0), vel(1), vel(2), acc(0), acc(1),
-      acc(2);
+    state << pos(0), pos(1), pos(2),
+             vel(0), vel(1), vel(2),
+             acc(0), acc(1), acc(2);
+    // clang-format on
 
     // perform measurement
     motion_noise << norm_x(rgen), norm_y(rgen), norm_z(rgen);
@@ -97,16 +100,16 @@ TEST(KalmanFilter, estimate) {
 
     // estimate
     // clang-format off
-        A << 1.0, 0, 0, dt, 0, 0, pow(dt, 2) / 2.0, 0, 0,
-             0, 1.0, 0, 0, dt, 0, 0, pow(dt, 2) / 2.0, 0,
-             0, 0, 1.0, 0, 0, dt, 0, 0, pow(dt, 2) / 2.0,
-             0, 0, 0, 1.0, 0, 0, dt, 0, 0,
-             0, 0, 0, 0, 1.0, 0, 0, dt, 0,
-             0, 0, 0, 0, 0, 1.0, 0, 0, dt,
-             0, 0, 0, 0, 0, 0, 1.0, 0, 0,
-             0, 0, 0, 0, 0, 0, 0, 1.0, 0,
-             0, 0, 0, 0, 0, 0, 0, 0, 1.0;
-        kf.estimate(A, y);
+    A << 1.0, 0, 0, dt, 0, 0, pow(dt, 2) / 2.0, 0, 0,
+          0, 1.0, 0, 0, dt, 0, 0, pow(dt, 2) / 2.0, 0,
+          0, 0, 1.0, 0, 0, dt, 0, 0, pow(dt, 2) / 2.0,
+          0, 0, 0, 1.0, 0, 0, dt, 0, 0,
+          0, 0, 0, 0, 1.0, 0, 0, dt, 0,
+          0, 0, 0, 0, 0, 1.0, 0, 0, dt,
+          0, 0, 0, 0, 0, 0, 1.0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 1.0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 1.0;
+    kf.estimate(A, y);
     // clang-format on
 
     // record

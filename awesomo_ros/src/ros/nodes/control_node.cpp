@@ -29,7 +29,7 @@ int ControlNode::configure(const std::string node_name, int hz) {
   this->registerSubscriber(STATE_TOPIC, &ControlNode::stateCallback, this);
   this->registerSubscriber(POSE_TOPIC, &ControlNode::poseCallback, this);
   this->registerSubscriber(RADIO_TOPIC, &ControlNode::radioCallback, this);
-  this->registerSubscriber(TARGET_TOPIC, &ControlNode::targetCallback, this);
+  this->registerSubscriber(TARGET_LOCAL_TOPIC, &ControlNode::targetLocalCallback, this);
   this->registerSubscriber(HOVER_SET_TOPIC, &ControlNode::hoverSetCallback, this);
   this->registerSubscriber(PCTRL_SET_TOPIC, &ControlNode::positionControllerSetCallback, this);
   // clang-format on
@@ -120,7 +120,7 @@ void ControlNode::radioCallback(const mavros_msgs::RCIn &msg) {
   }
 }
 
-void ControlNode::targetCallback(const geometry_msgs::Vector3 &msg) {
+void ControlNode::targetLocalCallback(const geometry_msgs::Vector3 &msg) {
   Vec3 target_bpf;
   target_bpf(0) = msg.x;
   target_bpf(1) = msg.y;

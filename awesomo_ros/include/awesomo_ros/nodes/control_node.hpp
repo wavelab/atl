@@ -44,7 +44,7 @@ namespace awesomo {
 #define STATE_TOPIC "/mavros/state"
 #define POSE_TOPIC "/mavros/local_position/pose"
 #define RADIO_TOPIC "/mavros/rc/in"
-#define TARGET_TOPIC "/awesomo/gimbal/target"
+#define TARGET_LOCAL_TOPIC "/awesomo/gimbal/target/local"
 #define HOVER_SET_TOPIC "/awesomo/control/hover/set"
 #define PCTRL_SET_TOPIC "/awesomo/control/position_controller/set"
 
@@ -71,7 +71,7 @@ public:
   int setOffboardModeOn(void);
   void stateCallback(const mavros_msgs::State::ConstPtr &msg);
   void poseCallback(const geometry_msgs::PoseStamped &msg);
-  void targetCallback(const geometry_msgs::Vector3 &msg);
+  void targetLocalCallback(const geometry_msgs::Vector3 &msg);
   void radioCallback(const mavros_msgs::RCIn &msg);
   void hoverSetCallback(const geometry_msgs::Vector3 &msg);
   void positionControllerSetCallback(const awesomo_msgs::PCtrlSettings &msg);

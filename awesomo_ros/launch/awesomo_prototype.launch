@@ -13,7 +13,11 @@
     <remap from="/prototype/camera/image" to="/awesomo/camera/image" />
   </node>
   <node pkg="prototype_ros" name="prototype_gimbal" type="gimbal_node" output="screen" required="true" >
+    <remap from="/prototype/gimbal/pose" to="/awesomo/gimbal/pose" />
+    <remap from="/prototype/gimbal/setpoint/attitude" to="/awesomo/gimbal/setpoint/attitude" />
     <remap from="/prototype/gimbal/track" to="/awesomo/gimbal/track" />
+    <remap from="/prototype/gimbal/target/local" to="/awesomo/gimbal/target/local" />
+    <remap from="/prototype/gimbal/target/world" to="/awesomo/gimbal/target/world" />
   </node>
 
   <!-- control node -->

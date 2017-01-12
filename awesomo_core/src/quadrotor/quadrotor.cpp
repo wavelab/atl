@@ -218,21 +218,20 @@ int Quadrotor::stepLandingMode(double dt) {
     tic(&this->landing_tic);
   }
 
-  // // transition
-  // conditions[0] = this->landing_target.target_detected;
-  // conditions[1] = this->landing_target.target_losted == false;
-  //
+  // transition
+  conditions[0] = this->landing_target.target_detected;
+  conditions[1] = this->landing_target.target_losted == false;
+
   // if (this->conditionsMet(conditions,2)) {
   //   // transition to disarm mode
   //   this->setMode(DISARM_MODE);
   //   this->landing_tic = (struct timespec){0};
   //
-  // } else if (this->landing_target.target_losted) {
-  //   // transition back to discovery mode
-  //   this->setMode(DISCOVER_MODE);
-  //   this->landing_tic = (struct timespec){0};
-  //
-  // }
+  if (this->landing_target.target_losted) {
+    // transition back to discovery mode
+    this->setMode(DISCOVER_MODE);
+    this->landing_tic = (struct timespec){0};
+  }
 
   return 0;
 }

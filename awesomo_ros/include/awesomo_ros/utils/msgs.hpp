@@ -41,7 +41,9 @@ void buildAprilTagPoseMsg(TagPose tag, awesomo_msgs::AprilTagPose &msg);
 void buildAprilTagTrackMsg(TagPose tag, geometry_msgs::Vector3 &msg);
 void buildPCtrlSettingsMsg(PositionController pc,
                            awesomo_msgs::PCtrlSettings &msg);
+void buildVector3Msg(Vec3 vec, geometry_msgs::Vector3 &msg);
 Pose convertPoseStampedMsg2Pose(geometry_msgs::PoseStamped msg);
+Vec3 convertVector3Msg2Vec3(geometry_msgs::Vector3 msg);
 TagPose convertAprilTagPoseMsg2TagPose(awesomo_msgs::AprilTagPose msg);
 
 }  // end of awesomo namespace

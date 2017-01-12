@@ -17,14 +17,7 @@ int GimbalNode::configure(std::string node_name, int hz) {
     return -2;
   };
 
-  // loop callback
-  this->registerLoopCallback(std::bind(&GimbalNode::loopCallback, this));
-
   this->configured = true;
-  return 0;
-}
-
-int GimbalNode::loopCallback(void) {
   return 0;
 }
 
