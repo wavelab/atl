@@ -6,7 +6,7 @@
 namespace awesomo {
 
 // NODE SETTNGS
-#define NODE_NAME "camera_test_node"
+#define TEST_NODE_NAME "camera_test_node"
 
 // SUBSCRIBE TOPICS
 #define CAMERA_IMAGE_TOPIC "/awesomo/camera/image"
@@ -51,6 +51,6 @@ TEST_F(CameraNodeTest, poseMsg) {
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
-  ros::init(argc, argv, NODE_NAME);
+  ros::init(argc, argv, TEST_NODE_NAME);
   return RUN_ALL_TESTS();
 }

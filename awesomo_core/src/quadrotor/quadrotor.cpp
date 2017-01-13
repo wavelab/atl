@@ -15,7 +15,7 @@ Quadrotor::Quadrotor(void) {
   this->discover_tic = (struct timespec){0};
   this->tracking_tic = (struct timespec){0};
 
-  this->current_mode = DISCOVER_MODE;
+  this->current_mode = TRACKING_MODE;
   this->heading = 0.0;
   this->pose = Pose();
   this->hover_position << 0.0, 0.0, 0.0;
@@ -45,7 +45,7 @@ int Quadrotor::configure(std::string config_path) {
     return -1;
   }
 
-  this->current_mode = DISCOVER_MODE;
+  this->current_mode = TRACKING_MODE;
   this->configured = true;
 
   return 0;

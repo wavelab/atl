@@ -6,7 +6,7 @@
 namespace awesomo {
 
 // NODE SETTNGS
-#define NODE_NAME "apriltag_test_node"
+#define TEST_NODE_NAME "apriltag_test_node"
 
 // PUBLISH TOPICS
 #define SHUTDOWN_TOPIC "/awesomo/apriltag/shutdown"
@@ -81,6 +81,6 @@ TEST_F(AprilTagNodeTest, poseMsg) {
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
-  ros::init(argc, argv, NODE_NAME);
+  ros::init(argc, argv, TEST_NODE_NAME);
   return RUN_ALL_TESTS();
 }

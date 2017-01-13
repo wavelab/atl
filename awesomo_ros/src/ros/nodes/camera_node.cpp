@@ -20,7 +20,7 @@ int CameraNode::configure(std::string node_name, int hz) {
 
   // register publisher and subscribers
   this->registerImagePublisher(CAMERA_IMAGE_TOPIC);
-  this->registerShutdown(SHUTDOWN_TOPIC);
+  // this->registerShutdown(SHUTDOWN_TOPIC);
 
   // register loop callback
   this->registerLoopCallback(std::bind(&CameraNode::loopCallback, this));
@@ -29,19 +29,9 @@ int CameraNode::configure(std::string node_name, int hz) {
   return 0;
 }
 
-int CameraNode::loopCallback(void) {
-  this->publishImage();
-  return 0;
-}
-
 int CameraNode::publishImage(void) {
   sensor_msgs::ImageConstPtr img_msg;
 
-  // get frame
-  this->camera.getFrame(this->image);
-  this->camera.showImage(this->image);
-
-  // publish image
   // clang-format off
   img_msg = cv_bridge::CvImage(
     std_msgs::Header(),
@@ -54,13 +44,21 @@ int CameraNode::publishImage(void) {
   return 0;
 }
 
+int CameraNode::loopCallback(void) {
+  this->camera.getFrame(this->image);
+  this->camera.showImage(this->image);
+  this->publishImage();
+
+  return 0;
+}
+
 }  // end of awesomo namespace
 
 
 int main(int argc, char **argv) {
   awesomo::CameraNode node(argc, argv);
 
-  if (node.configure(CAMERA_NODE_NAME, CAMERA_NODE_RATE) != 0) {
+  if (node.configure(NODE_NAME, NODE_RATE) != 0) {
     ROS_ERROR("Failed to configure CameraNode!");
     return -1;
   }

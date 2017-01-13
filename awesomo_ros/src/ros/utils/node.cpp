@@ -85,6 +85,7 @@ int ROSNode::registerImagePublisher(const std::string &topic) {
   // image transport
   image_transport::ImageTransport it(*this->ros_nh);
   this->img_pub = it.advertise(topic, 1);
+  ROS_INFO(INFO_PUB_INIT, topic.c_str());
 
   return 0;
 }

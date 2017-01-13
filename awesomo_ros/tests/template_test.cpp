@@ -6,7 +6,7 @@
 namespace awesomo {
 
 // NODE SETTNGS
-#define NODE_NAME "test_node"
+#define TEST_NODE_NAME "test_node"
 
 // PUBLISH TOPICS
 
@@ -31,6 +31,6 @@ TEST_F(NodeTest, test) {
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
-  ros::init(argc, argv, NODE_NAME);
+  ros::init(argc, argv, TEST_NODE_NAME);
   return RUN_ALL_TESTS();
 }

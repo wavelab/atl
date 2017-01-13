@@ -12,10 +12,11 @@ int EstimateNode::configure(std::string node_name, int hz) {
 
   // publishers and subscribers
   // clang-format off
-  this->registerPublisher<geometry_msgs::Vector3>(LT_WORLD_TOPIC);
-  this->registerPublisher<geometry_msgs::Vector3>(LT_LOCAL_TOPIC);
+  this->registerPublisher<geometry_msgs::Vector3>(LT_INERTIAL_TOPIC);
+  this->registerPublisher<geometry_msgs::Vector3>(LT_BODY_TOPIC);
+  this->registerPublisher<geometry_msgs::Vector3>(LT_VELOCITY_TOPIC);
   this->registerSubscriber(QUAD_POSE_TOPIC, &EstimateNode::quadPoseCallback, this);
-  this->registerSubscriber(GIMBAL_TARGET_WORLD_TOPIC, &EstimateNode::gimbalTargetWorldCallback, this);
+  this->registerSubscriber(GIMBAL_TARGET_INERTIAL_TOPIC, &EstimateNode::gimbalTargetWorldCallback, this);
   this->registerLoopCallback(std::bind(&EstimateNode::loopCallback, this));
   // clang-format on
 
@@ -25,31 +26,42 @@ int EstimateNode::configure(std::string node_name, int hz) {
 
 void EstimateNode::initLTKF(Vec3 target_wpf) {
   VecX mu(9);
-  MatX R(9, 9), C(3, 9), Q(3, 3);
+  MatX R(9, 9), C(6, 9), Q(6, 6);
 
   // initialize landing target kalman filter
   // clang-format off
+
+  // state estimates
   mu << target_wpf(0), target_wpf(1), target_wpf(2),
         0.0, 0.0, 0.0,
         0.0, 0.0, 0.0;
 
-  R << 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-       0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-       0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+  // motion noise
+  R << 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+       0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+       0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
        0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-       0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0,
+       0.0, 0.0, 0.0, 0.0, 10.0, 0.0, 0.0, 0.0, 0.0,
        0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
-       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0,
-       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0,
-       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0;
+       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
 
+  // measurements
   C << 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
        0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-       0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
+       0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+       0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+       0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0,
+       0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0;
 
-  Q << 20.0, 0.0, 0.0,
-       0.0, 20.0, 0.0,
-       0.0, 0.0, 20.0;
+  // measurement noise
+  Q << 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+       0.0, 1.0, 0.0, 0.0, 0.0, 0.0,
+       0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
+       0.0, 0.0, 0.0, 1.0, 0.0, 0.0,
+       0.0, 0.0, 0.0, 0.0, 1.0, 0.0,
+       0.0, 0.0, 0.0, 0.0, 0.0, 1.0;
   // clang-format on
 
   // initialize landing target kalman filter
@@ -93,7 +105,7 @@ void EstimateNode::publishLTKFWorldEstimate(void) {
   estimate << this->lt_kf.mu(0), this->lt_kf.mu(1), this->lt_kf.mu(2);
   buildVector3Msg(estimate, msg);
 
-  this->ros_pubs[LT_WORLD_TOPIC].publish(msg);
+  this->ros_pubs[LT_INERTIAL_TOPIC].publish(msg);
 }
 
 void EstimateNode::publishLTKFLocalEstimate(void) {
@@ -114,11 +126,22 @@ void EstimateNode::publishLTKFLocalEstimate(void) {
 
   buildVector3Msg(estimate_nwu, msg);
 
-  this->ros_pubs[LT_LOCAL_TOPIC].publish(msg);
+  this->ros_pubs[LT_BODY_TOPIC].publish(msg);
+}
+
+void EstimateNode::publishLTKFVelocityEstimate(void) {
+  geometry_msgs::Vector3 msg;
+  Vec3 estimate;
+
+  estimate << this->lt_kf.mu(3), this->lt_kf.mu(4), this->lt_kf.mu(5);
+  buildVector3Msg(estimate, msg);
+
+  this->ros_pubs[LT_VELOCITY_TOPIC].publish(msg);
 }
 
 int EstimateNode::loopCallback(void) {
-  MatX A(9, 9), C(3, 9);
+  MatX A(9, 9), C(6, 9);
+  VecX y(6);
   double dt;
 
   // pre-check
@@ -135,9 +158,9 @@ int EstimateNode::loopCallback(void) {
        0.0, 0.0, 0.0, 1.0, 0.0, 0.0, dt, 0.0, 0.0,
        0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, dt, 0.0,
        0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, dt,
-       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0,
-       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0,
-       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0;
+       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
   // clang-format on
 
   // check measurement
@@ -145,12 +168,27 @@ int EstimateNode::loopCallback(void) {
     // clang-format off
     C << 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-         0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
+         0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0;
+
+    y << this->target_wpf(0),
+         this->target_wpf(1),
+         this->target_wpf(2),
+         this->target_wpf(0) - this->target_last_wpf(0),
+         this->target_wpf(1) - this->target_last_wpf(1),
+         this->target_wpf(2) - this->target_last_wpf(2);
+
+    this->target_last_wpf = this->target_wpf;
     // clang-format on
 
   } else {
     // clang-format off
     C << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
     // clang-format on
@@ -158,13 +196,14 @@ int EstimateNode::loopCallback(void) {
 
   // estimate
   this->lt_kf.C = C;
-  this->lt_kf.estimate(A, this->target_wpf);
+  this->lt_kf.estimate(A, y);
   this->target_detected = false;
   this->target_wpf << 0.0, 0.0, 0.0;
 
   // publish
   this->publishLTKFWorldEstimate();
   this->publishLTKFLocalEstimate();
+  this->publishLTKFVelocityEstimate();
 
   return 0;
 }

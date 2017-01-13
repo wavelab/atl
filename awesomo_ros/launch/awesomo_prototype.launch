@@ -3,17 +3,25 @@
   <!-- sync gazebo time with ros -->
   <param name="use_sim_time" value="true" />
 
-  <!-- prototype -->
+  <!-- settings -->
   <param name="sim_mode" value="true" />
   <param name="debug_mode" value="false" />
+
+  <!-- prototype -->
+
+  <param name="imu_mode" value="true" />
+  <param name="imu_topic" value="/awesomo/gimbal/joint/orientation" />
+
   <node pkg="prototype_ros" name="prototype_gazebo" type="run_gazebo.sh" output="screen" required="true" />
   <node pkg="prototype_ros" name="prototype_world" type="world_node" output="screen" required="true" />
   <node pkg="prototype_ros" name="prototype_quadrotor" type="quadrotor_node" output="screen" required="true" />
   <node pkg="prototype_ros" name="prototype_camera" type="camera_node" output="screen" required="true">
     <remap from="/prototype/camera/image" to="/awesomo/camera/image" />
+    <remap from="/prototype/camera/image_imu" to="/awesomo/camera/image_imu" />
   </node>
   <node pkg="prototype_ros" name="prototype_gimbal" type="gimbal_node" output="screen" required="true" >
-    <remap from="/prototype/gimbal/pose" to="/awesomo/gimbal/pose" />
+    <remap from="/prototype/gimbal/frame/pose" to="/awesomo/gimbal/frame/pose" />
+    <remap from="/prototype/gimbal/joint/orientation" to="/awesomo/gimbal/joint/orientation" />
     <remap from="/prototype/gimbal/setpoint/attitude" to="/awesomo/gimbal/setpoint/attitude" />
     <remap from="/prototype/gimbal/track" to="/awesomo/gimbal/track" />
     <remap from="/prototype/gimbal/target/local" to="/awesomo/gimbal/target/local" />
@@ -21,19 +29,13 @@
   </node>
 
   <!-- control node -->
-  <include file="$(find awesomo_ros)/launch/control.launch" />
-  <param name="sim_mode" value="true" />
-  <param name="debug_mode" value="false" />
   <param name="control_config_dir" value="$(find awesomo_configs)/configs/quadrotor_gazebosim" />
+  <node pkg="awesomo_ros" name="awesomo_control" type="control_node" output="screen" />
 
   <!-- apriltag node -->
-  <param name="sim_mode" value="true" />
-  <param name="debug_mode" value="false" />
   <param name="apriltag_config" type="str" value="$(find awesomo_configs)/configs/apriltag/prototype.yaml" />
   <node pkg="awesomo_ros" name="awesomo_apriltag" type="apriltag_node" output="screen" required="true"/>
 
   <!-- estimate node -->
-  <param name="sim_mode" value="true" />
-  <param name="debug_mode" value="false" />
   <node pkg="awesomo_ros" name="awesomo_estimate" type="estimate_node" output="screen" required="true"/>
 </launch>

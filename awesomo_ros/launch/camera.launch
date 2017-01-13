@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <launch>
   <!-- configs -->
+  <param name="use_sim_time" value="false" />
   <param name="sim_mode" value="false" />
   <param name="debug_mode" value="false" />
   <param name="camera_config_dir" value="$(find awesomo_configs)/configs/camera/logitech_c270" />

@@ -15,8 +15,8 @@
 namespace awesomo {
 
 // NODE SETTINGS
-#define CAMERA_NODE_NAME "awesomo_camera"
-#define CAMERA_NODE_RATE 100
+#define NODE_NAME "awesomo_camera"
+#define NODE_RATE 100
 
 // PUBLISH TOPICS
 #define CAMERA_IMAGE_TOPIC "/awesomo/camera/image"
@@ -31,8 +31,9 @@ public:
 
   CameraNode(int argc, char **argv) : ROSNode(argc, argv) {}
   int configure(std::string node_name, int hz);
-  int loopCallback(void);
+  void imageCallback(const sensor_msgs::ImageConstPtr &msg);
   int publishImage(void);
+  int loopCallback(void);
 };
 
 }  // end of awesomo namespace

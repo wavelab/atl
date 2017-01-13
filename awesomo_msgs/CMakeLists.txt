@@ -35,6 +35,5 @@ CATKIN_PACKAGE(
     CATKIN_DEPENDS
       message_generation
       roscpp
-      std_msgs
       geometry_msgs
 )

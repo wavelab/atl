@@ -60,13 +60,14 @@ public:
     // image transport
     image_transport::ImageTransport it(*this->ros_nh);
     this->img_sub = it.subscribe(topic, queue_size, fp, obj);
+    ROS_INFO(INFO_SUB_INIT, topic.c_str());
 
     return 0;
   }
 
   template <typename M>
   int registerPublisher(const std::string &topic,
-                        uint32_t queue_size = 100,
+                        uint32_t queue_size = 1,
                         bool latch = false) {
     ::ros::Publisher publisher;
 
@@ -77,8 +78,8 @@ public:
 
     // register publisher
     publisher = this->ros_nh->advertise<M>(topic, queue_size, latch);
-    ROS_INFO(INFO_PUB_INIT, topic.c_str());
     this->ros_pubs[topic] = publisher;
+    ROS_INFO(INFO_PUB_INIT, topic.c_str());
 
     return 0;
   }
@@ -87,7 +88,7 @@ public:
   int registerSubscriber(const std::string &topic,
                          void (T::*fp)(M),
                          T *obj,
-                         uint32_t queue_size = 100) {
+                         uint32_t queue_size = 1) {
     ::ros::Subscriber subscriber;
 
     // pre-check
@@ -96,9 +97,9 @@ public:
     }
 
     // register subscriber
-    ROS_INFO(INFO_SUB_INIT, topic.c_str());
     subscriber = this->ros_nh->subscribe(topic, queue_size, fp, obj);
     this->ros_subs[topic] = subscriber;
+    ROS_INFO(INFO_SUB_INIT, topic.c_str());
 
     return 0;
   }
