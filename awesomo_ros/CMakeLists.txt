@@ -82,8 +82,8 @@ TARGET_LINK_LIBRARIES(camera_node ${DEPS})
 ADD_EXECUTABLE(control_node src/ros/nodes/control_node.cpp)
 TARGET_LINK_LIBRARIES(control_node ${DEPS})
 
-ADD_EXECUTABLE(estimate_node src/ros/nodes/estimate_node.cpp)
-TARGET_LINK_LIBRARIES(estimate_node ${DEPS})
+ADD_EXECUTABLE(estimator_node src/ros/nodes/estimator_node.cpp)
+TARGET_LINK_LIBRARIES(estimator_node ${DEPS})
 
 ADD_EXECUTABLE(example_node src/ros/nodes/example_node.cpp)
 TARGET_LINK_LIBRARIES(example_node ${DEPS})

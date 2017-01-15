@@ -9,15 +9,16 @@
 
   <!-- prototype -->
 
-  <param name="imu_mode" value="true" />
-  <param name="imu_topic" value="/awesomo/gimbal/joint/orientation" />
+  <param name="pose_stamped_mode" value="true" />
+  <param name="position_topic" value="/awesomo/gimbal/frame/pose" />
+  <param name="orientation_topic" value="/awesomo/gimbal/joint/orientation" />
 
   <node pkg="prototype_ros" name="prototype_gazebo" type="run_gazebo.sh" output="screen" required="true" />
   <node pkg="prototype_ros" name="prototype_world" type="world_node" output="screen" required="true" />
   <node pkg="prototype_ros" name="prototype_quadrotor" type="quadrotor_node" output="screen" required="true" />
   <node pkg="prototype_ros" name="prototype_camera" type="camera_node" output="screen" required="true">
     <remap from="/prototype/camera/image" to="/awesomo/camera/image" />
-    <remap from="/prototype/camera/image_imu" to="/awesomo/camera/image_imu" />
+    <remap from="/prototype/camera/image_pose_stamped" to="/awesomo/camera/image_pose_stamped" />
   </node>
   <node pkg="prototype_ros" name="prototype_gimbal" type="gimbal_node" output="screen" required="true" >
     <remap from="/prototype/gimbal/frame/pose" to="/awesomo/gimbal/frame/pose" />
@@ -37,5 +38,5 @@
   <node pkg="awesomo_ros" name="awesomo_apriltag" type="apriltag_node" output="screen" required="true"/>
 
   <!-- estimate node -->
-  <node pkg="awesomo_ros" name="awesomo_estimate" type="estimate_node" output="screen" required="true"/>
+  <node pkg="awesomo_ros" name="awesomo_estimator" type="estimator_node" output="screen" required="true"/>
 </launch>

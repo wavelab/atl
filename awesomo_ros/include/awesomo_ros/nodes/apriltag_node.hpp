@@ -20,13 +20,14 @@ namespace awesomo {
 
 // PUBLISH TOPICS
 #define TARGET_POSE_TOPIC "/awesomo/apriltag/target"
-#define TARGET_IF_TOPIC "/awesomo/apriltag/target/inertial_frame"
-#define TARGET_BPF_TOPIC "/awesomo/apriltag/target/body_planar_frame"
+#define TARGET_IF_TOPIC "/awesomo/apriltag/target/inertial"
+#define TARGET_BPF_TOPIC "/awesomo/apriltag/target/body"
 #define GIMBAL_SETPOINT_ATTITUDE_TOPIC "/awesomo/gimbal/setpoint/attitude"
 
 // SUBSCRIBE TOPICS
 #define GIMBAL_FRAME_POSE_TOPIC "/awesomo/gimbal/frame/pose"
-#define CAMERA_IMAGE_TOPIC "/awesomo/camera/image_imu"
+#define GIMBAL_JOINT_ORIENTATION_TOPIC "/awesomo/gimbal/joint/orientation"
+#define CAMERA_IMAGE_TOPIC "/awesomo/camera/image_pose_stamped"
 #define SHUTDOWN "/awesomo/apriltag/shutdown"
 
 class AprilTagNode : public ROSNode {
@@ -35,19 +36,21 @@ public:
   Pose camera_offset;
 
   Vec3 gimbal_position;
-  Quaternion gimbal_joint_orientation;
+  Quaternion gimbal_joint;
   Vec3 target_bpf;
 
   AprilTagNode(int argc, char **argv) : ROSNode(argc, argv) {}
   int configure(const std::string &node_name, int hz);
   void publishTagPoseMsg(TagPose tag);
   void publishTargetBodyPositionMsg(void);
-  void publishTargetInertialPositionMsg(void);
+  void publishTargetInertialPositionMsg(Vec3 gimbal_position);
   void publishGimbalSetpointAttitudeMsg(Vec3 setpoints);
   void gimbalFrameCallback(const geometry_msgs::Pose &msg);
+  void gimbalJointCallback(const geometry_msgs::Quaternion &msg);
   void imageCallback(const sensor_msgs::ImageConstPtr &msg);
   Vec3 getTargetPositionInBodyFrame(Vec3 target_cf);
-  Vec3 getTargetPositionInBodyPlanarFrame(Vec3 target_cf);
+  Vec3 getTargetPositionInBodyPlanarFrame(Vec3 target_cf,
+                                          Quaternion joint_if);
   void trackTarget(void);
 };
 

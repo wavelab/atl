@@ -3,7 +3,7 @@
 
 namespace awesomo {
 
-KalmanFilter::KalmanFilter(void) {
+KalmanFilterTracker::KalmanFilterTracker(void) {
   this->initialized = false;
 
   this->B = MatX::Zero(1, 1);
@@ -20,7 +20,7 @@ KalmanFilter::KalmanFilter(void) {
   this->S_p = MatX::Zero(1, 1);
 }
 
-int KalmanFilter::init(VecX mu, MatX R, MatX C, MatX Q) {
+int KalmanFilterTracker::init(VecX mu, MatX R, MatX C, MatX Q) {
   int nb_states;
 
   nb_states = mu.size();
@@ -43,11 +43,11 @@ int KalmanFilter::init(VecX mu, MatX R, MatX C, MatX Q) {
   return 0;
 }
 
-int KalmanFilter::reset(VecX mu, MatX R, MatX C, MatX Q) {
-  this->init(mu, R, C, Q);
+int KalmanFilterTracker::reset(VecX mu, MatX R, MatX C, MatX Q) {
+  return this->reset(mu, R, C, Q);
 }
 
-int KalmanFilter::estimate(MatX A, VecX y) {
+int KalmanFilterTracker::estimate(MatX A, VecX y) {
   // pre-check
   if (this->initialized == false) {
     return -1;

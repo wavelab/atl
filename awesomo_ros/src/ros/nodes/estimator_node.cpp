@@ -1,8 +1,8 @@
-#include "awesomo_ros/nodes/estimate_node.hpp"
+#include "awesomo_ros/nodes/estimator_node.hpp"
 
 namespace awesomo {
 
-int EstimateNode::configure(std::string node_name, int hz) {
+int EstimatorNode::configure(std::string node_name, int hz) {
   std::string config_file;
 
   // ros node
@@ -15,16 +15,17 @@ int EstimateNode::configure(std::string node_name, int hz) {
   this->registerPublisher<geometry_msgs::Vector3>(LT_INERTIAL_TOPIC);
   this->registerPublisher<geometry_msgs::Vector3>(LT_BODY_TOPIC);
   this->registerPublisher<geometry_msgs::Vector3>(LT_VELOCITY_TOPIC);
-  this->registerSubscriber(QUAD_POSE_TOPIC, &EstimateNode::quadPoseCallback, this);
-  this->registerSubscriber(GIMBAL_TARGET_INERTIAL_TOPIC, &EstimateNode::gimbalTargetWorldCallback, this);
-  this->registerLoopCallback(std::bind(&EstimateNode::loopCallback, this));
+  this->registerPublisher<geometry_msgs::Vector3>(GIMBAL_SETPOINT_ATTITUDE_TOPIC);
+  this->registerSubscriber(QUAD_POSE_TOPIC, &EstimatorNode::quadPoseCallback, this);
+  this->registerSubscriber(TARGET_INERTIAL_TOPIC, &EstimatorNode::targetWorldCallback, this);
+  this->registerLoopCallback(std::bind(&EstimatorNode::loopCallback, this));
   // clang-format on
 
   this->configured = true;
   return 0;
 }
 
-void EstimateNode::initLTKF(Vec3 target_wpf) {
+void EstimatorNode::initLTKF(Vec3 target_wpf) {
   VecX mu(9);
   MatX R(9, 9), C(6, 9), Q(6, 6);
 
@@ -38,10 +39,10 @@ void EstimateNode::initLTKF(Vec3 target_wpf) {
 
   // motion noise
   R << 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-       0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+       0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
        0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
        0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-       0.0, 0.0, 0.0, 0.0, 10.0, 0.0, 0.0, 0.0, 0.0,
+       0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0,
        0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -56,28 +57,27 @@ void EstimateNode::initLTKF(Vec3 target_wpf) {
        0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0;
 
   // measurement noise
-  Q << 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-       0.0, 1.0, 0.0, 0.0, 0.0, 0.0,
-       0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
-       0.0, 0.0, 0.0, 1.0, 0.0, 0.0,
-       0.0, 0.0, 0.0, 0.0, 1.0, 0.0,
-       0.0, 0.0, 0.0, 0.0, 0.0, 1.0;
+  Q << 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+       0.0, 1000.0, 0.0, 0.0, 0.0, 0.0,
+       0.0, 0.0, 1000.0, 0.0, 0.0, 0.0,
+       0.0, 0.0, 0.0, 1000.0, 0.0, 0.0,
+       0.0, 0.0, 0.0, 0.0, 1000.0, 0.0,
+       0.0, 0.0, 0.0, 0.0, 0.0, 1000.0;
   // clang-format on
 
   // initialize landing target kalman filter
   this->lt_kf.init(mu, R, C, Q);
 }
 
-void EstimateNode::resetLTKF(Vec3 target_wpf) {
+void EstimatorNode::resetLTKF(Vec3 target_wpf) {
   this->initLTKF(target_wpf);
 }
 
-void EstimateNode::quadPoseCallback(const geometry_msgs::PoseStamped &msg) {
+void EstimatorNode::quadPoseCallback(const geometry_msgs::PoseStamped &msg) {
   this->quad_pose = convertPoseStampedMsg2Pose(msg);
 }
 
-void EstimateNode::gimbalTargetWorldCallback(
-  const geometry_msgs::Vector3 &msg) {
+void EstimatorNode::targetWorldCallback(const geometry_msgs::Vector3 &msg) {
   bool lt_kf_reset;
 
   // check if estimator needs resetting
@@ -98,7 +98,7 @@ void EstimateNode::gimbalTargetWorldCallback(
   }
 }
 
-void EstimateNode::publishLTKFWorldEstimate(void) {
+void EstimatorNode::publishLTKFWorldEstimate(void) {
   geometry_msgs::Vector3 msg;
   Vec3 estimate;
 
@@ -108,9 +108,9 @@ void EstimateNode::publishLTKFWorldEstimate(void) {
   this->ros_pubs[LT_INERTIAL_TOPIC].publish(msg);
 }
 
-void EstimateNode::publishLTKFLocalEstimate(void) {
+void EstimatorNode::publishLTKFLocalEstimate(void) {
   geometry_msgs::Vector3 msg;
-  Vec3 estimate_enu, estimate_nwu;
+  Vec3 estimate_enu;
 
   // transform from world to body frame
   // clang-format off
@@ -120,16 +120,16 @@ void EstimateNode::publishLTKFLocalEstimate(void) {
   // clang-format on
 
   // transform from ENU to NWU
-  estimate_nwu(0) = estimate_enu(1);
-  estimate_nwu(1) = -estimate_enu(0);
-  estimate_nwu(2) = estimate_enu(2);
+  this->target_bpf(0) = estimate_enu(1);
+  this->target_bpf(1) = -estimate_enu(0);
+  this->target_bpf(2) = estimate_enu(2);
 
-  buildVector3Msg(estimate_nwu, msg);
-
+  // build an publish msg
+  buildVector3Msg(this->target_bpf, msg);
   this->ros_pubs[LT_BODY_TOPIC].publish(msg);
 }
 
-void EstimateNode::publishLTKFVelocityEstimate(void) {
+void EstimatorNode::publishLTKFVelocityEstimate(void) {
   geometry_msgs::Vector3 msg;
   Vec3 estimate;
 
@@ -139,7 +139,26 @@ void EstimateNode::publishLTKFVelocityEstimate(void) {
   this->ros_pubs[LT_VELOCITY_TOPIC].publish(msg);
 }
 
-int EstimateNode::loopCallback(void) {
+void EstimatorNode::publishGimbalSetpointAttitudeMsg(Vec3 setpoints) {
+  geometry_msgs::Vector3 msg;
+  buildVector3Msg(setpoints, msg);
+  this->ros_pubs[GIMBAL_SETPOINT_ATTITUDE_TOPIC].publish(msg);
+}
+
+void EstimatorNode::trackTarget(void) {
+  double dist;
+  Vec3 setpoints;
+
+  // calculate roll pitch yaw setpoints
+  dist = this->target_bpf.norm();
+  setpoints(0) = asin(this->target_bpf(1) / dist);   // roll
+  setpoints(1) = -asin(this->target_bpf(0) / dist);  // pitch
+  setpoints(2) = 0.0;                                // yaw
+
+  this->publishGimbalSetpointAttitudeMsg(setpoints);
+}
+
+int EstimatorNode::loopCallback(void) {
   MatX A(9, 9), C(6, 9);
   VecX y(6);
   double dt;
@@ -204,18 +223,20 @@ int EstimateNode::loopCallback(void) {
   this->publishLTKFWorldEstimate();
   this->publishLTKFLocalEstimate();
   this->publishLTKFVelocityEstimate();
+  this->trackTarget();
 
   return 0;
 }
+
 
 }  // end of awesomo namespace
 
 
 int main(int argc, char **argv) {
-  awesomo::EstimateNode node(argc, argv);
+  awesomo::EstimatorNode node(argc, argv);
 
   if (node.configure(NODE_NAME, NODE_RATE) != 0) {
-    ROS_ERROR("Failed to configure EstimateNode!");
+    ROS_ERROR("Failed to configure EstimatorNode!");
     return -1;
   }
   node.loop();

@@ -28,6 +28,12 @@ int ExtendedKalmanFilter::init(VecX mu, MatX R, MatX Q) {
 }
 
 int ExtendedKalmanFilter::predictionUpdate(VecX g, MatX G) {
+  // pre-check
+  if (this->initialized == false) {
+    return -1;
+  }
+
+  // prediction update
   mu_p = g;
   S_p = G * S * G.transpose() + R;
 
@@ -35,6 +41,12 @@ int ExtendedKalmanFilter::predictionUpdate(VecX g, MatX G) {
 }
 
 int ExtendedKalmanFilter::measurementUpdate(VecX h, MatX H, VecX y) {
+  // pre-check
+  if (this->initialized == false) {
+    return -1;
+  }
+
+  // measurement update
   K = S_p * H.transpose() * (H * S_p * H.transpose() + Q).inverse();
   mu = mu_p + K * (y - h);
   S = (I - K * H) * S_p;

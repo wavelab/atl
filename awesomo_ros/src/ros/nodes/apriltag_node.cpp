@@ -22,8 +22,8 @@ int AprilTagNode::configure(const std::string &node_name, int hz) {
   this->registerPublisher<awesomo_msgs::AprilTagPose>(TARGET_POSE_TOPIC);
   this->registerPublisher<geometry_msgs::Vector3>(TARGET_IF_TOPIC);
   this->registerPublisher<geometry_msgs::Vector3>(TARGET_BPF_TOPIC);
-  this->registerPublisher<geometry_msgs::Vector3>(GIMBAL_SETPOINT_ATTITUDE_TOPIC);
   this->registerSubscriber(GIMBAL_FRAME_POSE_TOPIC, &AprilTagNode::gimbalFrameCallback, this);
+  this->registerSubscriber(GIMBAL_JOINT_ORIENTATION_TOPIC, &AprilTagNode::gimbalJointCallback, this);
   this->registerImageSubscriber(CAMERA_IMAGE_TOPIC, &AprilTagNode::imageCallback, this);
   this->registerShutdown(SHUTDOWN);
   // clang-format on
@@ -47,7 +47,7 @@ void AprilTagNode::publishTargetBodyPositionMsg(void) {
   this->ros_pubs[TARGET_BPF_TOPIC].publish(msg);
 }
 
-void AprilTagNode::publishTargetInertialPositionMsg(void) {
+void AprilTagNode::publishTargetInertialPositionMsg(Vec3 gimbal_position) {
   geometry_msgs::Vector3 msg;
   Vec3 target_enu, target_if;
 
@@ -55,7 +55,7 @@ void AprilTagNode::publishTargetInertialPositionMsg(void) {
   nwu2enu(this->target_bpf, target_enu);
 
   // transform target from body to inertial frame
-  target_if = this->gimbal_position + target_enu;
+  target_if = gimbal_position + target_enu;
 
   // build and publish msg
   buildVector3Msg(target_if, msg);
@@ -74,8 +74,16 @@ void AprilTagNode::gimbalFrameCallback(const geometry_msgs::Pose &msg) {
   this->gimbal_position(2) = msg.position.z;
 }
 
+void AprilTagNode::gimbalJointCallback(const geometry_msgs::Quaternion &msg) {
+  this->gimbal_joint.w() = msg.w;
+  this->gimbal_joint.x() = msg.x;
+  this->gimbal_joint.y() = msg.y;
+  this->gimbal_joint.z() = msg.z;
+}
+
 void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
-  Vec3 target_cf;
+  Vec3 target_cf, gimbal_position;
+  Quaternion joint_if;
   cv_bridge::CvImagePtr image_ptr;
   std::vector<TagPose> tags;
 
@@ -96,17 +104,35 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
 
   // transform tag in camera frame to body planar frame
   target_cf << tags[0].position(0), tags[0].position(1), tags[0].position(2);
-  this->gimbal_joint_orientation.w() = image_ptr->image.at<double>(0, 0);
-  this->gimbal_joint_orientation.x() = image_ptr->image.at<double>(0, 1);
-  this->gimbal_joint_orientation.y() = image_ptr->image.at<double>(0, 2);
-  this->gimbal_joint_orientation.z() = image_ptr->image.at<double>(0, 3);
-  this->target_bpf = this->getTargetPositionInBodyPlanarFrame(target_cf);
+  gimbal_position(0) = image_ptr->image.at<double>(0, 0);
+  gimbal_position(1) = image_ptr->image.at<double>(0, 1);
+  gimbal_position(2) = image_ptr->image.at<double>(0, 2);
+  joint_if.w() = image_ptr->image.at<double>(0, 3);
+  joint_if.x() = image_ptr->image.at<double>(0, 4);
+  joint_if.y() = image_ptr->image.at<double>(0, 5);
+  joint_if.z() = image_ptr->image.at<double>(0, 6);
+  this->target_bpf =
+    this->getTargetPositionInBodyPlanarFrame(target_cf, joint_if);
+
+  // Vec3 euler_stamped, euler_actual;
+  // quat2euler(joint_if, 321, euler_stamped);
+  // quat2euler(this->gimbal_joint, 321, euler_actual);
+  // std::cout << fabs(euler_stamped(0) - euler_actual(0)) << std::endl;
+  // std::cout << fabs(euler_stamped(1) - euler_actual(1)) << std::endl;
+  // std::cout << fabs(euler_stamped(2) - euler_actual(2)) << std::endl;
+  // std::cout << std::endl;
+  //
+  // if (fabs(euler_stamped(0) - euler_actual(0)) > 0.02) {
+  //   return;
+  // } else if (fabs(euler_stamped(1) - euler_actual(1)) > 0.02) {
+  //   return;
+  // }
 
   // publish tag pose
   this->publishTagPoseMsg(tags[0]);
   this->publishTargetBodyPositionMsg();
-  this->publishTargetInertialPositionMsg();
-  this->trackTarget();
+  this->publishTargetInertialPositionMsg(gimbal_position);
+  // this->trackTarget();
 }
 
 Vec3 AprilTagNode::getTargetPositionInBodyFrame(Vec3 target_cf) {
@@ -129,13 +155,14 @@ Vec3 AprilTagNode::getTargetPositionInBodyFrame(Vec3 target_cf) {
   return (R * target_nwu + t);
 }
 
-Vec3 AprilTagNode::getTargetPositionInBodyPlanarFrame(Vec3 target_cf) {
+Vec3 AprilTagNode::getTargetPositionInBodyPlanarFrame(Vec3 target_cf,
+                                                      Quaternion joint_if) {
   Vec3 p;
   Mat3 R;
   Vec3 target_bpf;
 
   // joints are assumed to be NWU frame
-  R = this->gimbal_joint_orientation.toRotationMatrix();
+  R = joint_if.toRotationMatrix();
 
   // transform target in camera frame to body frame
   p = this->getTargetPositionInBodyFrame(target_cf);
@@ -158,7 +185,6 @@ void AprilTagNode::trackTarget(void) {
 
   this->publishGimbalSetpointAttitudeMsg(setpoints);
 }
-
 
 }  // end of awesomo namespace
 
