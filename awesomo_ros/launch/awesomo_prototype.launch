@@ -10,8 +10,8 @@
   <!-- prototype -->
 
   <param name="pose_stamped_mode" value="true" />
-  <param name="position_topic" value="/awesomo/gimbal/frame/pose" />
-  <param name="orientation_topic" value="/awesomo/gimbal/joint/orientation" />
+  <param name="position_topic" value="/awesomo/gimbal/position/inertial" />
+  <param name="orientation_topic" value="/awesomo/gimbal/joint/orientation/inertial" />
 
   <node pkg="prototype_ros" name="prototype_gazebo" type="run_gazebo.sh" output="screen" required="true" />
   <node pkg="prototype_ros" name="prototype_world" type="world_node" output="screen" required="true" />
@@ -26,12 +26,11 @@
     <remap from="/prototype/camera/image_pose_stamped" to="/awesomo/camera/image_pose_stamped" />
   </node>
   <node pkg="prototype_ros" name="prototype_gimbal" type="gimbal_node" output="screen" required="true" >
-    <remap from="/prototype/gimbal/frame/pose" to="/awesomo/gimbal/frame/pose" />
-    <remap from="/prototype/gimbal/joint/orientation" to="/awesomo/gimbal/joint/orientation" />
+    <remap from="/prototype/gimbal/position/inertial" to="/awesomo/gimbal/position/inertial" />
+    <remap from="/prototype/gimbal/frame/orientation/inertial" to="/awesomo/gimbal/frame/orientation/inertial" />
+    <remap from="/prototype/gimbal/joint/orientation/inertial" to="/awesomo/gimbal/joint/orientation/inertial" />
     <remap from="/prototype/gimbal/setpoint/attitude" to="/awesomo/gimbal/setpoint/attitude" />
-    <remap from="/prototype/gimbal/track" to="/awesomo/gimbal/track" />
-    <remap from="/prototype/gimbal/target/local" to="/awesomo/gimbal/target/local" />
-    <remap from="/prototype/gimbal/target/world" to="/awesomo/gimbal/target/world" />
+    <remap from="/prototype/gimbal/target/track" to="/awesomo/gimbal/target/track" />
   </node>
 
   <!-- control node -->

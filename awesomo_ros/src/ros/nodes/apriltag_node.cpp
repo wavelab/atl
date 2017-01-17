@@ -22,6 +22,7 @@ int AprilTagNode::configure(const std::string &node_name, int hz) {
   this->registerPublisher<awesomo_msgs::AprilTagPose>(TARGET_POSE_TOPIC);
   this->registerPublisher<geometry_msgs::Vector3>(TARGET_IF_TOPIC);
   this->registerPublisher<geometry_msgs::Vector3>(TARGET_BPF_TOPIC);
+  this->registerPublisher<geometry_msgs::Vector3>(GIMBAL_TRACK_TOPIC);
   this->registerImageSubscriber(CAMERA_IMAGE_TOPIC, &AprilTagNode::imageCallback, this);
   this->registerShutdown(SHUTDOWN);
   // clang-format on
@@ -58,6 +59,16 @@ void AprilTagNode::publishTargetInertialPositionMsg(Vec3 gimbal_position) {
   // build and publish msg
   buildVector3Msg(target_if, msg);
   this->ros_pubs[TARGET_IF_TOPIC].publish(msg);
+}
+
+void AprilTagNode::publishGimbalTrackMsg(TagPose tag) {
+  geometry_msgs::Vector3 msg;
+
+  msg.x = tag.position(0);
+  msg.y = tag.position(1);
+  msg.z = tag.position(2);
+
+  this->ros_pubs[GIMBAL_TRACK_TOPIC].publish(msg);
 }
 
 void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
@@ -103,7 +114,7 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
   this->publishTagPoseMsg(tags[0]);
   this->publishTargetBodyPositionMsg();
   this->publishTargetInertialPositionMsg(gimbal_position);
-  // this->trackTarget();
+  // this->publishGimbalTrackMsg(tags[0]);
 }
 
 Vec3 AprilTagNode::getTargetInBF(Vec3 target_cf) {

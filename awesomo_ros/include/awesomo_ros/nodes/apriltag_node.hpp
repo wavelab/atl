@@ -24,6 +24,7 @@ namespace awesomo {
 #define TARGET_POSE_TOPIC "/awesomo/apriltag/target"
 #define TARGET_IF_TOPIC "/awesomo/apriltag/target/inertial"
 #define TARGET_BPF_TOPIC "/awesomo/apriltag/target/body"
+#define GIMBAL_TRACK_TOPIC "/awesomo/gimbal/target/track"
 
 // SUBSCRIBE TOPICS
 #define CAMERA_IMAGE_TOPIC "/awesomo/camera/image_pose_stamped"
@@ -41,6 +42,7 @@ public:
   void publishTagPoseMsg(TagPose tag);
   void publishTargetBodyPositionMsg(void);
   void publishTargetInertialPositionMsg(Vec3 gimbal_position);
+  void publishGimbalTrackMsg(TagPose tag);
   void imageCallback(const sensor_msgs::ImageConstPtr &msg);
   Vec3 getTargetInBF(Vec3 target_cf);
   Vec3 getTargetInBPF(Vec3 target_cf, Quaternion joint_if);
