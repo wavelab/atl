@@ -49,12 +49,12 @@ ADD_LIBRARY(
     src/utils/stats.cpp
     src/utils/time.cpp
     # vision
-    src/vision/apriltag/swathmore.cpp
+    # src/vision/apriltag/swathmore.cpp
     src/vision/apriltag/mit.cpp
     src/vision/camera/camera.cpp
     src/vision/camera/config.cpp
     # src/vision/camera/ximea.cpp
-    # src/vision/camera/camera_pointgrey.cpp
+    # src/vision/camera/pointgrey.cpp
     src/vision/gimbal/gimbal.cpp
     src/vision/gimbal/sbgc.cpp
 )
@@ -62,7 +62,7 @@ SET(DEPS
     ${PROJECT_NAME}
     ${catkin_LIBRARIES}
     ${OpenCV_LIBS}
-    apriltags_swathmore
+    # apriltags_swathmore
     apriltags_mit
     CGAL
     yaml-cpp
@@ -88,7 +88,7 @@ ADD_EXECUTABLE(
     tests/quadrotor/landing_target_test.cpp
     tests/quadrotor/quadrotor_test.cpp
     # VISION TESTS
-    tests/vision/apriltag/swathmore_test.cpp
+    # tests/vision/apriltag/swathmore_test.cpp
     tests/vision/camera/camera_test.cpp
     tests/vision/camera/config_test.cpp
     tests/vision/gimbal/gimbal_test.cpp

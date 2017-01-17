@@ -223,7 +223,7 @@ int EstimatorNode::loopCallback(void) {
   this->publishLTKFWorldEstimate();
   this->publishLTKFLocalEstimate();
   this->publishLTKFVelocityEstimate();
-  this->trackTarget();
+  // this->trackTarget();
 
   return 0;
 }

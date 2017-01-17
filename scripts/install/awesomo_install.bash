@@ -1,5 +1,7 @@
 #!/bin/bash
 set -e  # exit on first error
+# ROS_VERSION="indigo"
+ROS_VERSION="kinetic"
 CATKIN_PATH="$HOME/catkin_ws"
 SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
@@ -9,12 +11,12 @@ sudo -v
 
 # intall dependencies
 # sudo bash $SCRIPT_PATH/ximea_install.bash
-sudo bash $SCRIPT_PATH/pointgrey_install.bash
-sudo $SCRIPT_PATH/apriltags_swathmore_install.bash
+# sudo bash $SCRIPT_PATH/pointgrey_install.bash
+# sudo $SCRIPT_PATH/apriltags_swathmore_install.bash
 sudo $SCRIPT_PATH/apriltags_mit_install.bash
-sudo apt-get install -y ros-indigo-mavros \
-                        ros-indigo-mavros-extras \
-                        ros-indigo-mavros-msgs
+sudo apt-get install -y ros-$ROS_VERSION-mavros \
+                        ros-$ROS_VERSION-mavros-extras \
+                        ros-$ROS_VERSION-mavros-msgs
 
 # link repo to catkin workspace
 if [ ! -d "$CATKIN_PATH/src/awesomo" ]; then

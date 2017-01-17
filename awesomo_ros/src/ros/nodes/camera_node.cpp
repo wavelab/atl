@@ -20,6 +20,8 @@ int CameraNode::configure(std::string node_name, int hz) {
 
   // register publisher and subscribers
   this->registerImagePublisher(CAMERA_IMAGE_TOPIC);
+  this->registerSubscriber(GIMBAL_FRAME_ORIENTATION_TOPIC, &CameraNode::gimbalFrameCallback, this);
+  this->registerSubscriber(GIMBAL_JOINT_ORIENTATION_TOPIC, &CameraNode::gimbalJointCallback, this);
   // this->registerShutdown(SHUTDOWN_TOPIC);
 
   // register loop callback
@@ -44,6 +46,20 @@ int CameraNode::publishImage(void) {
   return 0;
 }
 
+void CameraNode::gimbalFrameCallback(const geometry_msgs::Quaternion &msg) {
+  this->gimbal_frame.w() = msg.w;
+  this->gimbal_frame.x() = msg.x;
+  this->gimbal_frame.y() = msg.y;
+  this->gimbal_frame.z() = msg.z;
+}
+
+void CameraNode::gimbalJointCallback(const geometry_msgs::Quaternion &msg) {
+  this->gimbal_joint.w() = msg.w;
+  this->gimbal_joint.x() = msg.x;
+  this->gimbal_joint.y() = msg.y;
+  this->gimbal_joint.z() = msg.z;
+}
+
 int CameraNode::loopCallback(void) {
   this->camera.getFrame(this->image);
   this->camera.showImage(this->image);
@@ -53,7 +69,6 @@ int CameraNode::loopCallback(void) {
 }
 
 }  // end of awesomo namespace
-
 
 int main(int argc, char **argv) {
   awesomo::CameraNode node(argc, argv);

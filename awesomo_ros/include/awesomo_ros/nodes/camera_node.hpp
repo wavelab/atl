@@ -22,6 +22,8 @@ namespace awesomo {
 #define CAMERA_IMAGE_TOPIC "/awesomo/camera/image"
 
 // SUBSCRIBE TOPICS
+#define GIMBAL_FRAME_ORIENTATION_TOPIC "/awesomo/gimbal/frame/orientation/inertial"
+#define GIMBAL_JOINT_ORIENTATION_TOPIC "/awesomo/gimbal/joint/orientation/inertial"
 #define SHUTDOWN_TOPIC "/awesomo/camera/shutdown"
 
 class CameraNode : public ROSNode {
@@ -29,10 +31,15 @@ public:
   Camera camera;
   cv::Mat image;
 
+  Quaternion gimbal_frame;
+  Quaternion gimbal_joint;
+
   CameraNode(int argc, char **argv) : ROSNode(argc, argv) {}
   int configure(std::string node_name, int hz);
-  void imageCallback(const sensor_msgs::ImageConstPtr &msg);
   int publishImage(void);
+  void imageCallback(const sensor_msgs::ImageConstPtr &msg);
+  void gimbalFrameCallback(const geometry_msgs::Quaternion &msg);
+  void gimbalJointCallback(const geometry_msgs::Quaternion &msg);
   int loopCallback(void);
 };
 

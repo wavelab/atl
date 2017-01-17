@@ -66,7 +66,7 @@ SET(
     awesomo_core
     ${catkin_LIBRARIES}
     ${OpenCV_LIBS}
-    apriltags_swathmore
+    # apriltags_swathmore
     apriltags_mit
     CGAL
     yaml-cpp

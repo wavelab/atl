@@ -38,7 +38,7 @@ int Gimbal::configure(std::string config_file) {
     return -1;
   }
 
-  // SimpleBGC serial connection
+  // simple bgc serial connection
   this->sbgc = SBGC(device_path);
   if (this->sbgc.connect() != 0 || this->sbgc.on() != 0) {
     return -2;

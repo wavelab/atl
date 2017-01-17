@@ -16,6 +16,11 @@
   <node pkg="prototype_ros" name="prototype_gazebo" type="run_gazebo.sh" output="screen" required="true" />
   <node pkg="prototype_ros" name="prototype_world" type="world_node" output="screen" required="true" />
   <node pkg="prototype_ros" name="prototype_quadrotor" type="quadrotor_node" output="screen" required="true" />
+  <node pkg="prototype_ros" name="prototype_lz" type="lz_node" output="screen" required="true">
+    <remap from="/prototype/lz/pose" to="/awesomo/lz/pose" />
+    <remap from="/prototype/lz/position/set" to="/awesomo/lz/position/set" />
+    <remap from="/prototype/lz/velocity/set" to="/awesomo/lz/velocity/set" />
+  </node>
   <node pkg="prototype_ros" name="prototype_camera" type="camera_node" output="screen" required="true">
     <remap from="/prototype/camera/image" to="/awesomo/camera/image" />
     <remap from="/prototype/camera/image_pose_stamped" to="/awesomo/camera/image_pose_stamped" />
