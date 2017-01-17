@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e  # exit on first error
-# ROS_VERSION="indigo"
-ROS_VERSION="kinetic"
+ROS_VERSION="indigo"
+# ROS_VERSION="kinetic"
 CATKIN_PATH="$HOME/catkin_ws"
 SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
