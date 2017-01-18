@@ -87,8 +87,16 @@ void Quadrotor::setVelocity(Vec3 velocity) {
   this->velocity = velocity;
 }
 
-void Quadrotor::setTarget(Vec3 position, Vec3 velocity, bool detected) {
-  this->landing_target.setTarget(position, velocity, detected);
+void Quadrotor::setTargetPosition(Vec3 position) {
+  this->landing_target.setTargetPosition(position);
+}
+
+void Quadrotor::setTargetVelocity(Vec3 velocity) {
+  this->landing_target.setTargetVelocity(velocity);
+}
+
+void Quadrotor::setTargetDetected(bool detected) {
+  this->landing_target.update(detected);
 }
 
 void Quadrotor::setHoverXYPosition(Vec3 position) {
@@ -178,9 +186,9 @@ int Quadrotor::stepTrackingMode(double dt) {
 
   // track target
   tctrl_output = this->tracking_controller.calculate(errors, this->heading, dt);
-  // vctrl_output = this->velocity_controller.calculate(errors, dt);
   this->att_cmd = AttitudeCommand(tctrl_output);
-  // this->att_cmd = AttitudeCommand(tctrl_output + vctrl_output);
+  // vctrl_output = this->velocity_controller.calculate(errors, dt);
+  // this->att_cmd = AttitudeCommand(tctrl_output);
 
   // update hover position and tracking timer
   this->setHoverXYPosition(position);
@@ -283,7 +291,6 @@ int Quadrotor::step(double dt) {
       retval = this->stepHoverMode(dt);
       break;
   }
-  this->landing_target.update();
 
   return retval;
 }

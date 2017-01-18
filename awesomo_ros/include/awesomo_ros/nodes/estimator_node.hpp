@@ -15,9 +15,11 @@ namespace awesomo {
 #define NODE_RATE 200
 
 // PUBLISH TOPICS
-#define LT_INERTIAL_TOPIC "/awesomo/estimate/landing_target/inertial"
-#define LT_BODY_TOPIC "/awesomo/estimate/landing_target/body"
-#define LT_VELOCITY_TOPIC "/awesomo/estimate/landing_target/velocity"
+#define LT_INERTIAL_POSITION_TOPIC "/awesomo/estimate/landing_target/position/inertial"
+#define LT_INERTIAL_VELOCITY_TOPIC "/awesomo/estimate/landing_target/velocity/inertial"
+#define LT_BODY_POSITION_TOPIC "/awesomo/estimate/landing_target/position/body"
+#define LT_BODY_VELOCITY_TOPIC "/awesomo/estimate/landing_target/velocity/body"
+#define LT_DETECTED_TOPIC "/awesomo/estimate/landing_target/detected"
 #define GIMBAL_SETPOINT_ATTITUDE_TOPIC "/awesomo/gimbal/setpoint/attitude"
 
 // SUBSCRIBE TOPICS
@@ -56,9 +58,11 @@ public:
   void quadPoseCallback(const geometry_msgs::PoseStamped &msg);
   void quadVelocityCallback(const geometry_msgs::TwistStamped &msg);
   void targetWorldCallback(const geometry_msgs::Vector3 &msg);
-  void publishLTKFWorldEstimate(void);
-  void publishLTKFLocalEstimate(void);
-  void publishLTKFVelocityEstimate(void);
+  void publishLTKFInertialPositionEstimate(void);
+  void publishLTKFInertialVelocityEstimate(void);
+  void publishLTKFBodyPositionEstimate(void);
+  void publishLTKFBodyVelocityEstimate(void);
+  void publishLTDetected(void);
   void publishGimbalSetpointAttitudeMsg(Vec3 setpoints);
   void trackTarget(void);
   int loopCallback(void);

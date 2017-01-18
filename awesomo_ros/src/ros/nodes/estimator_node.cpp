@@ -12,9 +12,11 @@ int EstimatorNode::configure(std::string node_name, int hz) {
 
   // publishers and subscribers
   // clang-format off
-  this->registerPublisher<geometry_msgs::Vector3>(LT_INERTIAL_TOPIC);
-  this->registerPublisher<geometry_msgs::Vector3>(LT_BODY_TOPIC);
-  this->registerPublisher<geometry_msgs::Vector3>(LT_VELOCITY_TOPIC);
+  this->registerPublisher<geometry_msgs::Vector3>(LT_INERTIAL_POSITION_TOPIC);
+  this->registerPublisher<geometry_msgs::Vector3>(LT_INERTIAL_VELOCITY_TOPIC);
+  this->registerPublisher<geometry_msgs::Vector3>(LT_BODY_POSITION_TOPIC);
+  this->registerPublisher<geometry_msgs::Vector3>(LT_BODY_VELOCITY_TOPIC);
+  this->registerPublisher<std_msgs::Bool>(LT_DETECTED_TOPIC);
   this->registerPublisher<geometry_msgs::Vector3>(GIMBAL_SETPOINT_ATTITUDE_TOPIC);
   this->registerSubscriber(QUAD_POSE_TOPIC, &EstimatorNode::quadPoseCallback, this);
   this->registerSubscriber(QUAD_VELOCITY_TOPIC, &EstimatorNode::quadVelocityCallback, this);
@@ -28,7 +30,7 @@ int EstimatorNode::configure(std::string node_name, int hz) {
 
 void EstimatorNode::initLTKF(Vec3 target_wf) {
   VecX mu(9);
-  MatX R(9, 9), C(6, 9), Q(6, 6);
+  MatX R(9, 9), C(3, 9), Q(3, 3);
 
   // initialize landing target kalman filter
   // clang-format off
@@ -52,18 +54,12 @@ void EstimatorNode::initLTKF(Vec3 target_wf) {
   // measurements
   C << 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
        0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-       0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-       0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-       0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0,
-       0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0;
+       0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
 
   // measurement noise
-  Q << 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-       0.0, 1000.0, 0.0, 0.0, 0.0, 0.0,
-       0.0, 0.0, 1000.0, 0.0, 0.0, 0.0,
-       0.0, 0.0, 0.0, 1000.0, 0.0, 0.0,
-       0.0, 0.0, 0.0, 0.0, 1000.0, 0.0,
-       0.0, 0.0, 0.0, 0.0, 0.0, 1000.0;
+  Q << 1000.0, 0.0, 0.0,
+       0.0, 1000.0, 0.0,
+       0.0, 0.0, 1000.0;
   // clang-format on
 
   // initialize landing target kalman filter
@@ -105,21 +101,31 @@ void EstimatorNode::targetWorldCallback(const geometry_msgs::Vector3 &msg) {
   }
 }
 
-void EstimatorNode::publishLTKFWorldEstimate(void) {
+void EstimatorNode::publishLTKFInertialPositionEstimate(void) {
   geometry_msgs::Vector3 msg;
-  Vec3 estimate;
 
-  estimate << this->lt_kf.mu(0), this->lt_kf.mu(1), this->lt_kf.mu(2);
-  buildMsg(estimate, msg);
+  msg.x = this->lt_kf.mu(0);
+  msg.y = this->lt_kf.mu(1);
+  msg.z = this->lt_kf.mu(2);
 
-  this->ros_pubs[LT_INERTIAL_TOPIC].publish(msg);
+  this->ros_pubs[LT_INERTIAL_POSITION_TOPIC].publish(msg);
 }
 
-void EstimatorNode::publishLTKFLocalEstimate(void) {
+void EstimatorNode::publishLTKFInertialVelocityEstimate(void) {
+  geometry_msgs::Vector3 msg;
+
+  msg.x = this->lt_kf.mu(3);
+  msg.y = this->lt_kf.mu(4);
+  msg.z = this->lt_kf.mu(5);
+
+  this->ros_pubs[LT_INERTIAL_VELOCITY_TOPIC].publish(msg);
+}
+
+void EstimatorNode::publishLTKFBodyPositionEstimate(void) {
   geometry_msgs::Vector3 msg;
   Vec3 position_enu;
 
-  // transform from world to body frame
+  // transform from inertial to body frame
   // clang-format off
   position_enu << this->lt_kf.mu(0) - this->quad_pose.position(0),
                   this->lt_kf.mu(1) - this->quad_pose.position(1),
@@ -133,17 +139,34 @@ void EstimatorNode::publishLTKFLocalEstimate(void) {
 
   // build and publish msg
   buildMsg(this->target_bf, msg);
-  this->ros_pubs[LT_BODY_TOPIC].publish(msg);
+  this->ros_pubs[LT_BODY_POSITION_TOPIC].publish(msg);
 }
 
-void EstimatorNode::publishLTKFVelocityEstimate(void) {
+void EstimatorNode::publishLTKFBodyVelocityEstimate(void) {
   geometry_msgs::Vector3 msg;
-  Vec3 estimate;
+  Vec3 velocity_enu, velocity_nwu;
 
-  estimate << this->lt_kf.mu(3), this->lt_kf.mu(4), this->lt_kf.mu(5);
-  buildMsg(estimate, msg);
+  // transform from inertial to body frame
+  // clang-format off
+  velocity_enu << this->quad_velocity(0) - this->lt_kf.mu(3),
+                  this->quad_velocity(1) - this->lt_kf.mu(4),
+                  this->quad_velocity(2) - this->lt_kf.mu(5);
+  // clang-format on
 
-  this->ros_pubs[LT_VELOCITY_TOPIC].publish(msg);
+  // transform from ENU to NWU
+  velocity_nwu(0) = velocity_enu(1);
+  velocity_nwu(1) = -velocity_enu(0);
+  velocity_nwu(2) = -velocity_enu(2);
+
+  // build and publish msg
+  buildMsg(velocity_enu, msg);
+  this->ros_pubs[LT_BODY_VELOCITY_TOPIC].publish(msg);
+}
+
+void EstimatorNode::publishLTDetected(void) {
+  std_msgs::Bool msg;
+  msg.data = this->target_detected;
+  this->ros_pubs[LT_DETECTED_TOPIC].publish(msg);
 }
 
 void EstimatorNode::publishGimbalSetpointAttitudeMsg(Vec3 setpoints) {
@@ -158,10 +181,6 @@ void EstimatorNode::trackTarget(void) {
 
   // calculate roll pitch yaw setpoints
   dist = this->target_bf.norm();
-  std::cout << this->target_bf.transpose() << std::endl;
-  std::cout << this->target_bf.norm() << std::endl;
-  std::cout << std::endl;
-
   setpoints(0) = asin(this->target_bf(1) / dist);   // roll
   setpoints(1) = -asin(this->target_bf(0) / dist);  // pitch
   setpoints(2) = 0.0;                                // yaw
@@ -170,8 +189,8 @@ void EstimatorNode::trackTarget(void) {
 }
 
 int EstimatorNode::loopCallback(void) {
-  MatX A(9, 9), C(6, 9);
-  VecX y(6);
+  MatX A(9, 9), C(3, 9);
+  VecX y(3);
   double dt;
 
   // pre-check
@@ -198,17 +217,11 @@ int EstimatorNode::loopCallback(void) {
     // clang-format off
     C << 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-         0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-         0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-         0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0,
-         0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0;
+         0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
 
     y << this->target_wf(0),
          this->target_wf(1),
-         this->target_wf(2),
-         this->target_wf(0) - this->target_last_wf(0),
-         this->target_wf(1) - this->target_last_wf(1),
-         this->target_wf(2) - this->target_last_wf(2);
+         this->target_wf(2);
 
     this->target_last_wf = this->target_wf;
     // clang-format on
@@ -216,9 +229,6 @@ int EstimatorNode::loopCallback(void) {
   } else {
     // clang-format off
     C << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
     // clang-format on
@@ -229,9 +239,11 @@ int EstimatorNode::loopCallback(void) {
   this->lt_kf.estimate(A, y);
 
   // publish
-  this->publishLTKFWorldEstimate();
-  this->publishLTKFLocalEstimate();
-  this->publishLTKFVelocityEstimate();
+  this->publishLTKFInertialPositionEstimate();
+  this->publishLTKFInertialVelocityEstimate();
+  this->publishLTKFBodyPositionEstimate();
+  this->publishLTKFBodyVelocityEstimate();
+  this->publishLTDetected();
   this->trackTarget();
 
   // reset

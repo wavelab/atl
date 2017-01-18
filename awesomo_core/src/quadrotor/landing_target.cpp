@@ -23,22 +23,12 @@ bool LandingTarget::isTargetLosted(void) {
   return false;
 }
 
-void LandingTarget::setTarget(Vec3 position, Vec3 velocity, bool detected) {
-  // update target position and detected
+void LandingTarget::setTargetPosition(Vec3 position) {
   this->position_bf = position;
+}
+
+void LandingTarget::setTargetVelocity(Vec3 velocity) {
   this->velocity_bf = velocity;
-  this->detected = detected;
-
-  // initialize target first seen
-  if (this->first_seen.tv_sec == 0) {
-    tic(&this->first_seen);
-  }
-
-  // update target last seen
-  if (detected) {
-    this->losted = false;
-    tic(&this->last_seen);
-  }
 }
 
 double LandingTarget::tracked(void) {
@@ -54,7 +44,20 @@ void LandingTarget::reset(void) {
   this->last_seen = (struct timespec){0};
 }
 
-void LandingTarget::update(void) {
+void LandingTarget::update(bool detected) {
+  // initialize target first seen
+  if (this->first_seen.tv_sec == 0) {
+    tic(&this->first_seen);
+  }
+
+  // update target last seen
+  this->detected = detected;
+  if (detected) {
+    this->losted = false;
+    tic(&this->last_seen);
+  }
+
+  // target losted?
   this->isTargetLosted();
 }
 

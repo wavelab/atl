@@ -71,7 +71,9 @@ public:
   void setMode(enum Mode mode);
   void setPose(Pose pose);
   void setVelocity(Vec3 velocity);
-  void setTarget(Vec3 position, Vec3 velocity, bool detected);
+  void setTargetPosition(Vec3 position);
+  void setTargetVelocity(Vec3 velocity);
+  void setTargetDetected(bool detected);
   void setHoverXYPosition(Vec3 position);
   void setHoverPosition(Vec3 position);
   bool conditionsMet(bool *conditions, int nb_conditions);

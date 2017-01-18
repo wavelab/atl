@@ -18,10 +18,11 @@ public:
 
   LandingTarget(void);
   bool isTargetLosted(void);
-  void setTarget(Vec3 position, Vec3 velocity, bool detected);
+  void setTargetPosition(Vec3 position);
+  void setTargetVelocity(Vec3 velocity);
   double tracked(void);
   void reset(void);
-  void update(void);
+  void update(bool detected);
 };
 
 }  // end of awesomo namespace

@@ -30,7 +30,9 @@ int ControlNode::configure(const std::string node_name, int hz) {
   this->registerSubscriber(POSE_TOPIC, &ControlNode::poseCallback, this);
   this->registerSubscriber(VELOCITY_TOPIC, &ControlNode::velocityCallback, this);
   this->registerSubscriber(RADIO_TOPIC, &ControlNode::radioCallback, this);
-  this->registerSubscriber(TARGET_LOCAL_TOPIC, &ControlNode::targetLocalCallback, this);
+  this->registerSubscriber(TARGET_BODY_POSITION_TOPIC, &ControlNode::targetPositionCallback, this);
+  this->registerSubscriber(TARGET_BODY_VELOCITY_TOPIC, &ControlNode::targetVelocityCallback, this);
+  this->registerSubscriber(TARGET_DETECTED_TOPIC, &ControlNode::targetDetectedCallback, this);
   this->registerSubscriber(HOVER_SET_TOPIC, &ControlNode::hoverSetCallback, this);
   this->registerSubscriber(PCTRL_SET_TOPIC, &ControlNode::positionControllerSetCallback, this);
   // clang-format on
@@ -131,21 +133,20 @@ void ControlNode::radioCallback(const mavros_msgs::RCIn &msg) {
   }
 }
 
-void ControlNode::targetLocalCallback(const geometry_msgs::Vector3 &msg) {
-  bool detected;
-  Vec3 position, velocity;
+void ControlNode::targetPositionCallback(const geometry_msgs::Vector3 &msg) {
+  Vec3 position;
+  position = convertMsg(msg);
+  this->quadrotor.setTargetPosition(position);
+}
 
-  detected = true;
+void ControlNode::targetVelocityCallback(const geometry_msgs::Vector3 &msg) {
+  Vec3 velocity;
+  velocity = convertMsg(msg);
+  this->quadrotor.setTargetVelocity(velocity);
+}
 
-  position(0) = msg.x;
-  position(1) = msg.y;
-  position(2) = msg.z;
-
-  velocity(0) = 0.0;
-  velocity(1) = 0.0;
-  velocity(2) = 0.0;
-
-  this->quadrotor.setTarget(position, velocity, detected);
+void ControlNode::targetDetectedCallback(const std_msgs::Bool &msg) {
+  this->quadrotor.setTargetDetected(msg.data);
 }
 
 int ControlNode::loopCallback(void) {

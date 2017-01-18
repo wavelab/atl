@@ -41,7 +41,9 @@ namespace awesomo {
 #define POSE_TOPIC "/mavros/local_position/pose"
 #define VELOCITY_TOPIC "/mavros/local_position/velocity"
 #define RADIO_TOPIC "/mavros/rc/in"
-#define TARGET_LOCAL_TOPIC "/awesomo/estimate/landing_target/body"
+#define TARGET_BODY_POSITION_TOPIC "/awesomo/estimate/landing_target/position/body"
+#define TARGET_BODY_VELOCITY_TOPIC "/awesomo/estimate/landing_target/velocity/body"
+#define TARGET_DETECTED_TOPIC "/awesomo/estimate/landing_target/detected"
 #define HOVER_SET_TOPIC "/awesomo/control/hover/set"
 #define PCTRL_SET_TOPIC "/awesomo/control/position_controller/set"
 
@@ -69,7 +71,9 @@ public:
   void stateCallback(const mavros_msgs::State::ConstPtr &msg);
   void poseCallback(const geometry_msgs::PoseStamped &msg);
   void velocityCallback(const geometry_msgs::TwistStamped &msg);
-  void targetLocalCallback(const geometry_msgs::Vector3 &msg);
+  void targetPositionCallback(const geometry_msgs::Vector3 &msg);
+  void targetVelocityCallback(const geometry_msgs::Vector3 &msg);
+  void targetDetectedCallback(const std_msgs::Bool &msg);
   void radioCallback(const mavros_msgs::RCIn &msg);
   void hoverSetCallback(const geometry_msgs::Vector3 &msg);
   void positionControllerSetCallback(const awesomo_msgs::PCtrlSettings &msg);
