@@ -27,7 +27,6 @@ ADD_LIBRARY(
     ${PROJECT_NAME}
     STATIC
     # control
-    src/control/attitude_controller.cpp
     src/control/pid_controller.cpp
     src/control/position_controller.cpp
     src/control/tracking_controller.cpp
@@ -74,7 +73,6 @@ SET(DEPS
 ADD_EXECUTABLE(
     awesomo_tests
     # CONTROL
-    tests/control/attitude_controller_test.cpp
     tests/control/pid_controller_test.cpp
     tests/control/position_controller_test.cpp
     tests/control/tracking_controller_test.cpp

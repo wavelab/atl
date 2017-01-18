@@ -26,6 +26,7 @@ int TrackingController::configure(std::string config_file) {
   ConfigParser parser;
 
   // load config
+  // clang-format off
   parser.addParam<double>("roll_controller.k_p", &this->y_controller.k_p);
   parser.addParam<double>("roll_controller.k_i", &this->y_controller.k_i);
   parser.addParam<double>("roll_controller.k_d", &this->y_controller.k_d);
@@ -41,8 +42,8 @@ int TrackingController::configure(std::string config_file) {
   parser.addParam<double>("throttle_controller.k_p", &this->z_controller.k_p);
   parser.addParam<double>("throttle_controller.k_i", &this->z_controller.k_i);
   parser.addParam<double>("throttle_controller.k_d", &this->z_controller.k_d);
-  parser.addParam<double>("throttle_controller.hover_throttle",
-                          &this->hover_throttle);
+  parser.addParam<double>("throttle_controller.hover_throttle", &this->hover_throttle);
+  // clang-format on
 
   if (parser.load(config_file) != 0) {
     return -1;

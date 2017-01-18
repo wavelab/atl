@@ -1,16 +1,16 @@
-roll_controller:
-    min: -50
-    max: 50
+vx_controller:
+    roll_min: -40.0
+    roll_max: 40.0
     k_p: 0.1
     k_i: 0.2
     k_d: 0.3
-pitch_controller:
-    min: -50
-    max: 50
+vy_controller:
+    pitch_min: -40.0
+    pitch_max: 40.0
     k_p: 0.1
     k_i: 0.2
     k_d: 0.3
-throttle_controller:
+vz_controller:
     hover_throttle: 0.6
     k_p: 0.1
     k_i: 0.2

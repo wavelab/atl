@@ -11,6 +11,8 @@ TEST(VelocityController, constructor) {
 
   ASSERT_FALSE(controller.configured);
 
+  ASSERT_FLOAT_EQ(0.0, controller.dt);
+
   ASSERT_FLOAT_EQ(0.0, controller.vx_controller.k_p);
   ASSERT_FLOAT_EQ(0.0, controller.vx_controller.k_i);
   ASSERT_FLOAT_EQ(0.0, controller.vx_controller.k_d);
@@ -23,18 +25,22 @@ TEST(VelocityController, constructor) {
   ASSERT_FLOAT_EQ(0.0, controller.vz_controller.k_i);
   ASSERT_FLOAT_EQ(0.0, controller.vz_controller.k_d);
 
-  ASSERT_FLOAT_EQ(0.0, controller.hover_throttle);
-
   ASSERT_FLOAT_EQ(0.0, controller.roll_limit[0]);
   ASSERT_FLOAT_EQ(0.0, controller.roll_limit[1]);
 
   ASSERT_FLOAT_EQ(0.0, controller.pitch_limit[0]);
   ASSERT_FLOAT_EQ(0.0, controller.pitch_limit[1]);
 
-  for (int i = 0; i < 4; i++) {
-    ASSERT_FLOAT_EQ(0.0, controller.setpoints[i]);
-    ASSERT_FLOAT_EQ(0.0, controller.outputs[i]);
-  }
+  ASSERT_FLOAT_EQ(0.0, controller.hover_throttle);
+
+  ASSERT_FLOAT_EQ(0.0, controller.setpoints(0));
+  ASSERT_FLOAT_EQ(0.0, controller.setpoints(1));
+  ASSERT_FLOAT_EQ(0.0, controller.setpoints(2));
+
+  ASSERT_FLOAT_EQ(0.0, controller.outputs(0));
+  ASSERT_FLOAT_EQ(0.0, controller.outputs(1));
+  ASSERT_FLOAT_EQ(0.0, controller.outputs(2));
+  ASSERT_FLOAT_EQ(0.0, controller.outputs(3));
 }
 
 TEST(VelocityController, configure) {
@@ -43,6 +49,8 @@ TEST(VelocityController, configure) {
   controller.configure(TEST_CONFIG);
 
   ASSERT_TRUE(controller.configured);
+
+  ASSERT_FLOAT_EQ(0.0, controller.dt);
 
   ASSERT_FLOAT_EQ(0.1, controller.vx_controller.k_p);
   ASSERT_FLOAT_EQ(0.2, controller.vx_controller.k_i);
@@ -56,98 +64,79 @@ TEST(VelocityController, configure) {
   ASSERT_FLOAT_EQ(0.2, controller.vz_controller.k_i);
   ASSERT_FLOAT_EQ(0.3, controller.vz_controller.k_d);
 
+  ASSERT_FLOAT_EQ(deg2rad(-40.0), deg2rad(controller.roll_limit[0]));
+  ASSERT_FLOAT_EQ(deg2rad(40.0), deg2rad(controller.roll_limit[1]));
+
+  ASSERT_FLOAT_EQ(deg2rad(-40.0), deg2rad(controller.pitch_limit[0]));
+  ASSERT_FLOAT_EQ(deg2rad(40.0), deg2rad(controller.pitch_limit[1]));
+
   ASSERT_FLOAT_EQ(0.6, controller.hover_throttle);
 
-  ASSERT_FLOAT_EQ(deg2rad(-50.0), controller.roll_limit[0]);
-  ASSERT_FLOAT_EQ(deg2rad(50.0), controller.roll_limit[1]);
+  ASSERT_FLOAT_EQ(0.0, controller.setpoints(0));
+  ASSERT_FLOAT_EQ(0.0, controller.setpoints(1));
+  ASSERT_FLOAT_EQ(0.0, controller.setpoints(2));
 
-  ASSERT_FLOAT_EQ(deg2rad(-50.0), controller.pitch_limit[0]);
-  ASSERT_FLOAT_EQ(deg2rad(50.0), controller.pitch_limit[1]);
-
-  for (int i = 0; i < 4; i++) {
-    ASSERT_FLOAT_EQ(0.0, controller.setpoints[i]);
-    ASSERT_FLOAT_EQ(0.0, controller.outputs[i]);
-  }
+  ASSERT_FLOAT_EQ(0.0, controller.outputs(0));
+  ASSERT_FLOAT_EQ(0.0, controller.outputs(1));
+  ASSERT_FLOAT_EQ(0.0, controller.outputs(2));
+  ASSERT_FLOAT_EQ(0.0, controller.outputs(3));
 }
 
 TEST(VelocityController, calculate) {
-  Vec3 setpoint, actual;
-  float yaw_setpoint, dt;
+  Vec3 setpoints;
+  Vec3 actual;
+  double dt;
   VelocityController controller;
 
   // setup
   controller.configure(TEST_CONFIG);
 
   // CHECK HOVERING PID OUTPUT
-  setpoint << 0, 0, 0;
+  setpoints << 0, 0, 0;
   actual << 0, 0, 0;
-  yaw_setpoint = 0;
   dt = 0.1;
-  controller.calculate(setpoint, actual, yaw_setpoint, dt);
+  controller.calculate(setpoints, actual, dt);
+  controller.printOutputs();
 
-  // clang-format off
-  // std::cout << controller.outputs[0] << "\t"
-  //           << controller.outputs[1] << "\t"
-  //           << controller.outputs[3] << std::endl;
-  // clang-format on
-
-  ASSERT_FLOAT_EQ(0.0, controller.outputs[0]);
-  ASSERT_FLOAT_EQ(0.0, controller.outputs[1]);
-  ASSERT_FLOAT_EQ(controller.hover_throttle, controller.outputs[3]);
+  ASSERT_FLOAT_EQ(0.0, controller.outputs(0));
+  ASSERT_FLOAT_EQ(0.0, controller.outputs(1));
+  ASSERT_FLOAT_EQ(controller.hover_throttle, controller.outputs(3));
 
   // CHECK MOVING TOWARDS THE X LOCATION
-  setpoint << 1, 0, 0;
+  setpoints << 1, 0, 0;
   actual << 0, 0, 0;
-  yaw_setpoint = 0;
   dt = 0.1;
 
   controller.reset();
-  controller.calculate(setpoint, actual, yaw_setpoint, dt);
+  controller.calculate(setpoints, actual, dt);
+  controller.printOutputs();
 
-  // clang-format off
-  std::cout << controller.outputs[0] << "\t"
-            << controller.outputs[1] << "\t"
-            << controller.outputs[3] << std::endl;
-  // clang-format on
-
-  ASSERT_FLOAT_EQ(0.0, controller.outputs[0]);
-  ASSERT_TRUE(controller.outputs[1] < 0.0);
+  ASSERT_FLOAT_EQ(0.0, controller.outputs(0));
+  ASSERT_TRUE(controller.outputs(1) > 0.0);
 
   // CHECK MOVING TOWARDS THE Y LOCATION
-  setpoint << 0, 1, 0;
+  setpoints << 0, 1, 0;
   actual << 0, 0, 0;
-  yaw_setpoint = 0;
   dt = 0.1;
 
   controller.reset();
-  controller.calculate(setpoint, actual, yaw_setpoint, dt);
+  controller.calculate(setpoints, actual, dt);
+  controller.printOutputs();
 
-  // clang-format off
-  std::cout << controller.outputs[0] << "\t"
-            << controller.outputs[1] << "\t"
-            << controller.outputs[3] << std::endl;
-  // clang-format on
-
-  ASSERT_TRUE(controller.outputs[0] > 0.0);
-  ASSERT_FLOAT_EQ(0.0, controller.outputs[1]);
+  ASSERT_TRUE(controller.outputs(0) < 0.0);
+  ASSERT_FLOAT_EQ(0.0, controller.outputs(1));
 
   // CHECK MOVING TOWARDS THE X AND Y LOCATION
-  setpoint << 1, -1, 0;
+  setpoints << 1, 1, 0;
   actual << 0, 0, 0;
-  yaw_setpoint = 0;
   dt = 0.1;
 
-  // clang-format off
-  std::cout << controller.outputs[0] << "\t"
-            << controller.outputs[1] << "\t"
-            << controller.outputs[3] << std::endl;
-  // clang-format on
-
   controller.reset();
-  controller.calculate(setpoint, actual, yaw_setpoint, dt);
-  ASSERT_TRUE(controller.outputs[0] < 0.0);
-  ASSERT_TRUE(controller.outputs[1] < 0.0);
-  // ASSERT_TRUE(controller.throttle > controller.hover_throttle);
+  controller.calculate(setpoints, actual, dt);
+  controller.printOutputs();
+
+  ASSERT_TRUE(controller.outputs(0) < 0.0);
+  ASSERT_TRUE(controller.outputs(1) > 0.0);
 }
 
 }  // end of awesomo namepsace
