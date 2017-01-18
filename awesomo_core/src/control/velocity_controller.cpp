@@ -81,7 +81,7 @@ Vec4 VelocityController::calculate(Vec3 setpoints, Vec3 actual, double dt) {
   r = -this->vy_controller.calculate(errors(1), 0.0, this->dt);
   p = this->vx_controller.calculate(errors(0), 0.0, this->dt);
   y = 0.0;
-  t = this->hover_throttle + this->vz_controller.calculate(errors(2), 0.0, this->dt);
+  t = this->vz_controller.calculate(errors(2), 0.0, this->dt);
   t /= fabs(cos(r) * cos(p));  // adjust throttle for roll and pitch
   // clang-format o
 

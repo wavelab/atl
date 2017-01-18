@@ -169,7 +169,7 @@ int Quadrotor::stepDiscoverMode(double dt) {
 }
 
 int Quadrotor::stepTrackingMode(double dt) {
-  Vec3 errors, position;
+  Vec3 terrors, verrors;
   Vec4 tctrl_output, vctrl_output;
   bool conditions[3];
 
@@ -179,19 +179,23 @@ int Quadrotor::stepTrackingMode(double dt) {
   }
 
   // setup
-  position = this->pose.position;
-  errors(0) = this->landing_target.position_bf(0);
-  errors(1) = this->landing_target.position_bf(1);
-  errors(2) = this->hover_position(2) - position(2);
+  terrors(0) = this->landing_target.position_bf(0);
+  terrors(1) = this->landing_target.position_bf(1);
+  terrors(2) = this->hover_position(2) - this->pose.position(2);
+
+  verrors(0) = this->landing_target.velocity_bf(0);
+  verrors(1) = this->landing_target.velocity_bf(1);
+  verrors(2) = 0.0;
 
   // track target
-  tctrl_output = this->tracking_controller.calculate(errors, this->heading, dt);
-  this->att_cmd = AttitudeCommand(tctrl_output);
-  // vctrl_output = this->velocity_controller.calculate(errors, dt);
-  // this->att_cmd = AttitudeCommand(tctrl_output);
+  Vec3 tmp;
+  tmp << 0.0, 0.0, 0.0;
+  tctrl_output = this->tracking_controller.calculate(terrors, this->heading, dt);
+  vctrl_output = this->velocity_controller.calculate(verrors, tmp, dt);
+  this->att_cmd = AttitudeCommand(tctrl_output + vctrl_output);
 
   // update hover position and tracking timer
-  this->setHoverXYPosition(position);
+  this->setHoverXYPosition(this->pose.position);
   if (this->tracking_tic.tv_sec == 0) {
     tic(&this->tracking_tic);
   }
