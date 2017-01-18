@@ -22,6 +22,7 @@
 
 namespace awesomo {
 
+void buildMsg(Vec3 vec, geometry_msgs::Vector3 &msg);
 void buildMsg(int seq,
               ros::Time time,
               AttitudeCommand att_cmd,
@@ -31,13 +32,12 @@ void buildMsg(TagPose tag, awesomo_msgs::AprilTagPose &msg);
 void buildMsg(TagPose tag, geometry_msgs::Vector3 &msg);
 void buildMsg(PositionController pc, awesomo_msgs::PCtrlStats &msg);
 void buildMsg(PositionController pc, awesomo_msgs::PCtrlSettings &msg);
-void buildMsg(TrackingController controller, awesomo_msgs::TCtrlStats &msg);
-void buildMsg(TrackingController pc, awesomo_msgs::TCtrlSettings &msg);
-void buildMsg(Vec3 vec, geometry_msgs::Vector3 &msg);
+void buildMsg(TrackingController tc, awesomo_msgs::TCtrlStats &msg);
+void buildMsg(TrackingController tc, awesomo_msgs::TCtrlSettings &msg);
 
+Vec3 convertMsg(geometry_msgs::Vector3 msg);
 Pose convertMsg(geometry_msgs::PoseStamped msg);
 VecX convertMsg(geometry_msgs::TwistStamped msg);
-Vec3 convertMsg(geometry_msgs::Vector3 msg);
 TagPose convertMsg(awesomo_msgs::AprilTagPose msg);
 
 }  // end of awesomo namespace

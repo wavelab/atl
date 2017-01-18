@@ -3,6 +3,12 @@
 
 namespace awesomo {
 
+void buildMsg(Vec3 vec, geometry_msgs::Vector3 &msg) {
+  msg.x = vec(0);
+  msg.y = vec(1);
+  msg.z = vec(2);
+}
+
 void buildMsg(int seq,
               ros::Time time,
               AttitudeCommand att_cmd,
@@ -40,27 +46,27 @@ void buildMsg(TagPose tag, geometry_msgs::Vector3 &msg) {
   msg.z = tag.position(2);
 }
 
-void buildMsg(PositionController controller, awesomo_msgs::PCtrlStats &msg) {
+void buildMsg(PositionController pc, awesomo_msgs::PCtrlStats &msg) {
   // roll
-  msg.roll_p_error = controller.y_controller.error_p;
-  msg.roll_i_error = controller.y_controller.error_i;
-  msg.roll_d_error = controller.y_controller.error_d;
-  msg.roll_output = rad2deg(controller.outputs(0));
-  msg.roll_setpoint = controller.setpoints(0);
+  msg.roll_p_error = pc.y_controller.error_p;
+  msg.roll_i_error = pc.y_controller.error_i;
+  msg.roll_d_error = pc.y_controller.error_d;
+  msg.roll_output = rad2deg(pc.outputs(0));
+  msg.roll_setpoint = pc.setpoints(0);
 
   // pitch
-  msg.pitch_p_error = controller.x_controller.error_p;
-  msg.pitch_i_error = controller.x_controller.error_i;
-  msg.pitch_d_error = controller.x_controller.error_d;
-  msg.pitch_output = rad2deg(controller.outputs(1));
-  msg.pitch_setpoint = controller.setpoints(1);
+  msg.pitch_p_error = pc.x_controller.error_p;
+  msg.pitch_i_error = pc.x_controller.error_i;
+  msg.pitch_d_error = pc.x_controller.error_d;
+  msg.pitch_output = rad2deg(pc.outputs(1));
+  msg.pitch_setpoint = pc.setpoints(1);
 
   // thrust
-  msg.throttle_p_error = controller.z_controller.error_p;
-  msg.throttle_i_error = controller.z_controller.error_i;
-  msg.throttle_d_error = controller.z_controller.error_d;
-  msg.throttle_output = controller.outputs(3);
-  msg.throttle_setpoint = controller.setpoints(2);
+  msg.throttle_p_error = pc.z_controller.error_p;
+  msg.throttle_i_error = pc.z_controller.error_i;
+  msg.throttle_d_error = pc.z_controller.error_d;
+  msg.throttle_output = pc.outputs(3);
+  msg.throttle_setpoint = pc.setpoints(2);
 }
 
 void buildMsg(PositionController pc, awesomo_msgs::PCtrlSettings &msg) {
@@ -124,33 +130,10 @@ void buildMsg(TrackingController tc, awesomo_msgs::TCtrlSettings &msg) {
   msg.hover_throttle = tc.hover_throttle;
 }
 
-void buildMsg(PositionController controller, awesomo_msgs::TCtrlStats &msg) {
-  // roll
-  msg.roll_p_error = controller.y_controller.error_p;
-  msg.roll_i_error = controller.y_controller.error_i;
-  msg.roll_d_error = controller.y_controller.error_d;
-  msg.roll_output = rad2deg(controller.outputs(0));
-  msg.roll_setpoint = controller.setpoints(0);
-
-  // pitch
-  msg.pitch_p_error = controller.x_controller.error_p;
-  msg.pitch_i_error = controller.x_controller.error_i;
-  msg.pitch_d_error = controller.x_controller.error_d;
-  msg.pitch_output = rad2deg(controller.outputs(1));
-  msg.pitch_setpoint = controller.setpoints(1);
-
-  // thrust
-  msg.throttle_p_error = controller.z_controller.error_p;
-  msg.throttle_i_error = controller.z_controller.error_i;
-  msg.throttle_d_error = controller.z_controller.error_d;
-  msg.throttle_output = controller.outputs(3);
-  msg.throttle_setpoint = controller.setpoints(2);
-}
-
-void buildMsg(Vec3 vec, geometry_msgs::Vector3 &msg) {
-  msg.x = vec(0);
-  msg.y = vec(1);
-  msg.z = vec(2);
+Vec3 convertMsg(geometry_msgs::Vector3 msg) {
+  Vec3 v;
+  v << msg.x, msg.y, msg.z;
+  return v;
 }
 
 Pose convertMsg(geometry_msgs::PoseStamped msg) {
@@ -177,12 +160,6 @@ VecX convertMsg(geometry_msgs::TwistStamped msg) {
   twist(5) = msg.twist.angular.z;
 
   return twist;
-}
-
-Vec3 convertMsg(geometry_msgs::Vector3 msg) {
-  Vec3 v;
-  v << msg.x, msg.y, msg.z;
-  return v;
 }
 
 TagPose convertMsg(awesomo_msgs::AprilTagPose msg) {
