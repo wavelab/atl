@@ -12,11 +12,6 @@
 namespace awesomo {
 
 #define INFO_CONFIG "Configuring ROS Node [%s]!"
-#define INFO_PUB_INIT "Publisher [%s] initialized!"
-#define INFO_SUB_INIT "Subscriber [%s] initialized!"
-#define INFO_DEBUG_MODE "ROS Node [%s] is running in [DEBUG MODE]!"
-#define INFO_SIM_MODE "ROS Node [%s] is running in [SIM MODE]!"
-#define INFO_NORMAL_MODE "ROS Node [%s] is running..."
 
 class ROSNode {
 public:
@@ -60,7 +55,6 @@ public:
     // image transport
     image_transport::ImageTransport it(*this->ros_nh);
     this->img_sub = it.subscribe(topic, queue_size, fp, obj);
-    ROS_INFO(INFO_SUB_INIT, topic.c_str());
 
     return 0;
   }
@@ -79,7 +73,6 @@ public:
     // register publisher
     publisher = this->ros_nh->advertise<M>(topic, queue_size, latch);
     this->ros_pubs[topic] = publisher;
-    ROS_INFO(INFO_PUB_INIT, topic.c_str());
 
     return 0;
   }
@@ -99,7 +92,6 @@ public:
     // register subscriber
     subscriber = this->ros_nh->subscribe(topic, queue_size, fp, obj);
     this->ros_subs[topic] = subscriber;
-    ROS_INFO(INFO_SUB_INIT, topic.c_str());
 
     return 0;
   }

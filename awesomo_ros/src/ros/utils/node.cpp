@@ -40,17 +40,6 @@ int ROSNode::configure(const std::string node_name, int hz) {
   this->ros_rate = new ::ros::Rate(hz);
   this->configured = true;
 
-  // print mode
-  if (this->debug_mode) {
-    ROS_INFO(INFO_DEBUG_MODE, this->ros_node_name.c_str());
-  }
-  if (this->sim_mode) {
-    ROS_INFO(INFO_SIM_MODE, this->ros_node_name.c_str());
-  }
-  if (!this->debug_mode && !this->sim_mode) {
-    ROS_INFO(INFO_NORMAL_MODE, this->ros_node_name.c_str());
-  }
-
   return 0;
 }
 
@@ -62,7 +51,7 @@ void ROSNode::shutdownCallback(const std_msgs::Bool &msg) {
 
 int ROSNode::registerShutdown(std::string topic) {
   bool retval;
-  ::ros::Subscriber subscriber;
+  ::ros::Subscriber sub;
 
   // pre-check
   if (this->configured == false) {
@@ -70,10 +59,8 @@ int ROSNode::registerShutdown(std::string topic) {
   }
 
   // register subscriber
-  ROS_INFO(INFO_SUB_INIT, topic.c_str());
-  subscriber =
-    this->ros_nh->subscribe(topic, 1, &ROSNode::shutdownCallback, this);
-  this->ros_subs[topic] = subscriber;
+  sub = this->ros_nh->subscribe(topic, 1, &ROSNode::shutdownCallback, this);
+  this->ros_subs[topic] = sub;
 }
 
 int ROSNode::registerImagePublisher(const std::string &topic) {
@@ -85,7 +72,6 @@ int ROSNode::registerImagePublisher(const std::string &topic) {
   // image transport
   image_transport::ImageTransport it(*this->ros_nh);
   this->img_pub = it.advertise(topic, 1);
-  ROS_INFO(INFO_PUB_INIT, topic.c_str());
 
   return 0;
 }
