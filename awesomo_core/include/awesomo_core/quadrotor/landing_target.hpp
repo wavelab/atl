@@ -7,9 +7,10 @@ namespace awesomo {
 
 class LandingTarget {
 public:
-  Vec3 target_bpf;
-  bool target_detected;
-  bool target_losted;
+  Vec3 position_bf;
+  Vec3 velocity_bf;
+  bool detected;
+  bool losted;
   struct timespec first_seen;
   struct timespec last_seen;
 
@@ -17,7 +18,7 @@ public:
 
   LandingTarget(void);
   bool isTargetLosted(void);
-  void setTargetPosition(Vec3 position, bool detected);
+  void setTarget(Vec3 position, Vec3 velocity, bool detected);
   double tracked(void);
   void reset(void);
   void update(void);

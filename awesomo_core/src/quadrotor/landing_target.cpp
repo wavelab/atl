@@ -4,9 +4,10 @@
 namespace awesomo {
 
 LandingTarget::LandingTarget(void) {
-  this->target_bpf << 0.0, 0.0, 0.0;
-  this->target_detected = false;
-  this->target_losted = true;
+  this->position_bf << 0.0, 0.0, 0.0;
+  this->velocity_bf << 0.0, 0.0, 0.0;
+  this->detected = false;
+  this->losted = true;
   this->first_seen = (struct timespec){0};
   this->last_seen = (struct timespec){0};
 
@@ -22,10 +23,11 @@ bool LandingTarget::isTargetLosted(void) {
   return false;
 }
 
-void LandingTarget::setTargetPosition(Vec3 position, bool detected) {
+void LandingTarget::setTarget(Vec3 position, Vec3 velocity, bool detected) {
   // update target position and detected
-  this->target_bpf = position;
-  this->target_detected = detected;
+  this->position_bf = position;
+  this->velocity_bf = velocity;
+  this->detected = detected;
 
   // initialize target first seen
   if (this->first_seen.tv_sec == 0) {
@@ -34,7 +36,7 @@ void LandingTarget::setTargetPosition(Vec3 position, bool detected) {
 
   // update target last seen
   if (detected) {
-    this->target_losted = false;
+    this->losted = false;
     tic(&this->last_seen);
   }
 }
@@ -44,9 +46,10 @@ double LandingTarget::tracked(void) {
 }
 
 void LandingTarget::reset(void) {
-  this->target_bpf << 0.0, 0.0, 0.0;
-  this->target_detected = false;
-  this->target_losted = true;
+  this->position_bf << 0.0, 0.0, 0.0;
+  this->velocity_bf << 0.0, 0.0, 0.0;
+  this->detected = false;
+  this->losted = true;
   this->first_seen = (struct timespec){0};
   this->last_seen = (struct timespec){0};
 }

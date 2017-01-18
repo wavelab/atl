@@ -21,9 +21,10 @@ ADD_MESSAGE_FILES(
     DIRECTORY msgs
     FILES
     AprilTagPose.msg
-    PIDSettings.msg
+    LandingTarget.msg
     PCtrlStats.msg
     PCtrlSettings.msg
+    PIDSettings.msg
     TCtrlStats.msg
     TCtrlSettings.msg
     VCtrlStats.msg
