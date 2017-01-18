@@ -11,40 +11,34 @@
 
 #include <awesomo_core/awesomo_core.hpp>
 
-#include <awesomo_msgs/KFPlot.h>
-#include <awesomo_msgs/KFStats.h>
 #include <awesomo_msgs/AprilTagPose.h>
 #include <awesomo_msgs/PCtrlStats.h>
 #include <awesomo_msgs/PCtrlSettings.h>
+#include <awesomo_msgs/TCtrlStats.h>
+#include <awesomo_msgs/TCtrlSettings.h>
+#include <awesomo_msgs/VCtrlStats.h>
+#include <awesomo_msgs/VCtrlSettings.h>
 
 
 namespace awesomo {
 
-void buildPCtrlStatsMsg(int seq,
-                        ros::Time time,
-                        PositionController controller,
-                        awesomo_msgs::PCtrlStats &msg);
-void buildAttitudeMsg(int seq,
-                      ros::Time time,
-                      AttitudeCommand att_cmd,
-                      geometry_msgs::PoseStamped &msg,
-                      std_msgs::Float64 &thr_msg);
-void buildKFStatsMsg(int seq,
-                     ros::Time time,
-                     KalmanFilter estimator,
-                     awesomo_msgs::KFStats &msg);
-void buildKFPlotMsg(int seq,
-                    ros::Time time,
-                    KalmanFilter estimator,
-                    awesomo_msgs::KFPlot &msg);
-void buildAprilTagPoseMsg(TagPose tag, awesomo_msgs::AprilTagPose &msg);
-void buildAprilTagTrackMsg(TagPose tag, geometry_msgs::Vector3 &msg);
-void buildPCtrlSettingsMsg(PositionController pc,
-                           awesomo_msgs::PCtrlSettings &msg);
-void buildVector3Msg(Vec3 vec, geometry_msgs::Vector3 &msg);
-Pose convertPoseStampedMsg2Pose(geometry_msgs::PoseStamped msg);
-Vec3 convertVector3Msg2Vec3(geometry_msgs::Vector3 msg);
-TagPose convertAprilTagPoseMsg2TagPose(awesomo_msgs::AprilTagPose msg);
+void buildMsg(int seq,
+              ros::Time time,
+              AttitudeCommand att_cmd,
+              geometry_msgs::PoseStamped &msg,
+              std_msgs::Float64 &thr_msg);
+void buildMsg(TagPose tag, awesomo_msgs::AprilTagPose &msg);
+void buildMsg(TagPose tag, geometry_msgs::Vector3 &msg);
+void buildMsg(PositionController pc, awesomo_msgs::PCtrlStats &msg);
+void buildMsg(PositionController pc, awesomo_msgs::PCtrlSettings &msg);
+void buildMsg(TrackingController controller, awesomo_msgs::TCtrlStats &msg);
+void buildMsg(TrackingController pc, awesomo_msgs::TCtrlSettings &msg);
+void buildMsg(Vec3 vec, geometry_msgs::Vector3 &msg);
+
+Pose convertMsg(geometry_msgs::PoseStamped msg);
+VecX convertMsg(geometry_msgs::TwistStamped msg);
+Vec3 convertMsg(geometry_msgs::Vector3 msg);
+TagPose convertMsg(awesomo_msgs::AprilTagPose msg);
 
 }  // end of awesomo namespace
 #endif

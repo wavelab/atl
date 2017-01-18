@@ -50,6 +50,7 @@ public:
 
   PositionController position_controller;
   TrackingController tracking_controller;
+  VelocityController velocity_controller;
   AttitudeCommand att_cmd;
 
   double min_discover_time;
@@ -61,6 +62,7 @@ public:
   enum Mode current_mode;
   double heading;
   Pose pose;
+  Vec3 velocity;
   Vec3 hover_position;
   LandingTarget landing_target;
 
@@ -68,6 +70,7 @@ public:
   int configure(std::string config_path);
   void setMode(enum Mode mode);
   void setPose(Pose pose);
+  void setVelocity(Vec3 velocity);
   void setTargetPosition(Vec3 position, bool detected);
   void setHoverXYPosition(Vec3 position);
   void setHoverPosition(Vec3 position);

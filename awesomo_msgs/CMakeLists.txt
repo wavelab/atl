@@ -20,13 +20,14 @@ FIND_PACKAGE(
 ADD_MESSAGE_FILES(
     DIRECTORY msgs
     FILES
-    GimbalSetPoint.msg
-    KFPlot.msg
-    KFStats.msg
-    PCtrlStats.msg
     AprilTagPose.msg
     PIDSettings.msg
+    PCtrlStats.msg
     PCtrlSettings.msg
+    TCtrlStats.msg
+    TCtrlSettings.msg
+    VCtrlStats.msg
+    VCtrlSettings.msg
 )
 GENERATE_MESSAGES(DEPENDENCIES std_msgs geometry_msgs)
 

@@ -36,13 +36,13 @@ int AprilTagNode::configure(const std::string &node_name, int hz) {
 
 void AprilTagNode::publishTagPoseMsg(TagPose tag) {
   awesomo_msgs::AprilTagPose msg;
-  buildAprilTagPoseMsg(tag, msg);
+  buildMsg(tag, msg);
   this->ros_pubs[TARGET_POSE_TOPIC].publish(msg);
 }
 
 void AprilTagNode::publishTargetBodyPositionMsg(void) {
   geometry_msgs::Vector3 msg;
-  buildVector3Msg(this->target_bpf, msg);
+  buildMsg(this->target_bpf, msg);
   this->ros_pubs[TARGET_BPF_TOPIC].publish(msg);
 }
 
@@ -57,7 +57,7 @@ void AprilTagNode::publishTargetInertialPositionMsg(Vec3 gimbal_position) {
   target_if = gimbal_position + target_enu;
 
   // build and publish msg
-  buildVector3Msg(target_if, msg);
+  buildMsg(target_if, msg);
   this->ros_pubs[TARGET_IF_TOPIC].publish(msg);
 }
 

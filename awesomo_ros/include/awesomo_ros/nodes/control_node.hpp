@@ -33,8 +33,6 @@ namespace awesomo {
 #define SETPOINT_THROTTLE_TOPIC "/mavros/setpoint_attitude/att_throttle"
 #define SETPOINT_POSITION_TOPIC "/mavros/setpoint_position/local"
 #define PCTRL_STATS_TOPIC "/awesomo/position_controller/stats"
-#define KF_STATS_TOPIC "/awesomo/kf_estimation/stats"
-#define KF_PLOT_TOPIC "/awesomo/kf_estimation/plot"
 #define PCTRL_GET_TOPIC "/awesomo/control/position_controller/get"
 
 // SUBSCRIBE TOPICS
@@ -43,6 +41,7 @@ namespace awesomo {
 #define SHUTDOWN "/awesomo/control/shutdown"
 #define STATE_TOPIC "/mavros/state"
 #define POSE_TOPIC "/mavros/local_position/pose"
+#define VELOCITY_TOPIC "/mavros/local_position/velocity"
 #define RADIO_TOPIC "/mavros/rc/in"
 #define TARGET_LOCAL_TOPIC "/awesomo/estimate/landing_target/body"
 #define HOVER_SET_TOPIC "/awesomo/control/hover/set"
@@ -71,6 +70,7 @@ public:
   int setOffboardModeOn(void);
   void stateCallback(const mavros_msgs::State::ConstPtr &msg);
   void poseCallback(const geometry_msgs::PoseStamped &msg);
+  void velocityCallback(const geometry_msgs::TwistStamped &msg);
   void targetLocalCallback(const geometry_msgs::Vector3 &msg);
   void radioCallback(const mavros_msgs::RCIn &msg);
   void hoverSetCallback(const geometry_msgs::Vector3 &msg);

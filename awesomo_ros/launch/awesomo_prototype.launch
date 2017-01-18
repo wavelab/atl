@@ -8,7 +8,6 @@
   <param name="debug_mode" value="false" />
 
   <!-- prototype -->
-
   <param name="pose_stamped_mode" value="true" />
   <param name="position_topic" value="/awesomo/gimbal/position/inertial" />
   <param name="orientation_topic" value="/awesomo/gimbal/joint/orientation/inertial" />

@@ -74,7 +74,7 @@ void EstimatorNode::resetLTKF(Vec3 target_wpf) {
 }
 
 void EstimatorNode::quadPoseCallback(const geometry_msgs::PoseStamped &msg) {
-  this->quad_pose = convertPoseStampedMsg2Pose(msg);
+  this->quad_pose = convertMsg(msg);
 }
 
 void EstimatorNode::targetWorldCallback(const geometry_msgs::Vector3 &msg) {
@@ -89,7 +89,7 @@ void EstimatorNode::targetWorldCallback(const geometry_msgs::Vector3 &msg) {
 
   // update target
   this->target_detected = true;
-  this->target_wpf = convertVector3Msg2Vec3(msg);
+  this->target_wpf = convertMsg(msg);
   tic(&this->target_last_updated);
 
   // initialize or reset estimator
@@ -103,7 +103,7 @@ void EstimatorNode::publishLTKFWorldEstimate(void) {
   Vec3 estimate;
 
   estimate << this->lt_kf.mu(0), this->lt_kf.mu(1), this->lt_kf.mu(2);
-  buildVector3Msg(estimate, msg);
+  buildMsg(estimate, msg);
 
   this->ros_pubs[LT_INERTIAL_TOPIC].publish(msg);
 }
@@ -125,7 +125,7 @@ void EstimatorNode::publishLTKFLocalEstimate(void) {
   this->target_bpf(2) = estimate_enu(2);
 
   // build an publish msg
-  buildVector3Msg(this->target_bpf, msg);
+  buildMsg(this->target_bpf, msg);
   this->ros_pubs[LT_BODY_TOPIC].publish(msg);
 }
 
@@ -134,14 +134,14 @@ void EstimatorNode::publishLTKFVelocityEstimate(void) {
   Vec3 estimate;
 
   estimate << this->lt_kf.mu(3), this->lt_kf.mu(4), this->lt_kf.mu(5);
-  buildVector3Msg(estimate, msg);
+  buildMsg(estimate, msg);
 
   this->ros_pubs[LT_VELOCITY_TOPIC].publish(msg);
 }
 
 void EstimatorNode::publishGimbalSetpointAttitudeMsg(Vec3 setpoints) {
   geometry_msgs::Vector3 msg;
-  buildVector3Msg(setpoints, msg);
+  buildMsg(setpoints, msg);
   this->ros_pubs[GIMBAL_SETPOINT_ATTITUDE_TOPIC].publish(msg);
 }
 

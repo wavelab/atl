@@ -8,6 +8,7 @@ Quadrotor::Quadrotor(void) {
 
   this->position_controller = PositionController();
   this->tracking_controller = TrackingController();
+  // this->velocity_controller = VelocityController();
   this->att_cmd = AttitudeCommand();
 
   this->min_discover_time = FLT_MAX;
@@ -33,6 +34,10 @@ int Quadrotor::configure(std::string config_path) {
   // tracking controller
   config_file = config_path + "/controllers/" + "tracking_controller.yaml";
   CONFIGURE_CONTROLLER(this->tracking_controller, config_file, FCONFTCTRL);
+
+  // velocity controller
+  config_file = config_path + "/controllers/" + "velocity_controller.yaml";
+  CONFIGURE_CONTROLLER(this->velocity_controller, config_file, FCONFTCTRL);
 
   // load config
   // clang-format off
@@ -76,6 +81,10 @@ void Quadrotor::setMode(enum Mode mode) {
 
 void Quadrotor::setPose(Pose pose) {
   this->pose = pose;
+}
+
+void Quadrotor::setVelocity(Vec3 velocity) {
+  this->velocity = velocity;
 }
 
 void Quadrotor::setTargetPosition(Vec3 position, bool detected) {
@@ -153,7 +162,7 @@ int Quadrotor::stepDiscoverMode(double dt) {
 
 int Quadrotor::stepTrackingMode(double dt) {
   Vec3 errors, position;
-  Vec4 output;
+  Vec4 tctrl_output, vctrl_output;
   bool conditions[3];
 
   // pre-check
@@ -168,8 +177,12 @@ int Quadrotor::stepTrackingMode(double dt) {
   errors(2) = this->hover_position(2) - position(2);
 
   // track target
-  output = this->tracking_controller.calculate(errors, this->heading, dt);
-  this->att_cmd = AttitudeCommand(output);
+  tctrl_output = this->tracking_controller.calculate(errors, this->heading, dt);
+  // vctrl_output = this->velocity_controller.calculate(errors, dt);
+  this->att_cmd = AttitudeCommand(tctrl_output);
+  // this->att_cmd = AttitudeCommand(tctrl_output + vctrl_output);
+
+  // update hover position and tracking timer
   this->setHoverXYPosition(position);
   if (this->tracking_tic.tv_sec == 0) {
     tic(&this->tracking_tic);

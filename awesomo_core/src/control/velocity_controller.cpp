@@ -27,14 +27,14 @@ int VelocityController::configure(std::string config_file) {
 
   // load config
   // clang-format off
-  parser.addParam<double>("vx_controller.roll_min", &this->roll_limit[0]);
-  parser.addParam<double>("vx_controller.roll_max", &this->roll_limit[1]);
+  parser.addParam<double>("vx_controller.pitch_min", &this->pitch_limit[0]);
+  parser.addParam<double>("vx_controller.pitch_max", &this->pitch_limit[1]);
   parser.addParam<double>("vx_controller.k_p", &this->vx_controller.k_p);
   parser.addParam<double>("vx_controller.k_i", &this->vx_controller.k_i);
   parser.addParam<double>("vx_controller.k_d", &this->vx_controller.k_d);
 
-  parser.addParam<double>("vy_controller.pitch_min", &this->pitch_limit[0]);
-  parser.addParam<double>("vy_controller.pitch_max", &this->pitch_limit[1]);
+  parser.addParam<double>("vy_controller.roll_min", &this->roll_limit[0]);
+  parser.addParam<double>("vy_controller.roll_max", &this->roll_limit[1]);
   parser.addParam<double>("vy_controller.k_p", &this->vy_controller.k_p);
   parser.addParam<double>("vy_controller.k_i", &this->vy_controller.k_i);
   parser.addParam<double>("vy_controller.k_d", &this->vy_controller.k_d);
