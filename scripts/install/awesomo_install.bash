@@ -14,9 +14,11 @@ sudo -v
 # sudo bash $SCRIPT_PATH/pointgrey_install.bash
 # sudo $SCRIPT_PATH/apriltags_swathmore_install.bash
 sudo $SCRIPT_PATH/apriltags_mit_install.bash
-sudo apt-get install -y ros-$ROS_VERSION-mavros \
-                        ros-$ROS_VERSION-mavros-extras \
-                        ros-$ROS_VERSION-mavros-msgs
+sudo apt-get install -y \
+    libcgal-* \
+    ros-$ROS_VERSION-mavros \
+    ros-$ROS_VERSION-mavros-extras \
+    ros-$ROS_VERSION-mavros-msgs
 
 # link repo to catkin workspace
 if [ ! -d "$CATKIN_PATH/src/awesomo" ]; then
