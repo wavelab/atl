@@ -132,11 +132,20 @@ void ControlNode::radioCallback(const mavros_msgs::RCIn &msg) {
 }
 
 void ControlNode::targetLocalCallback(const geometry_msgs::Vector3 &msg) {
-  Vec3 target_bpf;
-  target_bpf(0) = msg.x;
-  target_bpf(1) = msg.y;
-  target_bpf(2) = msg.z;
-  this->quadrotor.setTargetPosition(target_bpf, true);
+  bool detected;
+  Vec3 position, velocity;
+
+  detected = true;
+
+  position(0) = msg.x;
+  position(1) = msg.y;
+  position(2) = msg.z;
+
+  velocity(0) = 0.0;
+  velocity(1) = 0.0;
+  velocity(2) = 0.0;
+
+  this->quadrotor.setTarget(position, velocity, detected);
 }
 
 int ControlNode::loopCallback(void) {

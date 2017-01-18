@@ -17,6 +17,7 @@ int EstimatorNode::configure(std::string node_name, int hz) {
   this->registerPublisher<geometry_msgs::Vector3>(LT_VELOCITY_TOPIC);
   this->registerPublisher<geometry_msgs::Vector3>(GIMBAL_SETPOINT_ATTITUDE_TOPIC);
   this->registerSubscriber(QUAD_POSE_TOPIC, &EstimatorNode::quadPoseCallback, this);
+  this->registerSubscriber(QUAD_VELOCITY_TOPIC, &EstimatorNode::quadVelocityCallback, this);
   this->registerSubscriber(TARGET_INERTIAL_TOPIC, &EstimatorNode::targetWorldCallback, this);
   this->registerLoopCallback(std::bind(&EstimatorNode::loopCallback, this));
   // clang-format on
@@ -25,7 +26,7 @@ int EstimatorNode::configure(std::string node_name, int hz) {
   return 0;
 }
 
-void EstimatorNode::initLTKF(Vec3 target_wpf) {
+void EstimatorNode::initLTKF(Vec3 target_wf) {
   VecX mu(9);
   MatX R(9, 9), C(6, 9), Q(6, 6);
 
@@ -33,7 +34,7 @@ void EstimatorNode::initLTKF(Vec3 target_wpf) {
   // clang-format off
 
   // state estimates
-  mu << target_wpf(0), target_wpf(1), target_wpf(2),
+  mu << target_wf(0), target_wf(1), target_wf(2),
         0.0, 0.0, 0.0,
         0.0, 0.0, 0.0;
 
@@ -69,12 +70,18 @@ void EstimatorNode::initLTKF(Vec3 target_wpf) {
   this->lt_kf.init(mu, R, C, Q);
 }
 
-void EstimatorNode::resetLTKF(Vec3 target_wpf) {
-  this->initLTKF(target_wpf);
+void EstimatorNode::resetLTKF(Vec3 target_wf) {
+  this->initLTKF(target_wf);
 }
 
 void EstimatorNode::quadPoseCallback(const geometry_msgs::PoseStamped &msg) {
   this->quad_pose = convertMsg(msg);
+}
+
+void EstimatorNode::quadVelocityCallback(const geometry_msgs::TwistStamped &msg) {
+  VecX twist;
+  twist = convertMsg(msg);
+  this->quad_velocity = twist.block(0, 0, 3, 1);
 }
 
 void EstimatorNode::targetWorldCallback(const geometry_msgs::Vector3 &msg) {
@@ -89,12 +96,12 @@ void EstimatorNode::targetWorldCallback(const geometry_msgs::Vector3 &msg) {
 
   // update target
   this->target_detected = true;
-  this->target_wpf = convertMsg(msg);
+  this->target_wf = convertMsg(msg);
   tic(&this->target_last_updated);
 
   // initialize or reset estimator
   if (this->lt_kf.initialized == false || lt_kf_reset) {
-    this->initLTKF(this->target_wpf);
+    this->initLTKF(this->target_wf);
   }
 }
 
@@ -110,22 +117,22 @@ void EstimatorNode::publishLTKFWorldEstimate(void) {
 
 void EstimatorNode::publishLTKFLocalEstimate(void) {
   geometry_msgs::Vector3 msg;
-  Vec3 estimate_enu;
+  Vec3 position_enu;
 
   // transform from world to body frame
   // clang-format off
-  estimate_enu << this->lt_kf.mu(0) - this->quad_pose.position(0),
+  position_enu << this->lt_kf.mu(0) - this->quad_pose.position(0),
                   this->lt_kf.mu(1) - this->quad_pose.position(1),
                   this->lt_kf.mu(2) - this->quad_pose.position(2);
   // clang-format on
 
   // transform from ENU to NWU
-  this->target_bpf(0) = estimate_enu(1);
-  this->target_bpf(1) = -estimate_enu(0);
-  this->target_bpf(2) = estimate_enu(2);
+  this->target_bf(0) = position_enu(1);
+  this->target_bf(1) = -position_enu(0);
+  this->target_bf(2) = position_enu(2);
 
-  // build an publish msg
-  buildMsg(this->target_bpf, msg);
+  // build and publish msg
+  buildMsg(this->target_bf, msg);
   this->ros_pubs[LT_BODY_TOPIC].publish(msg);
 }
 
@@ -150,9 +157,13 @@ void EstimatorNode::trackTarget(void) {
   Vec3 setpoints;
 
   // calculate roll pitch yaw setpoints
-  dist = this->target_bpf.norm();
-  setpoints(0) = asin(this->target_bpf(1) / dist);   // roll
-  setpoints(1) = -asin(this->target_bpf(0) / dist);  // pitch
+  dist = this->target_bf.norm();
+  std::cout << this->target_bf.transpose() << std::endl;
+  std::cout << this->target_bf.norm() << std::endl;
+  std::cout << std::endl;
+
+  setpoints(0) = asin(this->target_bf(1) / dist);   // roll
+  setpoints(1) = -asin(this->target_bf(0) / dist);  // pitch
   setpoints(2) = 0.0;                                // yaw
 
   this->publishGimbalSetpointAttitudeMsg(setpoints);
@@ -192,14 +203,14 @@ int EstimatorNode::loopCallback(void) {
          0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0;
 
-    y << this->target_wpf(0),
-         this->target_wpf(1),
-         this->target_wpf(2),
-         this->target_wpf(0) - this->target_last_wpf(0),
-         this->target_wpf(1) - this->target_last_wpf(1),
-         this->target_wpf(2) - this->target_last_wpf(2);
+    y << this->target_wf(0),
+         this->target_wf(1),
+         this->target_wf(2),
+         this->target_wf(0) - this->target_last_wf(0),
+         this->target_wf(1) - this->target_last_wf(1),
+         this->target_wf(2) - this->target_last_wf(2);
 
-    this->target_last_wpf = this->target_wpf;
+    this->target_last_wf = this->target_wf;
     // clang-format on
 
   } else {
@@ -216,14 +227,16 @@ int EstimatorNode::loopCallback(void) {
   // estimate
   this->lt_kf.C = C;
   this->lt_kf.estimate(A, y);
-  this->target_detected = false;
-  this->target_wpf << 0.0, 0.0, 0.0;
 
   // publish
   this->publishLTKFWorldEstimate();
   this->publishLTKFLocalEstimate();
   this->publishLTKFVelocityEstimate();
   this->trackTarget();
+
+  // reset
+  this->target_detected = false;
+  this->target_wf << 0.0, 0.0, 0.0;
 
   return 0;
 }

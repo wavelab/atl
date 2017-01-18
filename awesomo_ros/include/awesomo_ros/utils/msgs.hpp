@@ -12,6 +12,7 @@
 #include <awesomo_core/awesomo_core.hpp>
 
 #include <awesomo_msgs/AprilTagPose.h>
+#include <awesomo_msgs/LandingTarget.h>
 #include <awesomo_msgs/PCtrlStats.h>
 #include <awesomo_msgs/PCtrlSettings.h>
 #include <awesomo_msgs/TCtrlStats.h>

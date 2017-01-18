@@ -87,9 +87,7 @@ void Quadrotor::setVelocity(Vec3 velocity) {
   this->velocity = velocity;
 }
 
-void Quadrotor::setTargetPosition(Vec3 position, bool detected) {
-  Vec3 velocity;
-  velocity << 0.0, 0.0, 0.0;
+void Quadrotor::setTarget(Vec3 position, Vec3 velocity, bool detected) {
   this->landing_target.setTarget(position, velocity, detected);
 }
 
