@@ -45,6 +45,7 @@ namespace awesomo {
 #define TARGET_BODY_VELOCITY_TOPIC "/awesomo/estimate/landing_target/velocity/body"
 #define TARGET_DETECTED_TOPIC "/awesomo/estimate/landing_target/detected"
 #define HOVER_SET_TOPIC "/awesomo/control/hover/set"
+#define HOVER_HEIGHT_SET_TOPIC "/awesomo/control/hover/height/set"
 #define PCTRL_SET_TOPIC "/awesomo/control/position_controller/set"
 
 class ControlNode : public ROSNode {
@@ -76,6 +77,7 @@ public:
   void targetDetectedCallback(const std_msgs::Bool &msg);
   void radioCallback(const mavros_msgs::RCIn &msg);
   void hoverSetCallback(const geometry_msgs::Vector3 &msg);
+  void hoverHeightSetCallback(const std_msgs::Float64 &msg);
   void positionControllerSetCallback(const awesomo_msgs::PCtrlSettings &msg);
   int loopCallback(void);
   void publishStats(void);

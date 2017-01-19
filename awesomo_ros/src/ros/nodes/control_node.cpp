@@ -34,6 +34,7 @@ int ControlNode::configure(const std::string node_name, int hz) {
   this->registerSubscriber(TARGET_BODY_VELOCITY_TOPIC, &ControlNode::targetVelocityCallback, this);
   this->registerSubscriber(TARGET_DETECTED_TOPIC, &ControlNode::targetDetectedCallback, this);
   this->registerSubscriber(HOVER_SET_TOPIC, &ControlNode::hoverSetCallback, this);
+  this->registerSubscriber(HOVER_HEIGHT_SET_TOPIC, &ControlNode::hoverHeightSetCallback, this);
   this->registerSubscriber(PCTRL_SET_TOPIC, &ControlNode::positionControllerSetCallback, this);
   // clang-format on
 
@@ -202,6 +203,10 @@ void ControlNode::hoverSetCallback(const geometry_msgs::Vector3 &msg) {
   this->quadrotor.hover_position(2) = msg.z;
 }
 
+void ControlNode::hoverHeightSetCallback(const std_msgs::Float64 &msg) {
+  this->quadrotor.hover_position(2) = msg.data;
+}
+
 void ControlNode::positionControllerSetCallback(
   const awesomo_msgs::PCtrlSettings &msg) {
   PositionController *position_controller;
@@ -225,7 +230,6 @@ void ControlNode::positionControllerSetCallback(
   position_controller->z_controller.k_d = msg.throttle_controller.k_d;
   position_controller->hover_throttle = msg.hover_throttle;
 }
-
 
 }  // end of awesomo namespace
 
