@@ -22,7 +22,7 @@ public:
 
   double roll_limit[2];
   double pitch_limit[2];
-  double hover_throttle;
+  double throttle_limit[2];
 
   Vec3 setpoints;
   Vec4 outputs;

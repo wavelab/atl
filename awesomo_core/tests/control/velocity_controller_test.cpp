@@ -31,7 +31,8 @@ TEST(VelocityController, constructor) {
   ASSERT_FLOAT_EQ(0.0, controller.pitch_limit[0]);
   ASSERT_FLOAT_EQ(0.0, controller.pitch_limit[1]);
 
-  ASSERT_FLOAT_EQ(0.0, controller.hover_throttle);
+  ASSERT_FLOAT_EQ(0.0, controller.throttle_limit[0]);
+  ASSERT_FLOAT_EQ(0.0, controller.throttle_limit[1]);
 
   ASSERT_FLOAT_EQ(0.0, controller.setpoints(0));
   ASSERT_FLOAT_EQ(0.0, controller.setpoints(1));
@@ -70,7 +71,8 @@ TEST(VelocityController, configure) {
   ASSERT_FLOAT_EQ(deg2rad(-40.0), deg2rad(controller.pitch_limit[0]));
   ASSERT_FLOAT_EQ(deg2rad(40.0), deg2rad(controller.pitch_limit[1]));
 
-  ASSERT_FLOAT_EQ(0.6, controller.hover_throttle);
+  ASSERT_FLOAT_EQ(-1.0, controller.throttle_limit[0]);
+  ASSERT_FLOAT_EQ(1.0, controller.throttle_limit[1]);
 
   ASSERT_FLOAT_EQ(0.0, controller.setpoints(0));
   ASSERT_FLOAT_EQ(0.0, controller.setpoints(1));
@@ -100,7 +102,7 @@ TEST(VelocityController, calculate) {
 
   ASSERT_FLOAT_EQ(0.0, controller.outputs(0));
   ASSERT_FLOAT_EQ(0.0, controller.outputs(1));
-  ASSERT_FLOAT_EQ(controller.hover_throttle, controller.outputs(3));
+  ASSERT_FLOAT_EQ(0.0, controller.outputs(3));
 
   // CHECK MOVING TOWARDS THE X LOCATION
   setpoints << 1, 0, 0;

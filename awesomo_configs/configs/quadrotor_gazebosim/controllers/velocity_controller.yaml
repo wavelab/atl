@@ -11,7 +11,8 @@ vy_controller:
     k_i: 0.0
     k_d: 0.01
 vz_controller:
-    hover_throttle: 0.5
+    throttle_min: -1.0
+    throttle_max: 1.0
     k_p: 0.1
     k_i: 0.0
     k_d: 0.01

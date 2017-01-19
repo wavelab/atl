@@ -15,7 +15,8 @@ VelocityController::VelocityController(void) {
   this->roll_limit[1] = 0.0;
   this->pitch_limit[0] = 0.0;
   this->pitch_limit[1] = 0.0;
-  this->hover_throttle = 0.0;
+  this->throttle_limit[0] = 0.0;
+  this->throttle_limit[1] = 0.0;
 
   this->setpoints << 0.0, 0.0, 0.0;
   this->outputs << 0.0, 0.0, 0.0, 0.0;
@@ -39,7 +40,8 @@ int VelocityController::configure(std::string config_file) {
   parser.addParam<double>("vy_controller.k_i", &this->vy_controller.k_i);
   parser.addParam<double>("vy_controller.k_d", &this->vy_controller.k_d);
 
-  parser.addParam<double>("vz_controller.hover_throttle", &this->hover_throttle);
+  parser.addParam<double>("vz_controller.throttle_min", &this->throttle_limit[0]);
+  parser.addParam<double>("vz_controller.throttle_max", &this->throttle_limit[1]);
   parser.addParam<double>("vz_controller.k_p", &this->vz_controller.k_p);
   parser.addParam<double>("vz_controller.k_i", &this->vz_controller.k_i);
   parser.addParam<double>("vz_controller.k_d", &this->vz_controller.k_d);
