@@ -34,6 +34,7 @@ ADD_LIBRARY(
     # estimation
     src/estimation/ekf.cpp
     src/estimation/kf.cpp
+    src/estimation/kf_tracker.cpp
     # planning
     src/planning/planning.cpp
     # quadrotor
@@ -80,6 +81,7 @@ ADD_EXECUTABLE(
     # ESTIMATION
     tests/estimation/ekf_test.cpp
     tests/estimation/kf_test.cpp
+    tests/estimation/kf_tracker_test.cpp
     # PLANNING
     tests/planning/planning_test.cpp
     # QUADROTOR

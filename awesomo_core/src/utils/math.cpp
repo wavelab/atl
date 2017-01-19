@@ -195,15 +195,35 @@ int quat2rot(Quaternion q, Mat3 &R) {
 }
 
 void enu2nwu(Vec3 enu, Vec3 &nwu) {
+  // ENU frame:  (x - right, y - forward, z - up)
+  // NWU frame:  (x - forward, y - left, z - up)
   nwu(0) = enu(1);
   nwu(1) = -enu(0);
   nwu(2) = enu(2);
 }
 
+void cf2nwu(Vec3 cf, Vec3 &nwu) {
+  // camera frame:  (x - right, y - down, z - forward)
+  // NWU frame:  (x - forward, y - left, z - up)
+  nwu(0) = cf(2);
+  nwu(1) = -cf(0);
+  nwu(2) = -cf(1);
+}
+
 void nwu2enu(Vec3 nwu, Vec3 &enu) {
+  // NWU frame:  (x - forward, y - left, z - up)
+  // ENU frame:  (x - right, y - forward, z - up)
   enu(0) = -nwu(1);
   enu(1) = nwu(0);
   enu(2) = nwu(2);
+}
+
+void cf2enu(Vec3 cf, Vec3 &enu) {
+  // camera frame:  (x - right, y - down, z - forward)
+  // ENU frame:  (x - right, y - forward, z - up)
+  enu(0) = cf(0);
+  enu(1) = cf(2);
+  enu(2) = -cf(1);
 }
 
 }  // eof awesomo

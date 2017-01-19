@@ -30,7 +30,9 @@ int euler2quat(Vec3 euler, int euler_seq, Quaternion &q);
 int quat2euler(Quaternion q, int euler_seq, Vec3 &euler);
 int quat2rot(Quaternion q, Mat3 &R);
 void enu2nwu(Vec3 enu, Vec3 &nwu);
+void cf2nwu(Vec3 cf, Vec3 &nwu);
 void nwu2enu(Vec3 nwu, Vec3 &enu);
+void cf2enu(Vec3 cf, Vec3 &nwu);
 
 }  // end of awesomo namespace
 #endif
