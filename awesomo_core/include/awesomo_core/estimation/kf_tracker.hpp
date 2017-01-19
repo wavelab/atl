@@ -6,7 +6,6 @@
 
 namespace awesomo {
 
-#define EINVMODE "Invalid mode [%s]"
 #define ENBDIM "Invalid number of dimensions, have support for 1, 2, or 3!"
 #define EMUSIZE "Initial mu should have size %d but actual is %d!"
 #define ERROWSIZE "Motion noise R should have %d rows but got %d!"

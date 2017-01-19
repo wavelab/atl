@@ -37,9 +37,10 @@
   <node pkg="awesomo_ros" name="awesomo_control" type="control_node" output="screen" />
 
   <!-- apriltag node -->
-  <param name="apriltag_config" type="str" value="$(find awesomo_configs)/configs/apriltag/prototype.yaml" />
+  <param name="apriltag_config" value="$(find awesomo_configs)/configs/apriltag/prototype.yaml" />
   <node pkg="awesomo_ros" name="awesomo_apriltag" type="apriltag_node" output="screen" required="true"/>
 
   <!-- estimate node -->
+  <param name="estimator_config" value="$(find awesomo_configs)/configs/estimator/kf_tracker.yaml" />
   <node pkg="awesomo_ros" name="awesomo_estimator" type="estimator_node" output="screen" required="true"/>
 </launch>

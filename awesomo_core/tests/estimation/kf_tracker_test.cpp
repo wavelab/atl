@@ -58,7 +58,6 @@ TEST(KalmanFilterTracker, estimate) {
   std::normal_distribution<float> norm_y(0, 0.5);
   std::normal_distribution<float> norm_z(0, 0.5);
 
-
   // setup
   // clang-format off
   dt = 0.1;

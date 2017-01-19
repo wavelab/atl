@@ -29,7 +29,7 @@ namespace awesomo {
 
 class EstimatorNode : public ROSNode {
 public:
-  KalmanFilter lt_kf;
+  KalmanFilterTracker estimator;
 
   Pose quad_pose;
   Vec3 quad_velocity;
@@ -41,7 +41,7 @@ public:
   double target_lost_threshold;
 
   EstimatorNode(int argc, char **argv) : ROSNode(argc, argv) {
-    this->lt_kf = KalmanFilter();
+    this->estimator = KalmanFilterTracker();
 
     this->quad_pose = Pose();
     this->target_detected = false;
