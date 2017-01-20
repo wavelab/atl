@@ -14,22 +14,22 @@ namespace awesomo {
 // SUBSCRIBE TOPICS
 
 
-class GimbalNodeTest : public ::testing::Test {
+class NodeTest : public ::testing::Test {
 protected:
   ros::NodeHandle ros_nh;
 
 
-  GimbalNodeTest(void) {
+  NodeTest(void) {
     ros::spinOnce();
     ros::Duration(1.0).sleep();
   }
 
-  void poseCallback(const awesomo_msgs::GimbalPose &msg) {
+  void poseCallback(const awesomo_msgs::Pose &msg) {
     this->pose_msg = msg;
   }
 };
 
-TEST_F(GimbalNodeTest, test) {
+TEST_F(NodeTest, test) {
   ASSERT_TRUE(true);
 }
 

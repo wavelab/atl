@@ -48,6 +48,7 @@ CATKIN_PACKAGE(
         roscpp
         rospy
         std_msgs
+        geometry_msgs
         message_runtime
         awesomo_core
         awesomo_msgs
@@ -111,6 +112,13 @@ ADD_ROSTEST_GTEST(
     tests/camera_test.cpp
 )
 target_link_libraries(camera_test ${TEST_DEPS})
+
+ADD_ROSTEST_GTEST(
+    estimator_test
+    tests/launch/estimator_test.launch
+    tests/estimator_test.cpp
+)
+target_link_libraries(estimator_test ${TEST_DEPS})
 
 # INSTALL LAUNCH FILES
 SET(SHARE_DEST ${CATKIN_PACKAGE_SHARE_DESTINATION})

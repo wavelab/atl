@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 
 #include "awesomo_ros/utils/node.hpp"
-#include "awesomo_ros/nodes/camera_node.hpp"
 
 namespace awesomo {
 
@@ -11,18 +10,18 @@ namespace awesomo {
 // SUBSCRIBE TOPICS
 #define CAMERA_IMAGE_TOPIC "/awesomo/camera/image"
 
-class CameraNodeTest : public ::testing::Test {
+class NodeTest : public ::testing::Test {
 protected:
   ros::NodeHandle ros_nh;
   image_transport::Subscriber image_sub;
 
   cv::Mat image;
 
-  CameraNodeTest(void) {
+  NodeTest(void) {
     image_transport::ImageTransport it(this->ros_nh);
 
     // clang-format off
-    this->image_sub = it.subscribe(CAMERA_IMAGE_TOPIC, 1, &CameraNodeTest::imageCallback, this);
+    this->image_sub = it.subscribe(CAMERA_IMAGE_TOPIC, 1, &NodeTest::imageCallback, this);
     // clang-format on
 
     ros::spinOnce();
@@ -39,7 +38,7 @@ protected:
   }
 };
 
-TEST_F(CameraNodeTest, poseMsg) {
+TEST_F(NodeTest, poseMsg) {
   ros::Duration(1.0).sleep();
   ros::spinOnce();
 

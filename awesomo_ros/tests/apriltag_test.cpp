@@ -10,71 +10,107 @@ namespace awesomo {
 
 // PUBLISH TOPICS
 #define SHUTDOWN_TOPIC "/awesomo/apriltag/shutdown"
-#define IMAGE_TOPIC "/awesomo/camera/image"
+#define IMAGE_TOPIC "/awesomo/camera/image_pose_stamped"
 
 // SUBSCRIBE TOPICS
-#define APRILTAG_POSE_TOPIC "/awesomo/apriltag/pose"
-#define GIMBAL_TRACK_TOPIC "/awesomo/gimbal/track"
+#define TARGET_POSE_TOPIC "/awesomo/apriltag/target"
+#define TARGET_IF_TOPIC "/awesomo/apriltag/target/inertial"
+#define TARGET_BPF_TOPIC "/awesomo/apriltag/target/body"
 
 // TEST DATA
 #define TEST_IMAGE "test_data/image.jpg"
 
-class AprilTagNodeTest : public ::testing::Test {
+class NodeTest : public ::testing::Test {
 protected:
   ros::NodeHandle ros_nh;
-  awesomo_msgs::AprilTagPose pose_msg;
-  geometry_msgs::Vector3 track_msg;
 
   ros::Publisher shutdown_pub;
   image_transport::Publisher image_pub;
-  ros::Subscriber pose_sub;
-  ros::Subscriber track_sub;
 
-  AprilTagNodeTest(void) {
+  ros::Subscriber pose_sub;
+  ros::Subscriber if_sub;
+  ros::Subscriber bf_sub;
+
+  awesomo_msgs::AprilTagPose pose_msg;
+  geometry_msgs::Vector3 inertial_msg;
+  geometry_msgs::Vector3 body_msg;
+
+  NodeTest(void) {
     image_transport::ImageTransport it(this->ros_nh);
 
     // clang-format off
     this->image_pub = it.advertise(IMAGE_TOPIC, 1);
-    this->pose_sub = this->ros_nh.subscribe(APRILTAG_POSE_TOPIC, 1, &AprilTagNodeTest::poseCallback, this);
-    this->track_sub = this->ros_nh.subscribe(GIMBAL_TRACK_TOPIC, 1, &AprilTagNodeTest::trackCallback, this);
+    this->pose_sub = this->ros_nh.subscribe(TARGET_POSE_TOPIC, 1, &NodeTest::poseCallback, this);
+    this->if_sub = this->ros_nh.subscribe(TARGET_IF_TOPIC, 1, &NodeTest::inertialCallback, this);
+    this->bf_sub = this->ros_nh.subscribe(TARGET_BPF_TOPIC, 1, &NodeTest::bodyPlanarCallback, this);
     // clang-format on
 
     ros::spinOnce();
     ros::Duration(1.0).sleep();
   }
 
+  virtual void SetUp(void) {
+    sensor_msgs::ImageConstPtr msg;
+    cv::Mat image;
+
+    // setup image
+    image = cv::imread(TEST_IMAGE);
+    image.at<double>(0, 0) = 0.0;  // position x
+    image.at<double>(0, 1) = 0.0;  // position y
+    image.at<double>(0, 2) = 3.0;  // position z
+
+    image.at<double>(0, 3) = 1.0;  // quaternion w
+    image.at<double>(0, 4) = 0.0;  // quaternion x
+    image.at<double>(0, 5) = 0.0;  // quaternion y
+    image.at<double>(0, 6) = 0.0;  // quaternion z
+
+    // publish image
+    msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", image).toImageMsg();
+    this->image_pub.publish(msg);
+
+    // spin and sleep
+    ros::spinOnce();
+    ros::Duration(1.0).sleep();
+    ros::spinOnce();
+  }
+
   void poseCallback(const awesomo_msgs::AprilTagPose &msg) {
     this->pose_msg = msg;
   }
 
-  void trackCallback(const geometry_msgs::Vector3 &msg) {
-    std::cout << this->track_msg.x << std::endl;
-    std::cout << this->track_msg.y << std::endl;
-    std::cout << this->track_msg.z << std::endl;
-    this->track_msg = msg;
+  void inertialCallback(const geometry_msgs::Vector3 &msg) {
+    this->inertial_msg = msg;
+  }
+
+  void bodyPlanarCallback(const geometry_msgs::Vector3 &msg) {
+    this->body_msg = msg;
   }
 };
 
-TEST_F(AprilTagNodeTest, poseMsg) {
-  sensor_msgs::ImageConstPtr msg;
-  cv::Mat image;
-
-  // publish image
-  image = cv::imread(TEST_IMAGE);
-  msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", image).toImageMsg();
-  this->image_pub.publish(msg);
-  ros::spinOnce();
-  ros::Duration(1.0).sleep();
-  ros::spinOnce();
-
-  // assert
+TEST_F(NodeTest, poseMsg) {
   ASSERT_EQ(1, this->pose_sub.getNumPublishers());
-  ASSERT_EQ(0, this->pose_msg.tag_id);
 
+  ASSERT_EQ(0, this->pose_msg.tag_id);
   ASSERT_TRUE(this->pose_msg.tag_detected);
   ASSERT_NEAR(0.0, this->pose_msg.tag_position.x, 0.2);
   ASSERT_NEAR(0.0, this->pose_msg.tag_position.y, 0.2);
   ASSERT_NEAR(3.0, this->pose_msg.tag_position.z, 0.2);
+}
+
+TEST_F(NodeTest, inertialMsg) {
+  ASSERT_EQ(1, this->if_sub.getNumPublishers());
+
+  ASSERT_NEAR(0.0, this->inertial_msg.x, 0.2);
+  ASSERT_NEAR(0.0, this->inertial_msg.y, 0.2);
+  ASSERT_NEAR(0.0, this->inertial_msg.z, 0.2);
+}
+
+TEST_F(NodeTest, bodyMsg) {
+  ASSERT_EQ(1, this->bf_sub.getNumPublishers());
+
+  ASSERT_NEAR(0.0, this->body_msg.x, 0.2);
+  ASSERT_NEAR(0.0, this->body_msg.y, 0.2);
+  ASSERT_NEAR(-3.0, this->body_msg.z, 0.2);
 }
 
 }  // end of awesomo namespace

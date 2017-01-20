@@ -8,6 +8,8 @@
 #define TEST_EKF_OUTPUT_FILE "/tmp/estimation_ekf_test.output"
 
 
+namespace awesomo {
+
 static int prepareOutputFile(std::ofstream &output_file,
                              std::string output_path) {
   output_file.open(output_path);
@@ -29,8 +31,8 @@ static int prepareOutputFile(std::ofstream &output_file,
 
 static void recordTimeStep(std::ofstream &output_file,
                            int i,
-                           awesomo::Vec3 mea,
-                           awesomo::Vec3 est) {
+                           Vec3 mea,
+                           Vec3 est) {
   // record true state x, y, z
   output_file << i << ",";
   output_file << mea(0) << ",";
@@ -45,24 +47,14 @@ static void recordTimeStep(std::ofstream &output_file,
 
 TEST(ExtendedKalmanFilter, estimate) {
   float dt;
-  awesomo::VecX x(3);
-  awesomo::VecX y(3);
-  awesomo::VecX gaussian_noise(3);
-  awesomo::VecX mu(3);
-  awesomo::VecX u(3);
-  awesomo::MatX R(3, 3);
-  awesomo::MatX Q(3, 3);
-  awesomo::VecX g(3);
-  awesomo::MatX G(3, 3);
-  awesomo::VecX h(3);
-  awesomo::MatX H(3, 3);
-  awesomo::ExtendedKalmanFilter ekf;
+  VecX mu(3), x(3), y(3), u(2), g(3), h(3), gaussian_noise(3);
+  MatX R(3, 3), Q(3, 3), G(3, 3), H(3, 3);
+  ExtendedKalmanFilter ekf;
   std::ofstream output_file;
   std::default_random_engine rgen;
   std::normal_distribution<float> norm_x(0, pow(0.5, 2));
   std::normal_distribution<float> norm_y(0, pow(0.5, 2));
-  std::normal_distribution<float> norm_theta(0,
-                                             pow(awesomo::deg2rad(0.5), 2));
+  std::normal_distribution<float> norm_theta(0, pow(deg2rad(0.5), 2));
 
   // setup
   // clang-format off
@@ -71,17 +63,17 @@ TEST(ExtendedKalmanFilter, estimate) {
   mu << 0, 0, 0;
   R << pow(0.05, 2), 0, 0,
        0, pow(0.05, 2), 0,
-       0, 0, pow(awesomo::deg2rad(0.5), 2);
+       0, 0, pow(deg2rad(0.5), 2);
   Q << pow(0.5, 2), 0, 0,
        0, pow(0.5, 2), 0,
-       0, 0, pow(awesomo::deg2rad(10), 2);
-  u << -15.5, -10.5, 1.5;
+       0, 0, pow(deg2rad(10), 2);
+  u << 1.0, 0.1;
   ekf.init(mu, R, Q);
   prepareOutputFile(output_file, TEST_EKF_OUTPUT_FILE);
   // clang-format on
 
   // loop
-  for (int i = 0; i < 100; i++) {
+  for (int i = 0; i < 10000; i++) {
     // update true state
     // clang-format off
     x << x(0) + u(0) * cos(x(2)) * dt,
@@ -105,7 +97,7 @@ TEST(ExtendedKalmanFilter, estimate) {
     ekf.predictionUpdate(g, G);
 
     // propagate measurement
-    H = awesomo::MatX::Identity(3, 3);
+    H = MatX::Identity(3, 3);
     h = H * ekf.mu;
     ekf.measurementUpdate(h, H, y);
 
@@ -114,3 +106,5 @@ TEST(ExtendedKalmanFilter, estimate) {
   }
   output_file.close();
 }
+
+}  // end of awesomo namespace

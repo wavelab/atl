@@ -19,6 +19,7 @@
     <remap from="/prototype/lz/pose" to="/awesomo/lz/pose" />
     <remap from="/prototype/lz/position/set" to="/awesomo/lz/position/set" />
     <remap from="/prototype/lz/velocity/set" to="/awesomo/lz/velocity/set" />
+    <remap from="/prototype/lz/angular_velocity/set" to="/awesomo/lz/angular_velocity/set" />
   </node>
   <node pkg="prototype_ros" name="prototype_camera" type="camera_node" output="screen" required="true">
     <remap from="/prototype/camera/image" to="/awesomo/camera/image" />
