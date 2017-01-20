@@ -9,6 +9,7 @@ The following instructions assumes you have installed ROS.
 
     cd <your catkin workspace>/src
     git clone https://github.com/wavelab/awesomo
+    cd ..
     catkin_make
     catkin_make tests
     catkin_make install
