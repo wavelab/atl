@@ -70,14 +70,4 @@ int CameraNode::loopCallback(void) {
 
 }  // end of awesomo namespace
 
-int main(int argc, char **argv) {
-  awesomo::CameraNode node(argc, argv);
-
-  if (node.configure(NODE_NAME, NODE_RATE) != 0) {
-    ROS_ERROR("Failed to configure CameraNode!");
-    return -1;
-  }
-  node.loop();
-
-  return 0;
-}
+RUN_ROS_NODE(awesomo::CameraNode, NODE_NAME, NODE_RATE);

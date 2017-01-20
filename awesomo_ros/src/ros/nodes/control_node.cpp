@@ -233,14 +233,4 @@ void ControlNode::positionControllerSetCallback(
 
 }  // end of awesomo namespace
 
-int main(int argc, char **argv) {
-  awesomo::ControlNode node(argc, argv);
-
-  if (node.configure(CONTROL_NODE_NAME, CONTROL_NODE_RATE) != 0) {
-    ROS_ERROR("Failed to configure ControlNode!");
-    return -1;
-  }
-  node.loop();
-
-  return 0;
-}
+RUN_ROS_NODE(awesomo::ControlNode, NODE_NAME, NODE_RATE);

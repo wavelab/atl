@@ -145,14 +145,4 @@ Vec3 AprilTagNode::getTargetInBPF(Vec3 target_cf, Quaternion joint_if) {
 
 }  // end of awesomo namespace
 
-int main(int argc, char **argv) {
-  awesomo::AprilTagNode node(argc, argv);
-
-  if (node.configure(NODE_NAME, NODE_RATE) != 0) {
-    ROS_ERROR("Failed to configure AprilTag Node!");
-    return -1;
-  }
-  node.loop();
-
-  return 0;
-}
+RUN_ROS_NODE(awesomo::AprilTagNode, NODE_NAME, NODE_RATE);

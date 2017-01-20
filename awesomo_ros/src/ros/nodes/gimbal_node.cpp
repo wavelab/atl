@@ -18,20 +18,20 @@ int GimbalNode::configure(std::string node_name, int hz) {
   };
 
   // register publisher and subscribers
-  this->registerPublisher<geometry_msgs::Vector3>(CAMERA_RPY_TOPIC, 1);
-  this->registerPublisher<geometry_msgs::Vector3>(FRAME_RPY_TOPIC, 1);
-  this->registerPublisher<geometry_msgs::Vector3>(IMU_TOPIC, 1);
-  this->registerPublisher<geometry_msgs::Vector3>(GYRO_TOPIC, 1);
-
-  // subscribers
-  this->registerSubscriber(SET_ANGLE_TOPIC, &GimbalNode::setAngleCallback, this);
+  // clang-format off
+  this->registerPublisher<geometry_msgs::Vector3>(CAMERA_RPY_TOPIC);
+  this->registerPublisher<geometry_msgs::Vector3>(FRAME_RPY_TOPIC);
+  this->registerPublisher<geometry_msgs::Vector3>(IMU_TOPIC);
+  this->registerPublisher<geometry_msgs::Vector3>(GYRO_TOPIC);
+  this->registerSubscriber(SET_ATTITUDE_TOPIC, &GimbalNode::setAttitudeCallback, this);
+  // clang-format on
 
   this->registerLoopCallback(std::bind(&GimbalNode::loopCallback, this));
   this->configured = true;
   return 0;
 }
 
-void GimbalNode::setAngleCallback(const geometry_msgs::Vector3 &msg) {
+void GimbalNode::setAttitudeCallback(const geometry_msgs::Vector3 &msg) {
   // TODO update gimbal to take in yaw commands
   this->gimbal.setAngle(msg.x, msg.y);
 }
@@ -74,15 +74,4 @@ int GimbalNode::loopCallback(void) {
 
 }  // end of awesomo namespace
 
-int main(int argc, char **argv) {
-  awesomo::GimbalNode node(argc, argv);
-
-  if (node.configure(GIMBAL_NODE_NAME, GIMBAL_NODE_RATE) != 0) {
-    ROS_ERROR("Failed to configure GimbalNode!");
-    return -1;
-  }
-
-  node.loop();
-
-  return 0;
-}
+RUN_ROS_NODE(awesomo::GimbalNode, NODE_NAME, NODE_RATE);

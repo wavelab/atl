@@ -1,6 +1,6 @@
 # awesomo [![Build Status](https://travis-ci.com/wavelab/awesomo.svg?token=vyEJ7ehiK1iW6rTBostS&branch=ros)](https://travis-ci.com/wavelab/awesomo)
 
-Landing a quadrotor on a moving platform.
+Quadrotor autonomous landing project.
 
 
 ## Install
@@ -9,14 +9,30 @@ The following instructions assumes you have installed ROS.
 
     cd <your catkin workspace>/src
     git clone https://github.com/wavelab/awesomo
-    catkin_build
+    catkin_make
+    catkin_make tests
+    catkin_make install
 
 In short the above navigates to your catkin workspace's `src`, clones `awesomo`
-and finally runs `catkin_build`.
+and finally runs `catkin_make` to build the project, tests and installs configs
+and launch files.
 
 
+## ROS Node Tests
 
-## Licence
+Once you have performed the above instructions you can run ROS node tests via:
+
+    catkin_make run_tests
+
+Or alternatively you can launch individual tests via:
+
+    rostest awesomo_ros apriltag_test.launch
+    rostest awesomo_ros camera_test.launch
+    rostest awesomo_ros estimator_test.launch
+    rostest awesomo_ros gimbal_test.launch
+
+
+## License
 
 Licence LGPL License Copyright (C) <2016> Chris Choi, Stan Brown
 

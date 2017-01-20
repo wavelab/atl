@@ -12,6 +12,17 @@
 namespace awesomo {
 
 #define INFO_CONFIG "Configuring ROS Node [%s]!"
+#define RUN_ROS_NODE(NODE_CLASS, NODE_NAME, NODE_RATE) \
+  int main(int argc, char **argv) { \
+    NODE_CLASS node(argc, argv); \
+    if (node.configure(NODE_NAME, NODE_RATE) != 0) { \
+      ROS_ERROR("Failed to configure NODE_CLASS!"); \
+      return -1; \
+    } \
+    node.loop(); \
+    return 0; \
+  }
+
 
 class ROSNode {
 public:

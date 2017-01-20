@@ -12,8 +12,8 @@
 namespace awesomo {
 
 // NODE SETTINGS
-#define GIMBAL_NODE_NAME "awesomo_gimbal"
-#define GIMBAL_NODE_RATE 100
+#define NODE_NAME "awesomo_gimbal"
+#define NODE_RATE 100
 
 // PUBLISH TOPICS
 #define CAMERA_RPY_TOPIC "/awesomo/gimbal/joint/orientiation/inertial"
@@ -22,7 +22,7 @@ namespace awesomo {
 #define GYRO_TOPIC "/awesomo/gimbal/joint/gyro"
 
 // SUBSCRIBE TOPICS
-#define SET_ANGLE_TOPIC "/awesomo/gimbal/setpoint/attitude"
+#define SET_ATTITUDE_TOPIC "/awesomo/gimbal/setpoint/attitude"
 
 
 class GimbalNode : public ROSNode {
@@ -32,7 +32,7 @@ public:
   GimbalNode(int argc, char **argv) : ROSNode(argc, argv) {}
   int configure(std::string node_name, int hz);
 
-  void setAngleCallback(const geometry_msgs::Vector3 &msg);
+  void setAttitudeCallback(const geometry_msgs::Vector3 &msg);
   int loopCallback(void);
 };
 
