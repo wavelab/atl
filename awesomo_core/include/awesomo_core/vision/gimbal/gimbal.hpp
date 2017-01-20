@@ -9,6 +9,7 @@
 #include "awesomo_core/utils/utils.hpp"
 #include "awesomo_core/vision/gimbal/sbgc.hpp"
 
+#define G 9.80665
 
 namespace awesomo {
 
@@ -30,12 +31,14 @@ public:
   Vec3 rc_angles;
 
   Gimbal(void);
+  ~Gimbal(void);
   int configure(std::string config_path);
   int updateGimbalStates(void);
   Vec3 getTargetPositionInBodyFrame(Vec3 target_cf);
   Vec3 getTargetPositionInBodyPlanarFrame(Vec3 target_cf, Quaternion &imu_if);
   int getTargetPositionInBodyPlanarFrame(Vec3 target_cf, Vec3 &target_bpf);
   int trackTarget(Vec3 target_cf);
+  int shutdownMotors(void);
   void printSetpoints(void);
   int setAngle(double roll, double pitch);
 };
