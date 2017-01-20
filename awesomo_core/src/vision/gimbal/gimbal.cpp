@@ -154,6 +154,36 @@ int Gimbal::trackTarget(Vec3 target_bpf) {
   return 0;
 }
 
+int Gimbal::updateGimbalStates(void) {
+  int retval;
+  retval = this->sbgc.getRealtimeData();
+  if (retval != 0) {
+    return -1;
+  }
+
+  this->imu_accel(0) = deg2rad(this->sbgc.data.accel(0));
+  this->imu_accel(1) = deg2rad(this->sbgc.data.accel(1));
+  this->imu_accel(2) = deg2rad(this->sbgc.data.accel(2));
+
+  this->imu_gyro(0) = deg2rad(this->sbgc.data.gyro(0));
+  this->imu_gyro(1) = deg2rad(this->sbgc.data.gyro(1));
+  this->imu_gyro(2) = deg2rad(this->sbgc.data.gyro(2));
+
+  this->camera_angles(0) = deg2rad(this->sbgc.data.camera_angles(0));
+  this->camera_angles(1) = deg2rad(this->sbgc.data.camera_angles(1));
+  this->camera_angles(2) = deg2rad(this->sbgc.data.camera_angles(2));
+
+  this->frame_angles(0) = deg2rad(this->sbgc.data.frame_angles(0));
+  this->frame_angles(1) = deg2rad(this->sbgc.data.frame_angles(1));
+  this->frame_angles(2) = deg2rad(this->sbgc.data.frame_angles(2));
+
+  this->rc_angles(0) = deg2rad(this->sbgc.data.rc_angles(0));
+  this->rc_angles(1) = deg2rad(this->sbgc.data.rc_angles(1));
+  this->rc_angles(2) = deg2rad(this->sbgc.data.rc_angles(2));
+
+  return 0;
+}
+
 int Gimbal::setAngle(double roll, double pitch) {
   this->setpoints(0) = roll;
   this->setpoints(1) = pitch;

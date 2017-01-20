@@ -2,6 +2,7 @@
 #define __AWESOMO_ROS_NODES_GIMBAL_NODE_HPP__
 
 #include <ros/ros.h>
+#include <geometry_msgs/Vector3.h>
 
 #include <awesomo_core/awesomo_core.hpp>
 
@@ -15,8 +16,13 @@ namespace awesomo {
 #define GIMBAL_NODE_RATE 100
 
 // PUBLISH TOPICS
+#define CAMERA_RPY_TOPIC "/awesomo/gimbal/joint/orientiation/inertial"
+#define FRAME_RPY_TOPIC "/awesomo/gimbal/frame/orientiation/inertial"
+#define IMU_TOPIC "/awesomo/gimbal/joint/imu"
+#define GYRO_TOPIC "/awesomo/gimbal/joint/gyro"
 
 // SUBSCRIBE TOPICS
+#define SET_ANGLE_TOPIC "/awesomo/gimbal/setpoint/attitude"
 
 
 class GimbalNode : public ROSNode {
@@ -25,6 +31,8 @@ public:
 
   GimbalNode(int argc, char **argv) : ROSNode(argc, argv) {}
   int configure(std::string node_name, int hz);
+
+  void setAngleCallback(const geometry_msgs::Vector3 &msg);
   int loopCallback(void);
 };
 
