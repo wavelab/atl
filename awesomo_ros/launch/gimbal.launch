@@ -5,14 +5,6 @@
   <param name="sim_mode" value="true" />
   <param name="gimbal_config" value="$(find awesomo_configs)/configs/gimbal/config.yaml" />
 
-  <!-- publish topics -->
-  <param name="gimbal_pose_topic" value="/awesomo/gimbal/pose" />
-  <param name="gimbal_setpoint_attitude_topic" value="/awesomo/gimbal/setpoint/angle" />
-
-  <!-- subscribe topics -->
-  <param name="gimbal_track_topic" value="/awesomo/gimbal/track" />
-  <param name="shutdown" value="/awesomo/gimbal/shutdown" />
-
   <!-- node -->
-  <node pkg="awesomo_ros" name="awesomo_gimbal" type="gimbal_node" output="screen" />
+  <node pkg="awesomo_ros" name="awesomo_gimbal" type="gimbal_node" output="screen" required="true" />
 </launch>
