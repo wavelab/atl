@@ -61,9 +61,7 @@ void EstimatorNode::quadPoseCallback(const geometry_msgs::PoseStamped &msg) {
 }
 
 void EstimatorNode::quadVelocityCallback(const geometry_msgs::TwistStamped &msg) {
-  VecX twist;
-  twist = convertMsg(msg);
-  this->quad_velocity = twist.block(0, 0, 3, 1);
+  this->quad_velocity = convertMsg(msg.twist.linear);
 }
 
 void EstimatorNode::targetWorldCallback(const geometry_msgs::Vector3 &msg) {
@@ -216,7 +214,7 @@ int EstimatorNode::loopCallback(void) {
   this->publishLTKFBodyPositionEstimate();
   this->publishLTKFBodyVelocityEstimate();
   this->publishLTDetected();
-  this->trackTarget();
+  // this->trackTarget();
 
   // reset
   this->target_detected = false;

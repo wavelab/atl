@@ -32,9 +32,9 @@ public:
   Gimbal(void);
   int configure(std::string config_path);
   int updateGimbalStates(void);
-  Vec3 getTargetPositionInBodyFrame(Vec3 target_cf);
-  Vec3 getTargetPositionInBodyPlanarFrame(Vec3 target_cf, Quaternion &imu_if);
-  int getTargetPositionInBodyPlanarFrame(Vec3 target_cf, Vec3 &target_bpf);
+  static Vec3 getTargetInBF(Pose camera, Vec3 target_cf);
+  static Vec3 getTargetInBPF(Pose camera, Vec3 target_cf, Quaternion &imu_if);
+  int getTargetInBPF(Vec3 target_cf, Vec3 &target_bpf);
   int trackTarget(Vec3 target_cf);
   void printSetpoints(void);
   int setAngle(double roll, double pitch);

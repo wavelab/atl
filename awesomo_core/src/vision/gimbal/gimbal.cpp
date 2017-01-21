@@ -56,45 +56,45 @@ int Gimbal::configure(std::string config_file) {
   return 0;
 }
 
-Vec3 Gimbal::getTargetPositionInBodyFrame(Vec3 target_cf) {
+Vec3 Gimbal::getTargetInBF(Pose camera, Vec3 target_cf) {
   Vec3 target_nwu;
   Mat3 R;
   Vec3 t;
 
-  // transform camera frame to NWU frame
+  // transform camera frame to gimbal joint frame (NWU)
   // camera frame:  (z - forward, x - right, y - down)
-  // NWU frame:  (x - forward, y - left, z - up)
+  // gimbal joint frame (NWU):  (x - forward, y - left, z - up)
   target_nwu(0) = target_cf(2);
   target_nwu(1) = -target_cf(0);
   target_nwu(2) = -target_cf(1);
 
   // camera mount offset
-  R = this->camera_offset.rotationMatrix();
-  t = this->camera_offset.position;
+  R = camera.rotationMatrix();
+  t = camera.position;
 
-  // transform target from camera frame to body frame
+  // transform target from camera frame to gimbal joint frame
   return (R * target_nwu + t);
 }
 
-Vec3 Gimbal::getTargetPositionInBodyPlanarFrame(Vec3 target_cf,
-                                                Quaternion &imu_if) {
-  Vec3 p;
+Vec3 Gimbal::getTargetInBPF(Pose camera,
+                            Vec3 target_cf,
+                            Quaternion &joint_if) {
+  Vec3 p, target_bpf;
   Mat3 R;
 
-  // imu is assumed to be NWU frame (same as ROS REP-103)
-  R = imu_if.toRotationMatrix();
+  // joint is assumed to be NWU frame (same as ROS REP-103)
+  R = joint_if.toRotationMatrix();
 
   // transform target in camera frame to body frame
-  p = this->getTargetPositionInBodyFrame(target_cf);
+  p = Gimbal::getTargetInBF(camera, target_cf);
 
   // transform target in camera frame to body planar frame
-  this->target_bpf = R * p;
+  target_bpf = R * p;
 
-  return this->target_bpf;
+  return target_bpf;
 }
 
-int Gimbal::getTargetPositionInBodyPlanarFrame(Vec3 target_cf,
-                                               Vec3 &target_bpf) {
+int Gimbal::getTargetInBPF(Vec3 target_cf, Vec3 &target_bpf) {
   int retval;
   Vec3 tmp, euler;
   Quaternion gimbal_imu;
@@ -137,19 +137,6 @@ int Gimbal::trackTarget(Vec3 target_bpf) {
   this->setpoints(2) = 0.0;  // yaw setpoint - unsupported at the moment
   // Note: setpoints are assuming Gimbal are in NWU frame
   // NWU frame: (x - forward, y - left, z - up)
-
-  // // check setpoints
-  // for (int i = 0; i < 3; i++) {
-  //   // limit setpoints
-  //   if (this->setpoints(i) < this->limits[i * 2]) {
-  //     this->setpoints(i) = this->limits[i * 2];
-  //   } else if (this->setpoints(i) > this->limits[(i * 2) + 1]) {
-  //     this->setpoints(i) = this->limits[(i * 2) + 1];
-  //   }
-  // }
-  //
-  // // set angle
-  // this->setAngle(this->setpoints(0), this->setpoints(1));
 
   return 0;
 }

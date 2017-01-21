@@ -1,3 +1,4 @@
-int32 tag_id
-bool tag_detected
-geometry_msgs/Point tag_position
+int32 id
+bool detected
+geometry_msgs/Point position
+geometry_msgs/Quaternion orientation

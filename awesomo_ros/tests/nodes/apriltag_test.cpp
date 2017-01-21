@@ -90,11 +90,11 @@ protected:
 TEST_F(NodeTest, poseMsg) {
   ASSERT_EQ(1, this->pose_sub.getNumPublishers());
 
-  ASSERT_EQ(0, this->pose_msg.tag_id);
-  ASSERT_TRUE(this->pose_msg.tag_detected);
-  ASSERT_NEAR(0.0, this->pose_msg.tag_position.x, 0.2);
-  ASSERT_NEAR(0.0, this->pose_msg.tag_position.y, 0.2);
-  ASSERT_NEAR(3.0, this->pose_msg.tag_position.z, 0.2);
+  ASSERT_EQ(0, this->pose_msg.id);
+  ASSERT_TRUE(this->pose_msg.detected);
+  ASSERT_NEAR(0.0, this->pose_msg.position.x, 0.2);
+  ASSERT_NEAR(0.0, this->pose_msg.position.y, 0.2);
+  ASSERT_NEAR(3.0, this->pose_msg.position.z, 0.2);
 }
 
 TEST_F(NodeTest, inertialMsg) {

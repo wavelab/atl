@@ -73,17 +73,15 @@ Vec4 PositionController::calculate(Vec3 setpoints,
     return this->outputs;
   }
 
-  // transform setpoints from ENU to NWU
+  // transform setpoints from ENU to NWU (world to body)
   enu2nwu(setpoints, setpoints_nwu);
 
-  // transform robot position ENU to NWU
+  // transform robot position ENU to NWU (world to body)
   enu2nwu(robot_pose.position, robot_nwu);
   quat2euler(robot_pose.q, 321, euler);
 
   // calculate RPY errors relative to quadrotor by incorporating yaw
-  errors(0) = setpoints_nwu(0) - robot_nwu(0);
-  errors(1) = setpoints_nwu(1) - robot_nwu(1);
-  errors(2) = setpoints_nwu(2) - robot_nwu(2);
+  errors = setpoints_nwu - robot_nwu;
   euler << 0.0, 0.0, euler(2);
   euler2rot(euler, 123, R);
   errors = R * errors;

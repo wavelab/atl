@@ -49,14 +49,45 @@ class LandingZone(ROSNode):
         self.pubs[self.angular_velocity_topic].publish(msg)
 
 
+class Gimbal(ROSNode):
+    def __init__(self):
+        super(Gimbal, self).__init__()
+        self.attitude_topic = "/awesomo/gimbal/setpoint/attitude"
+        self.track_topic = "/awesomo/gimbal/track"
+
+        self.register_publisher(self.attitude_topic, Vector3)
+        self.register_publisher(self.track_topic, Vector3)
+
+    def set_attitude(self, attitude):
+        msg = Vector3()
+        msg.x = attitude[0]
+        msg.y = attitude[1]
+        msg.z = 0.0
+        self.pubs[self.attitude_topic].publish(msg)
+
+    def track(self, track):
+        msg = Vector3()
+        msg.x = track[0]
+        msg.y = track[1]
+        msg.z = 0.0
+        self.pubs[self.track_topic].publish(msg)
+
+
 class Quadrotor(ROSNode):
     def __init__(self):
         super(Quadrotor, self).__init__()
+        self.heading_topic = "/awesomo/control/heading/set"
         self.hover_point_topic = "/awesomo/control/hover/set"
         self.hover_height_topic = "/awesomo/control/hover/height/set"
 
+        self.register_publisher(self.heading_topic, Float64)
         self.register_publisher(self.hover_point_topic, Vector3)
         self.register_publisher(self.hover_height_topic, Float64)
+
+    def set_heading(self, heading):
+        msg = Float64()
+        msg.data = heading * (pi / 180.0)
+        self.pubs[self.heading_topic].publish(msg)
 
     def set_hover_point(self, hover_point):
         msg = Vector3()
@@ -86,12 +117,18 @@ if __name__ == "__main__":
     rospy.init_node("awesomo_remote")
     lz = LandingZone()
     quad = Quadrotor()
+    gimbal = Gimbal()
     rospy.sleep(1)
 
-    velocity, angular_velocity = lz_circle_path(30, 5.0)
-    # lz.set_position([0, 0, 0])
-    lz.set_velocity(velocity)
-    lz.set_angular_velocity(angular_velocity)
+    # gimbal.set_attitude([0.0, 0.8])
 
-    # quad.set_hover_point([0.0, 0.0, 10.0])
-    # quad.set_hover_height(15.0)
+    # lz.set_velocity(0.0)
+    # lz.set_position([100, 0, 0])
+
+    # velocity, angular_velocity = lz_circle_path(30, 1.0)
+    # lz.set_velocity(velocity)
+    # lz.set_angular_velocity(angular_velocity)
+
+    quad.set_heading(180.0)
+    quad.set_hover_point([0.0, 0.0, 3.0])
+    # quad.set_hover_height(3.0)

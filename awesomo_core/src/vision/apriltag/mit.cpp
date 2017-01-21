@@ -78,6 +78,8 @@ std::vector<TagPose> MITDetector::extractTags(cv::Mat &image) {
 
 int MITDetector::obtainPose(AprilTags::TagDetection tag, TagPose &tag_pose) {
   Mat4 transform;
+  Vec3 t;
+  Mat3 R;
   CameraConfig camera_config;
   double fx, fy, cx, cy, tag_size;
 
@@ -99,12 +101,15 @@ int MITDetector::obtainPose(AprilTags::TagDetection tag, TagPose &tag_pose) {
 
   // recovering the relative transform of a tag:
   transform = tag.getRelativeTransform(tag_size, fx, fy, cx, cy);
+  t = transform.col(3).head(3);
+  R = transform.block(0, 0, 3, 3);
 
   // tag is in camera frame
   // camera frame:  (z - forward, x - right, y - down)
   tag_pose.id = tag.id;
   tag_pose.detected = true;
-  tag_pose.position = transform.col(3).head(3);
+  tag_pose.position = t;
+  tag_pose.orientation = Quaternion(R);
 
   return 0;
 }

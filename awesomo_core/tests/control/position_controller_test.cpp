@@ -160,4 +160,32 @@ TEST(PositionController, calculate) {
   ASSERT_FLOAT_EQ(yaw_setpoint, controller.outputs(2));
 }
 
+TEST(PositionController, calculate2) {
+  Vec3 setpoint_nwu, setpoint_enu, euler;
+  Pose actual;
+  float yaw_setpoint, dt;
+  PositionController controller;
+
+  // setup
+  controller.configure(TEST_CONFIG);
+
+  // CHECK HEADING AT 90 DEGREE
+  setpoint_nwu << 1, 0, 0;  // setpoint infront of quad
+  nwu2enu(setpoint_nwu, setpoint_enu);
+
+  actual.position << 0, 0, 0;
+  euler << 0.0, 0.0, deg2rad(90.0);
+  euler2quat(euler, 321, actual.q);
+
+  yaw_setpoint = 0;
+  dt = 0.1;
+
+  controller.calculate(setpoint_enu, actual, yaw_setpoint, dt);
+  controller.printOutputs();
+
+  ASSERT_TRUE(controller.outputs(0) > 0);
+  ASSERT_NEAR(0.0, controller.outputs(1), 0.1);
+  ASSERT_NEAR(controller.hover_throttle, controller.outputs(3), 0.01);
+}
+
 }  // end of awesomo namepsace

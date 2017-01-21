@@ -3,10 +3,35 @@
 
 namespace awesomo {
 
+void buildMsg(bool b, std_msgs::Bool &msg) {
+  msg.data = b;
+}
+
+void buildMsg(std::string s, std_msgs::String &msg) {
+  msg.data = s;
+}
+
+void buildMsg(double d, std_msgs::Float64 &msg) {
+  msg.data = d;
+}
+
 void buildMsg(Vec3 vec, geometry_msgs::Vector3 &msg) {
   msg.x = vec(0);
   msg.y = vec(1);
   msg.z = vec(2);
+}
+
+void buildMsg(Vec3 vec, geometry_msgs::Point &msg) {
+  msg.x = vec(0);
+  msg.y = vec(1);
+  msg.z = vec(2);
+}
+
+void buildMsg(Quaternion q, geometry_msgs::Quaternion &msg) {
+  msg.w = q.w();
+  msg.x = q.x();
+  msg.y = q.y();
+  msg.z = q.z();
 }
 
 void buildMsg(int seq,
@@ -33,11 +58,17 @@ void buildMsg(int seq,
 }
 
 void buildMsg(TagPose tag, awesomo_msgs::AprilTagPose &msg) {
-  msg.tag_id = tag.id;
-  msg.tag_detected = tag.detected;
-  msg.tag_position.x = tag.position(0);
-  msg.tag_position.y = tag.position(1);
-  msg.tag_position.z = tag.position(2);
+  msg.id = tag.id;
+  msg.detected = tag.detected;
+
+  msg.position.x = tag.position(0);
+  msg.position.y = tag.position(1);
+  msg.position.z = tag.position(2);
+
+  msg.orientation.w = tag.orientation.w();
+  msg.orientation.x = tag.orientation.x();
+  msg.orientation.y = tag.orientation.y();
+  msg.orientation.z = tag.orientation.z();
 }
 
 void buildMsg(TagPose tag, geometry_msgs::Vector3 &msg) {
@@ -130,20 +161,47 @@ void buildMsg(TrackingController tc, awesomo_msgs::TCtrlSettings &msg) {
   msg.hover_throttle = tc.hover_throttle;
 }
 
+bool convertMsg(std_msgs::Bool msg) {
+  return msg.data;
+}
+
+std::string convertMsg(std_msgs::String msg) {
+  return msg.data;
+}
+
+double convertMsg(std_msgs::Float64 msg) {
+  return msg.data;
+}
+
 Vec3 convertMsg(geometry_msgs::Vector3 msg) {
   Vec3 v;
   v << msg.x, msg.y, msg.z;
   return v;
 }
 
+Vec3 convertMsg(geometry_msgs::Point msg) {
+  Vec3 v;
+  v << msg.x, msg.y, msg.z;
+  return v;
+}
+
+Quaternion convertMsg(geometry_msgs::Quaternion msg) {
+  Quaternion q;
+
+  q.w() = msg.w;
+  q.x() = msg.x;
+  q.y() = msg.y;
+  q.z() = msg.z;
+
+  return q;
+}
+
 Pose convertMsg(geometry_msgs::PoseStamped msg) {
   Vec3 p;
   Quaternion q;
-  geometry_msgs::Quaternion orientation;
 
-  orientation = msg.pose.orientation;
-  q = Quaternion(orientation.w, orientation.x, orientation.y, orientation.z);
-  p << msg.pose.position.x, msg.pose.position.y, msg.pose.position.z;
+  q = convertMsg(msg.pose.orientation);
+  p = convertMsg(msg.pose.position);
 
   return Pose(q, p);
 }
@@ -166,12 +224,14 @@ TagPose convertMsg(awesomo_msgs::AprilTagPose msg) {
   int id;
   bool detected;
   Vec3 p;
+  Quaternion q;
 
-  id = msg.tag_id;
-  detected = msg.tag_detected;
-  p << msg.tag_position.x, msg.tag_position.y, msg.tag_position.z;
+  id = msg.id;
+  detected = msg.detected;
+  p = convertMsg(msg.position);
+  q = convertMsg(msg.orientation);
 
-  return TagPose(id, detected, p);
+  return TagPose(id, detected, p, q);
 }
 
 }  // end of awesomo namespace

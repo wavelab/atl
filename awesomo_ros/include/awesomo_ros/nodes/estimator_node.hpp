@@ -25,7 +25,7 @@ namespace awesomo {
 // SUBSCRIBE TOPICS
 #define QUAD_POSE_TOPIC "/mavros/local_position/pose"
 #define QUAD_VELOCITY_TOPIC "/mavros/local_position/velocity"
-#define TARGET_INERTIAL_TOPIC "/awesomo/apriltag/target/inertial"
+#define TARGET_INERTIAL_TOPIC "/awesomo/apriltag/target/position/inertial"
 
 class EstimatorNode : public ROSNode {
 public:

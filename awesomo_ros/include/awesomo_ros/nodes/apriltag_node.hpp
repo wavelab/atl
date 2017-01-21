@@ -4,8 +4,6 @@
 #include <ros/ros.h>
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/CameraInfo.h>
-#include <geometry_msgs/Vector3.h>
-#include <geometry_msgs/Quaternion.h>
 
 #include <awesomo_core/awesomo_core.hpp>
 #include <awesomo_msgs/AprilTagPose.h>
@@ -22,24 +20,31 @@ namespace awesomo {
 
 // PUBLISH TOPICS
 #define TARGET_POSE_TOPIC "/awesomo/apriltag/target"
-#define TARGET_IF_TOPIC "/awesomo/apriltag/target/inertial"
-#define TARGET_BPF_TOPIC "/awesomo/apriltag/target/body"
+#define TARGET_IF_POS_TOPIC "/awesomo/apriltag/target/position/inertial"
+#define TARGET_BPF_POS_TOPIC "/awesomo/apriltag/target/position/body"
+#define TARGET_IF_YAW_TOPIC "/awesomo/apriltag/target/yaw/inertial"
+#define TARGET_BPF_YAW_TOPIC "/awesomo/apriltag/target/yaw/body"
 
 // SUBSCRIBE TOPICS
 #define CAMERA_IMAGE_TOPIC "/awesomo/camera/image_pose_stamped"
+#define MAVROS_POSE_TOPIC "/mavros/local_position/pose"
 #define SHUTDOWN "/awesomo/apriltag/shutdown"
 
 class AprilTagNode : public ROSNode {
 public:
   MITDetector detector;
   Pose camera_offset;
+  Quaternion orientation;
 
   AprilTagNode(int argc, char **argv) : ROSNode(argc, argv) {}
   int configure(const std::string &node_name, int hz);
   void publishTagPoseMsg(TagPose tag);
-  void publishTargetBodyPositionMsg(Vec3 target_bf);
   void publishTargetInertialPositionMsg(Vec3 gimbal_position, Vec3 target_bf);
+  void publishTargetInertialYawMsg(TagPose tag, Quaternion body);
+  void publishTargetBodyPositionMsg(Vec3 target_bf);
+  void publishTargetBodyYawMsg(TagPose tag);
   void imageCallback(const sensor_msgs::ImageConstPtr &msg);
+  void poseCallback(const geometry_msgs::PoseStamped &msg);
   Vec3 getTargetInBF(Vec3 target_cf);
   Vec3 getTargetInBPF(Vec3 target_cf, Quaternion joint_if);
 };
