@@ -3,6 +3,7 @@
 
 #include <ros/ros.h>
 #include <geometry_msgs/Vector3.h>
+#include <sensor_msgs/Imu.h>
 
 #include <awesomo_core/awesomo_core.hpp>
 
@@ -16,10 +17,8 @@ namespace awesomo {
 #define NODE_RATE 100
 
 // PUBLISH TOPICS
-#define CAMERA_RPY_TOPIC "/awesomo/gimbal/joint/orientiation/inertial"
 #define FRAME_RPY_TOPIC "/awesomo/gimbal/frame/orientiation/inertial"
-#define ACCEL_TOPIC "/awesomo/gimbal/joint/accel"
-#define GYRO_TOPIC "/awesomo/gimbal/joint/gyro"
+#define CAMERA_IMU_TOPIC "/awesomo/gimbal/joint/imu"
 
 // SUBSCRIBE TOPICS
 #define SET_ATTITUDE_TOPIC "/awesomo/gimbal/setpoint/attitude"
@@ -36,6 +35,7 @@ public:
 
   void setAttitudeCallback(const geometry_msgs::Vector3 &msg);
   int loopCallback(void);
+  int seq;
 };
 
 }  // end of awesomo namespace
