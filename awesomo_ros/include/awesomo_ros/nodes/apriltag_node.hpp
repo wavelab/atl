@@ -45,8 +45,6 @@ public:
   void publishTargetBodyYawMsg(TagPose tag);
   void imageCallback(const sensor_msgs::ImageConstPtr &msg);
   void poseCallback(const geometry_msgs::PoseStamped &msg);
-  Vec3 getTargetInBF(Vec3 target_cf);
-  Vec3 getTargetInBPF(Vec3 target_cf, Quaternion joint_if);
 };
 
 }  // end of awesomo namespace

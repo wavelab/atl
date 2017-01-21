@@ -58,7 +58,13 @@ error:
   return -1;
 }
 
-void Quadrotor::setMode(enum Mode mode) {
+int Quadrotor::setMode(enum Mode mode) {
+  // pre-check
+  if (this->configured == false) {
+    return -1;
+  }
+
+  // set mode
   this->current_mode = mode;
   switch (mode) {
     case DISARM_MODE:
@@ -77,37 +83,96 @@ void Quadrotor::setMode(enum Mode mode) {
       log_info(INFO_LMODE);
       break;
   }
+
+  return 0;
 }
 
-void Quadrotor::setPose(Pose pose) {
+int Quadrotor::setPose(Pose pose) {
+  // pre-check
+  if (this->configured == false) {
+    return -1;
+  }
+
+  // set pose
   this->pose = pose;
+
+  return 0;
 }
 
-void Quadrotor::setVelocity(Vec3 velocity) {
+int Quadrotor::setVelocity(Vec3 velocity) {
+  // pre-check
+  if (this->configured == false) {
+    return -1;
+  }
+
+  // set pose
   this->velocity = velocity;
+
+  return 0;
 }
 
-void Quadrotor::setTargetPosition(Vec3 position) {
+int Quadrotor::setTargetPosition(Vec3 position) {
+  // pre-check
+  if (this->configured == false) {
+    return -1;
+  }
+
+  // set target position
   this->landing_target.setTargetPosition(position);
+
+  return 0;
 }
 
-void Quadrotor::setTargetVelocity(Vec3 velocity) {
+int Quadrotor::setTargetVelocity(Vec3 velocity) {
+  // pre-check
+  if (this->configured == false) {
+    return -1;
+  }
+
+  // set target velocity
   this->landing_target.setTargetVelocity(velocity);
+
+  return 0;
 }
 
-void Quadrotor::setTargetDetected(bool detected) {
+int Quadrotor::setTargetDetected(bool detected) {
+  // pre-check
+  if (this->configured == false) {
+    return -1;
+  }
+
+  // set target detected
   this->landing_target.update(detected);
+
+  return 0;
 }
 
-void Quadrotor::setHoverXYPosition(Vec3 position) {
+
+int Quadrotor::setHoverXYPosition(Vec3 position) {
+  // pre-check
+  if (this->configured == false) {
+    return -1;
+  }
+
+  // set hover x-y position
   this->hover_position(0) = position(0);
   this->hover_position(1) = position(1);
+
+  return 0;
 }
 
-void Quadrotor::setHoverPosition(Vec3 position) {
+int Quadrotor::setHoverPosition(Vec3 position) {
+  // pre-check
+  if (this->configured == false) {
+    return -1;
+  }
+
+  // set hover position
   this->hover_position(0) = position(0);
   this->hover_position(1) = position(1);
   this->hover_position(2) = position(2);
+
+  return 0;
 }
 
 bool Quadrotor::conditionsMet(bool *conditions, int nb_conditions) {

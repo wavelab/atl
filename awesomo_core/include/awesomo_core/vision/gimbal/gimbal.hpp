@@ -33,8 +33,10 @@ public:
   int configure(std::string config_path);
   int on(void);
   int off(void);
-  static Vec3 getTargetInBF(Pose camera, Vec3 target_cf);
-  static Vec3 getTargetInBPF(Pose camera, Vec3 target_cf, Quaternion &imu_if);
+  static Vec3 getTargetInBF(Pose camera_offset, Vec3 target_cf);
+  static Vec3 getTargetInBPF(Pose camera_offset,
+                             Vec3 target_cf,
+                             Quaternion &imu_if);
   int getTargetInBPF(Vec3 target_cf, Vec3 &target_bpf);
   int trackTarget(Vec3 target_cf);
   int updateGimbalStates(void);

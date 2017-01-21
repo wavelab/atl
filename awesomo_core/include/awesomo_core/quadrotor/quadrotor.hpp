@@ -68,14 +68,15 @@ public:
 
   Quadrotor(void);
   int configure(std::string config_path);
-  void setMode(enum Mode mode);
-  void setPose(Pose pose);
-  void setVelocity(Vec3 velocity);
-  void setTargetPosition(Vec3 position);
-  void setTargetVelocity(Vec3 velocity);
-  void setTargetDetected(bool detected);
-  void setHoverXYPosition(Vec3 position);
-  void setHoverPosition(Vec3 position);
+  int setMode(enum Mode mode);
+  int setPose(Pose pose);
+  int setVelocity(Vec3 velocity);
+  int setTargetPosition(Vec3 position);
+  int setTargetVelocity(Vec3 velocity);
+  int setTargetDetected(bool detected);
+  int setHoverXYPosition(Vec3 position);
+  int setHoverPosition(Vec3 position);
+  static void transformTargetToBody(Vec3 target_if, Pose pose);
   bool conditionsMet(bool *conditions, int nb_conditions);
   int stepHoverMode(double dt);
   int stepDiscoverMode(double dt);

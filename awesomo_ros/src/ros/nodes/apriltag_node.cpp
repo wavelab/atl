@@ -129,7 +129,9 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
   joint_if.y() = image_ptr->image.at<double>(0, 5);
   joint_if.z() = image_ptr->image.at<double>(0, 6);
 
-  target_bpf = this->getTargetInBPF(target_cf, joint_if);
+  target_bpf = Gimbal::getTargetInBPF(this->camera_offset,
+                                      target_cf,
+                                      joint_if);
 
   // publish tag pose
   this->publishTagPoseMsg(tags[0]);
@@ -141,43 +143,6 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
 
 void AprilTagNode::poseCallback(const geometry_msgs::PoseStamped &msg) {
   this->orientation = convertMsg(msg.pose.orientation);
-}
-
-Vec3 AprilTagNode::getTargetInBF(Vec3 target_cf) {
-  Vec3 target_nwu;
-  Mat3 R;
-  Vec3 t;
-
-  // transform camera frame to NWU frame
-  // camera frame:  (x - right, y - down, z - forward)
-  // NWU frame:  (x - forward, y - left, z - up)
-  target_nwu(0) = target_cf(2);
-  target_nwu(1) = -target_cf(0);
-  target_nwu(2) = -target_cf(1);
-
-  // camera mount offset
-  R = this->camera_offset.rotationMatrix();
-  t = this->camera_offset.position;
-
-  // transform target from camera frame to gimbal joint frame
-  return (R * target_nwu + t);
-}
-
-Vec3 AprilTagNode::getTargetInBPF(Vec3 target_cf, Quaternion joint_if) {
-  Vec3 p;
-  Mat3 R;
-  Vec3 target_bpf;
-
-  // transform target in camera frame to gimbal joint frame
-  p = this->getTargetInBF(target_cf);
-
-  // joints are assumed to be NWU frame
-  R = joint_if.toRotationMatrix();
-
-  // transform target in gimbal joint frame to gimbal body planar frame
-  target_bpf = R * p;
-
-  return target_bpf;
 }
 
 }  // end of awesomo namespace

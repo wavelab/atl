@@ -146,7 +146,6 @@ TEST(Gimbal, getTargetInBF) {
 
 TEST(Gimbal, getTargetInBPF) {
   Gimbal gimbal;
-  Pose camera;
   Quaternion joint;
   Vec3 euler;
   Vec3 target_cf;
@@ -160,14 +159,14 @@ TEST(Gimbal, getTargetInBPF) {
   double dz = 0.0;
 
   target_cf << 0.0, 0.0, 10.0;  // let tag be directly infront of camera
-  camera = Pose(roll, pitch, yaw, dx, dy, dz);
+  gimbal.camera_offset = Pose(roll, pitch, yaw, dx, dy, dz);
   std::cout << "target is directly infront of camera: ";
   std::cout << "[" << target_cf.transpose() << "]" << std::endl;
 
   // pitch forwards
   euler << 0.0, deg2rad(10), 0.0;
   euler2quat(euler, 321, joint);
-  target_bpf = gimbal.getTargetInBPF(camera, target_cf, joint);
+  target_bpf = gimbal.getTargetInBPF(gimbal.camera_offset, target_cf, joint);
   std::cout << "[quadrotor pitch forwards]\t\t";
   print_target_relative_to_body_planar_frame(target_bpf);
   ASSERT_TRUE(target_bpf(0) < 0.0);
@@ -177,7 +176,7 @@ TEST(Gimbal, getTargetInBPF) {
   // pitch backwards
   euler << 0.0, deg2rad(-10), 0.0;
   euler2quat(euler, 321, joint);
-  target_bpf = gimbal.getTargetInBPF(camera, target_cf, joint);
+  target_bpf = gimbal.getTargetInBPF(gimbal.camera_offset, target_cf, joint);
   std::cout << "[quadrotor pitch backwards]\t\t";
   print_target_relative_to_body_planar_frame(target_bpf);
   ASSERT_TRUE(target_bpf(0) > 0.0);
@@ -187,7 +186,7 @@ TEST(Gimbal, getTargetInBPF) {
   // roll left
   euler << deg2rad(-10), 0.0, 0.0;
   euler2quat(euler, 321, joint);
-  target_bpf = gimbal.getTargetInBPF(camera, target_cf, joint);
+  target_bpf = gimbal.getTargetInBPF(gimbal.camera_offset, target_cf, joint);
   std::cout << "[quadrotor roll left]\t\t\t";
   print_target_relative_to_body_planar_frame(target_bpf);
   ASSERT_NEAR(0.0, target_bpf(0), 0.0000000001);
@@ -197,7 +196,7 @@ TEST(Gimbal, getTargetInBPF) {
   // roll right
   euler << deg2rad(10), 0.0, 0.0;
   euler2quat(euler, 321, joint);
-  target_bpf = gimbal.getTargetInBPF(camera, target_cf, joint);
+  target_bpf = gimbal.getTargetInBPF(gimbal.camera_offset, target_cf, joint);
   std::cout << "[quadrotor roll right]\t\t\t";
   print_target_relative_to_body_planar_frame(target_bpf);
   ASSERT_NEAR(0.0, target_bpf(0), 0.0000000001);
@@ -207,7 +206,7 @@ TEST(Gimbal, getTargetInBPF) {
   // pitch forward, roll left
   euler << deg2rad(-10), deg2rad(10), 0.0;
   euler2quat(euler, 321, joint);
-  target_bpf = gimbal.getTargetInBPF(camera, target_cf, joint);
+  target_bpf = gimbal.getTargetInBPF(gimbal.camera_offset, target_cf, joint);
   std::cout << "[quadrotor pitch forward, roll left]\t";
   print_target_relative_to_body_planar_frame(target_bpf);
   ASSERT_TRUE(target_bpf(0) < 0.0);
@@ -217,7 +216,7 @@ TEST(Gimbal, getTargetInBPF) {
   // pitch forward, roll right
   euler << deg2rad(10), deg2rad(10), 0.0;
   euler2quat(euler, 321, joint);
-  target_bpf = gimbal.getTargetInBPF(camera, target_cf, joint);
+  target_bpf = gimbal.getTargetInBPF(gimbal.camera_offset, target_cf, joint);
   std::cout << "[quadrotor pitch forward, roll right]\t";
   print_target_relative_to_body_planar_frame(target_bpf);
   ASSERT_TRUE(target_bpf(0) < 0.0);
@@ -227,7 +226,7 @@ TEST(Gimbal, getTargetInBPF) {
   // pitch backwards, roll left
   euler << deg2rad(-10), deg2rad(-10), 0.0;
   euler2quat(euler, 321, joint);
-  target_bpf = gimbal.getTargetInBPF(camera, target_cf, joint);
+  target_bpf = gimbal.getTargetInBPF(gimbal.camera_offset, target_cf, joint);
   std::cout << "[quadrotor pitch backwards, roll left]\t";
   print_target_relative_to_body_planar_frame(target_bpf);
   ASSERT_TRUE(target_bpf(0) > 0.0);
@@ -237,7 +236,7 @@ TEST(Gimbal, getTargetInBPF) {
   // pitch backwards, roll right
   euler << deg2rad(10), deg2rad(-10), 0.0;
   euler2quat(euler, 321, joint);
-  target_bpf = gimbal.getTargetInBPF(camera, target_cf, joint);
+  target_bpf = gimbal.getTargetInBPF(gimbal.camera_offset, target_cf, joint);
   std::cout << "[quadrotor pitch backwards, roll right]\t";
   print_target_relative_to_body_planar_frame(target_bpf);
   ASSERT_TRUE(target_bpf(0) > 0.0);

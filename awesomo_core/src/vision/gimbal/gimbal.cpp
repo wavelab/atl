@@ -74,7 +74,7 @@ int Gimbal::off(void) {
   return this->sbgc.off();
 }
 
-Vec3 Gimbal::getTargetInBF(Pose camera, Vec3 target_cf) {
+Vec3 Gimbal::getTargetInBF(Pose camera_offset, Vec3 target_cf) {
   Vec3 target_nwu;
   Mat3 R;
   Vec3 t;
@@ -87,14 +87,14 @@ Vec3 Gimbal::getTargetInBF(Pose camera, Vec3 target_cf) {
   target_nwu(2) = -target_cf(1);
 
   // camera mount offset
-  R = camera.rotationMatrix();
-  t = camera.position;
+  R = camera_offset.rotationMatrix();
+  t = camera_offset.position;
 
   // transform target from camera frame to gimbal joint frame
   return (R * target_nwu + t);
 }
 
-Vec3 Gimbal::getTargetInBPF(Pose camera,
+Vec3 Gimbal::getTargetInBPF(Pose camera_offset,
                             Vec3 target_cf,
                             Quaternion &joint_if) {
   Vec3 p, target_bpf;
@@ -104,7 +104,7 @@ Vec3 Gimbal::getTargetInBPF(Pose camera,
   R = joint_if.toRotationMatrix();
 
   // transform target in camera frame to body frame
-  p = Gimbal::getTargetInBF(camera, target_cf);
+  p = Gimbal::getTargetInBF(camera_offset, target_cf);
 
   // transform target in camera frame to body planar frame
   target_bpf = R * p;
