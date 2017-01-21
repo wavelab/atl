@@ -92,6 +92,7 @@ ADD_EXECUTABLE(
     tests/vision/camera/camera_test.cpp
     tests/vision/camera/config_test.cpp
     tests/vision/gimbal/gimbal_test.cpp
+    tests/vision/gimbal/sbgc_test.cpp
     # UTIL TESTS
     tests/utils/config_test.cpp
     tests/utils/data_test.cpp

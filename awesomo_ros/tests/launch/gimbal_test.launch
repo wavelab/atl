@@ -6,5 +6,7 @@
   <param name="gimbal_config" value="$(find awesomo_configs)/configs/gimbal/config.yaml" />
 
   <!-- node -->
-  <node pkg="awesomo_ros" name="awesomo_gimbal" type="gimbal_node" output="screen" required="true" />
+  <node pkg="awesomo_ros" name="awesomo_gimbal" type="gimbal_node" output="screen" />
+  <!-- test node -->
+  <test pkg="awesomo_ros" test-name="awesomo_gimbal_test" type="gimbal_test" cwd="node"/>
 </launch>

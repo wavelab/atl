@@ -25,3 +25,10 @@ ADD_ROSTEST_GTEST(
     nodes/estimator_test.cpp
 )
 TARGET_LINK_LIBRARIES(estimator_test ${TEST_DEPS})
+
+ADD_ROSTEST_GTEST(
+    gimbal_test
+    launch/gimbal_test.launch
+    nodes/gimbal_test.cpp
+)
+TARGET_LINK_LIBRARIES(gimbal_test ${TEST_DEPS})

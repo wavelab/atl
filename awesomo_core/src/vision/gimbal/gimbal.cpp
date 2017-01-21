@@ -13,6 +13,10 @@ Gimbal::Gimbal(void) {
   this->target_bpf = Vec3();
 }
 
+Gimbal::~Gimbal(void) {
+  this->shutdownMotors();
+}
+
 int Gimbal::configure(std::string config_file) {
   std::string device_path;
   ConfigParser parser;
@@ -148,9 +152,10 @@ int Gimbal::updateGimbalStates(void) {
     return -1;
   }
 
-  this->imu_accel(0) = deg2rad(this->sbgc.data.accel(0));
-  this->imu_accel(1) = deg2rad(this->sbgc.data.accel(1));
-  this->imu_accel(2) = deg2rad(this->sbgc.data.accel(2));
+  // convert from G's to m/s^2
+  this->imu_accel(0) = this->sbgc.data.accel(0) * G;
+  this->imu_accel(1) = this->sbgc.data.accel(1) * G;
+  this->imu_accel(2) = this->sbgc.data.accel(2) * G;
 
   this->imu_gyro(0) = deg2rad(this->sbgc.data.gyro(0));
   this->imu_gyro(1) = deg2rad(this->sbgc.data.gyro(1));
@@ -177,6 +182,10 @@ int Gimbal::setAngle(double roll, double pitch) {
   this->setpoints(2) = 0.0;
 
   return this->sbgc.setAngle(roll, pitch, 0.0);
+}
+
+int Gimbal::shutdownMotors(void) {
+  this->sbgc.off();
 }
 
 void Gimbal::printSetpoints(void) {
