@@ -11,10 +11,16 @@ Gimbal::Gimbal(void) {
   std::fill_n(this->limits, 6, 0);
   this->setpoints = Vec3();
   this->target_bpf = Vec3();
+
+  imu_accel = Vec3();
+  imu_gyro = Vec3();
+  camera_angles = Vec3();
+  frame_angles = Vec3();
+  rc_angles = Vec3();
 }
 
 Gimbal::~Gimbal(void) {
-  this->shutdownMotors();
+  this->off();
 }
 
 int Gimbal::configure(std::string config_file) {
@@ -58,6 +64,14 @@ int Gimbal::configure(std::string config_file) {
 
   this->configured = true;
   return 0;
+}
+
+int Gimbal::on(void) {
+  return this->sbgc.on();
+}
+
+int Gimbal::off(void) {
+  return this->sbgc.off();
 }
 
 Vec3 Gimbal::getTargetInBF(Pose camera, Vec3 target_cf) {
@@ -147,15 +161,18 @@ int Gimbal::trackTarget(Vec3 target_bpf) {
 
 int Gimbal::updateGimbalStates(void) {
   int retval;
+  const double k_gravity = 9.80665;
+
+  // get real time data from SimpleBGC
   retval = this->sbgc.getRealtimeData();
   if (retval != 0) {
     return -1;
   }
 
   // convert from G's to m/s^2
-  this->imu_accel(0) = this->sbgc.data.accel(0) * G;
-  this->imu_accel(1) = this->sbgc.data.accel(1) * G;
-  this->imu_accel(2) = this->sbgc.data.accel(2) * G;
+  this->imu_accel(0) = this->sbgc.data.accel(0) * k_gravity;
+  this->imu_accel(1) = this->sbgc.data.accel(1) * k_gravity;
+  this->imu_accel(2) = this->sbgc.data.accel(2) * k_gravity;
 
   this->imu_gyro(0) = deg2rad(this->sbgc.data.gyro(0));
   this->imu_gyro(1) = deg2rad(this->sbgc.data.gyro(1));
@@ -182,10 +199,6 @@ int Gimbal::setAngle(double roll, double pitch) {
   this->setpoints(2) = 0.0;
 
   return this->sbgc.setAngle(roll, pitch, 0.0);
-}
-
-int Gimbal::shutdownMotors(void) {
-  this->sbgc.off();
 }
 
 void Gimbal::printSetpoints(void) {

@@ -32,7 +32,7 @@ int GimbalNode::configure(std::string node_name, int hz) {
 }
 
 GimbalNode::~GimbalNode(void) {
-  this->gimbal.shutdownMotors();
+  this->gimbal.off();
 }
 
 void GimbalNode::setAttitudeCallback(const geometry_msgs::Vector3 &msg) {
