@@ -8,9 +8,10 @@
   <param name="debug_mode" value="false" />
 
   <!-- prototype -->
-  <param name="pose_stamped_mode" value="true" />
-  <param name="position_topic" value="/awesomo/gimbal/position/inertial" />
-  <param name="orientation_topic" value="/awesomo/gimbal/joint/orientation/inertial" />
+  <param name="gimbal_mode" value="true" />
+  <param name="gimbal/position/topic" value="/awesomo/gimbal/position/inertial" />
+  <param name="gimbal/frame/orientation/topic" value="/awesomo/gimbal/frame/orientation/inertial" />
+  <param name="gimbal/joint/orientation/topic" value="/awesomo/gimbal/joint/orientation/inertial" />
 
   <node pkg="prototype_ros" name="prototype_gazebo" type="run_gazebo.sh" output="screen" required="true" />
   <node pkg="prototype_ros" name="prototype_world" type="world_node" output="screen" required="true" />

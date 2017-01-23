@@ -42,15 +42,28 @@ void AprilTagNode::publishTagPoseMsg(TagPose tag) {
 }
 
 void AprilTagNode::publishTargetInertialPositionMsg(Vec3 gimbal_position,
+                                                    Quaternion gimbal_orientation,
                                                     Vec3 target_bpf) {
   geometry_msgs::Vector3 msg;
   Vec3 target_enu, target_if;
+
+  target_bpf = gimbal_orientation.toRotationMatrix() * target_bpf;
 
   // convert target body planar frame from NWU to ENU
   nwu2enu(target_bpf, target_enu);
 
   // transform target from body to inertial frame
   target_if = gimbal_position + target_enu;
+
+  // Vec3 euler;
+  // quat2euler(gimbal_orientation, 321, euler);
+  // std::cout << "frame: " << euler.transpose() << std::endl;
+
+  // std::cout << "target_if: " << target_if.transpose() << std::endl;
+  // target_if = gimbal_orientation.toRotationMatrix() * target_if;
+  // std::cout << "target_if: " << target_if.transpose() << std::endl;
+  // std::cout << std::endl;
+
 
   // build and publish msg
   buildMsg(target_if, msg);
@@ -94,7 +107,7 @@ void AprilTagNode::publishTargetBodyYawMsg(TagPose tag) {
 
 void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
   Vec3 target_cf, target_bpf, gimbal_position;
-  Quaternion joint_if;
+  Quaternion frame, joint;
   cv_bridge::CvImagePtr image_ptr;
   std::vector<TagPose> tags;
 
@@ -124,18 +137,23 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
   gimbal_position(1) = image_ptr->image.at<double>(0, 1);
   gimbal_position(2) = image_ptr->image.at<double>(0, 2);
 
-  joint_if.w() = image_ptr->image.at<double>(0, 3);
-  joint_if.x() = image_ptr->image.at<double>(0, 4);
-  joint_if.y() = image_ptr->image.at<double>(0, 5);
-  joint_if.z() = image_ptr->image.at<double>(0, 6);
+  frame.w() = image_ptr->image.at<double>(0, 3);
+  frame.x() = image_ptr->image.at<double>(0, 4);
+  frame.y() = image_ptr->image.at<double>(0, 5);
+  frame.z() = image_ptr->image.at<double>(0, 6);
+
+  joint.w() = image_ptr->image.at<double>(0, 7);
+  joint.x() = image_ptr->image.at<double>(0, 8);
+  joint.y() = image_ptr->image.at<double>(0, 9);
+  joint.z() = image_ptr->image.at<double>(0, 10);
 
   target_bpf = Gimbal::getTargetInBPF(this->camera_offset,
                                       target_cf,
-                                      joint_if);
+                                      joint);
 
   // publish tag pose
   this->publishTagPoseMsg(tags[0]);
-  this->publishTargetInertialPositionMsg(gimbal_position, target_bpf);
+  this->publishTargetInertialPositionMsg(gimbal_position, frame, target_bpf);
   this->publishTargetInertialYawMsg(tags[0], this->orientation);
   this->publishTargetBodyPositionMsg(target_bpf);
   this->publishTargetBodyYawMsg(tags[0]);

@@ -11,7 +11,7 @@ namespace awesomo {
 
 class AttitudeCommand {
 public:
-  Quaternion q;
+  Quaternion orientation;
   double throttle;
 
   AttitudeCommand(void);
@@ -75,7 +75,6 @@ public:
     this->yaw = 0;
   }
 };
-
 
 class LandingTargetPosition {
 public:

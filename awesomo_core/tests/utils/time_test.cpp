@@ -9,8 +9,6 @@ TEST(Utils, ticAndtoc) {
 
   tic(&start);
   usleep(10 * 1000);
-  std::cout << toc(&start) << std::endl;
-  std::cout << mtoc(&start) << std::endl;
   ASSERT_TRUE(toc(&start) < 0.011);
   ASSERT_TRUE(toc(&start) > 0.009);
   ASSERT_TRUE(mtoc(&start) < 11.0);

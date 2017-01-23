@@ -226,4 +226,40 @@ void cf2enu(Vec3 cf, Vec3 &enu) {
   enu(2) = -cf(1);
 }
 
+void target2body(Vec3 target_pos_if,
+                 Vec3 body_pos_if,
+                 Quaternion body_orientation_if,
+                 Vec3 &target_pos_bf) {
+  Mat3 R;
+  Vec3 pos_enu, pos_nwu;
+
+  // convert quaternion to rotation matrix
+  R = body_orientation_if.toRotationMatrix().inverse();
+
+  // calculate position difference and convert to body frame
+  pos_enu = target_pos_if - body_pos_if;  // assumes inertial frame is ENU
+  enu2nwu(pos_enu, pos_nwu);
+
+  // compensate for body orientation by rotating
+  target_pos_bf = R * pos_nwu;
+}
+
+void target2body(Vec3 target_pos_if,
+                 Vec3 body_pos_if,
+                 Vec3 body_orientation_if,
+                 Vec3 &target_pos_bf) {
+  Mat3 R;
+  Vec3 pos_enu, pos_nwu;
+
+  // convert euler to rotation matrix
+  euler2rot(body_orientation_if, 123, R);
+
+  // calculate position difference and convert to body frame
+  pos_enu = target_pos_if - body_pos_if;  // assumes inertial frame is ENU
+  enu2nwu(pos_enu, pos_nwu);
+
+  // compensate for body orientation by rotating
+  target_pos_bf = R * pos_nwu;
+}
+
 }  // eof awesomo

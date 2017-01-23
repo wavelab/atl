@@ -112,8 +112,8 @@ void ControlNode::stateCallback(const mavros_msgs::State::ConstPtr &msg) {
 }
 
 void ControlNode::poseCallback(const geometry_msgs::PoseStamped &msg) {
-  Pose world_pose = convertMsg(msg);
-  this->quadrotor.setPose(world_pose);
+  Pose pose = convertMsg(msg);
+  this->quadrotor.setPose(pose);
 }
 
 void ControlNode::velocityCallback(const geometry_msgs::TwistStamped &msg) {
