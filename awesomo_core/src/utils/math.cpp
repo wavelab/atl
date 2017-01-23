@@ -262,4 +262,33 @@ void target2body(Vec3 target_pos_if,
   target_pos_bf = R * pos_nwu;
 }
 
+void target2bodyplanar(Vec3 target_pos_if,
+                       Vec3 body_pos_if,
+                       Quaternion body_orientation_if,
+                       Vec3 &target_pos_bf) {
+  Vec3 euler;
+
+  // convert quaternion to euler
+  quat2euler(body_orientation_if, 321, euler);
+
+  // filtering out roll and pitch since we are in body planar frame
+  euler << 0.0, 0.0, euler(2);
+
+  // calculate setpoint relative to quadrotor
+  target2body(target_pos_if, body_pos_if, euler, target_pos_bf);
+}
+
+void target2bodyplanar(Vec3 target_pos_if,
+                       Vec3 body_pos_if,
+                       Vec3 body_orientation_if,
+                       Vec3 &target_pos_bf) {
+  Vec3 euler;
+
+  // filtering out roll and pitch since we are in body planar frame
+  euler << 0.0, 0.0, body_orientation_if(2);
+
+  // calculate setpoint relative to quadrotor
+  target2body(target_pos_if, body_pos_if, euler, target_pos_bf);
+}
+
 }  // eof awesomo

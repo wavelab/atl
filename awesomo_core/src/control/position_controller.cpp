@@ -63,7 +63,7 @@ Vec4 PositionController::calculate(Vec3 setpoints,
                                    double yaw,
                                    double dt) {
   double r, p, y, t;
-  Vec3 errors, euler;
+  Vec3 errors;
   Vec4 outputs;
   Mat3 R;
 
@@ -73,13 +73,8 @@ Vec4 PositionController::calculate(Vec3 setpoints,
     return this->outputs;
   }
 
-  // convert quaternion to euler and only pass yaw
-  // the position controller is operating in the body planar frame
-  quat2euler(robot_pose.q, 321, euler);
-  euler << 0.0, 0.0, euler(2);
-
   // calculate setpoint relative to quadrotor
-  target2body(setpoints, robot_pose.position, euler, errors);
+  target2bodyplanar(setpoints, robot_pose.position, robot_pose.q, errors);
 
   // roll, pitch, yaw and throttle (assuming NWU frame)
   // clang-format off

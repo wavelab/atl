@@ -121,22 +121,20 @@ void EstimatorNode::publishLTKFBodyPositionEstimate(void) {
   this->target_bf(1) = -position_enu(0);
   this->target_bf(2) = position_enu(2);
 
-  // std::cout << this->quad_pose.q.w() << "\t";
-  // std::cout << this->quad_pose.q.x() << "\t";
-  // std::cout << this->quad_pose.q.y() << "\t";
-  // std::cout << this->quad_pose.q.z() << "\n";
-  // std::cout << position_enu.transpose() << std::endl;
-  // std::cout << std::endl;
-
   Vec3 tmp;
+  Vec3 euler;
+  quat2euler(this->quad_pose.q, 321, euler);
+  euler(0) = 0.0;
+  euler(1) = 0.0;
+  euler(2) = euler(2);
   target2body(this->estimator.mu.head(3),
               this->quad_pose.position,
-              this->quad_pose.q,
+              euler,
               tmp);
 
-  // std::cout << this->target_bf.transpose() << std::endl;
-  // std::cout << tmp.transpose() << std::endl;
-  // std::cout << std::endl;
+  std::cout << this->target_bf.transpose() << std::endl;
+  std::cout << tmp.transpose() << std::endl;
+  std::cout << std::endl;
 
   // build and publish msg
   buildMsg(this->target_bf, msg);
