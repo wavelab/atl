@@ -148,13 +148,13 @@ int PointGreyCamera::setFormat7(void) {
   FlyCapture2::Format7PacketInfo fmt7PacketInfo;
   bool valid;
 
-  k_fmt7PixFmt = FlyCapture2::PIXEL_FORMAT_BGR;
+  k_fmt7PixFmt = FlyCapture2::PIXEL_FORMAT_RAW8;
 
-  fmt7_image_settings.mode = FlyCapture2::MODE_1;
-  fmt7_image_settings.offsetX = 200;
-  fmt7_image_settings.offsetY = 144;
-  fmt7_image_settings.width = 624;
-  fmt7_image_settings.height = 420;
+  fmt7_image_settings.mode = FlyCapture2::MODE_0;
+  fmt7_image_settings.offsetX = 380;
+  fmt7_image_settings.offsetY = 298;
+  fmt7_image_settings.width = 1264;
+  fmt7_image_settings.height = 930;
   fmt7_image_settings.pixelFormat = k_fmt7PixFmt;
 
 
