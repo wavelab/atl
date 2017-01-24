@@ -34,9 +34,10 @@ public:
   Pose quad_pose;
   Vec3 quad_velocity;
   bool target_detected;
-  Vec3 target_bf;
-  Vec3 target_wf;
-  Vec3 target_last_wf;
+  Vec3 target_pos_bpf;
+  Vec3 target_vel_bpf;
+  Vec3 target_pos_wf;
+  Vec3 target_last_pos_wf;
   struct timespec target_last_updated;
   double target_lost_threshold;
 
@@ -45,16 +46,17 @@ public:
 
     this->quad_pose = Pose();
     this->target_detected = false;
-    this->target_bf << 0.0, 0.0, 0.0;
-    this->target_wf << 0.0, 0.0, 0.0;
-    this->target_last_wf << 0.0, 0.0, 0.0;
+    this->target_pos_bpf << 0.0, 0.0, 0.0;
+    this->target_vel_bpf << 0.0, 0.0, 0.0;
+    this->target_pos_wf << 0.0, 0.0, 0.0;
+    this->target_last_pos_wf << 0.0, 0.0, 0.0;
     this->target_last_updated = (struct timespec){0};
     this->target_lost_threshold = 1000.0;
   }
 
   int configure(std::string node_name, int hz);
-  void initLTKF(Vec3 target_wf);
-  void resetLTKF(Vec3 target_wf);
+  void initLTKF(Vec3 target_pos_wf);
+  void resetLTKF(Vec3 target_pos_wf);
   void quadPoseCallback(const geometry_msgs::PoseStamped &msg);
   void quadVelocityCallback(const geometry_msgs::TwistStamped &msg);
   void targetWorldCallback(const geometry_msgs::Vector3 &msg);

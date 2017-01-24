@@ -22,7 +22,8 @@ namespace awesomo {
 #define TARGET_POSE_TOPIC "/awesomo/apriltag/target"
 #define TARGET_IF_POS_TOPIC "/awesomo/apriltag/target/position/inertial"
 #define TARGET_BPF_POS_TOPIC "/awesomo/apriltag/target/position/body"
-#define TARGET_IF_YAW_TOPIC "/awesomo/apriltag/target/yaw/inertial"
+// #define TARGET_IF_YAW_TOPIC "/awesomo/apriltag/target/yaw/inertial"
+#define TARGET_IF_YAW_TOPIC "/awesomo/control/heading/set"
 #define TARGET_BPF_YAW_TOPIC "/awesomo/apriltag/target/yaw/body"
 
 // SUBSCRIBE TOPICS
