@@ -26,7 +26,7 @@ namespace awesomo {
 #define GIMBAL_JOINT_ORIENTATION_TOPIC "/awesomo/gimbal/joint/orientation/inertial"
 #define SHUTDOWN_TOPIC "/awesomo/camera/shutdown"
 
-class CameraNode : public ROSNode {
+class PGCameraNode : public ROSNode {
 public:
   PointGreyCamera camera;
   cv::Mat image;
@@ -34,7 +34,7 @@ public:
   Quaternion gimbal_frame;
   Quaternion gimbal_joint;
 
-  CameraNode(int argc, char **argv) : ROSNode(argc, argv) {}
+  PGCameraNode(int argc, char **argv) : ROSNode(argc, argv) {}
   int configure(std::string node_name, int hz);
   int publishImage(void);
   void imageCallback(const sensor_msgs::ImageConstPtr &msg);

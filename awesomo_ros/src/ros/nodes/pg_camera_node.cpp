@@ -2,7 +2,7 @@
 
 namespace awesomo {
 
-int CameraNode::configure(std::string node_name, int hz) {
+int PGCameraNode::configure(std::string node_name, int hz) {
   std::string config_path;
 
   // ros node
@@ -20,18 +20,18 @@ int CameraNode::configure(std::string node_name, int hz) {
 
   // register publisher and subscribers
   this->registerImagePublisher(CAMERA_IMAGE_TOPIC);
-  this->registerSubscriber(GIMBAL_FRAME_ORIENTATION_TOPIC, &CameraNode::gimbalFrameCallback, this);
-  this->registerSubscriber(GIMBAL_JOINT_ORIENTATION_TOPIC, &CameraNode::gimbalJointCallback, this);
+  this->registerSubscriber(GIMBAL_FRAME_ORIENTATION_TOPIC, &PGCameraNode::gimbalFrameCallback, this);
+  this->registerSubscriber(GIMBAL_JOINT_ORIENTATION_TOPIC, &PGCameraNode::gimbalJointCallback, this);
   // this->registerShutdown(SHUTDOWN_TOPIC);
 
   // register loop callback
-  this->registerLoopCallback(std::bind(&CameraNode::loopCallback, this));
+  this->registerLoopCallback(std::bind(&PGCameraNode::loopCallback, this));
 
   this->configured = true;
   return 0;
 }
 
-int CameraNode::publishImage(void) {
+int PGCameraNode::publishImage(void) {
   sensor_msgs::ImageConstPtr img_msg;
   cv::Mat grey;
   cv::cvtColor(image, grey, CV_BGR2GRAY);
@@ -50,21 +50,15 @@ int CameraNode::publishImage(void) {
   return 0;
 }
 
-void CameraNode::gimbalFrameCallback(const geometry_msgs::Quaternion &msg) {
-  this->gimbal_frame.w() = msg.w;
-  this->gimbal_frame.x() = msg.x;
-  this->gimbal_frame.y() = msg.y;
-  this->gimbal_frame.z() = msg.z;
+void PGCameraNode::gimbalFrameCallback(const geometry_msgs::Quaternion &msg) {
+  convertMsg(msg, this->gimbal_frame);
 }
 
-void CameraNode::gimbalJointCallback(const geometry_msgs::Quaternion &msg) {
-  this->gimbal_joint.w() = msg.w;
-  this->gimbal_joint.x() = msg.x;
-  this->gimbal_joint.y() = msg.y;
-  this->gimbal_joint.z() = msg.z;
+void PGCameraNode::gimbalJointCallback(const geometry_msgs::Quaternion &msg) {
+  convertMsg(msg, this->gimbal_joint);
 }
 
-int CameraNode::loopCallback(void) {
+int PGCameraNode::loopCallback(void) {
   this->camera.getFrame(this->image);
   this->camera.showImage(this->image);
   this->publishImage();
@@ -74,4 +68,4 @@ int CameraNode::loopCallback(void) {
 
 }  // end of awesomo namespace
 
-RUN_ROS_NODE(awesomo::CameraNode, NODE_NAME, NODE_RATE);
+RUN_ROS_NODE(awesomo::PGCameraNode, NODE_NAME, NODE_RATE);
