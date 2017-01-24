@@ -195,8 +195,8 @@ int convertMsg(geometry_msgs::Quaternion msg, Quaternion &q) {
 }
 
 int convertMsg(geometry_msgs::PoseStamped msg, Pose &p) {
-  convertMsg(msg.pose.orientation, p.q);
   convertMsg(msg.pose.position, p.position);
+  convertMsg(msg.pose.orientation, p.orientation);
   return 0;
 }
 

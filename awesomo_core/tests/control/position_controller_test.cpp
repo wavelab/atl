@@ -175,7 +175,7 @@ TEST(PositionController, calculate2) {
 
   actual.position << 0, 0, 0;
   euler << 0.0, 0.0, deg2rad(90.0);
-  euler2quat(euler, 321, actual.q);
+  euler2quat(euler, 321, actual.orientation);
 
   yaw_setpoint = 0;
   dt = 0.1;

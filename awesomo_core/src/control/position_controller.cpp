@@ -74,14 +74,18 @@ Vec4 PositionController::calculate(Vec3 setpoints,
   }
 
   // calculate setpoint relative to quadrotor
-  target2bodyplanar(setpoints, robot_pose.position, robot_pose.q, errors);
+  target2bodyplanar(setpoints,
+                    robot_pose.position,
+                    robot_pose.orientation,
+                    errors);
 
   // roll, pitch, yaw and throttle (assuming NWU frame)
   // clang-format off
   r = -this->y_controller.calculate(errors(1), 0.0, this->dt);
   p = this->x_controller.calculate(errors(0), 0.0, this->dt);
   y = yaw;
-  t = this->hover_throttle + this->z_controller.calculate(errors(2), 0.0, this->dt);
+  t = this->hover_throttle;
+  t += this->z_controller.calculate(errors(2), 0.0, this->dt);
   t /= fabs(cos(r) * cos(p));  // adjust throttle for roll and pitch
   // clang-format o
 

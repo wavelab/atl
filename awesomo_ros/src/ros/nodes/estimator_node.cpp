@@ -117,7 +117,7 @@ void EstimatorNode::publishLTKFBodyPositionEstimate(void) {
   // transform target position from inertial frame to body planar frame
   target2bodyplanar(est_pos,
                     this->quad_pose.position,
-                    this->quad_pose.q,
+                    this->quad_pose.orientation,
                     this->target_pos_bpf);
 
   // build and publish msg
@@ -137,7 +137,7 @@ void EstimatorNode::publishLTKFBodyVelocityEstimate(void) {
   // transform target velocity from inertial frame to body planar frame
   target2bodyplanar(est_vel,
                     this->quad_velocity,
-                    this->quad_pose.q,
+                    this->quad_pose.orientation,
                     this->target_vel_bpf);
 
   // build and publish msg

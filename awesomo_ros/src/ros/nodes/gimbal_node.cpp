@@ -64,9 +64,9 @@ int GimbalNode::loopCallback(void) {
    // clang-format on
 
    // clang-format off
-   frame_euler << this->gimbal.frame(0),
-                  this->gimbal.frame(1),
-                  this->gimbal.frame(2);
+   frame_euler << this->gimbal.frame_angles(0),
+                  this->gimbal.frame_angles(1),
+                  this->gimbal.frame_angles(2);
    // clang-format on
 
    // convert angles to quaterions
@@ -90,7 +90,7 @@ int GimbalNode::loopCallback(void) {
    cam_imu_msg.linear_acceleration.y = this->gimbal.imu_accel(1);
    cam_imu_msg.linear_acceleration.z = this->gimbal.imu_accel(2);
 
-   buildMsg(frame_orientation, frame_msg);
+   buildMsg(frame_orientation, frame_angles_msg);
 
    this->ros_pubs[CAMERA_IMU_TOPIC].publish(cam_imu_msg);
    this->ros_pubs[FRAME_RPY_TOPIC].publish(frame_angles_msg);
