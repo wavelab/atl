@@ -20,6 +20,7 @@ INCLUDE_DIRECTORIES(
     /usr/include
     /usr/local/include
     /usr/include/eigen3
+    /usr/include/flycapture/
 )
 
 # LIBRARY
@@ -54,7 +55,7 @@ ADD_LIBRARY(
     src/vision/camera/camera.cpp
     src/vision/camera/config.cpp
     # src/vision/camera/ximea.cpp
-    # src/vision/camera/pointgrey.cpp
+    src/vision/camera/pointgrey.cpp
     src/vision/gimbal/gimbal.cpp
     src/vision/gimbal/sbgc.cpp
 )
@@ -62,6 +63,7 @@ SET(DEPS
     ${PROJECT_NAME}
     ${catkin_LIBRARIES}
     ${OpenCV_LIBS}
+    flycapture
     # apriltags_swathmore
     apriltags_mit
     CGAL
