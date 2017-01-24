@@ -291,4 +291,38 @@ void target2bodyplanar(Vec3 target_pos_if,
   target2body(target_pos_if, body_pos_if, euler, target_pos_bf);
 }
 
+void target2inertial(Vec3 target_pos_bf,
+                     Vec3 body_pos_if,
+                     Vec3 body_orientation_if,
+                     Vec3 &target_pos_if) {
+  Mat3 R;
+  Vec3 target_enu;
+
+  // construct rotation matrix from euler
+  euler2rot(body_orientation_if, 321, R);
+
+  // convert target body position from NWU to ENU
+  nwu2enu(target_pos_bf, target_enu);
+
+  // transform target from body to inertial frame
+  target_pos_if = (R * target_enu) + body_pos_if;
+}
+
+void target2inertial(Vec3 target_pos_bf,
+                     Vec3 body_pos_if,
+                     Quaternion body_orientation_if,
+                     Vec3 &target_pos_if) {
+  Mat3 R;
+  Vec3 target_enu;
+
+  // convert quaternion to rotation matrix
+  R = body_orientation_if.toRotationMatrix();
+
+  // convert target body position from NWU to ENU
+  nwu2enu(target_pos_bf, target_enu);
+
+  // transform target from body to inertial frame
+  target_pos_if = (R * target_enu) + body_pos_if;
+}
+
 }  // eof awesomo

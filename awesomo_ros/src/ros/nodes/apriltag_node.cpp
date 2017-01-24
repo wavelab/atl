@@ -21,8 +21,8 @@ int AprilTagNode::configure(const std::string &node_name, int hz) {
   // clang-format off
   this->registerPublisher<awesomo_msgs::AprilTagPose>(TARGET_POSE_TOPIC);
   this->registerPublisher<geometry_msgs::Vector3>(TARGET_IF_POS_TOPIC);
-  this->registerPublisher<std_msgs::Float64>(TARGET_IF_YAW_TOPIC);
   this->registerPublisher<geometry_msgs::Vector3>(TARGET_BPF_POS_TOPIC);
+  this->registerPublisher<std_msgs::Float64>(TARGET_IF_YAW_TOPIC);
   this->registerPublisher<std_msgs::Float64>(TARGET_BPF_YAW_TOPIC);
   this->registerImageSubscriber(CAMERA_IMAGE_TOPIC, &AprilTagNode::imageCallback, this);
   this->registerShutdown(SHUTDOWN);
@@ -42,55 +42,43 @@ void AprilTagNode::publishTagPoseMsg(TagPose tag) {
 }
 
 void AprilTagNode::publishTargetInertialPositionMsg(Vec3 gimbal_position,
-                                                    Quaternion gimbal_orientation,
+                                                    Quaternion gimbal_frame,
                                                     Vec3 target_bpf) {
   geometry_msgs::Vector3 msg;
-  Vec3 target_enu, target_if;
+  Vec3 target_if;
 
-  target_bpf = gimbal_orientation.toRotationMatrix() * target_bpf;
-
-  // convert target body planar frame from NWU to ENU
-  nwu2enu(target_bpf, target_enu);
-
-  // transform target from body to inertial frame
-  target_if = gimbal_position + target_enu;
-
-  // Vec3 euler;
-  // quat2euler(gimbal_orientation, 321, euler);
-  // std::cout << "frame: " << euler.transpose() << std::endl;
-
-  // std::cout << "target_if: " << target_if.transpose() << std::endl;
-  // target_if = gimbal_orientation.toRotationMatrix() * target_if;
-  // std::cout << "target_if: " << target_if.transpose() << std::endl;
-  // std::cout << std::endl;
-
+  // transform target from body planar to inertial frame
+  target_if = Gimbal::getTargetInIF(target_bpf,
+                                    gimbal_position,
+                                    gimbal_frame);
 
   // build and publish msg
   buildMsg(target_if, msg);
   this->ros_pubs[TARGET_IF_POS_TOPIC].publish(msg);
 }
 
-void AprilTagNode::publishTargetInertialYawMsg(TagPose tag, Quaternion body) {
-  double yaw_if;
-  Vec3 tag_euler, body_euler;
-  std_msgs::Float64 msg;
-
-  // convert orientation in quaternion to euler angles
-  quat2euler(body, 321, body_euler);
-  quat2euler(tag.orientation, 321, tag_euler);
-
-  // calculate inertial yaw
-  yaw_if = -tag_euler(2) + body_euler(2);
-
-  // build and publish msg
-  msg.data = yaw_if;
-  this->ros_pubs[TARGET_BPF_YAW_TOPIC].publish(msg);
-}
-
 void AprilTagNode::publishTargetBodyPositionMsg(Vec3 target_bpf) {
   geometry_msgs::Vector3 msg;
   buildMsg(target_bpf, msg);
   this->ros_pubs[TARGET_BPF_POS_TOPIC].publish(msg);
+}
+
+void AprilTagNode::publishTargetInertialYawMsg(TagPose tag,
+                                               Quaternion gimbal_frame) {
+  double yaw_if;
+  Vec3 tag_euler, gimbal_frame_euler;
+  std_msgs::Float64 msg;
+
+  // convert orientation in quaternion to euler angles
+  quat2euler(gimbal_frame, 321, gimbal_frame_euler);
+  quat2euler(tag.orientation, 321, tag_euler);
+
+  // calculate inertial yaw
+  yaw_if = gimbal_frame_euler(2) - tag_euler(2);
+
+  // build and publish msg
+  msg.data = yaw_if;
+  this->ros_pubs[TARGET_IF_YAW_TOPIC].publish(msg);
 }
 
 void AprilTagNode::publishTargetBodyYawMsg(TagPose tag) {
@@ -107,7 +95,7 @@ void AprilTagNode::publishTargetBodyYawMsg(TagPose tag) {
 
 void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
   Vec3 target_cf, target_bpf, gimbal_position;
-  Quaternion frame, joint;
+  Quaternion gimbal_frame, gimbal_joint;
   cv_bridge::CvImagePtr image_ptr;
   std::vector<TagPose> tags;
 
@@ -127,40 +115,34 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
   }
 
   // transform tag in camera frame to body planar frame
-  // clang-format off
-  target_cf << tags[0].position(0),
-               tags[0].position(1),
-               tags[0].position(2);
-  // clang-format on
+  target_cf << tags[0].position(0), tags[0].position(1), tags[0].position(2);
 
   gimbal_position(0) = image_ptr->image.at<double>(0, 0);
   gimbal_position(1) = image_ptr->image.at<double>(0, 1);
   gimbal_position(2) = image_ptr->image.at<double>(0, 2);
 
-  frame.w() = image_ptr->image.at<double>(0, 3);
-  frame.x() = image_ptr->image.at<double>(0, 4);
-  frame.y() = image_ptr->image.at<double>(0, 5);
-  frame.z() = image_ptr->image.at<double>(0, 6);
+  gimbal_frame.w() = image_ptr->image.at<double>(0, 3);
+  gimbal_frame.x() = image_ptr->image.at<double>(0, 4);
+  gimbal_frame.y() = image_ptr->image.at<double>(0, 5);
+  gimbal_frame.z() = image_ptr->image.at<double>(0, 6);
 
-  joint.w() = image_ptr->image.at<double>(0, 7);
-  joint.x() = image_ptr->image.at<double>(0, 8);
-  joint.y() = image_ptr->image.at<double>(0, 9);
-  joint.z() = image_ptr->image.at<double>(0, 10);
+  gimbal_joint.w() = image_ptr->image.at<double>(0, 7);
+  gimbal_joint.x() = image_ptr->image.at<double>(0, 8);
+  gimbal_joint.y() = image_ptr->image.at<double>(0, 9);
+  gimbal_joint.z() = image_ptr->image.at<double>(0, 10);
 
   target_bpf = Gimbal::getTargetInBPF(this->camera_offset,
                                       target_cf,
-                                      joint);
+                                      gimbal_joint);
 
   // publish tag pose
   this->publishTagPoseMsg(tags[0]);
-  this->publishTargetInertialPositionMsg(gimbal_position, frame, target_bpf);
-  this->publishTargetInertialYawMsg(tags[0], this->orientation);
+  this->publishTargetInertialPositionMsg(gimbal_position,
+                                         gimbal_frame,
+                                         target_bpf);
   this->publishTargetBodyPositionMsg(target_bpf);
+  this->publishTargetInertialYawMsg(tags[0], gimbal_frame);
   this->publishTargetBodyYawMsg(tags[0]);
-}
-
-void AprilTagNode::poseCallback(const geometry_msgs::PoseStamped &msg) {
-  this->orientation = convertMsg(msg.pose.orientation);
 }
 
 }  // end of awesomo namespace

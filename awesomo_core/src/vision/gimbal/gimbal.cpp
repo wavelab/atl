@@ -80,24 +80,20 @@ Vec3 Gimbal::getTargetInBF(Pose camera_offset, Vec3 target_cf) {
   Vec3 t;
 
   // transform camera frame to gimbal joint frame (NWU)
-  // camera frame:  (z - forward, x - right, y - down)
-  // gimbal joint frame (NWU):  (x - forward, y - left, z - up)
-  target_nwu(0) = target_cf(2);
-  target_nwu(1) = -target_cf(0);
-  target_nwu(2) = -target_cf(1);
+  cf2nwu(target_cf, target_nwu);
 
   // camera mount offset
   R = camera_offset.rotationMatrix();
   t = camera_offset.position;
 
   // transform target from camera frame to gimbal joint frame
-  return (R * target_nwu + t);
+  return R * target_nwu + t;
 }
 
 Vec3 Gimbal::getTargetInBPF(Pose camera_offset,
                             Vec3 target_cf,
-                            Quaternion &joint_if) {
-  Vec3 p, target_bpf;
+                            Quaternion joint_if) {
+  Vec3 p;
   Mat3 R;
 
   // joint is assumed to be NWU frame (same as ROS REP-103)
@@ -107,9 +103,30 @@ Vec3 Gimbal::getTargetInBPF(Pose camera_offset,
   p = Gimbal::getTargetInBF(camera_offset, target_cf);
 
   // transform target in camera frame to body planar frame
-  target_bpf = R * p;
+  return R * p;
+}
 
-  return target_bpf;
+Vec3 Gimbal::getTargetInIF(Vec3 target_bpf,
+                           Vec3 gimbal_position,
+                           Quaternion gimbal_frame_if) {
+  Vec3 euler, target, target_enu, target_if;
+  Mat3 R;
+
+  // filter out roll and pitch in quaternion
+  quat2euler(gimbal_frame_if, 321, euler);
+  euler << 0.0, 0.0, euler(2);
+  euler2rot(euler, 321, R);
+
+  // compensate yaw in target from body planar frame to inertial frame
+  target = R * target_bpf;
+
+  // convert target from NWU to ENU
+  nwu2enu(target, target_enu);
+
+  // transform target from body to inertial frame
+  target_if = gimbal_position + target_enu;
+
+  return target_if;
 }
 
 int Gimbal::getTargetInBPF(Vec3 target_cf, Vec3 &target_bpf) {

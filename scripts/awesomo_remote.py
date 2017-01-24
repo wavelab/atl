@@ -130,5 +130,5 @@ if __name__ == "__main__":
     # lz.set_angular_velocity(angular_velocity)
 
     quad.set_heading(270.0)
-    quad.set_hover_point([0.0, 0.0, 3.0])
+    # quad.set_hover_point([0.0, 2.0, 10.0])
     # quad.set_hover_height(3.0)

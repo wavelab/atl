@@ -51,6 +51,13 @@ void target2bodyplanar(Vec3 target_pos_if,
                        Vec3 body_pos_if,
                        Vec3 body_euler_if,
                        Vec3 &target_pos_bf);
-
+void target2inertial(Vec3 target_pos_bf,
+                     Vec3 body_pos_if,
+                     Vec3 body_euler_if,
+                     Vec3 &target_pos_if);
+void target2inertial(Vec3 target_pos_bf,
+                     Vec3 body_pos_if,
+                     Quaternion body_orientation_if,
+                     Vec3 &target_pos_if);
 }  // end of awesomo namespace
 #endif

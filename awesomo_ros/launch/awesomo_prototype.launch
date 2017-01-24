@@ -9,9 +9,9 @@
 
   <!-- prototype -->
   <param name="gimbal_mode" value="true" />
-  <param name="gimbal/position/topic" value="/awesomo/gimbal/position/inertial" />
-  <param name="gimbal/frame/orientation/topic" value="/awesomo/gimbal/frame/orientation/inertial" />
-  <param name="gimbal/joint/orientation/topic" value="/awesomo/gimbal/joint/orientation/inertial" />
+  <param name="gimbal_position_topic" value="/awesomo/gimbal/position/inertial" />
+  <param name="gimbal_frame_orientation_topic" value="/awesomo/gimbal/frame/orientation/inertial" />
+  <param name="gimbal_joint_orientation_topic" value="/awesomo/gimbal/joint/orientation/inertial" />
 
   <node pkg="prototype_ros" name="prototype_gazebo" type="run_gazebo.sh" output="screen" required="true" />
   <node pkg="prototype_ros" name="prototype_world" type="world_node" output="screen" required="true" />
@@ -24,7 +24,6 @@
   </node>
   <node pkg="prototype_ros" name="prototype_camera" type="camera_node" output="screen" required="true">
     <remap from="/prototype/camera/image" to="/awesomo/camera/image" />
-    <remap from="/prototype/camera/image_pose_stamped" to="/awesomo/camera/image_pose_stamped" />
   </node>
   <node pkg="prototype_ros" name="prototype_gimbal" type="gimbal_node" output="screen" required="true" >
     <remap from="/prototype/gimbal/position/inertial" to="/awesomo/gimbal/position/inertial" />

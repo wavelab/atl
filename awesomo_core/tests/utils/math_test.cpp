@@ -294,4 +294,91 @@ TEST(Utils, target2bodyplanar) {
   ASSERT_FLOAT_EQ(0.0, target_pos_bpf(2));
 }
 
+TEST(Utils, target2inertial) {
+  Vec3 target_pos_bf, target_pos_if, body_pos_if, euler;
+  Quaternion quat;
+
+  // setup
+  target_pos_bf << 2.0, 1.0, 0.0;
+  body_pos_if << 1.0, 2.0, 0.0;
+
+  // TEST EULER VERSION OF target2inertial()
+  // test 0 degree
+  euler << 0.0, 0.0, deg2rad(0.0);
+  target2inertial(target_pos_bf, body_pos_if, euler, target_pos_if);
+  std::cout << target_pos_if.transpose() << std::endl;
+
+  ASSERT_FLOAT_EQ(0.0, target_pos_if(0));
+  ASSERT_FLOAT_EQ(4.0, target_pos_if(1));
+  ASSERT_FLOAT_EQ(0.0, target_pos_if(2));
+
+  // test 90 degree
+  euler << 0.0, 0.0, deg2rad(90.0);
+  target2inertial(target_pos_bf, body_pos_if, euler, target_pos_if);
+  std::cout << target_pos_if.transpose() << std::endl;
+
+  ASSERT_FLOAT_EQ(-1.0, target_pos_if(0));
+  ASSERT_FLOAT_EQ(1.0, target_pos_if(1));
+  ASSERT_FLOAT_EQ(0.0, target_pos_if(2));
+
+  // test 180 degree
+  euler << 0.0, 0.0, deg2rad(180.0);
+  target2inertial(target_pos_bf, body_pos_if, euler, target_pos_if);
+  std::cout << target_pos_if.transpose() << std::endl;
+
+  ASSERT_FLOAT_EQ(2.0, target_pos_if(0));
+  ASSERT_FLOAT_EQ(0.0, target_pos_if(1));
+  ASSERT_FLOAT_EQ(0.0, target_pos_if(2));
+
+  // test 270 degree
+  euler << 0.0, 0.0, deg2rad(270.0);
+  target2inertial(target_pos_bf, body_pos_if, euler, target_pos_if);
+  std::cout << target_pos_if.transpose() << std::endl;
+
+  ASSERT_FLOAT_EQ(3.0, target_pos_if(0));
+  ASSERT_FLOAT_EQ(3.0, target_pos_if(1));
+  ASSERT_FLOAT_EQ(0.0, target_pos_if(2));
+
+  // TEST QUATERNION VERSION OF target2inertial()
+  // test 0 degree
+  euler << 0.0, 0.0, deg2rad(0.0);
+  euler2quat(euler, 321, quat);
+  target2inertial(target_pos_bf, body_pos_if, quat, target_pos_if);
+  std::cout << target_pos_if.transpose() << std::endl;
+
+  ASSERT_FLOAT_EQ(0.0, target_pos_if(0));
+  ASSERT_FLOAT_EQ(4.0, target_pos_if(1));
+  ASSERT_FLOAT_EQ(0.0, target_pos_if(2));
+
+  // test 90 degree
+  euler << 0.0, 0.0, deg2rad(90.0);
+  euler2quat(euler, 321, quat);
+  target2inertial(target_pos_bf, body_pos_if, quat, target_pos_if);
+  std::cout << target_pos_if.transpose() << std::endl;
+
+  ASSERT_FLOAT_EQ(-1.0, target_pos_if(0));
+  ASSERT_FLOAT_EQ(1.0, target_pos_if(1));
+  ASSERT_FLOAT_EQ(0.0, target_pos_if(2));
+
+  // test 180 degree
+  euler << 0.0, 0.0, deg2rad(180.0);
+  euler2quat(euler, 321, quat);
+  target2inertial(target_pos_bf, body_pos_if, quat, target_pos_if);
+  std::cout << target_pos_if.transpose() << std::endl;
+
+  ASSERT_FLOAT_EQ(2.0, target_pos_if(0));
+  ASSERT_FLOAT_EQ(0.0, target_pos_if(1));
+  ASSERT_FLOAT_EQ(0.0, target_pos_if(2));
+
+  // test 270 degree
+  euler << 0.0, 0.0, deg2rad(270.0);
+  euler2quat(euler, 321, quat);
+  target2inertial(target_pos_bf, body_pos_if, quat, target_pos_if);
+  std::cout << target_pos_if.transpose() << std::endl;
+
+  ASSERT_FLOAT_EQ(3.0, target_pos_if(0));
+  ASSERT_FLOAT_EQ(3.0, target_pos_if(1));
+  ASSERT_FLOAT_EQ(0.0, target_pos_if(2));
+}
+
 }  // end of awesomo namespace

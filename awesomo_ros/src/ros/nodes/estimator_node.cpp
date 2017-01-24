@@ -132,9 +132,9 @@ void EstimatorNode::publishLTKFBodyPositionEstimate(void) {
               euler,
               tmp);
 
-  std::cout << this->target_bf.transpose() << std::endl;
-  std::cout << tmp.transpose() << std::endl;
-  std::cout << std::endl;
+  // std::cout << this->target_bf.transpose() << std::endl;
+  // std::cout << tmp.transpose() << std::endl;
+  // std::cout << std::endl;
 
   // build and publish msg
   buildMsg(this->target_bf, msg);
