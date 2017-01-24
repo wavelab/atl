@@ -57,11 +57,11 @@ void EstimatorNode::resetLTKF(Vec3 target_pos_wf) {
 }
 
 void EstimatorNode::quadPoseCallback(const geometry_msgs::PoseStamped &msg) {
-  this->quad_pose = convertMsg(msg);
+  convertMsg(msg, this->quad_pose);
 }
 
 void EstimatorNode::quadVelocityCallback(const geometry_msgs::TwistStamped &msg) {
-  this->quad_velocity = convertMsg(msg.twist.linear);
+  convertMsg(msg.twist.linear, this->quad_velocity);
 }
 
 void EstimatorNode::targetWorldCallback(const geometry_msgs::Vector3 &msg) {
@@ -76,7 +76,7 @@ void EstimatorNode::targetWorldCallback(const geometry_msgs::Vector3 &msg) {
 
   // update target
   this->target_detected = true;
-  this->target_pos_wf = convertMsg(msg);
+  convertMsg(msg, this->target_pos_wf);
   tic(&this->target_last_updated);
 
   // initialize or reset estimator

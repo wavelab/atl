@@ -112,12 +112,14 @@ void ControlNode::stateCallback(const mavros_msgs::State::ConstPtr &msg) {
 }
 
 void ControlNode::poseCallback(const geometry_msgs::PoseStamped &msg) {
-  Pose pose = convertMsg(msg);
+  Pose pose;
+  convertMsg(msg, pose);
   this->quadrotor.setPose(pose);
 }
 
 void ControlNode::velocityCallback(const geometry_msgs::TwistStamped &msg) {
-  Vec3 linear_velocity = convertMsg(msg.twist.linear);
+  Vec3 linear_velocity;
+  convertMsg(msg.twist.linear, linear_velocity);
   this->quadrotor.setVelocity(linear_velocity);
 }
 
@@ -128,12 +130,14 @@ void ControlNode::radioCallback(const mavros_msgs::RCIn &msg) {
 }
 
 void ControlNode::targetPositionCallback(const geometry_msgs::Vector3 &msg) {
-  Vec3 position = convertMsg(msg);
+  Vec3 position;
+  convertMsg(msg, position);
   this->quadrotor.setTargetPosition(position);
 }
 
 void ControlNode::targetVelocityCallback(const geometry_msgs::Vector3 &msg) {
-  Vec3 velocity = convertMsg(msg);
+  Vec3 velocity;
+  convertMsg(msg, velocity);
   this->quadrotor.setTargetVelocity(velocity);
 }
 
@@ -142,39 +146,20 @@ void ControlNode::targetDetectedCallback(const std_msgs::Bool &msg) {
 }
 
 void ControlNode::headingSetCallback(const std_msgs::Float64 &msg) {
-  this->quadrotor.heading = convertMsg(msg);
+  convertMsg(msg, this->quadrotor.heading);
 }
 
 void ControlNode::hoverSetCallback(const geometry_msgs::Vector3 &msg) {
-  this->quadrotor.hover_position = convertMsg(msg);
+  convertMsg(msg, this->quadrotor.hover_position);
 }
 
 void ControlNode::hoverHeightSetCallback(const std_msgs::Float64 &msg) {
-  this->quadrotor.hover_position(2) = msg.data;
+  convertMsg(msg, this->quadrotor.hover_position(2));
 }
 
 void ControlNode::positionControllerSetCallback(
   const awesomo_msgs::PCtrlSettings &msg) {
-  PositionController *position_controller;
-
-  position_controller = &this->quadrotor.position_controller;
-
-  position_controller->pitch_limit[0] = deg2rad(msg.pitch_controller.min);
-  position_controller->pitch_limit[1] = deg2rad(msg.pitch_controller.max);
-  position_controller->x_controller.k_p = msg.pitch_controller.k_p;
-  position_controller->x_controller.k_i = msg.pitch_controller.k_i;
-  position_controller->x_controller.k_d = msg.pitch_controller.k_d;
-
-  position_controller->roll_limit[0] = deg2rad(msg.roll_controller.min);
-  position_controller->roll_limit[1] = deg2rad(msg.roll_controller.max);
-  position_controller->y_controller.k_p = msg.roll_controller.k_p;
-  position_controller->y_controller.k_i = msg.roll_controller.k_i;
-  position_controller->y_controller.k_d = msg.roll_controller.k_d;
-
-  position_controller->z_controller.k_p = msg.throttle_controller.k_p;
-  position_controller->z_controller.k_i = msg.throttle_controller.k_i;
-  position_controller->z_controller.k_d = msg.throttle_controller.k_d;
-  position_controller->hover_throttle = msg.hover_throttle;
+  convertMsg(msg, this->quadrotor.position_controller);
 }
 
 int ControlNode::loopCallback(void) {
