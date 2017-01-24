@@ -325,4 +325,17 @@ void target2inertial(Vec3 target_pos_bf,
   target_pos_if = (R * target_enu) + body_pos_if;
 }
 
+double wrapTo180(double euler_angle) {
+  return fmod((euler_angle + 180.0), 360.0) - 180.0;
+}
+
+double wrapTo360(double euler_angle) {
+  if (euler_angle > 0) {
+    return fmod(euler_angle, 360.0);
+  } else {
+    euler_angle += 360.0;
+    return fmod(euler_angle, 360.0);
+  }
+}
+
 }  // eof awesomo

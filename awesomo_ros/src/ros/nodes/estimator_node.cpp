@@ -229,7 +229,7 @@ int EstimatorNode::loopCallback(void) {
   this->publishLTKFBodyPositionEstimate();
   this->publishLTKFBodyVelocityEstimate();
   this->publishLTDetected();
-  // this->trackTarget();
+  this->trackTarget();
 
   // reset
   this->target_detected = false;

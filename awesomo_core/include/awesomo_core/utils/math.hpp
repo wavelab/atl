@@ -59,5 +59,9 @@ void target2inertial(Vec3 target_pos_bf,
                      Vec3 body_pos_if,
                      Quaternion body_orientation_if,
                      Vec3 &target_pos_if);
+double wrapTo180(double euler_angle);
+double wrapTo360(double euler_angle);
+
+
 }  // end of awesomo namespace
 #endif
