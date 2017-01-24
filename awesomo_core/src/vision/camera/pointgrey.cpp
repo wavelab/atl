@@ -7,7 +7,7 @@ PointGreyCamera::PointGreyCamera(void) {
   this->pointgrey = NULL;
 }
 
-~PointGreyCamera(void) {
+PointGreyCamera::~PointGreyCamera(void) {
   if (initialized) {
     delete this->pointgrey;
   }
@@ -19,73 +19,85 @@ int PointGreyCamera::initialize() {
   FlyCapture2::Property property;
   FlyCapture2::Property gain_property;
 
+  FlyCapture2::PGRGuid guid;
+  FlyCapture2::BusManager bus_manager;
+
   // setup
   this->pointgrey = new FlyCapture2::Camera();
 
-  // connect
-  camera_index = this->current_config->index;
-  error = this->pointgrey->Connect(camera_index);
+  // look for camera
+  error = bus_manager.GetCameraFromIndex(0, &guid);
+  if (error != FlyCapture2::PGRERROR_OK) {
+    log_err("ERROR! Could not find a camera!");
+    return -1;
+  }
+
+
+  error = this->pointgrey->Connect(&guid);
   if (error != FlyCapture2::PGRERROR_OK) {
     log_err("ERROR! Failed to connect to camera!");
     return -1;
   } else {
-    log_err("PointGrey camera connected!");
+    log_info("PointGrey camera connected!");
   }
+
+  this->printFormat7Capabilities();
+  this->setFormat7();
 
   // set video mode format and frame rate
-  error = this->pointgrey->SetVideoModeAndFrameRate(
-    FlyCapture2::VIDEOMODE_640x480Y8, FlyCapture2::FRAMERATE_60);
-  if (error != FlyCapture2::PGRERROR_OK) {
-    log_err("ERROR! Failed to set camera video mode and frame rate!");
-    return -1;
-  } else {
-    log_err("PointGrey camera video mode and frame rate configured!");
-  }
-
-  // configure exposure
-  property.type = FlyCapture2::AUTO_EXPOSURE;
-  property.onOff = true;
-  property.autoManualMode = false;
-  property.absControl = true;
-  property.absValue = this->camera_exposure_value;  // exposure value
-
-  error = this->pointgrey->SetProperty(&property);
-  if (error != FlyCapture2::PGRERROR_OK) {
-    log_err("ERROR! Failed to configure camera exposure!");
-    return -1;
-  } else {
-    log_err("PointGrey camera exposure configured!");
-  }
-
-  // configure gain
-  property.type = FlyCapture2::GAIN;
-  property.onOff = true;
-  property.autoManualMode = false;
-  property.absControl = true;
-  property.absValue = this->camera_gain_value;  // set the gain
-
-  error = this->pointgrey->SetProperty(&property);
-  if (error != FlyCapture2::PGRERROR_OK) {
-    log_err("ERROR! Failed to configure camera gain!");
-    return -1;
-  } else {
-    log_err("PointGrey camera gain configured!");
-  }
-
+  // error = this->pointgrey->SetVideoModeAndFrameRate(
+  //   FlyCapture2::VIDEOMODE_640x480Y8, FlyCapture2::FRAMERATE_60);
+  // if (error != FlyCapture2::PGRERROR_OK) {
+  //   log_err("ERROR! Failed to set camera video mode and frame rate!");
+  //   return -1;
+  // } else {
+  //   log_err("PointGrey camera video mode and frame rate configured!");
+  // }
+  //
+  // // configure exposure
+  // property.type = FlyCapture2::AUTO_EXPOSURE;
+  // property.onOff = true;
+  // property.autoManualMode = false;
+  // property.absControl = true;
+  // // property.absValue = this->camera_exposure_value;  // exposure value
+  //
+  // error = this->pointgrey->SetProperty(&property);
+  // if (error != FlyCapture2::PGRERROR_OK) {
+  //   log_err("ERROR! Failed to configure camera exposure!");
+  //   return -1;
+  // } else {
+  //   log_err("PointGrey camera exposure configured!");
+  // }
+  //
+  // // configure gain
+  // property.type = FlyCapture2::GAIN;
+  // property.onOff = true;
+  // property.autoManualMode = false;
+  // property.absControl = true;
+  // // property.absValue = this->camera_gain_value;  // set the gain
+  //
+  // error = this->pointgrey->SetProperty(&property);
+  // if (error != FlyCapture2::PGRERROR_OK) {
+  //   log_err("ERROR! Failed to configure camera gain!");
+  //   return -1;
+  // } else {
+  //   printf("PointGrey camera gain configured!");
+  // }
+  //
   // start camera
   error = this->pointgrey->StartCapture();
   if (error != FlyCapture2::PGRERROR_OK) {
     log_err("ERROR! Failed start camera!");
     return -1;
   } else {
-    log_err("PointGrey initialized!");
+    log_info("PointGrey initialized!");
   }
   this->initialized = true;
 
   return 0;
 }
 
-int Camera::getFrame(cv::Mat &image) {
+int PointGreyCamera::getFrame(cv::Mat &image) {
   double data_size;
   double data_rows;
   unsigned int row_bytes;
@@ -119,10 +131,67 @@ int Camera::getFrame(cv::Mat &image) {
 
   // resize the image to reflect camera mode
   // clang-format off
-  image_size = cv::Size(this->current_config->image_width,
-                        this->current_config->image_height);
-  cv::resize(image, image, image_size);
+  // image_size = cv::Size(this->current_config->image_width,
+  //                       this->current_config->image_height);
+  // image_size = cv::Size(480, 320);
+  // cv::resize(image, image, image_size);
   // clang-format on
+
+  return 0;
+}
+
+int PointGreyCamera::setFormat7(void) {
+
+  FlyCapture2::Format7ImageSettings fmt7_image_settings;
+  FlyCapture2::PixelFormat k_fmt7PixFmt = FlyCapture2::PIXEL_FORMAT_BGR;
+  FlyCapture2::Error error;
+  FlyCapture2::Format7PacketInfo fmt7PacketInfo;
+  bool valid;
+
+  k_fmt7PixFmt = FlyCapture2::PIXEL_FORMAT_BGR;
+
+  fmt7_image_settings.mode = FlyCapture2::MODE_1;
+  fmt7_image_settings.offsetX = 200;
+  fmt7_image_settings.offsetY = 144;
+  fmt7_image_settings.width = 624;
+  fmt7_image_settings.height = 420;
+  fmt7_image_settings.pixelFormat = k_fmt7PixFmt;
+
+
+  //Validate the settings to make sure that they are valid
+  error =
+    this->pointgrey->ValidateFormat7Settings(&fmt7_image_settings, &valid, &fmt7PacketInfo);
+  if (error != FlyCapture2::PGRERROR_OK) {
+    log_err("Format7 settings are invalid!");
+    return -1;
+  }
+  // Send the settings to the camera
+  error = this->pointgrey->SetFormat7Configuration(&fmt7_image_settings,
+      fmt7PacketInfo.recommendedBytesPerPacket);
+
+  if (error != FlyCapture2::PGRERROR_OK) {
+    log_err("Could not configure the camera with Format7!");
+    return -1;
+  }
+
+    log_info("Format7 Settings applied successfully!");
+  return 0;
+}
+
+int PointGreyCamera::printFormat7Capabilities(void) {
+  FlyCapture2::Format7Info fmt7_info;
+  bool supported;
+
+  this->pointgrey->GetFormat7Info(&fmt7_info, &supported);
+  log_info(
+      "Max image pixels: (%u, %u)\n"
+      "Image Unit size: (%u, %u)\n"
+      "Offset Unit size: (%u, %u)\n"
+      "Pixel format bitfield: 0x%08x\n",
+      fmt7_info.maxWidth, fmt7_info.maxHeight, fmt7_info.imageHStepSize,
+      fmt7_info.imageVStepSize, fmt7_info.offsetHStepSize,
+      fmt7_info.offsetVStepSize, fmt7_info.pixelFormatBitField
+  );
 
   return 0;
 }

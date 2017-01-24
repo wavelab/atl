@@ -4,8 +4,8 @@
   <param name="use_sim_time" value="false" />
   <param name="sim_mode" value="false" />
   <param name="debug_mode" value="false" />
-  <param name="camera_config_dir" value="$(find awesomo_configs)/configs/camera/logitech_c270" />
+  <param name="camera_config_dir" value="$(find awesomo_configs)/configs/camera/pointgrey_firefly" />
 
   <!-- ros node -->
-  <node pkg="awesomo_ros" name="awesomo_camera" type="camera_node" output="screen" required="true" />
+  <node pkg="awesomo_ros" name="awesomo_camera" type="pg_camera_node" output="screen" required="true" />
 </launch>

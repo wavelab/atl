@@ -1,9 +1,8 @@
 #ifndef __AWESOMO_CORE_VISION_CAMERA_POINTGREY_HPP__
 #define __AWESOMO_CORE_VISION_CAMERA_POINTGREY_HPP__
 
-#include <FlyCapture2.h>
-
-#include "awesomo_core/vision/camera/camera_pointgrey.hpp"
+#include <flycapture/FlyCapture2.h>
+#include "awesomo_core/vision/camera/camera.hpp"
 
 
 namespace awesomo {
@@ -16,6 +15,8 @@ public:
   ~PointGreyCamera(void);
   int initialize(void);
   int getFrame(cv::Mat &image);
+  int printFormat7Capabilities(void);
+  int setFormat7(void);
 };
 
 }  // end of awesomo namespace
