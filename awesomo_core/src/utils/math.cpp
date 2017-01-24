@@ -226,4 +226,116 @@ void cf2enu(Vec3 cf, Vec3 &enu) {
   enu(2) = -cf(1);
 }
 
+void target2body(Vec3 target_pos_if,
+                 Vec3 body_pos_if,
+                 Quaternion body_orientation_if,
+                 Vec3 &target_pos_bf) {
+  Mat3 R;
+  Vec3 pos_enu, pos_nwu;
+
+  // convert quaternion to rotation matrix
+  R = body_orientation_if.toRotationMatrix().inverse();
+
+  // calculate position difference and convert to body frame
+  pos_enu = target_pos_if - body_pos_if;  // assumes inertial frame is ENU
+  enu2nwu(pos_enu, pos_nwu);
+
+  // compensate for body orientation by rotating
+  target_pos_bf = R * pos_nwu;
+}
+
+void target2body(Vec3 target_pos_if,
+                 Vec3 body_pos_if,
+                 Vec3 body_orientation_if,
+                 Vec3 &target_pos_bf) {
+  Mat3 R;
+  Vec3 pos_enu, pos_nwu;
+
+  // convert euler to rotation matrix
+  euler2rot(body_orientation_if, 123, R);
+
+  // calculate position difference and convert to body frame
+  pos_enu = target_pos_if - body_pos_if;  // assumes inertial frame is ENU
+  enu2nwu(pos_enu, pos_nwu);
+
+  // compensate for body orientation by rotating
+  target_pos_bf = R * pos_nwu;
+}
+
+void target2bodyplanar(Vec3 target_pos_if,
+                       Vec3 body_pos_if,
+                       Quaternion body_orientation_if,
+                       Vec3 &target_pos_bf) {
+  Vec3 euler;
+
+  // convert quaternion to euler
+  quat2euler(body_orientation_if, 321, euler);
+
+  // filtering out roll and pitch since we are in body planar frame
+  euler << 0.0, 0.0, euler(2);
+
+  // calculate setpoint relative to quadrotor
+  target2body(target_pos_if, body_pos_if, euler, target_pos_bf);
+}
+
+void target2bodyplanar(Vec3 target_pos_if,
+                       Vec3 body_pos_if,
+                       Vec3 body_orientation_if,
+                       Vec3 &target_pos_bf) {
+  Vec3 euler;
+
+  // filtering out roll and pitch since we are in body planar frame
+  euler << 0.0, 0.0, body_orientation_if(2);
+
+  // calculate setpoint relative to quadrotor
+  target2body(target_pos_if, body_pos_if, euler, target_pos_bf);
+}
+
+void target2inertial(Vec3 target_pos_bf,
+                     Vec3 body_pos_if,
+                     Vec3 body_orientation_if,
+                     Vec3 &target_pos_if) {
+  Mat3 R;
+  Vec3 target_enu;
+
+  // construct rotation matrix from euler
+  euler2rot(body_orientation_if, 321, R);
+
+  // convert target body position from NWU to ENU
+  nwu2enu(target_pos_bf, target_enu);
+
+  // transform target from body to inertial frame
+  target_pos_if = (R * target_enu) + body_pos_if;
+}
+
+void target2inertial(Vec3 target_pos_bf,
+                     Vec3 body_pos_if,
+                     Quaternion body_orientation_if,
+                     Vec3 &target_pos_if) {
+  Mat3 R;
+  Vec3 target_enu;
+
+  // convert quaternion to rotation matrix
+  R = body_orientation_if.toRotationMatrix();
+
+  // convert target body position from NWU to ENU
+  nwu2enu(target_pos_bf, target_enu);
+
+  // transform target from body to inertial frame
+  target_pos_if = (R * target_enu) + body_pos_if;
+}
+
+double wrapTo180(double euler_angle) {
+  return fmod((euler_angle + 180.0), 360.0) - 180.0;
+}
+
+double wrapTo360(double euler_angle) {
+  if (euler_angle > 0) {
+    return fmod(euler_angle, 360.0);
+  } else {
+    euler_angle += 360.0;
+    return fmod(euler_angle, 360.0);
+  }
+}
+
 }  // eof awesomo

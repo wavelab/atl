@@ -1,6 +1,8 @@
 #ifndef __AWESOMO_UTILS_MATH_HPP__
 #define __AWESOMO_UTILS_MATH_HPP__
 
+#include <iostream>
+
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 
@@ -33,6 +35,33 @@ void enu2nwu(Vec3 enu, Vec3 &nwu);
 void cf2nwu(Vec3 cf, Vec3 &nwu);
 void nwu2enu(Vec3 nwu, Vec3 &enu);
 void cf2enu(Vec3 cf, Vec3 &nwu);
+void target2body(Vec3 target_pos_if,
+                 Vec3 body_pos_if,
+                 Quaternion body_orientation_if,
+                 Vec3 &target_pos_bf);
+void target2body(Vec3 target_pos_if,
+                 Vec3 body_pos_if,
+                 Vec3 body_euler_if,
+                 Vec3 &target_pos_bf);
+void target2bodyplanar(Vec3 target_pos_if,
+                       Vec3 body_pos_if,
+                       Quaternion body_orientation_if,
+                       Vec3 &target_pos_bf);
+void target2bodyplanar(Vec3 target_pos_if,
+                       Vec3 body_pos_if,
+                       Vec3 body_euler_if,
+                       Vec3 &target_pos_bf);
+void target2inertial(Vec3 target_pos_bf,
+                     Vec3 body_pos_if,
+                     Vec3 body_euler_if,
+                     Vec3 &target_pos_if);
+void target2inertial(Vec3 target_pos_bf,
+                     Vec3 body_pos_if,
+                     Quaternion body_orientation_if,
+                     Vec3 &target_pos_if);
+double wrapTo180(double euler_angle);
+double wrapTo360(double euler_angle);
+
 
 }  // end of awesomo namespace
 #endif

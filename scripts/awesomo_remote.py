@@ -120,15 +120,15 @@ if __name__ == "__main__":
     gimbal = Gimbal()
     rospy.sleep(1)
 
-    # gimbal.set_attitude([0.0, 0.8])
+    # gimbal.set_attitude([0.0, 0.0])
 
-    # lz.set_velocity(0.0)
+    # lz.set_velocity(0.5)
     # lz.set_position([100, 0, 0])
 
-    # velocity, angular_velocity = lz_circle_path(30, 1.0)
-    # lz.set_velocity(velocity)
-    # lz.set_angular_velocity(angular_velocity)
+    velocity, angular_velocity = lz_circle_path(2, 1.0)
+    lz.set_velocity(velocity)
+    lz.set_angular_velocity(angular_velocity)
 
-    quad.set_heading(180.0)
-    quad.set_hover_point([0.0, 0.0, 3.0])
+    # quad.set_heading(180.0)
+    # quad.set_hover_point([0.0, 2.0, 10.0])
     # quad.set_hover_height(3.0)

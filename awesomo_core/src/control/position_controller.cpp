@@ -63,8 +63,8 @@ Vec4 PositionController::calculate(Vec3 setpoints,
                                    double yaw,
                                    double dt) {
   double r, p, y, t;
-  Vec3 setpoints_nwu, robot_nwu, errors, euler;
-  Vec4 actual, outputs;
+  Vec3 errors;
+  Vec4 outputs;
   Mat3 R;
 
   // check rate
@@ -73,18 +73,8 @@ Vec4 PositionController::calculate(Vec3 setpoints,
     return this->outputs;
   }
 
-  // transform setpoints from ENU to NWU (world to body)
-  enu2nwu(setpoints, setpoints_nwu);
-
-  // transform robot position ENU to NWU (world to body)
-  enu2nwu(robot_pose.position, robot_nwu);
-  quat2euler(robot_pose.q, 321, euler);
-
-  // calculate RPY errors relative to quadrotor by incorporating yaw
-  errors = setpoints_nwu - robot_nwu;
-  euler << 0.0, 0.0, euler(2);
-  euler2rot(euler, 123, R);
-  errors = R * errors;
+  // calculate setpoint relative to quadrotor
+  target2bodyplanar(setpoints, robot_pose.position, robot_pose.q, errors);
 
   // roll, pitch, yaw and throttle (assuming NWU frame)
   // clang-format off
@@ -104,12 +94,6 @@ Vec4 PositionController::calculate(Vec3 setpoints,
   // limit throttle
   t = (t < 0) ? 0.0 : t;
   t = (t > 1.0) ? 1.0 : t;
-
-  // yaw first if above threshold
-  if (fabs(yaw - actual(3)) > deg2rad(10.0)) {
-    r = 0;
-    p = 0;
-  }
 
   // set outputs
   outputs << r, p, y, t;

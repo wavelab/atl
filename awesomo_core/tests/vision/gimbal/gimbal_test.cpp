@@ -244,6 +244,59 @@ TEST(Gimbal, getTargetInBPF) {
   ASSERT_TRUE(target_bpf(2) < 0.0);
 }
 
+TEST(Gimbal, getTargetInIF) {
+  Quaternion frame;
+  Vec3 euler, target_bpf, gimbal_position, target_if;
+
+  // setup
+  target_bpf << 1.0, 2.0, 0.0;
+  gimbal_position << 0.0, 1.0, 2.0;
+
+  // test 0 degree
+  euler << 0.0, 0.0, deg2rad(0.0);
+  euler2quat(euler, 321, frame);
+
+  target_if = Gimbal::getTargetInIF(target_bpf, gimbal_position, frame);
+  std::cout << "target if: " << target_if.transpose() << std::endl;
+
+  ASSERT_FLOAT_EQ(-2.0, target_if(0));
+  ASSERT_FLOAT_EQ(2.0, target_if(1));
+  ASSERT_FLOAT_EQ(2.0, target_if(2));
+
+  // test 90 degree
+  euler << 0.0, 0.0, deg2rad(90.0);
+  euler2quat(euler, 321, frame);
+
+  target_if = Gimbal::getTargetInIF(target_bpf, gimbal_position, frame);
+  std::cout << "target if: " << target_if.transpose() << std::endl;
+
+  ASSERT_FLOAT_EQ(-1.0, target_if(0));
+  ASSERT_FLOAT_EQ(-1.0, target_if(1));
+  ASSERT_FLOAT_EQ(2.0, target_if(2));
+
+  // test 180 degree
+  euler << 0.0, 0.0, deg2rad(180.0);
+  euler2quat(euler, 321, frame);
+
+  target_if = Gimbal::getTargetInIF(target_bpf, gimbal_position, frame);
+  std::cout << "target if: " << target_if.transpose() << std::endl;
+
+  ASSERT_NEAR(2.0, target_if(0), 0.001);
+  ASSERT_NEAR(0.0, target_if(1), 0.001);
+  ASSERT_NEAR(2.0, target_if(2), 0.001);
+
+  // test 270 degree
+  euler << 0.0, 0.0, deg2rad(270.0);
+  euler2quat(euler, 321, frame);
+
+  target_if = Gimbal::getTargetInIF(target_bpf, gimbal_position, frame);
+  std::cout << "target if: " << target_if.transpose() << std::endl;
+
+  ASSERT_NEAR(1.0, target_if(0), 0.001);
+  ASSERT_NEAR(3.0, target_if(1), 0.001);
+  ASSERT_NEAR(2.0, target_if(2), 0.001);
+}
+
 TEST(Gimbal, trackTarget) {
   Gimbal gimbal;
   Quaternion imu;

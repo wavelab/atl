@@ -76,7 +76,6 @@ public:
   int setTargetDetected(bool detected);
   int setHoverXYPosition(Vec3 position);
   int setHoverPosition(Vec3 position);
-  static void transformTargetToBody(Vec3 target_if, Pose pose);
   bool conditionsMet(bool *conditions, int nb_conditions);
   int stepHoverMode(double dt);
   int stepDiscoverMode(double dt);
