@@ -57,11 +57,11 @@ void EstimatorNode::resetLTKF(Vec3 target_pos_wf) {
 }
 
 void EstimatorNode::quadPoseCallback(const geometry_msgs::PoseStamped &msg) {
-  this->quad_pose = convertMsg(msg);
+  convertMsg(msg, this->quad_pose);
 }
 
 void EstimatorNode::quadVelocityCallback(const geometry_msgs::TwistStamped &msg) {
-  this->quad_velocity = convertMsg(msg.twist.linear);
+  convertMsg(msg.twist.linear, this->quad_velocity);
 }
 
 void EstimatorNode::targetWorldCallback(const geometry_msgs::Vector3 &msg) {
@@ -76,7 +76,7 @@ void EstimatorNode::targetWorldCallback(const geometry_msgs::Vector3 &msg) {
 
   // update target
   this->target_detected = true;
-  this->target_pos_wf = convertMsg(msg);
+  convertMsg(msg, this->target_pos_wf);
   tic(&this->target_last_updated);
 
   // initialize or reset estimator
@@ -117,7 +117,7 @@ void EstimatorNode::publishLTKFBodyPositionEstimate(void) {
   // transform target position from inertial frame to body planar frame
   target2bodyplanar(est_pos,
                     this->quad_pose.position,
-                    this->quad_pose.q,
+                    this->quad_pose.orientation,
                     this->target_pos_bpf);
 
   // build and publish msg
@@ -137,7 +137,7 @@ void EstimatorNode::publishLTKFBodyVelocityEstimate(void) {
   // transform target velocity from inertial frame to body planar frame
   target2bodyplanar(est_vel,
                     this->quad_velocity,
-                    this->quad_pose.q,
+                    this->quad_pose.orientation,
                     this->target_vel_bpf);
 
   // build and publish msg

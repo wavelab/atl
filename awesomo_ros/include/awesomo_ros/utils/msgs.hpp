@@ -42,15 +42,16 @@ void buildMsg(PositionController pc, awesomo_msgs::PCtrlSettings &msg);
 void buildMsg(TrackingController tc, awesomo_msgs::TCtrlStats &msg);
 void buildMsg(TrackingController tc, awesomo_msgs::TCtrlSettings &msg);
 
-bool convertMsg(std_msgs::Bool msg);
-std::string convertMsg(std_msgs::String msg);
-double convertMsg(std_msgs::Float64 msg);
-Vec3 convertMsg(geometry_msgs::Vector3 msg);
-Vec3 convertMsg(geometry_msgs::Point msg);
-Quaternion convertMsg(geometry_msgs::Quaternion msg);
-Pose convertMsg(geometry_msgs::PoseStamped msg);
-VecX convertMsg(geometry_msgs::TwistStamped msg);
-TagPose convertMsg(awesomo_msgs::AprilTagPose msg);
+int convertMsg(std_msgs::Bool msg, bool &b);
+int convertMsg(std_msgs::String msg, std::string &s);
+int convertMsg(std_msgs::Float64 msg, double &d);
+int convertMsg(geometry_msgs::Vector3 msg, Vec3 &v);
+int convertMsg(geometry_msgs::Point msg, Vec3 &v);
+int convertMsg(geometry_msgs::Quaternion msg, Quaternion &q);
+int convertMsg(geometry_msgs::PoseStamped msg, Pose &p);
+int convertMsg(geometry_msgs::TwistStamped msg, VecX &v);
+int convertMsg(awesomo_msgs::AprilTagPose msg, TagPose &p);
+int convertMsg(awesomo_msgs::PCtrlSettings msg, PositionController &pc);
 
 }  // end of awesomo namespace
 #endif

@@ -161,77 +161,85 @@ void buildMsg(TrackingController tc, awesomo_msgs::TCtrlSettings &msg) {
   msg.hover_throttle = tc.hover_throttle;
 }
 
-bool convertMsg(std_msgs::Bool msg) {
-  return msg.data;
+int convertMsg(std_msgs::Bool msg, bool &b) {
+  b = msg.data;
+  return 0;
 }
 
-std::string convertMsg(std_msgs::String msg) {
-  return msg.data;
+int convertMsg(std_msgs::String msg, std::string &s) {
+  s = msg.data;
+  return 0;
 }
 
-double convertMsg(std_msgs::Float64 msg) {
-  return msg.data;
+int convertMsg(std_msgs::Float64 msg, double &d) {
+  d = msg.data;
+  return 0;
 }
 
-Vec3 convertMsg(geometry_msgs::Vector3 msg) {
-  Vec3 v;
+int convertMsg(geometry_msgs::Vector3 msg, Vec3 &v) {
   v << msg.x, msg.y, msg.z;
-  return v;
+  return 0;
 }
 
-Vec3 convertMsg(geometry_msgs::Point msg) {
-  Vec3 v;
+int convertMsg(geometry_msgs::Point msg, Vec3 &v) {
   v << msg.x, msg.y, msg.z;
-  return v;
+  return 0;
 }
 
-Quaternion convertMsg(geometry_msgs::Quaternion msg) {
-  Quaternion q;
-
+int convertMsg(geometry_msgs::Quaternion msg, Quaternion &q) {
   q.w() = msg.w;
   q.x() = msg.x;
   q.y() = msg.y;
   q.z() = msg.z;
-
-  return q;
+  return 0;
 }
 
-Pose convertMsg(geometry_msgs::PoseStamped msg) {
-  Vec3 p;
-  Quaternion q;
-
-  q = convertMsg(msg.pose.orientation);
-  p = convertMsg(msg.pose.position);
-
-  return Pose(q, p);
+int convertMsg(geometry_msgs::PoseStamped msg, Pose &p) {
+  convertMsg(msg.pose.position, p.position);
+  convertMsg(msg.pose.orientation, p.orientation);
+  return 0;
 }
 
-VecX convertMsg(geometry_msgs::TwistStamped msg) {
-  VecX twist(6);
+int convertMsg(geometry_msgs::TwistStamped msg, VecX &v) {
+  v(0) = msg.twist.linear.x;
+  v(1) = msg.twist.linear.y;
+  v(2) = msg.twist.linear.z;
 
-  twist(0) = msg.twist.linear.x;
-  twist(1) = msg.twist.linear.y;
-  twist(2) = msg.twist.linear.z;
+  v(3) = msg.twist.angular.x;
+  v(4) = msg.twist.angular.y;
+  v(5) = msg.twist.angular.z;
 
-  twist(3) = msg.twist.angular.x;
-  twist(4) = msg.twist.angular.y;
-  twist(5) = msg.twist.angular.z;
-
-  return twist;
+  return 0;
 }
 
-TagPose convertMsg(awesomo_msgs::AprilTagPose msg) {
-  int id;
-  bool detected;
-  Vec3 p;
-  Quaternion q;
+int convertMsg(awesomo_msgs::AprilTagPose msg, TagPose &tag) {
+  tag.id = msg.id;
+  tag.detected = msg.detected;
+  convertMsg(msg.position, tag.position);
+  convertMsg(msg.orientation, tag.orientation);
 
-  id = msg.id;
-  detected = msg.detected;
-  p = convertMsg(msg.position);
-  q = convertMsg(msg.orientation);
+  return 0;
+}
 
-  return TagPose(id, detected, p, q);
+int convertMsg(awesomo_msgs::PCtrlSettings msg, PositionController &pc) {
+  pc.pitch_limit[0] = deg2rad(msg.pitch_controller.min);
+  pc.pitch_limit[1] = deg2rad(msg.pitch_controller.max);
+  pc.x_controller.k_p = msg.pitch_controller.k_p;
+  pc.x_controller.k_i = msg.pitch_controller.k_i;
+  pc.x_controller.k_d = msg.pitch_controller.k_d;
+
+  pc.roll_limit[0] = deg2rad(msg.roll_controller.min);
+  pc.roll_limit[1] = deg2rad(msg.roll_controller.max);
+  pc.y_controller.k_p = msg.roll_controller.k_p;
+  pc.y_controller.k_i = msg.roll_controller.k_i;
+  pc.y_controller.k_d = msg.roll_controller.k_d;
+
+  pc.z_controller.k_p = msg.throttle_controller.k_p;
+  pc.z_controller.k_i = msg.throttle_controller.k_i;
+  pc.z_controller.k_d = msg.throttle_controller.k_d;
+  pc.hover_throttle = msg.hover_throttle;
+
+  return 0;
 }
 
 }  // end of awesomo namespace

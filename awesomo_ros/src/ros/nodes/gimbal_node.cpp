@@ -25,8 +25,9 @@ int GimbalNode::configure(std::string node_name, int hz) {
   this->registerShutdown(SHUTDOWN_TOPIC);
   // clang-format on
 
+  // register loop callback
   this->registerLoopCallback(std::bind(&GimbalNode::loopCallback, this));
-  this->seq = 1;
+
   this->configured = true;
   return 0;
 }
@@ -45,36 +46,41 @@ int GimbalNode::loopCallback(void) {
    sensor_msgs::Imu cam_imu_msg;
    geometry_msgs::Quaternion frame_angles_msg;
 
-   Vec3 cam_angles_euler;
-   Vec3 frame_angles_euler;
-   Quaternion cam_quat;
-   Quaternion frame_quat;
-
+   Vec3 camera_euler;
+   Vec3 frame_euler;
+   Quaternion camera_orientation;
+   Quaternion frame_orientation;
 
    retval = this->gimbal.updateGimbalStates();
    if (retval != 0) {
-       return 0;
+     return 0;
      // return -1; // some frame will drop, we need to live with this
    }
 
-   cam_angles_euler <<
-     this->gimbal.camera_angles(0),
-     this->gimbal.camera_angles(1),
-     this->gimbal.camera_angles(2);
+   // clang-format off
+   camera_euler << this->gimbal.camera_angles(0),
+                   this->gimbal.camera_angles(1),
+                   this->gimbal.camera_angles(2);
+   // clang-format on
 
-   frame_angles_euler <<
-     this->gimbal.frame_angles(0),
-     this->gimbal.frame_angles(1),
-     this->gimbal.frame_angles(2);
+   // clang-format off
+   frame_euler << this->gimbal.frame_angles(0),
+                  this->gimbal.frame_angles(1),
+                  this->gimbal.frame_angles(2);
+   // clang-format on
 
    // convert angles to quaterions
-   euler2quat(cam_angles_euler, 123, cam_quat);
-   euler2quat(frame_angles_euler, 123, frame_quat);
+   euler2quat(camera_euler, 321, camera_orientation);
+   euler2quat(frame_euler, 321, frame_orientation);
 
-   cam_imu_msg.orientation.x = cam_quat.x();
-   cam_imu_msg.orientation.y = cam_quat.y();
-   cam_imu_msg.orientation.z = cam_quat.z();
-   cam_imu_msg.orientation.w = cam_quat.w();
+   cam_imu_msg.header.seq = this->ros_seq;
+   cam_imu_msg.header.stamp = ros::Time::now();
+   cam_imu_msg.header.frame_id = "gimbal_joint";
+
+   cam_imu_msg.orientation.x = camera_orientation.x();
+   cam_imu_msg.orientation.y = camera_orientation.y();
+   cam_imu_msg.orientation.z = camera_orientation.z();
+   cam_imu_msg.orientation.w = camera_orientation.w();
 
    cam_imu_msg.angular_velocity.x = this->gimbal.imu_gyro(0);
    cam_imu_msg.angular_velocity.y = this->gimbal.imu_gyro(1);
@@ -84,16 +90,7 @@ int GimbalNode::loopCallback(void) {
    cam_imu_msg.linear_acceleration.y = this->gimbal.imu_accel(1);
    cam_imu_msg.linear_acceleration.z = this->gimbal.imu_accel(2);
 
-   cam_imu_msg.header.seq = this->seq;
-   cam_imu_msg.header.stamp = ros::Time::now();
-   cam_imu_msg.header.frame_id = "gimbal_joint";
-
-   this->seq += 1;
-
-   frame_angles_msg.x = frame_quat.x();
-   frame_angles_msg.y = frame_quat.y();
-   frame_angles_msg.z = frame_quat.z();
-   frame_angles_msg.w = frame_quat.w();
+   buildMsg(frame_orientation, frame_angles_msg);
 
    this->ros_pubs[CAMERA_IMU_TOPIC].publish(cam_imu_msg);
    this->ros_pubs[FRAME_RPY_TOPIC].publish(frame_angles_msg);

@@ -16,10 +16,10 @@ TEST(Pose, checkPose) {
   float x, y, z;
 
   // check Pose with no arguments (q = identity, position = 0);
-  ASSERT_FLOAT_EQ(0.0, testPose.q.x());
-  ASSERT_FLOAT_EQ(0.0, testPose.q.y());
-  ASSERT_FLOAT_EQ(0.0, testPose.q.z());
-  ASSERT_FLOAT_EQ(1.0, testPose.q.w());
+  ASSERT_FLOAT_EQ(0.0, testPose.orientation.x());
+  ASSERT_FLOAT_EQ(0.0, testPose.orientation.y());
+  ASSERT_FLOAT_EQ(0.0, testPose.orientation.z());
+  ASSERT_FLOAT_EQ(1.0, testPose.orientation.w());
 
   ASSERT_FLOAT_EQ(0.0, testPose.position(0));
   ASSERT_FLOAT_EQ(0.0, testPose.position(1));
@@ -34,10 +34,10 @@ TEST(Pose, checkPose) {
   z = 22.0;
 
   testPose = Pose(roll, pitch, yaw, x, y, z);
-  ASSERT_FLOAT_EQ(0, testPose.q.x());
-  ASSERT_FLOAT_EQ(0, testPose.q.y());
-  ASSERT_FLOAT_EQ(0, testPose.q.z());
-  ASSERT_FLOAT_EQ(1, testPose.q.w());
+  ASSERT_FLOAT_EQ(0, testPose.orientation.x());
+  ASSERT_FLOAT_EQ(0, testPose.orientation.y());
+  ASSERT_FLOAT_EQ(0, testPose.orientation.z());
+  ASSERT_FLOAT_EQ(1, testPose.orientation.w());
 
   ASSERT_FLOAT_EQ(x, testPose.position(0));
   ASSERT_FLOAT_EQ(y, testPose.position(1));
@@ -52,21 +52,21 @@ TEST(Pose, checkPose) {
   euler2quat(euler, 321, q_test);
   testPose = Pose(roll, pitch, yaw, x, y, z);
 
-  ASSERT_FLOAT_EQ(q_test.x(), testPose.q.x());
-  ASSERT_FLOAT_EQ(q_test.y(), testPose.q.y());
-  ASSERT_FLOAT_EQ(q_test.z(), testPose.q.z());
-  ASSERT_FLOAT_EQ(q_test.w(), testPose.q.w());
+  ASSERT_FLOAT_EQ(q_test.x(), testPose.orientation.x());
+  ASSERT_FLOAT_EQ(q_test.y(), testPose.orientation.y());
+  ASSERT_FLOAT_EQ(q_test.z(), testPose.orientation.z());
+  ASSERT_FLOAT_EQ(q_test.w(), testPose.orientation.w());
 
   ASSERT_FLOAT_EQ(x, testPose.position(0));
   ASSERT_FLOAT_EQ(y, testPose.position(1));
   ASSERT_FLOAT_EQ(z, testPose.position(2));
 
   // test inializing with quaterion and a postion vector
-  testPose = Pose(q_test, Vec3(x, y, z));
-  ASSERT_FLOAT_EQ(q_test.x(), testPose.q.x());
-  ASSERT_FLOAT_EQ(q_test.y(), testPose.q.y());
-  ASSERT_FLOAT_EQ(q_test.z(), testPose.q.z());
-  ASSERT_FLOAT_EQ(q_test.w(), testPose.q.w());
+  testPose = Pose(Vec3(x, y, z), q_test);
+  ASSERT_FLOAT_EQ(q_test.x(), testPose.orientation.x());
+  ASSERT_FLOAT_EQ(q_test.y(), testPose.orientation.y());
+  ASSERT_FLOAT_EQ(q_test.z(), testPose.orientation.z());
+  ASSERT_FLOAT_EQ(q_test.w(), testPose.orientation.w());
 
   ASSERT_FLOAT_EQ(x, testPose.position(0));
   ASSERT_FLOAT_EQ(y, testPose.position(1));

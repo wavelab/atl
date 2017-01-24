@@ -32,10 +32,8 @@ public:
   GimbalNode(int argc, char **argv) : ROSNode(argc, argv) {}
   ~GimbalNode(void);
   int configure(std::string node_name, int hz);
-
   void setAttitudeCallback(const geometry_msgs::Vector3 &msg);
   int loopCallback(void);
-  int seq;
 };
 
 }  // end of awesomo namespace

@@ -61,7 +61,7 @@ TEST(Quadrotor, setPose) {
 
   // setup
   pose.position << 1.0, 2.0, 3.0;
-  pose.q = Quaternion();
+  pose.orientation = Quaternion();
 
   // check fail
   ASSERT_EQ(-1, quadrotor.setPose(pose));
