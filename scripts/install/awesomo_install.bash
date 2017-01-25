@@ -11,7 +11,7 @@ sudo -v
 
 # intall dependencies
 # sudo bash $SCRIPT_PATH/ximea_install.bash
-# sudo bash $SCRIPT_PATH/pointgrey_install.bash
+sudo bash $SCRIPT_PATH/pointgrey_install.bash
 # sudo $SCRIPT_PATH/apriltags_swathmore_install.bash
 sudo $SCRIPT_PATH/apriltags_mit_install.bash
 sudo apt-get install -y \
