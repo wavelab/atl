@@ -1,5 +1,6 @@
+% DOCUMENT CLASS
 \documentclass[letterpaper, 10 pt, conference]{ieeeconf}
-\IEEEoverridecommandlockouts                                                              
+\IEEEoverridecommandlockouts
 \overrideIEEEmargins  % required to meet printer requirements.
 
 % DOCUMENT STRUCTURE
@@ -34,15 +35,16 @@
 % COMMENT BLOCKS
 \usepackage{verbatim}
 
-% SUBSCRIPT COMMANDS 
+% SUBSCRIPT COMMANDS
 \newcommand{\superscript}[1]{\ensuremath{^{\textrm{#1}}}}
 \newcommand{\subscript}[1]{\ensuremath{_\textrm{#1}}}
 
 % TITLE
-\title{\large{\textbf{Autonomous Landing of a Quadrotor on a Moving Platform in Outdoor Environments}}}
+\title{\large \textbf Autonomous Landing of a Quadrotor on a Moving Platform in
+Outdoor Environments}
 
 % AUTHORS
-\author{
+\author{\
 Chris Choi\authorrefmark{1} Stanley Brown\authorrefmark{2} and  Steven L. Waslander\authorrefmark{3}
 \thanks{\superscript{*} M.A.Sc. Candidate, Mechanical and Mechatronics Engineering, University of Waterloo; c33choi@uwaterloo.ca}
 \thanks{\superscript{2} M.A.Sc. Candidate, Mechanical and Mechatronics Engineering, University of Waterloo; s52brown@uwaterloo.ca}
@@ -57,21 +59,59 @@ Chris Choi\authorrefmark{1} Stanley Brown\authorrefmark{2} and  Steven L. Waslan
 
 % ABSTRACT
 \begin{abstract}
-The task of landing an aircraft on moving objects has been a topic of interest ever since humans took to the skies in the early twentieth century. Typically when attempting landing small, Micro UAVs such as quadrotors, the landing procedure is either done manually, or using GPS guidance to land on a stationary target. If landing on a moving target or in high wind conditions, a human operator is generally required. However this requires the human operator to have a clear line of site to both the target and the aircraft during all stages of the landing procedure. In recent years there have been several papers that propose a set of methods for landing on a slow moving platform in ideal conditions such as low wind and ideal GPS signals with little or no noise. Our contribution in this work is the demonstration of a set of algorithms that allow a quadrotor to perform a autonomous landing on a car traveling at over 20 meters per second while relying only on visual inertial data collected from and on-board gimbaled camera system. From this image data, along with on-board IMU readings, it is shown that both speed of the target and the quadrotor in the inertial frame can be directly estimated, and using this information a set of controllers and planners can be developed that allows for the quadrotor to perform a high speed landing maneuver in a variety of conditions. The robustness of our system is demonstrated by landing in without using GPS, poorly lit conditions, and with high winds. 
+The task of landing an aircraft on moving objects has been a topic of interest
+ever since humans took to the skies in the early twentieth century. Typically
+when attempting landing small, Micro UAVs such as quadrotors, the landing
+procedure is either done manually, or using GPS guidance to land on a
+stationary target. If landing on a moving target or in high wind conditions, a
+human operator is generally required. However this requires the human operator
+to have a clear line of site to both the target and the aircraft during all
+stages of the landing procedure. In recent years there have been several papers
+that propose a set of methods for landing on a slow moving platform in ideal
+conditions such as low wind and ideal GPS signals with little or no noise. Our
+contribution in this work is the demonstration of a set of algorithms that
+allow a quadrotor to perform a autonomous landing on a car travelling at over 20
+meters per second while relying only on visual inertial data collected from and
+on-board gimbaled camera system. From this image data, along with on-board IMU
+readings, it is shown that both speed of the target and the quadrotor in the
+inertial frame can be directly estimated, and using this information a set of
+controllers and planners can be developed that allows for the quadrotor to
+perform a high speed landing manoeuvre in a variety of conditions. The
+robustness of our system is demonstrated by landing in without using GPS,
+poorly lit conditions, and with high winds.
 \end{abstract}
 
 
 % INTRODUCTION
 \section{Introduction}
 
-
 % RELATED WORK
 \section{Related Work}
 
+% CONTRIBUTION
+\section{Contribution}
 
-% PROBELM FORMULATION
+\begin{itemize}
+  \item{Robust Landing}
+  \item{AprilTag estimation with Kalman Filter}
+  \item{Light Invariant AprilTag detection}
+  \item{AprilTag windowing to speed up detection}
+\end{itemize}
+
+% PROBLEM FORMULATION
 \section{Problem Formulation}
 
+% CAMERA TRANSFORMS
+\section{Camera Transforms}
+
+% GIMBAL TRANSFORMS
+\section{Gimbal Transforms}
+
+% LIGHT INVARIANT
+\section{Light Invariant}
+
+% APRILTAG ESTIMATION
+\section{AprilTag Estimation}
 
 % SYSTEM ARCHITECTURE
 \section{System Architecture}
@@ -81,12 +121,10 @@ The task of landing an aircraft on moving objects has been a topic of interest e
 \section{Experiment Results}
 
 
+
 % CONCLUSIONS
 \section{Conclusions and Future Work}
 
- 
- 
- 
 
 \bibliography{paper}
 
