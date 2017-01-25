@@ -45,7 +45,7 @@ Outdoor Environments}
 
 % AUTHORS
 \author{\
-Chris Choi\authorrefmark{1} Stanley Brown\authorrefmark{2} and  Steven L. Waslander\authorrefmark{3}
+Chris Choi\authorrefmark{1}, Stanley Brown\authorrefmark{2} and  Steven L. Waslander\authorrefmark{3}
 \thanks{\superscript{*} M.A.Sc. Candidate, Mechanical and Mechatronics Engineering, University of Waterloo; c33choi@uwaterloo.ca}
 \thanks{\superscript{2} M.A.Sc. Candidate, Mechanical and Mechatronics Engineering, University of Waterloo; s52brown@uwaterloo.ca}
 \thanks{\superscript{\dag} Assistant Professor, Mechanical and Mechatronics Engineering, University of Waterloo; stevenw@uwaterloo.ca}
@@ -84,9 +84,81 @@ poorly lit conditions, and with high winds.
 
 % INTRODUCTION
 \section{Introduction}
+Over the years there has been a growing interest in autonomous landing of
+quadrotors, as landing is often one of the most dangerous and risk prone parts
+of flight. There are now several commercial and research based implementations
+of autonomous landing with both the DJI Phantom and Pixhawk flight controllers
+being capable of automatic landing using a series control algorithms. However,
+there does not appear to be a reliable method of landing a quadrotor on either
+a moving platform or in relatively large wind disturbances.
+
+In recent years there have been at least least 5 academic publications on the
+topic~\cite{Lee2012, Kim2014, Voos2010, Friis2009, Ling2014, Herisse2012} that
+approach the problem from a variety of angles. Overall none of these approach
+have completely solved the problem and most approaches only work on slow moving
+platforms with little or no wind disturbances.
+
+One of the most challenging problems associated with autonomous landing is the
+difficulty of obtaining a reliable state estimate of the landing target
+relative to the quadrotor. This is due to the fact that the landing target can
+often go out of the camera's field of view causing the quadrotor to lose track
+of the target or measurements can become corrupted by vision based artifacts
+that include lighting, lens distortion, color, etc. In many cases GPS is not a
+viable option both the landing target and the quadrotor due a lack of accuracy
+unless an RTK GPS system is used. In many cases the use of an RTK system is not
+a readily available option due to cost and the lack of required equipment.
 
 % RELATED WORK
 \section{Related Work}
+The autonomous landing problem can be thought of as a set of three separate
+control problems or stages. First the quadrotor must detect the relative
+position and velocity of the landing target using either GPS of visual methods.
+Next the quadrotor must determine a rendezvous location with the landing target
+and plan the required flight trajectory. Once the quadrotor has rendezvoused a
+final landing trajectory must be calculated between quadrotor and the landing
+pad.
+
+For the perception portion of the problem there have been two main techniques
+use to identify the landing pad and estimate its state relative to the
+quadrotor. In the work of Kim, 2014~\cite{Kim2014} a basic colour thresholding
+technique was used to identify the landing target and the MIT AprilTags library
+\cite{apriltags} was used to provide state estimations. In the work of Heriesse
+Et al., 2012~\cite{Herisse2012} an optical flow technique was applied to a
+series of images captured on-board the quadrotor to estimate the required
+states required to control the quadrotor and conduct autonomous landing. While
+both of these techniques have been shown to work in very specific cases both,
+require case specific parameters to be applied ahead of time, thereby limiting
+there general applicability.
+
+In the case of Ling, 2014~\cite{Kim2014}, the brightness used in his
+thresholding technique must be set ahead of time and is sensitive to lighting
+changes. A similar issue is noted in the work of Heriesse Et al., 2012
+\cite{Herisse2012}. Moreover in the work of Ling, there were implementation
+issues due to the slow state estimation rate of the AprilTag library and the
+AprilTag falling out of view of the camera during the final stages of decent.
+This meant that as the quadrotor approached the landing pad it tended to lose
+any measurements of its state and therefore had complete the final landing
+procedure by propagating the last measured state forward in time.
+
+Examining the related literature on the controllers used in solving the the
+autonomous landing problem, the majority of literature either uses a set of PID
+or a Linear Quadratic Controllers (LQC) to command and control the quadrotor at
+all stages of flight. A LQC was thoroughly explored in Friis Et al., 2009
+\cite{Friis2009} but the authors admit even though LQC performed slightly
+better than the PID controller the difference was minor and may be attributed
+to the additional time spent tuning the LQC\@. In~\cite{Herisse2012}, a PID
+controller was developed to land on a vertically oscillating platform no
+lateral movement. While interesting, the solution took over 1 minute to
+transition from hovering over the landing pad to landing. Additionally the
+experiments did not seem to account for pitch or roll of the platform.
+
+In this project we focus developing a set of controllers that produce the final
+landing trajectory and using a  AprilTags~\cite{apriltags} to provide the
+estimated state of the quadrotor relative to the landing pad. We seek to
+develop both a more robust and rapid method of determining the state of the
+quadrotor and landing pad system and to develop a set of PID controllers that
+can be used to control the quadrotor based on the measured state information.
+
 
 % CONTRIBUTION
 \section{Contribution}
@@ -94,8 +166,10 @@ poorly lit conditions, and with high winds.
 \begin{itemize}
   \item{Robust Landing}
   \item{AprilTag estimation with Kalman Filter}
-  \item{Light Invariant AprilTag detection}
   \item{AprilTag windowing to speed up detection}
+  \item{Light Invariant AprilTag detection}
+  \item{Tracking Controller}
+  \item{Trajectory Planning}
 \end{itemize}
 
 % PROBLEM FORMULATION
@@ -107,11 +181,53 @@ poorly lit conditions, and with high winds.
 % GIMBAL TRANSFORMS
 \section{Gimbal Transforms}
 
-% LIGHT INVARIANT
-\section{Light Invariant}
 
-% APRILTAG ESTIMATION
-\section{AprilTag Estimation}
+% LANDING TARGET ESTIMATION
+\section{Landing Target Estimation}
+
+Kalman Filter constant acceleration
+
+\subsection{Adaptive Image Processing}
+As discussed previously, the low rate of the AprilTag library when processing
+images of 640 by 480 pixels results in an update rate of approximately 3 to 5
+fps on the on-board computers used on the target quadrotor, which is too low to
+be used for controlling the quadrotor. Building upon who improved the AprilTag
+estimation rate by reducing the brightness of the image  such that the majority
+of the image is black, we implemented an adaptive down sampling of the image size
+as the estimated distance between camera and AprilTag decreased. In this work
+two image down sampling sizes $320 \times 280$ (half resolution) and $160
+\times 140$ (quarter resolution), were used. Whenever the distance between the
+camera and the AprilTag is less than 1.5 and 3 meters, the images are down
+sampled to the two resolutions respectively. If the camera is further than 3
+meters from the AprilTag, the native resolution of $640 \times 480$ is used.
+This change only affected the image processing time when the quadrotor is
+within 3 meters of the quad and has the desired effect of maintaining a high
+AprilTag estimation rate.
+
+\subsection{Adaptive Image Windowing}
+If the AprilTag in the image space does not translate too suddenly, one can
+make the assumption that the previous detected AprilTag will approximately be
+in the same approximate image coordinates. A bounding box around the AprilTag
+can be formed and used to feed into the AprilTag detector.
+
+\subsection{AprilTag Inception}
+To address both the decreasing state update rate as a function of proximity and
+reduce the probability of losing sight of the AprilTag during landing a
+secondary AprilTag is embedded in the larger AprilTag, we term this technique
+AprilTag Inception (patent pending). This secondary AprilTag is assigned
+different family ID to avoid confusion during detection, and is placed at the
+center of the larger primary AprilTag. Whenever the secondary AprilTag is
+captured in the image, the adaptive windowing method is set to track only the
+secondary AprilTag rather than the larger one, which reduces the portion of the
+image that must be processed in with each image capture. An example of this
+procedure is highlighted in Figure.
+
+\section{Light Invariant AprilTag}
+
+
+% QUADROTOR CONTROL
+\section{Quadrotor Control}
+
 
 % SYSTEM ARCHITECTURE
 \section{System Architecture}
