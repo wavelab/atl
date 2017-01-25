@@ -19,7 +19,7 @@ TEST(Pose, checkPose) {
   ASSERT_FLOAT_EQ(0.0, testPose.orientation.x());
   ASSERT_FLOAT_EQ(0.0, testPose.orientation.y());
   ASSERT_FLOAT_EQ(0.0, testPose.orientation.z());
-  ASSERT_FLOAT_EQ(1.0, testPose.orientation.w());
+  ASSERT_FLOAT_EQ(0.0, testPose.orientation.w());
 
   ASSERT_FLOAT_EQ(0.0, testPose.position(0));
   ASSERT_FLOAT_EQ(0.0, testPose.position(1));

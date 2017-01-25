@@ -229,6 +229,65 @@ procedure is highlighted in Figure.
 \section{Quadrotor Control}
 
 
+% TRAJECTORY PLANNING
+\section{Trajectory Planning}
+
+\begin{equation}
+  \textbf{x} = \begin{bmatrix}
+      x_{1} & x_{2} & x_{3} & x_{4} & x_{5}
+    \end{bmatrix} \\ 
+    = \begin{bmatrix}
+      x & \dot{x} & z & \dot{z} & \theta
+    \end{bmatrix} \in {\rm I\!R}^{5}
+\end{equation}
+
+\begin{equation}
+  \textbf{x}_{d} = \begin{bmatrix}
+      x_{d} & \dot{x_{d}} & z_{d} & \dot{z_{d}} & \theta_{d}
+  \end{bmatrix}
+\end{equation}
+
+\begin{equation}
+  \textbf{u}(t)
+    = \begin{bmatrix} u_{1} \\ u_{2} \end{bmatrix}
+    = \begin{bmatrix} \frac{F_{T}}{m} \\ \omega \end{bmatrix}
+    \in {\rm I\!R}^{2}
+\end{equation}
+
+\begin{equation}
+  \begin{bmatrix}
+    \ddot{x} \\
+    \ddot{z} \\
+    \theta
+  \end{bmatrix} =
+  \begin{bmatrix}
+    \cos(\theta) & -\sin(\theta) & 0 \\
+    \sin(\theta) & \cos(\theta) & 0 \\
+    0 & 0 & 1
+  \end{bmatrix}
+  \begin{bmatrix} 0 \\ u_{1} \\ u_{2} \end{bmatrix} +
+  \begin{bmatrix} 0 \\ -g \\ 0 \end{bmatrix}
+\end{equation}
+
+\begin{equation}
+  \dot{\textbf{x}} =
+    \begin{bmatrix}
+      \dot{x_{1}} \\ \dot{x_{2}} \\ \dot{x_{3}} \\ \dot{x_{4}} \\ \dot{x_{5}}
+    \end{bmatrix} =
+    f(\textbf{x}, \textbf{u}) =
+    \begin{bmatrix}
+      x_{2} \\
+      u_{1} \sin(x_{5}) \\
+      x_{4} \\
+      u_{1} \cos(x_{5}) - g \\
+      u_{2}
+    \end{bmatrix}
+\end{equation}
+
+\begin{equation}
+  \textbf{u}(t) \in \textbf{U} = \\
+\end{equation}
+
 % SYSTEM ARCHITECTURE
 \section{System Architecture}
 
