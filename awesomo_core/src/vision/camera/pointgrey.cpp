@@ -175,7 +175,25 @@ int PointGreyCamera::setFormat7(void) {
   }
 
     log_info("Format7 Settings applied successfully!");
+    this->setFrameRate(200);
+    return 0;
+}
+
+int PointGreyCamera::setFrameRate(double fps)
+{
+  FlyCapture2::PropertyInfo prop_info;
+  prop_info.type = FlyCapture2::FRAME_RATE;
+  this->pointgrey->GetPropertyInfo(&prop_info);
+  FlyCapture2::Property fps_prop;
+
+  fps_prop.type = FlyCapture2::FRAME_RATE;
+  fps_prop.onOff = true && prop_info.autoSupported;
+  fps_prop.autoManualMode = false && prop_info.autoSupported;
+  fps_prop.absControl = prop_info.absValSupported;
+  fps_prop.absValue = fps;
+  this->pointgrey->SetProperty(&fps_prop);
   return 0;
+
 }
 
 int PointGreyCamera::printFormat7Capabilities(void) {
