@@ -34,15 +34,15 @@ int PGCameraNode::configure(std::string node_name, int hz) {
 int PGCameraNode::publishImage(void) {
   sensor_msgs::ImageConstPtr img_msg;
   cv::Mat grey;
-  cv::cvtColor(image, grey, CV_BGR2GRAY);
+  // cv::cvtColor(image, grey, CV_BGR2GRAY);
 
   std_msgs::Header header;
   header.stamp = ros::Time::now();
   // clang-format off
   img_msg = cv_bridge::CvImage(
     header,
-    "mono8",
-    grey
+    "rbg8",
+    image
   ).toImageMsg();
   this->img_pub.publish(img_msg);
   // clang-format on
@@ -60,7 +60,7 @@ void PGCameraNode::gimbalJointCallback(const geometry_msgs::Quaternion &msg) {
 
 int PGCameraNode::loopCallback(void) {
   this->camera.getFrame(this->image);
-  this->camera.showImage(this->image);
+  // this->camera.showImage(this->image);
   this->publishImage();
 
   return 0;

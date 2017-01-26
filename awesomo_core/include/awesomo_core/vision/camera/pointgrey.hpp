@@ -17,6 +17,7 @@ public:
   int getFrame(cv::Mat &image);
   int printFormat7Capabilities(void);
   int setFormat7(void);
+  int setFrameRate(double fps);
 };
 
 }  // end of awesomo namespace

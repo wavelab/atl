@@ -150,12 +150,19 @@ int PointGreyCamera::setFormat7(void) {
 
   k_fmt7PixFmt = FlyCapture2::PIXEL_FORMAT_RAW8;
 
-  fmt7_image_settings.mode = FlyCapture2::MODE_0;
-  fmt7_image_settings.offsetX = 380;
-  fmt7_image_settings.offsetY = 298;
-  fmt7_image_settings.width = 1264;
-  fmt7_image_settings.height = 930;
+  fmt7_image_settings.mode = FlyCapture2::MODE_2;
+  fmt7_image_settings.offsetX = 192;
+  fmt7_image_settings.offsetY = 144;
+  fmt7_image_settings.width = 640;
+  fmt7_image_settings.height = 480;
   fmt7_image_settings.pixelFormat = k_fmt7PixFmt;
+
+  // fmt7_image_settings.mode = FlyCapture2::MODE_0;
+  // fmt7_image_settings.offsetX = 380;
+  // fmt7_image_settings.offsetY = 298;
+  // fmt7_image_settings.width = 1264;
+  // fmt7_image_settings.height = 930;
+  // fmt7_image_settings.pixelFormat = k_fmt7PixFmt;
 
 
   //Validate the settings to make sure that they are valid
@@ -175,7 +182,25 @@ int PointGreyCamera::setFormat7(void) {
   }
 
     log_info("Format7 Settings applied successfully!");
+    this->setFrameRate(200);
+    return 0;
+}
+
+int PointGreyCamera::setFrameRate(double fps)
+{
+  FlyCapture2::PropertyInfo prop_info;
+  prop_info.type = FlyCapture2::FRAME_RATE;
+  this->pointgrey->GetPropertyInfo(&prop_info);
+  FlyCapture2::Property fps_prop;
+
+  fps_prop.type = FlyCapture2::FRAME_RATE;
+  fps_prop.onOff = true && prop_info.autoSupported;
+  fps_prop.autoManualMode = false && prop_info.autoSupported;
+  fps_prop.absControl = prop_info.absValSupported;
+  fps_prop.absValue = fps;
+  this->pointgrey->SetProperty(&fps_prop);
   return 0;
+
 }
 
 int PointGreyCamera::printFormat7Capabilities(void) {
