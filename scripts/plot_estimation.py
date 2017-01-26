@@ -7,8 +7,7 @@ kf_tracker_output = "/tmp/estimation_kf_tracker_test.output"
 ekf_output = "/tmp/estimation_ekf_test.output"
 
 
-
-def parse_data(data_file):
+def plot(data_file):
     f = open(data_file, "r")
     reader = csv.reader(f, delimiter=",")
     next(reader)  # skip header
@@ -28,18 +27,5 @@ def parse_data(data_file):
     plt.show()
 
 
-# def plot(data_file):
-    # df = pandas.read_csv(data_file)
-
-    # x = df["x"]
-    # y = df["y"]
-    # bx = df["bx"]
-    # by = df["by"]
-
-    # df.plot(x="time_step")
-    # plt.show()
-
 if __name__ == "__main__":
-    parse_data(ekf_output)
-    # plot(kf_tracker_output)
-    # plot(ekf_output)
+    plot(ekf_output)
