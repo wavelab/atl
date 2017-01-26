@@ -1,6 +1,10 @@
 #ifndef __AWESOMO_TEST_HPP__
 #define __AWESOMO_TEST_HPP__
 
+#include <random>
+#include <fstream>
+#include <iostream>
+
 #include <gtest/gtest.h>
 
 #ifdef TEST_OUTPUT_ON
