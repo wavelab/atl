@@ -41,7 +41,7 @@ int PGCameraNode::publishImage(void) {
   // clang-format off
   img_msg = cv_bridge::CvImage(
     header,
-    "rbg8",
+    "rgb8",
     image
   ).toImageMsg();
   this->img_pub.publish(img_msg);
