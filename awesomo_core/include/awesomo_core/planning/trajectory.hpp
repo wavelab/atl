@@ -1,6 +1,9 @@
 #ifndef __AWESOMO_PLANNING_TRAJECTORY_HPP__
 #define __AWESOMO_PLANNING_TRAJECTORY_HPP__
 
+#include <iostream>
+#include <fstream>
+
 #include "awesomo_core/utils/utils.hpp"
 
 namespace awesomo {
@@ -46,6 +49,8 @@ Vec2 quadrotor_calculate_inputs(double mass, double thrust, double omega);
 VecX quadrotor_2d_model(VecX x, Vec2 u);
 
 void load_matrix(std::vector<double> x, int rows, int cols, MatX &y);
+void matrix2stdvector(MatX A, std::vector<double> &x);
+
 void trajectory_setup(struct problem_data *p,
                       int nb_states,
                       int nb_inputs,
@@ -55,6 +60,12 @@ int trajectory_calculate_desired(struct problem_data *p);
 double trajectory_cost_func(const std::vector<double> &x,
                             std::vector<double> &grad,
                             void *data);
+double trajectory_constraint_func(const std::vector<double> &x,
+                                  std::vector<double> &grad,
+                                  void *data);
+int trajectory_record_optimization(std::string file_path,
+                                   std::vector<double> x,
+                                   int nb_rows);
 
 
 }  // end of awesomo namespace

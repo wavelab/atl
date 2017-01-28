@@ -1,7 +1,9 @@
 #include "awesomo_core/awesomo_test.hpp"
 #include "awesomo_core/planning/trajectory.hpp"
+#include <nlopt.hpp>
 
 #define TEST_TRAJECTORY_OUTPUT_FILE "/tmp/trajectory.output"
+#define TEST_OPTIMIZED_OUTPUT_FILE "/tmp/trajectory_optimized.output"
 #define TEST_PATH_OUTPUT_FILE "/tmp/path.output"
 
 
@@ -41,6 +43,7 @@ static void record_path(std::ofstream &output_file, VecX path) {
   output_file << path(2) << ",";
   output_file << path(3) << ",";
   output_file << path(4) << ",";
+  output_file << path(5) << "\n";
 }
 
 TEST(Trajectory, quadrotor_2d_model) {
@@ -109,7 +112,7 @@ TEST(Trajectory, trajectory_calculate_desired_states) {
   // test
   trajectory_calculate_desired(&p);
   for (int i = 0; i < p.nb_steps; i++) {
-    state = p.desired.block(0, i, 5, 1);
+    state = p.desired.block(0, i, 6, 1);
     record_path(path_file, state);
   }
 
@@ -171,5 +174,68 @@ TEST(Trajectory, trajectory_cost_func) {
   cost = trajectory_cost_func(x, grad, &p);
   ASSERT_FLOAT_EQ(0.0, cost);
 }
+
+TEST(Trajectory, trajectory_constraint_func) {
+  struct problem_data p;
+  nlopt::opt opt;
+  std::vector<double> x, grad, cost_weights;
+  double error;
+
+  // setup problem
+  trajectory_setup(&p, 4, 2, 10, cost_weights);
+  p.pos_init << -1, 3.5;
+  p.pos_final << 2.3, 0;
+  p.vel_init << 1.0, 1.0;
+  p.vel_final << 0.0, 0.0;
+  p.thrust_init = 9.81;
+  p.thrust_final = 9.81;
+  p.theta_init = 0.2;
+  p.theta_final = 0.0;
+  trajectory_calculate_desired(&p);
+  matrix2stdvector(p.desired, x);
+
+  error = trajectory_constraint_func(x, grad, &p);
+  std::cout << error << std::endl;
+}
+
+// TEST(Trajectory, optimize) {
+//   double minf;
+//   struct problem_data p;
+//   nlopt::opt opt;
+//   std::vector<double> x;
+//   std::vector<double> cost_weights;
+//   std::ofstream output_file;
+//
+//   // setup cost weights
+//   cost_weights.push_back(1.0);
+//   cost_weights.push_back(1.0);
+//   cost_weights.push_back(0.5);
+//   cost_weights.push_back(1.0);
+//
+//   // setup problem
+//   trajectory_setup(&p, 4, 2, 100, cost_weights);
+//   p.pos_init << -1, 3.5;
+//   p.pos_final << 2.3, 0;
+//   p.vel_init << 1.0, 1.0;
+//   p.vel_final << 0.0, 0.0;
+//   p.thrust_init = 9.81;
+//   p.thrust_final = 9.81;
+//   p.theta_init = 0.2;
+//   p.theta_final = 0.0;
+//   trajectory_calculate_desired(&p);
+//   matrix2stdvector(p.desired, x);
+//
+//   // configure optimizer
+//   opt = nlopt::opt(nlopt::LN_COBYLA, 600);
+//   opt.set_min_objective(trajectory_cost_func, &p);
+//   opt.add_inequality_constraint(trajectory_constraint_func, &p, 1e-8);
+//   opt.set_xtol_rel(1e-4);
+//
+//   // optimize
+//   nlopt::result result = opt.optimize(x, minf);
+//
+//   // record results
+//   trajectory_record_optimization(TEST_OPTIMIZED_OUTPUT_FILE, x, 100);
+// }
 
 }  // end of awesomo namespace

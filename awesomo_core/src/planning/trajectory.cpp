@@ -113,6 +113,14 @@ void load_matrix(std::vector<double> x, int rows, int cols, MatX &y) {
   }
 }
 
+void matrix2stdvector(MatX A, std::vector<double> &x) {
+  for (int i = 0; i < A.cols(); i++) {
+    for (int j = 0; j < A.rows(); j++) {
+      x.push_back(A(j, i));
+    }
+  }
+}
+
 double trajectory_cost_func(const std::vector<double> &x,
                             std::vector<double> &grad,
                             void *data) {
@@ -146,6 +154,74 @@ double trajectory_cost_func(const std::vector<double> &x,
   cost += p->cost_weights[3] * u2_opt.squaredNorm();
 
   return cost;
+}
+
+double trajectory_constraint_func(const std::vector<double> &x,
+                                  std::vector<double> &grad,
+                                  void *data) {
+  struct problem_data *p;
+  double error, dt;
+  MatX X;
+  Vec4 x_curr, x_prev, x_dot;
+  Vec2 u_prev;
+
+  // setup
+  error = 0.0;
+  dt = 0.1;
+  p = (struct problem_data *) data;
+  load_matrix(x, p->nb_states + p->nb_inputs, p->nb_steps, X);
+
+  for (int i = 0; i < (p->nb_steps - 1); i++) {
+    u_prev = X.block(4, i, 2, 1);
+    x_prev = X.block(0, i, 4, 1);
+    x_curr = X.block(0, i + 1, 4, 1);
+
+    // clang-format off
+    x_dot << x_prev(1),
+             u_prev(0) * sin(u_prev(1)),
+             x_prev(3),
+             u_prev(0) * cos(u_prev(1));
+    // clang-format on
+
+    // calculate feasible regions
+    error += ((x_curr - x_prev) - dt * x_dot).sum();
+  }
+
+  return error;
+}
+
+int trajectory_record_optimization(std::string file_path,
+                                   std::vector<double> x,
+                                   int nb_rows) {
+  std::ofstream output_file;
+  int nb_states;
+
+  // setup
+  output_file.open(file_path);
+  output_file << "time_step" << ",";
+  output_file << "x" << ",";
+  output_file << "vx" << ",";
+  output_file << "z" << ",";
+  output_file << "vz" << ",";
+  output_file << "az" << ",";
+  output_file << "theta" << "\n";
+
+  // record
+  nb_states = 6;
+  for (int i = 0; i < nb_rows; i++) {
+    output_file << i << ",";
+    output_file << x[i * nb_states + 0] << ",";
+    output_file << x[i * nb_states + 1] << ",";
+    output_file << x[i * nb_states + 2] << ",";
+    output_file << x[i * nb_states + 3] << ",";
+    output_file << x[i * nb_states + 4] << ",";
+    output_file << x[i * nb_states + 5] << "\n";
+  }
+
+  // clean up
+  output_file.close();
+
+  return 0;
 }
 
 }  // end of awesomo namespace

@@ -3,6 +3,15 @@
 
 namespace awesomo {
 
+int randi(int ub, int lb) {
+  return rand() % lb + ub;
+}
+
+double randf(double ub, double lb) {
+  double f = (double) rand() / RAND_MAX;
+  return lb + f * (ub - lb);
+}
+
 int fltcmp(double f1, double f2) {
   if (fabs(f1 - f2) <= 0.0001) {
     return 0;

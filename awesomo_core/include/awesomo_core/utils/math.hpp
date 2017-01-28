@@ -24,6 +24,8 @@ typedef Eigen::MatrixXd MatX;
 typedef Eigen::Quaterniond Quaternion;
 #endif
 
+int randi(int ub, int lb);
+double randf(double ub, double lb);
 int fltcmp(double f1, double f2);
 double deg2rad(double d);
 double rad2deg(double r);
