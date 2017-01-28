@@ -29,6 +29,8 @@ double randf(double ub, double lb);
 int fltcmp(double f1, double f2);
 double deg2rad(double d);
 double rad2deg(double r);
+void load_matrix(std::vector<double> x, int rows, int cols, MatX &y);
+void load_matrix(MatX A, std::vector<double> &x);
 int euler2rot(Vec3 euler, int euler_seq, Mat3 &R);
 int euler2quat(Vec3 euler, int euler_seq, Quaternion &q);
 int quat2euler(Quaternion q, int euler_seq, Vec3 &euler);

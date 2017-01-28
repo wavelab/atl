@@ -192,7 +192,7 @@ TEST(Trajectory, trajectory_constraint_func) {
   p.theta_init = 0.2;
   p.theta_final = 0.0;
   trajectory_calculate_desired(&p);
-  matrix2stdvector(p.desired, x);
+  load_matrix(p.desired, x);
 
   error = trajectory_constraint_func(x, grad, &p);
   std::cout << error << std::endl;
@@ -223,7 +223,7 @@ TEST(Trajectory, trajectory_constraint_func) {
 //   p.theta_init = 0.2;
 //   p.theta_final = 0.0;
 //   trajectory_calculate_desired(&p);
-//   matrix2stdvector(p.desired, x);
+//   load_matrix(p.desired, x);
 //
 //   // configure optimizer
 //   opt = nlopt::opt(nlopt::LN_COBYLA, 600);

@@ -5,7 +5,8 @@ import matplotlib.pylab as plt
 # GLOBAL VARIABLES
 trajectory_output = "/tmp/trajectory.output"
 path_output = "/tmp/path.output"
-optimized_output = "/tmp/trajectory_optimized.output"
+# optimized_output = "/tmp/trajectory_optimized.output"
+optimized_output = "/tmp/best.output"
 
 
 def plot_trajectory(data_file):

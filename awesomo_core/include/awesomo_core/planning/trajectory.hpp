@@ -28,7 +28,6 @@ struct problem_constraints {
 struct problem_data {
   int nb_states;
   int nb_inputs;
-
   int nb_steps;
   double time_taken;
 
@@ -47,9 +46,6 @@ struct problem_data {
 
 Vec2 quadrotor_calculate_inputs(double mass, double thrust, double omega);
 VecX quadrotor_2d_model(VecX x, Vec2 u);
-
-void load_matrix(std::vector<double> x, int rows, int cols, MatX &y);
-void matrix2stdvector(MatX A, std::vector<double> &x);
 
 void trajectory_setup(struct problem_data *p,
                       int nb_states,
