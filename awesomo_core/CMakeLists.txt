@@ -38,6 +38,7 @@ ADD_LIBRARY(
     src/estimation/kf_tracker.cpp
     # planning
     src/planning/ga.cpp
+    src/planning/model.cpp
     src/planning/optimizer.cpp
     src/planning/trajectory.cpp
     src/planning/utils.cpp
@@ -90,6 +91,7 @@ ADD_EXECUTABLE(
     tests/estimation/kf_tracker_test.cpp
     # PLANNING
     tests/planning/ga_test.cpp
+    tests/planning/model_test.cpp
     tests/planning/optimizer_test.cpp
     tests/planning/trajectory_test.cpp
     tests/planning/utils_test.cpp
