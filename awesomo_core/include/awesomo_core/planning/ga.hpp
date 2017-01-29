@@ -6,38 +6,18 @@
 #include <vector>
 
 #include "awesomo_core/utils/utils.hpp"
+#include "awesomo_core/planning/model.hpp"
 
 
 namespace awesomo {
 
-struct problem_data {
-  int nb_states;
-  int nb_inputs;
-  int nb_steps;
-
-  Vec2 pos_init;
-  Vec2 pos_final;
-  Vec2 vel_init;
-  Vec2 vel_final;
-  double thrust_init;
-  double thrust_final;
-  double theta_init;
-  double theta_final;
-
-  MatX desired;
-  std::vector<double> cost_weights;
-};
-
-void problem_setup(struct problem_data *p,
-                   int nb_states,
-                   int nb_inputs,
-                   int nb_steps,
-                   std::vector<double> cost_weights);
-
 class GABitString {
 public:
   std::vector<double> chromosome;
+  int nb_inputs;
   int nb_time_steps;
+
+  MatX X;
   double score;
 
   GABitString(void);
@@ -51,7 +31,7 @@ public:
   std::vector<GABitString> individuals;
 
   GAPopulation(void);
-  int configure(int nb_individuals, struct problem_data *data);
+  int configure(int nb_individuals, int nb_time_steps);
   void print(void);
 };
 
@@ -64,19 +44,24 @@ public:
   double crossover_probability;
   double mutation_probability;
 
+  Simulator sim;
+  Vec4 x_init;
+  Vec4 x_final;
+
   GAProblem(void);
   int configure(int max_generations,
                 int tournament_size,
                 double crossover_probability,
-                double mutation_probability);
-  int calculateDesired(struct problem_data *p);
-  int evaluateIndividual(GABitString &bs, struct problem_data *data);
-  int evaluatePopulation(GAPopulation &p, struct problem_data *data);
+                double mutation_probability,
+                Vec4 x_init,
+                Vec4 x_final);
+  int evaluateIndividual(GABitString &bs);
+  int evaluatePopulation(GAPopulation &p);
   int tournamentSelection(GAPopulation &p);
   int pointCrossover(GABitString &b1, GABitString &b2);
   int pointMutation(GABitString &bs);
   void findBest(GAPopulation &p, GABitString &best);
-  int optimize(GAPopulation &p, struct problem_data *data);
+  int optimize(GAPopulation &p);
 };
 
 }  // end of awesomo namespace

@@ -79,17 +79,19 @@ int Simulator::configure(Vec4 x_init, Vec4 x_final, double m) {
   return 0;
 }
 
-int Simulator::simulate(double dt, double tend, MatX U) {
+int Simulator::simulate(double dt, double tend, MatX U, MatX &X) {
   Vec2 u, u_prev;
   int nb_ts;
 
   // setup
+  this->model.x = this->x_init;
   nb_ts = tend / dt;
   this->d_az = 0.0;
   this->d_theta = 0.0;
   this->az_sum = 0.0;
   this->dist_error = 0.0;
   this->vel_error = 0.0;
+  X.resize(4, nb_ts);
 
   // pre-check
   if (this->configured == false) {
@@ -102,21 +104,22 @@ int Simulator::simulate(double dt, double tend, MatX U) {
   for (int i = 0; i < nb_ts; i++) {
     u = U.col(i);
     model.update(u, dt);
+    X.block(0, i, 4, 1) = model.x;
 
     // record energy used in terms of thrust and pitch change
     if (i != 0) {
       u_prev = U.col(i - 1);
       this->d_az += fabs(u_prev(0) - u(0));
       this->d_theta += fabs(u_prev(1) - u(1));
-      this->az_sum += u(0);
+      this->az_sum += fabs(u(0));
     }
   }
 
   // calculate error against final state
-  this->dist_error += pow((model.x(0) - x_final(0)), 2);  // x
-  this->dist_error += pow((model.x(2) - x_final(2)), 2);  // z
-  this->vel_error += pow((model.x(1) - x_final(1)), 2);   // vx
-  this->vel_error += pow((model.x(3) - x_final(3)), 2);   // vz
+  this->dist_error += pow((model.x(0) - this->x_final(0)), 2);  // x
+  this->dist_error += pow((model.x(2) - this->x_final(2)), 2);  // z
+  this->vel_error += pow((model.x(1) - this->x_final(1)), 2);   // vx
+  this->vel_error += pow((model.x(3) - this->x_final(3)), 2);   // vz
 
   return 0;
 }

@@ -1,6 +1,8 @@
 #include "awesomo_core/awesomo_test.hpp"
 #include "awesomo_core/planning/model.hpp"
 
+#define SIM_OUTPUT "/tmp/sim.output"
+
 namespace awesomo {
 
 TEST(Quad2DModel, constructor) {
@@ -93,31 +95,54 @@ TEST(Simulator, configure) {
 
 TEST(Simulator, simulate) {
   int retval;
-  Simulator sim;
-  Vec4 x_init;
-  Vec4 x_final;
   double m;
-  MatX U;
+  Simulator sim;
+  Vec4 x_init, x_final;
+  MatX U, X;
   Vec2 u;
+  std::ofstream output_file;
 
   // test
   x_init << 1.0, 0.0, 5.0, 0.0;
   x_final << 1.0, 0.0, 5.0, 0.0;
   m = 1.0;
 
-  U.resize(2, 2);
-  u << 10.0, 0.0;
-  U.block(0, 0, 2, 1) = u;
-  u << 10.0, 0.0;
-  U.block(0, 1, 2, 1) = u;
+  U.resize(2, 10);
+  u << 10.0, deg2rad(10.0);
+  for (int i = 0; i < 10; i++) {
+    U.block(0, i, 2, 1) = u;
+  }
 
   sim.configure(x_init, x_final, m);
-  retval = sim.simulate(0.1, 0.2, U);
+  retval = sim.simulate(0.1, 1.0, U, X);
 
-  ASSERT_EQ(0, retval);
-  ASSERT_FLOAT_EQ(0.0, sim.d_az);
-  ASSERT_FLOAT_EQ(0.0, sim.d_theta);
-  ASSERT_FLOAT_EQ(10.0, sim.az_sum);
+  // ouput file
+  output_file.open(SIM_OUTPUT);
+  output_file << "time_step" << ",";
+  output_file << "x" << ",";
+  output_file << "vx" << ",";
+  output_file << "z" << ",";
+  output_file << "vz" << ",";
+  output_file << "theta" << std::endl;
+
+  for (int i = 0; i < 10; i++) {
+    output_file << i << ",";
+    output_file << X(0, i) << ",";
+    output_file << X(1, i) << ",";
+    output_file << X(2, i) << ",";
+    output_file << X(3, i) << ",";
+    output_file << U(1, i) << "\n";
+  }
+
+  output_file.close();
+
+  // asssert
+  // ASSERT_EQ(0, retval);
+  // ASSERT_FLOAT_EQ(0.0, sim.d_az);
+  // ASSERT_FLOAT_EQ(0.0, sim.d_theta);
+  // ASSERT_FLOAT_EQ(10.0, sim.az_sum);
+  // ASSERT_TRUE(sim.dist_error > 0);
+  // ASSERT_TRUE(sim.vel_error > 0);
 }
 
 }  // end of awesomo namespace

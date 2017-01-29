@@ -38,6 +38,9 @@ public:
   int configure(std::string config_file);
   int obtainPose(AprilTags::TagDetection tag, TagPose &tag_pose);
   std::vector<TagPose> extractTags(cv::Mat &image);
+  int calculateMask(TagPose tag_pose,
+                    cv::Mat &mask,
+                    double padding=0.1);
   void printTag(TagPose tag);
 };
 

@@ -3,17 +3,6 @@
 
 namespace awesomo {
 
-TEST(problem, setup) {
-  struct problem_data p;
-  std::vector<double> cost_weights;
-
-  problem_setup(&p, 1, 2, 10, cost_weights);
-
-  ASSERT_EQ(1, p.nb_states);
-  ASSERT_EQ(2, p.nb_inputs);
-  ASSERT_EQ(10, p.nb_steps);
-}
-
 TEST(GABitString, constructor) {
   GABitString bit_string;
 
@@ -30,113 +19,91 @@ TEST(GABitString, configure) {
   bit_string.configure(nb_time_steps);
   bit_string.print();
 
-  ASSERT_EQ(6, bit_string.chromosome.size());
+  ASSERT_EQ(2, bit_string.chromosome.size());
   ASSERT_EQ(nb_time_steps, bit_string.nb_time_steps);
 }
 
-// TEST(GAPopulation, configure) {
-//   GAPopulation population;
-//
-//   population.configure(1, 1);
-//   population.print();
-//
-//   ASSERT_EQ(1, population.individuals.size());
-//   ASSERT_EQ(6, population.individuals[0].chromosome.size());
-// }
+TEST(GAPopulation, constructor) {
+  GAPopulation population;
+
+  ASSERT_EQ(0, population.individuals.size());
+}
+
+TEST(GAPopulation, configure) {
+  GAPopulation population;
+
+  population.configure(1, 1);
+  population.print();
+
+  ASSERT_EQ(1, population.individuals.size());
+  ASSERT_EQ(2, population.individuals[0].chromosome.size());
+}
 
 TEST(GAProblem, configure) {
   GAProblem problem;
+  Vec4 x_init;
+  Vec4 x_final;
+
+  // setup
+  x_init << 0.0, 0.0, 5.0, 0.0;
+  x_final << 5.0, 0.0, 0.0, 0.0;
 
   // test and assert
-  problem.configure(1, 2, 1.0, 1.0);
+  problem.configure(1, 2, 1.0, 1.0, x_init, x_final);
+
   ASSERT_EQ(1, problem.max_generations);
   ASSERT_EQ(2, problem.tournament_size);
   ASSERT_FLOAT_EQ(1.0, problem.crossover_probability);
   ASSERT_FLOAT_EQ(1.0, problem.mutation_probability);
 }
 
-TEST(GAProblem, calculateDesired) {
-  struct problem_data p;
-  std::vector<double> cost_weights;
-  GAProblem problem;
-
-  problem_setup(&p, 4, 2, 1, cost_weights);
-  p.pos_init << -1, 3.5;
-  p.pos_final << 2.3, 0;
-  p.vel_init << 1.0, 1.0;
-  p.vel_final << 0.0, 0.0;
-  p.thrust_init = 9.81;
-  p.thrust_final = 0.0;
-  p.theta_init = 0.0;
-  p.theta_final = 0.0;
-
-  problem.calculateDesired(&p);
-}
-
 TEST(GAProblem, evaluateIndividual) {
-  struct problem_data p;
   std::vector<double> cost_weights;
   GAProblem problem;
   GABitString bs;
+  Vec4 x_init, x_final;
+
+  // setup
+  x_init << 0.0, 0.0, 5.0, 0.0;
+  x_final << 5.0, 0.0, 0.0, 0.0;
 
   // cost weights
   cost_weights.push_back(1.0);
   cost_weights.push_back(1.0);
   cost_weights.push_back(1.0);
-
-  // problem data
-  problem_setup(&p, 4, 2, 5, cost_weights);
-  p.pos_init << -1, 3.5;
-  p.pos_final << 2.3, 0;
-  p.vel_init << 1.0, 1.0;
-  p.vel_final << 0.0, 0.0;
-  p.thrust_init = 9.81;
-  p.thrust_final = 9.81;
-  p.theta_init = 0.0;
-  p.theta_final = 0.0;
-  problem.calculateDesired(&p);
-  load_matrix(p.desired, bs.chromosome);
+  bs.configure(100);
+  problem.configure(10, 2, 1.0, 1.0, x_init, x_final);
 
   // evaluate
-  problem.evaluateIndividual(bs, &p);
-  ASSERT_FLOAT_EQ(0.0, bs.score);
+  problem.evaluateIndividual(bs);
+  bs.record("/tmp/best.output");
 }
 
 TEST(GAProblem, evaluatePopulation) {
-  struct problem_data data;
   std::vector<double> cost_weights;
   GAProblem problem;
   GAPopulation population;
   GABitString bs;
+  Vec4 x_init, x_final;
 
   // cost weights
   cost_weights.push_back(1.0);
   cost_weights.push_back(1.0);
   cost_weights.push_back(1.0);
 
-  // problem data
-  problem_setup(&data, 4, 2, 5, cost_weights);
-  data.pos_init << -1, 3.5;
-  data.pos_final << 2.3, 0;
-  data.vel_init << 1.0, 1.0;
-  data.vel_final << 0.0, 0.0;
-  data.thrust_init = 9.81;
-  data.thrust_final = 9.81;
-  data.theta_init = 0.0;
-  data.theta_final = 0.0;
-  problem.calculateDesired(&data);
-
   // population
-  population.configure(5, &data);
+  population.configure(5, 30);
 
   // evaluate
-  problem.evaluatePopulation(population, &data);
+  problem.configure(10, 2, 1.0, 1.0, x_init, x_final);
+  problem.evaluatePopulation(population);
 }
 
 TEST(GAProblem, pointCrossover) {
   GAProblem problem;
   GABitString b1;
   GABitString b2;
+  Vec4 x_init, x_final;
 
   // setup
   b1.chromosome.push_back(1.0);
@@ -157,7 +124,7 @@ TEST(GAProblem, pointCrossover) {
   // b2.print();
   // std::cout << std::endl;
 
-  problem.configure(1, 2, 1.0, 1.0);
+  problem.configure(1, 2, 1.0, 1.0, x_init, x_final);
   problem.pointCrossover(b1, b2);
 
   ASSERT_FLOAT_EQ(0.0, b1.chromosome[0]);
@@ -178,8 +145,10 @@ TEST(GAProblem, pointCrossover) {
 TEST(GAProblem, pointMutation) {
   GAProblem problem;
   GABitString bs;
+  Vec4 x_init, x_final;
 
   // setup
+  bs.nb_inputs = 2;
   bs.chromosome.push_back(0.0);
   bs.chromosome.push_back(0.0);
   bs.chromosome.push_back(0.0);
@@ -187,7 +156,7 @@ TEST(GAProblem, pointMutation) {
   bs.chromosome.push_back(0.0);
   bs.chromosome.push_back(0.0);
 
-  problem.configure(1, 2, 1.0, 1.0);
+  problem.configure(1, 2, 1.0, 1.0, x_init, x_final);
   problem.pointMutation(bs);
 
   ASSERT_TRUE(bs.chromosome[0] != 0.0);
@@ -198,77 +167,70 @@ TEST(GAProblem, pointMutation) {
   ASSERT_TRUE(bs.chromosome[5] != 0.0);
 }
 
-// TEST(GAProblem, tournamentSelection) {
-//   GAProblem problem;
-//   GAPopulation population;
-//
-//   // setup
-//   population.configure(5, 1);
-//   population.print();
-//   std::cout << std::endl;
-//
-//   problem.configure(1, 2, 1.0, 1.0);
-//   problem.tournamentSelection(population);
-//
-//   // population.print();
-// }
+TEST(GAProblem, tournamentSelection) {
+  GAProblem problem;
+  GAPopulation population;
+  Vec4 x_init, x_final;
 
-// TEST(GAProblem, findBest) {
-//   GAProblem problem;
-//   GAPopulation population;
-//   GABitString bs;
-//
-//   // setup
-//   bs.score = 1.0;
-//   population.individuals.push_back(bs);
-//   bs.score = 2.0;
-//   population.individuals.push_back(bs);
-//   bs.score = 3.0;
-//   population.individuals.push_back(bs);
-//   bs.score = 4.0;
-//   population.individuals.push_back(bs);
-//   bs.score = 3.0;
-//   population.individuals.push_back(bs);
-//   bs.score = 2.0;
-//   population.individuals.push_back(bs);
-//   bs.score = 1.0;
-//   population.individuals.push_back(bs);
-//
-//   // test and assert
-//   problem.findBest(population, bs);
-//   ASSERT_FLOAT_EQ(4.0, bs.score);
-// }
+  // setup
+  population.configure(5, 1);
+  population.print();
+  std::cout << std::endl;
+
+  problem.configure(1, 2, 1.0, 1.0, x_init, x_final);
+  problem.tournamentSelection(population);
+
+  population.print();
+}
+
+TEST(GAProblem, findBest) {
+  GAProblem problem;
+  GAPopulation population;
+  GABitString bs;
+
+  // setup
+  bs.score = 1.0;
+  population.individuals.push_back(bs);
+  bs.score = 2.0;
+  population.individuals.push_back(bs);
+  bs.score = 3.0;
+  population.individuals.push_back(bs);
+  bs.score = 4.0;
+  population.individuals.push_back(bs);
+  bs.score = 3.0;
+  population.individuals.push_back(bs);
+  bs.score = 2.0;
+  population.individuals.push_back(bs);
+  bs.score = 1.0;
+  population.individuals.push_back(bs);
+
+  // test and assert
+  problem.findBest(population, bs);
+  ASSERT_FLOAT_EQ(4.0, bs.score);
+}
 
 TEST(GAProblem, optimize) {
-  struct problem_data data;
   std::vector<double> cost_weights;
   GAProblem problem;
   GAPopulation population;
   GABitString best;
+  Vec4 x_init, x_final;
+
+  // setup
+  x_init << 0.0, 0.0, 5.0, 0.0;
+  x_final << 5.0, 0.0, 0.0, 0.0;
 
   // cost weights
   cost_weights.push_back(1.0);
   cost_weights.push_back(1.0);
   cost_weights.push_back(1.0);
 
-  // problem data
-  problem_setup(&data, 4, 2, 50, cost_weights);
-  data.pos_init << -1, 3.5;
-  data.pos_final << 2.3, 0;
-  data.vel_init << 1.0, 1.0;
-  data.vel_final << 0.0, 0.0;
-  data.thrust_init = 9.81;
-  data.thrust_final = 0.0;
-  data.theta_init = 0.0;
-  data.theta_final = 0.0;
-  problem.calculateDesired(&data);
-
   // population
-  population.configure(200, &data);
+  population.configure(500, 50);
 
   // optimize
-  problem.configure(500, 10, 0.0, 0.01);
-  problem.optimize(population, &data);
+  problem.configure(1, 10, 0.0, 0.02, x_init, x_final);
+  problem.optimize(population);
   problem.findBest(population, best);
 
   best.record("/tmp/best.output");

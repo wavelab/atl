@@ -15,14 +15,14 @@ public:
   ~PointGreyCamera(void);
   int initialize(void);
   int getFrame(cv::Mat &image);
-  int setFormat7(std::string pixel_format, int crop_width, int crop_height, int mode);
-
+  int setFormat7(std::string pixel_format,
+                 int crop_width,
+                 int crop_height,
+                 int mode);
   int setFrameRate(double frame_rate);
   int setExposure(double exposure);
   int setGain(double gain);
-
   int printFormat7Capabilities(void);
-
 };
 
 }  // end of awesomo namespace

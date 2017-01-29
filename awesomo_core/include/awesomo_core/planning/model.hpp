@@ -35,7 +35,7 @@ public:
 
   Simulator(void);
   int configure(Vec4 x_init, Vec4 x_final, double m);
-  int simulate(double dt, double tend, MatX U);
+  int simulate(double dt, double tend, MatX U, MatX &X);
 };
 
 }  // end of awesomo namespace

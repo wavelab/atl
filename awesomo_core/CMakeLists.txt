@@ -99,6 +99,7 @@ ADD_EXECUTABLE(
     tests/quadrotor/landing_target_test.cpp
     tests/quadrotor/quadrotor_test.cpp
     # VISION TESTS
+    tests/vision/apriltag/mit_test.cpp
     # tests/vision/apriltag/swathmore_test.cpp
     tests/vision/camera/camera_test.cpp
     tests/vision/camera/config_test.cpp

@@ -3,51 +3,29 @@
 
 namespace awesomo {
 
-void problem_setup(struct problem_data *p,
-                   int nb_states,
-                   int nb_inputs,
-                   int nb_steps,
-                   std::vector<double> cost_weights) {
-  p->nb_states = nb_states;
-  p->nb_inputs = nb_inputs;
-  p->nb_steps = nb_steps;
-
-  p->pos_init << 0.0, 0.0;
-  p->pos_final << 0.0, 0.0;
-  p->vel_init << 0.0, 0.0;
-  p->vel_final << 0.0, 0.0;
-  p->theta_init = 0.0;
-  p->theta_final = 0.0;
-
-  p->desired.resize(nb_states + nb_inputs, nb_steps);
-  p->cost_weights = cost_weights;
-}
-
 GABitString::GABitString(void) {
   this->chromosome.clear();
+  this->nb_inputs = 0;
   this->nb_time_steps = 0;
   this->score = 0.0;
 }
 
 int GABitString::configure(int nb_time_steps) {
-  int nb_states;
   int nb_inputs;
-  int n;
+  double rand_az;
+  double rand_theta;
 
   // setup
-  nb_states = 4;
-  nb_inputs = 2;
-  n = nb_states + nb_inputs;
+  this->nb_inputs = 2;
   this->nb_time_steps = nb_time_steps;
+  this->X.resize(4, nb_time_steps);
+  rand_az = randf(0.0, 5.0);
+  rand_theta = randf(deg2rad(-40.0), deg2rad(40.0));
 
   // initialize chromosome
-  for (int i = 0; i < nb_time_steps; i++) {
-    this->chromosome.push_back(randf(-2.0, 5.0));    // x
-    this->chromosome.push_back(randf(-5.0, 5.0));    // vx
-    this->chromosome.push_back(randf(0.0, 10.0));    // z
-    this->chromosome.push_back(randf(-5.0, 5.0));    // vz
-    this->chromosome.push_back(randf(-10.0, 10.0));  // az
-    this->chromosome.push_back(randf(deg2rad(-90.0), deg2rad(90.0)));  // theta
+  for (int i = 0; i < this->nb_time_steps; i++) {
+    this->chromosome.push_back(rand_az);     // az
+    this->chromosome.push_back(rand_theta);  // theta
   }
 }
 
@@ -66,15 +44,14 @@ int GABitString::record(std::string file_path) {
   output_file << "theta" << std::endl;
 
   // record
-  m = 6;  // states + inputs (4 + 2)
   for (int i = 0; i < this->nb_time_steps; i++) {
     output_file << i << ",";
-    output_file << this->chromosome[i * m + 0] << ",";
-    output_file << this->chromosome[i * m + 1] << ",";
-    output_file << this->chromosome[i * m + 2] << ",";
-    output_file << this->chromosome[i * m + 3] << ",";
-    output_file << this->chromosome[i * m + 4] << ",";
-    output_file << this->chromosome[i * m + 5] << std::endl;
+    output_file << this->X(0, i) << ",";
+    output_file << this->X(1, i) << ",";
+    output_file << this->X(2, i) << ",";
+    output_file << this->X(3, i) << ",";
+    output_file << this->chromosome[i * 2 + 0] << ",";
+    output_file << this->chromosome[i * 2 + 1] << std::endl;
   }
 
   // clean up
@@ -82,7 +59,6 @@ int GABitString::record(std::string file_path) {
 
   return 0;
 }
-
 
 void GABitString::print(void) {
   for (int i = 0; i < this->chromosome.size(); i++) {
@@ -94,14 +70,10 @@ GAPopulation::GAPopulation(void) {
   this->individuals.clear();
 }
 
-int GAPopulation::configure(int nb_individuals, struct problem_data *data) {
-  std::vector<double> desired;
-  load_matrix(data->desired, desired);
-
+int GAPopulation::configure(int nb_individuals, int nb_time_steps) {
   for (int i = 0; i < nb_individuals; i++) {
     GABitString bs;
-    bs.configure(data->nb_steps);
-    bs.chromosome = std::vector<double>(desired);
+    bs.configure(nb_time_steps);
     this->individuals.push_back(bs);
   }
 }
@@ -115,12 +87,22 @@ void GAPopulation::print(void) {
 
 GAProblem::GAProblem(void) {
   this->configured = false;
+
+  this->max_generations = 0;
+  this->tournament_size = 0;
+  this->crossover_probability = 0.0;
+  this->mutation_probability = 0.0;
+
+  this->x_init << 0.0, 0.0, 0.0, 0.0;
+  this->x_final << 0.0, 0.0, 0.0, 0.0;
 }
 
 int GAProblem::configure(int max_generations,
                          int tournament_size,
                          double crossover_probability,
-                         double mutation_probability) {
+                         double mutation_probability,
+                         Vec4 x_init,
+                         Vec4 x_final) {
 
   // seed random
   srand(time(NULL));
@@ -130,104 +112,41 @@ int GAProblem::configure(int max_generations,
   this->tournament_size = tournament_size;
   this->crossover_probability = crossover_probability;
   this->mutation_probability = mutation_probability;
+
+  this->sim.configure(x_init, x_final, 1.0);
+  this->x_init = x_init;
+  this->x_final = x_final;
+
   this->configured = true;
-
   return 0;
 }
 
-int GAProblem::calculateDesired(struct problem_data *p) {
-  double dx;
-  VecX x(6);
-  double m, c;
+int GAProblem::evaluateIndividual(GABitString &bs) {
+  double dt, tend;
+  MatX U;
 
   // setup
-  p->desired.block(0, p->nb_steps - 1, 6, 1) = x;
+  dt = 0.1;
+  tend = dt * bs.nb_time_steps;
+  load_matrix(bs.chromosome, 2, bs.nb_time_steps, U);
 
-  // calculate line equation, gradient and intersect
-  m = (p->pos_init(1) - p->pos_final(1)) / (p->pos_init(0) - p->pos_final(0));
-  c = p->pos_init(1) - m * p->pos_init(0);
-
-  // push initial x
-  x(0) = p->pos_init(0);  // state - x
-  x(1) = p->vel_init(0);  // state - vx
-  x(2) = p->pos_init(1);  // state - z
-  x(3) = p->vel_init(1);  // state - vz
-  x(4) = p->thrust_init;  // input - az
-  x(5) = p->theta_init;   // input - w
-  p->desired.block(0, 0, 6, 1) = x;
-
-  // create points along the desired line path
-  dx = (p->pos_final(0) - p->pos_init(0)) / (double) (p->nb_steps - 1);
-  for (int i = 0; i < (p->nb_steps - 2); i++) {
-    x = p->desired.block(0, i, 6, 1);
-
-    x(0) += dx;             // state - x
-    x(1) = p->vel_init(0);  // state - vx
-    x(2) = m * x(0) + c;    // state - z
-    x(3) = p->vel_init(1);  // state - vz
-    x(4) = p->thrust_init;  // input - az
-    x(5) = p->theta_init;   // input - w
-
-    p->desired.block(0, i + 1, 6, 1) = x;
-  }
-
-  // push final x
-  x(0) = p->pos_final(0);   // state - x
-  x(1) = p->vel_final(0);   // state - vx
-  x(2) = p->pos_final(1);   // state - z
-  x(3) = p->vel_final(1);   // state - vz
-  x(4) = p->thrust_final;   // input - az
-  x(5) = p->theta_final;    // input - w
-  p->desired.block(0, p->nb_steps - 1, 6, 1) = x;
+  // evaluate
+  sim.simulate(dt, tend, U, bs.X);
+  bs.score = 0;
+  // bs.score -= 10 * sim.d_az;
+  // bs.score -= 10 * sim.d_az;
+  // bs.score -= 10 * sim.d_theta;
+  // bs.score -= 10 * sim.az_sum;
+  bs.score -= 1000 * sim.dist_error;
+  bs.score -= 1000 * sim.vel_error;
 
   return 0;
 }
 
-int GAProblem::evaluateIndividual(GABitString &bs, struct problem_data *data) {
-  int m;
-  double cost;
-  MatX X;
-  VecX g;
-  VecX x_opt, x_des;
-  VecX z_opt, z_des;
-  VecX u1_opt, u2_opt;
-
-  // setup
-  cost = 0.0;
-  m = data->nb_states + data->nb_inputs;
-  load_matrix(bs.chromosome, m, data->nb_steps, X);
-  g = 9.81 * MatX::Ones(data->nb_steps, 1);
-
-  // position error cost
-  x_opt = X.row(0);
-  x_des = data->desired.row(0);
-  cost -= data->cost_weights[0] * (x_opt - x_des).squaredNorm();
-
-  z_opt = X.row(2);
-  z_des = data->desired.row(2);
-  cost -= data->cost_weights[1] * (z_opt - z_des).squaredNorm();
-
-  for (int i = 1; i < bs.nb_time_steps; i++) {
-    cost -= pow(fabs(x_opt(i) - x_opt(i - 1)), 4);
-    cost -= pow(fabs(z_opt(i) - z_opt(i - 1)), 4);
-  }
-
-  // control input cost
-  u1_opt = X.row(4);
-  u2_opt = X.row(5);
-  cost -= data->cost_weights[2] * (u1_opt - g).squaredNorm();
-  cost -= data->cost_weights[3] * u2_opt.squaredNorm();
-
-  // set bit string score
-  bs.score = cost;
-
-  return 0;
-}
-
-int GAProblem::evaluatePopulation(GAPopulation &p, struct problem_data *data) {
+int GAProblem::evaluatePopulation(GAPopulation &p) {
   // evaluate individuals
   for (int i = 0; i < p.individuals.size(); i++) {
-    this->evaluateIndividual(p.individuals[i], data);
+    this->evaluateIndividual(p.individuals[i]);
   }
 
   return 0;
@@ -267,35 +186,16 @@ int GAProblem::pointMutation(GABitString &bs) {
   }
 
   // point mutation
-  for (int i = 0; i < (bs.chromosome.size() / 6); i++) {
-    // x
-    if (this->mutation_probability > randf(0.0, 1.0)) {
-      bs.chromosome[i * 6 + 0] = randf(-2.0, 5.0);
-    }
-
-    // vx
-    if (this->mutation_probability > randf(0.0, 1.0)) {
-      bs.chromosome[i * 6 + 1] = randf(-5.0, 5.0);
-    }
-
-    // z
-    if (this->mutation_probability > randf(0.0, 1.0)) {
-      bs.chromosome[i * 6 + 2] = randf(0.0, 10.0);
-    }
-
-    // vz
-    if (this->mutation_probability > randf(0.0, 1.0)) {
-      bs.chromosome[i * 6 + 3] = randf(-5.0, 5.0);
-    }
-
+  for (int i = 0; i < (bs.chromosome.size() / bs.nb_inputs); i++) {
     // az
     if (this->mutation_probability > randf(0.0, 1.0)) {
-      bs.chromosome[i * 6 + 4] = randf(-10.0, 10.0);
+      bs.chromosome[i * bs.nb_inputs + 0] = randf(0.0, 5.0);
     }
 
     // theta
     if (this->mutation_probability > randf(0.0, 1.0)) {
-      bs.chromosome[i * 6 + 5] = randf(deg2rad(-90.0), deg2rad(90.0));
+      bs.chromosome[i * bs.nb_inputs + 1] = randf(deg2rad(-40.0),
+                                                  deg2rad(40.0));
     }
   }
 
@@ -352,7 +252,7 @@ void GAProblem::findBest(GAPopulation &p, GABitString &best) {
   }
 }
 
-int GAProblem::optimize(GAPopulation &p, struct problem_data *data) {
+int GAProblem::optimize(GAPopulation &p) {
   GABitString best;
 
   // pre-check
@@ -362,7 +262,7 @@ int GAProblem::optimize(GAPopulation &p, struct problem_data *data) {
 
   // optimize
   for (int i = 0; i < this->max_generations; i++) {
-    this->evaluatePopulation(p, data);
+    this->evaluatePopulation(p);
     this->tournamentSelection(p);
 
     for (int j = 0; j < (p.individuals.size() / 2); j++) {
