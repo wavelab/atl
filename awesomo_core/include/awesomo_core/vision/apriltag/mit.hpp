@@ -28,6 +28,8 @@ public:
 
   AprilTags::TagDetector *detector;
   TagPose prev_tag;
+  int prev_tag_image_width;
+  int prev_tag_image_height;
 
   std::map<int, float> tag_configs;
   std::string camera_mode;
@@ -38,7 +40,7 @@ public:
   MITDetector(void);
   int configure(std::string config_file);
   int obtainPose(AprilTags::TagDetection tag, TagPose &tag_pose);
-  std::vector<TagPose> extractTags(cv::Mat &image);
+  int extractTags(cv::Mat &image, std::vector<TagPose> &tags);
   int changeMode(cv::Mat &image);
   int maskImage(TagPose tag_pose,
                 cv::Mat &image,

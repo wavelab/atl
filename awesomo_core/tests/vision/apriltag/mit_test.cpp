@@ -45,6 +45,7 @@ TEST(MITDetector, configure) {
 }
 
 TEST(MITDetector, extractTags) {
+  int retval;
   cv::Mat image;
   std::vector<TagPose> tags;
   MITDetector detector;
@@ -54,10 +55,11 @@ TEST(MITDetector, extractTags) {
 
   // CENTER
   image = cv::imread(TEST_IMAGE_CENTER, CV_LOAD_IMAGE_COLOR);
-  tags = detector.extractTags(image);
+  retval = detector.extractTags(image, tags);
   detector.prev_tag.detected = false;
   // tags[0].print();
 
+  ASSERT_EQ(0, retval);
   ASSERT_EQ(1, tags.size());
   ASSERT_NEAR(0.0, tags[0].position(0), 0.15);
   ASSERT_NEAR(0.0, tags[0].position(1), 0.15);
@@ -65,10 +67,11 @@ TEST(MITDetector, extractTags) {
 
   // TOP
   image = cv::imread(TEST_IMAGE_TOP, CV_LOAD_IMAGE_COLOR);
-  tags = detector.extractTags(image);
+  retval = detector.extractTags(image, tags);
   detector.prev_tag.detected = false;
   // tags[0].print();
 
+  ASSERT_EQ(0, retval);
   ASSERT_EQ(1, tags.size());
   ASSERT_NEAR(0.0, tags[0].position(0), 0.15);
   ASSERT_NEAR(-0.5, tags[0].position(1), 0.15);
@@ -76,10 +79,11 @@ TEST(MITDetector, extractTags) {
 
   // RIGHT
   image = cv::imread(TEST_IMAGE_RIGHT, CV_LOAD_IMAGE_COLOR);
-  tags = detector.extractTags(image);
+  retval = detector.extractTags(image, tags);
   detector.prev_tag.detected = false;
   // tags[0].print();
 
+  ASSERT_EQ(0, retval);
   ASSERT_EQ(1, tags.size());
   ASSERT_NEAR(0.5, tags[0].position(0), 0.15);
   ASSERT_NEAR(0.0, tags[0].position(1), 0.15);
@@ -107,6 +111,7 @@ TEST(MITDetector, changeMode) {
 }
 
 TEST(MITDetector, maskImage) {
+  int retval;
   MITDetector detector;
   cv::Mat image, masked;
   std::vector<TagPose> tags;
@@ -116,7 +121,7 @@ TEST(MITDetector, maskImage) {
 
   // CENTER
   image = cv::imread(TEST_IMAGE_CENTER, CV_LOAD_IMAGE_COLOR);
-  tags = detector.extractTags(image);
+  retval = detector.extractTags(image, tags);
   detector.maskImage(tags[0], image, masked);
 
   // cv::imshow("test", masked);
