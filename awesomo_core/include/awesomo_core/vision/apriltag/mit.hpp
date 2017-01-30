@@ -27,6 +27,7 @@ public:
   bool configured;
 
   AprilTags::TagDetector *detector;
+  TagPose prev_tag;
 
   std::map<int, float> tag_configs;
   std::string camera_mode;
@@ -38,9 +39,11 @@ public:
   int configure(std::string config_file);
   int obtainPose(AprilTags::TagDetection tag, TagPose &tag_pose);
   std::vector<TagPose> extractTags(cv::Mat &image);
-  int calculateMask(TagPose tag_pose,
-                    cv::Mat &mask,
-                    double padding=0.1);
+  int changeMode(cv::Mat &image);
+  int maskImage(TagPose tag_pose,
+                cv::Mat &image,
+                cv::Mat &masked,
+                double padding=0.1);
   void printTag(TagPose tag);
 };
 

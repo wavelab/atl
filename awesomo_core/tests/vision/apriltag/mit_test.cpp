@@ -55,7 +55,8 @@ TEST(MITDetector, extractTags) {
   // CENTER
   image = cv::imread(TEST_IMAGE_CENTER, CV_LOAD_IMAGE_COLOR);
   tags = detector.extractTags(image);
-  tags[0].print();
+  detector.prev_tag.detected = false;
+  // tags[0].print();
 
   ASSERT_EQ(1, tags.size());
   ASSERT_NEAR(0.0, tags[0].position(0), 0.15);
@@ -65,7 +66,8 @@ TEST(MITDetector, extractTags) {
   // TOP
   image = cv::imread(TEST_IMAGE_TOP, CV_LOAD_IMAGE_COLOR);
   tags = detector.extractTags(image);
-  tags[0].print();
+  detector.prev_tag.detected = false;
+  // tags[0].print();
 
   ASSERT_EQ(1, tags.size());
   ASSERT_NEAR(0.0, tags[0].position(0), 0.15);
@@ -75,7 +77,8 @@ TEST(MITDetector, extractTags) {
   // RIGHT
   image = cv::imread(TEST_IMAGE_RIGHT, CV_LOAD_IMAGE_COLOR);
   tags = detector.extractTags(image);
-  tags[0].print();
+  detector.prev_tag.detected = false;
+  // tags[0].print();
 
   ASSERT_EQ(1, tags.size());
   ASSERT_NEAR(0.5, tags[0].position(0), 0.15);
@@ -83,11 +86,30 @@ TEST(MITDetector, extractTags) {
   ASSERT_NEAR(2.30, tags[0].position(2), 0.15);
 }
 
-TEST(MITDetector, calculateMask) {
+TEST(MITDetector, changeMode) {
   MITDetector detector;
-  cv::Mat image;
+  cv::Mat image1, image2, image3;
+
+  // setup
+  detector.configure(TEST_CONFIG);
+
+  image1 = cv::Mat(480, 640, CV_64F, double(0));
+  detector.changeMode(image1);
+  ASSERT_EQ("640x480", detector.camera_mode);
+
+  image2 = cv::Mat(240, 320, CV_64F, double(0));
+  detector.changeMode(image2);
+  ASSERT_EQ("320x240", detector.camera_mode);
+
+  image3 = cv::Mat(120, 160, CV_64F, double(0));
+  detector.changeMode(image3);
+  ASSERT_EQ("160x120", detector.camera_mode);
+}
+
+TEST(MITDetector, maskImage) {
+  MITDetector detector;
+  cv::Mat image, masked;
   std::vector<TagPose> tags;
-  cv::Mat mask;
 
   // setup
   detector.configure(TEST_CONFIG);
@@ -95,12 +117,10 @@ TEST(MITDetector, calculateMask) {
   // CENTER
   image = cv::imread(TEST_IMAGE_CENTER, CV_LOAD_IMAGE_COLOR);
   tags = detector.extractTags(image);
-  detector.calculateMask(tags[0], mask);
+  detector.maskImage(tags[0], image, masked);
 
-  cv::Mat masked;
-  image.copyTo(masked, mask);
-  cv::imshow("test", masked);
-  cv::waitKey(100000);
+  // cv::imshow("test", masked);
+  // cv::waitKey(100000);
 }
 
 }  // end of awesomo namespace

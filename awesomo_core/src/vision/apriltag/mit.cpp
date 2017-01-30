@@ -7,6 +7,7 @@ MITDetector::MITDetector(void) {
   this->configured = false;
 
   this->detector = NULL;
+  this->prev_tag = TagPose();
 
   this->tag_configs.clear();
   this->camera_mode = "";
@@ -55,18 +56,34 @@ int MITDetector::configure(std::string config_file) {
 
 std::vector<TagPose> MITDetector::extractTags(cv::Mat &image) {
   TagPose pose;
-  cv::Mat image_gray;
+  cv::Mat masked, image_gray;
   std::vector<AprilTags::TagDetection> detections;
   std::vector<TagPose> pose_estimates;
 
+  // change mode based on image size
+  this->changeMode(image);
+
+  // mask image if tag was last detected
+  if (this->prev_tag.detected) {
+    this->maskImage(this->prev_tag, image, masked);
+    this->prev_tag.detected = false;
+    cv::cvtColor(masked, image_gray, cv::COLOR_BGR2GRAY);
+
+  } else {
+    cv::cvtColor(image, image_gray, cv::COLOR_BGR2GRAY);
+
+  }
+
   // extract tags
-  cv::cvtColor(image, image_gray, cv::COLOR_BGR2GRAY);
   detections = this->detector->extractTags(image_gray);
 
   // calculate tag pose
   for (int i = 0; i < detections.size(); i++) {
     if (this->obtainPose(detections[i], pose) == 0) {
       pose_estimates.push_back(pose);
+
+      // keep track of last tag
+      this->prev_tag = pose;
 
       // only need 1 tag
       break;
@@ -114,9 +131,36 @@ int MITDetector::obtainPose(AprilTags::TagDetection tag, TagPose &tag_pose) {
   return 0;
 }
 
-int MITDetector::calculateMask(TagPose tag_pose,
-                               cv::Mat &mask,
-                               double padding) {
+int MITDetector::changeMode(cv::Mat &image) {
+  int image_width;
+  int image_height;
+  bool widths_equal;
+  bool heights_equal;
+  CameraConfig config;
+
+  // setup
+  image_width = image.cols;
+  image_height = image.rows;
+
+  // traverse all camera modes and change mode based on image size
+  for (int i = 0; i < this->camera_modes.size(); i++) {
+    config = this->camera_configs[this->camera_modes[i]];
+    widths_equal = (config.image_width == image_width);
+    heights_equal = (config.image_height == image_height);
+
+    if (widths_equal && heights_equal) {
+      this->camera_mode = this->camera_modes[i];
+      return 1;
+    }
+  }
+
+  return 0;
+}
+
+int MITDetector::maskImage(TagPose tag_pose,
+                           cv::Mat &image,
+                           cv::Mat &masked,
+                           double padding) {
   std::string camera_mode;
   int image_width, image_height;
   double x, y, z;
@@ -124,6 +168,7 @@ int MITDetector::calculateMask(TagPose tag_pose,
   double tag_size;
   Vec2 top_left, bottom_right;
   cv::Point p1, p2;
+  cv::Mat mask;
 
   // position is in camera frame
   // camera frame:  (z - forward, x - right, y - down)
@@ -164,6 +209,9 @@ int MITDetector::calculateMask(TagPose tag_pose,
   p2 = cv::Point(bottom_right(0), bottom_right(1));
   mask = cv::Mat::zeros(image_height, image_width, CV_8U);
   cv::rectangle(mask, p1, p2, cv::Scalar(255, 255, 255), CV_FILLED);
+
+  // mask image
+  image.copyTo(masked, mask);
 
   return 0;
 }
