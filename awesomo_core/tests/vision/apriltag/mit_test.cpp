@@ -64,6 +64,7 @@ TEST(MITDetector, extractTags) {
   ASSERT_NEAR(0.0, tags[0].position(0), 0.15);
   ASSERT_NEAR(0.0, tags[0].position(1), 0.15);
   ASSERT_NEAR(2.2, tags[0].position(2), 0.15);
+  tags.clear();
 
   // TOP
   image = cv::imread(TEST_IMAGE_TOP, CV_LOAD_IMAGE_COLOR);
@@ -76,6 +77,7 @@ TEST(MITDetector, extractTags) {
   ASSERT_NEAR(0.0, tags[0].position(0), 0.15);
   ASSERT_NEAR(-0.5, tags[0].position(1), 0.15);
   ASSERT_NEAR(2.4, tags[0].position(2), 0.15);
+  tags.clear();
 
   // RIGHT
   image = cv::imread(TEST_IMAGE_RIGHT, CV_LOAD_IMAGE_COLOR);
@@ -88,6 +90,7 @@ TEST(MITDetector, extractTags) {
   ASSERT_NEAR(0.5, tags[0].position(0), 0.15);
   ASSERT_NEAR(0.0, tags[0].position(1), 0.15);
   ASSERT_NEAR(2.30, tags[0].position(2), 0.15);
+  tags.clear();
 }
 
 TEST(MITDetector, changeMode) {

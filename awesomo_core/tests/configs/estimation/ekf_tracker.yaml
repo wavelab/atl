@@ -1,0 +1,20 @@
+nb_states: 3
+nb_dimensions: 3
+
+motion_noise_matrix:
+    rows: 3
+    cols: 3
+    data: [
+        1.0, 0.0, 0.0,
+        0.0, 1.0, 0.0,
+        0.0, 0.0, 1.0
+    ]
+
+measurement_noise_matrix:
+    rows: 3
+    cols: 3
+    data: [
+        1000.0, 0.0, 0.0,
+        0.0, 1000.0, 0.0,
+        0.0, 0.0, 1000.0
+    ]

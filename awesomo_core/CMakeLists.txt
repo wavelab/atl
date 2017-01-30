@@ -34,6 +34,7 @@ ADD_LIBRARY(
     src/control/velocity_controller.cpp
     # estimation
     src/estimation/ekf.cpp
+    src/estimation/ekf_tracker.cpp
     src/estimation/kf.cpp
     src/estimation/kf_tracker.cpp
     # planning
@@ -87,6 +88,7 @@ ADD_EXECUTABLE(
     tests/control/velocity_controller_test.cpp
     # ESTIMATION
     tests/estimation/ekf_test.cpp
+    tests/estimation/ekf_tracker_test.cpp
     tests/estimation/kf_test.cpp
     tests/estimation/kf_tracker_test.cpp
     # PLANNING

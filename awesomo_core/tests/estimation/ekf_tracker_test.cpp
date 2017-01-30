@@ -1,16 +1,21 @@
-#include "awesomo_core/awesomo_test.hpp"
-#include "awesomo_core/estimation/ekf.hpp"
+#include <random>
+#include <fstream>
+#include <iostream>
 
-#define TEST_EKF_OUTPUT_FILE "/tmp/estimation_ekf_test.output"
+#include "awesomo_core/awesomo_test.hpp"
+#include "awesomo_core/estimation/ekf_tracker.hpp"
+
+#define TEST_CONFIG "tests/configs/estimation/ekf_tracker.yaml"
+#define TEST_OUTPUT_FILE "/tmp/estimation_ekf_tracker_test.output"
 
 
 namespace awesomo {
 
 static int prepareOutputFile(std::ofstream &output_file,
                              std::string output_path) {
+  // clang-format off
   output_file.open(output_path);
 
-  // clang-format off
   output_file << "time_step" << ",";
 
   output_file << "x" << ",";
@@ -41,12 +46,12 @@ static void recordTimeStep(std::ofstream &output_file,
   output_file << est(2) << std::endl;
 }
 
-TEST(ExtendedKalmanFilter, estimate) {
+TEST(ExtendedKalmanFilterTracker, estimate) {
   float dt;
   Vec2 u;
   Vec3 mu, x, y, g, h, gaussian_noise;
-  Mat3 R, Q, G, H;
-  ExtendedKalmanFilter ekf;
+  Mat3 G, H;
+  ExtendedKalmanFilterTracker tracker;
   std::ofstream output_file;
   std::default_random_engine rgen;
   std::normal_distribution<float> norm_x(0, pow(0.5, 2));
@@ -57,19 +62,14 @@ TEST(ExtendedKalmanFilter, estimate) {
   // clang-format off
   dt = 0.01;
   x << 0, 0, 0;
-  mu << 0, 0, 0;
-  R << pow(0.05, 2), 0, 0,
-       0, pow(0.05, 2), 0,
-       0, 0, pow(deg2rad(0.5), 2);
-  Q << pow(0.5, 2), 0, 0,
-       0, pow(0.5, 2), 0,
-       0, 0, pow(deg2rad(10), 2);
+  mu << 0.0, 0.0, 0.0;    // x, y, theata
   u << 1.0, 0.1;
-  ekf.init(mu, R, Q);
-  prepareOutputFile(output_file, TEST_EKF_OUTPUT_FILE);
+  tracker.configure(TEST_CONFIG);
+  tracker.initialize(mu);
+  prepareOutputFile(output_file, TEST_OUTPUT_FILE);
   // clang-format on
 
-  // loop
+  // estimate
   for (int i = 0; i < 10000; i++) {
     // update true state
     // clang-format off
@@ -83,23 +83,15 @@ TEST(ExtendedKalmanFilter, estimate) {
     y = x + gaussian_noise;
 
     // propagate motion model
-    // clang-format off
-    g << ekf.mu(0) + u(0) * cos(ekf.mu(2)) * dt,
-         ekf.mu(1) + u(0) * sin(ekf.mu(2)) * dt,
-         ekf.mu(2) + u(1) * dt;
-    G << 1, 0, (-u(0) * sin(ekf.mu(2)) * dt),
-         0, 1, (u(0) * cos(ekf.mu(2)) * dt),
-         0, 0, 1;
-    // clang-format on
-    ekf.predictionUpdate(g, G);
+    TWO_WHEEL_MOTION_MODEL(tracker, G, g);
+    tracker.predictionUpdate(g, G);
 
     // propagate measurement
-    H = MatX::Identity(3, 3);
-    h = H * ekf.mu;
-    ekf.measurementUpdate(h, H, y);
+    TWO_WHEEL_MEASUREMENT_MODEL(tracker, H, h);
+    tracker.measurementUpdate(h, H, y);
 
     // record
-    recordTimeStep(output_file, i, x, ekf.mu);
+    recordTimeStep(output_file, i, x, tracker.mu);
   }
   output_file.close();
 }
