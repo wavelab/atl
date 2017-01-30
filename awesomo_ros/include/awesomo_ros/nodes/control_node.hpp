@@ -36,6 +36,7 @@ namespace awesomo {
 // SUBSCRIBE TOPICS
 #define MODE_TOPIC "/mavros/set_mode"
 #define ARM_TOPIC "/mavros/cmd/arming"
+#define QMODE_TOPIC "/awesomo/control/mode"
 #define STATE_TOPIC "/mavros/state"
 #define POSE_TOPIC "/mavros/local_position/pose"
 #define VELOCITY_TOPIC "/mavros/local_position/velocity"
@@ -69,6 +70,7 @@ public:
   void waitForConnection(void);
   int disarm(void);
   int setOffboardModeOn(void);
+  void modeCallback(const std_msgs::String &msg);
   void stateCallback(const mavros_msgs::State::ConstPtr &msg);
   void poseCallback(const geometry_msgs::PoseStamped &msg);
   void velocityCallback(const geometry_msgs::TwistStamped &msg);
