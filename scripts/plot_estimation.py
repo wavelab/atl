@@ -28,8 +28,8 @@ def plot(data_file):
         data["est_x"].append(float(row[4]))
         data["est_y"].append(float(row[5]))
 
-    plt.plot(data["x"], data["y"])
-    plt.plot(data["est_x"], data["est_y"])
+    plt.plot(data["x"][::100], data["y"][::100])
+    plt.plot(data["est_x"][::100], data["est_y"][::100])
     plt.show()
 
 

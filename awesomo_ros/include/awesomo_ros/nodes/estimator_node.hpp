@@ -10,6 +10,9 @@
 
 namespace awesomo {
 
+#define KF_MODE 1
+#define EKF_MODE 2
+
 // NODE SETTINGS
 #define NODE_NAME "awesomo_estimator"
 #define NODE_RATE 200
@@ -29,7 +32,9 @@ namespace awesomo {
 
 class EstimatorNode : public ROSNode {
 public:
-  KalmanFilterTracker estimator;
+  int mode;
+  KalmanFilterTracker kf_tracker;
+  ExtendedKalmanFilterTracker ekf_tracker;
 
   Pose quad_pose;
   Vec3 quad_velocity;
@@ -42,7 +47,7 @@ public:
   double target_lost_threshold;
 
   EstimatorNode(int argc, char **argv) : ROSNode(argc, argv) {
-    this->estimator = KalmanFilterTracker();
+    this->kf_tracker = KalmanFilterTracker();
 
     this->quad_pose = Pose();
     this->target_detected = false;
@@ -67,6 +72,8 @@ public:
   void publishLTDetected(void);
   void publishGimbalSetpointAttitudeMsg(Vec3 setpoints);
   void trackTarget(void);
+  int estimateKF(double dt);
+  int estimateEKF(double dt);
   int loopCallback(void);
 };
 
