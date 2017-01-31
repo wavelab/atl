@@ -33,6 +33,7 @@ namespace awesomo {
 class EstimatorNode : public ROSNode {
 public:
   int mode;
+  bool initialized;
   KalmanFilterTracker kf_tracker;
   ExtendedKalmanFilterTracker ekf_tracker;
 

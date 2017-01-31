@@ -398,6 +398,9 @@ TEST(Utils, wrapTo180) {
   ASSERT_FLOAT_EQ(0.0, retval);
 
   // edge cases
+  retval = wrapTo180(-180.0);
+  ASSERT_FLOAT_EQ(-180.0, retval);
+
   retval = wrapTo180(-90.0);
   ASSERT_FLOAT_EQ(-90.0, retval);
 
