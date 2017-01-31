@@ -1,4 +1,18 @@
-## Autonomous Landing on a Moving Platform (Friis et al - 2009)
+## Time-Optimal Control of a Hovering Quad-Rotor Helicopter
+
+- (Lai et al - 2005)
+
+Basically a Time-Optimal Control problem that is initialized by using Genetic
+Algorithm, to generate initial feasible solutions of the formulated Nonlinear
+Programming problem, the author notes that GAs can be used for initialization
+but not to find the time optimal values, because it very easily generates
+infeasible inputs during the trajectory.
+
+
+
+## Autonomous Landing on a Moving Platform
+
+- (Friis et al - 2009)
 
 The goal of this project is to land a quadrotor onto a moving platform. The
 main emphasis of this project is quadrotor control.The report documents the
@@ -13,7 +27,9 @@ improved with better statistics in comparing PID and LQ controllers.
 
 
 
-## Nonlinear Tracking and Landing Controller for Quadrotor Aerial Robots (Voos et al - 2010)
+## Nonlinear Tracking and Landing Controller for Quadrotor Aerial Robots
+
+- (Voos et al - 2010)
 
 The contribution of this paper is a new nonlinear control algorithm based upon
 a decomposition of the overall controller into a nested structure of velocity
@@ -29,7 +45,9 @@ algorithm would really perform in the real world.
 
 
 
-## Precision Flight Control For a Multi-vehicle Quadrotor Helicopter testbed (Hoffmann et al - 2011)
+## Precision Flight Control For a Multi-vehicle Quadrotor Helicopter testbed
+
+- (Hoffmann et al - 2011)
 
 Accurate dynamic models for deriving controllers for moderate to high speeds
 have been lacking. This work presents theoretical models of quadrotor
@@ -52,7 +70,10 @@ dependent and already well known.
 
 
 
-## Automatic Take Off, Tracking and Landing of a Miniature UAV on a Moving Carrier Vehicle (Wenzel et al - 2011)
+## Automatic Take Off, Tracking and Landing of a Miniature UAV on a Moving   
+## Carrier Vehicle
+
+- (Wenzel et al - 2011)
 
 Used a Wii remote infrared (IR) camera and worked with an onboard 8 bit
 microccontroller. Position and orientation relative to the IR pattern is
@@ -66,7 +87,9 @@ Impressive that it worked at all. But too limited, IR will not work outdoors.
 
 
 
-## Autonomous Landing of a VTOL UAV on a Moving Platform Using Image-based Visual Servoing (Lee et al - 2012)
+## Autonomous Landing of a VTOL UAV on a Moving Platform Using Image-based Visual Servoing
+
+- (Lee et al - 2012)
 
 The authors of this paper used a Image-based Visual Servoing (IBVS) to track
 the moving platform in 2D and generate a velocity reference command used as the
@@ -80,7 +103,9 @@ is difficult to evaluate the relative performance of this system.
 
 
 
-## Landing a VTOL Unmanned Aerial Vehicle on a Moving Platform Using Optical Flow (Herisse et al - 2012)
+## Landing a VTOL Unmanned Aerial Vehicle on a Moving Platform Using Optical Flow
+
+- (Herisse et al - 2012)
 
 This paper introduces the use of optical flow to extract necessary realative
 information, and a nonlinear controller to land of a moving platform, the
@@ -109,7 +134,9 @@ While impressive the convergence rate was very slow as seen in the video.
 
 
 
-## Outdoor Autonomous Landing on a Moving Platform for Quadrotors using an Omnidirectional Camera (Kim et al - 2014)
+## Outdoor Autonomous Landing on a Moving Platform for Quadrotors using an Omnidirectional Camera
+
+- (Kim et al - 2014)
 
 This paper explores the use of a smartphone (iPhone) to serve as an on-board
 camera and processing unit, where measurements from the omnidirectional camera
@@ -125,7 +152,9 @@ others.
 
 
 
-## Autonomous Quadrotor Flight Using Onboard RGB-D Visual Odometry (Valenti et al - 2014)
+## Autonomous Quadrotor Flight Using Onboard RGB-D Visual Odometry
+
+- (Valenti et al - 2014)
 
 Visual odometry algorithm used uses an uncertainty analysis of the depth
 information to align newly observed features against a global sparse model of
@@ -162,7 +191,9 @@ difficult to gauge the robustness of the implementation.
 
 
 
-## Keyframe-Based Visual-Inertial SLAM Using NonLinear Optimization (Leutenegger et al - 2015)
+## Keyframe-Based Visual-Inertial SLAM Using NonLinear Optimization
+
+- (Leutenegger et al - 2015)
 
 Most fusion strategies use filtering, the visual robotics community has
 recently turned to non-linear optimization approaches for visal SLAM, which
