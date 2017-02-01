@@ -34,9 +34,12 @@ ADD_LIBRARY(
     src/control/velocity_controller.cpp
     # estimation
     src/estimation/ekf.cpp
+    src/estimation/ekf_tracker.cpp
     src/estimation/kf.cpp
     src/estimation/kf_tracker.cpp
     # planning
+    src/planning/ga.cpp
+    src/planning/model.cpp
     src/planning/optimizer.cpp
     src/planning/trajectory.cpp
     src/planning/utils.cpp
@@ -85,9 +88,12 @@ ADD_EXECUTABLE(
     tests/control/velocity_controller_test.cpp
     # ESTIMATION
     tests/estimation/ekf_test.cpp
+    tests/estimation/ekf_tracker_test.cpp
     tests/estimation/kf_test.cpp
     tests/estimation/kf_tracker_test.cpp
     # PLANNING
+    tests/planning/ga_test.cpp
+    tests/planning/model_test.cpp
     tests/planning/optimizer_test.cpp
     tests/planning/trajectory_test.cpp
     tests/planning/utils_test.cpp
@@ -95,6 +101,7 @@ ADD_EXECUTABLE(
     tests/quadrotor/landing_target_test.cpp
     tests/quadrotor/quadrotor_test.cpp
     # VISION TESTS
+    tests/vision/apriltag/mit_test.cpp
     # tests/vision/apriltag/swathmore_test.cpp
     tests/vision/camera/camera_test.cpp
     tests/vision/camera/config_test.cpp

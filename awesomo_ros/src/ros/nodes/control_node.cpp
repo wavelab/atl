@@ -35,6 +35,7 @@ int ControlNode::configure(const std::string node_name, int hz) {
 
   // subscribers
   // clang-format off
+  this->registerSubscriber(QMODE_TOPIC, &ControlNode::modeCallback, this);
   this->registerSubscriber(STATE_TOPIC, &ControlNode::stateCallback, this);
   this->registerSubscriber(POSE_TOPIC, &ControlNode::poseCallback, this);
   this->registerSubscriber(VELOCITY_TOPIC, &ControlNode::velocityCallback, this);
@@ -104,6 +105,23 @@ int ControlNode::setOffboardModeOn(void) {
   } else {
     ROS_ERROR("Failed to enable offboard mode!");
     return -1;
+  }
+}
+
+void ControlNode::modeCallback(const std_msgs::String &msg) {
+  std::string mode;
+
+  convertMsg(msg, mode);
+  if (mode == "DISARM_MODE") {
+    this->quadrotor.setMode(DISARM_MODE);
+  } else if (mode == "HOVER_MODE") {
+    this->quadrotor.setMode(HOVER_MODE);
+  } else if (mode == "DISCOVER_MODE") {
+    this->quadrotor.setMode(DISCOVER_MODE);
+  } else if (mode == "TRACKING_MODE") {
+    this->quadrotor.setMode(TRACKING_MODE);
+  } else if (mode == "LANDING_MODE") {
+    this->quadrotor.setMode(LANDING_MODE);
   }
 }
 

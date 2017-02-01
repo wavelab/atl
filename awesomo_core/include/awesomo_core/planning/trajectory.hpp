@@ -1,11 +1,14 @@
 #ifndef __AWESOMO_PLANNING_TRAJECTORY_HPP__
 #define __AWESOMO_PLANNING_TRAJECTORY_HPP__
 
+#include <iostream>
+#include <fstream>
+
 #include "awesomo_core/utils/utils.hpp"
 
 namespace awesomo {
 
-typedef struct {
+struct problem_constraints {
   // input constraints
   double thrust_min;
   double thrust_max;
@@ -20,26 +23,46 @@ typedef struct {
   double feasible_angular_rate_min;
   double feasible_angular_rate_max;
 
-} trajectory_constraints;
+};
 
-typedef struct {
+struct problem_data {
   int nb_states;
-  int nb_time_steps;
+  int nb_inputs;
+  int nb_steps;
   double time_taken;
 
-  Vec3 state_initial;
-  Vec3 state_final;
-  std::vector<Vec2> desired_trajectory;
+  Vec2 pos_init;
+  Vec2 pos_final;
+  Vec2 vel_init;
+  Vec2 vel_final;
+  double thrust_init;
+  double thrust_final;
+  double theta_init;
+  double theta_final;
 
-} trajectory_data;
+  MatX desired;
+  std::vector<double> cost_weights;
+};
 
 Vec2 quadrotor_calculate_inputs(double mass, double thrust, double omega);
 VecX quadrotor_2d_model(VecX x, Vec2 u);
-int trajectory_problem_dimensions(int nb_states, int nb_timesteps);
-int trajectory_sampling_time(double time_taken, int nb_steps);
-std::vector<Vec2> trajectory_desired_path(Vec2 pos_init,
-                                          Vec2 pos_final,
-                                          int nb_steps);
+
+void trajectory_setup(struct problem_data *p,
+                      int nb_states,
+                      int nb_inputs,
+                      int nb_steps,
+                      std::vector<double> cost_weights);
+int trajectory_calculate_desired(struct problem_data *p);
+double trajectory_cost_func(const std::vector<double> &x,
+                            std::vector<double> &grad,
+                            void *data);
+double trajectory_constraint_func(const std::vector<double> &x,
+                                  std::vector<double> &grad,
+                                  void *data);
+int trajectory_record_optimization(std::string file_path,
+                                   std::vector<double> x,
+                                   int nb_rows);
+
 
 }  // end of awesomo namespace
 #endif

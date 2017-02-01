@@ -43,8 +43,9 @@ static void recordTimeStep(std::ofstream &output_file,
 
 TEST(ExtendedKalmanFilter, estimate) {
   float dt;
-  VecX mu(3), x(3), y(3), u(2), g(3), h(3), gaussian_noise(3);
-  MatX R(3, 3), Q(3, 3), G(3, 3), H(3, 3);
+  Vec2 u;
+  Vec3 mu, x, y, g, h, gaussian_noise;
+  Mat3 R, Q, G, H;
   ExtendedKalmanFilter ekf;
   std::ofstream output_file;
   std::default_random_engine rgen;

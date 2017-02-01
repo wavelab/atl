@@ -3,6 +3,7 @@ from math import pi
 
 import rospy
 from std_msgs.msg import Float64
+from std_msgs.msg import String
 from geometry_msgs.msg import Vector3
 
 
@@ -18,6 +19,20 @@ class ROSNode(object):
 
     def register_subscriber(self, topic, msg_type, callback):
         self.subs[topic] = rospy.Subscriber(topic, msg_type, callback)
+
+
+class Camera(ROSNode):
+    def __init__(self):
+        super(Camera, self).__init__()
+        self.image_topic = "/awesomo/camera/image"
+        self.mode_topic = "/prototype/camera/mode"
+
+        self.register_publisher(self.mode_topic, String)
+
+    def set_mode(self, mode):
+        msg = String()
+        msg.data = mode
+        self.pubs[self.mode_topic].publish(msg)
 
 
 class LandingZone(ROSNode):
@@ -76,13 +91,20 @@ class Gimbal(ROSNode):
 class Quadrotor(ROSNode):
     def __init__(self):
         super(Quadrotor, self).__init__()
+        self.mode_topic = "/awesomo/control/mode"
         self.heading_topic = "/awesomo/control/heading/set"
         self.hover_point_topic = "/awesomo/control/hover/set"
         self.hover_height_topic = "/awesomo/control/hover/height/set"
 
+        self.register_publisher(self.mode_topic, String)
         self.register_publisher(self.heading_topic, Float64)
         self.register_publisher(self.hover_point_topic, Vector3)
         self.register_publisher(self.hover_height_topic, Float64)
+
+    def set_mode(self, mode):
+        msg = String()
+        msg.data = mode
+        self.pubs[self.mode_topic].publish(msg)
 
     def set_heading(self, heading):
         msg = Float64()
@@ -116,19 +138,26 @@ def lz_circle_path(radius, velocity):
 if __name__ == "__main__":
     rospy.init_node("awesomo_remote")
     lz = LandingZone()
+    camera = Camera()
     quad = Quadrotor()
     gimbal = Gimbal()
     rospy.sleep(1)
+
+    # camera.set_mode("320x320")
+    # camera.set_mode("160x160")
 
     # gimbal.set_attitude([0.0, 0.0])
 
     # lz.set_velocity(0.5)
     # lz.set_position([100, 0, 0])
 
-    velocity, angular_velocity = lz_circle_path(5, 2.0)
-    lz.set_velocity(velocity)
-    lz.set_angular_velocity(angular_velocity)
+    # velocity, angular_velocity = lz_circle_path(5, 1.0)
+    # lz.set_velocity(velocity)
+    # lz.set_angular_velocity(angular_velocity)
 
-    # quad.set_heading(180.0)
-    # quad.set_hover_point([0.0, 2.0, 10.0])
-    # quad.set_hover_height(3.0)
+    # quad.set_heading(0.0)
+    # quad.set_mode("HOVER_MODE")
+    # quad.set_mode("DISCOVER_MODE")
+    # quad.set_hover_point([3.0, -3.0, 2.0])
+    # quad.set_hover_point([0.0, 0.0, 5.0])
+    # quad.set_hover_height(10.0)

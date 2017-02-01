@@ -113,7 +113,10 @@ int PointGreyCamera::getFrame(cv::Mat &image) {
   return 0;
 }
 
-int PointGreyCamera::setFormat7(std::string pixel_format, int crop_width, int crop_height, int mode) {
+int PointGreyCamera::setFormat7(std::string pixel_format,
+                                int crop_width,
+                                int crop_height,
+                                int mode) {
 
   FlyCapture2::Format7ImageSettings fmt7_settings;
   FlyCapture2::PixelFormat k_fmt7PixFmt;
@@ -123,21 +126,16 @@ int PointGreyCamera::setFormat7(std::string pixel_format, int crop_width, int cr
   int max_image_width;
   int max_image_height;
 
-    log_err("Format7 settings are to be set soon");
-  fmt7_settings.pixelFormat = FlyCapture2::PIXEL_FORMAT_RAW8;
-  // if (pixel_format == "MONO8") {
-  //   fmt7_settings.pixelFormat = FlyCapture2::PIXEL_FORMAT_MONO8;
-  // }
-  // else if (pixel_format == "MONO16") {
-  //   fmt7_settings.pixelFormat = FlyCapture2::PIXEL_FORMAT_MONO16;
-  // }
-  // else if (pixel_format == "RAW8") {
-  //   fmt7_settings.pixelFormat = FlyCapture2::PIXEL_FORMAT_RAW8;
-  // }
-  // else if (pixel_format == "RAW16") {
-  //   fmt7_settings.pixelFormat = FlyCapture2::PIXEL_FORMAT_RAW16;
-  // }
 
+  if (pixel_format == "MONO8") {
+    fmt7_settings.pixelFormat = FlyCapture2::PIXEL_FORMAT_MONO8;
+  } else if (pixel_format == "MONO16") {
+    fmt7_settings.pixelFormat = FlyCapture2::PIXEL_FORMAT_MONO16;
+  } else if (pixel_format == "RAW8") {
+    fmt7_settings.pixelFormat = FlyCapture2::PIXEL_FORMAT_RAW8;
+  } else if (pixel_format == "RAW16") {
+    fmt7_settings.pixelFormat = FlyCapture2::PIXEL_FORMAT_RAW16;
+  }
 
   switch (mode) {
     case 0:
@@ -163,8 +161,9 @@ int PointGreyCamera::setFormat7(std::string pixel_format, int crop_width, int cr
   fmt7_settings.height = crop_height;
 
   // Validate the Format7 settings
-  error =
-    this->pointgrey->ValidateFormat7Settings(&fmt7_settings, &valid, &fmt7PacketInfo);
+  error = this->pointgrey->ValidateFormat7Settings(&fmt7_settings,
+                                                   &valid,
+                                                   &fmt7PacketInfo);
   if (error != FlyCapture2::PGRERROR_OK) {
     log_err("Format7 settings are invalid!, could not configure the camera");
     return -1;
@@ -173,7 +172,6 @@ int PointGreyCamera::setFormat7(std::string pixel_format, int crop_width, int cr
   // Send the settings to the camera with recommended packet size
   error = this->pointgrey->SetFormat7Configuration(&fmt7_settings,
       fmt7PacketInfo.recommendedBytesPerPacket);
-
   if (error != FlyCapture2::PGRERROR_OK) {
     log_err("Could not configure the camera with Format7!");
     return -1;
@@ -183,8 +181,7 @@ int PointGreyCamera::setFormat7(std::string pixel_format, int crop_width, int cr
   return 0;
 }
 
-int PointGreyCamera::setFrameRate(double frame_rate)
-{
+int PointGreyCamera::setFrameRate(double frame_rate) {
   FlyCapture2::Error error;
   FlyCapture2::Property fps_prop;
 
@@ -195,18 +192,17 @@ int PointGreyCamera::setFrameRate(double frame_rate)
   fps_prop.absValue = frame_rate;
 
   error = this->pointgrey->SetProperty(&fps_prop);
-
   if (error != FlyCapture2::PGRERROR_OK) {
     log_err("ERROR! Failed to configure camera frame_rate!");
     return -1;
   } else {
     log_info("PointGrey camera frame_rate set to %3.2f", frame_rate);
   }
+
   return 0;
 }
 
-int PointGreyCamera::setExposure(double exposure)
-{
+int PointGreyCamera::setExposure(double exposure) {
   FlyCapture2::Error error;
   FlyCapture2::Property exposure_prop;
 
@@ -227,8 +223,7 @@ int PointGreyCamera::setExposure(double exposure)
   return 0;
 }
 
-int PointGreyCamera::setGain(double gain)
-{
+int PointGreyCamera::setGain(double gain) {
   FlyCapture2::Error error;
   FlyCapture2::Property gain_prop;
 
@@ -250,8 +245,8 @@ int PointGreyCamera::setGain(double gain)
 }
 
 int PointGreyCamera::printFormat7Capabilities(void) {
-  FlyCapture2::Format7Info fmt7_info;
   bool supported;
+  FlyCapture2::Format7Info fmt7_info;
 
   this->pointgrey->GetFormat7Info(&fmt7_info, &supported);
   log_info(

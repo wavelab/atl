@@ -3,8 +3,9 @@ import csv
 import matplotlib.pylab as plt
 
 # GLOBAL VARIABLES
-kf_tracker_output = "/tmp/estimation_kf_tracker_test.output"
-ekf_output = "/tmp/estimation_ekf_test.output"
+# output_file = "/tmp/estimation_kf_tracker_test.output"
+# output_file = "/tmp/estimation_ekf_test.output"
+output_file = "/tmp/estimation_ekf_tracker_test.output"
 
 
 def plot(data_file):
@@ -15,17 +16,22 @@ def plot(data_file):
     data = {
         "timestep": [],
         "x": [],
-        "y": []
+        "y": [],
+        "est_x": [],
+        "est_y": []
     }
 
     for row in reader:
         data["timestep"].append(float(row[0]))
         data["x"].append(float(row[1]))
         data["y"].append(float(row[2]))
+        data["est_x"].append(float(row[4]))
+        data["est_y"].append(float(row[5]))
 
-    plt.plot(data["x"], data["y"])
+    plt.plot(data["x"][::100], data["y"][::100])
+    plt.plot(data["est_x"][::100], data["est_y"][::100])
     plt.show()
 
 
 if __name__ == "__main__":
-    plot(ekf_output)
+    plot(output_file)

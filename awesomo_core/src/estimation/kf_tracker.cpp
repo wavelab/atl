@@ -48,8 +48,6 @@ int KalmanFilterTracker::configure(std::string config_file) {
 }
 
 int KalmanFilterTracker::initialize(VecX mu) {
-  int nb_states;
-
   // pre-check
   if (this->configured== false) {
     return -1;

@@ -175,11 +175,27 @@ can be used to control the quadrotor based on the measured state information.
 % PROBLEM FORMULATION
 \section{Problem Formulation}
 
-% CAMERA TRANSFORMS
-\section{Camera Transforms}
 
 % GIMBAL TRANSFORMS
 \section{Gimbal Transforms}
+
+Transform detected target from image frame to gimbal joint frame
+
+\begin{equation}
+  x_{\text{gjf}} = R^{\text{gjf}}_{\text{i}} R^{\text{nwu}}_{\text{cf}} x_{\text{i}} + t_{c}
+\end{equation}
+
+Gimbal joint frame to body planar frame
+
+\begin{equation}
+  x_{\text{bpf}} = R^{\text{bpf}}_{\text{gjf}} x_{\text{gjf}}
+\end{equation}
+
+Body planar frame to inertial frame
+
+\begin{equation}
+  x_{\text{if}} = R^{\text{enu}}_{\text{nwu}} R^{\text{if}}_{\text{bpf}} x_{\text{bpf}}
+\end{equation}
 
 
 % LANDING TARGET ESTIMATION
@@ -222,7 +238,7 @@ secondary AprilTag rather than the larger one, which reduces the portion of the
 image that must be processed in with each image capture. An example of this
 procedure is highlighted in Figure.
 
-\section{Light Invariant AprilTag}
+\section{Illumination Invariant AprilTag}
 
 
 % QUADROTOR CONTROL

@@ -96,6 +96,7 @@ void AprilTagNode::publishTargetBodyYawMsg(TagPose tag) {
 }
 
 void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
+  int retval;
   Vec3 target_cf, target_bpf, gimbal_position;
   Quaternion gimbal_frame, gimbal_joint;
   cv_bridge::CvImagePtr image_ptr;
@@ -111,8 +112,10 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
   }
 
   // detect tags
-  tags = this->detector.extractTags(image_ptr->image);
-  if (tags.size() == 0) {
+  retval = this->detector.extractTags(image_ptr->image, tags);
+  if (retval == -1) {
+    exit(-1);  // dangerous but necessary
+  } else if (tags.size() == 0) {
     return;
   }
 

@@ -1,6 +1,8 @@
 #ifndef __AWESOMO_ROS_UTILS_MATH_HPP__
 #define __AWESOMO_ROS_UTILS_MATH_HPP__
 
+#include <random>
+
 #include <Eigen/Geometry>
 
 #include <ros/ros.h>
