@@ -7,6 +7,7 @@
 
 #define TEST_CONFIG "tests/configs/estimation/ekf_tracker.yaml"
 #define TEST_CONFIG2 "tests/configs/estimation/ekf_tracker2.yaml"
+#define TEST_CONFIG3 "tests/configs/estimation/ekf_tracker3.yaml"
 #define TEST_OUTPUT_FILE "/tmp/estimation_ekf_tracker_test.output"
 
 
@@ -142,6 +143,74 @@ TEST(ExtendedKalmanFilterTracker, estimate2) {
 
     // propagate measurement
     TWO_WHEEL_NO_INPUTS_MEASUREMENT_MODEL(tracker, H, h);
+    tracker.measurementUpdate(h, H, y);
+
+    // record
+    recordTimeStep(output_file, i, x, tracker.mu);
+  }
+  output_file.close();
+}
+
+TEST(ExtendedKalmanFilterTracker, estimate3) {
+  float dt;
+  VecX u(3), mu(7), x(7), y(7), g(7), h(7), gaussian_noise(7);
+  MatX G(7, 7), H(7, 7);
+  ExtendedKalmanFilterTracker tracker;
+  std::ofstream output_file;
+  std::default_random_engine rgen;
+  std::normal_distribution<float> norm_x(0, pow(0.5, 2));
+  std::normal_distribution<float> norm_y(0, pow(0.5, 2));
+  std::normal_distribution<float> norm_z(0, pow(0.5, 2));
+  std::normal_distribution<float> norm_theta(0, pow(deg2rad(0.5), 2));
+  std::normal_distribution<float> pn1(0, pow(0.5, 2));
+  std::normal_distribution<float> pn2(0, pow(0.5, 2));
+  std::normal_distribution<float> pn3(0, pow(0.5, 2));
+
+  // setup
+  // clang-format off
+  dt = 0.01;
+  x << 0, 0, 0, 1.0, 0.1, 0.0, 0.0;
+  mu << 0, 0, 0, 1.0, 0.1, 0.0, 0.0;  // x, y, z, theata, v, omega, vz
+  u << 1.0, 0.1, 0.0;
+  tracker.configure(TEST_CONFIG3);
+  tracker.initialize(mu);
+  prepareOutputFile(output_file, TEST_OUTPUT_FILE);
+  // clang-format on
+
+  // estimate
+  for (int i = 0; i < 6000; i++) {
+    // update true state
+    // clang-format off
+    x << x(0) + u(0) * cos(x(3)) * dt,
+         x(1) + u(0) * sin(x(3)) * dt,
+         x(2) + u(2) * dt,
+         x(3) + u(1) * dt,
+         u(0),
+         u(1),
+         u(2);
+    // clang-format on
+
+    // take measurement
+    gaussian_noise << norm_x(rgen),
+                      norm_y(rgen),
+                      norm_z(rgen),
+                      norm_theta(rgen),
+                      0.0,
+                      0.0,
+                      0.0;
+    y = x + gaussian_noise;
+
+    // propagate motion model
+    TWO_WHEEL_3D_NO_INPUTS_MOTION_MODEL(tracker,
+                                        G,
+                                        g,
+                                        pn1(rgen),
+                                        pn2(rgen),
+                                        pn3(rgen));
+    tracker.predictionUpdate(g, G);
+
+    // propagate measurement
+    TWO_WHEEL_3D_NO_INPUTS_MEASUREMENT_MODEL(tracker, H, h);
     tracker.measurementUpdate(h, H, y);
 
     // record
