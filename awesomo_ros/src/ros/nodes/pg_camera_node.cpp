@@ -87,12 +87,12 @@ int PGCameraNode::loopCallback(void) {
   double dist;
   // change mode depending on aprTag distance
   dist = this->target_bpf.norm();
-  if (dist > 8.0) {
-    this->camera.changeMode("640x640");
+  if (dist > 8.0 || dist == 0) {
+    this->camera.changeMode("640x480");
   } else if ( dist > 4.0 ) {
-    this->camera.changeMode("320x320");
+    this->camera.changeMode("320x240");
   } else  {
-    this->camera.changeMode("160x160");
+    this->camera.changeMode("160x120");
   }
 
   // this->camera.showImage(this->image);

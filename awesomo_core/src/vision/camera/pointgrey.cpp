@@ -181,6 +181,16 @@ int PointGreyCamera::setFormat7(std::string pixel_format,
   return 0;
 }
 
+int PointGreyCamera::changeMode(std::string mode) {
+  // pre-check
+  if (this->configs.find(mode) == this->configs.end()) {
+    return -1;
+  }
+  // update camera settings
+  this->config = this->configs[mode];
+  return 0;
+}
+
 int PointGreyCamera::setFrameRate(double frame_rate) {
   FlyCapture2::Error error;
   FlyCapture2::Property fps_prop;

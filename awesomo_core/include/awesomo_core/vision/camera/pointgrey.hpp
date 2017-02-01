@@ -23,6 +23,7 @@ public:
   int setExposure(double exposure);
   int setGain(double gain);
   int printFormat7Capabilities(void);
+  int changeMode(std::string mode);
 };
 
 }  // end of awesomo namespace
