@@ -20,8 +20,12 @@ int GimbalNode::configure(std::string node_name, int hz) {
   // register publisher and subscribers
   // clang-format off
   this->registerPublisher<sensor_msgs::Imu>(CAMERA_IMU_TOPIC);
-  this->registerPublisher<geometry_msgs::Quaternion>(FRAME_RPY_TOPIC);
-  this->registerSubscriber(SET_ATTITUDE_TOPIC, &GimbalNode::setAttitudeCallback, this);
+  this->registerPublisher<geometry_msgs::Quaternion>(FRAME_ORIENTATION_TOPIC);
+  this->registerPublisher<geometry_msgs::Quaternion>(JOINT_ORIENTATION_TOPIC);
+
+  this->registerSubscriber(QUAD_POSE_TOPIC, &GimbalNode::quadPoseCallback, this);
+  this->registerSubscriber(TRACK_TOPIC, &GimbalNode::trackTargetCallback, this);
+  this->registerSubscriber(SETPOINT_TOPIC, &GimbalNode::setAttitudeCallback, this);
   this->registerShutdown(SHUTDOWN_TOPIC);
   // clang-format on
 
@@ -41,10 +45,27 @@ void GimbalNode::setAttitudeCallback(const geometry_msgs::Vector3 &msg) {
   this->gimbal.setAngle(msg.x, msg.y);
 }
 
+void GimbalNode::trackTargetCallback(const geometry_msgs::Vector3 &msg) {
+  Eigen::Vector3d target_cf;
+  target_cf << msg.x, msg.y, msg.z;
+  this->gimbal.trackTarget(target_cf);
+}
+
+void GimbalNode::quadPoseCallback(const geometry_msgs::PoseStamped &msg) {
+  geometry_msgs::Vector3 ros_msg;
+
+  ros_msg.x = msg.pose.position.x;
+  ros_msg.y = msg.pose.position.y;
+  ros_msg.z = msg.pose.position.z;
+
+  this->ros_pubs[POSITION_TOPIC].publish(ros_msg);
+}
+
 int GimbalNode::loopCallback(void) {
    int retval;
    sensor_msgs::Imu cam_imu_msg;
    geometry_msgs::Quaternion frame_angles_msg;
+   geometry_msgs::Quaternion cam_angles_msg;
 
    Vec3 camera_euler;
    Vec3 frame_euler;
@@ -91,9 +112,11 @@ int GimbalNode::loopCallback(void) {
    cam_imu_msg.linear_acceleration.z = this->gimbal.imu_accel(2);
 
    buildMsg(frame_orientation, frame_angles_msg);
+   buildMsg(frame_orientation, cam_angles_msg);
 
    this->ros_pubs[CAMERA_IMU_TOPIC].publish(cam_imu_msg);
-   this->ros_pubs[FRAME_RPY_TOPIC].publish(frame_angles_msg);
+   this->ros_pubs[FRAME_ORIENTATION_TOPIC].publish(frame_angles_msg);
+   this->ros_pubs[JOINT_ORIENTATION_TOPIC].publish(cam_angles_msg);
 
    return 0;
  }

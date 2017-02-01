@@ -17,11 +17,17 @@ namespace awesomo {
 #define NODE_RATE 100
 
 // PUBLISH TOPICS
-#define FRAME_RPY_TOPIC "/awesomo/gimbal/frame/orientiation/inertial"
 #define CAMERA_IMU_TOPIC "/awesomo/gimbal/joint/imu"
+#define FRAME_ORIENTATION_TOPIC "/awesomo/gimbal/frame/orientation/inertial"
+#define JOINT_ORIENTATION_TOPIC "/awesomo/gimbal/joint/orientation/inertial"
+#define POSITION_TOPIC "/awesomo/gimbal/position/inertial"
+
 
 // SUBSCRIBE TOPICS
-#define SET_ATTITUDE_TOPIC "/awesomo/gimbal/setpoint/attitude"
+#define SETPOINT_TOPIC "/awesomo/gimbal/setpoint/attitude"
+#define TRACK_TOPIC "/awesomo/gimbal/target/track"
+#define QUAD_POSE_TOPIC "/mavros/local_position/pose"
+
 #define SHUTDOWN_TOPIC "/awesomo/gimbal/shutdown"
 
 
@@ -32,7 +38,9 @@ public:
   GimbalNode(int argc, char **argv) : ROSNode(argc, argv) {}
   ~GimbalNode(void);
   int configure(std::string node_name, int hz);
+  void quadPoseCallback(const geometry_msgs::PoseStamped &msg);
   void setAttitudeCallback(const geometry_msgs::Vector3 &msg);
+  void trackTargetCallback(const geometry_msgs::Vector3 &msg);
   int loopCallback(void);
 };
 

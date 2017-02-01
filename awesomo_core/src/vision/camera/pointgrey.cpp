@@ -32,7 +32,6 @@ int PointGreyCamera::initialize() {
     return -1;
   }
 
-
   error = this->pointgrey->Connect(&guid);
   if (error != FlyCapture2::PGRERROR_OK) {
     log_err("ERROR! Failed to connect to camera!");
@@ -42,9 +41,9 @@ int PointGreyCamera::initialize() {
   }
 
   // this->printFormat7Capabilities();
-  this->setFormat7("raw8", 640, 480, 0);
+  // this->setFormat7("raw8", 640, 480, 0); // make these not hard coded
 
-  // set video mode format and frame rate USB 2.0 cameras
+  // set video mode format and frame RRRR USB 2.0 cameras
   // error = this->pointgrey->SetVideoModeAndFrameRate(
   //   FlyCapture2::VIDEOMODE_640x480Y8, FlyCapture2::FRAMERATE_60);
   // if (error != FlyCapture2::PGRERROR_OK) {
@@ -57,6 +56,7 @@ int PointGreyCamera::initialize() {
   this->setExposure(this->config.exposure_value);
   this->setGain(this->config.gain_value);
   this->setFrameRate(200);
+  this->setFormat7("RAW8", 640 * 2, 480 * 2, 0); // make these not hard coded
 
   // start camera
   error = this->pointgrey->StartCapture();
@@ -105,10 +105,9 @@ int PointGreyCamera::getFrame(cv::Mat &image) {
 
   // resize the image to reflect camera mode
   // clang-format off
-  // image_size = cv::Size(this->current_config->image_width,
-  //                       this->current_config->image_height);
-  // image_size = cv::Size(480, 320);
-  // cv::resize(image, image, image_size);
+  image_size = cv::Size(this->config.image_width,
+                        this->config.image_height);
+  cv::resize(image, image, image_size);
   // clang-format on
 
   return 0;
@@ -124,19 +123,20 @@ int PointGreyCamera::setFormat7(std::string pixel_format, int crop_width, int cr
   int max_image_width;
   int max_image_height;
 
-
-  if (pixel_format == "MONO8") {
-    fmt7_settings.pixelFormat = FlyCapture2::PIXEL_FORMAT_MONO8;
-  }
-  else if (pixel_format == "MONO16") {
-    fmt7_settings.pixelFormat = FlyCapture2::PIXEL_FORMAT_MONO16;
-  }
-  else if (pixel_format == "RAW8") {
-    fmt7_settings.pixelFormat = FlyCapture2::PIXEL_FORMAT_RAW8;
-  }
-  else if (pixel_format == "RAW16") {
-    fmt7_settings.pixelFormat = FlyCapture2::PIXEL_FORMAT_RAW16;
-  }
+    log_err("Format7 settings are to be set soon");
+  fmt7_settings.pixelFormat = FlyCapture2::PIXEL_FORMAT_RAW8;
+  // if (pixel_format == "MONO8") {
+  //   fmt7_settings.pixelFormat = FlyCapture2::PIXEL_FORMAT_MONO8;
+  // }
+  // else if (pixel_format == "MONO16") {
+  //   fmt7_settings.pixelFormat = FlyCapture2::PIXEL_FORMAT_MONO16;
+  // }
+  // else if (pixel_format == "RAW8") {
+  //   fmt7_settings.pixelFormat = FlyCapture2::PIXEL_FORMAT_RAW8;
+  // }
+  // else if (pixel_format == "RAW16") {
+  //   fmt7_settings.pixelFormat = FlyCapture2::PIXEL_FORMAT_RAW16;
+  // }
 
 
   switch (mode) {
