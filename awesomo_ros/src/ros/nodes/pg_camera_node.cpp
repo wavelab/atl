@@ -13,7 +13,7 @@ int PGCameraNode::configure(std::string node_name, int hz) {
   // camera
   this->ros_nh->getParam("/camera_config_dir", config_path);
   if (this->camera.configure(config_path) != 0) {
-    ROS_ERROR("Failed to configure PGCamera!");
+    ROS_ERROR("Failed to configure Camera!");
     return -2;
   };
   this->camera.initialize();
@@ -22,8 +22,8 @@ int PGCameraNode::configure(std::string node_name, int hz) {
   this->registerImagePublisher(CAMERA_IMAGE_TOPIC);
   this->registerSubscriber(GIMBAL_FRAME_ORIENTATION_TOPIC, &PGCameraNode::gimbalFrameCallback, this);
   this->registerSubscriber(GIMBAL_JOINT_ORIENTATION_TOPIC, &PGCameraNode::gimbalJointCallback, this);
-  this->registerSubscriber(TARGET_BPF_POS_TOPIC , &PGCameraNode::aprilTagCallback, this);
-  // this->registerShutdown(SHUTDOWN_TOPIC);
+  this->registerSubscriber(APRILTAG_TOPIC , &PGCameraNode::aprilTagCallback, this);
+  this->registerShutdown(SHUTDOWN_TOPIC);
 
   // register loop callback
   this->registerLoopCallback(std::bind(&PGCameraNode::loopCallback, this));
@@ -79,27 +79,36 @@ void PGCameraNode::gimbalJointCallback(const geometry_msgs::Quaternion &msg) {
   this->gimbal_joint_orientation.z() = msg.z;
 }
 
-void PGCameraNode::aprilTagCallback(const  geometry_msgs::Vector3 &msg) {
-  this->target_bpf << msg.x, msg.y, msg.z;
+void PGCameraNode::aprilTagCallback(const awesomo_msgs::AprilTagPose &msg) {
+  convertMsg(msg, this->tag);
 }
 
 int PGCameraNode::loopCallback(void) {
   double dist;
-  // change mode depending on aprTag distance
-  dist = this->target_bpf.norm();
-  if (dist > 8.0 || dist == 0) {
+
+  // change mode depending on apriltag distance
+  if (this->tag.detected == false) {
     this->camera.changeMode("640x480");
-  } else if ( dist > 4.0 ) {
-    this->camera.changeMode("320x240");
-  } else  {
-    this->camera.changeMode("160x120");
+
+  } else {
+    dist = this->tag.position(2);
+    if (dist > 1.0) {
+      this->camera.changeMode("640x480");
+    } else if ( dist > 0.5 ) {
+      this->camera.changeMode("320x240");
+    } else  {
+      this->camera.changeMode("160x120");
+    }
+
   }
 
   // this->camera.showImage(this->image);
   this->camera.getFrame(this->image);
   this->publishImage();
+
+  return 0;
 }
 
-}  // end of awesomo namespace
+} // eof awesomo namespace
 
 RUN_ROS_NODE(awesomo::PGCameraNode, NODE_NAME, NODE_RATE);

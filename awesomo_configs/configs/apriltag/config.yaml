@@ -1,5 +1,5 @@
 tag_family: "Tag16h5"
 tag_ids: [0, 5]
-tag_sizes: [0.161, 0.161]
+tag_sizes: [0.07, 0.6]
 camera_config: "../camera/pointgrey_chameleon"
 imshow: true

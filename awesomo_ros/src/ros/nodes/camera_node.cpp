@@ -22,8 +22,8 @@ int CameraNode::configure(std::string node_name, int hz) {
   this->registerImagePublisher(CAMERA_IMAGE_TOPIC);
   this->registerSubscriber(GIMBAL_FRAME_ORIENTATION_TOPIC, &CameraNode::gimbalFrameCallback, this);
   this->registerSubscriber(GIMBAL_JOINT_ORIENTATION_TOPIC, &CameraNode::gimbalJointCallback, this);
-  this->registerSubscriber(TARGET_BPF_POS_TOPIC , &CameraNode::aprilTagCallback, this);
-  // this->registerShutdown(SHUTDOWN_TOPIC);
+  this->registerSubscriber(APRILTAG_TOPIC , &CameraNode::aprilTagCallback, this);
+  this->registerShutdown(SHUTDOWN_TOPIC);
 
   // register loop callback
   this->registerLoopCallback(std::bind(&CameraNode::loopCallback, this));
@@ -79,20 +79,27 @@ void CameraNode::gimbalJointCallback(const geometry_msgs::Quaternion &msg) {
   this->gimbal_joint_orientation.z() = msg.z;
 }
 
-void CameraNode::aprilTagCallback(const  geometry_msgs::Vector3 &msg) {
-  this->target_bpf << msg.x, msg.y, msg.z;
+void CameraNode::aprilTagCallback(const awesomo_msgs::AprilTagPose &msg) {
+  convertMsg(msg, this->tag);
 }
 
 int CameraNode::loopCallback(void) {
   double dist;
-  // change mode depending on aprTag distance
-  dist = this->target_bpf.norm();
-  if (dist > 8.0) {
+
+  // change mode depending on apriltag distance
+  if (this->tag.detected == false) {
     this->camera.changeMode("640x640");
-  } else if ( dist > 4.0 ) {
-    this->camera.changeMode("320x320");
-  } else  {
-    this->camera.changeMode("160x160");
+
+  } else {
+    dist = this->tag.position(2);
+    if (dist > 8.0) {
+      this->camera.changeMode("640x640");
+    } else if ( dist > 4.0 ) {
+      this->camera.changeMode("320x320");
+    } else  {
+      this->camera.changeMode("160x160");
+    }
+
   }
 
   // this->camera.showImage(this->image);

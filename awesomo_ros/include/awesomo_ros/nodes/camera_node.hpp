@@ -22,11 +22,11 @@ namespace awesomo {
 #define CAMERA_IMAGE_TOPIC "/awesomo/camera/image"
 
 // SUBSCRIBE TOPICS
+#define APRILTAG_TOPIC "/awesomo/apriltag/target"
 #define GIMBAL_FRAME_ORIENTATION_TOPIC "/awesomo/gimbal/frame/orientation/inertial"
 #define GIMBAL_JOINT_ORIENTATION_TOPIC "/awesomo/gimbal/joint/orientation/inertial"
+#define APRILTAG_TOPIC "/awesomo/apriltag/target"
 #define SHUTDOWN_TOPIC "/awesomo/camera/shutdown"
-
-#define TARGET_BPF_POS_TOPIC "/awesomo/apriltag/target/position/body"
 
 class CameraNode : public ROSNode {
 public:
@@ -36,7 +36,7 @@ public:
   Quaternion gimbal_frame_orientation;
   Quaternion gimbal_joint_orientation;
   Vec3 gimbal_position;
-  Vec3 target_bpf;
+  TagPose tag;
 
   CameraNode(int argc, char **argv) : ROSNode(argc, argv) {}
   int configure(std::string node_name, int hz);
@@ -44,7 +44,7 @@ public:
   void imageCallback(const sensor_msgs::ImageConstPtr &msg);
   void gimbalFrameCallback(const geometry_msgs::Quaternion &msg);
   void gimbalJointCallback(const geometry_msgs::Quaternion &msg);
-  void aprilTagCallback(const geometry_msgs::Vector3 &msg);
+  void aprilTagCallback(const awesomo_msgs::AprilTagPose &msg);
   int loopCallback(void);
 };
 

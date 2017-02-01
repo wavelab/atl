@@ -146,7 +146,7 @@ if __name__ == "__main__":
     # camera.set_mode("320x320")
     # camera.set_mode("160x160")
 
-    # gimbal.set_attitude([0.0, 0.0])
+    gimbal.set_attitude([0.0, -1.57])
 
     # lz.set_velocity(0.5)
     # lz.set_position([100, 0, 0])

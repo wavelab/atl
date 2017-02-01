@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <launch>
-    
+
+<!-- controller node -->
   <param name="control_config_dir" value="$(find awesomo_configs)/configs/quadrotor_gazebosim" />
   <node pkg="awesomo_ros" name="awesomo_control" type="control_node" output="screen" />
 
@@ -8,7 +9,7 @@
   <param name="apriltag_config" value="$(find awesomo_configs)/configs/apriltag/config.yaml" />
   <node pkg="awesomo_ros" name="awesomo_apriltag" type="apriltag_node" output="screen" required="true"/>
 
-<!-- estimate node -->
+  <!-- estimate node -->
   <param name="tracker_mode" value="1" />
   <param name="kf_tracker_config" value="$(find awesomo_configs)/configs/estimator/kf_tracker.yaml" />
   <param name="ekf_tracker_config" value="$(find awesomo_configs)/configs/estimator/ekf_tracker.yaml" />
