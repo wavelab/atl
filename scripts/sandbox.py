@@ -43,7 +43,6 @@ R = sympy.Matrix([
     [0, 0, 1]
 ])
 
-pprint(R.jacobian(R))
 
 # R.jacobian(sympy.Matrix([
 #     [x1, x1, x1],
