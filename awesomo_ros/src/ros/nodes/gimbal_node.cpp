@@ -112,7 +112,7 @@ int GimbalNode::loopCallback(void) {
    cam_imu_msg.linear_acceleration.z = this->gimbal.imu_accel(2);
 
    buildMsg(frame_orientation, frame_angles_msg);
-   buildMsg(frame_orientation, cam_angles_msg);
+   buildMsg(camera_orientation, cam_angles_msg);
 
    this->ros_pubs[CAMERA_IMU_TOPIC].publish(cam_imu_msg);
    this->ros_pubs[FRAME_ORIENTATION_TOPIC].publish(frame_angles_msg);

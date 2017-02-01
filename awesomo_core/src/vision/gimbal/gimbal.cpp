@@ -211,11 +211,15 @@ int Gimbal::updateGimbalStates(void) {
 }
 
 int Gimbal::setAngle(double roll, double pitch) {
-  this->setpoints(0) = roll;
-  this->setpoints(1) = pitch;
-  this->setpoints(2) = 0.0;
+  this->setpoints(0) = roll * 180 / M_PI;
+  this->setpoints(1) = pitch * 180 / M_PI;
+  this->setpoints(2) = 0.0 * 180 / M_PI;
 
-  return this->sbgc.setAngle(roll, pitch, 0.0);
+  return this->sbgc.setAngle(
+    this->setpoints(0),
+    this->setpoints(1),
+    this->setpoints(2)
+  );
 }
 
 void Gimbal::printSetpoints(void) {

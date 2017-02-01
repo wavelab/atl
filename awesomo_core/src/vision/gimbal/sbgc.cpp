@@ -402,7 +402,7 @@ int SBGC::getRealtimeData(void) {
   // obtain real time data
   retval = this->readFrame(68, frame);
   if (retval == -1) {
-    std::cout << "failed to parse SBGC frame for realtime data!" << std::endl;
+    // std::cout << "failed to parse SBGC frame for realtime data!" << std::endl;
     return -1;
   }
 
