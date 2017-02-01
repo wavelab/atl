@@ -41,9 +41,9 @@ int PointGreyCamera::initialize() {
   }
 
   // this->printFormat7Capabilities();
-  this->setFormat7("raw8", 640, 480, 0);
+  // this->setFormat7("raw8", 640, 480, 0); // make these not hard coded
 
-  // set video mode format and frame rate USB 2.0 cameras
+  // set video mode format and frame RRRR USB 2.0 cameras
   // error = this->pointgrey->SetVideoModeAndFrameRate(
   //   FlyCapture2::VIDEOMODE_640x480Y8, FlyCapture2::FRAMERATE_60);
   // if (error != FlyCapture2::PGRERROR_OK) {
@@ -56,6 +56,7 @@ int PointGreyCamera::initialize() {
   this->setExposure(this->config.exposure_value);
   this->setGain(this->config.gain_value);
   this->setFrameRate(200);
+  this->setFormat7("RAW8", 640 * 2, 480 * 2, 0); // make these not hard coded
 
   // start camera
   error = this->pointgrey->StartCapture();
@@ -104,10 +105,9 @@ int PointGreyCamera::getFrame(cv::Mat &image) {
 
   // resize the image to reflect camera mode
   // clang-format off
-  // image_size = cv::Size(this->current_config->image_width,
-  //                       this->current_config->image_height);
-  // image_size = cv::Size(480, 320);
-  // cv::resize(image, image, image_size);
+  image_size = cv::Size(this->config.image_width,
+                        this->config.image_height);
+  cv::resize(image, image, image_size);
   // clang-format on
 
   return 0;
@@ -178,6 +178,16 @@ int PointGreyCamera::setFormat7(std::string pixel_format,
   }
   log_info("Format7 Settings applied successfully!");
 
+  return 0;
+}
+
+int PointGreyCamera::changeMode(std::string mode) {
+  // pre-check
+  if (this->configs.find(mode) == this->configs.end()) {
+    return -1;
+  }
+  // update camera settings
+  this->config = this->configs[mode];
   return 0;
 }
 

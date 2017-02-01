@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<launch>
+
+<!-- controller node -->
+  <param name="control_config_dir" value="$(find awesomo_configs)/configs/quadrotor_gazebosim" />
+  <node pkg="awesomo_ros" name="awesomo_control" type="control_node" output="screen" />
+
+  <!-- apriltag node -->
+  <param name="apriltag_config" value="$(find awesomo_configs)/configs/apriltag/config.yaml" />
+  <node pkg="awesomo_ros" name="awesomo_apriltag" type="apriltag_node" output="screen" required="true"/>
+
+  <!-- estimate node -->
+  <param name="tracker_mode" value="1" />
+  <param name="kf_tracker_config" value="$(find awesomo_configs)/configs/estimator/kf_tracker.yaml" />
+  <param name="ekf_tracker_config" value="$(find awesomo_configs)/configs/estimator/ekf_tracker.yaml" />
+  <node pkg="awesomo_ros" name="awesomo_estimator" type="estimator_node" output="screen" required="true"/>
+
+  <!-- pg camera node -->
+  <param name="use_sim_time" value="false" />
+  <param name="sim_mode" value="false" />
+  <param name="debug_mode" value="false" />
+  <param name="camera_config_dir" value="$(find awesomo_configs)/configs/camera/pointgrey_chameleon" />
+  <node pkg="awesomo_ros" name="awesomo_camera" type="pg_camera_node" output="screen" required="true" />
+
+  <!-- gimbal node -->
+  <param name="debug_mode" value="true" />
+  <param name="sim_mode" value="true" />
+  <param name="gimbal_config" value="$(find awesomo_configs)/configs/gimbal/config.yaml" />
+  <node pkg="awesomo_ros" name="awesomo_gimbal" type="gimbal_node" output="screen" required="true" />
+
+</launch>

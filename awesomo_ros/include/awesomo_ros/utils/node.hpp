@@ -16,7 +16,7 @@ namespace awesomo {
   int main(int argc, char **argv) { \
     NODE_CLASS node(argc, argv); \
     if (node.configure(NODE_NAME, NODE_RATE) != 0) { \
-      ROS_ERROR("Failed to configure NODE_CLASS!"); \
+      ROS_ERROR("Failed to configure %s", #NODE_CLASS); \
       return -1; \
     } \
     node.loop(); \

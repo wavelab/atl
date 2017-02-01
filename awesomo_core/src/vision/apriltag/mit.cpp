@@ -95,6 +95,12 @@ int MITDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
     }
   }
 
+  // imshow
+  if (this->imshow) {
+    cv::imshow("MITDetector", image_gray);
+    cv::waitKey(1);
+  }
+
   return 0;
 }
 

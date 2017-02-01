@@ -1,5 +1,5 @@
-#ifndef __AWESOMO_ROS_NODES_CAMERA_NODE_HPP__
-#define __AWESOMO_ROS_NODES_CAMERA_NODE_HPP__
+#ifndef __AWESOMO_ROS_NODES_PG_CAMERA_NODE_HPP__
+#define __AWESOMO_ROS_NODES_PG_CAMERA_NODE_HPP__
 
 #include <ros/ros.h>
 #include <cv_bridge/cv_bridge.h>
@@ -16,14 +16,16 @@ namespace awesomo {
 
 // NODE SETTINGS
 #define NODE_NAME "awesomo_camera"
-#define NODE_RATE 110
+#define NODE_RATE 100
 
 // PUBLISH TOPICS
 #define CAMERA_IMAGE_TOPIC "/awesomo/camera/image"
 
 // SUBSCRIBE TOPICS
+#define APRILTAG_TOPIC "/awesomo/apriltag/target"
 #define GIMBAL_FRAME_ORIENTATION_TOPIC "/awesomo/gimbal/frame/orientation/inertial"
 #define GIMBAL_JOINT_ORIENTATION_TOPIC "/awesomo/gimbal/joint/orientation/inertial"
+#define APRILTAG_TOPIC "/awesomo/apriltag/target"
 #define SHUTDOWN_TOPIC "/awesomo/camera/shutdown"
 
 class PGCameraNode : public ROSNode {
@@ -31,8 +33,10 @@ public:
   PointGreyCamera camera;
   cv::Mat image;
 
-  Quaternion gimbal_frame;
-  Quaternion gimbal_joint;
+  Quaternion gimbal_frame_orientation;
+  Quaternion gimbal_joint_orientation;
+  Vec3 gimbal_position;
+  TagPose tag;
 
   PGCameraNode(int argc, char **argv) : ROSNode(argc, argv) {}
   int configure(std::string node_name, int hz);
@@ -40,6 +44,7 @@ public:
   void imageCallback(const sensor_msgs::ImageConstPtr &msg);
   void gimbalFrameCallback(const geometry_msgs::Quaternion &msg);
   void gimbalJointCallback(const geometry_msgs::Quaternion &msg);
+  void aprilTagCallback(const awesomo_msgs::AprilTagPose &msg);
   int loopCallback(void);
 };
 
