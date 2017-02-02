@@ -1,6 +1,8 @@
 #ifndef __AWESOMO_ROS_NODES_GIMBAL_NODE_HPP__
 #define __AWESOMO_ROS_NODES_GIMBAL_NODE_HPP__
 
+#include <unistd.h>
+
 #include <ros/ros.h>
 #include <geometry_msgs/Vector3.h>
 #include <sensor_msgs/Imu.h>
