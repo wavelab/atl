@@ -22,6 +22,7 @@ int GimbalNode::configure(std::string node_name, int hz) {
   this->registerPublisher<sensor_msgs::Imu>(CAMERA_IMU_TOPIC);
   this->registerPublisher<geometry_msgs::Quaternion>(FRAME_ORIENTATION_TOPIC);
   this->registerPublisher<geometry_msgs::Quaternion>(JOINT_ORIENTATION_TOPIC);
+  this->registerPublisher<geometry_msgs::Vector3>(POSITION_TOPIC);
 
   this->registerSubscriber(QUAD_POSE_TOPIC, &GimbalNode::quadPoseCallback, this);
   this->registerSubscriber(TRACK_TOPIC, &GimbalNode::trackTargetCallback, this);
