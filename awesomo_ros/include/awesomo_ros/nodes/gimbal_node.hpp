@@ -36,6 +36,7 @@ namespace awesomo {
 class GimbalNode : public ROSNode {
 public:
   Gimbal gimbal;
+  Vec3 set_points;
 
   GimbalNode(int argc, char **argv) : ROSNode(argc, argv) {}
   ~GimbalNode(void);

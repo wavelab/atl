@@ -45,9 +45,10 @@ GimbalNode::~GimbalNode(void) {
 
 void GimbalNode::setAttitudeCallback(const geometry_msgs::Vector3 &msg) {
   // TODO update gimbal to take in yaw commands
-  // this->gimbal.setAngle(msg.x, -msg.y);
-  this->gimbal.setAngle(msg.x, msg.y);
-  usleep(5000); //sleep for 10 microseconds
+  this->set_points << msg.x, msg.y, msg.z;
+  // this->gimbal.setAngle(msg.x, msg.y);
+  // this->gimbal.setAngle(msg.x, msg.y);
+  // usleep(7000); //sleep for .7 milliseconds
 }
 
 void GimbalNode::trackTargetCallback(const geometry_msgs::Vector3 &msg) {
@@ -77,8 +78,8 @@ int GimbalNode::loopCallback(void) {
    Quaternion camera_orientation;
    Quaternion frame_orientation;
 
-
-   usleep(6000); // sleep for 10 microseconds to help avoid dropping frames
+   this->gimbal.setAngle(this->set_points(0), this->set_points(1));
+   usleep(12000); // sleep for 10 microseconds to help avoid dropping frames
    retval = this->gimbal.updateGimbalStates();
    if (retval != 0) {
      return 0;
@@ -124,6 +125,7 @@ int GimbalNode::loopCallback(void) {
    this->ros_pubs[CAMERA_IMU_TOPIC].publish(cam_imu_msg);
    this->ros_pubs[FRAME_ORIENTATION_TOPIC].publish(frame_angles_msg);
    this->ros_pubs[JOINT_ORIENTATION_TOPIC].publish(cam_angles_msg);
+   // usleep(10000); // sleep for 10 microseconds to help avoid dropping frames
 
    return 0;
  }

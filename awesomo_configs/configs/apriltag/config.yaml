@@ -3,4 +3,4 @@ tag_ids: [0, 5, 2]
 # tag_sizes: [0.07, 0.6, 0.044] // Blue and Green Tag
 tag_sizes: [0.045, 0.342, 0.044] # Tag made of tape
 camera_config: "../camera/pointgrey_chameleon"
-imshow: true
+imshow: false

@@ -106,10 +106,10 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
   image_ptr = cv_bridge::toCvCopy(msg);
 
   // debug
-  if (this->debug_mode) {
-    cv::imshow("AprilTagNode Image", image_ptr->image);
-    cv::waitKey(1);
-  }
+  // if (this->debug_mode) {
+  //   cv::imshow("AprilTagNode Image", image_ptr->image);
+  //   cv::waitKey(1);
+  // }
 
   // detect tags
   retval = this->detector.extractTags(image_ptr->image, tags);

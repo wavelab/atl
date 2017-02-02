@@ -1,6 +1,7 @@
 #ifndef __AWESOMO_GIMBAL_HPP__
 #define __AWESOMO_GIMBAL_HPP__
 
+#include <unistd.h>
 #include <iostream>
 #include <math.h>
 #include <map>
