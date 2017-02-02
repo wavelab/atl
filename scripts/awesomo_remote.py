@@ -162,13 +162,13 @@ if __name__ == "__main__":
     quad = Quadrotor()
     gimbal = Gimbal()
     mavros = MavrosTopics()
-    rospy.sleep(1)
+    rospy.sleep(0.5)
 
     mavros.set_local_pose(0, 0, 0)
-    camera.set_mode("320x240")
-    # camera.set_mode("160x160")
-
-    gimbal.set_attitude([-0.5, -1.57])
+    # camera.set_mode("320x240")
+    # # camera.set_mode("160x160")
+    #
+    # gimbal.set_attitude([-0.5, -1.57])
 
     # lz.set_velocity(0.5)
     # lz.set_position([1000, 0, 0])
