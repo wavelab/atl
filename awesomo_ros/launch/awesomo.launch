@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <launch>
+ 
+<!-- mavros --> 
+  <include file="$(find mavros)/launch/px4.launch" />
 
 <!-- controller node -->
   <param name="control_config_dir" value="$(find awesomo_configs)/configs/quadrotor_gazebosim" />
@@ -15,7 +18,7 @@
   <param name="ekf_tracker_config" value="$(find awesomo_configs)/configs/estimator/ekf_tracker.yaml" />
   <node pkg="awesomo_ros" name="awesomo_estimator" type="estimator_node" output="screen" required="true"/>
 
-  <!-- pg camera node -->
+<!-- pg camera node -->
   <param name="use_sim_time" value="false" />
   <param name="sim_mode" value="false" />
   <param name="debug_mode" value="false" />

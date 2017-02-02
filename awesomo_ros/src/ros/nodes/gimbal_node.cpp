@@ -34,7 +34,7 @@ int GimbalNode::configure(std::string node_name, int hz) {
   this->registerLoopCallback(std::bind(&GimbalNode::loopCallback, this));
 
   // intialize setpoints
-  this->gimbal.setAngle(0.0, -0.7);
+  this->gimbal.setAngle(0.0, -0.9);
   this->configured = true;
   return 0;
 }
