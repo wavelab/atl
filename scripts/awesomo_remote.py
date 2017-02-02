@@ -168,14 +168,14 @@ if __name__ == "__main__":
     camera.set_mode("320x240")
     # camera.set_mode("160x160")
 
-    # gimbal.set_attitude([0.4, 0.1])
+    gimbal.set_attitude([-0.5, -1.57])
 
     # lz.set_velocity(0.5)
     # lz.set_position([1000, 0, 0])
 
-    velocity, angular_velocity = lz_circle_path(5, 1.0)
-    lz.set_velocity(velocity)
-    lz.set_angular_velocity(angular_velocity)
+    # velocity, angular_velocity = lz_circle_path(5, 1.0)
+    # lz.set_velocity(velocity)
+    # lz.set_angular_velocity(angular_velocity)
 
     # quad.set_mode("HOVER_MODE")
     # quad.set_heading(270.0)

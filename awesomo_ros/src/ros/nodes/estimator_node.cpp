@@ -244,6 +244,7 @@ void EstimatorNode::trackTarget(void) {
   setpoints(0) = asin(this->target_pos_bpf(1) / dist);   // roll
   setpoints(1) = -asin(this->target_pos_bpf(0) / dist);  // pitch
   setpoints(2) = 0.0;                                // yaw
+  std::cout << setpoints << std::endl;
 
   this->publishGimbalSetpointAttitudeMsg(setpoints);
 }

@@ -32,6 +32,8 @@ int GimbalNode::configure(std::string node_name, int hz) {
   // register loop callback
   this->registerLoopCallback(std::bind(&GimbalNode::loopCallback, this));
 
+  // intialize setpoints
+  this->gimbal.setAngle(0.0, 0.0);
   this->configured = true;
   return 0;
 }
@@ -42,7 +44,9 @@ GimbalNode::~GimbalNode(void) {
 
 void GimbalNode::setAttitudeCallback(const geometry_msgs::Vector3 &msg) {
   // TODO update gimbal to take in yaw commands
+  // this->gimbal.setAngle(msg.x, -msg.y);
   this->gimbal.setAngle(msg.x, msg.y);
+  usleep(5000); //sleep for 10 microseconds
 }
 
 void GimbalNode::trackTargetCallback(const geometry_msgs::Vector3 &msg) {
@@ -72,6 +76,8 @@ int GimbalNode::loopCallback(void) {
    Quaternion camera_orientation;
    Quaternion frame_orientation;
 
+
+   usleep(6000); // sleep for 10 microseconds to help avoid dropping frames
    retval = this->gimbal.updateGimbalStates();
    if (retval != 0) {
      return 0;
