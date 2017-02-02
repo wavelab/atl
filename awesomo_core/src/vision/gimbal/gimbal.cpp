@@ -22,7 +22,6 @@ Gimbal::Gimbal(void) {
 Gimbal::~Gimbal(void) {
   this->off();
 }
-
 int Gimbal::configure(std::string config_file) {
   std::string device_path;
   ConfigParser parser;
@@ -181,6 +180,7 @@ int Gimbal::updateGimbalStates(void) {
   const double k_gravity = 9.80665;
 
   // get real time data from SimpleBGC
+  // usleep(80000);
   retval = this->sbgc.getRealtimeData();
   if (retval != 0) {
     return -1;
@@ -215,6 +215,7 @@ int Gimbal::setAngle(double roll, double pitch) {
   this->setpoints(1) = pitch * 180 / M_PI;
   this->setpoints(2) = 0.0 * 180 / M_PI;
 
+  // usleep(20000);
   return this->sbgc.setAngle(
     this->setpoints(0),
     this->setpoints(1),
