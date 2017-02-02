@@ -30,6 +30,6 @@ projection_matrix:
          0.000000, 215.268661, 130.377094, 0.000000,
          0.000000, 0.000000, 1.000000, 0.000000]
 
-imshow: true
+imshow: false
 snapshot: false
 showfps: true
