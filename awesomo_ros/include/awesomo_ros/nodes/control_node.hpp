@@ -55,6 +55,7 @@ public:
 
   int rc_in[16];
   Quadrotor quadrotor;
+  bool armed;
 
   mavros_msgs::State mavros_state;
   ros::ServiceClient mode_client;

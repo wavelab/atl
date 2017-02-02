@@ -5,6 +5,7 @@ import rospy
 from std_msgs.msg import Float64
 from std_msgs.msg import String
 from geometry_msgs.msg import Vector3
+from geometry_msgs.msg import PoseStamped, Point, Quaternion
 
 
 class ROSNode(object):
@@ -124,6 +125,26 @@ class Quadrotor(ROSNode):
         self.pubs[self.hover_height_topic].publish(msg)
 
 
+class MavrosTopics(ROSNode):
+    def __init__(self):
+        super(MavrosTopics, self).__init__()
+        self.local_pose_topic = "/mavros/local_position/pose"
+
+        self.register_publisher(self.local_pose_topic, PoseStamped)
+
+    def set_local_pose(self, x, y, z):
+        msg = PoseStamped()
+        msg.pose.position.x = x
+        msg.pose.position.y = y
+        msg.pose.position.z = z
+
+        msg.pose.orientation.x = 0
+        msg.pose.orientation.y = 0
+        msg.pose.orientation.z = 0
+        msg.pose.orientation.w = 1
+        self.pubs[self.local_pose_topic].publish(msg)
+
+
 def lz_circle_path(radius, velocity):
     # calculate time taken to complete circle
     distance = 2 * pi * radius
@@ -134,26 +155,27 @@ def lz_circle_path(radius, velocity):
 
     return (velocity, angular_velocity)
 
-
 if __name__ == "__main__":
     rospy.init_node("awesomo_remote")
     lz = LandingZone()
     camera = Camera()
     quad = Quadrotor()
     gimbal = Gimbal()
-    rospy.sleep(1)
+    mavros = MavrosTopics()
+    rospy.sleep(0.5)
 
-    # camera.set_mode("320x320")
-    # camera.set_mode("160x160")
-
-    gimbal.set_attitude([0.0, -1.57])
+    mavros.set_local_pose(0, 0, 0)
+    # camera.set_mode("320x240")
+    # # camera.set_mode("160x160")
+    #
+    # gimbal.set_attitude([-0.5, -1.57])
 
     # lz.set_velocity(0.5)
     # lz.set_position([1000, 0, 0])
 
-    velocity, angular_velocity = lz_circle_path(5, 1.0)
-    lz.set_velocity(velocity)
-    lz.set_angular_velocity(angular_velocity)
+    # velocity, angular_velocity = lz_circle_path(5, 1.0)
+    # lz.set_velocity(velocity)
+    # lz.set_angular_velocity(angular_velocity)
 
     # quad.set_mode("HOVER_MODE")
     # quad.set_heading(270.0)

@@ -22,6 +22,7 @@ int GimbalNode::configure(std::string node_name, int hz) {
   this->registerPublisher<sensor_msgs::Imu>(CAMERA_IMU_TOPIC);
   this->registerPublisher<geometry_msgs::Quaternion>(FRAME_ORIENTATION_TOPIC);
   this->registerPublisher<geometry_msgs::Quaternion>(JOINT_ORIENTATION_TOPIC);
+  this->registerPublisher<geometry_msgs::Vector3>(POSITION_TOPIC);
 
   this->registerSubscriber(QUAD_POSE_TOPIC, &GimbalNode::quadPoseCallback, this);
   this->registerSubscriber(TRACK_TOPIC, &GimbalNode::trackTargetCallback, this);
@@ -32,6 +33,8 @@ int GimbalNode::configure(std::string node_name, int hz) {
   // register loop callback
   this->registerLoopCallback(std::bind(&GimbalNode::loopCallback, this));
 
+  // intialize setpoints
+  this->gimbal.setAngle(0.0, -0.9);
   this->configured = true;
   return 0;
 }
@@ -42,7 +45,10 @@ GimbalNode::~GimbalNode(void) {
 
 void GimbalNode::setAttitudeCallback(const geometry_msgs::Vector3 &msg) {
   // TODO update gimbal to take in yaw commands
-  this->gimbal.setAngle(msg.x, msg.y);
+  this->set_points << msg.x, msg.y, msg.z;
+  // this->gimbal.setAngle(msg.x, msg.y);
+  // this->gimbal.setAngle(msg.x, msg.y);
+  // usleep(7000); //sleep for .7 milliseconds
 }
 
 void GimbalNode::trackTargetCallback(const geometry_msgs::Vector3 &msg) {
@@ -72,6 +78,8 @@ int GimbalNode::loopCallback(void) {
    Quaternion camera_orientation;
    Quaternion frame_orientation;
 
+   this->gimbal.setAngle(this->set_points(0), this->set_points(1));
+   usleep(12000); // sleep for 10 microseconds to help avoid dropping frames
    retval = this->gimbal.updateGimbalStates();
    if (retval != 0) {
      return 0;
@@ -112,11 +120,12 @@ int GimbalNode::loopCallback(void) {
    cam_imu_msg.linear_acceleration.z = this->gimbal.imu_accel(2);
 
    buildMsg(frame_orientation, frame_angles_msg);
-   buildMsg(frame_orientation, cam_angles_msg);
+   buildMsg(camera_orientation, cam_angles_msg);
 
    this->ros_pubs[CAMERA_IMU_TOPIC].publish(cam_imu_msg);
    this->ros_pubs[FRAME_ORIENTATION_TOPIC].publish(frame_angles_msg);
    this->ros_pubs[JOINT_ORIENTATION_TOPIC].publish(cam_angles_msg);
+   // usleep(10000); // sleep for 10 microseconds to help avoid dropping frames
 
    return 0;
  }
