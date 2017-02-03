@@ -9,9 +9,10 @@ import matplotlib.pylab as plt
 
 
 def quadrotor(x, u, dt):
-    x[0] = x[0] + u[0] * cos(x[2]) * dt
-    x[1] = x[1] + u[0] * sin(x[2]) * dt
-    x[2] = x[2] + u[1] * dt
+    x[0] += x[1] * dt
+    x[1] += (u[0] * sin(u[1]) - 0.5 * x[1]) * dt
+    x[2] += x[3] * dt
+    x[3] += (u[0] * cos(u[1]) - 10.0 - 0.2 * x[3]) * dt
 
     return x
 
@@ -118,11 +119,11 @@ def cost_func(x, args):
 
     # control input cost
     cost += 0.5 * np.linalg.norm(states[4])  # az
-    cost += 0.5 * np.linalg.norm(states[5])  # theta
+    cost += 1.0 * np.linalg.norm(states[5])  # theta
 
-    # # control input difference cost
-    # cost += 0.1 * np.sum(np.diff(states[4]))  # az
-    # cost += 0.1 * np.sum(np.diff(states[5]))  # theta
+    # control input difference cost
+    cost += 1.0 * pow(np.sum(np.diff(states[4])), 2)  # az
+    cost += 1.0 * pow(np.sum(np.diff(states[5])), 2)  # theta
 
     return cost
 
@@ -135,8 +136,8 @@ def ine_constraints(x, *args):
 
     # setup
     retval = np.array([])
-    opt_vel = np.array([])
-    fea_vel = np.array([])
+    state_curr = np.array([])
+    state_feas = np.array([])
 
     # convert the (N * T) vector to T x N matrix
     x = x.reshape(T, n + m)
@@ -145,14 +146,15 @@ def ine_constraints(x, *args):
     x_prev = x[0]
     for x_curr in x[1:]:
         # calculate error between optimized velocity and feasible velocity
-        opt_vel = np.array([x_curr[0:4] - x_prev[0:4]])
-        fea_vel = np.array([x_prev[1],                                # x
-                            x_prev[4] * sin(x_prev[5]),               # vx
-                            x_prev[3],                                # z
-                            x_prev[4] * cos(x_prev[5]) - 10.0]) * dt  # vz
+        state_curr = np.array(x_curr[0:4])
+        state_feas = x_prev[0:4] + np.array([
+            x_prev[1],                                            # vx
+            x_prev[4] * sin(x_prev[5]) - 0.5 * x_prev[1],         # ax
+            x_prev[3],                                            # vz
+            x_prev[4] * cos(x_prev[5]) - 10.0 - 0.2 * x_prev[3]   # az
+        ]) * dt
 
-        # update
-        retval = np.append(retval, opt_vel - fea_vel)
+        retval = np.append(retval, state_feas - state_curr)
         x_prev = x_curr
 
     return retval
@@ -174,25 +176,47 @@ if __name__ == "__main__":
     args = {"traj": traj, "T": T, "n": n, "m": m}
     constraints = [
         # equality constraint for start position
-        {"type": "eq", "fun": lambda x: np.array([x[0] - p0[0]])},  # x
-        {"type": "eq", "fun": lambda x: np.array([x[1] - 0.0])},    # vx
-        {"type": "eq", "fun": lambda x: np.array([x[2] - p0[1]])},  # z
-        {"type": "eq", "fun": lambda x: np.array([x[3] - 0.0])},    # vz
+        {"type": "eq", "fun": lambda x: np.array([x[0] - x0[0][0]])},  # x
+        {"type": "eq", "fun": lambda x: np.array([x[1] - x0[0][1]])},  # vx
+        {"type": "eq", "fun": lambda x: np.array([x[2] - x0[0][2]])},  # z
+        {"type": "eq", "fun": lambda x: np.array([x[3] - x0[0][3]])},  # vz
+        {"type": "eq", "fun": lambda x: np.array([x[4] - x0[0][4]])},  # az
+        {"type": "eq", "fun": lambda x: np.array([x[5] - x0[0][5]])},  # theta
 
         # equality constraint for end position
         {"type": "eq", "fun": lambda x: np.array([x[-6] - pf[0]])},  # x
         {"type": "eq", "fun": lambda x: np.array([x[-5] - 0.0])},    # vx
         {"type": "eq", "fun": lambda x: np.array([x[-4] - pf[1]])},  # z
         {"type": "eq", "fun": lambda x: np.array([x[-3] - 0.0])},    # vz
+        {"type": "eq", "fun": lambda x: np.array([x[-2] - 0.0])},    # az
+        {"type": "eq", "fun": lambda x: np.array([x[-1] - 0.0])},    # theta
 
-        # nonlinear inequality constraint for motion
-        {"type": "ineq", "fun": ine_constraints, "args": (T, dt, n, m)}
+        # nonlinear equality constraint for motion
+        {"type": "eq", "fun": ine_constraints, "args": (T, dt, n, m)}
     ]
 
+    # optimize
     result = scipy.optimize.minimize(cost_func,
                                      x0,
                                      args=args,
-                                     constraints=constraints,
-                                     options={'disp': True})
-    print(result.x.reshape(T, n + m))
+                                     constraints=constraints)
+
+    # plot optimization results
     plot_results(traj, result.x, T, n, m)
+
+    # plot real trajectory using only inputs
+    x = [x0[0][0], x0[0][1], x0[0][2], x0[0][3]]
+    pos_x = [x[0]]
+    pos_y = [x[2]]
+    states = result.x.reshape(T, n + m).T
+    for i in range(T):
+        u = [states[4][i], states[5][i]]
+        x = quadrotor(x, u, dt)
+        pos_x.append(x[0])
+        pos_y.append(x[2])
+
+    plt.title("Optimal Control Trajectory")
+    plt.plot(pos_x, pos_y)
+    plt.xlabel("x")
+    plt.ylabel("z")
+    plt.show()

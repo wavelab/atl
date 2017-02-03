@@ -1,7 +1,8 @@
 #include <gtest/gtest.h>
 
+#include <sensor_msgs/Imu.h>
+
 #include "awesomo_ros/utils/node.hpp"
-#include "awesomo_ros/nodes/gimbal_node.hpp"
 
 
 namespace awesomo {
@@ -10,7 +11,7 @@ namespace awesomo {
 #define TEST_NODE_NAME "gimbal_test_node"
 
 // SUBSCRIBE TOPICS
-#define CAMERA_IMU_TOPIC "/awesomo/gimbal/joint/imu"
+#define FRAME_JOINT_TOPIC "/awesomo/gimbal/joint/imu"
 #define FRAME_ORIENTATION_TOPIC "/awesomo/gimbal/frame/orientiation/inertial"
 
 // PUBLISH TOPICS
@@ -30,11 +31,11 @@ protected:
   geometry_msgs::Quaternion frame_if_orien_msg;
 
   NodeTest(void) {
-    // clang-format off
-
     // Subscribers
-    this->joint_if_imu_sub = this->ros_nh.subscribe(CAMERA_IMU_TOPIC, 1, &NodeTest::jointImuCallback, this);
+    // clang-format off
+    this->joint_if_imu_sub = this->ros_nh.subscribe(FRAME_JOINT_TOPIC, 1, &NodeTest::jointImuCallback, this);
     this->frame_if_orientation_sub = this->ros_nh.subscribe(FRAME_ORIENTATION_TOPIC, 1, &NodeTest::frameOrientationCallback, this);
+    // clang-format on
 
     // Publishers
     this->setpoint_pub = this->ros_nh.advertise<geometry_msgs::Vector3>(SET_ATTITUDE_TOPIC, 1);
@@ -43,7 +44,6 @@ protected:
   }
 
   virtual void SetUp(void) {
-
     geometry_msgs::Vector3 setpoint_msg;
     setpoint_msg.x = 10;
     setpoint_msg.y = 10;

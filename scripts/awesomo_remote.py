@@ -5,7 +5,10 @@ import rospy
 from std_msgs.msg import Float64
 from std_msgs.msg import String
 from geometry_msgs.msg import Vector3
-from geometry_msgs.msg import PoseStamped, Point, Quaternion
+from geometry_msgs.msg import PoseStamped
+# from geometry_msgs.msg import Point
+# from geometry_msgs.msg import Quaternion
+from awesomo_msgs.msg import PCtrlSettings
 
 
 class ROSNode(object):
@@ -96,11 +99,13 @@ class Quadrotor(ROSNode):
         self.heading_topic = "/awesomo/control/heading/set"
         self.hover_point_topic = "/awesomo/control/hover/set"
         self.hover_height_topic = "/awesomo/control/hover/height/set"
+        self.pctrl_set_topic = "/awesomo/control/position_controller/set"
 
         self.register_publisher(self.mode_topic, String)
         self.register_publisher(self.heading_topic, Float64)
         self.register_publisher(self.hover_point_topic, Vector3)
         self.register_publisher(self.hover_height_topic, Float64)
+        self.register_publisher(self.pctrl_set_topic, PCtrlSettings)
 
     def set_mode(self, mode):
         msg = String()
@@ -123,6 +128,29 @@ class Quadrotor(ROSNode):
         msg = Float64()
         msg.data = hover_height
         self.pubs[self.hover_height_topic].publish(msg)
+
+    def set_pctrl_settings(self, params):
+        msg = PCtrlSettings()
+
+        msg.roll_controller.min = params["roll"]["min"]
+        msg.roll_controller.max = params["roll"]["max"]
+        msg.roll_controller.k_p = params["roll"]["k_p"]
+        msg.roll_controller.k_i = params["roll"]["k_i"]
+        msg.roll_controller.k_d = params["roll"]["k_d"]
+
+        msg.pitch_controller.min = params["pitch"]["min"]
+        msg.pitch_controller.max = params["pitch"]["max"]
+        msg.pitch_controller.k_p = params["pitch"]["k_p"]
+        msg.pitch_controller.k_i = params["pitch"]["k_i"]
+        msg.pitch_controller.k_d = params["pitch"]["k_d"]
+
+        msg.throttle_controller.k_p = params["throttle"]["k_p"]
+        msg.throttle_controller.k_i = params["throttle"]["k_i"]
+        msg.throttle_controller.k_d = params["throttle"]["k_d"]
+
+        msg.hover_throttle = params["throttle"]["hover"]
+
+        self.pubs[self.pctrl_set_topic].publish(msg)
 
 
 class MavrosTopics(ROSNode):
@@ -164,7 +192,7 @@ if __name__ == "__main__":
     mavros = MavrosTopics()
     rospy.sleep(0.5)
 
-    mavros.set_local_pose(0, 0, 0)
+    # mavros.set_local_pose(0, 0, 0)
     # camera.set_mode("320x240")
     # # camera.set_mode("160x160")
     #
@@ -177,9 +205,27 @@ if __name__ == "__main__":
     # lz.set_velocity(velocity)
     # lz.set_angular_velocity(angular_velocity)
 
-    # quad.set_mode("HOVER_MODE")
-    # quad.set_heading(270.0)
-    # quad.set_mode("DISCOVER_MODE")
-    # quad.set_hover_point([3.0, -3.0, 2.0])
-    # quad.set_hover_point([0.0, 0.0, 5.0])
-    # quad.set_hover_height(10.0)
+    quad.set_mode("HOVER_MODE")
+    quad.set_hover_point([0.0, 0.0, 5.0])
+    quad.set_pctrl_settings({
+        "roll": {
+            "min": -30,
+            "max": 30,
+            "k_p": 0.3,
+            "k_i": 0.0,
+            "k_d": 0.2
+        },
+        "pitch": {
+            "min": -30,
+            "max": 30,
+            "k_p": 0.3,
+            "k_i": 0.0,
+            "k_d": 0.2
+        },
+        "throttle": {
+            "hover": 0.5,
+            "k_p": 0.4,
+            "k_i": 0.0,
+            "k_d": 0.2
+        }
+    })
