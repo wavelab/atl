@@ -1,8 +1,49 @@
 <?xml version="1.0"?>
 <launch>
- 
+
+	<!-- Vicon Server -->
+    <arg name="server" default="192.168.1.37:11311" />
+    <node pkg="vrpn_client_ros" type="vrpn_client_node" name="vrpn_client_node_ros" output="screen" >
+        <rosparam subst_value="true">
+            server: $(arg server)
+            port: 3883
+
+            update_frequency: 100.0
+            frame_id: world
+
+            #Use the VRPN server time
+            use_server_time: false
+            broadcast_tf: true
+
+            # Must either specify requres frequency > 0.0 or a litst of trackers tot create
+            refresh_tracker_frequency: 1.0
+
+        </rosparam>
+    </node>
+
 <!-- mavros --> 
-  <include file="$(find mavros)/launch/px4.launch" />
+    <!-- vim: set ft=xml noet : -->
+    <!-- example launch script for PX4 based FCU's -->
+
+    <arg name="fcu_url" default="/dev/ttyACM0:57600" />
+    <arg name="gcs_url" default="" />
+    <arg name="tgt_system" default="1" />
+    <arg name="tgt_component" default="1" />
+	<arg name="log_output" default="screen" />
+
+	<!-- required to make the pose data work -->
+	<remap from="/mavros/mocap/pose" to="/vrpn_client_node_ros/quad/pose" />
+
+	<include file="$(find mavros)/launch/node.launch">
+		<arg name="pluginlists_yaml" value="$(find mavros)/launch/px4_pluginlists.yaml" />
+		<arg name="config_yaml" value="$(find mavros)/launch/px4_config.yaml" />
+
+		<arg name="fcu_url" value="$(arg fcu_url)" />
+		<arg name="gcs_url" value="$(arg gcs_url)" />
+		<arg name="tgt_system" value="$(arg tgt_system)" />
+		<arg name="tgt_component" value="$(arg tgt_component)" />
+		<arg name="log_output" value="$(arg log_output)" />
+	</include>
 
 <!-- controller node -->
   <param name="control_config_dir" value="$(find awesomo_configs)/configs/quadrotor_anastasia" />
