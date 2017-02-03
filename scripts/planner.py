@@ -122,8 +122,8 @@ def cost_func(x, args):
     cost += 1.0 * np.linalg.norm(states[5])  # theta
 
     # control input difference cost
-    # cost += 0.1 * pow(np.sum(np.diff(states[4])), 2)  # az
-    # cost += 0.1 * pow(np.sum(np.diff(states[5])), 2)  # theta
+    cost += 1.0 * pow(np.sum(np.diff(states[4])), 2)  # az
+    cost += 1.0 * pow(np.sum(np.diff(states[5])), 2)  # theta
 
     return cost
 
@@ -136,8 +136,8 @@ def ine_constraints(x, *args):
 
     # setup
     retval = np.array([])
-    opt_vel = np.array([])
-    fea_vel = np.array([])
+    state_curr = np.array([])
+    state_feas = np.array([])
 
     # convert the (N * T) vector to T x N matrix
     x = x.reshape(T, n + m)
@@ -146,15 +146,15 @@ def ine_constraints(x, *args):
     x_prev = x[0]
     for x_curr in x[1:]:
         # calculate error between optimized velocity and feasible velocity
-        opt_vel = np.array(x_curr[0:4] - x_prev[0:4])
-        fea_vel = np.array([
-            x_prev[1],                                            # x
-            x_prev[4] * sin(x_prev[5]) - 0.5 * x_prev[1],         # vx
-            x_prev[3],                                            # z
-            x_prev[4] * cos(x_prev[5]) - 10.0 - 0.2 * x_prev[3]   # vz
+        state_curr = np.array(x_curr[0:4])
+        state_feas = x_prev[0:4] + np.array([
+            x_prev[1],                                            # vx
+            x_prev[4] * sin(x_prev[5]) - 0.5 * x_prev[1],         # ax
+            x_prev[3],                                            # vz
+            x_prev[4] * cos(x_prev[5]) - 10.0 - 0.2 * x_prev[3]   # az
         ]) * dt
 
-        retval = np.append(retval, fea_vel - opt_vel)
+        retval = np.append(retval, state_feas - state_curr)
         x_prev = x_curr
 
     return retval
@@ -204,7 +204,7 @@ if __name__ == "__main__":
     # plot optimization results
     plot_results(traj, result.x, T, n, m)
 
-    # plot real trajectory
+    # plot real trajectory using only inputs
     x = [x0[0][0], x0[0][1], x0[0][2], x0[0][3]]
     pos_x = [x[0]]
     pos_y = [x[2]]
@@ -215,5 +215,8 @@ if __name__ == "__main__":
         pos_x.append(x[0])
         pos_y.append(x[2])
 
+    plt.title("Optimal Control Trajectory")
     plt.plot(pos_x, pos_y)
+    plt.xlabel("x")
+    plt.ylabel("z")
     plt.show()
