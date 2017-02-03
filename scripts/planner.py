@@ -160,16 +160,6 @@ def ine_constraints(x, *args):
     return retval
 
 
-# def ine_constraints2(x, *args):
-#     T = args[0]
-#     dt = args[1]
-#     n = args[2]
-#     m = args[3]
-#     i = args[4]
-#
-#     # setup
-
-
 if __name__ == "__main__":
     T = 20      # num of time steps
     dt = 0.1    # time step
@@ -201,11 +191,11 @@ if __name__ == "__main__":
         {"type": "eq", "fun": lambda x: np.array([x[-2] - 0.0])},    # az
         {"type": "eq", "fun": lambda x: np.array([x[-1] - 0.0])},    # theta
 
-        # nonlinear inequality constraint for motion
-        {"type": "ineq", "fun": ine_constraints, "args": (T, dt, n, m)}
-
+        # nonlinear equality constraint for motion
+        {"type": "eq", "fun": ine_constraints, "args": (T, dt, n, m)}
     ]
 
+    # optimize
     result = scipy.optimize.minimize(cost_func,
                                      x0,
                                      args=args,
