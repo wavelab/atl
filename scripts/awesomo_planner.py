@@ -119,7 +119,7 @@ def cost_func(x, args):
 
     # control input cost
     cost += 0.5 * np.linalg.norm(states[4])  # az
-    cost += 1.0 * np.linalg.norm(states[5])  # theta
+    cost += 2.0 * np.linalg.norm(states[5])  # theta
 
     # control input difference cost
     cost += 1.0 * pow(np.sum(np.diff(states[4])), 2)  # az
@@ -205,18 +205,18 @@ if __name__ == "__main__":
     plot_results(traj, result.x, T, n, m)
 
     # plot real trajectory using only inputs
-    x = [x0[0][0], x0[0][1], x0[0][2], x0[0][3]]
-    pos_x = [x[0]]
-    pos_y = [x[2]]
-    states = result.x.reshape(T, n + m).T
-    for i in range(T):
-        u = [states[4][i], states[5][i]]
-        x = quadrotor(x, u, dt)
-        pos_x.append(x[0])
-        pos_y.append(x[2])
-
-    plt.title("Optimal Control Trajectory")
-    plt.plot(pos_x, pos_y)
-    plt.xlabel("x")
-    plt.ylabel("z")
-    plt.show()
+    # x = [x0[0][0], x0[0][1], x0[0][2], x0[0][3]]
+    # pos_x = [x[0]]
+    # pos_y = [x[2]]
+    # states = result.x.reshape(T, n + m).T
+    # for i in range(T):
+    #     u = [states[4][i], states[5][i]]
+    #     x = quadrotor(x, u, dt)
+    #     pos_x.append(x[0])
+    #     pos_y.append(x[2])
+    #
+    # plt.title("Optimal Control Trajectory")
+    # plt.plot(pos_x, pos_y)
+    # plt.xlabel("x")
+    # plt.ylabel("z")
+    # plt.show()
