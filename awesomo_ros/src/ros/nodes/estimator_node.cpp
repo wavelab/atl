@@ -10,6 +10,13 @@ int EstimatorNode::configure(std::string node_name, int hz) {
     return -1;
   }
 
+  // set quad pose to zero so that when mavros is not active, this node still produces output
+  this->quad_pose.position  << 0.0, 0.0, 0.0;
+  this->quad_pose.orientation.w() = 0.0;
+  this->quad_pose.orientation.x() = 0.0;
+  this->quad_pose.orientation.y() = 0.0;
+  this->quad_pose.orientation.z() = 0.0;
+
   // estimator
   this->ros_nh->getParam("/tracker_mode", this->mode);
   this->initialized = false;

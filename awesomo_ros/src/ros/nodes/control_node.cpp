@@ -49,6 +49,7 @@ int ControlNode::configure(const std::string node_name, int hz) {
   this->registerSubscriber(PCTRL_SET_TOPIC, &ControlNode::positionControllerSetCallback, this);
   // clang-format on
 
+  this->armed = false;
   // loop callback
   // clang-format off
   this->registerLoopCallback(std::bind(&ControlNode::loopCallback, this));
@@ -148,12 +149,12 @@ void ControlNode::radioCallback(const mavros_msgs::RCIn &msg) {
   if (this->armed) {
       if (this->rc_in[6] < 1500) {
           this->armed = false;
-          this->disarm();
+          //     this->disarm();
       }
   } else {
       if (this->rc_in[6] > 1500) {
           this->armed = true;
-          this->setOffboardModeOn();
+          this->quadrotor.setMode(HOVER_MODE);
       }
   }
 
@@ -202,19 +203,30 @@ int ControlNode::loopCallback(void) {
   // setup
   seq = this->ros_seq;
   dt = (ros::Time::now() - this->ros_last_updated).toSec();
+  // step
+  if (this->quadrotor.step(dt) != 0) {
+      return -1;
+  }
 
-  if (this->armed) {
-      // step
-      if (this->quadrotor.step(dt) != 0) {
-          return -1;
-      }
-
-      // publish msgs
-      att_cmd = this->quadrotor.att_cmd;
-      buildMsg(seq, ros::Time::now(), att_cmd, att_msg, thr_msg);
+  // publish msgs
+  att_cmd = this->quadrotor.att_cmd;
+  buildMsg(seq, ros::Time::now(), att_cmd, att_msg, thr_msg);
+  if (this->armed == true) {
       this->ros_pubs[SETPOINT_ATTITUDE_TOPIC].publish(att_msg);
       this->ros_pubs[SETPOINT_THROTTLE_TOPIC].publish(thr_msg);
       this->publishStats();
+  } else {
+      geometry_msgs::PoseStamped zero_position_msg;
+      zero_position_msg.pose.position.x = 0.0;
+      zero_position_msg.pose.position.y = 0.0;
+      zero_position_msg.pose.position.z = 5.0;
+
+      zero_position_msg.pose.orientation.x = 0.0;
+      zero_position_msg.pose.orientation.y = 0.0;
+      zero_position_msg.pose.orientation.z = 0.0;
+      zero_position_msg.pose.orientation.w = 1.0;
+
+      this->ros_pubs[SETPOINT_POSITION_TOPIC].publish(zero_position_msg);
   }
 
   return 0;
