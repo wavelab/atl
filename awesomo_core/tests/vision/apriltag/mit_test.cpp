@@ -41,7 +41,7 @@ TEST(MITDetector, configure) {
   ASSERT_EQ(detector.camera_modes[0], detector.camera_mode);
   ASSERT_EQ(3, detector.camera_modes.size());
   ASSERT_EQ(3, detector.camera_configs.size());
-  ASSERT_TRUE(detector.imshow);
+  ASSERT_FALSE(detector.imshow);
 }
 
 TEST(MITDetector, extractTags) {
