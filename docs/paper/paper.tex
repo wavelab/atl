@@ -81,8 +81,34 @@ Chris Choi\authorrefmark{1}, Stanley Brown\authorrefmark{2} and  Steven L. Wasla
   \item{Trajectory Planning}
 \end{itemize}
 
-% PROBLEM FORMULATION
-\section{Problem Formulation}
+% SYSTEM OVERVIEW
+\section{System Overview}
+In this section we describe the setup of our problem, from the quadrotor,
+ground landing target to coordinate systems used to represent positions in
+body and inertial frames.
+
+For the autonomous landing problem we assume that the quadrotor has direct line
+of sight to the landing target and that the AprilTag is detectable. The target
+position and velocity estimation is performed on-board the quadrotor, and
+using the estimations of the target the quadrotor tracks and lands onto the
+target.
+
+\begin{itemize}
+  \item{$I$\@: Inertial Frame}
+  \item{$C$\@: Camera Frame}
+  \item{$G$\@: Gimbal Frame}
+  \item{$B$\@: Quadrotor Body Frame}
+  \item{$BP$\@: Quadrotor Body Planar Frame}
+\end{itemize}
+
+We describe five different main coordinate frames used throughout this
+paper, in general we have followed the ROS coordinate frame conventions
+where the inertial frame $I$ is in ENU coordinate frame, the camera frame
+$C$ is in EDN coordinate frame, gimbal frame $G$, quadrotor body frame $B$ and
+quadrotor body planar frame $BP$ uses NWU coordinate frame. The quadrotor body
+planar frame $BP$ is defined as the body centered and inertial horizon $x$-$y$
+aligned frame, to reiterate the body planar frame $BP$ ignores the roll and
+pitch (but not yaw) normally considered in a body frame $B$.
 
 
 
@@ -162,13 +188,15 @@ environment which in turn interferes with the performance of detection
 algorithms. From our experience the standard black and white AprilTag
 fails to be detected if a shadow is casted partially or fully upon the tag
 features, this is because the AprilTag detection relies heavily on the
-edges and lines of the tag to be able to estimate the 6dof pose.
+edges and lines of the tag to be able to estimate the 6 dof pose.
+Depending on the time of day or weather conditions, this can have
+a significant impact as the quadrotor approaches the target, as its own
+shadow over the AprilTag can render the tag undetectable.
 
-Reliable image processing regardless of the time of day is vital to the
-success of target detection. Using methods described in~\cite{Maddern14}
-we have idenitified the best colours for an illumination invariant
-AprilTag to be blue and green (see
-Fig~\ref{apriltag_illumination_invariant}), additionally
+Reliable image processing is therefore paramount to the success of target
+detection, using methods described in~\cite{Maddern14} we have idenitified
+the best colours for an illumination invariant AprilTag to be blue and
+green (see Fig~\ref{apriltag_illumination_invariant}), additionally
 
 \begin{equation}
   I = \log(R_{2}) - \alpha \log(R_{1}) - (1 - \alpha) \log(R_{3})
@@ -259,16 +287,15 @@ process model are driven by Gaussian White Noise, since we do not possess
 input information to the two wheel robot motion model.
 
 \subsection{Measurement Model}
+The measurement inputted into the estimator is the target position ($x, y,
+z$) in the inertial frame, the target position has been transformed from
+the camera frame through to the gimbal frame to the inertial frame. Care
+was taken to ensure that the IMU measurements were synchronized with image
+of the AprilTag at the time it was captured.
 
-\begin{equation}
-  h(t) = \begin{bmatrix} p_{1 \times 3} & {0}_{1 \times 4} \end{bmatrix}
-\end{equation}
-
-
-% GIMBAL TRANSFORMS
-\section{Gimbal Transforms}
-
-Transform detected target from image frame to gimbal joint frame
+To obtain the target position in the inertial frame, the detected target
+position is first transformed from image frame to gimbal joint frame as
+follows:
 
 \begin{equation}
   x_{\text{gjf}} = R^{\text{gjf}}_{\text{i}}
@@ -276,13 +303,13 @@ Transform detected target from image frame to gimbal joint frame
     x_{\text{i}} + t_{c}
 \end{equation}
 
-Gimbal joint frame to body planar frame
+Then from gimbal joint frame to body planar frame:
 
 \begin{equation}
   x_{\text{bpf}} = R^{\text{bpf}}_{\text{gjf}} x_{\text{gjf}}
 \end{equation}
 
-Body planar frame to inertial frame
+Finally from body planar frame to inertial frame:
 
 \begin{equation}
   x_{\text{if}} = R^{\text{enu}}_{\text{nwu}}
@@ -290,14 +317,41 @@ Body planar frame to inertial frame
     x_{\text{bpf}}
 \end{equation}
 
+This final target position in the inertial frame is then passed onto the
+estimator. The measurement model $h(t)$ and the linearized measurement
+model $H(t)$ at time $t$ is then simply
+
+\begin{equation}
+    h(t) = \begin{bmatrix} x, y, z \end{bmatrix}^{T}
+\end{equation}
+
+\begin{equation}
+    H(t) = \begin{bmatrix} I_{3 \times 3} \end{bmatrix}^{T}
+\end{equation}
+
+The Extended Kalman Filter updates the process model at 200 Hz, while the
+measurement is updated upon when the AprilTag is detected and transformed.
+The output of the estimator is in turn used for tracking and landing.
 
 
 % TRAJECTORY PLANNING
 \section{Trajectory Planning}
 
+\subsection{2D Quadrotor Model}
+The model used for trajectory planning is a two dimensional three degrees
+of freedom (DOF) quadrotor in the $x$-$z$ plane. By using this model we
+assume there will be small changes in the $x$-$y$ plane where the
+controllers can correct without planning.
+
+The 2D quadrotor state $\textbf{x}$ includes both position and velocity in the
+$x$ and $z$ direction. Where $x_{0}$ and $x_{d}$ are the initial and final
+states of the quadrotor. The inputs to the quadrotor model are the
+acceleration $a_{z}$ in the $z$ direction in body frame, and pitch angle
+$\theta$ in inertial frame.
+
 \begin{equation}
   \begin{split}
-    \textbf{x} 
+    \textbf{x}
       &= \begin{bmatrix}
         x_{1} & x_{2} & x_{3} & x_{4}
       \end{bmatrix}^{T} \\ 
@@ -310,7 +364,7 @@ Body planar frame to inertial frame
 \begin{equation}
   \begin{split}
     \textbf{x}_{0} = \begin{bmatrix}
-        x_{0} & \dot{x_{d}} & z_{d} & \dot{z_{d}}
+        x_{0} & \dot{x_{0}} & z_{0} & \dot{z_{0}}
     \end{bmatrix}^{T} \\
     \textbf{x}_{d} = \begin{bmatrix}
         x_{d} & \dot{x_{d}} & z_{d} & \dot{z_{d}}
@@ -324,6 +378,8 @@ Body planar frame to inertial frame
     = \begin{bmatrix} a_{z} \\ \theta \end{bmatrix}
     \in {\rm I\!R}^{2}
 \end{equation}
+
+The dynamics are thus given as:
 
 \begin{equation}
   \dot{\textbf{x}} =
@@ -340,7 +396,47 @@ Body planar frame to inertial frame
     \end{bmatrix}
 \end{equation}
 
-\begin{align} 
+Where $g$ is the gravitational constant.
+
+\subsection{Trajectory Problem Formulation}
+The objective of the trajectory is to achieve landing of the quadrotor
+onto a non-stationary target at $\textbf{x}_{d}$, further the trajectory
+has to satisfy a number of desirable soft constraints, which are minimal
+deviation from desired path $p_{\text{diff}}$, minimal total input
+$u_{\text{total}}$ and minimal input control difference between time steps
+$u_{\text{diff}}$.
+
+The desired path $\textbf{p}_{\text{desired}}$ vector is a straight-line
+from initial position $x_{0}$ to final position $x_{d}$. 
+
+\begin{equation}
+    p_{\text{diff}} = || \textbf{x} - \textbf{p}_{\text{desired}} ||^{2}
+\end{equation}
+
+\begin{equation}
+    u_{\text{total}} = || \textbf{u} ||^{2}
+\end{equation}
+
+\begin{equation}
+    u_{\text{diff}} = \sum_{i = 0}^{t_{f} - 1}
+        \left\Vert
+            \textbf{u}(i + 1) - \textbf{u}(i)
+        \right\Vert^{2}
+\end{equation}
+
+\begin{equation}
+    J(\textbf{x}, \textbf{u}) =
+        w_{1} \cdot p_{\text{diff}}
+        + w_{2} \cdot u_{\text{total}}
+        + w_{3} \cdot u_{\text{diff}}
+\end{equation}
+
+\begin{equation}
+  C_{\text{eq}} = \sum_{i = 0}^{t_{f} - 1}
+    \textbf{x}(i + 1) - f(\textbf{x}(i), \textbf{u}(i))
+\end{equation}
+
+\begin{align}
   \text{minimize} \quad &J(\textbf{x}, \textbf{u}) \\
   \text{s.t.} \quad & \dot{\textbf{x}} = f(\textbf{x}, \textbf{u}) \\
     & \textbf{x}(t = 0) = \textbf{x}_{0} \\
@@ -351,9 +447,29 @@ Body planar frame to inertial frame
 
 % QUADROTOR CONTROL
 \section{Quadrotor Control}
-For target tracking a Proportional-Integral-Derivative (PID) controller
-was implemented. The estimated target position in inertial frame is
-converted to body frame and used as control errors to the tracker control
+
+\subsection{Tracking Controller}
+For target tracking two PID controllers were implemented, first a position
+based controller that corrects positional errors of the quadrotor relative
+to the target. Second, a velocity based controller that uses estimated
+target velocity as a feed-forward signal to match the target's velocity.
+The two controllers are combined together to form the tracking controller.
+
+\begin{equation}
+   \theta = k_{p} e + k_{i} \sum_{i = 0}^{t} e_{i} dt + k_{d} \dot{e}
+\end{equation}
+
+\begin{figure}
+\label{fig:tracking_controller}
+  \includegraphics[width=\linewidth]{images/tracking_controller}
+  \caption{Tracking Controller}
+\end{figure}
+
+\subsection{Landing Controller}
+During landing the controller will be switched from tracking to landing,
+the controller contains two PID controllers the first controller is
+a position based control to correct positional errors of the quadrotor
+relative to the target in the body frame.
 
 
 
