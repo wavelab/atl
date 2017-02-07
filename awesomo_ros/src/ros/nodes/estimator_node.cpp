@@ -268,7 +268,9 @@ int EstimatorNode::estimateKF(double dt) {
     C << 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
-    y << this->target_pos_wf(0), this->target_pos_wf(1), this->target_pos_wf(2);
+    y << this->target_pos_wf(0),
+         this->target_pos_wf(1),
+         this->target_pos_wf(2);
     this->target_last_pos_wf = this->target_pos_wf;
     // clang-format on
 
@@ -289,11 +291,11 @@ int EstimatorNode::estimateKF(double dt) {
 
 int EstimatorNode::estimateEKF(double dt) {
   std::default_random_engine rgen;
-  std::normal_distribution<float> pn1(0, pow(0.5, 2));
-  std::normal_distribution<float> pn2(0, pow(0.5, 2));
-  std::normal_distribution<float> pn3(0, pow(0.5, 2));
-  VecX y(7), g(7), h(7);
-  MatX G(7, 7), H(7, 7);
+  std::normal_distribution<float> pn1(0, pow(0.1, 2));
+  std::normal_distribution<float> pn2(0, pow(0.1, 2));
+  std::normal_distribution<float> pn3(0, pow(0.1, 2));
+  VecX y(3), g(7), h(3);
+  MatX G(7, 7), H(3, 7);
 
   // propagate motion model
   TWO_WHEEL_3D_NO_INPUTS_MOTION_MODEL(this->ekf_tracker,
@@ -310,9 +312,8 @@ int EstimatorNode::estimateEKF(double dt) {
     this->target_last_pos_wf = this->target_pos_wf;
     // clang-format off
     y << this->target_pos_wf(0),
-        this->target_pos_wf(1),
-        this->target_pos_wf(2),
-        0.0, 0.0, 0.0, 0.0;
+         this->target_pos_wf(1),
+         this->target_pos_wf(2);
     // clang-format on
     this->ekf_tracker.measurementUpdate(h, H, y);
   }

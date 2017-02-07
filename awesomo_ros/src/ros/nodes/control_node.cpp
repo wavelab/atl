@@ -203,6 +203,7 @@ int ControlNode::loopCallback(void) {
   // setup
   seq = this->ros_seq;
   dt = (ros::Time::now() - this->ros_last_updated).toSec();
+
   // step
   if (this->quadrotor.step(dt) != 0) {
       return -1;
@@ -211,15 +212,16 @@ int ControlNode::loopCallback(void) {
   // publish msgs
   att_cmd = this->quadrotor.att_cmd;
   buildMsg(seq, ros::Time::now(), att_cmd, att_msg, thr_msg);
-  if (this->armed == true) {
+  if (this->armed || this->sim_mode) {
       this->ros_pubs[SETPOINT_ATTITUDE_TOPIC].publish(att_msg);
       this->ros_pubs[SETPOINT_THROTTLE_TOPIC].publish(thr_msg);
       this->publishStats();
+
   } else {
       geometry_msgs::PoseStamped zero_position_msg;
       zero_position_msg.pose.position.x = 0.0;
       zero_position_msg.pose.position.y = 0.0;
-      zero_position_msg.pose.position.z = 5.0;
+      zero_position_msg.pose.position.z = 2.0;
 
       zero_position_msg.pose.orientation.x = 0.0;
       zero_position_msg.pose.orientation.y = 0.0;

@@ -45,7 +45,7 @@ public:
   int maskImage(TagPose tag_pose,
                 cv::Mat &image,
                 cv::Mat &masked,
-                double padding=0.1);
+                double padding=0.5);
   void printTag(TagPose tag);
 };
 

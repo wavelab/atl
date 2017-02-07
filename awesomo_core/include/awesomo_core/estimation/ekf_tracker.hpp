@@ -49,7 +49,10 @@
        EKF.mu(6) + pn3;
 
 #define TWO_WHEEL_3D_NO_INPUTS_MEASUREMENT_MODEL(EKF, H, h)  \
-    H = MatX::Identity(7, 7);                                \
+    H = MatX::Zero(3, 7);                                    \
+    H(0, 0) = 1.0;                                           \
+    H(1, 1) = 1.0;                                           \
+    H(2, 2) = 1.0;                                           \
     h = H * EKF.mu;
 
 namespace awesomo {
