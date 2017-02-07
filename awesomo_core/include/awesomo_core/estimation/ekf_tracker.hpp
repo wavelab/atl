@@ -29,10 +29,10 @@
        EKF.mu(4) + pn2;
 
 #define TWO_WHEEL_NO_INPUTS_MEASUREMENT_MODEL(EKF, H, h)  \
-    H = MatX::Identity(5, 5);                             \
-    h = H * EKF.mu;
+  H = MatX::Identity(5, 5);                               \
+  h = H * EKF.mu;
 
-#define TWO_WHEEL_3D_NO_INPUTS_MOTION_MODEL(EKF, G, g, pn1, pn2, pn3)           \
+#define TWO_WHEEL_3D_NO_INPUTS_MOTION_MODEL(EKF, G, g)                          \
   G << 1, 0, 0, (-EKF.mu(4) * sin(EKF.mu(3)) * dt), cos(EKF.mu(3)) * dt, 0, 0,  \
        0, 1, 0, (EKF.mu(4) * cos(EKF.mu(3)) * dt), sin(EKF.mu(3)) * dt, 0, 0,   \
        0, 0, 1, 0, 0, 0, dt,                                                    \
@@ -50,10 +50,11 @@
 
 #define TWO_WHEEL_3D_NO_INPUTS_MEASUREMENT_MODEL(EKF, H, h)  \
     H = MatX::Zero(3, 7);                                    \
-    H(0, 0) = 1.0;  // x                                     \
-    H(1, 1) = 1.0;  // y                                     \
-    H(2, 2) = 1.0;  // z                                     \
+    H(0, 0) = 1.0;  /* x */                                  \
+    H(1, 1) = 1.0;  /* y */                                  \
+    H(2, 2) = 1.0;  /* z */                                  \
     h = H * EKF.mu;
+
 
 namespace awesomo {
 

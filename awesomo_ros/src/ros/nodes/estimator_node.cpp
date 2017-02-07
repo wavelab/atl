@@ -142,7 +142,6 @@ void EstimatorNode::publishLTKFInertialPositionEstimate(void) {
       msg.z = this->ekf_tracker.mu(2);
       break;
   }
-  std::cout << this->ekf_tracker.mu.transpose() << std::endl;
 
   this->ros_pubs[LT_INERTIAL_POSITION_TOPIC].publish(msg);
 }
@@ -250,7 +249,8 @@ void EstimatorNode::publishQuadHeadingMsg(void) {
   // build and publish msg
   switch (mode) {
     case KF_MODE: buildMsg(this->target_yaw_wf, msg); break;
-    case EKF_MODE: buildMsg(this->ekf_tracker.mu(3), msg); break;
+    // case EKF_MODE: buildMsg(this->ekf_tracker.mu(3), msg); break;
+    case EKF_MODE: buildMsg(this->target_yaw_wf, msg); break;
   }
   this->ros_pubs[QUAD_HEADING_TOPIC].publish(msg);
 }
@@ -304,20 +304,11 @@ int EstimatorNode::estimateKF(double dt) {
 }
 
 int EstimatorNode::estimateEKF(double dt) {
-  std::default_random_engine rgen;
-  std::normal_distribution<float> pn1(0, pow(0.1, 2));
-  std::normal_distribution<float> pn2(0, pow(0.001, 2));
-  std::normal_distribution<float> pn3(0, pow(0.001, 2));
   VecX y(3), g(7), h(3);
   MatX G(7, 7), H(3, 7);
 
   // prediction update
-  TWO_WHEEL_3D_NO_INPUTS_MOTION_MODEL(this->ekf_tracker,
-                                      G,
-                                      g,
-                                      pn1(rgen),
-                                      pn2(rgen),
-                                      0);
+  TWO_WHEEL_3D_NO_INPUTS_MOTION_MODEL(this->ekf_tracker, G, g);
   this->ekf_tracker.predictionUpdate(g, G);
 
   // measurement update

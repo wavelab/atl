@@ -158,19 +158,16 @@ TEST(ExtendedKalmanFilterTracker, estimate3) {
   ExtendedKalmanFilterTracker tracker;
   std::ofstream output_file;
   std::default_random_engine rgen;
-  std::normal_distribution<float> norm_x(0, pow(0.5, 2));
-  std::normal_distribution<float> norm_y(0, pow(0.5, 2));
-  std::normal_distribution<float> norm_z(0, pow(0.5, 2));
+  std::normal_distribution<float> norm_x(0, pow(0.2, 2));
+  std::normal_distribution<float> norm_y(0, pow(0.2, 2));
+  std::normal_distribution<float> norm_z(0, pow(0.01, 2));
   std::normal_distribution<float> norm_theta(0, pow(deg2rad(0.5), 2));
-  std::normal_distribution<float> pn1(0, pow(0.5, 2));
-  std::normal_distribution<float> pn2(0, pow(0.5, 2));
-  std::normal_distribution<float> pn3(0, pow(0.5, 2));
 
   // setup
   // clang-format off
   dt = 0.01;
-  x << 0, 0, 0, 1.0, 0.1, 0.0, 0.0;
-  mu << 0, 0, 0, 1.0, 0.1, 0.0, 0.0;  // x, y, z, theata, v, omega, vz
+  x << 0, 0, 0, 0.0, 0.1, 0.0, 0.0;
+  mu << 0, 0, 0, 0.0, 0.1, 0.0, 0.0;  // x, y, z, theata, v, omega, vz
   u << 1.0, 0.1, 0.0;
   tracker.configure(TEST_CONFIG3);
   tracker.initialize(mu);
@@ -195,12 +192,7 @@ TEST(ExtendedKalmanFilterTracker, estimate3) {
     y = x.block(0, 0, 3, 1) + gaussian_noise;
 
     // propagate motion model
-    TWO_WHEEL_3D_NO_INPUTS_MOTION_MODEL(tracker,
-                                        G,
-                                        g,
-                                        pn1(rgen),
-                                        pn2(rgen),
-                                        pn3(rgen));
+    TWO_WHEEL_3D_NO_INPUTS_MOTION_MODEL(tracker, G, g);
     tracker.predictionUpdate(g, G);
 
     // propagate measurement
