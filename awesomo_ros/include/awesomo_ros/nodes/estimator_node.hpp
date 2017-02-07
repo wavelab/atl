@@ -24,11 +24,13 @@ namespace awesomo {
 #define LT_BODY_VELOCITY_TOPIC "/awesomo/estimate/landing_target/velocity/body"
 #define LT_DETECTED_TOPIC "/awesomo/estimate/landing_target/detected"
 #define GIMBAL_SETPOINT_ATTITUDE_TOPIC "/awesomo/gimbal/setpoint/attitude"
+#define QUAD_HEADING_TOPIC "/awesomo/control/heading/set"
 
 // SUBSCRIBE TOPICS
 #define QUAD_POSE_TOPIC "/mavros/local_position/pose"
 #define QUAD_VELOCITY_TOPIC "/mavros/local_position/velocity"
-#define TARGET_INERTIAL_TOPIC "/awesomo/apriltag/target/position/inertial"
+#define TARGET_IF_POS_TOPIC "/awesomo/apriltag/target/position/inertial"
+#define TARGET_IF_YAW_TOPIC "/awesomo/apriltag/target/yaw/inertial"
 
 class EstimatorNode : public ROSNode {
 public:
@@ -42,6 +44,7 @@ public:
   bool target_detected;
   Vec3 target_pos_bpf;
   Vec3 target_vel_bpf;
+  double target_yaw_wf;
   Vec3 target_pos_wf;
   Vec3 target_last_pos_wf;
   struct timespec target_last_updated;
@@ -54,6 +57,7 @@ public:
     this->target_detected = false;
     this->target_pos_bpf << 0.0, 0.0, 0.0;
     this->target_vel_bpf << 0.0, 0.0, 0.0;
+    this->target_yaw_wf = 0.0;
     this->target_pos_wf << 0.0, 0.0, 0.0;
     this->target_last_pos_wf << 0.0, 0.0, 0.0;
     this->target_last_updated = (struct timespec){0};
@@ -65,13 +69,15 @@ public:
   void resetLTKF(Vec3 target_pos_wf);
   void quadPoseCallback(const geometry_msgs::PoseStamped &msg);
   void quadVelocityCallback(const geometry_msgs::TwistStamped &msg);
-  void targetWorldCallback(const geometry_msgs::Vector3 &msg);
+  void targetInertialPosCallback(const geometry_msgs::Vector3 &msg);
+  void targetInertialYawCallback(const std_msgs::Float64 &msg);
   void publishLTKFInertialPositionEstimate(void);
   void publishLTKFInertialVelocityEstimate(void);
   void publishLTKFBodyPositionEstimate(void);
   void publishLTKFBodyVelocityEstimate(void);
   void publishLTDetected(void);
   void publishGimbalSetpointAttitudeMsg(Vec3 setpoints);
+  void publishQuadHeadingMsg(void);
   void trackTarget(void);
   int estimateKF(double dt);
   int estimateEKF(double dt);

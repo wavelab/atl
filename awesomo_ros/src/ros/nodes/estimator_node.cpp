@@ -53,9 +53,11 @@ int EstimatorNode::configure(std::string node_name, int hz) {
   this->registerPublisher<geometry_msgs::Vector3>(LT_BODY_VELOCITY_TOPIC);
   this->registerPublisher<std_msgs::Bool>(LT_DETECTED_TOPIC);
   this->registerPublisher<geometry_msgs::Vector3>(GIMBAL_SETPOINT_ATTITUDE_TOPIC);
+  this->registerPublisher<std_msgs::Float64>(QUAD_HEADING_TOPIC);
   this->registerSubscriber(QUAD_POSE_TOPIC, &EstimatorNode::quadPoseCallback, this);
   this->registerSubscriber(QUAD_VELOCITY_TOPIC, &EstimatorNode::quadVelocityCallback, this);
-  this->registerSubscriber(TARGET_INERTIAL_TOPIC, &EstimatorNode::targetWorldCallback, this);
+  this->registerSubscriber(TARGET_IF_POS_TOPIC, &EstimatorNode::targetInertialPosCallback, this);
+  this->registerSubscriber(TARGET_IF_YAW_TOPIC, &EstimatorNode::targetInertialYawCallback, this);
   this->registerLoopCallback(std::bind(&EstimatorNode::loopCallback, this));
   // clang-format on
 
@@ -108,26 +110,20 @@ void EstimatorNode::quadVelocityCallback(const geometry_msgs::TwistStamped &msg)
   convertMsg(msg.twist.linear, this->quad_velocity);
 }
 
-void EstimatorNode::targetWorldCallback(const geometry_msgs::Vector3 &msg) {
-  bool estimator_reset;
-
-  // check if estimator needs resetting
-  if (mtoc(&this->target_last_updated) > this->target_lost_threshold) {
-    estimator_reset = true;
-    this->initialized = false;
-  } else {
-    estimator_reset = false;
-  }
-
+void EstimatorNode::targetInertialPosCallback(const geometry_msgs::Vector3 &msg) {
   // update target
   this->target_detected = true;
   convertMsg(msg, this->target_pos_wf);
   tic(&this->target_last_updated);
 
-  // initialize or reset estimator
-  if (this->initialized == false || estimator_reset) {
+  // initialize estimator
+  if (this->initialized == false) {
     this->initLTKF(this->target_pos_wf);
   }
+}
+
+void EstimatorNode::targetInertialYawCallback(const std_msgs::Float64 &msg) {
+  convertMsg(msg, this->target_yaw_wf);
 }
 
 void EstimatorNode::publishLTKFInertialPositionEstimate(void) {
@@ -146,6 +142,7 @@ void EstimatorNode::publishLTKFInertialPositionEstimate(void) {
       msg.z = this->ekf_tracker.mu(2);
       break;
   }
+  std::cout << this->ekf_tracker.mu.transpose() << std::endl;
 
   this->ros_pubs[LT_INERTIAL_POSITION_TOPIC].publish(msg);
 }
@@ -242,6 +239,22 @@ void EstimatorNode::publishGimbalSetpointAttitudeMsg(Vec3 setpoints) {
   this->ros_pubs[GIMBAL_SETPOINT_ATTITUDE_TOPIC].publish(msg);
 }
 
+void EstimatorNode::publishQuadHeadingMsg(void) {
+  std_msgs::Float64 msg;
+
+  // pre-check
+  if (this->initialized == false) {
+    return;
+  }
+
+  // build and publish msg
+  switch (mode) {
+    case KF_MODE: buildMsg(this->target_yaw_wf, msg); break;
+    case EKF_MODE: buildMsg(this->ekf_tracker.mu(3), msg); break;
+  }
+  this->ros_pubs[QUAD_HEADING_TOPIC].publish(msg);
+}
+
 void EstimatorNode::trackTarget(void) {
   double dist;
   Vec3 setpoints;
@@ -253,6 +266,7 @@ void EstimatorNode::trackTarget(void) {
   setpoints(2) = 0.0;                                // yaw
 
   this->publishGimbalSetpointAttitudeMsg(setpoints);
+  this->publishQuadHeadingMsg();
 }
 
 int EstimatorNode::estimateKF(double dt) {
@@ -292,21 +306,21 @@ int EstimatorNode::estimateKF(double dt) {
 int EstimatorNode::estimateEKF(double dt) {
   std::default_random_engine rgen;
   std::normal_distribution<float> pn1(0, pow(0.1, 2));
-  std::normal_distribution<float> pn2(0, pow(0.1, 2));
-  std::normal_distribution<float> pn3(0, pow(0.1, 2));
+  std::normal_distribution<float> pn2(0, pow(0.001, 2));
+  std::normal_distribution<float> pn3(0, pow(0.001, 2));
   VecX y(3), g(7), h(3);
   MatX G(7, 7), H(3, 7);
 
-  // propagate motion model
+  // prediction update
   TWO_WHEEL_3D_NO_INPUTS_MOTION_MODEL(this->ekf_tracker,
                                       G,
                                       g,
                                       pn1(rgen),
                                       pn2(rgen),
-                                      pn3(rgen));
+                                      0);
   this->ekf_tracker.predictionUpdate(g, G);
 
-  // propagate measurement model
+  // measurement update
   if (this->target_detected) {
     TWO_WHEEL_3D_NO_INPUTS_MEASUREMENT_MODEL(this->ekf_tracker, H, h);
     this->target_last_pos_wf = this->target_pos_wf;
@@ -338,13 +352,20 @@ int EstimatorNode::loopCallback(void) {
     case EKF_MODE: this->estimateEKF(dt); break;
   }
 
+  // check if target is losted
+  if (mtoc(&this->target_last_updated) > this->target_lost_threshold) {
+    this->initialized = false;
+  }
+
   // publish
-  this->publishLTKFInertialPositionEstimate();
-  this->publishLTKFInertialVelocityEstimate();
-  this->publishLTKFBodyPositionEstimate();
-  this->publishLTKFBodyVelocityEstimate();
-  this->publishLTDetected();
-  this->trackTarget();
+  if (this->initialized) {
+    this->publishLTKFInertialPositionEstimate();
+    this->publishLTKFInertialVelocityEstimate();
+    this->publishLTKFBodyPositionEstimate();
+    this->publishLTKFBodyVelocityEstimate();
+    this->publishLTDetected();
+    this->trackTarget();
+  }
 
   // reset
   this->target_detected = false;

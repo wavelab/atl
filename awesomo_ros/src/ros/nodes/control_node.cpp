@@ -147,15 +147,15 @@ void ControlNode::radioCallback(const mavros_msgs::RCIn &msg) {
     this->rc_in[i] = msg.channels[i];
   }
   if (this->armed) {
-      if (this->rc_in[6] < 1500) {
-          this->armed = false;
-          //     this->disarm();
-      }
+    if (this->rc_in[6] < 1500) {
+      this->armed = false;
+      //     this->disarm();
+    }
   } else {
-      if (this->rc_in[6] > 1500) {
-          this->armed = true;
-          this->quadrotor.setMode(HOVER_MODE);
-      }
+    if (this->rc_in[6] > 1500) {
+      this->armed = true;
+      this->quadrotor.setMode(HOVER_MODE);
+    }
   }
 
 }
