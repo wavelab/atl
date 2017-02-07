@@ -247,9 +247,9 @@ void EstimatorNode::publishQuadHeadingMsg(void) {
   }
 
   // build and publish msg
+  std::cout << rad2deg(this->ekf_tracker.mu(3)) << std::endl;
   switch (mode) {
     case KF_MODE: buildMsg(this->target_yaw_wf, msg); break;
-    // case EKF_MODE: buildMsg(this->ekf_tracker.mu(3), msg); break;
     case EKF_MODE: buildMsg(this->target_yaw_wf, msg); break;
   }
   this->ros_pubs[QUAD_HEADING_TOPIC].publish(msg);
@@ -304,8 +304,8 @@ int EstimatorNode::estimateKF(double dt) {
 }
 
 int EstimatorNode::estimateEKF(double dt) {
-  VecX y(3), g(7), h(3);
-  MatX G(7, 7), H(3, 7);
+  VecX y(4), g(7), h(4);
+  MatX G(7, 7), H(4, 7);
 
   // prediction update
   TWO_WHEEL_3D_NO_INPUTS_MOTION_MODEL(this->ekf_tracker, G, g);
@@ -318,7 +318,8 @@ int EstimatorNode::estimateEKF(double dt) {
     // clang-format off
     y << this->target_pos_wf(0),
          this->target_pos_wf(1),
-         this->target_pos_wf(2);
+         this->target_pos_wf(2),
+         this->target_yaw_wf;
     // clang-format on
     this->ekf_tracker.measurementUpdate(h, H, y);
   }

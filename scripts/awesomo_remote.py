@@ -203,7 +203,7 @@ if __name__ == "__main__":
     # lz.set_velocity(0.1)
     # lz.set_position([0, 0, 0])
 
-    velocity, angular_velocity = lz_circle_path(10, 0.5)
+    velocity, angular_velocity = lz_circle_path(5, 0.5)
     lz.set_velocity(velocity)
     lz.set_angular_velocity(angular_velocity)
 

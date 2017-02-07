@@ -49,10 +49,11 @@
        EKF.mu(6);
 
 #define TWO_WHEEL_3D_NO_INPUTS_MEASUREMENT_MODEL(EKF, H, h)  \
-    H = MatX::Zero(3, 7);                                    \
+    H = MatX::Zero(4, 7);                                    \
     H(0, 0) = 1.0;  /* x */                                  \
     H(1, 1) = 1.0;  /* y */                                  \
     H(2, 2) = 1.0;  /* z */                                  \
+    H(3, 3) = 1.0;  /* theta */                              \
     h = H * EKF.mu;
 
 
