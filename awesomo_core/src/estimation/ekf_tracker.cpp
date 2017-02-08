@@ -106,4 +106,55 @@ int ExtendedKalmanFilterTracker::measurementUpdate(VecX h, MatX H, VecX y) {
   return 0;
 }
 
+void two_wheel_process_model(ExtendedKalmanFilterTracker &ekf,
+                             MatX &G,
+                             VecX &g,
+                             double dt) {
+  // x0 - x
+  // x1 - y
+  // x2 - z
+  // x3 - theta
+  // x4 - v
+  // x5 - vz
+  // x6 - omega
+  // x7 - a
+  // x8 - az
+
+  // g - proces model
+  g(0) = ekf.mu(0) + ekf.mu(4) * cos(ekf.mu(3)) * dt;
+  g(1) = ekf.mu(1) + ekf.mu(4) * sin(ekf.mu(3)) * dt;
+  g(2) = ekf.mu(2) + ekf.mu(5) * dt;
+  g(3) = ekf.mu(3) + ekf.mu(6) * dt;
+  g(4) = ekf.mu(4) + ekf.mu(7) * dt;
+  g(5) = ekf.mu(5) + ekf.mu(8) * dt;
+  g(6) = ekf.mu(6);
+  g(7) = ekf.mu(7);
+  g(8) = ekf.mu(8);
+
+  // G - linearized process model
+  // clang-format off
+  G = MatX::Identity(9, 9);
+  G << 1, 0, 0, -dt * ekf.mu(4) * sin(ekf.mu(3)), dt * cos(ekf.mu(3)), 0,  0,  0,  0,
+       0, 1, 0, dt * ekf.mu(4) * cos(ekf.mu(3)), dt * sin(ekf.mu(3)), 0,  0,  0,  0,
+       0, 0, 1, 0, 0, dt, 0, 0, 0,
+       0, 0, 0, 1, 0, 0, dt, 0, 0,
+       0, 0, 0, 0, 1, 0, 0, dt, 0,
+       0, 0, 0, 0, 0, 1, 0, 0, dt,
+       0, 0, 0, 0, 0, 0, 1, 0, 0,
+       0, 0, 0, 0, 0, 0, 0, 1, 0,
+       0, 0, 0, 0, 0, 0, 0, 0, 1;
+  // clang-format on
+}
+
+void two_wheel_measurement_model(ExtendedKalmanFilterTracker &ekf,
+                                 MatX &H,
+                                 VecX &h) {
+  H = MatX::Zero(4, 9);
+  H(0, 0) = 1.0;  /* x */
+  H(1, 1) = 1.0;  /* y */
+  H(2, 2) = 1.0;  /* z */
+  H(3, 3) = 1.0;  /* theta */
+  h = H * ekf.mu;
+}
+
 }  // end of awesomo namespace

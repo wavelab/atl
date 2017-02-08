@@ -85,8 +85,11 @@ void EstimatorNode::initLTKF(Vec3 target_pos_wf) {
       break;
 
     case EKF_MODE:
-      mu = VecX(7);
-      mu << target_pos_wf(0), target_pos_wf(1), target_pos_wf(2), 0, 0, 0, 0;
+      mu = VecX(9);
+      mu << target_pos_wf(0), target_pos_wf(1), target_pos_wf(2),
+            0, 0, 0,
+            0, 0, 0;
+      log_info("Intialize ExtendedKalmanFilterTracker!");
 
       if (this->ekf_tracker.initialize(mu) != 0) {
         log_err("Failed to intialize ExtendedKalmanFilterTracker!");
@@ -159,7 +162,7 @@ void EstimatorNode::publishLTKFInertialVelocityEstimate(void) {
     case EKF_MODE:
       msg.x = this->ekf_tracker.mu(4) * cos(this->ekf_tracker.mu(3));
       msg.y = this->ekf_tracker.mu(4) * sin(this->ekf_tracker.mu(3));
-      msg.z = this->ekf_tracker.mu(6);
+      msg.z = this->ekf_tracker.mu(5);
       break;
   }
 
@@ -211,7 +214,7 @@ void EstimatorNode::publishLTKFBodyVelocityEstimate(void) {
     case EKF_MODE:
       est_vel(0) = this->ekf_tracker.mu(4) * cos(this->ekf_tracker.mu(3));
       est_vel(1) = this->ekf_tracker.mu(4) * sin(this->ekf_tracker.mu(3));
-      est_vel(2) = this->ekf_tracker.mu(6);
+      est_vel(2) = this->ekf_tracker.mu(5);
       break;
   }
 
@@ -303,24 +306,25 @@ int EstimatorNode::estimateKF(double dt) {
 }
 
 int EstimatorNode::estimateEKF(double dt) {
-  VecX y(4), g(7), h(4);
-  MatX G(7, 7), H(4, 7);
+  VecX y(4), g(9), h(4);
+  MatX G(9, 9), H(4, 9);
 
   // prediction update
-  TWO_WHEEL_3D_NO_INPUTS_MOTION_MODEL(this->ekf_tracker, G, g);
+  two_wheel_process_model(this->ekf_tracker, G, g, dt);
   this->ekf_tracker.predictionUpdate(g, G);
 
   // measurement update
   if (this->target_detected) {
-    TWO_WHEEL_3D_NO_INPUTS_MEASUREMENT_MODEL(this->ekf_tracker, H, h);
+    two_wheel_measurement_model(this->ekf_tracker, H, h);
     this->target_last_pos_wf = this->target_pos_wf;
     // clang-format off
     y << this->target_pos_wf(0),
          this->target_pos_wf(1),
          this->target_pos_wf(2),
-         this->target_yaw_wf;
+         deg2rad(wrapTo180(rad2deg(this->target_yaw_wf)));
     // clang-format on
     this->ekf_tracker.measurementUpdate(h, H, y);
+    std::cout << this->ekf_tracker.mu(4) << std::endl;
   }
 
   return 0;

@@ -50,7 +50,6 @@ public:
 
   PositionController position_controller;
   TrackingController tracking_controller;
-  VelocityController velocity_controller;
   AttitudeCommand att_cmd;
 
   double min_discover_time;

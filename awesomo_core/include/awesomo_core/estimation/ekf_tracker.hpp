@@ -88,5 +88,15 @@ public:
   int measurementUpdate(VecX h, MatX H, VecX y);
 };
 
+void two_wheel_process_model(ExtendedKalmanFilterTracker &ekf,
+                             MatX &G,
+                             VecX &g,
+                             double dt);
+
+void two_wheel_measurement_model(ExtendedKalmanFilterTracker &ekf,
+                                 MatX &H,
+                                 VecX &h);
+
+
 }  // end of awesomo namespace
 #endif
