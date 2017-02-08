@@ -247,7 +247,6 @@ void EstimatorNode::publishQuadHeadingMsg(void) {
   }
 
   // build and publish msg
-  std::cout << rad2deg(this->ekf_tracker.mu(3)) << std::endl;
   switch (mode) {
     case KF_MODE: buildMsg(this->target_yaw_wf, msg); break;
     case EKF_MODE: buildMsg(this->target_yaw_wf, msg); break;

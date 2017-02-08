@@ -3,6 +3,7 @@
 
 #include <float.h>
 #include <math.h>
+#include <iostream>
 
 namespace awesomo {
 

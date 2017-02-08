@@ -234,8 +234,7 @@ int Quadrotor::stepDiscoverMode(double dt) {
 }
 
 int Quadrotor::stepTrackingMode(double dt) {
-  Vec3 terrors, verrors;
-  Vec4 tctrl_output, vctrl_output;
+  Vec3 perrors, verrors;
   bool conditions[3];
 
   // pre-check
@@ -244,20 +243,19 @@ int Quadrotor::stepTrackingMode(double dt) {
   }
 
   // setup
-  terrors(0) = this->landing_target.position_bf(0);
-  terrors(1) = this->landing_target.position_bf(1);
-  terrors(2) = this->hover_position(2) - this->pose.position(2);
+  perrors(0) = this->landing_target.position_bf(0);
+  perrors(1) = this->landing_target.position_bf(1);
+  perrors(2) = this->hover_position(2) - this->pose.position(2);
 
   verrors(0) = this->landing_target.velocity_bf(0);
   verrors(1) = this->landing_target.velocity_bf(1);
   verrors(2) = 0.0;
 
   // track target
-  Vec3 tmp;
-  tmp << 0.0, 0.0, 0.0;
-  tctrl_output = this->tracking_controller.calculate(terrors, this->heading, dt);
-  vctrl_output = this->velocity_controller.calculate(verrors, tmp, dt);
-  this->att_cmd = AttitudeCommand(tctrl_output + vctrl_output);
+  this->att_cmd = this->tracking_controller.calculate(perrors,
+                                                      verrors,
+                                                      this->heading,
+                                                      dt);
 
   // update hover position and tracking timer
   this->setHoverXYPosition(this->pose.position);
@@ -271,9 +269,9 @@ int Quadrotor::stepTrackingMode(double dt) {
   conditions[2] = mtoc(&this->tracking_tic) > this->min_tracking_time;
 
   if (this->conditionsMet(conditions, 3)) {
-    // transition to landing mode
-    this->setMode(LANDING_MODE);
-    this->tracking_tic = (struct timespec){0};
+    // // transition to landing mode
+    // this->setMode(LANDING_MODE);
+    // this->tracking_tic = (struct timespec){0};
 
   } else if (this->landing_target.isTargetLosted()) {
     // transition back to discover mode
@@ -303,7 +301,9 @@ int Quadrotor::stepLandingMode(double dt) {
   errors(2) = this->hover_position(2) - position(2);
 
   // land on target
-  output = this->tracking_controller.calculate(errors, this->heading, dt);
+  output = this->tracking_controller.calculatePositionErrors(errors,
+                                                             this->heading,
+                                                             dt);
   this->att_cmd = AttitudeCommand(output);
   this->setHoverXYPosition(position);
   if (this->landing_tic.tv_sec == 0) {

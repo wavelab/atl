@@ -153,8 +153,8 @@ TEST(ExtendedKalmanFilterTracker, estimate2) {
 
 TEST(ExtendedKalmanFilterTracker, estimate3) {
   float dt;
-  VecX u(3), mu(7), x(7), y(3), g(7), h(3), gaussian_noise(3);
-  MatX G(7, 7), H(3, 7);
+  VecX u(3), mu(7), x(7), y(4), g(7), h(4), gaussian_noise(4);
+  MatX G(7, 7), H(4, 7);
   ExtendedKalmanFilterTracker tracker;
   std::ofstream output_file;
   std::default_random_engine rgen;
@@ -188,8 +188,13 @@ TEST(ExtendedKalmanFilterTracker, estimate3) {
     // clang-format on
 
     // take measurement
-    gaussian_noise << norm_x(rgen), norm_y(rgen), norm_z(rgen);
-    y = x.block(0, 0, 3, 1) + gaussian_noise;
+    // clang-format off
+    gaussian_noise << norm_x(rgen),
+                      norm_y(rgen),
+                      norm_z(rgen),
+                      norm_theta(rgen);
+    y = x.block(0, 0, 4, 1) + gaussian_noise;
+    // clang-format on
 
     // propagate motion model
     TWO_WHEEL_3D_NO_INPUTS_MOTION_MODEL(tracker, G, g);

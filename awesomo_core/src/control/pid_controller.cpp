@@ -36,6 +36,7 @@ double PID::calculate(double setpoint, double input, double dt) {
   error = setpoint - input;
   this->error_sum += error * dt;
 
+
   // calculate output
   this->error_p = this->k_p * error;
   this->error_i = this->k_i * this->error_sum;
