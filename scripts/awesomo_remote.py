@@ -201,7 +201,7 @@ if __name__ == "__main__":
     # gimbal.set_attitude([0.0, 0.0])
 
     lz.set_velocity(1.0)
-    # lz.set_position([0, 0, 0])
+    # lz.set_position([0, 1, 0])
 
     # velocity, angular_velocity = lz_circle_path(20, 2.0)
     # lz.set_velocity(velocity)

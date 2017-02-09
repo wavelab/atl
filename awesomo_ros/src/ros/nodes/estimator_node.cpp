@@ -65,7 +65,7 @@ int EstimatorNode::configure(std::string node_name, int hz) {
   return 0;
 }
 
-void EstimatorNode::initLTKF(Vec3 target_pos_wf) {
+void EstimatorNode::initLTKF(Vec3 x0) {
   VecX mu;
 
   // initialize estimator
@@ -73,26 +73,29 @@ void EstimatorNode::initLTKF(Vec3 target_pos_wf) {
     case KF_MODE:
       // clang-format off
       mu = VecX(9);
-      mu << target_pos_wf(0), target_pos_wf(1), target_pos_wf(2),
+      mu << x0(0), x0(1), x0(2),
             0.0, 0.0, 0.0,
             0.0, 0.0, 0.0;
       // clang-format on
 
+      ROS_INFO("Intializing KF!");
       if (this->kf_tracker.initialize(mu) != 0) {
-        log_err("Failed to intialize KalmanFilterTracker!");
+        ROS_ERROR("Failed to intialize KalmanFilterTracker!");
         exit(-1);  // dangerous but necessary
       }
       break;
 
     case EKF_MODE:
+      // clang-format off
       mu = VecX(9);
-      mu << target_pos_wf(0), target_pos_wf(1), target_pos_wf(2),
+      mu << x0(0), x0(1), x0(2),
             0, 0, 0,
             0, 0, 0;
-      log_info("Intialize ExtendedKalmanFilterTracker!");
+      // clang-format on
 
+      ROS_INFO("Intializing EKF!");
       if (this->ekf_tracker.initialize(mu) != 0) {
-        log_err("Failed to intialize ExtendedKalmanFilterTracker!");
+        ROS_ERROR("Failed to intialize ExtendedKalmanFilterTracker!");
         exit(-1);  // dangerous but necessary
       }
       break;
@@ -101,8 +104,8 @@ void EstimatorNode::initLTKF(Vec3 target_pos_wf) {
   this->initialized = true;
 }
 
-void EstimatorNode::resetLTKF(Vec3 target_pos_wf) {
-  this->initLTKF(target_pos_wf);
+void EstimatorNode::resetLTKF(Vec3 x0) {
+  this->initLTKF(x0);
 }
 
 void EstimatorNode::quadPoseCallback(const geometry_msgs::PoseStamped &msg) {
@@ -309,22 +312,29 @@ int EstimatorNode::estimateEKF(double dt) {
   VecX y(4), g(9), h(4);
   MatX G(9, 9), H(4, 9);
 
+  // setup
+  H = MatX::Zero(4, 9);
+  y(0) = this->target_pos_wf(0);
+  y(1) = this->target_pos_wf(1);
+  y(2) = this->target_pos_wf(2);
+  y(3) = deg2rad(wrapTo180(rad2deg(this->target_yaw_wf)));
+
   // prediction update
   two_wheel_process_model(this->ekf_tracker, G, g, dt);
   this->ekf_tracker.predictionUpdate(g, G);
 
   // measurement update
   if (this->target_detected) {
-    two_wheel_measurement_model(this->ekf_tracker, H, h);
-    this->target_last_pos_wf = this->target_pos_wf;
-    // clang-format off
-    y << this->target_pos_wf(0),
-         this->target_pos_wf(1),
-         this->target_pos_wf(2),
-         deg2rad(wrapTo180(rad2deg(this->target_yaw_wf)));
-    // clang-format on
+    H(0, 0) = 1.0;  /* x */
+    H(1, 1) = 1.0;  /* y */
+    H(2, 2) = 1.0;  /* z */
+    H(3, 3) = 1.0;  /* theta */
+    h = H * this->ekf_tracker.mu_p;
     this->ekf_tracker.measurementUpdate(h, H, y);
-    std::cout << this->ekf_tracker.mu(4) << std::endl;
+
+  } else {
+    this->ekf_tracker.mu = this->ekf_tracker.mu_p;
+
   }
 
   return 0;
@@ -349,6 +359,7 @@ int EstimatorNode::loopCallback(void) {
 
   // check if target is losted
   if (mtoc(&this->target_last_updated) > this->target_lost_threshold) {
+    ROS_INFO("Target losted, resetting estimator!");
     this->initialized = false;
   }
 

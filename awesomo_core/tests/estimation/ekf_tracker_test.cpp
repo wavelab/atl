@@ -234,20 +234,22 @@ TEST(ExtendedKalmanFilterTracker, estimate3) {
 
   // setup
   // clang-format off
-  dt = 0.1;
+  dt = 0.01;
   x << 0, 0, 0,
        0, 1.0, 0,
        0, 0, 0;
-  mu = x;
-  mu(4) = 0.0;
-  u << 0.1, 0.0, 0.0;
+  mu << 0, 0, 0,
+       0, 1.0, 0,
+       0, 0, 0;
+  u << 0.0, 0.0, 0.0;
+
   tracker.configure(TEST_CONFIG3);
   tracker.initialize(mu);
   prepareOutputFile(output_file, TEST_OUTPUT_FILE);
   // clang-format on
 
   // estimate
-  for (int i = 0; i < 600; i++) {
+  for (int i = 0; i < 1000; i++) {
     // update true state
     // clang-format off
     x(0) = x(0) + x(4) * cos(x(3)) * dt;
@@ -275,7 +277,14 @@ TEST(ExtendedKalmanFilterTracker, estimate3) {
     tracker.predictionUpdate(g, G);
 
     // propagate measurement
-    two_wheel_measurement_model(tracker, H, h);
+    H = MatX::Zero(4, 9);
+    if (i % 3 == 0) {
+      H(0, 0) = 1.0;  /* x */
+      H(1, 1) = 1.0;  /* y */
+      H(2, 2) = 1.0;  /* z */
+      H(3, 3) = 1.0;  /* theta */
+    }
+    h = H * tracker.mu_p;
     tracker.measurementUpdate(h, H, y);
 
     // record true state x, y, z

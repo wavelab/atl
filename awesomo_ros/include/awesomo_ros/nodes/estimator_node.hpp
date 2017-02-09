@@ -15,7 +15,7 @@ namespace awesomo {
 
 // NODE SETTINGS
 #define NODE_NAME "awesomo_estimator"
-#define NODE_RATE 100
+#define NODE_RATE 50
 
 // PUBLISH TOPICS
 #define LT_INERTIAL_POSITION_TOPIC "/awesomo/estimate/landing_target/position/inertial"
