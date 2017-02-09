@@ -36,6 +36,25 @@ void buildMsg(Quaternion q, geometry_msgs::Quaternion &msg) {
 
 void buildMsg(int seq,
               ros::Time time,
+              Pose pose,
+              geometry_msgs::PoseStamped &msg) {
+
+  msg.header.seq = seq;
+  msg.header.stamp = time;
+  msg.header.frame_id = "awesomo_quadrotor_pose";
+
+  msg.pose.position.x = pose.position(0);
+  msg.pose.position.y = pose.position(1);
+  msg.pose.position.z = pose.position(2);
+
+  msg.pose.orientation.w = pose.orientation.w();
+  msg.pose.orientation.x = pose.orientation.x();
+  msg.pose.orientation.y = pose.orientation.y();
+  msg.pose.orientation.z = pose.orientation.z();
+}
+
+void buildMsg(int seq,
+              ros::Time time,
               AttitudeCommand att_cmd,
               geometry_msgs::PoseStamped &msg,
               std_msgs::Float64 &thr_msg) {

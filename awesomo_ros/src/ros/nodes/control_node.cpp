@@ -31,7 +31,8 @@ int ControlNode::configure(const std::string node_name, int hz) {
   this->registerPublisher<geometry_msgs::PoseStamped>(SETPOINT_POSITION_TOPIC);
   this->registerPublisher<awesomo_msgs::PCtrlStats>(PCTRL_STATS_TOPIC);
   this->registerPublisher<awesomo_msgs::PCtrlSettings>(PCTRL_GET_TOPIC);
-  // clang-format on
+  this->registerPublisher<geometry_msgs::PoseStamped>(QUADROTOR_POSE, 1);
+ // clang-format on
 
   // subscribers
   // clang-format off
@@ -199,6 +200,7 @@ int ControlNode::loopCallback(void) {
   AttitudeCommand att_cmd;
   std_msgs::Float64 thr_msg;
   geometry_msgs::PoseStamped att_msg;
+  geometry_msgs::PoseStamped quad_pose_msg;
 
   // setup
   seq = this->ros_seq;
@@ -212,9 +214,12 @@ int ControlNode::loopCallback(void) {
   // publish msgs
   att_cmd = this->quadrotor.att_cmd;
   buildMsg(seq, ros::Time::now(), att_cmd, att_msg, thr_msg);
+  buildMsg(seq, ros::Time::now(), this->quadrotor.pose, quad_pose_msg);
+
   if (this->armed || this->sim_mode) {
       this->ros_pubs[SETPOINT_ATTITUDE_TOPIC].publish(att_msg);
       this->ros_pubs[SETPOINT_THROTTLE_TOPIC].publish(thr_msg);
+      this->ros_pubs[QUADROTOR_POSE].publish(quad_pose_msg);
       this->publishStats();
 
   } else {
@@ -251,7 +256,7 @@ void ControlNode::publishStats(void) {
   // clang-format on
 
   // publish
-  // this->ros_pubs[PCTRL_STATS_TOPIC].publish(pcs_stats_msg);
+  this->ros_pubs[PCTRL_STATS_TOPIC].publish(pc_stats_msg);
   // this->ros_pubs[PCTRL_GET].publish(pcs_settings_msg);
 }
 
