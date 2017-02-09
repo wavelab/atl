@@ -65,7 +65,6 @@ public:
   bool initialized;
 
   int nb_states;
-  int nb_dimensions;
   std::string config_file;
 
   VecX mu;

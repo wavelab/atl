@@ -217,10 +217,10 @@ TEST(ExtendedKalmanFilterTracker, estimate3) {
   ExtendedKalmanFilterTracker tracker;
   std::ofstream output_file;
   std::default_random_engine rgen;
-  std::normal_distribution<float> norm_x(0, pow(0.2, 2));
-  std::normal_distribution<float> norm_y(0, pow(0.2, 2));
-  std::normal_distribution<float> norm_z(0, pow(0.01, 2));
-  std::normal_distribution<float> norm_theta(0, pow(deg2rad(0.5), 2));
+  std::normal_distribution<float> norm_x(0, pow(0.5, 2));
+  std::normal_distribution<float> norm_y(0, pow(0.5, 2));
+  std::normal_distribution<float> norm_z(0, pow(0.5, 2));
+  std::normal_distribution<float> norm_theta(0, pow(deg2rad(10), 2));
 
   // x0 - x
   // x1 - y
@@ -283,9 +283,12 @@ TEST(ExtendedKalmanFilterTracker, estimate3) {
       H(1, 1) = 1.0;  /* y */
       H(2, 2) = 1.0;  /* z */
       H(3, 3) = 1.0;  /* theta */
+      h = H * tracker.mu_p;
+      tracker.measurementUpdate(h, H, y);
+    } else {
+      tracker.mu = tracker.mu_p;
+
     }
-    h = H * tracker.mu_p;
-    tracker.measurementUpdate(h, H, y);
 
     // record true state x, y, z
     output_file << i << ",";

@@ -64,7 +64,7 @@ int KalmanFilterTracker::initialize(VecX mu) {
 
   this->S = MatX::Identity(this->nb_states, this->nb_states);
   this->I = MatX::Identity(this->nb_states, this->nb_states);
-  this->K = MatX::Zero(this->nb_states, this->nb_states);
+  this->K;
 
   this->mu_p = VecX::Zero(this->nb_states);
   this->S_p = MatX::Zero(this->nb_states, this->nb_states);

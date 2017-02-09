@@ -8,7 +8,6 @@ ExtendedKalmanFilterTracker::ExtendedKalmanFilterTracker(void) {
   this->initialized = false;
 
   this->nb_states = 0;
-  this->nb_dimensions = 0;
   this->config_file = "";
 
   this->mu = VecX::Zero(1);
@@ -30,7 +29,6 @@ int ExtendedKalmanFilterTracker::configure(std::string config_file) {
 
   // parse and load config file
   parser.addParam<int>("nb_states", &this->nb_states);
-  parser.addParam<int>("nb_dimensions", &this->nb_dimensions);
   parser.addParam<MatX>("motion_noise_matrix", &this->R);
   parser.addParam<MatX>("measurement_noise_matrix", &this->Q);
   this->config_file = config_file;
@@ -56,7 +54,7 @@ int ExtendedKalmanFilterTracker::initialize(VecX mu) {
 
   this->S = MatX::Identity(this->nb_states, this->nb_states);
   this->I = MatX::Identity(this->nb_states, this->nb_states);
-  this->K = MatX::Zero(this->nb_states, this->nb_states);
+  this->K;
 
   this->mu_p = VecX::Zero(this->nb_states);
   this->S_p = MatX::Zero(this->nb_states, this->nb_states);
@@ -144,7 +142,6 @@ void two_wheel_process_model(ExtendedKalmanFilterTracker &ekf,
        0, 0, 0, 0, 0, 0, 0, 1, 0,
        0, 0, 0, 0, 0, 0, 0, 0, 1;
   // clang-format on
-
 }
 
 void two_wheel_measurement_model(ExtendedKalmanFilterTracker &ekf,
