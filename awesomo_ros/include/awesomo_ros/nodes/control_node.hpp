@@ -32,6 +32,7 @@ namespace awesomo {
 #define SETPOINT_POSITION_TOPIC "/mavros/setpoint_position/local"
 #define PCTRL_STATS_TOPIC "/awesomo/position_controller/stats"
 #define PCTRL_GET_TOPIC "/awesomo/control/position_controller/get"
+#define QUADROTOR_POSE "awesomo/control/quad_pose"
 
 // SUBSCRIBE TOPICS
 #define MODE_TOPIC "/mavros/set_mode"
@@ -48,6 +49,7 @@ namespace awesomo {
 #define HOVER_SET_TOPIC "/awesomo/control/hover/set"
 #define HOVER_HEIGHT_SET_TOPIC "/awesomo/control/hover/height/set"
 #define PCTRL_SET_TOPIC "/awesomo/control/position_controller/set"
+
 
 class ControlNode : public ROSNode {
 public:

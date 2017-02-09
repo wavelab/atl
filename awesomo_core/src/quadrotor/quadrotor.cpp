@@ -95,7 +95,6 @@ int Quadrotor::setPose(Pose pose) {
 
   // set pose
   this->pose = pose;
-
   return 0;
 }
 

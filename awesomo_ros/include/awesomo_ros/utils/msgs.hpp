@@ -32,6 +32,10 @@ void buildMsg(Vec3 vec, geometry_msgs::Point &msg);
 void buildMsg(Quaternion q, geometry_msgs::Quaternion &msg);
 void buildMsg(int seq,
               ros::Time time,
+              Pose pose,
+              geometry_msgs::PoseStamped &msg);
+void buildMsg(int seq,
+              ros::Time time,
               AttitudeCommand att_cmd,
               geometry_msgs::PoseStamped &msg,
               std_msgs::Float64 &thr_msg);
