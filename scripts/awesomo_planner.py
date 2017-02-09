@@ -1,18 +1,34 @@
 #!/usr/bin/env python3
+import itertools
+
 from math import cos
 from math import sin
 from math import asin
 
-import scipy.optimize
 import numpy as np
+import scipy.optimize
 import matplotlib.pylab as plt
 
 
-def quadrotor(x, u, dt):
+def frange(x, y, jump, digits=0):
+    array = []
+    while x < y:
+        array.append(round(x, digits))
+        x += jump
+
+    return array
+
+
+def quadrotor(x, u, dt, cdx=0.5, cdz=0.2):
+    g = 10.0
+    h_ge = 1.0
+    k_ge = 0.2
+    a_ge = k_ge * (h_ge - min(h_ge, x[2])) / h_ge
+
     x[0] += x[1] * dt
-    x[1] += (u[0] * sin(u[1]) - 0.5 * x[1]) * dt
+    x[1] += (u[0] * sin(u[1]) - cdx * x[1]) * dt
     x[2] += x[3] * dt
-    x[3] += (u[0] * cos(u[1]) - 10.0 - 0.2 * x[3]) * dt
+    x[3] += (u[0] * cos(u[1]) * (1 + a_ge) - g - cdz * x[3]) * dt
 
     return x
 
@@ -22,7 +38,13 @@ def desired_system(p0, pf, T, dt):
     traj = []
 
     # calculate line equation, gradient and intersect
-    m = (p0[1] - pf[1]) / (p0[0] - pf[0])
+    dx = (p0[0] - pf[0])
+    dy = (p0[1] - pf[1])
+    if dx != 0.0:
+        m = dy / dx
+    else:
+        m = p0[0]
+
     c = p0[1] - m * p0[0]
     vx = (pf[0] - p0[0]) / (T * dt)
     vz = (pf[1] - p0[1]) / (T * dt)
@@ -56,6 +78,20 @@ def desired_system(p0, pf, T, dt):
     return (np.array(desired), np.array(traj))
 
 
+def generate_bounds(T, n, m, nbs, mbs):
+    x = []
+    for i in range(0, T):
+        # state bounds
+        for j in range(n):
+            x.append(nbs[j])
+
+        # input bounds
+        for k in range(m):
+            x.append(mbs[k])
+
+    return tuple(x)
+
+
 def plot_desired_trajectory(traj):
     traj = traj.T
     plt.plot(traj[0], traj[1])
@@ -64,7 +100,7 @@ def plot_desired_trajectory(traj):
     plt.show()
 
 
-def plot_results(traj, x, T, n, m):
+def plot_optimization_results(traj, x, T, n, m):
     # setup
     x = x.reshape(T, n + m).T
     traj = traj.T
@@ -106,6 +142,25 @@ def plot_results(traj, x, T, n, m):
     plt.show()
 
 
+def plot_inputs_based_trajectory(T, dt, n, m, x0, result):
+    # plot real trajectory using only inputs
+    x = [x0[0][0], x0[0][1], x0[0][2], x0[0][3]]
+    pos_x = [x[0]]
+    pos_y = [x[2]]
+    states = result.x.reshape(T, n + m).T
+    for i in range(T):
+        u = [states[4][i], states[5][i]]
+        x = quadrotor(x, u, dt)
+        pos_x.append(x[0])
+        pos_y.append(x[2])
+
+    plt.title("Optimal Control Trajectory")
+    plt.plot(pos_x, pos_y)
+    plt.xlabel("x")
+    plt.ylabel("z")
+    plt.show()
+
+
 def cost_func(x, args):
     cost = 0.0
 
@@ -119,11 +174,14 @@ def cost_func(x, args):
 
     # control input cost
     cost += 0.5 * np.linalg.norm(states[4])  # az
-    cost += 2.0 * np.linalg.norm(states[5])  # theta
+    cost += 0.5 * np.linalg.norm(states[5])  # theta
 
     # control input difference cost
-    cost += 1.0 * pow(np.sum(np.diff(states[4])), 2)  # az
-    cost += 1.0 * pow(np.sum(np.diff(states[5])), 2)  # theta
+    cost += 0.5 * pow(np.sum(np.diff(states[4])), 2)  # az
+    cost += 0.5 * pow(np.sum(np.diff(states[5])), 2)  # theta
+
+    # end cost to bias to matched landing ??
+    # cost += 15.0 * pow(x[-1], 2)
 
     return cost
 
@@ -145,13 +203,21 @@ def ine_constraints(x, *args):
     # calculate vector valued inequality constraints
     x_prev = x[0]
     for x_curr in x[1:]:
+        c_dx = 0.5
+        c_dz = 0.2
+        g = 10.0
+
+        h_ge = 0.5
+        k_ge = 0.2
+        a_ge = k_ge * (h_ge - min(h_ge, x_curr[2])) / h_ge
+
         # calculate error between optimized velocity and feasible velocity
         state_curr = np.array(x_curr[0:4])
         state_feas = x_prev[0:4] + np.array([
-            x_prev[1],                                            # vx
-            x_prev[4] * sin(x_prev[5]) - 0.5 * x_prev[1],         # ax
-            x_prev[3],                                            # vz
-            x_prev[4] * cos(x_prev[5]) - 10.0 - 0.2 * x_prev[3]   # az
+            x_prev[1],
+            x_prev[4] * sin(x_prev[5]) - c_dx * x_prev[1],
+            x_prev[3],
+            (x_prev[4] * cos(x_prev[5])) * (1 + a_ge) - g - c_dz * x_prev[3]
         ]) * dt
 
         retval = np.append(retval, state_feas - state_curr)
@@ -160,14 +226,28 @@ def ine_constraints(x, *args):
     return retval
 
 
-if __name__ == "__main__":
-    T = 20      # num of time steps
+def optimize(p0, pf):
+    T = 30      # num of time steps
     dt = 0.1    # time step
     n = 4       # num of states
     m = 2       # num of inputs
 
-    p0 = np.array([0.0, 5.0])  # start position (x, z)
-    pf = np.array([5.0, 0.0])  # end position (x, z)
+    # state bounds
+    state_bounds = (
+        (None, None),  # x
+        (None, None),  # vx
+        (0, None),  # z
+        (None, None)  # vz
+    )
+
+    # input bounds
+    input_bounds = (
+        (0, 20),  # az
+        (-0.5235, 0.5235)  # theta
+    )
+
+    # generate bounds for all time steps
+    bounds = generate_bounds(T, n, m, state_bounds, input_bounds)
 
     # setup
     x0, traj = desired_system(p0, pf, T, dt)
@@ -196,27 +276,70 @@ if __name__ == "__main__":
     ]
 
     # optimize
-    result = scipy.optimize.minimize(cost_func,
-                                     x0,
-                                     args=args,
-                                     constraints=constraints)
+    results = scipy.optimize.minimize(cost_func,
+                                      x0,
+                                      args=args,
+                                      constraints=constraints,
+                                      bounds=bounds)
 
     # plot optimization results
-    plot_results(traj, result.x, T, n, m)
+    # plot_optimization_results(traj, results.x, T, n, m)
+    # plot_inputs_based_trajectory(T, dt, n, m, x0, results)
 
-    # plot real trajectory using only inputs
-    # x = [x0[0][0], x0[0][1], x0[0][2], x0[0][3]]
-    # pos_x = [x[0]]
-    # pos_y = [x[2]]
-    # states = result.x.reshape(T, n + m).T
-    # for i in range(T):
-    #     u = [states[4][i], states[5][i]]
-    #     x = quadrotor(x, u, dt)
-    #     pos_x.append(x[0])
-    #     pos_y.append(x[2])
-    #
-    # plt.title("Optimal Control Trajectory")
-    # plt.plot(pos_x, pos_y)
-    # plt.xlabel("x")
-    # plt.ylabel("z")
-    # plt.show()
+    return (T, n, m, results)
+
+
+def record_optimized_results(T, n, m, fpath, results):
+    # setup
+    f = open(fpath, "wb")
+    f.write(bytes("x,vx,z,vz,az,theta\n", "UTF-8"))
+
+    states = results.x.reshape(T, n + m)
+    for x in states:
+        for i in x:
+            f.write(bytes(str(i), "UTF-8"))
+            f.write(bytes(",", "UTF-8"))
+        f.write(bytes("\n", "UTF-8"))
+    f.close()
+
+
+def generate_trajectory_table():
+    p0_x = [0.0]
+    p0_z = frange(2, 10, 0.1, 1)
+    pf_x = frange(0, 10, 0.1, 1)
+    pf_z = [0.0]
+
+    conditions = [p0_x, p0_z, pf_x, pf_z]
+    conditions = list(itertools.product(*conditions))
+
+    table = []
+    for c in conditions:
+        if c[1] != 0.0:
+            table.append(c)
+
+    return table
+
+
+if __name__ == "__main__":
+    basedir = "./trajectory/"
+    table = generate_trajectory_table()
+    index = 0
+
+    # prep index file
+    index_file = open(basedir + "index.csv", "wb")
+    index_file.write(bytes("index,p0,pf\n", "UTF-8"))
+
+    # create trajectory table
+    for t in table:
+        p0 = (t[0], t[1])
+        pf = (t[2], t[3])
+        filepath = basedir + str(index) + ".csv"
+        index_file.write(bytes("{0},{1},{2}\n".format(index, p0, pf), "UTF-8"))
+        index += 1
+
+        print("Optimizing for {0} to {1}".format(p0, pf))
+        T, n, m, results = optimize(p0, pf)
+        record_optimized_results(T, n, m, filepath, results)
+
+    # close index file
+    index_file.close()

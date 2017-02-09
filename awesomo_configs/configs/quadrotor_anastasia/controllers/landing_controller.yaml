@@ -1,26 +1,40 @@
-thrust_controller:
-    hover_throttle: 0.5
-    setpoint: 1.0
-    deadzone: 0.0
-    min: -0.4
-    max: 0.4
+roll_controller:
     k_p: 0.1
     k_i: 0.0
     k_d: 0.05
 
-landing:
-    height_update:
-        period: 0.3
-        multiplier:
-            descend: 0.8
-            recover: 1.2
+pitch_controller:
+    k_p: 0.1
+    k_i: 0.0
+    k_d: 0.05
 
-    disarm_conditions:
-        # x, y ,z disarm conditions from AprilTag center
-        x_cutoff: 0.15
-        y_cutoff: 0.15
-        z_cutoff: 0.15
+throttle_controller:
+    hover_throttle: 0.5
+    k_p: 0.4
+    k_i: 0.0
+    k_d: 0.2
 
-        # num of frames apriltag is detected before disarm
-        # this introduces redundancy rejection
-        belief_threshold: 200
+vx_controller:
+    k_p: 0.1
+    k_i: 0.0
+    k_d: 0.01
+vy_controller:
+    k_p: 0.1
+    k_i: 0.0
+    k_d: 0.01
+vz_controller:
+    k_p: 0.1
+    k_i: 0.0
+    k_d: 0.01
+
+roll_limit:
+    min: -30.0
+    max: 30.0
+
+pitch_limit:
+    min: -30.0
+    max: 30.0
+
+throttle_limit:
+    min: -1.0
+    max: 1.0

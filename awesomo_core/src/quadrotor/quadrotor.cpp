@@ -8,6 +8,7 @@ Quadrotor::Quadrotor(void) {
 
   this->position_controller = PositionController();
   this->tracking_controller = TrackingController();
+  this->landing_controller = LandingController();
   this->att_cmd = AttitudeCommand();
 
   this->min_discover_time = FLT_MAX;
@@ -33,6 +34,10 @@ int Quadrotor::configure(std::string config_path) {
   // tracking controller
   config_file = config_path + "/controllers/" + "tracking_controller.yaml";
   CONFIGURE_CONTROLLER(this->tracking_controller, config_file, FCONFTCTRL);
+
+  // landing controller
+  config_file = config_path + "/controllers/" + "landing_controller.yaml";
+  CONFIGURE_CONTROLLER(this->landing_controller, config_file, FCONFTCTRL);
 
   // load config
   // clang-format off
