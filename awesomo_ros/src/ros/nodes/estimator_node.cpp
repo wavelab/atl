@@ -23,25 +23,25 @@ int EstimatorNode::configure(std::string node_name, int hz) {
 
   switch (this->mode) {
     case KF_MODE:
-      ROS_INFO("Estimator running in KF_MODE!");
+      log_info("Estimator running in KF_MODE!");
       this->ros_nh->getParam("/kf_tracker_config", config_file);
       if (this->kf_tracker.configure(config_file) != 0) {
-        ROS_ERROR("Failed to configure KalmanFilterTracker!");
+        log_err("Failed to configure KalmanFilterTracker!");
         return -2;
       }
       break;
 
     case EKF_MODE:
-      ROS_INFO("Estimator running in EKF_MODE!");
+      log_info("Estimator running in EKF_MODE!");
       this->ros_nh->getParam("/ekf_tracker_config", config_file);
       if (this->ekf_tracker.configure(config_file) != 0) {
-        ROS_ERROR("Failed to configure ExtendedKalmanFilterTracker!");
+        log_err("Failed to configure ExtendedKalmanFilterTracker!");
         return -2;
       }
       break;
 
     default:
-      ROS_ERROR("Invalid Tracker Mode!");
+      log_err("Invalid Tracker Mode!");
       return -2;
   }
 
@@ -78,9 +78,9 @@ void EstimatorNode::initLTKF(Vec3 x0) {
             0.0, 0.0, 0.0;
       // clang-format on
 
-      ROS_INFO("Intializing KF!");
+      log_info("Intializing KF!");
       if (this->kf_tracker.initialize(mu) != 0) {
-        ROS_ERROR("Failed to intialize KalmanFilterTracker!");
+        log_err("Failed to intialize KalmanFilterTracker!");
         exit(-1);  // dangerous but necessary
       }
       break;
@@ -93,9 +93,9 @@ void EstimatorNode::initLTKF(Vec3 x0) {
             0, 0, 0;
       // clang-format on
 
-      ROS_INFO("Intializing EKF!");
+      log_info("Intializing EKF!");
       if (this->ekf_tracker.initialize(mu) != 0) {
-        ROS_ERROR("Failed to intialize ExtendedKalmanFilterTracker!");
+        log_err("Failed to intialize ExtendedKalmanFilterTracker!");
         exit(-1);  // dangerous but necessary
       }
       break;
@@ -359,7 +359,7 @@ int EstimatorNode::loopCallback(void) {
 
   // check if target is losted
   if (mtoc(&this->target_last_updated) > this->target_lost_threshold) {
-    ROS_INFO("Target losted, resetting estimator!");
+    log_info("Target losted, resetting estimator!");
     this->initialized = false;
   }
 

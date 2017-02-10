@@ -149,9 +149,9 @@ Vec4 LandingController::calculateVelocityErrors(Vec3 errors,
   r = -this->vy_controller.calculate(errors(1), 0.0, this->vctrl_dt);
   p = this->vx_controller.calculate(errors(0), 0.0, this->vctrl_dt);
   y = 0.0;
-  t = this->vz_controller.calculate(errors(2), 0.0, this->vctrl_dt);
+  t = this->hover_throttle + this->vz_controller.calculate(errors(2), 0.0, this->vctrl_dt);
   t /= fabs(cos(r) * cos(p));  // adjust throttle for roll and pitch
-  // clang-format o
+  // clang-format on
 
   // limit roll, pitch
   r = (r < this->roll_limit[0]) ? this->roll_limit[0] : r;
@@ -175,7 +175,7 @@ AttitudeCommand LandingController::calculate(Vec3 pos_errors,
                                               Vec3 vel_errors,
                                               double yaw,
                                               double dt) {
-  this->calculatePositionErrors(pos_errors, yaw, dt);
+  // this->calculatePositionErrors(pos_errors, yaw, dt);
   this->calculateVelocityErrors(vel_errors, yaw, dt);
   this->att_cmd = AttitudeCommand(this->pctrl_outputs + this->vctrl_outputs);
   return this->att_cmd;
