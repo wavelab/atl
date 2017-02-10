@@ -371,4 +371,41 @@ double wrapTo360(double euler_angle) {
   }
 }
 
+double cross_track_error(Vec2 p1, Vec2 p2, Vec2 pos) {
+  double x0, y0;
+  double x1, y1;
+  double x2, y2;
+  double numerator, denominator;
+
+  // setup
+  x0 = pos(0);
+  y0 = pos(1);
+
+  x1 = p1(0);
+  y1 = p1(0);
+
+  x2 = p2(0);
+  y2 = p2(0);
+
+  // calculate perpendicular distance between line (p1, p2) and point (pos)
+  numerator = ((y2 - y1) * x0 - (x2 - x1) * y0 + x2 * y1 - y2 * x1);
+  denominator = sqrt(pow(y2 - y1, 2) + pow(x2 - x1, 2));
+  return fabs(numerator) / denominator;
+}
+
+int point_left_right(Vec2 a, Vec2 b, Vec2 c) {
+  double x;
+
+  x = (b(0) - a(0)) * (c(1) - a(1)) - (b(1) - a(1)) * (c(0) - a(0));
+  if (x > 0) {
+    return 1;  // left
+  } else if (x < 0) {
+    return 2;  // right
+  } else if (x == 0) {
+    return 0;  // parallel
+  }
+
+  return -1;
+}
+
 }  // eof awesomo

@@ -433,7 +433,54 @@ TEST(Utils, wrapTo360) {
 
   retval = wrapTo360(-90.0);
   ASSERT_FLOAT_EQ(270.0, retval);
+}
 
+TEST(Utils, cross_track_error) {
+  Vec2 pos, p1, p2;
+
+  pos << 2, 2;
+  p1 << 1, 1;
+  p2 << 5, 5;
+  ASSERT_FLOAT_EQ(0.0, cross_track_error(p1, p2, pos));
+
+  pos << 2, 3;
+  p1 << 1, 1;
+  p2 << 5, 5;
+  ASSERT_TRUE(0.0 < cross_track_error(p1, p2, pos));
+}
+
+TEST(Utils, point_left_right) {
+  Vec2 pos, p1, p2;
+
+  pos << 2, 3;
+  p1 << 1, 1;
+  p2 << 5, 5;
+  ASSERT_EQ(1, point_left_right(p1, p2, pos));
+
+  pos << 2, 1;
+  p1 << 1, 1;
+  p2 << 5, 5;
+  ASSERT_EQ(2, point_left_right(p1, p2, pos));
+
+  pos << 2, 2;
+  p1 << 1, 1;
+  p2 << 5, 5;
+  ASSERT_EQ(0, point_left_right(p1, p2, pos));
+
+  pos << 2, 1;
+  p1 << 5, 5;
+  p2 << 1, 1;
+  ASSERT_EQ(1, point_left_right(p1, p2, pos));
+
+  pos << 2, 3;
+  p1 << 5, 5;
+  p2 << 1, 1;
+  ASSERT_EQ(2, point_left_right(p1, p2, pos));
+
+  pos << 2, 2;
+  p1 << 5, 5;
+  p2 << 1, 1;
+  ASSERT_EQ(0, point_left_right(p1, p2, pos));
 }
 
 }  // end of awesomo namespace
