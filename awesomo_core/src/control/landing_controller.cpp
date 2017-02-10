@@ -149,19 +149,17 @@ Vec4 LandingController::calculateVelocityErrors(Vec3 errors,
   r = -this->vy_controller.calculate(errors(1), 0.0, this->vctrl_dt);
   p = this->vx_controller.calculate(errors(0), 0.0, this->vctrl_dt);
   y = 0.0;
-  t = this->hover_throttle + this->vz_controller.calculate(errors(2), 0.0, this->vctrl_dt);
+  t = this->vz_controller.calculate(errors(2), 0.0, this->vctrl_dt);
   t /= fabs(cos(r) * cos(p));  // adjust throttle for roll and pitch
   // clang-format on
 
-  // limit roll, pitch
+  // limit roll, pitch, throttle
   r = (r < this->roll_limit[0]) ? this->roll_limit[0] : r;
   r = (r > this->roll_limit[1]) ? this->roll_limit[1] : r;
   p = (p < this->pitch_limit[0]) ? this->pitch_limit[0] : p;
   p = (p > this->pitch_limit[1]) ? this->pitch_limit[1] : p;
-
-  // limit throttle
-  t = (t < 0) ? 0.0 : t;
-  t = (t > 1.0) ? 1.0 : t;
+  t = (t < this->throttle_limit[0]) ? this->throttle_limit[0] : t;
+  t = (t > this->throttle_limit[1]) ? this->throttle_limit[1] : t;
 
   // keep track of setpoints and outputs
   this->vctrl_setpoints = errors;
@@ -172,10 +170,10 @@ Vec4 LandingController::calculateVelocityErrors(Vec3 errors,
 }
 
 AttitudeCommand LandingController::calculate(Vec3 pos_errors,
-                                              Vec3 vel_errors,
-                                              double yaw,
-                                              double dt) {
-  // this->calculatePositionErrors(pos_errors, yaw, dt);
+                                             Vec3 vel_errors,
+                                             double yaw,
+                                             double dt) {
+  this->calculatePositionErrors(pos_errors, yaw, dt);
   this->calculateVelocityErrors(vel_errors, yaw, dt);
   this->att_cmd = AttitudeCommand(this->pctrl_outputs + this->vctrl_outputs);
   return this->att_cmd;

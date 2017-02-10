@@ -287,6 +287,7 @@ int Quadrotor::stepLandingMode(double dt) {
   Vec3 perrors, verrors;
   Vec4 output;
   bool conditions[3];
+  double dz;
 
   // pre-check
   if (this->configured == false) {
@@ -294,13 +295,15 @@ int Quadrotor::stepLandingMode(double dt) {
   }
 
   // setup
+  dz = (this->pose.position(2) - this->hover_position(2)) / dt;
+
   perrors(0) = this->landing_target.position_bf(0);
   perrors(1) = this->landing_target.position_bf(1);
-  perrors(2) = this->landing_target.position_bf(2);
+  perrors(2) = this->hover_position(2) - this->pose.position(2);
 
   verrors(0) = this->landing_target.velocity_bf(0);
   verrors(1) = this->landing_target.velocity_bf(1);
-  verrors(2) = -0.1 - (this->hover_position(2) - this->pose.position(2));
+  verrors(2) = -0.2 - dz;
 
   // land on target
   this->att_cmd = this->landing_controller.calculate(perrors,
@@ -344,6 +347,8 @@ int Quadrotor::step(double dt) {
   // step
   switch (this->current_mode) {
     case DISARM_MODE:
+      this->att_cmd = AttitudeCommand();
+      retval = 0;
       break;
     case HOVER_MODE:
       retval = this->stepHoverMode(dt);

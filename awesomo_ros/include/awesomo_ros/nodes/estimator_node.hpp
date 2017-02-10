@@ -13,6 +13,9 @@ namespace awesomo {
 #define KF_MODE 1
 #define EKF_MODE 2
 
+#define ESTIMATOR_ON 1
+#define ESTIMATOR_OFF -1
+
 // NODE SETTINGS
 #define NODE_NAME "awesomo_estimator"
 #define NODE_RATE 50
@@ -27,6 +30,8 @@ namespace awesomo {
 #define QUAD_HEADING_TOPIC "/awesomo/control/heading/set"
 
 // SUBSCRIBE TOPICS
+#define ESTIMATOR_ON_TOPIC "/awesomo/estimator/on"
+#define ESTIMATOR_OFF_TOPIC "/awesomo/estimator/off"
 #define QUAD_POSE_TOPIC "/mavros/local_position/pose"
 #define QUAD_VELOCITY_TOPIC "/mavros/local_position/velocity"
 #define TARGET_IF_POS_TOPIC "/awesomo/apriltag/target/position/inertial"
@@ -35,6 +40,7 @@ namespace awesomo {
 class EstimatorNode : public ROSNode {
 public:
   int mode;
+  int state;
   bool initialized;
   KalmanFilterTracker kf_tracker;
   ExtendedKalmanFilterTracker ekf_tracker;
@@ -67,6 +73,8 @@ public:
   int configure(std::string node_name, int hz);
   void initLTKF(Vec3 target_pos_wf);
   void resetLTKF(Vec3 target_pos_wf);
+  void onCallback(const std_msgs::Bool &msg);
+  void offCallback(const std_msgs::Bool &msg);
   void quadPoseCallback(const geometry_msgs::PoseStamped &msg);
   void quadVelocityCallback(const geometry_msgs::TwistStamped &msg);
   void targetInertialPosCallback(const geometry_msgs::Vector3 &msg);

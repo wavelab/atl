@@ -32,7 +32,9 @@ namespace awesomo {
 #define SETPOINT_POSITION_TOPIC "/mavros/setpoint_position/local"
 #define PCTRL_STATS_TOPIC "/awesomo/position_controller/stats"
 #define PCTRL_GET_TOPIC "/awesomo/control/position_controller/get"
-#define QUADROTOR_POSE "awesomo/control/quad_pose"
+#define QUADROTOR_POSE "/awesomo/control/quad_pose"
+#define ESTIMATOR_ON_TOPIC "/awesomo/estimator/on"
+#define ESTIMATOR_OFF_TOPIC "/awesomo/estimator/off"
 
 // SUBSCRIBE TOPICS
 #define MODE_TOPIC "/mavros/set_mode"
@@ -70,9 +72,12 @@ public:
   }
 
   int configure(std::string node_name, int hz);
-  void waitForConnection(void);
+  void waitForFCU(void);
+  void waitForEstimator(void);
   int disarm(void);
   int setOffboardModeOn(void);
+  void setEstimatorOn(void);
+  void setEstimatorOff(void);
   void modeCallback(const std_msgs::String &msg);
   void stateCallback(const mavros_msgs::State::ConstPtr &msg);
   void poseCallback(const geometry_msgs::PoseStamped &msg);

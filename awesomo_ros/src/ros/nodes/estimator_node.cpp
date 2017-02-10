@@ -20,6 +20,7 @@ int EstimatorNode::configure(std::string node_name, int hz) {
   // estimator
   this->ros_nh->getParam("/tracker_mode", this->mode);
   this->initialized = false;
+  this->state = ESTIMATOR_OFF;
 
   switch (this->mode) {
     case KF_MODE:
@@ -54,6 +55,8 @@ int EstimatorNode::configure(std::string node_name, int hz) {
   this->registerPublisher<std_msgs::Bool>(LT_DETECTED_TOPIC);
   this->registerPublisher<geometry_msgs::Vector3>(GIMBAL_SETPOINT_ATTITUDE_TOPIC);
   this->registerPublisher<std_msgs::Float64>(QUAD_HEADING_TOPIC);
+  this->registerSubscriber(ESTIMATOR_ON_TOPIC, &EstimatorNode::onCallback, this);
+  this->registerSubscriber(ESTIMATOR_OFF_TOPIC, &EstimatorNode::offCallback, this);
   this->registerSubscriber(QUAD_POSE_TOPIC, &EstimatorNode::quadPoseCallback, this);
   this->registerSubscriber(QUAD_VELOCITY_TOPIC, &EstimatorNode::quadVelocityCallback, this);
   this->registerSubscriber(TARGET_IF_POS_TOPIC, &EstimatorNode::targetInertialPosCallback, this);
@@ -67,6 +70,11 @@ int EstimatorNode::configure(std::string node_name, int hz) {
 
 void EstimatorNode::initLTKF(Vec3 x0) {
   VecX mu;
+
+  // pre-check
+  if (this->state == ESTIMATOR_OFF) {
+    return;
+  }
 
   // initialize estimator
   switch (this->mode) {
@@ -106,6 +114,34 @@ void EstimatorNode::initLTKF(Vec3 x0) {
 
 void EstimatorNode::resetLTKF(Vec3 x0) {
   this->initLTKF(x0);
+}
+
+void EstimatorNode::onCallback(const std_msgs::Bool &msg) {
+  bool data;
+
+  // setup
+  convertMsg(msg, data);
+
+  // switch on estimator
+  if (data) {
+    this->state = ESTIMATOR_ON;
+  }
+}
+
+void EstimatorNode::offCallback(const std_msgs::Bool &msg) {
+  bool data;
+  Vec3 setpoints;
+
+  // setup
+  convertMsg(msg, data);
+  setpoints << 0.0, 0.0, 0.0;
+
+  // switch off estimator
+  if (data) {
+    this->state = ESTIMATOR_OFF;
+    this->initialized = false;
+    this->publishGimbalSetpointAttitudeMsg(setpoints);
+  }
 }
 
 void EstimatorNode::quadPoseCallback(const geometry_msgs::PoseStamped &msg) {
@@ -219,6 +255,7 @@ void EstimatorNode::publishLTKFBodyVelocityEstimate(void) {
       est_vel(1) = this->ekf_tracker.mu(4) * sin(this->ekf_tracker.mu(3));
       est_vel(2) = this->ekf_tracker.mu(5);
       break;
+    std::cout << "Estimator ON" << std::endl;
   }
 
   // transform target velocity from inertial frame to body planar frame

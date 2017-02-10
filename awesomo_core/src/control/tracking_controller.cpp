@@ -159,9 +159,9 @@ Vec4 TrackingController::calculateVelocityErrors(Vec3 errors,
   p = (p < this->pitch_limit[0]) ? this->pitch_limit[0] : p;
   p = (p > this->pitch_limit[1]) ? this->pitch_limit[1] : p;
 
-  // limit throttle
-  t = (t < 0) ? 0.0 : t;
-  t = (t > 1.0) ? 1.0 : t;
+  // // limit throttle
+  // t = (t < 0) ? 0.0 : t;
+  // t = (t > 1.0) ? 1.0 : t;
 
   // keep track of setpoints and outputs
   this->vctrl_setpoints = errors;

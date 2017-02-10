@@ -26,12 +26,14 @@ int ControlNode::configure(const std::string node_name, int hz) {
 
   // publishers
   // clang-format off
-  this->registerPublisher<geometry_msgs::PoseStamped>(SETPOINT_ATTITUDE_TOPIC, 1);
-  this->registerPublisher<std_msgs::Float64>(SETPOINT_THROTTLE_TOPIC, 1);
+  this->registerPublisher<geometry_msgs::PoseStamped>(SETPOINT_ATTITUDE_TOPIC);
+  this->registerPublisher<std_msgs::Float64>(SETPOINT_THROTTLE_TOPIC);
   this->registerPublisher<geometry_msgs::PoseStamped>(SETPOINT_POSITION_TOPIC);
   this->registerPublisher<awesomo_msgs::PCtrlStats>(PCTRL_STATS_TOPIC);
   this->registerPublisher<awesomo_msgs::PCtrlSettings>(PCTRL_GET_TOPIC);
-  this->registerPublisher<geometry_msgs::PoseStamped>(QUADROTOR_POSE, 1);
+  this->registerPublisher<geometry_msgs::PoseStamped>(QUADROTOR_POSE);
+  this->registerPublisher<std_msgs::Bool>(ESTIMATOR_ON_TOPIC);
+  this->registerPublisher<std_msgs::Bool>(ESTIMATOR_OFF_TOPIC);
  // clang-format on
 
   // subscribers
@@ -56,41 +58,54 @@ int ControlNode::configure(const std::string node_name, int hz) {
   this->registerLoopCallback(std::bind(&ControlNode::loopCallback, this));
   // clang-format on
 
-  // wait till connected to FCU
-  this->waitForConnection();
+  // wait till connected to FCU and Estimator
+  this->waitForFCU();
+  this->waitForEstimator();
 
   this->configured = true;
   return 0;
 }
 
-void ControlNode::waitForConnection(void) {
+void ControlNode::waitForFCU(void) {
   // pre-check
   if (this->sim_mode) {
     return;
   }
 
   // wait fo FCU
-  ROS_INFO("Waiting for FCU ...");
+  log_info("Waiting for FCU ...");
   while (this->mavros_state.connected != true) {
     ros::spinOnce();
     sleep(1);
   }
-  ROS_INFO("Connected to FCU!");
+  log_info("Connected to FCU!");
+}
+
+void ControlNode::waitForEstimator(void) {
+  // wait for estimator
+  log_info("Waiting for Estimator ...");
+  while (this->ros_pubs[ESTIMATOR_ON_TOPIC].getNumSubscribers() == 0) {
+    ros::spinOnce();
+    sleep(1);
+  }
+
+  // switch estimator on
+  this->setEstimatorOn();
 }
 
 int ControlNode::disarm(void) {
   mavros_msgs::CommandBool msg;
 
   // setup
-  ROS_INFO("Disarming awesomo ...");
+  log_info("Disarming awesomo ...");
   msg.request.value = false;
 
   // disarm
   if (this->arming_client.call(msg)) {
-    ROS_INFO("Awesomo disarmed!");
+    log_info("Awesomo disarmed!");
     return 0;
   } else {
-    ROS_ERROR("Failed to disarm awesomo!");
+    log_err("Failed to disarm awesomo!");
     return -1;
   }
 }
@@ -100,29 +115,48 @@ int ControlNode::setOffboardModeOn(void) {
 
   // setup
   msg.request.custom_mode = "OFFBOARD";
-
   if (this->mode_client.call(msg) && msg.response.success) {
-    ROS_INFO("OFFBOARD MODE ON!");
+    log_info("OFFBOARD MODE ON!");
     return 0;
   } else {
-    ROS_ERROR("Failed to enable offboard mode!");
+    log_err("Failed to enable offboard mode!");
     return -1;
   }
+}
+
+void ControlNode::setEstimatorOn(void) {
+  std_msgs::Bool msg;
+  msg.data = true;
+  this->ros_pubs[ESTIMATOR_ON_TOPIC].publish(msg);
+}
+
+void ControlNode::setEstimatorOff(void) {
+  std_msgs::Bool msg;
+  msg.data = true;
+  this->ros_pubs[ESTIMATOR_OFF_TOPIC].publish(msg);
 }
 
 void ControlNode::modeCallback(const std_msgs::String &msg) {
   std::string mode;
 
+  // setup
   convertMsg(msg, mode);
+
+  // parse mode
   if (mode == "DISARM_MODE") {
+    this->setEstimatorOff();
     this->quadrotor.setMode(DISARM_MODE);
   } else if (mode == "HOVER_MODE") {
+    this->setEstimatorOff();
     this->quadrotor.setMode(HOVER_MODE);
   } else if (mode == "DISCOVER_MODE") {
+    this->setEstimatorOn();
     this->quadrotor.setMode(DISCOVER_MODE);
   } else if (mode == "TRACKING_MODE") {
+    this->setEstimatorOn();
     this->quadrotor.setMode(TRACKING_MODE);
   } else if (mode == "LANDING_MODE") {
+    this->setEstimatorOn();
     this->quadrotor.setMode(LANDING_MODE);
   }
 }
@@ -147,10 +181,10 @@ void ControlNode::radioCallback(const mavros_msgs::RCIn &msg) {
   for (int i = 0; i < 16; i++) {
     this->rc_in[i] = msg.channels[i];
   }
+
   if (this->armed) {
     if (this->rc_in[6] < 1500) {
       this->armed = false;
-      //     this->disarm();
     }
   } else {
     if (this->rc_in[6] > 1500) {
@@ -158,7 +192,6 @@ void ControlNode::radioCallback(const mavros_msgs::RCIn &msg) {
       this->quadrotor.setMode(HOVER_MODE);
     }
   }
-
 }
 
 void ControlNode::targetPositionCallback(const geometry_msgs::Vector3 &msg) {
@@ -209,6 +242,8 @@ int ControlNode::loopCallback(void) {
   // step
   if (this->quadrotor.step(dt) != 0) {
       return -1;
+  } else if (this->quadrotor.current_mode == DISARM_MODE) {
+    this->setEstimatorOff();
   }
 
   // publish msgs
