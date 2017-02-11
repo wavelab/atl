@@ -65,6 +65,7 @@ public:
   Vec3 velocity;
   Vec3 hover_position;
   LandingTarget landing_target;
+  Vec3 prev_target_position;
 
   Quadrotor(void);
   int configure(std::string config_path);

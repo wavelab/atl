@@ -203,13 +203,13 @@ if __name__ == "__main__":
     # lz.set_velocity(0.0)
     # lz.set_position([0, 0, 0])
 
-    # velocity, angular_velocity = lz_circle_path(20, 1.0)
-    # lz.set_velocity(velocity)
-    # lz.set_angular_velocity(angular_velocity)
+    velocity, angular_velocity = lz_circle_path(20, 5.0)
+    lz.set_velocity(velocity)
+    lz.set_angular_velocity(angular_velocity)
 
     # quad.set_heading(90)
     # quad.set_mode("DISCOVER_MODE")
-    quad.set_hover_point([0.0, 0.0, 5.0])
+    # quad.set_hover_point([0.0, 0.0, 5.0])
     # quad.set_pctrl_settings({
     #     "roll": {
     #         "min": -30,

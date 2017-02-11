@@ -117,6 +117,7 @@ int Quadrotor::setTargetPosition(Vec3 position) {
   }
 
   // set target position
+  this->prev_target_position = this->landing_target.position_bf;
   this->landing_target.setTargetPosition(position);
 
   return 0;
