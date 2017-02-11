@@ -20,7 +20,7 @@ def frange(x, y, jump, digits=0):
 
 
 def quadrotor(x, u, dt, cdx=0.5, cdz=0.2):
-    g = 10.0
+    g = 10.0  # I count three places you need to define gravity.  Can you find them all!?
     h_ge = 1.0
     k_ge = 0.2
     a_ge = k_ge * (h_ge - min(h_ge, x[2])) / h_ge
@@ -73,7 +73,7 @@ def desired_system(p0, pf, T, dt):
 
     # final point
     traj.append(pf)
-    desired.append([pf[0], 0.0, pf[1], 0.0, 0.0, 0.0])
+    desired.append([pf[0], vx, pf[1], 0.0, 5.0, 0.0])
 
     return (np.array(desired), np.array(traj))
 
@@ -174,16 +174,16 @@ def cost_func(x, args):
     traj = args["traj"].T
 
     # position error cost
-    cost += 1.0 * np.linalg.norm(states[0] - traj[0])  # dx
-    cost += 1.0 * np.linalg.norm(states[2] - traj[1])  # dz
+    cost += 0.0 * np.linalg.norm(states[0] - traj[0])  # dx
+    cost += 0.0 * np.linalg.norm(states[2] - traj[1])  # dz
 
     # control input cost
-    cost += 0.5 * np.linalg.norm(states[4])  # az
-    cost += 0.5 * np.linalg.norm(states[5])  # theta
+    cost += 0.0 * np.linalg.norm(states[4] - 10)       # az
+    cost += 1.0 * np.linalg.norm(states[5])       # theta
 
     # control input difference cost
-    cost += 1 * np.linalg.norm(np.diff(states[4]))  # az
-    cost += 1 * np.linalg.norm(np.diff(states[5]))  # theta
+    cost += 1.0 * np.linalg.norm(np.diff(states[4]))  # az
+    cost += 1.0 * np.linalg.norm(np.diff(states[5]))  # theta
 
     # end cost to bias to matched landing ??
     # cost += 15.0 * pow(x[-1], 2)
@@ -232,8 +232,8 @@ def ine_constraints(x, *args):
 
 
 def optimize(p0, pf):
-    T = 100      # num of time steps
-    dt = 0.01    # time step
+    T = 80     # num of time steps
+    dt = 0.05   # time step
     n = 4       # num of states
     m = 2       # num of inputs
 
@@ -259,6 +259,7 @@ def optimize(p0, pf):
     # plot_desired_trajectory(traj)
 
     args = {"traj": traj, "T": T, "n": n, "m": m}
+    vx = (pf[0] - p0[0]) / (T * dt)
     constraints = [
         # equality constraint for start position
         {"type": "eq", "fun": lambda x: np.array([x[0] - x0[0][0]])},  # x
@@ -270,10 +271,10 @@ def optimize(p0, pf):
 
         # equality constraint for end position
         {"type": "eq", "fun": lambda x: np.array([x[-6] - pf[0]])},  # x
-        {"type": "eq", "fun": lambda x: np.array([x[-5] - 0.0])},    # vx
+        {"type": "eq", "fun": lambda x: np.array([x[-5] - vx])},    # vx
         {"type": "eq", "fun": lambda x: np.array([x[-4] - pf[1]])},  # z
         {"type": "eq", "fun": lambda x: np.array([x[-3] - 0.0])},    # vz
-        {"type": "eq", "fun": lambda x: np.array([x[-2] - 0.0])},    # az
+        {"type": "eq", "fun": lambda x: np.array([x[-2] - 5.0])},    # az
         {"type": "eq", "fun": lambda x: np.array([x[-1] - 0.0])},    # theta
 
         # nonlinear equality constraint for motion
@@ -285,7 +286,8 @@ def optimize(p0, pf):
                                       x0,
                                       args=args,
                                       constraints=constraints,
-                                      bounds=bounds)
+                                      bounds=bounds,
+                                      options={'disp': True})
 
     # plot optimization results
     plot_optimization_results(traj, results.x, T, n, m)
@@ -344,7 +346,7 @@ if __name__ == "__main__":
 
 #        print("Optimizing for {0} to {1}".format(p0, pf))
     p0 = [0.0, 2.0]
-    pf = [2.0, 0.0]
+    pf = [10.0, 0.0]
     T, n, m, results = optimize(p0, pf)
     # plot_optimization_results(traj, results.x, T, n, m)
     # close index file
