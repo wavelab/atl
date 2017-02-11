@@ -2,12 +2,18 @@
 #define __AWESOMO_UTILS_DATA_HPP__
 
 #include <iostream>
+#include <fstream>
 #include <vector>
 
 #include "awesomo_core/utils/math.hpp"
 
 
 namespace awesomo {
+
+// CSV ERROR MESSAGES
+#define E_CSV_DATA_LOAD "Error! failed to load test data [%s]!!\n"
+#define E_CSV_DATA_OPEN "Error! failed to open file for output [%s]!!\n"
+
 
 class AttitudeCommand {
 public:
@@ -85,6 +91,11 @@ public:
     this->position << 0, 0, 0;
   }
 };
+
+int csvrows(std::string file_path);
+int csvcols(std::string file_path);
+int csv2mat(std::string file_path, bool header, MatX &data);
+int mat2csv(std::string file_path, MatX data);
 
 }  // end of awesomo namespace
 #endif
