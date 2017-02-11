@@ -141,6 +141,11 @@ def plot_optimization_results(traj, x, T, n, m):
 
     plt.show()
 
+    # plt.figure(2)
+
+    # plt.plot(traj[0], traj[1], label="desired")
+    # plt.show()
+
 
 def plot_inputs_based_trajectory(T, dt, n, m, x0, result):
     # plot real trajectory using only inputs
@@ -177,8 +182,8 @@ def cost_func(x, args):
     cost += 0.5 * np.linalg.norm(states[5])  # theta
 
     # control input difference cost
-    cost += 0.5 * pow(np.sum(np.diff(states[4])), 2)  # az
-    cost += 0.5 * pow(np.sum(np.diff(states[5])), 2)  # theta
+    cost += 1 * np.linalg.norm(np.diff(states[4]))  # az
+    cost += 1 * np.linalg.norm(np.diff(states[5]))  # theta
 
     # end cost to bias to matched landing ??
     # cost += 15.0 * pow(x[-1], 2)
@@ -227,8 +232,8 @@ def ine_constraints(x, *args):
 
 
 def optimize(p0, pf):
-    T = 30      # num of time steps
-    dt = 0.1    # time step
+    T = 100      # num of time steps
+    dt = 0.01    # time step
     n = 4       # num of states
     m = 2       # num of inputs
 
@@ -283,8 +288,8 @@ def optimize(p0, pf):
                                       bounds=bounds)
 
     # plot optimization results
-    # plot_optimization_results(traj, results.x, T, n, m)
-    # plot_inputs_based_trajectory(T, dt, n, m, x0, results)
+    plot_optimization_results(traj, results.x, T, n, m)
+    #plot_inputs_based_trajectory(T, dt, n, m, x0, results)
 
     return (T, n, m, results)
 
@@ -321,25 +326,26 @@ def generate_trajectory_table():
 
 
 if __name__ == "__main__":
-    basedir = "./trajectory/"
-    table = generate_trajectory_table()
-    index = 0
+#    basedir = "./trajectory/"
+#    table = generate_trajectory_table()
+#    index = 0
 
     # prep index file
-    index_file = open(basedir + "index.csv", "wb")
-    index_file.write(bytes("index,p0,pf\n", "UTF-8"))
+#    index_file = open(basedir + "index.csv", "wb")
+#    index_file.write(bytes("index,p0,pf\n", "UTF-8"))
 
     # create trajectory table
-    for t in table:
-        p0 = (t[0], t[1])
-        pf = (t[2], t[3])
-        filepath = basedir + str(index) + ".csv"
-        index_file.write(bytes("{0},{1},{2}\n".format(index, p0, pf), "UTF-8"))
-        index += 1
+#    for t in table:
+#        p0 = (t[0], t[1])
+#        pf = (t[2], t[3])
+#        filepath = basedir + str(index) + ".csv"
+#        index_file.write(bytes("{0},{1},{2}\n".format(index, p0, pf), "UTF-8"))
+#        index += 1
 
-        print("Optimizing for {0} to {1}".format(p0, pf))
-        T, n, m, results = optimize(p0, pf)
-        record_optimized_results(T, n, m, filepath, results)
-
+#        print("Optimizing for {0} to {1}".format(p0, pf))
+    p0 = [0.0, 2.0]
+    pf = [2.0, 0.0]
+    T, n, m, results = optimize(p0, pf)
+    # plot_optimization_results(traj, results.x, T, n, m)
     # close index file
-    index_file.close()
+    # index_file.close()
