@@ -9,6 +9,9 @@ import numpy as np
 import scipy.optimize
 import matplotlib.pylab as plt
 
+# GLOBAL VARIABLES
+k_g = 10.0  # gravity acceleration constant (got to catch'em all - pokemon)
+
 
 def frange(x, y, jump, digits=0):
     array = []
@@ -19,16 +22,15 @@ def frange(x, y, jump, digits=0):
     return array
 
 
-def quadrotor(x, u, dt, cdx=0.5, cdz=0.2):
-    g = 10.0  # I count three places you need to define gravity.  Can you find them all!?
+def quadrotor(x, u, dt, c_dx=0.5, c_dz=0.2):
     h_ge = 1.0
     k_ge = 0.2
     a_ge = k_ge * (h_ge - min(h_ge, x[2])) / h_ge
 
     x[0] += x[1] * dt
-    x[1] += (u[0] * sin(u[1]) - cdx * x[1]) * dt
+    x[1] += (u[0] * sin(u[1]) - c_dx * x[1]) * dt
     x[2] += x[3] * dt
-    x[3] += (u[0] * cos(u[1]) * (1 + a_ge) - g - cdz * x[3]) * dt
+    x[3] += (u[0] * cos(u[1]) * (1 + a_ge) - k_g - c_dz * x[3]) * dt
 
     return x
 
@@ -48,12 +50,11 @@ def desired_system(p0, pf, T, dt):
     c = p0[1] - m * p0[0]
     vx = (pf[0] - p0[0]) / (T * dt)
     vz = (pf[1] - p0[1]) / (T * dt)
-    az = 10.0
-    theta = asin(vx / az)
+    theta = asin(vx / k_g)
 
     # initial point
     traj.append(p0)
-    desired.append([p0[0], vx, p0[1], vz, az, theta])
+    desired.append([p0[0], vx, p0[1], vz, k_g, theta])
 
     # create points along the desired line path
     dx = (pf[0] - p0[0]) / (T - 1.0)
@@ -65,7 +66,7 @@ def desired_system(p0, pf, T, dt):
         x[1] = vx                  # vx
         x[2] = m * x[0] + c        # z
         x[3] = vz                  # vz
-        x[4] = az                  # az
+        x[4] = k_g                  # az
         x[5] = theta               # theta
 
         desired.append(x)
@@ -140,11 +141,6 @@ def plot_optimization_results(traj, x, T, n, m):
     plt.ylabel("acceleration")
 
     plt.show()
-
-    # plt.figure(2)
-
-    # plt.plot(traj[0], traj[1], label="desired")
-    # plt.show()
 
 
 def plot_inputs_based_trajectory(T, dt, n, m, x0, result):
@@ -271,7 +267,7 @@ def optimize(p0, pf):
 
         # equality constraint for end position
         {"type": "eq", "fun": lambda x: np.array([x[-6] - pf[0]])},  # x
-        {"type": "eq", "fun": lambda x: np.array([x[-5] - vx])},    # vx
+        {"type": "eq", "fun": lambda x: np.array([x[-5] - vx])},     # vx
         {"type": "eq", "fun": lambda x: np.array([x[-4] - pf[1]])},  # z
         {"type": "eq", "fun": lambda x: np.array([x[-3] - 0.0])},    # vz
         {"type": "eq", "fun": lambda x: np.array([x[-2] - 5.0])},    # az
@@ -291,7 +287,7 @@ def optimize(p0, pf):
 
     # plot optimization results
     plot_optimization_results(traj, results.x, T, n, m)
-    #plot_inputs_based_trajectory(T, dt, n, m, x0, results)
+    # plot_inputs_based_trajectory(T, dt, n, m, x0, results)
 
     return (T, n, m, results)
 
@@ -310,7 +306,7 @@ def record_optimized_results(T, n, m, fpath, results):
     f.close()
 
 
-def generate_trajectory_table():
+def generate_trajectory_table(basedir):
     p0_x = [0.0]
     p0_z = frange(2, 10, 0.1, 1)
     pf_x = frange(0, 10, 0.1, 1)
@@ -319,35 +315,34 @@ def generate_trajectory_table():
     conditions = [p0_x, p0_z, pf_x, pf_z]
     conditions = list(itertools.product(*conditions))
 
+    # generate different start and end combinations
     table = []
     for c in conditions:
         if c[1] != 0.0:
             table.append(c)
 
-    return table
+    # prep index file
+    index_file = open(basedir + "index.csv", "wb")
+    index_file.write(bytes("index,p0,pf\n", "UTF-8"))
+
+    # create trajectory table
+    index = 0
+    for t in table:
+        p0 = (t[0], t[1])
+        pf = (t[2], t[3])
+        filepath = basedir + str(index) + ".csv"
+        index_file.write(bytes("{0},{1},{2}\n".format(index, p0, pf), "UTF-8"))
+        index += 1
+
+        print("Optimizing for {0} to {1}".format(p0, pf))
+        T, n, m, results = optimize(p0, pf)
+        record_optimized_results(T, n, m, filepath, results)
+
+    # close index file
+    index_file.close()
 
 
 if __name__ == "__main__":
-#    basedir = "./trajectory/"
-#    table = generate_trajectory_table()
-#    index = 0
-
-    # prep index file
-#    index_file = open(basedir + "index.csv", "wb")
-#    index_file.write(bytes("index,p0,pf\n", "UTF-8"))
-
-    # create trajectory table
-#    for t in table:
-#        p0 = (t[0], t[1])
-#        pf = (t[2], t[3])
-#        filepath = basedir + str(index) + ".csv"
-#        index_file.write(bytes("{0},{1},{2}\n".format(index, p0, pf), "UTF-8"))
-#        index += 1
-
-#        print("Optimizing for {0} to {1}".format(p0, pf))
     p0 = [0.0, 2.0]
     pf = [10.0, 0.0]
     T, n, m, results = optimize(p0, pf)
-    # plot_optimization_results(traj, results.x, T, n, m)
-    # close index file
-    # index_file.close()
