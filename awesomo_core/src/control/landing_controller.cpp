@@ -132,8 +132,8 @@ Vec4 LandingController::calculatePositionErrors(Vec3 errors,
 }
 
 Vec4 LandingController::calculateVelocityErrors(Vec3 errors,
-                                                 double yaw,
-                                                 double dt) {
+                                                double yaw,
+                                                double dt) {
   double r, p, y, t;
   Vec3 euler;
   Mat3 R;
@@ -177,6 +177,37 @@ AttitudeCommand LandingController::calculate(Vec3 pos_errors,
   this->calculateVelocityErrors(vel_errors, yaw, dt);
   this->att_cmd = AttitudeCommand(this->pctrl_outputs + this->vctrl_outputs);
   return this->att_cmd;
+}
+
+int LandingController::loadTrajectoryFile(std::string filepath, Trajectory &traj) {
+  MatX traj_data;
+
+  // pre-check
+  if (file_exists(filepath) == false) {
+    log_err("File not found: %s", filepath.c_str());
+    return -1;
+  }
+
+  // load trajectory file
+  // assumes each column is: x,vx,z,vz,az,theta
+  csv2mat(filepath, true, traj_data);
+  if (traj_data.rows() == 0) {
+    log_err("trajectory file [%s] has 0 rows?", filepath.c_str());
+    return -2;
+  } else if (traj_data.cols() != 6) {
+    log_err("trajectory file [%s] invalid number of cols?", filepath.c_str());
+    return -2;
+  }
+
+  // set trajectory class
+  traj.x = traj_data.col(0);
+  traj.vx = traj_data.col(1);
+  traj.z = traj_data.col(2);
+  traj.vz = traj_data.col(3);
+  traj.az = traj_data.col(4);
+  traj.theta = traj_data.col(5);
+
+  return 0;
 }
 
 void LandingController::reset(void) {

@@ -11,6 +11,12 @@
 
 namespace awesomo {
 
+class Trajectory {
+public:
+  VecX x, z, vx, vz;
+  VecX az,theta;
+};
+
 class LandingController {
 public:
   bool configured;
@@ -45,6 +51,7 @@ public:
                             Vec3 vel_errors,
                             double yaw,
                             double dt);
+  int loadTrajectoryFile(std::string filepath, Trajectory &traj);
   void reset(void);
   void printOutputs(void);
   void printErrors(void);

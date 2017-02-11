@@ -2,6 +2,7 @@
 #include "awesomo_core/control/landing_controller.hpp"
 
 #define TEST_CONFIG "tests/configs/control/landing_controller.yaml"
+#define TEST_TRAJ "tests/data/trajectory/trajectory.csv"
 
 
 namespace awesomo {
@@ -237,6 +238,17 @@ TEST(LandingController, calculateVelocityErrors) {
 
   ASSERT_TRUE(controller.vctrl_outputs(0) < 0.0);
   ASSERT_TRUE(controller.vctrl_outputs(1) > 0.0);
+}
+
+TEST(LandingController, loadTrajectoryFile) {
+  int retval;
+  LandingController controller;
+  Trajectory traj;
+
+  controller.configure(TEST_CONFIG);
+  retval = controller.loadTrajectoryFile(TEST_TRAJ, traj);
+
+  ASSERT_EQ(0, retval);
 }
 
 }  // end of awesomo namepsace
