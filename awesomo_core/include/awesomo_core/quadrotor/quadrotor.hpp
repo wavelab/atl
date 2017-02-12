@@ -53,8 +53,14 @@ public:
   LandingController landing_controller;
   AttitudeCommand att_cmd;
 
+  double recover_height;
+  bool auto_track;
+  bool auto_land;
+  bool auto_disarm;
+  double target_lost_threshold;
   double min_discover_time;
   double min_tracking_time;
+
   struct timespec discover_tic;
   struct timespec tracking_tic;
   struct timespec landing_tic;

@@ -11,10 +11,17 @@ Quadrotor::Quadrotor(void) {
   this->landing_controller = LandingController();
   this->att_cmd = AttitudeCommand();
 
+  this->recover_height = 0.0;
+  this->auto_track = false;
+  this->auto_land = false;
+  this->auto_disarm = false;
+  this->target_lost_threshold = 0.0;
   this->min_discover_time = FLT_MAX;
   this->min_tracking_time = FLT_MAX;
+
   this->discover_tic = (struct timespec){0};
   this->tracking_tic = (struct timespec){0};
+  this->landing_tic = (struct timespec){0};
 
   this->current_mode = DISCOVER_MODE;
   this->heading = 0.0;
@@ -43,14 +50,18 @@ int Quadrotor::configure(std::string config_path) {
   // load config
   // clang-format off
   parser.addParam<Vec3>("hover_position", &this->hover_position);
-  parser.addParam<double>("target_lost_threshold", &this->landing_target.lost_threshold);
+  parser.addParam<double>("recover_height", &this->recover_height);
+  parser.addParam<bool>("auto_track", &this->auto_track);
+  parser.addParam<bool>("auto_land", &this->auto_land);
+  parser.addParam<bool>("auto_disarm", &this->auto_disarm);
+  parser.addParam<double>("target_lost_threshold", &this->target_lost_threshold);
   parser.addParam<double>("min_discover_time", &this->min_discover_time);
-  parser.addParam<double>("min_track_time", &this->min_tracking_time);
+  parser.addParam<double>("min_tracking_time", &this->min_tracking_time);
   // clang-format on
   if (parser.load(config_path + "/config.yaml") != 0) {
     return -1;
   }
-
+  this->landing_target.lost_threshold = this->target_lost_threshold;
   this->current_mode = DISCOVER_MODE;
   this->configured = true;
 
@@ -226,7 +237,7 @@ int Quadrotor::stepDiscoverMode(double dt) {
   conditions[1] = this->landing_target.losted == false;
   conditions[2] = mtoc(&this->discover_tic) > this->min_discover_time;
 
-  if (this->conditionsMet(conditions, 3)) {
+  if (this->conditionsMet(conditions, 3) && this->auto_track) {
     // transition to tracking mode
     this->setMode(TRACKING_MODE);
     this->discover_tic = (struct timespec){0};
@@ -264,7 +275,7 @@ int Quadrotor::stepTrackingMode(double dt) {
   conditions[1] = this->landing_target.losted == false;
   conditions[2] = mtoc(&this->tracking_tic) > this->min_tracking_time;
 
-  if (this->conditionsMet(conditions, 3)) {
+  if (this->conditionsMet(conditions, 3) && this->auto_land) {
     // transition to landing mode
     this->setMode(LANDING_MODE);
     this->tracking_tic = (struct timespec){0};
@@ -309,7 +320,7 @@ int Quadrotor::stepLandingMode(double dt) {
   conditions[1] = this->landing_target.losted == false;
   conditions[2] = this->landing_target.position_bf.norm() < 0.1;
 
-  if (this->conditionsMet(conditions, 3)) {
+  if (this->conditionsMet(conditions, 3) && this->auto_disarm) {
     // transition to disarm mode
     this->setMode(DISARM_MODE);
     this->landing_tic = (struct timespec){0};

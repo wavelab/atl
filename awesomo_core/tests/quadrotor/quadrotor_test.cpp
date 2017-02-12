@@ -10,6 +10,14 @@ TEST(Quadrotor, constructor) {
 
   ASSERT_FALSE(quadrotor.configured);
   ASSERT_EQ(DISCOVER_MODE, quadrotor.current_mode);
+
+  ASSERT_FLOAT_EQ(0.0, quadrotor.recover_height);
+  ASSERT_FALSE(quadrotor.auto_track);
+  ASSERT_FALSE(quadrotor.auto_land);
+  ASSERT_FALSE(quadrotor.auto_disarm);
+  ASSERT_FLOAT_EQ(0.0, quadrotor.target_lost_threshold);
+  ASSERT_FLOAT_EQ(FLT_MAX, quadrotor.min_discover_time);
+  ASSERT_FLOAT_EQ(FLT_MAX, quadrotor.min_tracking_time);
 }
 
 TEST(Quadrotor, configure) {

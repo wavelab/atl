@@ -73,6 +73,7 @@ public:
   Vec4 vctrl_outputs;
   AttitudeCommand att_cmd;
 
+  TrajectoryIndex traj_index;
   Trajectory trajectory;
 
   LandingController(void);

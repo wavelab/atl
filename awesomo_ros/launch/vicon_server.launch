@@ -1,21 +1,21 @@
 <?xml version="1.0"?>
 <launch>
-    <arg name="server" default="192.168.1.37:11311" />
-    <node pkg="vrpn_client_ros" type="vrpn_client_node" name="vrpn_client_node_ros" output="screen" >
-        <rosparam subst_value="true">
-            server: $(arg server)
-            port: 3883
+  <arg name="server" default="192.168.1.37:11311" />
+  <node pkg="vrpn_client_ros" type="vrpn_client_node" name="vrpn_client_node_ros" output="screen" >
+    <rosparam subst_value="true">
+      server: $(arg server)
+      port: 3883
 
-            update_frequency: 100.0
-            frame_id: world
+      update_frequency: 100.0
+      frame_id: world
 
-            #Use the VRPN server time
-            use_server_time: false
-            broadcast_tf: true
+      #Use the VRPN server time
+      use_server_time: false
+      broadcast_tf: true
 
-            # Must either specify requres frequency > 0.0 or a litst of trackers tot create
-            refresh_tracker_frequency: 1.0
+      # Must either specify requres frequency > 0.0 or a litst of trackers tot create
+      refresh_tracker_frequency: 1.0
 
-        </rosparam>
-    </node>
+    </rosparam>
+  </node>
 </launch>
