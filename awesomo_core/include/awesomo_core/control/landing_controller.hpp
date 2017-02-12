@@ -2,6 +2,8 @@
 #define __AWESOMO_CONTROL_LANDING_CONTROLLER_HPP__
 
 #include <iomanip>
+#include <libgen.h>
+#include <string>
 
 #include <yaml-cpp/yaml.h>
 
@@ -11,10 +13,38 @@
 
 namespace awesomo {
 
+#define ETROWS "Trajectory [%s] has 0 rows!"
+#define ETCOLS "Trajectory [%s] invalid number of cols!"
+#define ETLOAD "Failed to load trajectory file [%s]!"
+#define ETIROWS "Trajectory index [%s] has 0 rows!"
+#define ETICOLS "Trajectory index [%s] invalid number of cols!"
+#define ETIFAIL "Found no trajectory for p0 = (%f, %f), pf = (%f, %f), v = %f"
+
 class Trajectory {
 public:
+  bool loaded;
   VecX x, z, vx, vz;
   VecX az,theta;
+
+  Trajectory(void);
+  int load(std::string filepath);
+  void reset(void);
+};
+
+class TrajectoryIndex {
+public:
+  bool loaded;
+
+  std::string traj_dir;
+  MatX index_data;
+  double pos_thres;
+  double vel_thres;
+
+  TrajectoryIndex(void);
+  int load(std::string index_file,
+           double pos_thres=0.1,
+           double vel_thres=0.2);
+  int find(Vec2 p0, Vec2 pf, double v, Trajectory &traj);
 };
 
 class LandingController {
@@ -43,8 +73,11 @@ public:
   Vec4 vctrl_outputs;
   AttitudeCommand att_cmd;
 
+  Trajectory trajectory;
+
   LandingController(void);
   int configure(std::string config_file);
+  int loadTrajectoryIndexFile(std::string traj_index_file);
   Vec4 calculatePositionErrors(Vec3 errors, double yaw, double dt);
   Vec4 calculateVelocityErrors(Vec3 errors, double yaw, double dt);
   AttitudeCommand calculate(Vec3 pos_errors,
@@ -57,8 +90,6 @@ public:
                             Vec3 pos_prev,
                             double yaw,
                             double dt);
-  int loadTrajectoryFile(std::string filepath, Trajectory &traj);
-  int executeTrajectory(Trajectory traj, Vec3 quad_pos, Vec3 target_pos);
   void reset(void);
   void printOutputs(void);
   void printErrors(void);

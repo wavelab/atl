@@ -3,6 +3,145 @@
 
 namespace awesomo {
 
+// TRAJECTORY
+Trajectory::Trajectory(void) {
+  this->loaded = false;
+}
+
+int Trajectory::load(std::string filepath) {
+  MatX traj_data;
+
+  // pre-check
+  if (file_exists(filepath) == false) {
+    log_err("File not found: %s", filepath.c_str());
+    return -1;
+  }
+
+  // load trajectory file
+  // assumes each column is: x,vx,z,vz,az,theta
+  csv2mat(filepath, true, traj_data);
+  if (traj_data.rows() == 0) {
+    log_err(ETROWS, filepath.c_str());
+    return -2;
+  } else if (traj_data.cols() != 6) {
+    log_err(ETCOLS, filepath.c_str());
+    return -2;
+  }
+
+  // set trajectory class
+  this->x = traj_data.col(0);
+  this->vx = traj_data.col(1);
+  this->z = traj_data.col(2);
+  this->vz = traj_data.col(3);
+  this->az = traj_data.col(4);
+  this->theta = traj_data.col(5);
+
+  this->loaded = true;
+  return 0;
+}
+
+void Trajectory::reset(void) {
+  this->x = VecX();
+  this->z = VecX();
+  this->vx = VecX();
+  this->vz = VecX();
+  this->az = VecX();
+  this->theta = VecX();
+
+  this->loaded = false;
+}
+
+
+// TRAJECTORY INDEX
+TrajectoryIndex::TrajectoryIndex(void) {
+  this->loaded = false;
+
+  this->traj_dir = "";
+  this->index_data = MatX();
+  this->pos_thres = 0.0;
+  this->vel_thres = 0.0;
+}
+
+int TrajectoryIndex::load(std::string index_file,
+                          double pos_thres,
+                          double vel_thres) {
+  // pre-check
+  if (file_exists(index_file) == false) {
+    log_err("File not found: %s", index_file.c_str());
+    return -1;
+  }
+
+  // load trajectory index
+  // assumes each column is: (index, p0_x, p0_z, pf_x, pf_z, z)
+  csv2mat(index_file, true, this->index_data);
+  this->traj_dir = std::string(dirname((char *) index_file.c_str()));
+  this->pos_thres = pos_thres;
+  this->vel_thres = vel_thres;
+
+  if (this->index_data.rows() == 0) {
+    log_err(ETIROWS, index_file.c_str());
+    return -2;
+  } else if (this->index_data.cols() != 6) {
+    log_err(ETICOLS, index_file.c_str());
+    return -2;
+  }
+
+  this->loaded = true;
+  return 0;
+}
+
+int TrajectoryIndex::find(Vec2 p0, Vec2 pf, double v, Trajectory &traj) {
+  bool p_ok, v_ok;
+  std::vector<double> p0_matches;
+  std::vector<VecX> matches;
+  std::string traj_file;
+
+  // pre-check
+  if (this->loaded == false) {
+    return -1;
+  }
+
+  // NOTE: the following is not the most efficient way of implementing
+  // a lookup table, a better way could involve a search tree and traverse it
+  // or even a bucket based approach. The following implements a list traversal
+  // type search, which is approx O(n), ok for small lookups.
+
+  // find rows in the index that have same approx
+  // start height (p0_z) and velocity (v)
+  for (int i = 0; i < this->index_data.rows(); i++) {
+    p_ok = fabs(p0(1) - this->index_data(i, 2)) < this->pos_thres;
+    v_ok = fabs(v - this->index_data(i, 5)) < this->vel_thres;
+
+    if (p_ok && v_ok) {
+      p0_matches.push_back(i);
+    }
+  }
+
+  // filter those that have approx end position (pf_x)
+  for (int i = 0; i < p0_matches.size(); i++) {
+    if (fabs(pf(0) - this->index_data(p0_matches[i], 3)) < this->pos_thres) {
+      matches.push_back(this->index_data.row(p0_matches[i]));
+    }
+  }
+
+  if (matches.size() == 0) {
+    log_err(ETIFAIL, p0(0), p0(1), pf(0), pf(1), v);
+    return -2;  // found no trajectory
+  }
+
+  // load trajectory
+  traj_file = this->traj_dir + "/";
+  traj_file += std::to_string((int) matches[0](0)) + ".csv";
+  if (traj.load(traj_file) != 0) {
+    log_err(ETLOAD, traj_file.c_str());
+    return -3;
+  }
+
+  return 0;
+}
+
+
+// LANDING CONTROLLER
 LandingController::LandingController(void) {
   this->configured = false;
 
@@ -202,51 +341,20 @@ AttitudeCommand LandingController::calculate(Vec3 target_pos_bf,
   return this->calculate(perrors, verrors, yaw, dt);
 }
 
-int LandingController::loadTrajectoryFile(std::string filepath, Trajectory &traj) {
-  MatX traj_data;
-
-  // pre-check
-  if (file_exists(filepath) == false) {
-    log_err("File not found: %s", filepath.c_str());
-    return -1;
-  }
-
-  // load trajectory file
-  // assumes each column is: x,vx,z,vz,az,theta
-  csv2mat(filepath, true, traj_data);
-  if (traj_data.rows() == 0) {
-    log_err("trajectory file [%s] has 0 rows?", filepath.c_str());
-    return -2;
-  } else if (traj_data.cols() != 6) {
-    log_err("trajectory file [%s] invalid number of cols?", filepath.c_str());
-    return -2;
-  }
-
-  // set trajectory class
-  traj.x = traj_data.col(0);
-  traj.vx = traj_data.col(1);
-  traj.z = traj_data.col(2);
-  traj.vz = traj_data.col(3);
-  traj.az = traj_data.col(4);
-  traj.theta = traj_data.col(5);
-
-  return 0;
-}
-
-int LandingController::executeTrajectory(Trajectory traj,
-                                         Vec3 quad_pos,
-                                         Vec3 target_pos) {
-  int retval;
-
-  // load trajectory
-  // retval = this->loadTrajectory(filepath);
-  // if (retval != 0) {
-  //   log_err("Failed to load trajectory [%s]!", filepath.c_str());
-  // }
-
-
-  return 0;
-}
+// int LandingController::executeTrajectory(Trajectory traj,
+//                                          Vec3 quad_pos,
+//                                          Vec3 target_pos) {
+//   int retval;
+//
+//   // load trajectory
+//   // retval = this->loadTrajectory(filepath);
+//   // if (retval != 0) {
+//   //   log_err("Failed to load trajectory [%s]!", filepath.c_str());
+//   // }
+//
+//
+//   return 0;
+// }
 
 void LandingController::reset(void) {
   this->x_controller.reset();

@@ -2,11 +2,95 @@
 #include "awesomo_core/control/landing_controller.hpp"
 
 #define TEST_CONFIG "tests/configs/control/landing_controller.yaml"
-#define TEST_TRAJ "tests/data/trajectory/trajectory.csv"
+#define TEST_TRAJ_INDEX "tests/data/trajectory/index.csv"
+#define TEST_TRAJ "tests/data/trajectory/0.csv"
 
 
 namespace awesomo {
 
+// TRAJECTORY
+TEST(Trajectory, constructor) {
+  Trajectory trajectory;
+
+  ASSERT_FALSE(trajectory.loaded);
+}
+
+TEST(Trajectory, load) {
+  int retval;
+  Trajectory traj;
+
+  retval = traj.load(TEST_TRAJ);
+  ASSERT_EQ(0, retval);
+  ASSERT_EQ(30, traj.x.size());
+  ASSERT_EQ(30, traj.z.size());
+  ASSERT_EQ(30, traj.vx.size());
+  ASSERT_EQ(30, traj.vz.size());
+  ASSERT_EQ(30, traj.az.size());
+  ASSERT_EQ(30, traj.theta.size());
+}
+
+TEST(Trajectory, reset) {
+  Trajectory traj;
+
+  traj.load(TEST_TRAJ);
+  traj.reset();
+  ASSERT_EQ(0, traj.x.size());
+  ASSERT_EQ(0, traj.z.size());
+  ASSERT_EQ(0, traj.vx.size());
+  ASSERT_EQ(0, traj.vz.size());
+  ASSERT_EQ(0, traj.az.size());
+  ASSERT_EQ(0, traj.theta.size());
+}
+
+
+// TRAJECTORY INDEX
+TEST(TrajectoryIndex, constructor) {
+  TrajectoryIndex index;
+
+  ASSERT_FALSE(index.loaded);
+}
+
+TEST(TrajectoryIndex, load) {
+  int retval;
+  TrajectoryIndex index;
+
+  retval = index.load(TEST_TRAJ_INDEX);
+  ASSERT_EQ(0, retval);
+  ASSERT_TRUE(index.loaded);
+  ASSERT_EQ(7, index.index_data.rows());
+  ASSERT_EQ(6, index.index_data.cols());
+
+  ASSERT_FLOAT_EQ(0.1, index.pos_thres);
+  ASSERT_FLOAT_EQ(0.2, index.vel_thres);
+}
+
+TEST(TrajectoryIndex, find) {
+  int retval;
+  Vec2 p0, pf;
+  double v;
+  Trajectory traj;
+  TrajectoryIndex index;
+
+  // setup
+  index.load(TEST_TRAJ_INDEX);
+
+  // test and assert
+  p0 << 0, 5;
+  pf << 5, 0;
+  v = 1;
+  retval = index.find(p0, pf, v, traj);
+
+  ASSERT_EQ(0, retval);
+  ASSERT_EQ(30, traj.x.size());
+  ASSERT_EQ(30, traj.z.size());
+  ASSERT_EQ(30, traj.vx.size());
+  ASSERT_EQ(30, traj.vz.size());
+  ASSERT_EQ(30, traj.az.size());
+  ASSERT_EQ(30, traj.theta.size());
+}
+
+
+// LANDING CONTROLLER
 TEST(LandingController, constructor) {
   LandingController controller;
 
@@ -238,23 +322,6 @@ TEST(LandingController, calculateVelocityErrors) {
 
   ASSERT_TRUE(controller.vctrl_outputs(0) < 0.0);
   ASSERT_TRUE(controller.vctrl_outputs(1) > 0.0);
-}
-
-TEST(LandingController, loadTrajectoryFile) {
-  int retval;
-  LandingController controller;
-  Trajectory traj;
-
-  controller.configure(TEST_CONFIG);
-  retval = controller.loadTrajectoryFile(TEST_TRAJ, traj);
-
-  ASSERT_EQ(0, retval);
-  ASSERT_EQ(30, traj.x.size());
-  ASSERT_EQ(30, traj.z.size());
-  ASSERT_EQ(30, traj.vx.size());
-  ASSERT_EQ(30, traj.vz.size());
-  ASSERT_EQ(30, traj.az.size());
-  ASSERT_EQ(30, traj.theta.size());
 }
 
 }  // end of awesomo namepsace
