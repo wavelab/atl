@@ -21,6 +21,7 @@ Quadrotor::Quadrotor(void) {
   this->pose = Pose();
   this->hover_position << 0.0, 0.0, 0.0;
   this->landing_target = LandingTarget();
+  this->landing_target_prev = LandingTarget();
 }
 
 int Quadrotor::configure(std::string config_path) {
@@ -117,6 +118,7 @@ int Quadrotor::setTargetPosition(Vec3 position) {
   }
 
   // set target position
+  this->landing_target_prev.position_bf = this->landing_target.position_bf;
   this->landing_target.setTargetPosition(position);
 
   return 0;
@@ -129,6 +131,7 @@ int Quadrotor::setTargetVelocity(Vec3 velocity) {
   }
 
   // set target velocity
+  this->landing_target_prev.velocity_bf = this->landing_target.velocity_bf;
   this->landing_target.setTargetVelocity(velocity);
 
   return 0;
@@ -233,7 +236,6 @@ int Quadrotor::stepDiscoverMode(double dt) {
 }
 
 int Quadrotor::stepTrackingMode(double dt) {
-  Vec3 perrors, verrors;
   bool conditions[3];
 
   // pre-check
@@ -241,20 +243,15 @@ int Quadrotor::stepTrackingMode(double dt) {
     return -1;
   }
 
-  // setup
-  perrors(0) = this->landing_target.position_bf(0);
-  perrors(1) = this->landing_target.position_bf(1);
-  perrors(2) = this->hover_position(2) - this->pose.position(2);
-
-  verrors(0) = this->landing_target.velocity_bf(0);
-  verrors(1) = this->landing_target.velocity_bf(1);
-  verrors(2) = 0.0;
-
   // track target
-  this->att_cmd = this->tracking_controller.calculate(perrors,
-                                                      verrors,
-                                                      this->heading,
-                                                      dt);
+  this->att_cmd = this->tracking_controller.calculate(
+    this->landing_target.position_bf,
+    this->landing_target.velocity_bf,
+    this->pose.position,
+    this->hover_position,
+    this->heading,
+    dt
+  );
 
   // update hover position and tracking timer
   this->setHoverXYPosition(this->pose.position);
@@ -284,32 +281,24 @@ int Quadrotor::stepTrackingMode(double dt) {
 }
 
 int Quadrotor::stepLandingMode(double dt) {
-  Vec3 perrors, verrors;
-  Vec4 output;
   bool conditions[3];
-  double dz;
 
   // pre-check
   if (this->configured == false) {
     return -1;
   }
 
-  // setup
-  dz = (this->pose.position(2) - this->hover_position(2)) / dt;
-
-  perrors(0) = this->landing_target.position_bf(0);
-  perrors(1) = this->landing_target.position_bf(1);
-  perrors(2) = this->hover_position(2) - this->pose.position(2);
-
-  verrors(0) = this->landing_target.velocity_bf(0);
-  verrors(1) = this->landing_target.velocity_bf(1);
-  verrors(2) = -0.2 - dz;
-
   // land on target
-  this->att_cmd = this->landing_controller.calculate(perrors,
-                                                     verrors,
-                                                     this->heading,
-                                                     dt);
+  this->att_cmd = this->landing_controller.calculate(
+    this->landing_target.position_bf,
+    this->landing_target.velocity_bf,
+    this->pose.position,
+    this->hover_position,
+    this->heading,
+    dt
+  );
+
+  // update hover position and tracking timer
   this->setHoverPosition(this->pose.position);
   if (this->landing_tic.tv_sec == 0) {
     tic(&this->landing_tic);

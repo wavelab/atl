@@ -45,6 +45,12 @@ public:
                             Vec3 vel_errors,
                             double yaw,
                             double dt);
+  AttitudeCommand calculate(Vec3 target_pos_bf,
+                            Vec3 target_vel_bf,
+                            Vec3 pos,
+                            Vec3 pos_prev,
+                            double yaw,
+                            double dt);
   void reset(void);
   void printOutputs(void);
   void printErrors(void);

@@ -181,6 +181,25 @@ AttitudeCommand TrackingController::calculate(Vec3 pos_errors,
   return this->att_cmd;
 }
 
+AttitudeCommand TrackingController::calculate(Vec3 target_pos_bf,
+                                              Vec3 target_vel_bf,
+                                              Vec3 pos,
+                                              Vec3 pos_prev,
+                                              double yaw,
+                                              double dt) {
+  Vec3 perrors, verrors;
+
+  perrors(0) = target_pos_bf(0);
+  perrors(1) = target_pos_bf(1);
+  perrors(2) = pos_prev(2) - pos(2);
+
+  verrors(0) = target_vel_bf(0);
+  verrors(1) = target_vel_bf(1);
+  verrors(2) = 0.0;
+
+  return this->calculate(perrors, verrors, yaw, dt);
+}
+
 void TrackingController::reset(void) {
   this->x_controller.reset();
   this->y_controller.reset();

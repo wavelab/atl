@@ -154,9 +154,9 @@ class Quadrotor(ROSNode):
         self.pubs[self.pctrl_set_topic].publish(msg)
 
 
-class MavrosTopics(ROSNode):
+class MAVROS(ROSNode):
     def __init__(self):
-        super(MavrosTopics, self).__init__()
+        super(MAVROS, self).__init__()
         self.local_pose_topic = "/mavros/local_position/pose"
 
         self.register_publisher(self.local_pose_topic, PoseStamped)
@@ -191,7 +191,7 @@ if __name__ == "__main__":
     camera = Camera()
     quad = Quadrotor()
     gimbal = Gimbal()
-    mavros = MavrosTopics()
+    mavros = MAVROS()
     rospy.sleep(0.5)
 
     # mavros.set_local_pose(0, 0, 0)
@@ -203,7 +203,7 @@ if __name__ == "__main__":
     # lz.set_velocity(0.0)
     # lz.set_position([0, 0, 0])
 
-    # velocity, angular_velocity = lz_circle_path(20, 5.0)
+    # velocity, angular_velocity = lz_circle_path(20, 1.0)
     # lz.set_velocity(velocity)
     # lz.set_angular_velocity(angular_velocity)
 

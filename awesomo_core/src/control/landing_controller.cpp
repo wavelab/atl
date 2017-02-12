@@ -179,6 +179,29 @@ AttitudeCommand LandingController::calculate(Vec3 pos_errors,
   return this->att_cmd;
 }
 
+
+AttitudeCommand LandingController::calculate(Vec3 target_pos_bf,
+                                             Vec3 target_vel_bf,
+                                             Vec3 pos,
+                                             Vec3 pos_prev,
+                                             double yaw,
+                                             double dt) {
+  Vec3 perrors, verrors;
+  double dz;
+
+  dz = (pos(2) - pos_prev(2)) / dt;
+
+  perrors(0) = target_pos_bf(0);
+  perrors(1) = target_pos_bf(1);
+  perrors(2) = pos_prev(2) - pos(2);
+
+  verrors(0) = target_vel_bf(0);
+  verrors(1) = target_vel_bf(1);
+  verrors(2) = -0.2 - dz;
+
+  return this->calculate(perrors, verrors, yaw, dt);
+}
+
 int LandingController::loadTrajectoryFile(std::string filepath, Trajectory &traj) {
   MatX traj_data;
 
@@ -206,6 +229,21 @@ int LandingController::loadTrajectoryFile(std::string filepath, Trajectory &traj
   traj.vz = traj_data.col(3);
   traj.az = traj_data.col(4);
   traj.theta = traj_data.col(5);
+
+  return 0;
+}
+
+int LandingController::executeTrajectory(Trajectory traj,
+                                         Vec3 quad_pos,
+                                         Vec3 target_pos) {
+  int retval;
+
+  // load trajectory
+  // retval = this->loadTrajectory(filepath);
+  // if (retval != 0) {
+  //   log_err("Failed to load trajectory [%s]!", filepath.c_str());
+  // }
+
 
   return 0;
 }

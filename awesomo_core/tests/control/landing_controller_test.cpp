@@ -249,6 +249,12 @@ TEST(LandingController, loadTrajectoryFile) {
   retval = controller.loadTrajectoryFile(TEST_TRAJ, traj);
 
   ASSERT_EQ(0, retval);
+  ASSERT_EQ(30, traj.x.size());
+  ASSERT_EQ(30, traj.z.size());
+  ASSERT_EQ(30, traj.vx.size());
+  ASSERT_EQ(30, traj.vz.size());
+  ASSERT_EQ(30, traj.az.size());
+  ASSERT_EQ(30, traj.theta.size());
 }
 
 }  // end of awesomo namepsace
