@@ -15,7 +15,7 @@ namespace awesomo {
 
 #define ETROWS "Trajectory [%s] has 0 rows!"
 #define ETCOLS "Trajectory [%s] invalid number of cols!"
-#define ETLOAD "Failed to load trajectory file [%s]!"
+#define ETLOAD "Failed to load trajectory!"
 #define ETIROWS "Trajectory index [%s] has 0 rows!"
 #define ETICOLS "Trajectory index [%s] invalid number of cols!"
 #define ETIFAIL "Found no trajectory for p0 = (%f, %f), pf = (%f, %f), v = %f"
@@ -78,7 +78,7 @@ public:
 
   LandingController(void);
   int configure(std::string config_file);
-  int loadTrajectory(Vec3 pos, Vec3 target_pos_bf);
+  int loadTrajectory(Vec3 pos, Vec3 target_pos_bf, double v);
   Vec4 calculatePositionErrors(Vec3 errors, double yaw, double dt);
   Vec4 calculateVelocityErrors(Vec3 errors, double yaw, double dt);
   AttitudeCommand calculate(Vec3 pos_errors,

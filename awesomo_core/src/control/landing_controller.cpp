@@ -123,9 +123,7 @@ int TrajectoryIndex::find(Vec2 p0, Vec2 pf, double v, Trajectory &traj) {
       matches.push_back(this->index_data.row(p0_matches[i]));
     }
   }
-
   if (matches.size() == 0) {
-    log_err(ETIFAIL, p0(0), p0(1), pf(0), pf(1), v);
     return -2;  // found no trajectory
   }
 
@@ -133,7 +131,6 @@ int TrajectoryIndex::find(Vec2 p0, Vec2 pf, double v, Trajectory &traj) {
   traj_file = this->traj_dir + "/";
   traj_file += std::to_string((int) matches[0](0)) + ".csv";
   if (traj.load(traj_file) != 0) {
-    log_err(ETLOAD, traj_file.c_str());
     return -3;
   }
 
@@ -221,7 +218,6 @@ int LandingController::configure(std::string config_file) {
   config_dir = std::string(dirname((char *) config_file.c_str()));
   paths_combine(config_dir, traj_index_file, traj_index_file);
   if (this->traj_index.load(traj_index_file) != 0) {
-    log_err(ETLOAD, traj_index_file.c_str());
     return -2;
   }
 
@@ -241,15 +237,29 @@ int LandingController::configure(std::string config_file) {
   return 0;
 }
 
-int LandingController::loadTrajectory(Vec3 pos, Vec3 target_pos_bf) {
+int LandingController::loadTrajectory(Vec3 pos,
+                                      Vec3 target_pos_bf,
+                                      double v) {
+  Vec2 quad, target;
+  int retval;
 
+  quad << pos(0), pos(2);
+  target << target_pos_bf(0), target_pos_bf(2);
+  retval = this->traj_index.find(quad, target, v, this->trajectory);
+  if (retval == -2) {
+    log_err(ETIFAIL, pos(0), pos(1), target_pos_bf(0), target_pos_bf(1), v);
+    return -1;
+  } else if (retval == -3) {
+    log_err(ETLOAD);
+    return -1;
+  }
 
   return 0;
 }
 
 Vec4 LandingController::calculatePositionErrors(Vec3 errors,
-                                                 double yaw,
-                                                 double dt) {
+                                                double yaw,
+                                                double dt) {
   double r, p, y, t;
   Vec3 euler;
   Mat3 R;

@@ -204,6 +204,29 @@ TEST(LandingController, configure) {
   ASSERT_FLOAT_EQ(0.0, controller.pctrl_outputs(3));
 }
 
+TEST(LandingController, loadTrajectory) {
+  LandingController controller;
+  Vec3 p0, pf;
+  double v;
+  int retval;
+
+  p0 << 0, 0, 5;
+  pf << 5, 0, 0;
+  v = 1;
+
+  controller.configure(TEST_CONFIG);
+  retval = controller.loadTrajectory(p0, pf, v);
+
+  ASSERT_EQ(0, retval);
+  ASSERT_TRUE(controller.trajectory.loaded);
+  ASSERT_EQ(30, controller.trajectory.x.size());
+  ASSERT_EQ(30, controller.trajectory.z.size());
+  ASSERT_EQ(30, controller.trajectory.vx.size());
+  ASSERT_EQ(30, controller.trajectory.vz.size());
+  ASSERT_EQ(30, controller.trajectory.az.size());
+  ASSERT_EQ(30, controller.trajectory.theta.size());
+}
+
 TEST(LandingController, calculatePositionErrors) {
   Vec3 errors;
   double yaw, dt;
