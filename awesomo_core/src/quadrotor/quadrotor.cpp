@@ -257,6 +257,14 @@ int Quadrotor::stepTrackingMode(double dt) {
     return -1;
   }
 
+  // calculate velocity
+  // velocity = (this->pose.position - this->hover_position) / dt;
+  // v = velocity.block(0, 0, 2, 1).norm();
+  // std::cout << "pose.position: " << this->pose.position.transpose() << std::endl;
+  // std::cout << "hover_position: " << this->hover_position.transpose() << std::endl;
+  // std::cout << "velocity: " << velocity.transpose() << std::endl;
+  // std::cout << "v: " << v << std::endl;
+
   // track target
   this->att_cmd = this->tracking_controller.calculate(
     this->landing_target.position_bf,
@@ -280,8 +288,6 @@ int Quadrotor::stepTrackingMode(double dt) {
 
   if (this->conditionsMet(conditions, 3) && this->auto_land) {
     // load trajectory
-    velocity = (this->pose.position - this->hover_position) / dt;
-    v = velocity.block(0, 0, 2, 1).norm();
     retval = this->landing_controller.loadTrajectory(
       this->pose.position,
       this->landing_target.position_bf,
@@ -300,6 +306,7 @@ int Quadrotor::stepTrackingMode(double dt) {
     log_info("Transitioning back to [DISCOVER_MODE]!");
     this->setMode(DISCOVER_MODE);
     this->tracking_tic = (struct timespec){0};
+    this->hover_position(2) = this->recover_height;
   }
 
   return 0;

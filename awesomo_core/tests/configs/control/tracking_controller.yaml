@@ -36,3 +36,5 @@ pitch_limit:
 throttle_limit:
     min: -1.0
     max: 1.0
+
+track_offset: [1.0, 2.0, 3.0]

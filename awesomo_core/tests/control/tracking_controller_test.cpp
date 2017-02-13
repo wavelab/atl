@@ -45,6 +45,13 @@ TEST(TrackingController, constructor) {
   ASSERT_FLOAT_EQ(0.0, controller.pitch_limit[0]);
   ASSERT_FLOAT_EQ(0.0, controller.pitch_limit[1]);
 
+  ASSERT_FLOAT_EQ(0.0, controller.throttle_limit[0]);
+  ASSERT_FLOAT_EQ(0.0, controller.throttle_limit[1]);
+
+  ASSERT_FLOAT_EQ(0.0, controller.track_offset[0]);
+  ASSERT_FLOAT_EQ(0.0, controller.track_offset[1]);
+  ASSERT_FLOAT_EQ(0.0, controller.track_offset[2]);
+
   ASSERT_FLOAT_EQ(0.0, controller.pctrl_setpoints(0));
   ASSERT_FLOAT_EQ(0.0, controller.pctrl_setpoints(0));
   ASSERT_FLOAT_EQ(0.0, controller.pctrl_setpoints(1));
@@ -109,6 +116,13 @@ TEST(TrackingController, configure) {
   ASSERT_FLOAT_EQ(-1.0, controller.throttle_limit[0]);
   ASSERT_FLOAT_EQ(1.0, controller.throttle_limit[1]);
 
+  ASSERT_FLOAT_EQ(1.0, controller.track_offset[0]);
+  ASSERT_FLOAT_EQ(2.0, controller.track_offset[1]);
+  ASSERT_FLOAT_EQ(3.0, controller.track_offset[2]);
+
+  ASSERT_FLOAT_EQ(-1.0, controller.throttle_limit[0]);
+  ASSERT_FLOAT_EQ(1.0, controller.throttle_limit[1]);
+
   ASSERT_FLOAT_EQ(0.0, controller.pctrl_setpoints(0));
   ASSERT_FLOAT_EQ(0.0, controller.pctrl_setpoints(1));
   ASSERT_FLOAT_EQ(0.0, controller.pctrl_setpoints(2));
@@ -126,6 +140,7 @@ TEST(TrackingController, calculatePositionErrors) {
 
   // setup
   controller.configure(TEST_CONFIG);
+  controller.track_offset << 0.0, 0.0, 0.0;
 
   // CHECK HOVERING PID OUTPUT
   errors << 0, 0, 0;
@@ -193,6 +208,7 @@ TEST(TrackingController, calculateVelocityErrors) {
 
   // setup
   controller.configure(TEST_CONFIG);
+  controller.track_offset << 0.0, 0.0, 0.0;
 
   // CHECK HOVERING PID OUTPUT
   verrors << 0, 0, 0;

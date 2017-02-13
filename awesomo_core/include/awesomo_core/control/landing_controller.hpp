@@ -45,7 +45,7 @@ public:
 
   TrajectoryIndex(void);
   int load(std::string index_file,
-           double pos_thres=0.1,
+           double pos_thres=0.2,
            double vel_thres=0.2);
   int find(Vec2 p0, Vec2 pf, double v, Trajectory &traj);
 };

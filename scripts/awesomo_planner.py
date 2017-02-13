@@ -33,19 +33,30 @@ def quadrotor(x, u, dt, cdx=0.5, cdz=0.2):
     return x
 
 
-def desired_system(p0, pf, T, dt):
+def desired_system(p0, pf, v, dt):
     desired = []
     traj = []
 
     # calculate line equation, gradient and intersect
-    dx = (p0[0] - pf[0])
-    dy = (p0[1] - pf[1])
+    dx = (pf[0] - p0[0])
+    dz = (pf[1] - p0[1])
     if dx != 0.0:
-        m = dy / dx
+        m = dz / dx
     else:
         m = p0[0]
-
     c = p0[1] - m * p0[0]
+
+    # calculate time steps
+    if dx == 0.0:
+        T = (dz / 0.25) / dt
+    elif v == 0.0:
+        T = (dx / 1.0) / dt
+    else:
+        T = (dx / v) / dt
+    T = int(T)
+    print(p0, pf, v, T)
+
+    # calculate desired velocity and inputs
     vx = (pf[0] - p0[0]) / (T * dt)
     vz = (pf[1] - p0[1]) / (T * dt)
     az = 10.0
@@ -75,7 +86,7 @@ def desired_system(p0, pf, T, dt):
     traj.append(pf)
     desired.append([pf[0], 0.0, pf[1], 0.0, 0.0, 0.0])
 
-    return (np.array(desired), np.array(traj))
+    return (np.array(desired), np.array(traj), T)
 
 
 def generate_bounds(T, n, m, nbs, mbs):
@@ -110,6 +121,8 @@ def plot_optimization_results(traj, x, T, n, m):
     plt.figure(1)
 
     plt.subplot(411)
+    plt.tight_layout()
+
     plt.plot(traj[0], traj[1], label="desired")
     plt.plot(x[0], x[2], label="optimized")
     plt.title("Landing Trajectory")
@@ -226,11 +239,13 @@ def ine_constraints(x, *args):
     return retval
 
 
-def optimize(p0, pf):
-    T = 30      # num of time steps
+def optimize(p0, pf, v):
     dt = 0.1    # time step
     n = 4       # num of states
     m = 2       # num of inputs
+
+    x0, traj, T = desired_system(p0, pf, v, dt)
+    # plot_desired_trajectory(traj)
 
     # state bounds
     state_bounds = (
@@ -249,10 +264,7 @@ def optimize(p0, pf):
     # generate bounds for all time steps
     bounds = generate_bounds(T, n, m, state_bounds, input_bounds)
 
-    # setup
-    x0, traj = desired_system(p0, pf, T, dt)
-    # plot_desired_trajectory(traj)
-
+    # constraints
     args = {"traj": traj, "T": T, "n": n, "m": m}
     constraints = [
         # equality constraint for start position
@@ -305,11 +317,12 @@ def record_optimized_results(T, n, m, fpath, results):
 
 def generate_trajectory_table():
     p0_x = [0.0]
-    p0_z = frange(5, 10, 1, 1)
-    pf_x = frange(0, 10, 1, 1)
+    p0_z = frange(5, 6, 1, 1)
+    pf_x = frange(1, 6, 1, 1)
     pf_z = [0.0]
+    v = frange(0, 5, 1)
 
-    conditions = [p0_x, p0_z, pf_x, pf_z]
+    conditions = [p0_x, p0_z, pf_x, pf_z, v]
     conditions = list(itertools.product(*conditions))
 
     table = []
@@ -321,32 +334,33 @@ def generate_trajectory_table():
 
 
 if __name__ == "__main__":
-    # basedir = "./trajectory/"
-    # table = generate_trajectory_table()
-    # index = 0
+    basedir = "./trajectory/"
+    table = generate_trajectory_table()
+    index = 0
 
-    # T = 30
-    # dt = 0.1
-    # p0 = [0, 5]
-    # pf = [5, 0]
-    # desired_system(p0, pf, T, dt)
+    # prep index file
+    index_file = open(basedir + "index.csv", "wb")
+    index_file.write(bytes("index,p0_x,p0_z,pf_x,pf_z,v\n", "UTF-8"))
 
-    # # prep index file
-    # index_file = open(basedir + "index.csv", "wb")
-    # index_file.write(bytes("index,p0,pf\n", "UTF-8"))
-    #
-    # # create trajectory table
-    # for t in table:
-    #     p0 = (t[0], t[1])
-    #     pf = (t[2], t[3])
-    #     filepath = basedir + str(index) + ".csv"
-    #     index_file.write(bytes("{0},{1},{2}\n".format(index, p0, pf), "UTF-8"))
-    #     index += 1
-    #
-    #     print("Optimizing for {0} to {1}".format(p0, pf))
-    #     T, n, m, results = optimize(p0, pf)
-    #     record_optimized_results(T, n, m, filepath, results)
+    # create trajectory table
+    for t in table:
+        p0 = (t[0], t[1])
+        pf = (t[2], t[3])
+        v = t[4]
 
-    # # close index file
-    # index_file.close()
-    pass
+        filepath = basedir + str(index) + ".csv"
+        index_line = "{0},{1},{2},{3},{4},{5}\n".format(
+            index,
+            p0[0], p0[1],
+            pf[0], pf[1],
+            v
+        )
+        index_file.write(bytes(index_line, "UTF-8"))
+        index += 1
+
+        print("Optimizing for {0} to {1} @ {2}ms^-1".format(p0, pf, v))
+        T, n, m, results = optimize(p0, pf, v)
+        record_optimized_results(T, n, m, filepath, results)
+
+    # close index file
+    index_file.close()

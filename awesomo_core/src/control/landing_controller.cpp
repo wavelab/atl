@@ -279,11 +279,11 @@ int LandingController::loadTrajectory(Vec3 pos,
   int retval;
 
   quad << 0.0, pos(2);
-  target << target_pos_bf(0), target_pos_bf(2);
+  target << target_pos_bf(0), pos(2) + target_pos_bf(2);
   retval = this->traj_index.find(quad, target, v, this->trajectory);
 
   if (retval == -2) {
-    log_err(ETIFAIL, pos(0), pos(1), target_pos_bf(0), target_pos_bf(1), v);
+    log_err(ETIFAIL, quad(0), quad(1), target(0), target(1), v);
     return -1;
   } else if (retval == -3) {
     log_err(ETLOAD);
@@ -389,7 +389,7 @@ AttitudeCommand LandingController::calculate(Vec3 target_pos_bf,
                                              double dt) {
   Vec3 perrors, verrors;
   Vec2 wp_pos, wp_vel;
-  // double vz;
+  double vz;
 
   // obtain position and velocity waypoints
   this->trajectory.update(target_pos_bf, wp_pos, wp_vel);
@@ -399,10 +399,10 @@ AttitudeCommand LandingController::calculate(Vec3 target_pos_bf,
   perrors(1) = target_pos_bf(1);
   perrors(2) = wp_pos(1) - pos(2);
 
-  // vz = (pos(2) - pos_prev(2)) / dt;
+  vz = (pos(2) - pos_prev(2)) / dt;
   verrors(0) = wp_vel(0);
   verrors(1) = target_vel_bf(1);
-  verrors(2) = wp_vel(1);
+  verrors(2) = wp_vel(1) - vz;
 
   // control
   return this->calculate(perrors, verrors, yaw, dt);

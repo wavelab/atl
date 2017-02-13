@@ -30,6 +30,7 @@ public:
   double roll_limit[2];
   double pitch_limit[2];
   double throttle_limit[2];
+  Vec3 track_offset;
 
   Vec3 pctrl_setpoints;
   Vec4 pctrl_outputs;

@@ -23,6 +23,7 @@ TrackingController::TrackingController(void) {
   this->pitch_limit[1] = 0.0;
   this->throttle_limit[0] = 0.0;
   this->throttle_limit[1] = 0.0;
+  this->track_offset << 0.0, 0.0, 0.0;
 
   this->pctrl_setpoints << 0.0, 0.0, 0.0;
   this->pctrl_outputs << 0.0, 0.0, 0.0, 0.0;
@@ -69,6 +70,8 @@ int TrackingController::configure(std::string config_file) {
 
   parser.addParam<double>("throttle_limit.min", &this->throttle_limit[0]);
   parser.addParam<double>("throttle_limit.max", &this->throttle_limit[1]);
+
+  parser.addParam<Vec3>("track_offset", &this->track_offset);
   // clang-format on
 
   if (parser.load(config_file) != 0) {
@@ -103,6 +106,9 @@ Vec4 TrackingController::calculatePositionErrors(Vec3 errors,
   if (this->pctrl_dt < 0.01) {
     return this->pctrl_outputs;
   }
+
+  // add offsets
+  errors = errors + this->track_offset;
 
   // roll, pitch, yaw and throttle (assuming NWU frame)
   // clang-format off
