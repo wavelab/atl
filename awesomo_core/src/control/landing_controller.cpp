@@ -101,10 +101,10 @@ int TrajectoryIndex::find(Vec2 p0, Vec2 pf, double v, Trajectory &traj) {
     return -1;
   }
 
-  // NOTE: the following is not the most efficient way of implementing
-  // a lookup table, a better way could involve a search tree and traverse it
-  // or even a bucket based approach. The following implements a list traversal
-  // type search, which is approx O(n), ok for small lookups.
+  // NOTE: the following is not the most efficient way of implementing a lookup
+  // table, a better way could involve a search tree and traverse it or even a
+  // bucket based approach. The following implements a list traversal type
+  // search which is approx O(n), ok for small lookups.
 
   // find rows in the index that have same approx
   // start height (p0_z) and velocity (v)
@@ -172,6 +172,8 @@ LandingController::LandingController(void) {
 
 int LandingController::configure(std::string config_file) {
   ConfigParser parser;
+  std::string config_dir;
+  std::string traj_index_file;
 
   // load config
   // clang-format off
@@ -208,10 +210,19 @@ int LandingController::configure(std::string config_file) {
 
   parser.addParam<double>("throttle_limit.min", &this->throttle_limit[0]);
   parser.addParam<double>("throttle_limit.max", &this->throttle_limit[1]);
-  // clang-format on
 
+  parser.addParam<std::string>("trajectory_index", &traj_index_file);
+  // clang-format on
   if (parser.load(config_file) != 0) {
     return -1;
+  }
+
+  // load trajectory index
+  config_dir = std::string(dirname((char *) config_file.c_str()));
+  paths_combine(config_dir, traj_index_file, traj_index_file);
+  if (this->traj_index.load(traj_index_file) != 0) {
+    log_err(ETLOAD, traj_index_file.c_str());
+    return -2;
   }
 
   // convert roll and pitch limits from degrees to radians
@@ -227,6 +238,12 @@ int LandingController::configure(std::string config_file) {
   this->vctrl_outputs << 0.0, 0.0, 0.0, 0.0;
 
   this->configured = true;
+  return 0;
+}
+
+int LandingController::loadTrajectory(Vec3 pos, Vec3 target_pos_bf) {
+
+
   return 0;
 }
 
@@ -318,7 +335,6 @@ AttitudeCommand LandingController::calculate(Vec3 pos_errors,
   return this->att_cmd;
 }
 
-
 AttitudeCommand LandingController::calculate(Vec3 target_pos_bf,
                                              Vec3 target_vel_bf,
                                              Vec3 pos,
@@ -340,21 +356,6 @@ AttitudeCommand LandingController::calculate(Vec3 target_pos_bf,
 
   return this->calculate(perrors, verrors, yaw, dt);
 }
-
-// int LandingController::executeTrajectory(Trajectory traj,
-//                                          Vec3 quad_pos,
-//                                          Vec3 target_pos) {
-//   int retval;
-//
-//   // load trajectory
-//   // retval = this->loadTrajectory(filepath);
-//   // if (retval != 0) {
-//   //   log_err("Failed to load trajectory [%s]!", filepath.c_str());
-//   // }
-//
-//
-//   return 0;
-// }
 
 void LandingController::reset(void) {
   this->x_controller.reset();

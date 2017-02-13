@@ -67,6 +67,7 @@ double wrapTo180(double euler_angle);
 double wrapTo360(double euler_angle);
 double cross_track_error(Vec2 p1, Vec2 p2, Vec2 pos);
 int point_left_right(Vec2 p1, Vec2 p2, Vec2 pos);
+int closest_point(Vec2 p1, Vec2 p2, Vec2 p3, Vec2 &closest);
 
 }  // end of awesomo namespace
 #endif

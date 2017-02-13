@@ -78,7 +78,7 @@ public:
 
   LandingController(void);
   int configure(std::string config_file);
-  int loadTrajectoryIndexFile(std::string traj_index_file);
+  int loadTrajectory(Vec3 pos, Vec3 target_pos_bf);
   Vec4 calculatePositionErrors(Vec3 errors, double yaw, double dt);
   Vec4 calculateVelocityErrors(Vec3 errors, double yaw, double dt);
   AttitudeCommand calculate(Vec3 pos_errors,

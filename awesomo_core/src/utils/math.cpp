@@ -408,4 +408,27 @@ int point_left_right(Vec2 a, Vec2 b, Vec2 c) {
   return -1;
 }
 
+int closest_point(Vec2 a, Vec2 b, Vec2 p, Vec2 &closest) {
+  Vec2 v1, v2, result;
+  double t;
+
+  // calculate closest point
+  v1 = p - a;
+  v2 = b - a;
+  t = v1.dot(v2) / v2.squaredNorm();
+  closest = a + t * v2;
+
+  // check if point p is:
+  // 1. before point a
+  // 2. after point b
+  // 3. middle of point a, b
+  if (t < 0) {
+    return 1;
+  } else if (t > 1) {
+    return 2;
+  } else {
+    return 0;
+  }
+}
+
 }  // eof awesomo
