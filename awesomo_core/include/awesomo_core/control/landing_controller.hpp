@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <libgen.h>
 #include <string>
+#include <deque>
 
 #include <yaml-cpp/yaml.h>
 
@@ -23,11 +24,13 @@ namespace awesomo {
 class Trajectory {
 public:
   bool loaded;
-  VecX x, z, vx, vz;
-  VecX az,theta;
+  std::deque<Vec2> pos;
+  std::deque<Vec2> vel;
+  std::deque<Vec2> inputs;
 
   Trajectory(void);
   int load(std::string filepath);
+  int update(Vec3 target_pos_bf, Vec2 &wp_pos, Vec2 &wp_vel);
   void reset(void);
 };
 

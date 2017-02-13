@@ -21,12 +21,17 @@ TEST(Trajectory, load) {
 
   retval = traj.load(TEST_TRAJ);
   ASSERT_EQ(0, retval);
-  ASSERT_EQ(30, traj.x.size());
-  ASSERT_EQ(30, traj.z.size());
-  ASSERT_EQ(30, traj.vx.size());
-  ASSERT_EQ(30, traj.vz.size());
-  ASSERT_EQ(30, traj.az.size());
-  ASSERT_EQ(30, traj.theta.size());
+  ASSERT_EQ(30, traj.pos.size());
+  ASSERT_EQ(30, traj.vel.size());
+  ASSERT_EQ(30, traj.inputs.size());
+}
+
+TEST(Trajectory, update) {
+  Trajectory traj;
+
+  traj.load(TEST_TRAJ);
+
+
 }
 
 TEST(Trajectory, reset) {
@@ -34,12 +39,9 @@ TEST(Trajectory, reset) {
 
   traj.load(TEST_TRAJ);
   traj.reset();
-  ASSERT_EQ(0, traj.x.size());
-  ASSERT_EQ(0, traj.z.size());
-  ASSERT_EQ(0, traj.vx.size());
-  ASSERT_EQ(0, traj.vz.size());
-  ASSERT_EQ(0, traj.az.size());
-  ASSERT_EQ(0, traj.theta.size());
+  ASSERT_EQ(0, traj.pos.size());
+  ASSERT_EQ(0, traj.vel.size());
+  ASSERT_EQ(0, traj.inputs.size());
 }
 
 
@@ -81,12 +83,9 @@ TEST(TrajectoryIndex, find) {
   retval = index.find(p0, pf, v, traj);
 
   ASSERT_EQ(0, retval);
-  ASSERT_EQ(30, traj.x.size());
-  ASSERT_EQ(30, traj.z.size());
-  ASSERT_EQ(30, traj.vx.size());
-  ASSERT_EQ(30, traj.vz.size());
-  ASSERT_EQ(30, traj.az.size());
-  ASSERT_EQ(30, traj.theta.size());
+  ASSERT_EQ(30, traj.pos.size());
+  ASSERT_EQ(30, traj.vel.size());
+  ASSERT_EQ(30, traj.inputs.size());
 }
 
 
@@ -219,12 +218,9 @@ TEST(LandingController, loadTrajectory) {
 
   ASSERT_EQ(0, retval);
   ASSERT_TRUE(controller.trajectory.loaded);
-  ASSERT_EQ(30, controller.trajectory.x.size());
-  ASSERT_EQ(30, controller.trajectory.z.size());
-  ASSERT_EQ(30, controller.trajectory.vx.size());
-  ASSERT_EQ(30, controller.trajectory.vz.size());
-  ASSERT_EQ(30, controller.trajectory.az.size());
-  ASSERT_EQ(30, controller.trajectory.theta.size());
+  ASSERT_EQ(30, controller.trajectory.pos.size());
+  ASSERT_EQ(30, controller.trajectory.vel.size());
+  ASSERT_EQ(30, controller.trajectory.inputs.size());
 }
 
 TEST(LandingController, calculatePositionErrors) {

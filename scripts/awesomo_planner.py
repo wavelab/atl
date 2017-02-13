@@ -305,8 +305,8 @@ def record_optimized_results(T, n, m, fpath, results):
 
 def generate_trajectory_table():
     p0_x = [0.0]
-    p0_z = frange(2, 10, 0.1, 1)
-    pf_x = frange(0, 10, 0.1, 1)
+    p0_z = frange(5, 10, 1, 1)
+    pf_x = frange(0, 10, 1, 1)
     pf_z = [0.0]
 
     conditions = [p0_x, p0_z, pf_x, pf_z]
@@ -321,25 +321,32 @@ def generate_trajectory_table():
 
 
 if __name__ == "__main__":
-    basedir = "./trajectory/"
-    table = generate_trajectory_table()
-    index = 0
+    # basedir = "./trajectory/"
+    # table = generate_trajectory_table()
+    # index = 0
 
-    # prep index file
-    index_file = open(basedir + "index.csv", "wb")
-    index_file.write(bytes("index,p0,pf\n", "UTF-8"))
+    # T = 30
+    # dt = 0.1
+    # p0 = [0, 5]
+    # pf = [5, 0]
+    # desired_system(p0, pf, T, dt)
 
-    # create trajectory table
-    for t in table:
-        p0 = (t[0], t[1])
-        pf = (t[2], t[3])
-        filepath = basedir + str(index) + ".csv"
-        index_file.write(bytes("{0},{1},{2}\n".format(index, p0, pf), "UTF-8"))
-        index += 1
+    # # prep index file
+    # index_file = open(basedir + "index.csv", "wb")
+    # index_file.write(bytes("index,p0,pf\n", "UTF-8"))
+    #
+    # # create trajectory table
+    # for t in table:
+    #     p0 = (t[0], t[1])
+    #     pf = (t[2], t[3])
+    #     filepath = basedir + str(index) + ".csv"
+    #     index_file.write(bytes("{0},{1},{2}\n".format(index, p0, pf), "UTF-8"))
+    #     index += 1
+    #
+    #     print("Optimizing for {0} to {1}".format(p0, pf))
+    #     T, n, m, results = optimize(p0, pf)
+    #     record_optimized_results(T, n, m, filepath, results)
 
-        print("Optimizing for {0} to {1}".format(p0, pf))
-        T, n, m, results = optimize(p0, pf)
-        record_optimized_results(T, n, m, filepath, results)
-
-    # close index file
-    index_file.close()
+    # # close index file
+    # index_file.close()
+    pass

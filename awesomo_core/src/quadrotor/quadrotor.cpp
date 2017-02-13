@@ -247,7 +247,10 @@ int Quadrotor::stepDiscoverMode(double dt) {
 }
 
 int Quadrotor::stepTrackingMode(double dt) {
+  int retval;
   bool conditions[3];
+  Vec3 velocity;
+  double v;
 
   // pre-check
   if (this->configured == false) {
@@ -276,9 +279,20 @@ int Quadrotor::stepTrackingMode(double dt) {
   conditions[2] = mtoc(&this->tracking_tic) > this->min_tracking_time;
 
   if (this->conditionsMet(conditions, 3) && this->auto_land) {
-    // transition to landing mode
-    this->setMode(LANDING_MODE);
-    this->tracking_tic = (struct timespec){0};
+    // load trajectory
+    velocity = (this->pose.position - this->hover_position) / dt;
+    v = velocity.block(0, 0, 2, 1).norm();
+    retval = this->landing_controller.loadTrajectory(
+      this->pose.position,
+      this->landing_target.position_bf,
+      v
+    );
+
+    if (retval == 0) {
+      // transition to landing mode
+      this->setMode(LANDING_MODE);
+      this->tracking_tic = (struct timespec){0};
+    }
 
   } else if (this->landing_target.isTargetLosted()) {
     // transition back to discover mode

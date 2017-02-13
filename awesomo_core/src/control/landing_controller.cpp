@@ -6,10 +6,14 @@ namespace awesomo {
 // TRAJECTORY
 Trajectory::Trajectory(void) {
   this->loaded = false;
+  this->pos.clear();
+  this->vel.clear();
+  this->inputs.clear();
 }
 
 int Trajectory::load(std::string filepath) {
   MatX traj_data;
+  Vec2 pos, vel, inputs;
 
   // pre-check
   if (file_exists(filepath) == false) {
@@ -29,25 +33,56 @@ int Trajectory::load(std::string filepath) {
   }
 
   // set trajectory class
-  this->x = traj_data.col(0);
-  this->vx = traj_data.col(1);
-  this->z = traj_data.col(2);
-  this->vz = traj_data.col(3);
-  this->az = traj_data.col(4);
-  this->theta = traj_data.col(5);
+  for (int i = 0; i < traj_data.rows(); i++) {
+    pos << traj_data(i, 0), traj_data(i, 2);
+    vel << traj_data(i, 1), traj_data(i, 3);
+    inputs << traj_data(i, 4), traj_data(i, 5);
+
+    this->pos.push_back(pos);
+    this->vel.push_back(vel);
+    this->inputs.push_back(inputs);
+  }
 
   this->loaded = true;
   return 0;
 }
 
-void Trajectory::reset(void) {
-  this->x = VecX();
-  this->z = VecX();
-  this->vx = VecX();
-  this->vz = VecX();
-  this->az = VecX();
-  this->theta = VecX();
+int Trajectory::update(Vec3 target_pos_bf, Vec2 &wp_pos, Vec2 &wp_vel) {
+  int retval;
+  Vec2 wp_pos_start, wp_pos_end, pos;
 
+  // pre-check
+  if (this->loaded == false) {
+    return -1;
+  } else if (this->pos.size() < 2) {
+    wp_pos = this->pos.at(0);
+    wp_vel = this->vel.at(0);
+    return 0;
+  }
+
+  // setup
+  wp_pos_start = this->pos.at(0);
+  wp_pos_end = this->pos.at(1);
+  pos << target_pos_bf(0), target_pos_bf(2);
+
+  // find next waypoint position and velocity
+  retval = closest_point(wp_pos_start, wp_pos_end, pos, wp_pos);
+  wp_vel = this->vel.at(0);
+
+  // update trajectory waypoints
+  if (retval == 2) {
+    this->pos.pop_front();
+    this->vel.pop_front();
+    this->inputs.pop_front();
+  }
+
+  return 0;
+}
+
+void Trajectory::reset(void) {
+  this->pos.clear();
+  this->vel.clear();
+  this->inputs.clear();
   this->loaded = false;
 }
 
@@ -243,9 +278,10 @@ int LandingController::loadTrajectory(Vec3 pos,
   Vec2 quad, target;
   int retval;
 
-  quad << pos(0), pos(2);
+  quad << 0.0, pos(2);
   target << target_pos_bf(0), target_pos_bf(2);
   retval = this->traj_index.find(quad, target, v, this->trajectory);
+
   if (retval == -2) {
     log_err(ETIFAIL, pos(0), pos(1), target_pos_bf(0), target_pos_bf(1), v);
     return -1;
@@ -352,18 +388,23 @@ AttitudeCommand LandingController::calculate(Vec3 target_pos_bf,
                                              double yaw,
                                              double dt) {
   Vec3 perrors, verrors;
-  double dz;
+  Vec2 wp_pos, wp_vel;
+  // double vz;
 
-  dz = (pos(2) - pos_prev(2)) / dt;
+  // obtain position and velocity waypoints
+  this->trajectory.update(target_pos_bf, wp_pos, wp_vel);
 
-  perrors(0) = target_pos_bf(0);
+  // calculate position and velocity errors
+  perrors(0) = wp_pos(0);
   perrors(1) = target_pos_bf(1);
-  perrors(2) = pos_prev(2) - pos(2);
+  perrors(2) = wp_pos(1) - pos(2);
 
-  verrors(0) = target_vel_bf(0);
+  // vz = (pos(2) - pos_prev(2)) / dt;
+  verrors(0) = wp_vel(0);
   verrors(1) = target_vel_bf(1);
-  verrors(2) = -0.2 - dz;
+  verrors(2) = wp_vel(1);
 
+  // control
   return this->calculate(perrors, verrors, yaw, dt);
 }
 
