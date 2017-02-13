@@ -54,7 +54,6 @@ def desired_system(p0, pf, v, dt):
     else:
         T = (dx / v) / dt
     T = int(T)
-    print(p0, pf, v, T)
 
     # calculate desired velocity and inputs
     vx = (pf[0] - p0[0]) / (T * dt)
@@ -182,16 +181,16 @@ def cost_func(x, args):
     traj = args["traj"].T
 
     # position error cost
-    cost += 1.0 * np.linalg.norm(states[0] - traj[0])  # dx
-    cost += 1.0 * np.linalg.norm(states[2] - traj[1])  # dz
+    cost += 0.0 * np.linalg.norm(states[0] - traj[0])  # dx
+    cost += 0.0 * np.linalg.norm(states[2] - traj[1])  # dz
 
     # control input cost
-    cost += 0.5 * np.linalg.norm(states[4])  # az
+    cost += 0.0 * np.linalg.norm(states[4])  # az
     cost += 0.5 * np.linalg.norm(states[5])  # theta
 
     # control input difference cost
-    cost += 0.5 * pow(np.sum(np.diff(states[4])), 2)  # az
-    cost += 0.5 * pow(np.sum(np.diff(states[5])), 2)  # theta
+    cost += 0.5 * np.linalg.norm(np.diff(states[4]))  # az
+    cost += 0.5 * np.linalg.norm(np.diff(states[5]))  # theta
 
     # end cost to bias to matched landing ??
     # cost += 15.0 * pow(x[-1], 2)
@@ -240,19 +239,19 @@ def ine_constraints(x, *args):
 
 
 def optimize(p0, pf, v):
-    dt = 0.1    # time step
+    dt = 0.01    # time step
     n = 4       # num of states
     m = 2       # num of inputs
 
     x0, traj, T = desired_system(p0, pf, v, dt)
-    # plot_desired_trajectory(traj)
+    plot_desired_trajectory(traj)
 
     # state bounds
     state_bounds = (
         (None, None),  # x
-        (None, None),  # vx
-        (0, None),  # z
-        (None, None)  # vz
+        (-0.2, None),  # vx
+        (0, None),     # z
+        (None, None)   # vz
     )
 
     # input bounds
@@ -295,7 +294,7 @@ def optimize(p0, pf, v):
                                       bounds=bounds)
 
     # plot optimization results
-    # plot_optimization_results(traj, results.x, T, n, m)
+    plot_optimization_results(traj, results.x, T, n, m)
     # plot_inputs_based_trajectory(T, dt, n, m, x0, results)
 
     return (T, n, m, results)
@@ -335,32 +334,33 @@ def generate_trajectory_table():
 
 if __name__ == "__main__":
     basedir = "./trajectory/"
-    table = generate_trajectory_table()
-    index = 0
+    # table = generate_trajectory_table()
+    # index = 0
 
     # prep index file
-    index_file = open(basedir + "index.csv", "wb")
-    index_file.write(bytes("index,p0_x,p0_z,pf_x,pf_z,v\n", "UTF-8"))
+    # index_file = open(basedir + "index.csv", "wb")
+    # index_file.write(bytes("index,p0,pf\n", "UTF-8"))
 
-    # create trajectory table
-    for t in table:
-        p0 = (t[0], t[1])
-        pf = (t[2], t[3])
-        v = t[4]
+    p0 = (0.0, 5.0)
+    pf = (1.0, 0.0)
+    v = 0.0
+    T, n, m, results = optimize(p0, pf, v)
+    filepath = basedir + "0.csv"
+    record_optimized_results(T, n, m, filepath, results)
 
-        filepath = basedir + str(index) + ".csv"
-        index_line = "{0},{1},{2},{3},{4},{5}\n".format(
-            index,
-            p0[0], p0[1],
-            pf[0], pf[1],
-            v
-        )
-        index_file.write(bytes(index_line, "UTF-8"))
-        index += 1
-
-        print("Optimizing for {0} to {1} @ {2}ms^-1".format(p0, pf, v))
-        T, n, m, results = optimize(p0, pf, v)
-        record_optimized_results(T, n, m, filepath, results)
-
-    # close index file
-    index_file.close()
+    # # create trajectory table
+    # for t in table:
+    #     p0 = (t[0], t[1])
+    #     pf = (t[2], t[3])
+    #     v = t[4]
+    #     filepath = basedir + str(index) + ".csv"
+    #     index_line = "{0},{1},{2},{3}\n".format(index, p0, pf, v)
+    #     index_file.write(bytes(index_line, "UTF-8"))
+    #     index += 1
+    #
+    #     print("Optimizing for {0} to {1} @ {2}ms^-1".format(p0, pf, v))
+    #     T, n, m, results = optimize(p0, pf, v)
+    #     record_optimized_results(T, n, m, filepath, results)
+    #
+    # # close index file
+    # index_file.close()
