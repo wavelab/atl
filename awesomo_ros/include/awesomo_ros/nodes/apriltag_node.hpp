@@ -27,7 +27,6 @@ namespace awesomo {
 
 // SUBSCRIBE TOPICS
 #define CAMERA_IMAGE_TOPIC "/awesomo/camera/image"
-#define MAVROS_POSE_TOPIC "/mavros/local_position/pose"
 #define SHUTDOWN "/awesomo/apriltag/shutdown"
 
 class AprilTagNode : public ROSNode {

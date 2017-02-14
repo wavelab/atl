@@ -169,14 +169,21 @@ void ControlNode::stateCallback(const mavros_msgs::State::ConstPtr &msg) {
 
 void ControlNode::poseCallback(const geometry_msgs::PoseStamped &msg) {
   Pose pose;
+  Vec3 pos_enu;
+
   convertMsg(msg, pose);
+  ned2enu(pose.position, pos_enu);
+  pose.position = pos_enu;
+
   this->quadrotor.setPose(pose);
 }
 
 void ControlNode::velocityCallback(const geometry_msgs::TwistStamped &msg) {
-  Vec3 linear_velocity;
-  convertMsg(msg.twist.linear, linear_velocity);
-  this->quadrotor.setVelocity(linear_velocity);
+  Vec3 vel_ned, vel_enu;
+
+  convertMsg(msg.twist.linear, vel_ned);
+  ned2enu(vel_ned, vel_enu);
+  this->quadrotor.setVelocity(vel_enu);
 }
 
 void ControlNode::headingCallback(const std_msgs::Float64 &msg) {

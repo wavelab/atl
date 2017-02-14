@@ -60,9 +60,10 @@ void GimbalNode::trackTargetCallback(const geometry_msgs::Vector3 &msg) {
 void GimbalNode::quadPoseCallback(const geometry_msgs::PoseStamped &msg) {
   geometry_msgs::Vector3 ros_msg;
 
-  ros_msg.x = msg.pose.position.x;
-  ros_msg.y = msg.pose.position.y;
-  ros_msg.z = msg.pose.position.z;
+  // transform from NED to ENU
+  ros_msg.x = msg.pose.position.y;
+  ros_msg.y = msg.pose.position.x;
+  ros_msg.z = -msg.pose.position.z;
 
   this->ros_pubs[POSITION_TOPIC].publish(ros_msg);
 }

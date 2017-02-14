@@ -145,11 +145,19 @@ void EstimatorNode::offCallback(const std_msgs::Bool &msg) {
 }
 
 void EstimatorNode::quadPoseCallback(const geometry_msgs::PoseStamped &msg) {
+  Vec3 pos_enu;
+
   convertMsg(msg, this->quad_pose);
+  ned2enu(this->quad_pose.position, pos_enu);
+  this->quad_pose.position = pos_enu;
 }
 
 void EstimatorNode::quadVelocityCallback(const geometry_msgs::TwistStamped &msg) {
+  Vec3 vel_enu;
+
   convertMsg(msg.twist.linear, this->quad_velocity);
+  ned2enu(this->quad_velocity, vel_enu);
+  this->quad_velocity = vel_enu;
 }
 
 void EstimatorNode::targetInertialPosCallback(const geometry_msgs::Vector3 &msg) {

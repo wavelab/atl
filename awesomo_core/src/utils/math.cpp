@@ -251,6 +251,14 @@ void nwu2enu(Vec3 nwu, Vec3 &enu) {
   enu(2) = nwu(2);
 }
 
+void ned2enu(Vec3 ned, Vec3 &enu) {
+  // NED frame:  (x - forward, y - right, z - down)
+  // ENU frame:  (x - right, y - forward, z - up)
+  enu(0) = ned(1);
+  enu(1) = ned(0);
+  enu(2) = -ned(2);
+}
+
 void cf2enu(Vec3 cf, Vec3 &enu) {
   // camera frame:  (x - right, y - down, z - forward)
   // ENU frame:  (x - right, y - forward, z - up)

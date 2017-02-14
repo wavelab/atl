@@ -34,9 +34,9 @@
   </node>
 
   <!-- control node -->
-  <param name="position_mode" value="gps" />
+  <!-- <param name="position_mode" value="gps" /> -->
   <!-- <param name="position_mode" value="mocap" /> -->
-  <node pkg="awesomo_ros" name="awesomo_position" type="position_node.py" output="screen" required="true"/>
+  <!-- <node pkg="awesomo_ros" name="awesomo_position" type="position_node.py" output="screen" required="true"/> -->
 
   <!-- control node -->
   <param name="control_config_dir" value="$(find awesomo_configs)/configs/quadrotor_gazebosim" />
