@@ -57,6 +57,7 @@ public:
 
   double pctrl_dt;
   double vctrl_dt;
+  double blackbox_dt;
 
   PID x_controller;
   PID y_controller;
@@ -80,9 +81,22 @@ public:
   TrajectoryIndex traj_index;
   Trajectory trajectory;
 
+  bool blackbox_enable;
+  double blackbox_rate;
+  std::ofstream blackbox;
+
   LandingController(void);
+  ~LandingController(void);
   int configure(std::string config_file);
   int loadTrajectory(Vec3 pos, Vec3 target_pos_bf, double v);
+  int prepBlackbox(std::string blackbox_file);
+  int record(Vec3 pos,
+             Vec3 vel,
+             Vec2 wp_pos,
+             Vec2 wp_vel,
+             Vec3 target_pos_bf,
+             Vec3 target_vel_bf,
+             double dt);
   Vec4 calculatePositionErrors(Vec3 errors, double yaw, double dt);
   Vec4 calculateVelocityErrors(Vec3 errors, double yaw, double dt);
   AttitudeCommand calculate(Vec3 pos_errors,

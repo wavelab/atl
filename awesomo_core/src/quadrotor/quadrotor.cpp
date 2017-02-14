@@ -6,10 +6,10 @@ namespace awesomo {
 Quadrotor::Quadrotor(void) {
   this->configured = false;
 
-  this->position_controller = PositionController();
-  this->tracking_controller = TrackingController();
-  this->landing_controller = LandingController();
-  this->att_cmd = AttitudeCommand();
+  this->position_controller;
+  this->tracking_controller;
+  this->landing_controller;
+  this->att_cmd;
 
   this->recover_height = 0.0;
   this->auto_track = false;

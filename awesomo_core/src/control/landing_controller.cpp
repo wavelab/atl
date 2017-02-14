@@ -79,20 +79,15 @@ int Trajectory::update(Vec3 target_pos_bf, Vec2 &wp_pos, Vec2 &wp_vel) {
     this->inputs.pop_front();
   }
 
-  wp_pos = wp_pos_last;
-  // if (wp_pos(1) < 0.2) {
-  //   wp_pos(1) = 0.2;
-  // }
-
-  std::cout << "target_pos_bf: " << target_pos_bf.transpose() << std::endl;
-  std::cout << "position: " << p.transpose() << std::endl;
-  std::cout << "wp_start: " << wp_pos_start.transpose() << std::endl;
-  std::cout << "wp_end: " << wp_pos_end.transpose() << std::endl;
-  std::cout << "wp_last: " << wp_pos_last.transpose() << std::endl;
-  std::cout << "wp_vel: " << wp_vel.transpose() << std::endl;
-  std::cout << "wp: " << wp_pos.transpose() << std::endl;
-  std::cout << "waypoints: " << this->pos.size() << std::endl;
-  std::cout << std::endl;
+  // std::cout << "target_pos_bf: " << target_pos_bf.transpose() << std::endl;
+  // std::cout << "position: " << p.transpose() << std::endl;
+  // std::cout << "wp_start: " << wp_pos_start.transpose() << std::endl;
+  // std::cout << "wp_end: " << wp_pos_end.transpose() << std::endl;
+  // std::cout << "wp_last: " << wp_pos_last.transpose() << std::endl;
+  // std::cout << "wp_vel: " << wp_vel.transpose() << std::endl;
+  // std::cout << "wp: " << wp_pos.transpose() << std::endl;
+  // std::cout << "waypoints: " << this->pos.size() << std::endl;
+  // std::cout << std::endl;
 
   return 0;
 }
@@ -196,12 +191,14 @@ LandingController::LandingController(void) {
   this->configured = false;
 
   this->pctrl_dt = 0.0;
+  this->vctrl_dt = 0.0;
+  this->blackbox_dt = 0.0;
+
   this->x_controller = PID(0.0, 0.0, 0.0);
   this->y_controller = PID(0.0, 0.0, 0.0);
   this->z_controller = PID(0.0, 0.0, 0.0);
   this->hover_throttle = 0.0;
 
-  this->vctrl_dt = 0.0;
   this->vx_controller = PID(0.0, 0.0, 0.0);
   this->vy_controller = PID(0.0, 0.0, 0.0);
   this->vz_controller = PID(0.0, 0.0, 0.0);
@@ -218,12 +215,26 @@ LandingController::LandingController(void) {
   this->vctrl_setpoints << 0.0, 0.0, 0.0;
   this->vctrl_outputs << 0.0, 0.0, 0.0, 0.0;
   this->att_cmd = AttitudeCommand();
+
+  this->traj_index;
+  this->trajectory;
+
+  this->blackbox_enable = false;
+  this->blackbox_rate = FLT_MAX;
+  this->blackbox;
+}
+
+LandingController::~LandingController(void) {
+  if (this->blackbox) {
+    this->blackbox.close();
+  }
 }
 
 int LandingController::configure(std::string config_file) {
   ConfigParser parser;
   std::string config_dir;
   std::string traj_index_file;
+  std::string blackbox_file;
 
   // load config
   // clang-format off
@@ -262,6 +273,7 @@ int LandingController::configure(std::string config_file) {
   parser.addParam<double>("throttle_limit.max", &this->throttle_limit[1]);
 
   parser.addParam<std::string>("trajectory_index", &traj_index_file);
+  parser.addParam<std::string>("blackbox_file", &blackbox_file);
   // clang-format on
   if (parser.load(config_file) != 0) {
     return -1;
@@ -272,6 +284,12 @@ int LandingController::configure(std::string config_file) {
   paths_combine(config_dir, traj_index_file, traj_index_file);
   if (this->traj_index.load(traj_index_file) != 0) {
     return -2;
+  }
+
+  // prepare blackbox file
+  if (this->prepBlackbox(blackbox_file) != 0) {
+    log_err("Failed to open blackbox file at [%s]", blackbox_file.c_str());
+    return -3;
   }
 
   // convert roll and pitch limits from degrees to radians
@@ -309,6 +327,75 @@ int LandingController::loadTrajectory(Vec3 pos,
   } else {
     log_info(TLOAD, quad(0), quad(1), target(0), target(1), v);
   }
+
+  return 0;
+}
+
+int LandingController::prepBlackbox(std::string blackbox_file) {
+  // setup
+  this->blackbox.open(blackbox_file);
+  if (!this->blackbox) {
+    return -1;
+  }
+
+  // write header
+  this->blackbox << "dt" << ",";
+  this->blackbox << "x" << ",";
+  this->blackbox << "y" << ",";
+  this->blackbox << "z" << ",";
+  this->blackbox << "vx" << ",";
+  this->blackbox << "vy" << ",";
+  this->blackbox << "vz" << ",";
+  this->blackbox << "wp_pos_x" << ",";
+  this->blackbox << "wp_pos_y" << ",";
+  this->blackbox << "wp_pos_z" << ",";
+  this->blackbox << "wp_vel_x" << ",";
+  this->blackbox << "wp_vel_y" << ",";
+  this->blackbox << "wp_vel_z" << ",";
+  this->blackbox << "target_pos_bf_x" << ",";
+  this->blackbox << "target_pos_bf_y" << ",";
+  this->blackbox << "target_pos_bf_z" << ",";
+  this->blackbox << "target_vel_bf_x" << ",";
+  this->blackbox << "target_vel_bf_y" << ",";
+  this->blackbox << "target_vel_bf_z" << ",";
+  this->blackbox << std::endl;
+
+  return 0;
+}
+
+int LandingController::record(Vec3 pos,
+                              Vec3 vel,
+                              Vec2 wp_pos,
+                              Vec2 wp_vel,
+                              Vec3 target_pos_bf,
+                              Vec3 target_vel_bf,
+                              double dt) {
+  // pre-check
+  this->blackbox_dt += dt;
+  if (this->blackbox_enable && this->blackbox_dt > this->blackbox_rate) {
+    return 0;
+  }
+
+  // record
+  this->blackbox << dt << ",";
+  this->blackbox << pos(0) << ",";
+  this->blackbox << pos(1) << ",";
+  this->blackbox << pos(2) << ",";
+  this->blackbox << vel(0) << ",";
+  this->blackbox << vel(1) << ",";
+  this->blackbox << vel(2) << ",";
+  this->blackbox << wp_pos(0) << ",";
+  this->blackbox << wp_pos(1) << ",";
+  this->blackbox << wp_vel(0) << ",";
+  this->blackbox << wp_vel(1) << ",";
+  this->blackbox << target_pos_bf(0) << ",";
+  this->blackbox << target_pos_bf(1) << ",";
+  this->blackbox << target_pos_bf(2) << ",";
+  this->blackbox << target_vel_bf(0) << ",";
+  this->blackbox << target_vel_bf(1) << ",";
+  this->blackbox << target_vel_bf(2) << ",";
+  this->blackbox << std::endl;
+  this->blackbox_dt = 0.0;
 
   return 0;
 }
@@ -408,25 +495,31 @@ AttitudeCommand LandingController::calculate(Vec3 target_pos_bf,
                                              double yaw,
                                              double dt) {
   int retval;
-  Vec3 perrors, verrors;
+  Vec3 vel, perrors, verrors;
   Vec2 wp_pos, wp_vel;
-  double vz;
+
+  // calculate velocity
+  vel(0) = (pos(0) - pos_prev(0)) / dt;
+  vel(1) = (pos(1) - pos_prev(1)) / dt;
+  vel(2) = (pos(2) - pos_prev(2)) / dt;
 
   // obtain position and velocity waypoints
   retval = this->trajectory.update(target_pos_bf, wp_pos, wp_vel);
 
   // calculate position and velocity errors
-  // perrors(0) = target_pos_bf(0);
-  // perrors(1) = target_pos_bf(1);
-  // perrors(2) = wp_pos(1) - pos(2);
+  perrors(0) = (target_pos_bf(0) - this->trajectory.pos.back()(0)) + wp_pos(0);
+  perrors(1) = target_pos_bf(1);
+  perrors(2) = wp_pos(1) - pos(2);
 
-  vz = (pos(2) - pos_prev(2)) / dt;
-  verrors(0) = wp_vel(0);
+  verrors(0) = wp_vel(0) - (vel.block(0, 0, 2, 1).norm());
   verrors(1) = target_vel_bf(1);
-  verrors(2) = wp_vel(1) - vz;
+  verrors(2) = wp_vel(1) - vel(2);
 
-  // control
-  return this->calculate(perrors, verrors, yaw, dt);
+  // calculate control outputs and record
+  this->calculate(perrors, verrors, yaw, dt);
+  this->record(pos, vel, wp_pos, wp_vel, target_pos_bf, target_vel_bf, dt);
+
+  return this->att_cmd;
 }
 
 void LandingController::reset(void) {

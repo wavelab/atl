@@ -33,6 +33,22 @@ def quadrotor(x, u, dt, cdx=0.5, cdz=0.2):
     return x
 
 
+def calculate_time_steps(dt, p0, pf, v, vz_max=-0.5):
+    dx = (pf[0] - p0[0])
+    dz = (pf[1] - p0[1])
+    Tx = 0
+    Tz = 0
+
+    if v == 0.0 and dx != 0.0:
+        Tx = (dx / 1.0) / dt
+    elif dx != 0.0:
+        Tx = (dx / v) / dt
+
+    Tz = (dz / vz_max) / dt
+
+    return max(int(Tx), int(Tz))
+
+
 def desired_system(p0, pf, v, dt):
     desired = []
     traj = []
@@ -47,13 +63,8 @@ def desired_system(p0, pf, v, dt):
     c = p0[1] - m * p0[0]
 
     # calculate time steps
-    if dx == 0.0:
-        T = (dz / 0.25) / dt
-    elif v == 0.0:
-        T = (dx / 1.0) / dt
-    else:
-        T = (dx / v) / dt
-    T = int(T)
+    T = calculate_time_steps(dt, p0, pf, v)
+    print(T)
 
     # calculate desired velocity and inputs
     vx = (pf[0] - p0[0]) / (T * dt)
@@ -181,11 +192,11 @@ def cost_func(x, args):
     traj = args["traj"].T
 
     # position error cost
-    cost += 0.0 * np.linalg.norm(states[0] - traj[0])  # dx
-    cost += 0.0 * np.linalg.norm(states[2] - traj[1])  # dz
+    cost += 1.0 * np.linalg.norm(states[0] - traj[0])  # dx
+    cost += 1.0 * np.linalg.norm(states[2] - traj[1])  # dz
 
     # control input cost
-    cost += 0.0 * np.linalg.norm(states[4])  # az
+    cost += 0.5 * np.linalg.norm(states[4])  # az
     cost += 0.5 * np.linalg.norm(states[5])  # theta
 
     # control input difference cost
@@ -239,19 +250,18 @@ def ine_constraints(x, *args):
 
 
 def optimize(p0, pf, v):
-    dt = 0.01    # time step
+    dt = 0.1    # time step
     n = 4       # num of states
     m = 2       # num of inputs
 
     x0, traj, T = desired_system(p0, pf, v, dt)
-    plot_desired_trajectory(traj)
 
     # state bounds
     state_bounds = (
         (None, None),  # x
-        (-0.2, None),  # vx
+        (None, None),  # vx
         (0, None),     # z
-        (None, None)   # vz
+        (-0.5, None)   # vz
     )
 
     # input bounds
@@ -343,9 +353,9 @@ if __name__ == "__main__":
 
     p0 = (0.0, 5.0)
     pf = (1.0, 0.0)
-    v = 0.0
+    v = 0.5
     T, n, m, results = optimize(p0, pf, v)
-    filepath = basedir + "0.csv"
+    filepath = basedir + "1.csv"
     record_optimized_results(T, n, m, filepath, results)
 
     # # create trajectory table
