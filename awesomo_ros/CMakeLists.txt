@@ -53,6 +53,11 @@ CATKIN_PACKAGE(
         awesomo_core
         awesomo_msgs
 )
+CATKIN_INSTALL_PYTHON(
+    PROGRAMS
+    src/ros/nodes/position_node.py
+    DESTINATION ${CATKIN_DEVEL_PREFIX}/lib/awesomo_ros/
+)
 
 # SUBDIRECTORIES
 ADD_SUBDIRECTORY(src)

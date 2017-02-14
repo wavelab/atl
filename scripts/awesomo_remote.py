@@ -7,8 +7,6 @@ from std_msgs.msg import Float64
 from std_msgs.msg import String
 from geometry_msgs.msg import Vector3
 from geometry_msgs.msg import PoseStamped
-# from geometry_msgs.msg import Point
-# from geometry_msgs.msg import Quaternion
 from awesomo_msgs.msg import PCtrlSettings
 from awesomo_msgs.msg import TCtrlSettings
 from awesomo_msgs.msg import LCtrlSettings

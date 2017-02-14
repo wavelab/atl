@@ -34,8 +34,13 @@
   </node>
 
   <!-- control node -->
+  <param name="position_mode" value="gps" />
+  <!-- <param name="position_mode" value="mocap" /> -->
+  <node pkg="awesomo_ros" name="awesomo_position" type="position_node.py" output="screen" required="true"/>
+
+  <!-- control node -->
   <param name="control_config_dir" value="$(find awesomo_configs)/configs/quadrotor_gazebosim" />
-  <node pkg="awesomo_ros" name="awesomo_control" type="control_node" output="screen" />
+  <node pkg="awesomo_ros" name="awesomo_control" type="control_node" output="screen" required="true"/>
 
   <!-- apriltag node -->
   <param name="apriltag_config" value="$(find awesomo_configs)/configs/apriltag/prototype.yaml" />
