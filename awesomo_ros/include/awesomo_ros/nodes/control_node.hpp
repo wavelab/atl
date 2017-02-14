@@ -43,14 +43,16 @@ namespace awesomo {
 #define STATE_TOPIC "/mavros/state"
 #define POSE_TOPIC "/mavros/local_position/pose"
 #define VELOCITY_TOPIC "/mavros/local_position/velocity"
+#define HEADING_TOPIC "/awesomo/control/heading/set"
 #define RADIO_TOPIC "/mavros/rc/in"
 #define TARGET_BODY_POSITION_TOPIC "/awesomo/estimate/landing_target/position/body"
 #define TARGET_BODY_VELOCITY_TOPIC "/awesomo/estimate/landing_target/velocity/body"
 #define TARGET_DETECTED_TOPIC "/awesomo/estimate/landing_target/detected"
-#define HEADING_SET_TOPIC "/awesomo/control/heading/set"
 #define HOVER_SET_TOPIC "/awesomo/control/hover/set"
 #define HOVER_HEIGHT_SET_TOPIC "/awesomo/control/hover/height/set"
 #define PCTRL_SET_TOPIC "/awesomo/control/position_controller/set"
+#define TCTRL_SET_TOPIC "/awesomo/control/tracking_controller/set"
+#define LCTRL_SET_TOPIC "/awesomo/control/landing_controller/set"
 
 
 class ControlNode : public ROSNode {
@@ -82,14 +84,16 @@ public:
   void stateCallback(const mavros_msgs::State::ConstPtr &msg);
   void poseCallback(const geometry_msgs::PoseStamped &msg);
   void velocityCallback(const geometry_msgs::TwistStamped &msg);
+  void headingCallback(const std_msgs::Float64 &msg);
   void radioCallback(const mavros_msgs::RCIn &msg);
   void targetPositionCallback(const geometry_msgs::Vector3 &msg);
   void targetVelocityCallback(const geometry_msgs::Vector3 &msg);
   void targetDetectedCallback(const std_msgs::Bool &msg);
-  void headingSetCallback(const std_msgs::Float64 &msg);
   void hoverSetCallback(const geometry_msgs::Vector3 &msg);
   void hoverHeightSetCallback(const std_msgs::Float64 &msg);
   void positionControllerSetCallback(const awesomo_msgs::PCtrlSettings &msg);
+  void trackingControllerSetCallback(const awesomo_msgs::TCtrlSettings &msg);
+  void landingControllerSetCallback(const awesomo_msgs::LCtrlSettings &msg);
   int loopCallback(void);
   void publishStats(void);
 };

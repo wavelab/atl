@@ -23,6 +23,7 @@ int Trajectory::load(std::string filepath) {
 
   // load trajectory file
   // assumes each column is: x,vx,z,vz,az,theta
+  this->reset();
   csv2mat(filepath, true, traj_data);
   if (traj_data.rows() == 0) {
     log_err(ETROWS, filepath.c_str());
@@ -49,7 +50,7 @@ int Trajectory::load(std::string filepath) {
 
 int Trajectory::update(Vec3 target_pos_bf, Vec2 &wp_pos, Vec2 &wp_vel) {
   int retval;
-  Vec2 wp_pos_start, wp_pos_end, pos;
+  Vec2 wp_pos_start, wp_pos_end, wp_pos_last, p;
 
   // pre-check
   if (this->loaded == false) {
@@ -63,11 +64,13 @@ int Trajectory::update(Vec3 target_pos_bf, Vec2 &wp_pos, Vec2 &wp_vel) {
   // setup
   wp_pos_start = this->pos.at(0);
   wp_pos_end = this->pos.at(1);
-  pos << target_pos_bf(0), target_pos_bf(2);
+  wp_pos_last = this->pos.back();
+  p(0) = wp_pos_last(0) - target_pos_bf(0);
+  p(1) = target_pos_bf(2) * -1;
 
   // find next waypoint position and velocity
-  retval = closest_point(wp_pos_start, wp_pos_end, pos, wp_pos);
-  wp_vel = this->vel.at(0);
+  retval = closest_point(wp_pos_start, wp_pos_end, p, wp_pos);
+  wp_vel = this->vel.at(1);
 
   // update trajectory waypoints
   if (retval == 2) {
@@ -75,6 +78,21 @@ int Trajectory::update(Vec3 target_pos_bf, Vec2 &wp_pos, Vec2 &wp_vel) {
     this->vel.pop_front();
     this->inputs.pop_front();
   }
+
+  wp_pos = wp_pos_last;
+  // if (wp_pos(1) < 0.2) {
+  //   wp_pos(1) = 0.2;
+  // }
+
+  std::cout << "target_pos_bf: " << target_pos_bf.transpose() << std::endl;
+  std::cout << "position: " << p.transpose() << std::endl;
+  std::cout << "wp_start: " << wp_pos_start.transpose() << std::endl;
+  std::cout << "wp_end: " << wp_pos_end.transpose() << std::endl;
+  std::cout << "wp_last: " << wp_pos_last.transpose() << std::endl;
+  std::cout << "wp_vel: " << wp_vel.transpose() << std::endl;
+  std::cout << "wp: " << wp_pos.transpose() << std::endl;
+  std::cout << "waypoints: " << this->pos.size() << std::endl;
+  std::cout << std::endl;
 
   return 0;
 }
@@ -288,6 +306,8 @@ int LandingController::loadTrajectory(Vec3 pos,
   } else if (retval == -3) {
     log_err(ETLOAD);
     return -1;
+  } else {
+    log_info(TLOAD, quad(0), quad(1), target(0), target(1), v);
   }
 
   return 0;
@@ -387,17 +407,18 @@ AttitudeCommand LandingController::calculate(Vec3 target_pos_bf,
                                              Vec3 pos_prev,
                                              double yaw,
                                              double dt) {
+  int retval;
   Vec3 perrors, verrors;
   Vec2 wp_pos, wp_vel;
   double vz;
 
   // obtain position and velocity waypoints
-  this->trajectory.update(target_pos_bf, wp_pos, wp_vel);
+  retval = this->trajectory.update(target_pos_bf, wp_pos, wp_vel);
 
   // calculate position and velocity errors
-  perrors(0) = wp_pos(0);
-  perrors(1) = target_pos_bf(1);
-  perrors(2) = wp_pos(1) - pos(2);
+  // perrors(0) = target_pos_bf(0);
+  // perrors(1) = target_pos_bf(1);
+  // perrors(2) = wp_pos(1) - pos(2);
 
   vz = (pos(2) - pos_prev(2)) / dt;
   verrors(0) = wp_vel(0);

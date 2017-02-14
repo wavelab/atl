@@ -6,5 +6,3 @@ float32 hover_throttle
 awesomo_msgs/PIDSettings vx_controller
 awesomo_msgs/PIDSettings vy_controller
 awesomo_msgs/PIDSettings vz_controller
-
-geometry_msgs/Vector3 track_offset

@@ -78,6 +78,7 @@ public:
   int setMode(enum Mode mode);
   int setPose(Pose pose);
   int setVelocity(Vec3 velocity);
+  int setHeading(double heading);
   int setTargetPosition(Vec3 position);
   int setTargetVelocity(Vec3 velocity);
   int setTargetDetected(bool detected);

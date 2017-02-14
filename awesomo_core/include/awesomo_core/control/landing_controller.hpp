@@ -20,6 +20,7 @@ namespace awesomo {
 #define ETIROWS "Trajectory index [%s] has 0 rows!"
 #define ETICOLS "Trajectory index [%s] invalid number of cols!"
 #define ETIFAIL "Found no trajectory for p0 = (%f, %f), pf = (%f, %f), v = %f"
+#define TLOAD "Loaded trajectory @ p0 = (%f, %f), pf = (%f, %f), v = %f"
 
 class Trajectory {
 public:

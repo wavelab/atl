@@ -122,6 +122,20 @@ int Quadrotor::setVelocity(Vec3 velocity) {
   return 0;
 }
 
+int Quadrotor::setHeading(double heading) {
+  // pre-check
+  if (this->configured == false) {
+    return -1;
+  } else if (this->current_mode == LANDING_MODE) {
+    return -2;
+  }
+
+  // set pose
+  this->heading = heading;
+
+  return 0;
+}
+
 int Quadrotor::setTargetPosition(Vec3 position) {
   // pre-check
   if (this->configured == false) {
@@ -258,12 +272,8 @@ int Quadrotor::stepTrackingMode(double dt) {
   }
 
   // calculate velocity
-  // velocity = (this->pose.position - this->hover_position) / dt;
-  // v = velocity.block(0, 0, 2, 1).norm();
-  // std::cout << "pose.position: " << this->pose.position.transpose() << std::endl;
-  // std::cout << "hover_position: " << this->hover_position.transpose() << std::endl;
-  // std::cout << "velocity: " << velocity.transpose() << std::endl;
-  // std::cout << "v: " << v << std::endl;
+  velocity = (this->pose.position - this->hover_position) / dt;
+  v = velocity.block(0, 0, 2, 1).norm();
 
   // track target
   this->att_cmd = this->tracking_controller.calculate(
@@ -352,6 +362,7 @@ int Quadrotor::stepLandingMode(double dt) {
     log_info("Transitioning back to [DISCOVER_MODE]!");
     this->setMode(DISCOVER_MODE);
     this->landing_tic = (struct timespec){0};
+    this->hover_position(2) = this->recover_height;
   }
 
   return 0;

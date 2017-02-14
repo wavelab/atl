@@ -10,6 +10,8 @@ from geometry_msgs.msg import PoseStamped
 # from geometry_msgs.msg import Point
 # from geometry_msgs.msg import Quaternion
 from awesomo_msgs.msg import PCtrlSettings
+from awesomo_msgs.msg import TCtrlSettings
+from awesomo_msgs.msg import LCtrlSettings
 
 
 class ROSNode(object):
@@ -101,12 +103,16 @@ class Quadrotor(ROSNode):
         self.hover_point_topic = "/awesomo/control/hover/set"
         self.hover_height_topic = "/awesomo/control/hover/height/set"
         self.pctrl_set_topic = "/awesomo/control/position_controller/set"
+        self.tctrl_set_topic = "/awesomo/control/tracking_controller/set"
+        self.lctrl_set_topic = "/awesomo/control/landing_controller/set"
 
         self.register_publisher(self.mode_topic, String)
         self.register_publisher(self.heading_topic, Float64)
         self.register_publisher(self.hover_point_topic, Vector3)
         self.register_publisher(self.hover_height_topic, Float64)
         self.register_publisher(self.pctrl_set_topic, PCtrlSettings)
+        self.register_publisher(self.tctrl_set_topic, TCtrlSettings)
+        self.register_publisher(self.lctrl_set_topic, LCtrlSettings)
 
     def set_mode(self, mode):
         msg = String()
@@ -152,6 +158,74 @@ class Quadrotor(ROSNode):
         msg.hover_throttle = params["throttle"]["hover"]
 
         self.pubs[self.pctrl_set_topic].publish(msg)
+
+    def set_tctrl_settings(self, params):
+        msg = TCtrlSettings()
+
+        msg.roll_controller.min = params["roll"]["min"]
+        msg.roll_controller.max = params["roll"]["max"]
+        msg.roll_controller.k_p = params["roll"]["k_p"]
+        msg.roll_controller.k_i = params["roll"]["k_i"]
+        msg.roll_controller.k_d = params["roll"]["k_d"]
+
+        msg.pitch_controller.min = params["pitch"]["min"]
+        msg.pitch_controller.max = params["pitch"]["max"]
+        msg.pitch_controller.k_p = params["pitch"]["k_p"]
+        msg.pitch_controller.k_i = params["pitch"]["k_i"]
+        msg.pitch_controller.k_d = params["pitch"]["k_d"]
+
+        msg.throttle_controller.k_p = params["throttle"]["k_p"]
+        msg.throttle_controller.k_i = params["throttle"]["k_i"]
+        msg.throttle_controller.k_d = params["throttle"]["k_d"]
+        msg.hover_throttle = params["throttle"]["hover"]
+
+        msg.vx_controller.k_p = params["vx"]["k_p"]
+        msg.vx_controller.k_i = params["vx"]["k_i"]
+        msg.vx_controller.k_d = params["vx"]["k_d"]
+
+        msg.vy_controller.k_p = params["vy"]["k_p"]
+        msg.vy_controller.k_i = params["vy"]["k_i"]
+        msg.vy_controller.k_d = params["vy"]["k_d"]
+
+        msg.vz_controller.k_p = params["vz"]["k_p"]
+        msg.vz_controller.k_i = params["vz"]["k_i"]
+        msg.vz_controller.k_d = params["vz"]["k_d"]
+
+        self.pubs[self.tctrl_set_topic].publish(msg)
+
+    def set_lctrl_settings(self, params):
+        msg = LCtrlSettings()
+
+        msg.roll_controller.min = params["roll"]["min"]
+        msg.roll_controller.max = params["roll"]["max"]
+        msg.roll_controller.k_p = params["roll"]["k_p"]
+        msg.roll_controller.k_i = params["roll"]["k_i"]
+        msg.roll_controller.k_d = params["roll"]["k_d"]
+
+        msg.pitch_controller.min = params["pitch"]["min"]
+        msg.pitch_controller.max = params["pitch"]["max"]
+        msg.pitch_controller.k_p = params["pitch"]["k_p"]
+        msg.pitch_controller.k_i = params["pitch"]["k_i"]
+        msg.pitch_controller.k_d = params["pitch"]["k_d"]
+
+        msg.throttle_controller.k_p = params["throttle"]["k_p"]
+        msg.throttle_controller.k_i = params["throttle"]["k_i"]
+        msg.throttle_controller.k_d = params["throttle"]["k_d"]
+        msg.hover_throttle = params["throttle"]["hover"]
+
+        msg.vx_controller.k_p = params["vx"]["k_p"]
+        msg.vx_controller.k_i = params["vx"]["k_i"]
+        msg.vx_controller.k_d = params["vx"]["k_d"]
+
+        msg.vy_controller.k_p = params["vy"]["k_p"]
+        msg.vy_controller.k_i = params["vy"]["k_i"]
+        msg.vy_controller.k_d = params["vy"]["k_d"]
+
+        msg.vz_controller.k_p = params["vz"]["k_p"]
+        msg.vz_controller.k_i = params["vz"]["k_i"]
+        msg.vz_controller.k_d = params["vz"]["k_d"]
+
+        self.pubs[self.lctrl_set_topic].publish(msg)
 
 
 class MAVROS(ROSNode):
@@ -208,9 +282,9 @@ if __name__ == "__main__":
     # lz.set_angular_velocity(angular_velocity)
 
     # quad.set_heading(90)
-    # quad.set_mode("DISCOVER_MODE")
+    quad.set_mode("DISCOVER_MODE")
     # quad.set_hover_point([0.0, 0.0, 5.0])
-    quad.set_hover_height(5.0)
+    # quad.set_hover_height(5.0)
     # quad.set_pctrl_settings({
     #     "roll": {
     #         "min": -30,
@@ -235,3 +309,41 @@ if __name__ == "__main__":
     # })
     # sleep(5)
     # quad.set_hover_point([1.0, 0.0, 5.0])
+
+    quad.set_lctrl_settings({
+        "roll": {
+            "min": -30,
+            "max": 30,
+            "k_p": 0.1,
+            "k_i": 0.0,
+            "k_d": 0.05
+        },
+        "pitch": {
+            "min": -30,
+            "max": 30,
+            "k_p": 0.1,
+            "k_i": 0.0,
+            "k_d": 0.05
+        },
+        "throttle": {
+            "hover": 0.5,
+            "k_p": 0.4,
+            "k_i": 0.0,
+            "k_d": 0.2
+        },
+        "vx": {
+            "k_p": 0.2,
+            "k_i": 0.0,
+            "k_d": 0.0
+        },
+        "vy": {
+            "k_p": 0.2,
+            "k_i": 0.0,
+            "k_d": 0.0
+        },
+        "vz": {
+            "k_p": 0.2,
+            "k_i": 0.0,
+            "k_d": 0.0
+        }
+    })

@@ -14,6 +14,7 @@
 #include <awesomo_core/awesomo_core.hpp>
 
 #include <awesomo_msgs/AprilTagPose.h>
+#include <awesomo_msgs/LCtrlSettings.h>
 #include <awesomo_msgs/PCtrlStats.h>
 #include <awesomo_msgs/PCtrlSettings.h>
 #include <awesomo_msgs/TCtrlStats.h>
@@ -45,6 +46,7 @@ void buildMsg(PositionController pc, awesomo_msgs::PCtrlStats &msg);
 void buildMsg(PositionController pc, awesomo_msgs::PCtrlSettings &msg);
 void buildMsg(TrackingController tc, awesomo_msgs::TCtrlStats &msg);
 void buildMsg(TrackingController tc, awesomo_msgs::TCtrlSettings &msg);
+void buildMsg(LandingController tc, awesomo_msgs::LCtrlSettings &msg);
 
 int convertMsg(std_msgs::Bool msg, bool &b);
 int convertMsg(std_msgs::String msg, std::string &s);
@@ -56,6 +58,8 @@ int convertMsg(geometry_msgs::PoseStamped msg, Pose &p);
 int convertMsg(geometry_msgs::TwistStamped msg, VecX &v);
 int convertMsg(awesomo_msgs::AprilTagPose msg, TagPose &p);
 int convertMsg(awesomo_msgs::PCtrlSettings msg, PositionController &pc);
+int convertMsg(awesomo_msgs::TCtrlSettings msg, TrackingController &tc);
+int convertMsg(awesomo_msgs::LCtrlSettings msg, LandingController &lc);
 
 }  // end of awesomo namespace
 #endif

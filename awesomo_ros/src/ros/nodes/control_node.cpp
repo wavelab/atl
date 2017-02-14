@@ -42,14 +42,16 @@ int ControlNode::configure(const std::string node_name, int hz) {
   this->registerSubscriber(STATE_TOPIC, &ControlNode::stateCallback, this);
   this->registerSubscriber(POSE_TOPIC, &ControlNode::poseCallback, this);
   this->registerSubscriber(VELOCITY_TOPIC, &ControlNode::velocityCallback, this);
+  this->registerSubscriber(HEADING_TOPIC, &ControlNode::headingCallback, this);
   this->registerSubscriber(RADIO_TOPIC, &ControlNode::radioCallback, this);
   this->registerSubscriber(TARGET_BODY_POSITION_TOPIC, &ControlNode::targetPositionCallback, this);
   this->registerSubscriber(TARGET_BODY_VELOCITY_TOPIC, &ControlNode::targetVelocityCallback, this);
   this->registerSubscriber(TARGET_DETECTED_TOPIC, &ControlNode::targetDetectedCallback, this);
-  this->registerSubscriber(HEADING_SET_TOPIC, &ControlNode::headingSetCallback, this);
   this->registerSubscriber(HOVER_SET_TOPIC, &ControlNode::hoverSetCallback, this);
   this->registerSubscriber(HOVER_HEIGHT_SET_TOPIC, &ControlNode::hoverHeightSetCallback, this);
   this->registerSubscriber(PCTRL_SET_TOPIC, &ControlNode::positionControllerSetCallback, this);
+  this->registerSubscriber(TCTRL_SET_TOPIC, &ControlNode::trackingControllerSetCallback, this);
+  this->registerSubscriber(LCTRL_SET_TOPIC, &ControlNode::landingControllerSetCallback, this);
   // clang-format on
 
   this->armed = false;
@@ -177,6 +179,12 @@ void ControlNode::velocityCallback(const geometry_msgs::TwistStamped &msg) {
   this->quadrotor.setVelocity(linear_velocity);
 }
 
+void ControlNode::headingCallback(const std_msgs::Float64 &msg) {
+  double heading;
+  convertMsg(msg, heading);
+  this->quadrotor.setHeading(heading);
+}
+
 void ControlNode::radioCallback(const mavros_msgs::RCIn &msg) {
   for (int i = 0; i < 16; i++) {
     this->rc_in[i] = msg.channels[i];
@@ -210,10 +218,6 @@ void ControlNode::targetDetectedCallback(const std_msgs::Bool &msg) {
   this->quadrotor.setTargetDetected(msg.data);
 }
 
-void ControlNode::headingSetCallback(const std_msgs::Float64 &msg) {
-  convertMsg(msg, this->quadrotor.heading);
-}
-
 void ControlNode::hoverSetCallback(const geometry_msgs::Vector3 &msg) {
   convertMsg(msg, this->quadrotor.hover_position);
 }
@@ -225,6 +229,16 @@ void ControlNode::hoverHeightSetCallback(const std_msgs::Float64 &msg) {
 void ControlNode::positionControllerSetCallback(
   const awesomo_msgs::PCtrlSettings &msg) {
   convertMsg(msg, this->quadrotor.position_controller);
+}
+
+void ControlNode::trackingControllerSetCallback(
+  const awesomo_msgs::TCtrlSettings &msg) {
+  convertMsg(msg, this->quadrotor.tracking_controller);
+}
+
+void ControlNode::landingControllerSetCallback(
+  const awesomo_msgs::LCtrlSettings &msg) {
+  convertMsg(msg, this->quadrotor.landing_controller);
 }
 
 int ControlNode::loopCallback(void) {

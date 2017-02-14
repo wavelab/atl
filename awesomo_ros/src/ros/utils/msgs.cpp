@@ -162,14 +162,10 @@ void buildMsg(TrackingController tc, awesomo_msgs::TCtrlStats &msg) {
 }
 
 void buildMsg(TrackingController tc, awesomo_msgs::TCtrlSettings &msg) {
-  msg.roll_controller.min = tc.roll_limit[0];
-  msg.roll_controller.max = tc.roll_limit[1];
   msg.roll_controller.k_p = tc.x_controller.k_p;
   msg.roll_controller.k_i = tc.x_controller.k_i;
   msg.roll_controller.k_d = tc.x_controller.k_d;
 
-  msg.pitch_controller.min = tc.pitch_limit[0];
-  msg.pitch_controller.max = tc.pitch_limit[1];
   msg.pitch_controller.k_p = tc.y_controller.k_p;
   msg.pitch_controller.k_i = tc.y_controller.k_i;
   msg.pitch_controller.k_d = tc.y_controller.k_d;
@@ -178,6 +174,67 @@ void buildMsg(TrackingController tc, awesomo_msgs::TCtrlSettings &msg) {
   msg.throttle_controller.k_i = tc.z_controller.k_i;
   msg.throttle_controller.k_d = tc.z_controller.k_d;
   msg.hover_throttle = tc.hover_throttle;
+
+  msg.vx_controller.k_p = tc.vx_controller.k_p;
+  msg.vx_controller.k_i = tc.vx_controller.k_i;
+  msg.vx_controller.k_d = tc.vx_controller.k_d;
+
+  msg.vy_controller.k_p = tc.vy_controller.k_p;
+  msg.vy_controller.k_i = tc.vy_controller.k_i;
+  msg.vy_controller.k_d = tc.vy_controller.k_d;
+
+  msg.vz_controller.k_p = tc.vz_controller.k_p;
+  msg.vz_controller.k_i = tc.vz_controller.k_i;
+  msg.vz_controller.k_d = tc.vz_controller.k_d;
+
+  msg.roll_controller.min = tc.roll_limit[0];
+  msg.roll_controller.max = tc.roll_limit[1];
+
+  msg.pitch_controller.min = tc.pitch_limit[0];
+  msg.pitch_controller.max = tc.pitch_limit[1];
+
+  msg.throttle_controller.min = tc.throttle_limit[0];
+  msg.throttle_controller.max = tc.throttle_limit[1];
+
+  msg.track_offset.x = tc.track_offset(0);
+  msg.track_offset.y = tc.track_offset(1);
+  msg.track_offset.z = tc.track_offset(2);
+}
+
+void buildMsg(LandingController lc, awesomo_msgs::LCtrlSettings &msg) {
+  msg.roll_controller.k_p = lc.x_controller.k_p;
+  msg.roll_controller.k_i = lc.x_controller.k_i;
+  msg.roll_controller.k_d = lc.x_controller.k_d;
+
+  msg.pitch_controller.k_p = lc.y_controller.k_p;
+  msg.pitch_controller.k_i = lc.y_controller.k_i;
+  msg.pitch_controller.k_d = lc.y_controller.k_d;
+
+  msg.throttle_controller.k_p = lc.z_controller.k_p;
+  msg.throttle_controller.k_i = lc.z_controller.k_i;
+  msg.throttle_controller.k_d = lc.z_controller.k_d;
+  msg.hover_throttle = lc.hover_throttle;
+
+  msg.vx_controller.k_p = lc.vx_controller.k_p;
+  msg.vx_controller.k_i = lc.vx_controller.k_i;
+  msg.vx_controller.k_d = lc.vx_controller.k_d;
+
+  msg.vy_controller.k_p = lc.vy_controller.k_p;
+  msg.vy_controller.k_i = lc.vy_controller.k_i;
+  msg.vy_controller.k_d = lc.vy_controller.k_d;
+
+  msg.vz_controller.k_p = lc.vz_controller.k_p;
+  msg.vz_controller.k_i = lc.vz_controller.k_i;
+  msg.vz_controller.k_d = lc.vz_controller.k_d;
+
+  msg.roll_controller.min = lc.roll_limit[0];
+  msg.roll_controller.max = lc.roll_limit[1];
+
+  msg.pitch_controller.min = lc.pitch_limit[0];
+  msg.pitch_controller.max = lc.pitch_limit[1];
+
+  msg.throttle_controller.min = lc.throttle_limit[0];
+  msg.throttle_controller.max = lc.throttle_limit[1];
 }
 
 int convertMsg(std_msgs::Bool msg, bool &b) {
@@ -257,6 +314,88 @@ int convertMsg(awesomo_msgs::PCtrlSettings msg, PositionController &pc) {
   pc.z_controller.k_i = msg.throttle_controller.k_i;
   pc.z_controller.k_d = msg.throttle_controller.k_d;
   pc.hover_throttle = msg.hover_throttle;
+
+  return 0;
+}
+
+int convertMsg(awesomo_msgs::TCtrlSettings msg, TrackingController &tc) {
+  tc.y_controller.k_p = msg.roll_controller.k_p;
+  tc.y_controller.k_i = msg.roll_controller.k_i;
+  tc.y_controller.k_d = msg.roll_controller.k_d;
+
+  tc.x_controller.k_p = msg.pitch_controller.k_p;
+  tc.x_controller.k_i = msg.pitch_controller.k_i;
+  tc.x_controller.k_d = msg.pitch_controller.k_d;
+
+  tc.z_controller.k_p = msg.throttle_controller.k_p;
+  tc.z_controller.k_i = msg.throttle_controller.k_i;
+  tc.z_controller.k_d = msg.throttle_controller.k_d;
+  tc.hover_throttle = msg.hover_throttle;
+
+  tc.vx_controller.k_p = msg.vx_controller.k_p;
+  tc.vx_controller.k_i = msg.vx_controller.k_i;
+  tc.vx_controller.k_d = msg.vx_controller.k_d;
+
+  tc.vy_controller.k_p = msg.vy_controller.k_p;
+  tc.vy_controller.k_i = msg.vy_controller.k_i;
+  tc.vy_controller.k_d = msg.vy_controller.k_d;
+
+  tc.vz_controller.k_p = msg.vz_controller.k_p;
+  tc.vz_controller.k_i = msg.vz_controller.k_i;
+  tc.vz_controller.k_d = msg.vz_controller.k_d;
+
+  tc.roll_limit[0] = deg2rad(msg.roll_controller.min);
+  tc.roll_limit[1] = deg2rad(msg.roll_controller.max);
+
+  tc.pitch_limit[0] = deg2rad(msg.pitch_controller.min);
+  tc.pitch_limit[1] = deg2rad(msg.pitch_controller.max);
+
+  tc.throttle_limit[0] = msg.throttle_controller.min;
+  tc.throttle_limit[1] = msg.throttle_controller.max;
+
+  // clang-format off
+  tc.track_offset << msg.track_offset.x,
+                     msg.track_offset.y,
+                     msg.track_offset.z;
+  // clang-format on
+
+  return 0;
+}
+
+int convertMsg(awesomo_msgs::LCtrlSettings msg, LandingController &lc) {
+  lc.y_controller.k_p = msg.roll_controller.k_p;
+  lc.y_controller.k_i = msg.roll_controller.k_i;
+  lc.y_controller.k_d = msg.roll_controller.k_d;
+
+  lc.x_controller.k_p = msg.pitch_controller.k_p;
+  lc.x_controller.k_i = msg.pitch_controller.k_i;
+  lc.x_controller.k_d = msg.pitch_controller.k_d;
+
+  lc.z_controller.k_p = msg.throttle_controller.k_p;
+  lc.z_controller.k_i = msg.throttle_controller.k_i;
+  lc.z_controller.k_d = msg.throttle_controller.k_d;
+  lc.hover_throttle = msg.hover_throttle;
+
+  lc.vx_controller.k_p = msg.vx_controller.k_p;
+  lc.vx_controller.k_i = msg.vx_controller.k_i;
+  lc.vx_controller.k_d = msg.vx_controller.k_d;
+
+  lc.vy_controller.k_p = msg.vy_controller.k_p;
+  lc.vy_controller.k_i = msg.vy_controller.k_i;
+  lc.vy_controller.k_d = msg.vy_controller.k_d;
+
+  lc.vz_controller.k_p = msg.vz_controller.k_p;
+  lc.vz_controller.k_i = msg.vz_controller.k_i;
+  lc.vz_controller.k_d = msg.vz_controller.k_d;
+
+  lc.roll_limit[0] = deg2rad(msg.roll_controller.min);
+  lc.roll_limit[1] = deg2rad(msg.roll_controller.max);
+
+  lc.pitch_limit[0] = deg2rad(msg.pitch_controller.min);
+  lc.pitch_limit[1] = deg2rad(msg.pitch_controller.max);
+
+  lc.throttle_limit[0] = msg.throttle_controller.min;
+  lc.throttle_limit[1] = msg.throttle_controller.max;
 
   return 0;
 }
