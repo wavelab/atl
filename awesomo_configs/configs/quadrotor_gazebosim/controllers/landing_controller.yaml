@@ -39,7 +39,7 @@ throttle_limit:
     min: -1.0
     max: 1.0
 
-trajectory_index: "trajectory/index.csv"
+trajectory_index: "../../trajectory/index.csv"
 
 blackbox_enable: true
 blackbox_rate: 0.2
