@@ -47,6 +47,9 @@ ADD_LIBRARY(
     # quadrotor
     src/quadrotor/landing_target.cpp
     src/quadrotor/quadrotor.cpp
+    # sensor
+    src/sensor/i2c.cpp
+    src/sensor/MPU6050.cpp
     # utils
     src/utils/config.cpp
     src/utils/data.cpp
