@@ -9,11 +9,13 @@ Trajectory::Trajectory(void) {
   this->pos.clear();
   this->vel.clear();
   this->inputs.clear();
+  this->target_bf.clear();
+  this->p0 << 0.0, 0.0, 0.0;
 }
 
-int Trajectory::load(std::string filepath) {
+int Trajectory::load(std::string filepath, Vec3 p0) {
   MatX traj_data;
-  Vec2 pos, vel, inputs;
+  Vec2 p, v, u, target_bf;
 
   // pre-check
   if (file_exists(filepath) == false) {
@@ -22,35 +24,46 @@ int Trajectory::load(std::string filepath) {
   }
 
   // load trajectory file
-  // assumes each column is: x,vx,z,vz,az,theta
+  // assumes each column is:
+  // - x
+  // - vx
+  // - z
+  // - vz
+  // - az
+  // - theta
+  // - target_bf_x
+  // - target_bf_z
   this->reset();
   csv2mat(filepath, true, traj_data);
   if (traj_data.rows() == 0) {
     log_err(ETROWS, filepath.c_str());
     return -2;
-  } else if (traj_data.cols() != 6) {
+  } else if (traj_data.cols() != 8) {
     log_err(ETCOLS, filepath.c_str());
     return -2;
   }
 
   // set trajectory class
   for (int i = 0; i < traj_data.rows(); i++) {
-    pos << traj_data(i, 0), traj_data(i, 2);
-    vel << traj_data(i, 1), traj_data(i, 3);
-    inputs << traj_data(i, 4), traj_data(i, 5);
+    p << traj_data(i, 0), traj_data(i, 2);
+    v << traj_data(i, 1), traj_data(i, 3);
+    u << traj_data(i, 4), traj_data(i, 5);
+    target_bf << traj_data(i, 6), traj_data(i, 7);
 
-    this->pos.push_back(pos);
-    this->vel.push_back(vel);
-    this->inputs.push_back(inputs);
+    this->pos.push_back(p);
+    this->vel.push_back(v);
+    this->inputs.push_back(u);
+    this->target_bf.push_back(target_bf);
   }
 
+  this->p0 = p0;
   this->loaded = true;
   return 0;
 }
 
-int Trajectory::update(Vec3 target_pos_bf, Vec2 &wp_pos, Vec2 &wp_vel) {
+int Trajectory::update(Vec3 pos, Vec2 &wp_pos, Vec2 &wp_vel, Vec2 &q_pos) {
   int retval;
-  Vec2 wp_pos_start, wp_pos_end, wp_pos_last, p;
+  Vec2 wp_pos_start, wp_pos_end, wp_pos_last;
 
   // pre-check
   if (this->loaded == false) {
@@ -65,11 +78,11 @@ int Trajectory::update(Vec3 target_pos_bf, Vec2 &wp_pos, Vec2 &wp_vel) {
   wp_pos_start = this->pos.at(0);
   wp_pos_end = this->pos.at(1);
   wp_pos_last = this->pos.back();
-  p(0) = wp_pos_last(0) - target_pos_bf(0);
-  p(1) = target_pos_bf(2) * -1;
+  q_pos(0) = (this->p0.block(0, 0, 2, 1) - pos.block(0, 0, 2, 1)).norm();
+  q_pos(1) = pos(2);
 
   // find next waypoint position and velocity
-  retval = closest_point(wp_pos_start, wp_pos_end, p, wp_pos);
+  retval = closest_point(wp_pos_start, wp_pos_end, q_pos, wp_pos);
   wp_vel = this->vel.at(1);
 
   // update trajectory waypoints
@@ -77,26 +90,31 @@ int Trajectory::update(Vec3 target_pos_bf, Vec2 &wp_pos, Vec2 &wp_vel) {
     this->pos.pop_front();
     this->vel.pop_front();
     this->inputs.pop_front();
+    this->target_bf.pop_front();
   }
 
-  // std::cout << "target_pos_bf: " << target_pos_bf.transpose() << std::endl;
-  // std::cout << "position: " << p.transpose() << std::endl;
+  // std::cout << "pos: " << pos.transpose() << std::endl;
+  std::cout << "p0: " << this->p0.block(0, 0, 2, 1).transpose() << std::endl;
+  std::cout << "q_pos: " << q_pos.transpose() << std::endl;
   // std::cout << "wp_start: " << wp_pos_start.transpose() << std::endl;
   // std::cout << "wp_end: " << wp_pos_end.transpose() << std::endl;
   // std::cout << "wp_last: " << wp_pos_last.transpose() << std::endl;
   // std::cout << "wp_vel: " << wp_vel.transpose() << std::endl;
-  // std::cout << "wp: " << wp_pos.transpose() << std::endl;
+  std::cout << "wp: " << wp_pos.transpose() << std::endl;
+  std::cout << "target_bf: " << this->target_bf.at(0).transpose() << std::endl;
   // std::cout << "waypoints: " << this->pos.size() << std::endl;
-  // std::cout << std::endl;
+  std::cout << std::endl;
 
   return 0;
 }
 
 void Trajectory::reset(void) {
+  this->loaded = false;
   this->pos.clear();
   this->vel.clear();
   this->inputs.clear();
-  this->loaded = false;
+  this->target_bf.clear();
+  this->p0 << 0.0, 0.0, 0.0;
 }
 
 
@@ -129,7 +147,7 @@ int TrajectoryIndex::load(std::string index_file,
   if (this->index_data.rows() == 0) {
     log_err(ETIROWS, index_file.c_str());
     return -2;
-  } else if (this->index_data.cols() != 6) {
+  } else if (this->index_data.cols() != 3) {
     log_err(ETICOLS, index_file.c_str());
     return -2;
   }
@@ -138,10 +156,9 @@ int TrajectoryIndex::load(std::string index_file,
   return 0;
 }
 
-int TrajectoryIndex::find(Vec2 p0, Vec2 pf, double v, Trajectory &traj) {
+int TrajectoryIndex::find(Vec3 pos, double v, Trajectory &traj) {
   bool p_ok, v_ok;
-  std::vector<double> p0_matches;
-  std::vector<VecX> matches;
+  std::vector<int> matches;
   std::string traj_file;
 
   // pre-check
@@ -155,30 +172,25 @@ int TrajectoryIndex::find(Vec2 p0, Vec2 pf, double v, Trajectory &traj) {
   // search which is approx O(n), ok for small lookups.
 
   // find rows in the index that have same approx
-  // start height (p0_z) and velocity (v)
+  // start height (z) and velocity (v)
   for (int i = 0; i < this->index_data.rows(); i++) {
-    p_ok = fabs(p0(1) - this->index_data(i, 2)) < this->pos_thres;
-    v_ok = fabs(v - this->index_data(i, 5)) < this->vel_thres;
+    p_ok = fabs(pos(2) - this->index_data(i, 1)) < this->pos_thres;
+    v_ok = fabs(v - this->index_data(i, 2)) < this->vel_thres;
 
     if (p_ok && v_ok) {
-      p0_matches.push_back(i);
+      matches.push_back(i);
     }
   }
 
-  // filter those that have approx end position (pf_x)
-  for (int i = 0; i < p0_matches.size(); i++) {
-    if (fabs(pf(0) - this->index_data(p0_matches[i], 3)) < this->pos_thres) {
-      matches.push_back(this->index_data.row(p0_matches[i]));
-    }
-  }
+  // check number of matches
   if (matches.size() == 0) {
     return -2;  // found no trajectory
   }
 
   // load trajectory
   traj_file = this->traj_dir + "/";
-  traj_file += std::to_string((int) matches[0](0)) + ".csv";
-  if (traj.load(traj_file) != 0) {
+  traj_file += std::to_string((int) matches[0]) + ".csv";
+  if (traj.load(traj_file, pos) != 0) {
     return -3;
   }
 
@@ -311,21 +323,20 @@ int LandingController::configure(std::string config_file) {
 int LandingController::loadTrajectory(Vec3 pos,
                                       Vec3 target_pos_bf,
                                       double v) {
-  Vec2 quad, target;
   int retval;
 
-  quad << 0.0, pos(2);
-  target << target_pos_bf(0), pos(2) + target_pos_bf(2);
-  retval = this->traj_index.find(quad, target, v, this->trajectory);
+  // find trajectory
+  retval = this->traj_index.find(pos, v, this->trajectory);
 
+  // check retval
   if (retval == -2) {
-    log_err(ETIFAIL, quad(0), quad(1), target(0), target(1), v);
+    log_err(ETIFAIL, pos(2), v);
     return -1;
   } else if (retval == -3) {
     log_err(ETLOAD);
     return -1;
   } else {
-    log_info(TLOAD, quad(0), quad(1), target(0), target(1), v);
+    log_info(TLOAD, pos(2), v);
   }
 
   return 0;
@@ -496,7 +507,7 @@ AttitudeCommand LandingController::calculate(Vec3 target_pos_bf,
                                              double dt) {
   int retval;
   Vec3 vel, perrors, verrors;
-  Vec2 wp_pos, wp_vel;
+  Vec2 wp_pos, wp_pos_last, wp_vel, q_pos;
 
   // calculate velocity
   vel(0) = (pos(0) - pos_prev(0)) / dt;
@@ -504,12 +515,13 @@ AttitudeCommand LandingController::calculate(Vec3 target_pos_bf,
   vel(2) = (pos(2) - pos_prev(2)) / dt;
 
   // obtain position and velocity waypoints
-  retval = this->trajectory.update(target_pos_bf, wp_pos, wp_vel);
+  retval = this->trajectory.update(pos, wp_pos, wp_vel, q_pos);
 
   // calculate position and velocity errors
-  perrors(0) = (target_pos_bf(0) - this->trajectory.pos.back()(0)) + wp_pos(0);
+  // perrors(0) = wp_pos(0) - q_pos(0);
+  perrors(0) = this->trajectory.target_bf.at(0)(0) + target_pos_bf(0);
   perrors(1) = target_pos_bf(1);
-  perrors(2) = wp_pos(1) - pos(2);
+  perrors(2) = wp_pos(1) - q_pos(1);
 
   verrors(0) = wp_vel(0) - (vel.block(0, 0, 2, 1).norm());
   verrors(1) = target_vel_bf(1);

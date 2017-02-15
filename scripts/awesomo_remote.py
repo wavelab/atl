@@ -272,12 +272,12 @@ if __name__ == "__main__":
 
     # gimbal.set_attitude([0.0, 0.0])
 
-    # lz.set_velocity(0.0)
+    lz.set_velocity(3.0)
     # lz.set_position([0, 1000, 0])
 
-    velocity, angular_velocity = lz_circle_path(20, 3.0)
-    lz.set_velocity(velocity)
-    lz.set_angular_velocity(angular_velocity)
+    # velocity, angular_velocity = lz_circle_path(20, 2.0)
+    # lz.set_velocity(velocity)
+    # lz.set_angular_velocity(angular_velocity)
 
     # quad.set_heading(0)
     # quad.set_mode("DISCOVER_MODE")

@@ -39,4 +39,4 @@ throttle_limit:
     min: -1.0
     max: 1.0
 
-track_offset: [-1.0, 0.0, 0.0]
+track_offset: [0.0, 0.0, 0.0]

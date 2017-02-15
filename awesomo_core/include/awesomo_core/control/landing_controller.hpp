@@ -19,8 +19,8 @@ namespace awesomo {
 #define ETLOAD "Failed to load trajectory!"
 #define ETIROWS "Trajectory index [%s] has 0 rows!"
 #define ETICOLS "Trajectory index [%s] invalid number of cols!"
-#define ETIFAIL "Found no trajectory for p0 = (%f, %f), pf = (%f, %f), v = %f"
-#define TLOAD "Loaded trajectory @ p0 = (%f, %f), pf = (%f, %f), v = %f"
+#define ETIFAIL "Found no trajectory for z = %f, v = %f"
+#define TLOAD "Loaded trajectory @ z = %f, v = %f"
 
 class Trajectory {
 public:
@@ -28,10 +28,12 @@ public:
   std::deque<Vec2> pos;
   std::deque<Vec2> vel;
   std::deque<Vec2> inputs;
+  std::deque<Vec2> target_bf;
+  Vec3 p0;
 
   Trajectory(void);
-  int load(std::string filepath);
-  int update(Vec3 target_pos_bf, Vec2 &wp_pos, Vec2 &wp_vel);
+  int load(std::string filepath, Vec3 pos);
+  int update(Vec3 pos, Vec2 &wp_pos, Vec2 &wp_vel, Vec2 &q_pos);
   void reset(void);
 };
 
@@ -48,7 +50,7 @@ public:
   int load(std::string index_file,
            double pos_thres=0.2,
            double vel_thres=0.2);
-  int find(Vec2 p0, Vec2 pf, double v, Trajectory &traj);
+  int find(Vec3 pos, double v, Trajectory &traj);
 };
 
 class LandingController {

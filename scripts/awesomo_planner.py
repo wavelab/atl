@@ -37,7 +37,7 @@ def desired_system(p0_z, pf_z, v, dt, vz_max=-1.0):
     desired = []
     traj = []
 
-    t_end = ((pf_z - p0_z) / vz_max) + 1.0
+    t_end = ((pf_z - p0_z) / vz_max)
     T = int(t_end / dt)
 
     p0 = [0.0, p0_z]
@@ -179,15 +179,15 @@ def cost_func(x, args):
 
     # position error cost
     cost += 0.0 * np.linalg.norm(states[0] - traj[0])  # dx
-    cost += 1.0 * np.linalg.norm(states[2] - traj[1])  # dz
+    cost += 0.0 * np.linalg.norm(states[2] - traj[1])  # dz
 
     # control input cost
     cost += 0.5 * np.linalg.norm(states[4])  # az
-    cost += 0.5 * np.linalg.norm(states[5])  # theta
+    cost += 1.0 * np.linalg.norm(states[5])  # theta
 
     # control input difference cost
-    cost += 0.5 * np.linalg.norm(np.diff(states[4]))  # az
-    cost += 0.5 * np.linalg.norm(np.diff(states[5]))  # theta
+    cost += 1.0 * np.linalg.norm(np.diff(states[4]))  # az
+    cost += 1.0 * np.linalg.norm(np.diff(states[5]))  # theta
 
     # end cost to bias to matched landing ??
     # cost += 15.0 * pow(x[-1], 2)
@@ -290,7 +290,7 @@ def optimize(p0_z, pf_z, v, dt, vz_max=-1.0):
                                       bounds=bounds)
 
     # plot optimization results
-    # plot_optimization_results(traj, results.x, T, n, m)
+    plot_optimization_results(traj, results.x, T, n, m)
     # plot_inputs_based_trajectory(T, dt, n, m, x0, results)
 
     return (T, n, m, v, dt, results)
@@ -336,33 +336,33 @@ def generate_trajectory_combinations():
 if __name__ == "__main__":
     basedir = "./trajectory/"
     index = 0
-    dt = 0.1
+    dt = 0.05
 
-    # p0_z = 5.0
-    # pf_z = 0.0
-    # v = 1.0
-    # T, n, m, v, dt, results = optimize(p0_z, pf_z, v, dt)
+    p0_z = 5.0
+    pf_z = 0.0
+    v = 3.0
+    T, n, m, v, dt, results = optimize(p0_z, pf_z, v, dt)
     # filepath = basedir + "0.csv"
     # record_optimized_results(T, n, m, v, dt, results, filepath)
 
-    # prep index file
-    index_file = open(basedir + "index.csv", "wb")
-    index_file.write(bytes("index,p0_z,v\n", "UTF-8"))
-
-    # create trajectory table
-    combinations = generate_trajectory_combinations()
-    for c in combinations:
-        p0_z = c[0]
-        pf_z = 0.0
-        v = c[2]
-        filepath = basedir + str(index) + ".csv"
-        index_line = "{0},{1},{2}\n".format(index, p0_z, v)
-        index_file.write(bytes(index_line, "UTF-8"))
-        index += 1
-
-        print("Optimizing starting height {0} @ {1}ms^-1".format(p0_z, v))
-        T, n, m, v, dt, results = optimize(p0_z, pf_z, v, dt)
-        record_optimized_results(T, n, m, v, dt, results, filepath)
-
-    # close index file
-    index_file.close()
+    # # prep index file
+    # index_file = open(basedir + "index.csv", "wb")
+    # index_file.write(bytes("index,p0_z,v\n", "UTF-8"))
+    #
+    # # create trajectory table
+    # combinations = generate_trajectory_combinations()
+    # for c in combinations:
+    #     p0_z = c[0]
+    #     pf_z = 0.0
+    #     v = c[2]
+    #     filepath = basedir + str(index) + ".csv"
+    #     index_line = "{0},{1},{2}\n".format(index, p0_z, v)
+    #     index_file.write(bytes(index_line, "UTF-8"))
+    #     index += 1
+    #
+    #     print("Optimizing starting height {0} @ {1}ms^-1".format(p0_z, v))
+    #     T, n, m, v, dt, results = optimize(p0_z, pf_z, v, dt)
+    #     record_optimized_results(T, n, m, v, dt, results, filepath)
+    #
+    # # close index file
+    # index_file.close()
