@@ -19,6 +19,7 @@ int EstimatorNode::configure(std::string node_name, int hz) {
 
   // estimator
   this->ros_nh->getParam("/tracker_mode", this->mode);
+  this->ros_nh->getParam("/quad_frame", this->quad_frame);
   this->initialized = false;
   this->state = ESTIMATOR_OFF;
 
@@ -145,19 +146,28 @@ void EstimatorNode::offCallback(const std_msgs::Bool &msg) {
 }
 
 void EstimatorNode::quadPoseCallback(const geometry_msgs::PoseStamped &msg) {
-  Vec3 pos_enu;
+  Vec3 pos;
 
   convertMsg(msg, this->quad_pose);
-  ned2enu(this->quad_pose.position, pos_enu);
-  this->quad_pose.position = pos_enu;
+  if (this->quad_frame == "NWU") {
+    nwu2enu(this->quad_pose.position, pos);
+  } else if (this->quad_frame == "NED") {
+    ned2enu(this->quad_pose.position, pos);
+  }
+  this->quad_pose.position = pos;
 }
 
 void EstimatorNode::quadVelocityCallback(const geometry_msgs::TwistStamped &msg) {
-  Vec3 vel_enu;
+  Vec3 vel;
 
   convertMsg(msg.twist.linear, this->quad_velocity);
-  ned2enu(this->quad_velocity, vel_enu);
-  this->quad_velocity = vel_enu;
+  if (this->quad_frame == "NWU") {
+    nwu2enu(this->quad_velocity, vel);
+  } else if (this->quad_frame == "NED") {
+    ned2enu(this->quad_velocity, vel);
+  }
+
+  this->quad_velocity = vel;
 }
 
 void EstimatorNode::targetInertialPosCallback(const geometry_msgs::Vector3 &msg) {

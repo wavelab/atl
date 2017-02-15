@@ -13,6 +13,7 @@ int ControlNode::configure(const std::string node_name, int hz) {
 
   // quadrotor
   this->ros_nh->getParam("/control_config_dir", config_path);
+  this->ros_nh->getParam("/quad_frame", this->quad_frame);
   if (this->quadrotor.configure(config_path) != 0) {
     ROS_ERROR(FCONFQUAD);
     return -2;
@@ -169,21 +170,34 @@ void ControlNode::stateCallback(const mavros_msgs::State::ConstPtr &msg) {
 
 void ControlNode::poseCallback(const geometry_msgs::PoseStamped &msg) {
   Pose pose;
-  Vec3 pos_enu;
+  Vec3 pos;
 
+  // convert message to pose
   convertMsg(msg, pose);
-  ned2enu(pose.position, pos_enu);
-  pose.position = pos_enu;
+  if (this->quad_frame == "NWU") {
+    nwu2enu(pose.position, pos);
+  } else if (this->quad_frame == "NED") {
+    ned2enu(pose.position, pos);
+  }
+  pose.position = pos;
 
   this->quadrotor.setPose(pose);
 }
 
 void ControlNode::velocityCallback(const geometry_msgs::TwistStamped &msg) {
-  Vec3 vel_ned, vel_enu;
+  Vec3 vel_nwu, vel_ned, vel_enu;
 
-  convertMsg(msg.twist.linear, vel_ned);
-  ned2enu(vel_ned, vel_enu);
-  this->quadrotor.setVelocity(vel_enu);
+  if (this->quad_frame == "NWU") {
+    convertMsg(msg.twist.linear, vel_nwu);
+    nwu2enu(vel_nwu, vel_enu);
+    this->quadrotor.setVelocity(vel_enu);
+
+  } else if (this->quad_frame == "NED") {
+    convertMsg(msg.twist.linear, vel_ned);
+    ned2enu(vel_ned, vel_enu);
+    this->quadrotor.setVelocity(vel_enu);
+
+  }
 }
 
 void ControlNode::headingCallback(const std_msgs::Float64 &msg) {
@@ -312,7 +326,7 @@ void ControlNode::publishStats(void) {
   // clang-format on
 
   // publish
-  this->ros_pubs[PCTRL_STATS_TOPIC].publish(pc_stats_msg);
+  // this->ros_pubs[PCTRL_STATS_TOPIC].publish(pc_stats_msg);
   // this->ros_pubs[PCTRL_GET].publish(pcs_settings_msg);
 }
 

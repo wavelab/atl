@@ -35,6 +35,7 @@ namespace awesomo {
 
 class GimbalNode : public ROSNode {
 public:
+  std::string quad_frame;
   Gimbal gimbal;
   Vec3 set_points;
 

@@ -11,6 +11,7 @@ int GimbalNode::configure(std::string node_name, int hz) {
   }
 
   // gimbal
+  this->ros_nh->getParam("/quad_frame", this->quad_frame);
   this->ros_nh->getParam("/gimbal_config", config_file);
   if (this->gimbal.configure(config_file) != 0) {
     ROS_ERROR("Failed to configure Gimbal!");
@@ -60,10 +61,16 @@ void GimbalNode::trackTargetCallback(const geometry_msgs::Vector3 &msg) {
 void GimbalNode::quadPoseCallback(const geometry_msgs::PoseStamped &msg) {
   geometry_msgs::Vector3 ros_msg;
 
-  // transform from NED to ENU
-  ros_msg.x = msg.pose.position.y;
-  ros_msg.y = msg.pose.position.x;
-  ros_msg.z = -msg.pose.position.z;
+  // transform from NWU to ENU
+  if (this->quad_frame == "NWU") {
+    ros_msg.x = -msg.pose.position.y;
+    ros_msg.y = msg.pose.position.x;
+    ros_msg.z = msg.pose.position.z;
+  } else if (this->quad_frame == "NED") {
+    ros_msg.x = msg.pose.position.x;
+    ros_msg.y = -msg.pose.position.y;
+    ros_msg.z = msg.pose.position.z;
+  }
 
   this->ros_pubs[POSITION_TOPIC].publish(ros_msg);
 }

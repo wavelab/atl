@@ -6,6 +6,7 @@
   <!-- settings -->
   <param name="sim_mode" value="true" />
   <param name="debug_mode" value="false" />
+  <param name="quad_frame" value="NWU" />
 
   <!-- prototype -->
   <param name="gimbal_mode" value="true" />

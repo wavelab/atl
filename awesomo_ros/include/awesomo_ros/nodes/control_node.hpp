@@ -59,8 +59,10 @@ class ControlNode : public ROSNode {
 public:
   bool configured;
 
-  int rc_in[16];
   Quadrotor quadrotor;
+  std::string quad_frame;
+
+  int rc_in[16];
   bool armed;
 
   mavros_msgs::State mavros_state;

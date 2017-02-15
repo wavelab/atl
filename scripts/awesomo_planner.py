@@ -351,12 +351,12 @@ if __name__ == "__main__":
     # index_file = open(basedir + "index.csv", "wb")
     # index_file.write(bytes("index,p0,pf\n", "UTF-8"))
 
-    p0 = (0.0, 5.0)
-    pf = (1.0, 0.0)
-    v = 0.5
-    T, n, m, results = optimize(p0, pf, v)
-    filepath = basedir + "1.csv"
-    record_optimized_results(T, n, m, filepath, results)
+    # p0 = (0.0, 5.0)
+    # pf = (1.0, 0.0)
+    # v = 0.5
+    # T, n, m, results = optimize(p0, pf, v)
+    # filepath = basedir + "1.csv"
+    # record_optimized_results(T, n, m, filepath, results)
 
     # # create trajectory table
     # for t in table:

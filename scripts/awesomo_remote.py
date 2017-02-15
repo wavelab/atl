@@ -275,14 +275,14 @@ if __name__ == "__main__":
     # lz.set_velocity(0.0)
     # lz.set_position([0, 1000, 0])
 
-    # velocity, angular_velocity = lz_circle_path(10, 1.0)
-    # lz.set_velocity(velocity)
-    # lz.set_angular_velocity(angular_velocity)
+    velocity, angular_velocity = lz_circle_path(20, 3.0)
+    lz.set_velocity(velocity)
+    lz.set_angular_velocity(angular_velocity)
 
     # quad.set_heading(0)
     # quad.set_mode("DISCOVER_MODE")
     # quad.set_hover_point([0.0, -1.0, 5.0])
-    # quad.set_hover_height(5.0)
+    # quad.set_hover_height(0.5)
     # quad.set_pctrl_settings({
     #     "roll": {
     #         "min": -30,
@@ -307,6 +307,44 @@ if __name__ == "__main__":
     # })
     # sleep(5)
     # quad.set_hover_point([1.0, 0.0, 5.0])
+
+    # quad.set_tctrl_settings({
+    #     "roll": {
+    #         "min": -30,
+    #         "max": 30,
+    #         "k_p": 0.8,
+    #         "k_i": 0.00001,
+    #         "k_d": 0.2
+    #     },
+    #     "pitch": {
+    #         "min": -30,
+    #         "max": 30,
+    #         "k_p": 0.1,
+    #         "k_i": 0.0,
+    #         "k_d": 0.05
+    #     },
+    #     "throttle": {
+    #         "hover": 0.5,
+    #         "k_p": 0.4,
+    #         "k_i": 0.0,
+    #         "k_d": 0.2
+    #     },
+    #     "vx": {
+    #         "k_p": 0.2,
+    #         "k_i": 0.0,
+    #         "k_d": 0.0
+    #     },
+    #     "vy": {
+    #         "k_p": 0.5,
+    #         "k_i": 0.0,
+    #         "k_d": 0.0
+    #     },
+    #     "vz": {
+    #         "k_p": 0.2,
+    #         "k_i": 0.0,
+    #         "k_d": 0.0
+    #     }
+    # })
 
     # quad.set_lctrl_settings({
     #     "roll": {
