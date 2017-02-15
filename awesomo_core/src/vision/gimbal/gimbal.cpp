@@ -22,6 +22,7 @@ Gimbal::Gimbal(void) {
 Gimbal::~Gimbal(void) {
   this->off();
 }
+
 int Gimbal::configure(std::string config_file) {
   std::string device_path;
   ConfigParser parser;
