@@ -13,7 +13,7 @@ namespace awesomo {
 
 // NODE SETTINGS
 #define NODE_NAME "awesomo_imu"
-#define NODE_RATE 500
+#define NODE_RATE 100
 
 // PUBLISH TOPICS
 #define IMU_TOPIC "/awesomo/imu"

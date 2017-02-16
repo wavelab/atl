@@ -88,7 +88,7 @@ int8_t MPU6050::configure(void) {
   this->sample_rate = this->getSampleRate();
 
   /* calibrate mpu6050 */
-  this->calibrate();
+  // this->calibrate();
 
   return 0;
 }
@@ -222,8 +222,7 @@ int8_t MPU6050::calibrate(void) {
   return 0;
 }
 
-void MPU6050::print(void)
-{
+void MPU6050::print(void) {
   printf("gyro_x: %f\n", this->gyro.x);
   printf("gyro_y: %f\n", this->gyro.y);
   printf("gyro_z: %f\n", this->gyro.z);
@@ -245,10 +244,7 @@ void MPU6050::print(void)
   printf("\n");
 }
 
-int8_t MPU6050::setDPLFConfig(int8_t setting)
-{
-  int retval;
-
+int8_t MPU6050::setDPLFConfig(int8_t setting) {
   /*
      DPLF_CFG    Accelerometer
      ----------------------------------------
@@ -274,7 +270,8 @@ int8_t MPU6050::setDPLFConfig(int8_t setting)
      5           10              13.4        1
      6           5               18.5        1
      7           RESERVED        RESERVED    8
-     */
+  */
+  int retval;
 
   /* check setting range */
   if (setting > 7 || setting < 0) {
@@ -291,8 +288,7 @@ int8_t MPU6050::setDPLFConfig(int8_t setting)
   return 0;
 }
 
-int8_t MPU6050::getDPLFConfig(void)
-{
+int8_t MPU6050::getDPLFConfig(void) {
   char data[1];
   int retval;
 
@@ -310,8 +306,7 @@ int8_t MPU6050::getDPLFConfig(void)
   return data[0];
 }
 
-int8_t MPU6050::setSampleRateDiv(int8_t div)
-{
+int8_t MPU6050::setSampleRateDiv(int8_t div) {
   int retval;
 
   /* set sample rate divider */
@@ -324,8 +319,7 @@ int8_t MPU6050::setSampleRateDiv(int8_t div)
   return 0;
 }
 
-int8_t MPU6050::getSampleRateDiv(void)
-{
+int8_t MPU6050::getSampleRateDiv(void) {
   char data;
   int retval;
 
@@ -339,8 +333,7 @@ int8_t MPU6050::getSampleRateDiv(void)
   return data;
 }
 
-int16_t MPU6050::getSampleRate(void)
-{
+int16_t MPU6050::getSampleRate(void) {
   uint8_t smplrt_div;
   uint8_t dlpf_cfg;
   uint16_t sample_divider;
@@ -368,8 +361,7 @@ int16_t MPU6050::getSampleRate(void)
   return gyro_rate / (1 + sample_divider);
 }
 
-int8_t MPU6050::setGyroRange(int8_t range)
-{
+int8_t MPU6050::setGyroRange(int8_t range) {
   char data;
   uint8_t retval;
 
@@ -389,8 +381,7 @@ int8_t MPU6050::setGyroRange(int8_t range)
   return 0;
 }
 
-int8_t MPU6050::getGyroRange(void)
-{
+int8_t MPU6050::getGyroRange(void) {
   char data;
   int retval;
 
@@ -408,8 +399,7 @@ int8_t MPU6050::getGyroRange(void)
   return data;
 }
 
-int8_t MPU6050::setAccelRange(int8_t range)
-{
+int8_t MPU6050::setAccelRange(int8_t range) {
   char data;
   uint8_t retval;
 
@@ -429,8 +419,7 @@ int8_t MPU6050::setAccelRange(int8_t range)
   return 0;
 }
 
-int8_t MPU6050::getAccelRange(void)
-{
+int8_t MPU6050::getAccelRange(void) {
   char data;
   uint8_t retval;
 
@@ -448,8 +437,7 @@ int8_t MPU6050::getAccelRange(void)
   return data;
 }
 
-void MPU6050::info(void)
-{
+void MPU6050::info(void) {
   printf("gyro sensitivity: %f\n", this->gyro.sensitivity);
   printf("gyro offset_x: %f\n", this->gyro.offset_x);
   printf("gyro offset_y: %f\n", this->gyro.offset_y);
@@ -464,8 +452,7 @@ void MPU6050::info(void)
   printf("\n");
 }
 
-void MPU6050::recordHeader(FILE *output_file)
-{
+void MPU6050::recordHeader(FILE *output_file) {
   fprintf(output_file, "gyro.x,");
   fprintf(output_file, "gyro.y,");
   fprintf(output_file, "gyro.z,");
@@ -500,8 +487,7 @@ void MPU6050::recordData(FILE *output_file)
   fprintf(output_file, "%f\n", this->roll);
 }
 
-int8_t MPU6050::record(std::string output_path, int nb_samples)
-{
+int8_t MPU6050::record(std::string output_path, int nb_samples) {
   int i;
   int8_t retval;
   FILE *output_file;

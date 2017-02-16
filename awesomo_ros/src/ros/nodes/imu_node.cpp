@@ -31,7 +31,7 @@ int IMUNode::publishData(void) {
   Quaternion quat;
 
   if (this->imu.getData() == 0) {
-    euler << this->imu.roll, this->imu.pitch, 0.0;
+    euler << deg2rad(this->imu.roll), deg2rad(this->imu.pitch), 0.0;
     euler2quat(euler, 321, quat);
     buildMsg(quat, msg);
     this->ros_pubs[IMU_TOPIC].publish(msg);
