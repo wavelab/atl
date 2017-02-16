@@ -9,6 +9,7 @@ SET(
     apriltags_mit
     CGAL
     yaml-cpp
+    m3api
 )
 
 # ROS NODES
@@ -20,6 +21,9 @@ TARGET_LINK_LIBRARIES(camera_node ${DEPS})
 
 ADD_EXECUTABLE(pg_camera_node ros/nodes/pg_camera_node.cpp)
 TARGET_LINK_LIBRARIES(pg_camera_node ${DEPS})
+
+ADD_EXECUTABLE(ximea_camera_node ros/nodes/ximea_camera_node.cpp)
+TARGET_LINK_LIBRARIES(ximea_camera_node ${DEPS})
 
 ADD_EXECUTABLE(control_node ros/nodes/control_node.cpp)
 TARGET_LINK_LIBRARIES(control_node ${DEPS})

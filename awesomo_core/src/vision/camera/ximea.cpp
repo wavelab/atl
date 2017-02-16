@@ -12,10 +12,10 @@ int XimeaCamera::initialize(void) {
   XI_RETURN retval;
 
   // setup
-  time_us = this->config->exposure_value;
+  time_us = this->config.exposure_value;
   ds_type = 0;
   ds_rate = 2;
-  gain_db = this->config->gain_value;
+  gain_db = this->config.gain_value;
   img_format = XI_RGB24;
 
   this->ximea = NULL;
@@ -94,7 +94,7 @@ int XimeaCamera::getFrame(cv::Mat &image) {
     cv::resize(
       image,
       image,
-      cv::Size(this->config->image_width, this->config->image_height));
+      cv::Size(this->config.image_width, this->config.image_height));
     return 0;
   }
 }
