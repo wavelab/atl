@@ -1,5 +1,5 @@
-#ifndef __AWESOMO_CORE_MPU6050_HPP__
-#define __AWESOMO_CORE_MPU6050_HPP__
+#ifndef __AWESOMO_MPU6050_HPP__
+#define __AWESOMO_MPU6050_HPP__
 
 #include <time.h>
 

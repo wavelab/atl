@@ -169,7 +169,6 @@ int8_t MPU6050::getData(void) {
   this->gyro.y = this->gyro.raw_y / this->gyro.sensitivity;
   this->gyro.z = this->gyro.raw_z / this->gyro.sensitivity;
 
-
   /* calculate dt */
   time_now = clock();
   dt = ((double) time_now - this->last_updated) / CLOCKS_PER_SEC;
