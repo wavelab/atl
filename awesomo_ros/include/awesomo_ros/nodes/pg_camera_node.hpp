@@ -25,7 +25,8 @@ namespace awesomo {
 #define APRILTAG_TOPIC "/awesomo/apriltag/target"
 #define GIMBAL_FRAME_ORIENTATION_TOPIC "/awesomo/gimbal/frame/orientation/inertial"
 #define GIMBAL_JOINT_ORIENTATION_TOPIC "/awesomo/gimbal/joint/orientation/inertial"
-#define APRILTAG_TOPIC "/awesomo/apriltag/target"
+#define LT_BODY_POSITION_TOPIC "/awesomo/estimate/landing_target/position/body"
+#define LT_DETECTED_TOPIC "/awesomo/estimate/landing_target/detected"
 #define SHUTDOWN_TOPIC "/awesomo/camera/shutdown"
 
 class PGCameraNode : public ROSNode {
@@ -36,15 +37,23 @@ public:
   Quaternion gimbal_frame_orientation;
   Quaternion gimbal_joint_orientation;
   Vec3 gimbal_position;
-  TagPose tag;
+  bool target_detected;
+  Vec3 target_pos_bf;
 
-  PGCameraNode(int argc, char **argv) : ROSNode(argc, argv) {}
+  PGCameraNode(int argc, char **argv) : ROSNode(argc, argv) {
+    this->gimbal_frame_orientation = Quaternion();
+    this->gimbal_joint_orientation = Quaternion();
+    this->gimbal_position = Vec3();
+    this->target_detected = false;
+    this->target_pos_bf = Vec3();
+  }
   int configure(std::string node_name, int hz);
   int publishImage(void);
   void imageCallback(const sensor_msgs::ImageConstPtr &msg);
   void gimbalFrameCallback(const geometry_msgs::Quaternion &msg);
   void gimbalJointCallback(const geometry_msgs::Quaternion &msg);
-  void aprilTagCallback(const awesomo_msgs::AprilTagPose &msg);
+  void targetPositionCallback(const geometry_msgs::Vector3 &msg);
+  void targetDetectedCallback(const std_msgs::Bool &msg);
   int loopCallback(void);
 };
 

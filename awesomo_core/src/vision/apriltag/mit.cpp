@@ -121,7 +121,7 @@ int MITDetector::obtainPose(AprilTags::TagDetection tag, TagPose &tag_pose) {
 
   // get tag size according to tag id
   if (this->tag_configs.find(tag.id) == this->tag_configs.end()) {
-    log_err("ERROR! Tag size for [%d] not configured!\n", (int) tag.id);
+    // log_err("ERROR! Tag size for [%d] not configured!", (int) tag.id);
     return -2;
   } else {
     tag_size = this->tag_configs[tag.id];
