@@ -63,7 +63,7 @@ ADD_LIBRARY(
     src/vision/apriltag/mit.cpp
     src/vision/camera/camera.cpp
     src/vision/camera/config.cpp
-    # src/vision/camera/ximea.cpp
+    src/vision/camera/ximea.cpp
     src/vision/camera/pointgrey.cpp
     src/vision/gimbal/gimbal.cpp
     src/vision/gimbal/sbgc.cpp
@@ -80,6 +80,7 @@ SET(DEPS
     yaml-cpp
     gtest
     pthread
+    m3api
 )
 
 # UNIT TESTS

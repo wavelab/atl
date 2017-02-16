@@ -18,7 +18,7 @@ class XimeaCamera : public Camera {
 public:
   HANDLE ximea;
 
-  XimeaCamera(void);
+  XimeaCamera(void) {};
   int initialize(void);
   int getFrame(cv::Mat &image);
 };
