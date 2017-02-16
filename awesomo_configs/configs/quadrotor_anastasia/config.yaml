@@ -1,5 +1,5 @@
-hover_position: [3.0, 5.0, 7.5]
-recover_height: 7.5
+hover_position: [0.0, 0.0, 4.0]
+recover_height: 7.0
 
 auto_track: true
 auto_land: false

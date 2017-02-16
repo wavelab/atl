@@ -61,14 +61,15 @@ void GimbalNode::trackTargetCallback(const geometry_msgs::Vector3 &msg) {
 void GimbalNode::quadPoseCallback(const geometry_msgs::PoseStamped &msg) {
   geometry_msgs::Vector3 ros_msg;
 
-  // transform from NWU to ENU
   if (this->quad_frame == "NWU") {
+    // transform from NWU to ENU
     ros_msg.x = -msg.pose.position.y;
     ros_msg.y = msg.pose.position.x;
     ros_msg.z = msg.pose.position.z;
   } else if (this->quad_frame == "NED") {
-    ros_msg.x = msg.pose.position.x;
-    ros_msg.y = -msg.pose.position.y;
+    // transform from NED to ENU
+    ros_msg.x = msg.pose.position.y;
+    ros_msg.y = msg.pose.position.x;
     ros_msg.z = msg.pose.position.z;
   }
 

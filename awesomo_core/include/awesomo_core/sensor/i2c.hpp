@@ -1,5 +1,5 @@
-#ifndef __AWESOMO_CORE_SENSOR_I2C_HPP__
-#define __AWESOMO_CORE_SENSOR_I2C_HPP__
+#ifndef __AWESOMO_SENSOR_I2C_HPP__
+#define __AWESOMO_SENSOR_I2C_HPP__
 
 #include <stdio.h>
 #include <stdlib.h>

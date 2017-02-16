@@ -40,3 +40,7 @@ throttle_limit:
     max: 1.0
 
 trajectory_index: "../../trajectory/index.csv"
+
+blackbox_enable: true
+blackbox_rate: 0.2
+blackbox_file: "/tmp/landing_blackbox.csv"

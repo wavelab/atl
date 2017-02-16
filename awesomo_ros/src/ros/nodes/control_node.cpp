@@ -62,7 +62,7 @@ int ControlNode::configure(const std::string node_name, int hz) {
   // clang-format on
 
   // wait till connected to FCU and Estimator
-  this->waitForFCU();
+  // this->waitForFCU();
   this->waitForEstimator();
 
   this->configured = true;
@@ -70,17 +70,28 @@ int ControlNode::configure(const std::string node_name, int hz) {
 }
 
 void ControlNode::waitForFCU(void) {
+  int waited_for;
+
   // pre-check
   if (this->sim_mode) {
     return;
   }
 
   // wait fo FCU
+  waited_for = 0;
   log_info("Waiting for FCU ...");
+
   while (this->mavros_state.connected != true) {
-    ros::spinOnce();
+    if (waited_for == 10) {
+      log_info("Failed to connect to FCU for 10 seconds ...");
+      exit(-1);
+    }
+
     sleep(1);
+    ros::spinOnce();
+    waited_for++;
   }
+
   log_info("Connected to FCU!");
 }
 
@@ -293,17 +304,18 @@ int ControlNode::loopCallback(void) {
       this->publishStats();
 
   } else {
-      geometry_msgs::PoseStamped zero_position_msg;
-      zero_position_msg.pose.position.x = 0.0;
-      zero_position_msg.pose.position.y = 0.0;
-      zero_position_msg.pose.position.z = 2.0;
+      geometry_msgs::PoseStamped msg;
 
-      zero_position_msg.pose.orientation.x = 0.0;
-      zero_position_msg.pose.orientation.y = 0.0;
-      zero_position_msg.pose.orientation.z = 0.0;
-      zero_position_msg.pose.orientation.w = 1.0;
+      msg.pose.position.x = 0.0;
+      msg.pose.position.y = 0.0;
+      msg.pose.position.z = 2.0;
 
-      this->ros_pubs[SETPOINT_POSITION_TOPIC].publish(zero_position_msg);
+      msg.pose.orientation.x = 0.0;
+      msg.pose.orientation.y = 0.0;
+      msg.pose.orientation.z = 0.0;
+      msg.pose.orientation.w = 1.0;
+
+      this->ros_pubs[SETPOINT_POSITION_TOPIC].publish(msg);
   }
 
   return 0;

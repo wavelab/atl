@@ -11,6 +11,7 @@ install:
     - sudo bash scripts/install/ros_install.bash
     - sudo bash scripts/install/catkin_setup.bash
     - sudo bash scripts/install/awesomo_install.bash
+    - sudo bash scripts/install/ximea_install.bash
 
 script:
     - cd ~/catkin_ws/src/awesomo/awesomo_core

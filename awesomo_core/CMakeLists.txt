@@ -106,14 +106,16 @@ ADD_EXECUTABLE(
     # QUADROTOR
     tests/quadrotor/landing_target_test.cpp
     tests/quadrotor/quadrotor_test.cpp
-    # VISION TESTS
+    # SENSOR
+    tests/sensor/MPU6050_test.cpp
+    # VISION
     tests/vision/apriltag/mit_test.cpp
     # tests/vision/apriltag/swathmore_test.cpp
     tests/vision/camera/camera_test.cpp
     tests/vision/camera/config_test.cpp
     tests/vision/gimbal/gimbal_test.cpp
     tests/vision/gimbal/sbgc_test.cpp
-    # UTIL TESTS
+    # UTIL
     tests/utils/config_test.cpp
     tests/utils/data_test.cpp
     tests/utils/filesystem_test.cpp
