@@ -18,9 +18,6 @@ TARGET_LINK_LIBRARIES(apriltag_node ${DEPS})
 ADD_EXECUTABLE(camera_node ros/nodes/camera_node.cpp)
 TARGET_LINK_LIBRARIES(camera_node ${DEPS})
 
-ADD_EXECUTABLE(pg_camera_node ros/nodes/pg_camera_node.cpp)
-TARGET_LINK_LIBRARIES(pg_camera_node ${DEPS})
-
 ADD_EXECUTABLE(control_node ros/nodes/control_node.cpp)
 TARGET_LINK_LIBRARIES(control_node ${DEPS})
 
@@ -32,6 +29,13 @@ TARGET_LINK_LIBRARIES(example_node ${DEPS})
 
 ADD_EXECUTABLE(gimbal_node ros/nodes/gimbal_node.cpp)
 TARGET_LINK_LIBRARIES(gimbal_node ${DEPS})
+
+ADD_EXECUTABLE(imu_node ros/nodes/imu_node.cpp)
+TARGET_LINK_LIBRARIES(imu_node ${DEPS})
+
+ADD_EXECUTABLE(pg_camera_node ros/nodes/pg_camera_node.cpp)
+TARGET_LINK_LIBRARIES(pg_camera_node ${DEPS})
+
 
 # ROS UTILS
 ADD_LIBRARY(
