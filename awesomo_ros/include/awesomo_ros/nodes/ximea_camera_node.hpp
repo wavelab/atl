@@ -32,6 +32,7 @@ class XimeaCameraNode : public ROSNode {
 public:
   XimeaCamera camera;
   cv::Mat image;
+  bool grey_scale;
 
   Quaternion gimbal_frame_orientation;
   Quaternion gimbal_joint_orientation;
