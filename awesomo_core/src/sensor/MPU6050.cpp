@@ -12,7 +12,9 @@ int8_t MPU6050::configure(void) {
 
   /* setup */
   this->i2c = I2C();
-  this->i2c.setup();
+  if (this->i2c.setup() != 0) {
+    log_err("Failed to initilize I2C!");
+  }
   this->i2c.setSlave(MPU6050_ADDRESS);
 
   /* set intial values */
