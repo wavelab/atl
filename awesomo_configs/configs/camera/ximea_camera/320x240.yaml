@@ -1,21 +1,21 @@
 index: 0
-image_width: 320
+image_width: 320 
 image_height: 240
 
-exposure_value: 0.0
-gain_value: 10.0
+exposure_value: 1000 # in micro seconds
+gain_value: 12.0 # limit is 16
 lambda: [0.0, 0.0, 0.0]
 alpha: 4.0
 
 camera_matrix:
   rows: 3
   cols: 3
-  data: [584.851557, 0.000000, 161.248114, 0.000000, 583.263575, 119.226257, 0.000000, 0.000000, 1.000000]
+  data: [389.598659, 0.000000, 324.264902, 0.000000, 363.082577, 238.563275, 0.000000, 0.000000, 1.000000]
 distortion_model: plumb_bob
 distortion_coefficients:
   rows: 1
   cols: 5
-  data: [-0.254174, 0.729207, -0.000063, 0.000174, 0.000000]
+  data: [-0.290367, 0.073869, 0.000556, -0.000337, 0.000000]
 rectification_matrix:
   rows: 3
   cols: 3
@@ -23,7 +23,7 @@ rectification_matrix:
 projection_matrix:
   rows: 3
   cols: 4
-  data: [574.116699, 0.000000, 160.796461, 0.000000, 0.000000, 575.249329, 118.711570, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000]
+  data: [297.129150, 0.000000, 325.472112, 0.000000, 0.000000, 308.765686, 238.003730, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000]
 
 imshow: false
 snapshot: false

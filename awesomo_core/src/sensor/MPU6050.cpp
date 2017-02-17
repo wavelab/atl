@@ -175,8 +175,8 @@ int8_t MPU6050::getData(void) {
 
   /* complimentary filter */
   this->accelerometerCalcAngle();
-  this->pitch = (0.98 * this->gyro.pitch) + (0.02 * this->accel.pitch);
-  this->roll = (0.98 * this->gyro.roll) + (0.02 * this->accel.roll);
+  this->pitch = (0.90 * this->gyro.pitch) + (0.1 * this->accel.pitch);
+  this->roll = (0.90 * this->gyro.roll) + (0.1 * this->accel.roll);
   this->gyroscopeCalcAngle(dt);
 
   /* offset pitch and roll */

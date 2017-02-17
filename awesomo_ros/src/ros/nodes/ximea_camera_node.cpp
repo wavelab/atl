@@ -4,6 +4,7 @@ namespace awesomo {
 
 int XimeaCameraNode::configure(std::string node_name, int hz) {
   std::string config_path;
+  grey_scale = false;
 
   // ros node
   if (ROSNode::configure(node_name, hz) != 0) {
@@ -16,6 +17,9 @@ int XimeaCameraNode::configure(std::string node_name, int hz) {
     ROS_ERROR("Failed to configure Camera!");
     return -2;
   };
+
+  this->ros_nh->getParam("/grey_scale", grey_scale);
+
   this->camera.initialize();
 
   // register publisher and subscribers
@@ -36,32 +40,45 @@ int XimeaCameraNode::publishImage(void) {
   sensor_msgs::ImageConstPtr img_msg;
 
 
+
   // encode position and orientation into image (first 11 pixels in first row)
   // if (this->gimbal_mode) {
-  this->image.at<double>(0, 0) = this->gimbal_position(0);
-  this->image.at<double>(0, 1) = this->gimbal_position(1);
-  this->image.at<double>(0, 2) = this->gimbal_position(2);
-
-  this->image.at<double>(0, 3) = this->gimbal_frame_orientation.w();
-  this->image.at<double>(0, 4) = this->gimbal_frame_orientation.x();
-  this->image.at<double>(0, 5) = this->gimbal_frame_orientation.y();
-  this->image.at<double>(0, 6) = this->gimbal_frame_orientation.z();
-
-  this->image.at<double>(0, 7) = this->gimbal_joint_orientation.w();
-  this->image.at<double>(0, 8) = this->gimbal_joint_orientation.x();
-  this->image.at<double>(0, 9) = this->gimbal_joint_orientation.y();
-  this->image.at<double>(0, 10) = this->gimbal_joint_orientation.z();
+  // this->image.at<double>(0, 0) = this->gimbal_position(0);
+  // this->image.at<double>(0, 1) = this->gimbal_position(1);
+  // this->image.at<double>(0, 2) = this->gimbal_position(2);
+  //
+  // this->image.at<double>(0, 3) = this->gimbal_frame_orientation.w();
+  // this->image.at<double>(0, 4) = this->gimbal_frame_orientation.x();
+  // this->image.at<double>(0, 5) = this->gimbal_frame_orientation.y();
+  // this->image.at<double>(0, 6) = this->gimbal_frame_orientation.z();
+  //
+  // this->image.at<double>(0, 7) = this->gimbal_joint_orientation.w();
+  // this->image.at<double>(0, 8) = this->gimbal_joint_orientation.x();
+  // this->image.at<double>(0, 9) = this->gimbal_joint_orientation.y();
+  // this->image.at<double>(0, 10) = this->gimbal_joint_orientation.z();
   // }
 
-  // clang-format off
-  img_msg = cv_bridge::CvImage(
-    std_msgs::Header(),
-    "bgr8",
-    this->image
-  ).toImageMsg();
-  this->img_pub.publish(img_msg);
+  // if (this->grey_scale) {
+    // cv::Mat grey_image;
+    // cv::cvtColor(this->image, grey_image, CV_BGR2GRAY);
+    // cv::Size s = this->image.size();
+    // std::cout << s.height << std::endl;
+    // std::cout << s.width << std::endl;
+    img_msg = cv_bridge::CvImage(
+        std_msgs::Header(),
+        "mono8",
+        this->image
+        ).toImageMsg();
+  // } else {
+  //   // clang-format off
+  //   img_msg = cv_bridge::CvImage(
+  //       std_msgs::Header(),
+  //       "bgr8",
+  //       this->image
+  //       ).toImageMsg();
+  // }
   // clang-format on
-
+  this->img_pub.publish(img_msg);
   return 0;
 }
 

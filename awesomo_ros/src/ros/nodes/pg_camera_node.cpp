@@ -19,11 +19,14 @@ int PGCameraNode::configure(std::string node_name, int hz) {
   this->camera.initialize();
 
   // register publisher and subscribers
+  // clang-format off
   this->registerImagePublisher(CAMERA_IMAGE_TOPIC);
   this->registerSubscriber(GIMBAL_FRAME_ORIENTATION_TOPIC, &PGCameraNode::gimbalFrameCallback, this);
   this->registerSubscriber(GIMBAL_JOINT_ORIENTATION_TOPIC, &PGCameraNode::gimbalJointCallback, this);
-  this->registerSubscriber(APRILTAG_TOPIC , &PGCameraNode::aprilTagCallback, this);
+  this->registerSubscriber(LT_BODY_POSITION_TOPIC , &PGCameraNode::targetPositionCallback, this);
+  this->registerSubscriber(LT_DETECTED_TOPIC , &PGCameraNode::targetDetectedCallback, this);
   this->registerShutdown(SHUTDOWN_TOPIC);
+  // clang-format on
 
   // register loop callback
   this->registerLoopCallback(std::bind(&PGCameraNode::loopCallback, this));
@@ -79,27 +82,30 @@ void PGCameraNode::gimbalJointCallback(const geometry_msgs::Quaternion &msg) {
   this->gimbal_joint_orientation.z() = msg.z;
 }
 
-void PGCameraNode::aprilTagCallback(const awesomo_msgs::AprilTagPose &msg) {
-  convertMsg(msg, this->tag);
+void PGCameraNode::targetPositionCallback(const geometry_msgs::Vector3 &msg) {
+  convertMsg(msg, this->target_pos_bf);
+}
+
+void PGCameraNode::targetDetectedCallback(const std_msgs::Bool &msg) {
+  convertMsg(msg, this->target_detected);
 }
 
 int PGCameraNode::loopCallback(void) {
   double dist;
 
   // change mode depending on apriltag distance
-  if (this->tag.detected == false) {
+  if (this->target_detected == false) {
     this->camera.changeMode("640x480");
 
   } else {
-    dist = this->tag.position(2);
-    if (dist > 4.0) {
+    dist = -1 * this->target_pos_bf(2);
+    if (dist > 10.0) {
       this->camera.changeMode("640x480");
-    } else if ( dist > 0.4 ) {
+    } else if (dist > 3.0) {
       this->camera.changeMode("320x240");
     } else  {
       this->camera.changeMode("160x120");
     }
-
   }
 
   // this->camera.showImage(this->image);

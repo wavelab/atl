@@ -21,6 +21,7 @@ INCLUDE_DIRECTORIES(
     /usr/local/include
     /usr/include/eigen3
     /usr/include/flycapture/
+    /usr/include/m3api/
 )
 
 # LIBRARY

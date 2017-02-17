@@ -20,15 +20,11 @@ namespace awesomo {
 
 // PUBLISH TOPICS
 #define CAMERA_IMU_TOPIC "/awesomo/gimbal/joint/imu"
-#define FRAME_ORIENTATION_TOPIC "/awesomo/gimbal/frame/orientation/inertial"
-#define JOINT_ORIENTATION_TOPIC "/awesomo/gimbal/joint/orientation/inertial"
-#define POSITION_TOPIC "/awesomo/gimbal/position/inertial"
 
 
 // SUBSCRIBE TOPICS
 #define SETPOINT_TOPIC "/awesomo/gimbal/setpoint/attitude"
 #define TRACK_TOPIC "/awesomo/gimbal/target/track"
-#define QUAD_POSE_TOPIC "/mavros/local_position/pose"
 
 #define SHUTDOWN_TOPIC "/awesomo/gimbal/shutdown"
 

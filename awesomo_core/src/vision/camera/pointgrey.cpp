@@ -151,14 +151,18 @@ int PointGreyCamera::setFormat7(std::string pixel_format,
     case 2:
       fmt7_settings.mode = FlyCapture2::MODE_2;
       max_image_width = 1024;
-      max_image_height = 738;
+      max_image_height = 768;
       break;
   }
 
-  fmt7_settings.offsetX = (max_image_width / 2 )  - crop_width / 2;
-  fmt7_settings.offsetY = (max_image_height / 2 ) - crop_height / 2;
-  fmt7_settings.width = crop_width;
-  fmt7_settings.height = crop_height;
+  // fmt7_settings.offsetX = (max_image_width / 2 )  - crop_width / 2;
+  // fmt7_settings.offsetY = (max_image_height / 2 ) - crop_height / 2;
+  // fmt7_settings.width = crop_width;
+  // fmt7_settings.height = crop_height;
+  fmt7_settings.width = 1024 - 200 ;
+  fmt7_settings.height = 768  - 200;
+  fmt7_settings.offsetX = 200;
+  fmt7_settings.offsetY = 200;
 
   // Validate the Format7 settings
   error = this->pointgrey->ValidateFormat7Settings(&fmt7_settings,

@@ -1,6 +1,12 @@
+index: 0
 image_width: 640
 image_height: 480
-camera_name: narrow_stereo
+
+exposure_value: 100 # in micro seconds
+gain_value: 8.0 #limit is 16
+lambda: [0.0, 0.0, 0.0]
+alpha: 4.0
+
 camera_matrix:
   rows: 3
   cols: 3
@@ -18,3 +24,7 @@ projection_matrix:
   rows: 3
   cols: 4
   data: [297.129150, 0.000000, 325.472112, 0.000000, 0.000000, 308.765686, 238.003730, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000]
+
+imshow: false
+snapshot: false
+showfps: true

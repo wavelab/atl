@@ -1,6 +1,16 @@
 tag_family: "Tag16h5"
-tag_ids: [0, 5, 2]
-# tag_sizes: [0.07, 0.6, 0.044] // Blue and Green Tag
-tag_sizes: [0.045, 0.342, 0.044] # Tag made of tape
+# tag_ids: [0, 5]
+# tag_sizes: [0.07, 0.6] // Blue and Green Tag
+# tag_sizes: [0.045, 0.342] # Tag made of tape
+
+tag_ids: [0]
+tag_sizes: [0.045] # Tag made of tape
+
+# tag_ids: [5]
+# tag_sizes: [0.342] # Tag made of tape
+
+# tag_ids: [0]
+# tag_sizes: [0.07]
+
 camera_config: "../camera/pointgrey_chameleon"
-imshow: false
+imshow: true
