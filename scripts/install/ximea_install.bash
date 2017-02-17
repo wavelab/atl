@@ -12,7 +12,9 @@ install_ximea_drivers()
     tar xzf $PACKAGE_NAME
     mv package ximea_driver
     cd ximea_driver
-    ./install -cam_usb30
+    ./install -cam_usb30 << EOF
+\n
+EOF
 }
 
 install_ximea_drivers
