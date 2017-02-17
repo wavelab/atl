@@ -56,11 +56,46 @@ int MITDetector::configure(std::string config_file) {
   return 0;
 }
 
+
+int MITDetector::illuminationInvarientTransform(cv::Mat &input, cv::Mat &output, float alpha) {
+  // this code is adapted from  Maddern et al 2014 Icra Paper
+  //     // Illumination invarient imaging
+  cv::Mat log_ch_1;
+  cv::Mat log_ch_2;
+  cv::Mat log_ch_3;
+
+  std::vector<cv::Mat> channels(3);
+  split(input, channels);
+
+  channels[0].convertTo(channels[0], CV_32F);
+  channels[1].convertTo(channels[1], CV_32F);
+  channels[2].convertTo(channels[2], CV_32F);
+
+  // channels[0].row(0).setTo(cv::Scalar(10));
+  // channels[1].row(0).setTo(cv::Scalar(10));
+  // channels[2].row(0).setTo(cv::Scalar(10));
+
+  cv::log(channels[0], log_ch_1);
+  cv::log(channels[1], log_ch_2);
+  cv::log(channels[2], log_ch_3);
+
+  output = log_ch_2 - alpha * log_ch_3 -
+    (1 - alpha) * log_ch_1;
+  cv::normalize(output, output, 0, 255, cv::NORM_MINMAX, CV_8UC1);
+
+  return 0;
+}
+
+
 int MITDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
   int retval;
   TagPose pose;
   cv::Mat masked, image_gray;
   std::vector<AprilTags::TagDetection> detections;
+  float lambda_1;
+  float lambda_2;
+  float lambda_3;
+  float alpha;
 
   // change mode based on image size
   this->changeMode(image);
@@ -73,12 +108,18 @@ int MITDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
       case -4: return -1;
     }
   }
-  if (image_gray.empty()) {
-    cv::cvtColor(image, image_gray, cv::COLOR_BGR2GRAY);
-  }
+  // if (image_gray.empty()) {
+  //   cv::cvtColor(image, image_gray, cv::COLOR_BGR2GRAY);
+  // }
 
-  // extract tags
-  detections = this->detector->extractTags(image_gray);
+  lambda_1 = 420;
+  lambda_2 = 530;
+  lambda_3 = 640;
+
+  alpha = (lambda_1 * lambda_3 - lambda_1 * lambda_2) /
+          (lambda_2 * lambda_3 - lambda_1 * lambda_2);
+
+  this->illuminationInvarientTransform(image, image_gray, alpha);
 
   // calculate tag pose
   for (int i = 0; i < detections.size(); i++) {

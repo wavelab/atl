@@ -111,16 +111,6 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
     cv::waitKey(1);
   }
 
-  // detect tags
-  retval = this->detector.extractTags(image_ptr->image, tags);
-  if (retval == -1) {
-    exit(-1);  // dangerous but necessary
-  } else if (tags.size() == 0) {
-    return;
-  }
-
-  // transform tag in camera frame to body planar frame
-  target_cf << tags[0].position(0), tags[0].position(1), tags[0].position(2);
 
   gimbal_position(0) = image_ptr->image.at<double>(0, 0);
   gimbal_position(1) = image_ptr->image.at<double>(0, 1);
@@ -135,6 +125,34 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
   gimbal_joint.x() = image_ptr->image.at<double>(0, 8);
   gimbal_joint.y() = image_ptr->image.at<double>(0, 9);
   gimbal_joint.z() = image_ptr->image.at<double>(0, 10);
+
+
+  // Remove the data from the image
+  image_ptr->image.at<double>(0, 0) = 0;
+  image_ptr->image.at<double>(0, 1) = 0;
+  image_ptr->image.at<double>(0, 2) = 0;
+
+  image_ptr->image.at<double>(0, 3) = 0;
+  image_ptr->image.at<double>(0, 4) = 0;
+  image_ptr->image.at<double>(0, 5) = 0;
+  image_ptr->image.at<double>(0, 6) = 0;
+
+  image_ptr->image.at<double>(0, 7) = 0;
+  image_ptr->image.at<double>(0, 8) = 0;
+  image_ptr->image.at<double>(0, 9) = 0;
+  image_ptr->image.at<double>(0, 10) = 0;
+  image_ptr->image.at<double>(0, 11) = 0;
+
+  // detect tags
+  retval = this->detector.extractTags(image_ptr->image, tags);
+  if (retval == -1) {
+    exit(-1);  // dangerous but necessary
+  } else if (tags.size() == 0) {
+    return;
+  }
+
+  // transform tag in camera frame to body planar frame
+  target_cf << tags[0].position(0), tags[0].position(1), tags[0].position(2);
 
   target_bpf = Gimbal::getTargetInBPF(this->camera_offset,
                                       target_cf,
