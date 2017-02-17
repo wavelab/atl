@@ -40,6 +40,7 @@ public:
   MITDetector(void);
   int configure(std::string config_file);
   int obtainPose(AprilTags::TagDetection tag, TagPose &tag_pose);
+  int illuminationInvarientTransform(cv::Mat &input, cv::Mat &output, float alpha);
   int extractTags(cv::Mat &image, std::vector<TagPose> &tags);
   int changeMode(cv::Mat &image);
   int maskImage(TagPose tag_pose,
