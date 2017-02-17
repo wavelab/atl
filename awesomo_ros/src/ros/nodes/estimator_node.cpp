@@ -110,6 +110,7 @@ void EstimatorNode::initLTKF(Vec3 x0) {
       break;
   }
 
+  log_info("Estimator intialized!");
   this->initialized = true;
 }
 
@@ -289,7 +290,11 @@ void EstimatorNode::publishLTKFBodyVelocityEstimate(void) {
 
 void EstimatorNode::publishLTDetected(void) {
   std_msgs::Bool msg;
-  msg.data = (this->target_losted == false);
+  if (this->target_losted) {
+    msg.data = false;
+  } else {
+    msg.data = true;
+  }
   this->ros_pubs[LT_DETECTED_TOPIC].publish(msg);
 }
 
@@ -414,7 +419,7 @@ int EstimatorNode::loopCallback(void) {
 
   // check if target is losted
   if (mtoc(&this->target_last_updated) > this->target_lost_threshold) {
-    log_info("Target losted, resetting estimator!");
+    log_info("Target lost, resetting estimator!");
     this->initialized = false;
     this->target_losted = true;
 

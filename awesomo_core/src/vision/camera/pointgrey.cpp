@@ -5,15 +5,16 @@ namespace awesomo {
 
 PointGreyCamera::PointGreyCamera(void) {
   this->pointgrey = NULL;
+  this->shutter_speed = 0.5;
 }
 
 PointGreyCamera::~PointGreyCamera(void) {
-  if (initialized) {
+  if (this->initialized) {
     delete this->pointgrey;
   }
 }
 
-int PointGreyCamera::initialize() {
+int PointGreyCamera::initialize(void) {
   int camera_index;
   FlyCapture2::Error error;
   FlyCapture2::Property property;
@@ -32,6 +33,7 @@ int PointGreyCamera::initialize() {
     return -1;
   }
 
+  // connect
   error = this->pointgrey->Connect(&guid);
   if (error != FlyCapture2::PGRERROR_OK) {
     log_err("ERROR! Failed to connect to camera!");
@@ -39,7 +41,6 @@ int PointGreyCamera::initialize() {
   } else {
     log_info("PointGrey camera connected!");
   }
-
 
   // set video mode format and frame  USB 2.0 cameras
   // error = this->pointgrey->SetVideoModeAndFrameRate(
@@ -59,6 +60,7 @@ int PointGreyCamera::initialize() {
   // this->setFormat7("RAW8", 640 * 2, 480 * 2, 0); // make these not hard coded
   this->setFormat7VideoMode(0, "RAW8", 640 * 3, 480 * 3, 0); // make these not hard coded
   // All of these are hard coded
+
   // start camera
   error = this->pointgrey->StartCapture();
   if (error != FlyCapture2::PGRERROR_OK) {
@@ -67,8 +69,8 @@ int PointGreyCamera::initialize() {
   } else {
     log_info("PointGrey initialized!");
   }
-  this->initialized = true;
 
+  this->initialized = true;
   return 0;
 }
 
@@ -115,11 +117,10 @@ int PointGreyCamera::getFrame(cv::Mat &image) {
 }
 
 int PointGreyCamera::setFormat7VideoMode(int format7_mode,
-    std::string pixel_format,
-    int width,
-    int height,
-    bool center_ROI)
-{
+                                         std::string pixel_format,
+                                         int width,
+                                         int height,
+                                         bool center_ROI) {
   bool supported;
   bool valid;
   FlyCapture2::Format7Info fmt7_info;
@@ -171,8 +172,10 @@ int PointGreyCamera::setFormat7VideoMode(int format7_mode,
   }
 
   // Send the settings to the camera with recommended packet size
-  error = this->pointgrey->SetFormat7Configuration(&fmt7_settings,
-      fmt7PacketInfo.recommendedBytesPerPacket);
+  error = this->pointgrey->SetFormat7Configuration(
+      &fmt7_settings,
+      fmt7PacketInfo.recommendedBytesPerPacket
+  );
   if (error != FlyCapture2::PGRERROR_OK) {
     log_err("Could not configure the camera with Format7!");
     return -1;
@@ -183,11 +186,10 @@ int PointGreyCamera::setFormat7VideoMode(int format7_mode,
 }
 
 int PointGreyCamera::setROI(const FlyCapture2::Format7Info &format7_info,
-                             FlyCapture2::Format7ImageSettings &format7_settings,
-                             int width,
-                             int height,
-                             bool center_ROI)
-{
+                            FlyCapture2::Format7ImageSettings &format7_settings,
+                            int width,
+                            int height,
+                            bool center_ROI) {
   const auto width_setting = this->centerROI(width, format7_info.maxWidth,
       format7_info.imageHStepSize);
   const auto height_setting = this->centerROI(height, format7_info.maxHeight,
@@ -337,8 +339,7 @@ int PointGreyCamera::setProperty(const FlyCapture2::PropertyType prop_type, bool
 }
 
 FlyCapture2::Property PointGreyCamera::getProperty(
-    const FlyCapture2::PropertyType &prop_type)
-{
+    const FlyCapture2::PropertyType &prop_type) {
   FlyCapture2::Error error;
   FlyCapture2::Property prop;
 
@@ -351,8 +352,7 @@ FlyCapture2::Property PointGreyCamera::getProperty(
 }
 
 FlyCapture2::PropertyInfo PointGreyCamera::getPropertyInfo(
-    const FlyCapture2::PropertyType &prop_type)
-{
+    const FlyCapture2::PropertyType &prop_type) {
   FlyCapture2::Error error;
   FlyCapture2::PropertyInfo prop_info;
 
@@ -363,7 +363,5 @@ FlyCapture2::PropertyInfo PointGreyCamera::getPropertyInfo(
   }
   return prop_info;
 }
-
-
 
 }  // end of awesomo namespace
