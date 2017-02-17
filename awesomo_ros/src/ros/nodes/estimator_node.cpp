@@ -166,7 +166,6 @@ void EstimatorNode::quadVelocityCallback(const geometry_msgs::TwistStamped &msg)
   } else if (this->quad_frame == "NED") {
     ned2enu(this->quad_velocity, vel);
   }
-
   this->quad_velocity = vel;
 }
 
