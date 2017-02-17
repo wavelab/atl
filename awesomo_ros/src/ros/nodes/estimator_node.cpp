@@ -417,6 +417,11 @@ int EstimatorNode::loopCallback(void) {
     log_info("Target losted, resetting estimator!");
     this->initialized = false;
     this->target_losted = true;
+
+    // reset gimbal
+    Vec3 setpoints;
+    setpoints << 0, 0, 0;
+    this->publishGimbalSetpointAttitudeMsg(setpoints);
   }
 
   // publish
@@ -425,9 +430,9 @@ int EstimatorNode::loopCallback(void) {
     this->publishLTKFInertialVelocityEstimate();
     this->publishLTKFBodyPositionEstimate();
     this->publishLTKFBodyVelocityEstimate();
-    this->publishLTDetected();
     this->trackTarget();
   }
+  this->publishLTDetected();
 
   // reset
   this->target_detected = false;
