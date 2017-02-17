@@ -2,8 +2,8 @@ index: 0
 image_width: 640
 image_height: 480
 
-exposure_value: 0.0
-gain_value: 30.0
+exposure_value: 2.0 # in mili seconds
+gain_value: 20.0
 lambda: [0.0, 0.0, 0.0]
 alpha: 4.0
 
