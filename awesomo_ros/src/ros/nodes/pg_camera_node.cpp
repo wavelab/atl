@@ -101,7 +101,7 @@ int PGCameraNode::loopCallback(void) {
     dist = -1 * this->target_pos_bf(2);
     if (dist > 10.0) {
       this->camera.changeMode("640x480");
-    } else if (dist > 3.0) {
+    } else if (dist > 0.3) {
       this->camera.changeMode("320x240");
     } else  {
       this->camera.changeMode("160x120");
