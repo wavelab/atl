@@ -28,6 +28,9 @@ TARGET_LINK_LIBRARIES(estimator_node ${DEPS})
 ADD_EXECUTABLE(example_node ros/nodes/example_node.cpp)
 TARGET_LINK_LIBRARIES(example_node ${DEPS})
 
+ADD_EXECUTABLE(fake_mavros_node ros/nodes/fake_mavros_node.cpp)
+TARGET_LINK_LIBRARIES(fake_mavros_node ${DEPS})
+
 ADD_EXECUTABLE(gimbal_node ros/nodes/gimbal_node.cpp)
 TARGET_LINK_LIBRARIES(gimbal_node ${DEPS})
 
