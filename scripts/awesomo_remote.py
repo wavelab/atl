@@ -281,8 +281,8 @@ if __name__ == "__main__":
 
     # quad.set_heading(0)
     # quad.set_mode("DISCOVER_MODE")
-    # quad.set_hover_point([0.0, -1.0, 5.0])
-    quad.set_hover_height(3.0)
+    quad.set_hover_point([-2.3, 2.3, 5.0])
+    # quad.set_hover_height(3.0)
     # quad.set_pctrl_settings({
     #     "roll": {
     #         "min": -30,

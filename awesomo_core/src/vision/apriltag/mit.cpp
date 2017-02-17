@@ -236,11 +236,10 @@ int MITDetector::maskImage(TagPose tag_pose,
   // create and check mask coordinates
   p1 = cv::Point(top_left(0), top_left(1));
   p2 = cv::Point(bottom_right(0), bottom_right(1));
-  if (p1.x > image.cols || p2.x > image.cols) {
-    return -3;
-  } else if (p1.x > image.cols || p2.x > image.cols) {
-    return -3;
-  }
+  p1.x = (p1.x > image.cols) ? image.cols : p1.x;
+  p1.y = (p1.y > image.rows) ? image.rows: p1.y;
+  p2.x = (p2.x > image.cols) ? image.cols : p2.x;
+  p2.y = (p2.y > image.rows) ? image.rows: p2.y;
 
   // create mask
   mask = cv::Mat::zeros(image_height, image_width, CV_8U);
