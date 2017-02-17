@@ -50,6 +50,7 @@ public:
   Pose quad_pose;
   Vec3 quad_velocity;
   bool target_detected;
+  bool target_losted;
   Vec3 target_pos_bpf;
   Vec3 target_vel_bpf;
   double target_yaw_wf;
@@ -63,6 +64,7 @@ public:
 
     this->quad_pose = Pose();
     this->target_detected = false;
+    this->target_losted = true;
     this->target_pos_bpf << 0.0, 0.0, 0.0;
     this->target_vel_bpf << 0.0, 0.0, 0.0;
     this->target_yaw_wf = 0.0;

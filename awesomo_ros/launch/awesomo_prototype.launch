@@ -35,11 +35,6 @@
   </node>
 
   <!-- control node -->
-  <!-- <param name="position_mode" value="gps" /> -->
-  <!-- <param name="position_mode" value="mocap" /> -->
-  <!-- <node pkg="awesomo_ros" name="awesomo_position" type="position_node.py" output="screen" required="true"/> -->
-
-  <!-- control node -->
   <param name="control_config_dir" value="$(find awesomo_configs)/configs/quadrotor_gazebosim" />
   <node pkg="awesomo_ros" name="awesomo_control" type="control_node" output="screen" required="true"/>
 
@@ -49,7 +44,7 @@
 
   <!-- estimate node -->
   <param name="tracker_mode" value="1" />
-  <param name="kf_tracker_config" value="$(find awesomo_configs)/configs/estimator/kf_tracker.yaml" />
+  <param name="kf_tracker_config" value="$(find awesomo_configs)/configs/estimator/kf_tracker_prototype.yaml" />
   <param name="ekf_tracker_config" value="$(find awesomo_configs)/configs/estimator/ekf_tracker.yaml" />
   <node pkg="awesomo_ros" name="awesomo_estimator" type="estimator_node" output="screen" required="true"/>
 </launch>

@@ -186,7 +186,7 @@ def cost_func(x, args):
     cost += 1.0 * np.linalg.norm(states[5])  # theta
 
     # control input difference cost
-    cost += 1.0 * np.linalg.norm(np.diff(states[4]))  # az
+    cost += 0.0 * np.linalg.norm(np.diff(states[4]))  # az
     cost += 1.0 * np.linalg.norm(np.diff(states[5]))  # theta
 
     # end cost to bias to matched landing ??
@@ -240,7 +240,6 @@ def optimize(p0_z, pf_z, v, dt, vz_max=-1.0):
     m = 2       # num of inputs
 
     x0, traj, T = desired_system(p0_z, pf_z, v, dt)
-    print(T)
 
     # state bounds
     state_bounds = (
@@ -272,11 +271,11 @@ def optimize(p0_z, pf_z, v, dt, vz_max=-1.0):
 
         # equality constraint for end position
         {"type": "eq", "fun": lambda x: np.array([x[-6] - x0[-1][0]])},  # x
-        {"type": "eq", "fun": lambda x: np.array([x[-5] - 0.0])},    # vx
+        {"type": "eq", "fun": lambda x: np.array([x[-5] - 0.0])},        # vx
         {"type": "eq", "fun": lambda x: np.array([x[-4] - x0[-1][1]])},  # z
-        {"type": "eq", "fun": lambda x: np.array([x[-3] - 0.0])},    # vz
-        {"type": "eq", "fun": lambda x: np.array([x[-2] - 0.0])},    # az
-        {"type": "eq", "fun": lambda x: np.array([x[-1] - 0.0])},    # theta
+        {"type": "eq", "fun": lambda x: np.array([x[-3] - 0.0])},        # vz
+        {"type": "eq", "fun": lambda x: np.array([x[-2] - 0.0])},        # az
+        {"type": "eq", "fun": lambda x: np.array([x[-1] - 0.0])},        # theta
 
         # nonlinear equality constraint for motion
         {"type": "eq", "fun": ine_constraints, "args": (T, dt, n, m)}
@@ -290,7 +289,7 @@ def optimize(p0_z, pf_z, v, dt, vz_max=-1.0):
                                       bounds=bounds)
 
     # plot optimization results
-    plot_optimization_results(traj, results.x, T, n, m)
+    # plot_optimization_results(traj, results.x, T, n, m)
     # plot_inputs_based_trajectory(T, dt, n, m, x0, results)
 
     return (T, n, m, v, dt, results)
@@ -326,7 +325,7 @@ def record_optimized_results(T, n, m, v, dt, results, fpath):
 def generate_trajectory_combinations():
     p0_z = frange(5, 6, 1, 1)
     pf_z = [0.0]
-    v = frange(0, 5, 1)
+    v = frange(1, 5, 1)
 
     conditions = [p0_z, pf_z, v]
     conditions = list(itertools.product(*conditions))
@@ -338,31 +337,31 @@ if __name__ == "__main__":
     index = 0
     dt = 0.05
 
-    p0_z = 5.0
-    pf_z = 0.0
-    v = 3.0
-    T, n, m, v, dt, results = optimize(p0_z, pf_z, v, dt)
+    # p0_z = 5.0
+    # pf_z = 0.0
+    # v = 0.0
+    # T, n, m, v, dt, results = optimize(p0_z, pf_z, v, dt)
     # filepath = basedir + "0.csv"
     # record_optimized_results(T, n, m, v, dt, results, filepath)
 
-    # # prep index file
-    # index_file = open(basedir + "index.csv", "wb")
-    # index_file.write(bytes("index,p0_z,v\n", "UTF-8"))
-    #
-    # # create trajectory table
-    # combinations = generate_trajectory_combinations()
-    # for c in combinations:
-    #     p0_z = c[0]
-    #     pf_z = 0.0
-    #     v = c[2]
-    #     filepath = basedir + str(index) + ".csv"
-    #     index_line = "{0},{1},{2}\n".format(index, p0_z, v)
-    #     index_file.write(bytes(index_line, "UTF-8"))
-    #     index += 1
-    #
-    #     print("Optimizing starting height {0} @ {1}ms^-1".format(p0_z, v))
-    #     T, n, m, v, dt, results = optimize(p0_z, pf_z, v, dt)
-    #     record_optimized_results(T, n, m, v, dt, results, filepath)
-    #
-    # # close index file
-    # index_file.close()
+    # prep index file
+    index_file = open(basedir + "index.csv", "wb")
+    index_file.write(bytes("index,p0_z,v\n", "UTF-8"))
+
+    # create trajectory table
+    combinations = generate_trajectory_combinations()
+    for c in combinations:
+        p0_z = c[0]
+        pf_z = 0.0
+        v = c[2]
+        filepath = basedir + str(index) + ".csv"
+        index_line = "{0},{1},{2}\n".format(index, p0_z, v)
+        index_file.write(bytes(index_line, "UTF-8"))
+        index += 1
+
+        print("Optimizing starting height {0} @ {1}ms^-1".format(p0_z, v))
+        T, n, m, v, dt, results = optimize(p0_z, pf_z, v, dt)
+        record_optimized_results(T, n, m, v, dt, results, filepath)
+
+    # close index file
+    index_file.close()

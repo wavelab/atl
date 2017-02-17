@@ -1,10 +1,5 @@
-- refactor planner to take in height
-- add 1 second to T
-- add virtual target
-- record virtual target position
-- add virtual target position relative to quad at each time step
-- add check for /quad_frame parameter
-- refactor landing controller
-- fix ned orientation transformation
 - fix apriltag windowing near image limits
-- add code for mpu6050
+- downward facing camera for gazebo
+- make svo work in simulation
+- redo trajectories
+- update paper
