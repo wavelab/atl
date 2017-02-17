@@ -9,4 +9,5 @@ tag_ids: [0, 5]
 tag_sizes: [0.1, 0.857]
 
 camera_config: "../camera/prototype"
-imshow: false
+imshow: true
+# imshow: false

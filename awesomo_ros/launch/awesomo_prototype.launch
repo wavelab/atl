@@ -44,7 +44,7 @@
 
   <!-- estimate node -->
   <param name="tracker_mode" value="1" />
-  <param name="kf_tracker_config" value="$(find awesomo_configs)/configs/estimator/kf_tracker.yaml" />
+  <param name="kf_tracker_config" value="$(find awesomo_configs)/configs/estimator/kf_tracker_prototype.yaml" />
   <param name="ekf_tracker_config" value="$(find awesomo_configs)/configs/estimator/ekf_tracker.yaml" />
   <node pkg="awesomo_ros" name="awesomo_estimator" type="estimator_node" output="screen" required="true"/>
 </launch>

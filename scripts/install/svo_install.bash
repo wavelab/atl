@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
-# ROS_DISTRO="indigo"
-ROS_DISTRO="kinetic"
+ROS_DISTRO="indigo"
+# ROS_DISTRO="kinetic"
 CATKIN_WS=$HOME/catkin_ws/
 
 install_sophus()
@@ -54,8 +54,8 @@ install_svo()
 
 
 # RUN
-# install_sophus
-# install_fast
-# install_g2o
-# install_vikit
+install_sophus
+install_fast
+install_g2o
+install_vikit
 install_svo

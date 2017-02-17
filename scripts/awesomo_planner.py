@@ -325,7 +325,7 @@ def record_optimized_results(T, n, m, v, dt, results, fpath):
 def generate_trajectory_combinations():
     p0_z = frange(5, 6, 1, 1)
     pf_z = [0.0]
-    v = frange(0, 5, 1)
+    v = frange(1, 5, 1)
 
     conditions = [p0_z, pf_z, v]
     conditions = list(itertools.product(*conditions))
@@ -335,7 +335,7 @@ def generate_trajectory_combinations():
 if __name__ == "__main__":
     basedir = "./trajectory/"
     index = 0
-    dt = 0.1
+    dt = 0.05
 
     # p0_z = 5.0
     # pf_z = 0.0

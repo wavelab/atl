@@ -172,6 +172,7 @@ void EstimatorNode::quadVelocityCallback(const geometry_msgs::TwistStamped &msg)
 void EstimatorNode::targetInertialPosCallback(const geometry_msgs::Vector3 &msg) {
   // update target
   this->target_detected = true;
+  this->target_losted = false;
   convertMsg(msg, this->target_pos_wf);
   tic(&this->target_last_updated);
 
@@ -288,7 +289,7 @@ void EstimatorNode::publishLTKFBodyVelocityEstimate(void) {
 
 void EstimatorNode::publishLTDetected(void) {
   std_msgs::Bool msg;
-  msg.data = this->target_detected;
+  msg.data = (this->target_losted == false);
   this->ros_pubs[LT_DETECTED_TOPIC].publish(msg);
 }
 
@@ -415,6 +416,7 @@ int EstimatorNode::loopCallback(void) {
   if (mtoc(&this->target_last_updated) > this->target_lost_threshold) {
     log_info("Target losted, resetting estimator!");
     this->initialized = false;
+    this->target_losted = true;
   }
 
   // publish
