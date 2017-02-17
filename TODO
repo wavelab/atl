@@ -1,4 +1,3 @@
-- fix apriltag windowing near image limits
 - downward facing camera for gazebo
 - make svo work in simulation
 - redo trajectories
