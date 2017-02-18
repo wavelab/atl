@@ -424,8 +424,8 @@ int PointGreyCamera::getFrame(cv::Mat &image) {
   // clang-format on
 
   // resize the image to reflect camera mode
-  // image_size = cv::Size(this->config.image_width, this->config.image_height);
-  // cv::resize(image, image, image_size, 0, 0, cv::INTER_NEAREST);
+  image_size = cv::Size(this->config.image_width, this->config.image_height);
+  cv::resize(image, image, image_size, 0, 0, cv::INTER_NEAREST);
 
   return 0;
 }

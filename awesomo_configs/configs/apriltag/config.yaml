@@ -17,5 +17,5 @@ tag_sizes: [0.07, 0.6] # Blue and Green Tag
 
 camera_config: "../camera/pointgrey_chameleon"
 illum_invar: false
-# imshow: false
-imshow: true
+imshow: false
+# imshow: true
