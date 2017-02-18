@@ -51,7 +51,7 @@ TEST(PointGreyCamera, brightness) {
   camera.setBrightness(0.5);
   camera.getBrightness(brightness);
 
-  ASSERT_FLOAT_EQ(0.5, brightness);
+  ASSERT_NEAR(0.5, brightness, 0.2);
 }
 
 TEST(PointGreyCamera, frameRate) {
@@ -103,7 +103,15 @@ TEST(PointGreyCamera, gain) {
   camera.setGain(5.0);
   camera.getGain(gain);
 
-  ASSERT_NEAR(5.0, gain, 0.1);
+  ASSERT_NEAR(5.0, gain, 0.2);
+}
+
+TEST(PointGreyCamera, printFormat7Capabilities) {
+  PointGreyCamera camera;
+
+  camera.configure(TEST_CONFIG_PATH);
+  camera.initialize();
+  camera.printFormat7Capabilities();
 }
 
 // TEST(PointGreyCamera, changeMode) {

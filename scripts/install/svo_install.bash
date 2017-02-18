@@ -6,7 +6,7 @@ CATKIN_WS=$HOME/catkin_ws/
 
 install_sophus()
 {
-    cd /tmp
+    cd /usr/local/src/
     git clone https://github.com/strasdat/Sophus.git
     cd Sophus
     git checkout a621ff
@@ -18,7 +18,7 @@ install_sophus()
 
 install_fast()
 {
-    cd /tmp
+    cd /usr/local/src/
     git clone https://github.com/uzh-rpg/fast.git
     cd fast
     mkdir build
@@ -29,7 +29,7 @@ install_fast()
 
 install_g2o()
 {
-    cd /tmp
+    cd /usr/local/src/
     git clone https://github.com/RainerKuemmerle/g2o.git
     cd g2o
     mkdir build
