@@ -16,6 +16,7 @@ public:
   ~PointGreyCamera(void);
   int initialize(void);
   int getFrame(cv::Mat &image);
+  int setVideoMode(int mode);
   int setFormat7(std::string pixel_format,
                  int crop_width,
                  int crop_height,
@@ -43,6 +44,7 @@ public:
                   double value);
   FlyCapture2::Property getProperty(const FlyCapture2::PropertyType &prop_type);
   FlyCapture2::PropertyInfo getPropertyInfo(const FlyCapture2::PropertyType &prop_type);
+  int run(void);
 };
 
 }  // end of awesomo namespace

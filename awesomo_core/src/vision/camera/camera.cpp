@@ -18,7 +18,7 @@ Camera::Camera(void) {
 }
 
 Camera::~Camera(void) {
-  if (this->initialized) {
+  if (this->initialized && this->capture) {
     this->capture->release();
     this->capture = NULL;
   }
@@ -89,7 +89,7 @@ int Camera::initialize(void) {
 }
 
 int Camera::shutdown(void) {
-  if (this->initialized) {
+  if (this->initialized && this->capture) {
     this->capture->release();
     this->capture = NULL;
     this->initialized = false;
@@ -182,7 +182,7 @@ int Camera::showImage(cv::Mat &image) {
   }
 
   // show image
-  if (this->config.imshow) {
+  if (this->config.imshow && image.rows && image.cols) {
     cv::imshow("Camera", image);
     cv::waitKey(1);
   }

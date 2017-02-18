@@ -73,15 +73,14 @@ SET(DEPS
     ${PROJECT_NAME}
     ${catkin_LIBRARIES}
     ${OpenCV_LIBS}
+    m3api
     flycapture
-    # apriltags_swathmore
     apriltags_mit
     CGAL
     nlopt
     yaml-cpp
     gtest
     pthread
-    m3api
 )
 
 # UNIT TESTS

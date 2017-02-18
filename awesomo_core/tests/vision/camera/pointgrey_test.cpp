@@ -32,9 +32,9 @@ TEST(PointGreyCamera, configure) {
   ASSERT_EQ(0, retval);
 }
 
-// TEST(Camera, changeMode) {
+// TEST(PointGreyCamera, changeMode) {
 //   cv::Mat image;
-//   Camera camera;
+//   PointGreyCamera camera;
 //
 //   camera.configure(TEST_CONFIG_PATH);
 //   camera.initialize();
@@ -48,24 +48,28 @@ TEST(PointGreyCamera, configure) {
 //   ASSERT_EQ(320, image.cols);
 //   ASSERT_EQ(240, image.rows);
 // }
-//
-// TEST(Camera, getFrame) {
-//   cv::Mat image;
-//   Camera camera;
-//
-//   camera.configure(TEST_CONFIG_PATH);
-//   camera.initialize();
-//   camera.getFrame(image);
-//
-//   ASSERT_FALSE(image.empty());
-// }
-//
-// // TEST(Camera, run) {
-// //   Camera camera;
-// //
-// //   camera.configure(TEST_CONFIG_PATH);
-// //   camera.initialize();
-// //   camera.run();
-// // }
+
+TEST(PointGreyCamera, getFrame) {
+  cv::Mat image;
+  PointGreyCamera camera;
+
+  camera.configure(TEST_CONFIG_PATH);
+  camera.initialize();
+  camera.getFrame(image);
+
+  // cv::imshow("Image", image);
+  // cv::waitKey(100000);
+
+  // ASSERT_FALSE(image.empty());
+}
+
+TEST(PointGreyCamera, run) {
+  PointGreyCamera camera;
+
+  camera.configure(TEST_CONFIG_PATH);
+  camera.initialize();
+  // camera.config.imshow = true;
+  camera.run();
+}
 
 }  // end of awesomo namespace
