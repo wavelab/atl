@@ -125,21 +125,21 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
   gimbal_joint.y() = image_ptr->image.at<double>(0, 9);
   gimbal_joint.z() = image_ptr->image.at<double>(0, 10);
 
-  // // Remove the data from the image
-  // image_ptr->image.at<double>(0, 0) = 0;
-  // image_ptr->image.at<double>(0, 1) = 0;
-  // image_ptr->image.at<double>(0, 2) = 0;
-  //
-  // image_ptr->image.at<double>(0, 3) = 0;
-  // image_ptr->image.at<double>(0, 4) = 0;
-  // image_ptr->image.at<double>(0, 5) = 0;
-  // image_ptr->image.at<double>(0, 6) = 0;
-  //
-  // image_ptr->image.at<double>(0, 7) = 0;
-  // image_ptr->image.at<double>(0, 8) = 0;
-  // image_ptr->image.at<double>(0, 9) = 0;
-  // image_ptr->image.at<double>(0, 10) = 0;
-  // image_ptr->image.at<double>(0, 11) = 0;
+  // Remove the data from the image
+  image_ptr->image.at<double>(0, 0) = 0;
+  image_ptr->image.at<double>(0, 1) = 0;
+  image_ptr->image.at<double>(0, 2) = 0;
+
+  image_ptr->image.at<double>(0, 3) = 0;
+  image_ptr->image.at<double>(0, 4) = 0;
+  image_ptr->image.at<double>(0, 5) = 0;
+  image_ptr->image.at<double>(0, 6) = 0;
+
+  image_ptr->image.at<double>(0, 7) = 0;
+  image_ptr->image.at<double>(0, 8) = 0;
+  image_ptr->image.at<double>(0, 9) = 0;
+  image_ptr->image.at<double>(0, 10) = 0;
+  image_ptr->image.at<double>(0, 11) = 0;
 
   // detect tags
   retval = this->detector.extractTags(image_ptr->image, tags);

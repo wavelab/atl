@@ -15,6 +15,7 @@ MITDetector::MITDetector(void) {
   this->camera_mode = "";
   this->camera_modes.clear();
   this->camera_configs.clear();
+  this->illum_invar = false;
   this->imshow = false;
 }
 
@@ -29,6 +30,7 @@ int MITDetector::configure(std::string config_file) {
   parser.addParam<std::vector<int>>("tag_ids", &tag_ids);
   parser.addParam<std::vector<float>>("tag_sizes", &tag_sizes);
   parser.addParam<std::string>("camera_config", &camera_config);
+  parser.addParam<bool>("illum_invar", &this->illum_invar);
   parser.addParam<bool>("imshow", &this->imshow);
   if (parser.load(config_file) != 0) {
     return -1;
@@ -56,72 +58,72 @@ int MITDetector::configure(std::string config_file) {
   return 0;
 }
 
-
-int MITDetector::illuminationInvarientTransform(cv::Mat &input, cv::Mat &output, float alpha) {
-  // this code is adapted from  Maddern et al 2014 Icra Paper
-  // Illumination invarient imaging
-  cv::Mat log_ch_1;
-  cv::Mat log_ch_2;
-  cv::Mat log_ch_3;
-
+int MITDetector::illuminationInvariantTransform(cv::Mat &image) {
+  // the following is adapted from:
+  // Illumination Invariant Imaging: Applications in Robust Vision-based
+  // Localisation, Mapping and Classification for Autonomous Vehicles
+  // Maddern et al (2014)
+  cv::Mat log_ch_1, log_ch_2, log_ch_3;
+  double lambda_1, lambda_2, lambda_3;
+  double alpha;
   std::vector<cv::Mat> channels(3);
-  split(input, channels);
 
+  lambda_1 = 420;
+  lambda_2 = 530;
+  lambda_3 = 640;
+
+  // clang-format off
+  alpha = (lambda_1 * lambda_3 - lambda_1 * lambda_2) /
+          (lambda_2 * lambda_3 - lambda_1 * lambda_2);
+  // clang-format on
+
+  split(image, channels);
   channels[0].convertTo(channels[0], CV_32F);
   channels[1].convertTo(channels[1], CV_32F);
   channels[2].convertTo(channels[2], CV_32F);
 
-  // channels[0].row(0).setTo(cv::Scalar(10));
-  // channels[1].row(0).setTo(cv::Scalar(10));
-  // channels[2].row(0).setTo(cv::Scalar(10));
+  channels[0].row(0).setTo(cv::Scalar(10));
+  channels[1].row(0).setTo(cv::Scalar(10));
+  channels[2].row(0).setTo(cv::Scalar(10));
 
   cv::log(channels[0], log_ch_1);
   cv::log(channels[1], log_ch_2);
   cv::log(channels[2], log_ch_3);
 
-  output = log_ch_2 - alpha * log_ch_3 -
-    (1 - alpha) * log_ch_1;
-  cv::normalize(output, output, 0, 255, cv::NORM_MINMAX, CV_8UC1);
+  image = log_ch_2 - alpha * log_ch_3 - (1 - alpha) * log_ch_1;
+  cv::normalize(image, image, 0, 255, cv::NORM_MINMAX, CV_8UC1);
 
   return 0;
 }
-
 
 int MITDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
   int retval;
   TagPose pose;
   cv::Mat masked, image_gray;
   std::vector<AprilTags::TagDetection> detections;
-  float lambda_1;
-  float lambda_2;
-  float lambda_3;
-  float alpha;
 
   // change mode based on image size
   this->changeMode(image);
 
+  // tranform illumination invariant tag
+  if (this->illum_invar) {
+    this->illuminationInvariantTransform(image);
+  }
+
   // mask image if tag was last detected
   if (this->prev_tag.detected) {
-    retval = this->maskImage(this->prev_tag, image, masked);
-    switch (retval) {
-      case 0: cv::cvtColor(masked, image_gray, cv::COLOR_BGR2GRAY); break;
-      case -4: return -1;
+    retval = this->maskImage(this->prev_tag, image);
+    if (retval == -4) {
+      return -1;
     }
   }
-  if (image_gray.empty()) {
+
+  // convert image to gray-scale
+  if (image.channels() == 3) {
     cv::cvtColor(image, image_gray, cv::COLOR_BGR2GRAY);
+  } else {
+    image_gray = image;
   }
-
-  // lambda_1 = 420;
-  // lambda_2 = 530;
-  // lambda_3 = 640;
-  //
-  // alpha = (lambda_1 * lambda_3 - lambda_1 * lambda_2) /
-  //         (lambda_2 * lambda_3 - lambda_1 * lambda_2);
-
-  // this->illuminationInvarientTransform(image, image_gray, alpha);
-
-  // this->illuminationInvarientTransform(image, image_gray, alpha);
 
   // extract tags
   detections = this->detector->extractTags(image_gray);
@@ -214,10 +216,7 @@ int MITDetector::changeMode(cv::Mat &image) {
   return 0;
 }
 
-int MITDetector::maskImage(TagPose tag_pose,
-                           cv::Mat &image,
-                           cv::Mat &masked,
-                           double padding) {
+int MITDetector::maskImage(TagPose tag_pose, cv::Mat &image, double padding) {
   std::string camera_mode;
   int image_width, image_height;
   double x, y, z;
@@ -225,7 +224,7 @@ int MITDetector::maskImage(TagPose tag_pose,
   double tag_size;
   Vec2 top_left, bottom_right;
   cv::Point p1, p2;
-  cv::Mat mask;
+  cv::Mat mask, masked;
 
   // pre-check
   if (image.cols != this->prev_tag_image_width) {
@@ -293,6 +292,7 @@ int MITDetector::maskImage(TagPose tag_pose,
 
   // mask image
   image.copyTo(masked, mask);
+  masked.copyTo(image);
   this->prev_tag.detected = false;
 
   return 0;

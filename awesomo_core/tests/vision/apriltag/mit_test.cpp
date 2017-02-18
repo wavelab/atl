@@ -12,6 +12,7 @@
 #define TEST_IMAGE_BOTTOM_LEFT "tests/data/apriltag/bottom_left.png"
 #define TEST_IMAGE_TOP_RIGHT "tests/data/apriltag/top_right.png"
 #define TEST_IMAGE_BOTTOM_RIGHT "tests/data/apriltag/bottom_right.png"
+#define TEST_ILLUM_INVAR "tests/data/apriltag/illum_invar.png"
 
 namespace awesomo {
 
@@ -42,6 +43,25 @@ TEST(MITDetector, configure) {
   ASSERT_EQ(3, detector.camera_modes.size());
   ASSERT_EQ(3, detector.camera_configs.size());
   ASSERT_FALSE(detector.imshow);
+}
+
+TEST(MITDetector, illuminationInvarientTransform) {
+  int retval;
+  cv::Mat image;
+  MITDetector detector;
+  std::vector<AprilTags::TagDetection> tags;
+
+  // setup
+  detector.configure(TEST_CONFIG);
+  image = cv::imread(TEST_ILLUM_INVAR, CV_LOAD_IMAGE_COLOR);
+
+  // test and assert
+  detector.illuminationInvariantTransform(image);
+  tags = detector.detector->extractTags(image);
+
+  ASSERT_EQ(1, tags.size());
+  // cv::imshow("image", image_gray);
+  // cv::waitKey(1000000);
 }
 
 TEST(MITDetector, extractTags) {
@@ -125,9 +145,9 @@ TEST(MITDetector, maskImage) {
   // CENTER
   image = cv::imread(TEST_IMAGE_CENTER, CV_LOAD_IMAGE_COLOR);
   retval = detector.extractTags(image, tags);
-  detector.maskImage(tags[0], image, masked);
+  detector.maskImage(tags[0], image);
 
-  // cv::imshow("test", masked);
+  // cv::imshow("test", image);
   // cv::waitKey(100000);
 }
 

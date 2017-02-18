@@ -37,16 +37,16 @@
     <remap from="/prototype/gimbal/target/track" to="/awesomo/gimbal/target/track" />
   </node>
 
-  <!-- svo -->
-  <node pkg="svo_ros" type="vo" name="svo" clear_params="true" output="screen" required="true">
-    <param name="cam_topic" value="/awesomo/df_camera/image" />
-
-    <!-- camera calibration file -->
-    <rosparam file="$(find awesomo_configs)/configs/svo/camera_atan_prototype.yaml" />
-
-    <!-- default parameter settings: choose between vo_fast and vo_accurate -->
-    <rosparam file="$(find awesomo_configs)/configs/svo/vo_fast.yaml" />
-  </node>
+  <!-- <!&#45;&#45; svo &#45;&#45;> -->
+  <!-- <node pkg="svo_ros" type="vo" name="svo" clear_params="true" output="screen" required="true"> -->
+  <!--   <param name="cam_topic" value="/awesomo/df_camera/image" /> -->
+  <!--  -->
+  <!--   <!&#45;&#45; camera calibration file &#45;&#45;> -->
+  <!--   <rosparam file="$(find awesomo_configs)/configs/svo/camera_atan_prototype.yaml" /> -->
+  <!--  -->
+  <!--   <!&#45;&#45; default parameter settings: choose between vo_fast and vo_accurate &#45;&#45;> -->
+  <!--   <rosparam file="$(find awesomo_configs)/configs/svo/vo_fast.yaml" /> -->
+  <!-- </node> -->
 
   <!-- control node -->
   <param name="control_config_dir" value="$(find awesomo_configs)/configs/quadrotor_gazebosim" />
