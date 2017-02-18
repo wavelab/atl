@@ -111,8 +111,8 @@ ADD_EXECUTABLE(
     tests/sensor/MPU6050_test.cpp
     # VISION
     tests/vision/apriltag/mit_test.cpp
-    # tests/vision/apriltag/swathmore_test.cpp
     tests/vision/camera/camera_test.cpp
+    tests/vision/camera/pointgrey_test.cpp
     tests/vision/camera/config_test.cpp
     tests/vision/gimbal/gimbal_test.cpp
     tests/vision/gimbal/sbgc_test.cpp

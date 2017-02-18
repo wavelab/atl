@@ -2,10 +2,13 @@
 #include "awesomo_core/utils/opencv.hpp"
 #include "awesomo_core/vision/camera/camera.hpp"
 
-#define TEST_CONFIG_PATH "tests/configs/camera"
+#define TEST_CONFIG_PATH "tests/configs/camera/webcam"
+
+
+namespace awesomo {
 
 TEST(Camera, constructor) {
-  awesomo::Camera camera;
+  Camera camera;
 
   ASSERT_FALSE(camera.configured);
   ASSERT_FALSE(camera.initialized);
@@ -20,7 +23,7 @@ TEST(Camera, constructor) {
 
 TEST(Camera, configure) {
   int retval;
-  awesomo::Camera camera;
+  Camera camera;
 
   retval = camera.configure(TEST_CONFIG_PATH);
   ASSERT_EQ(0, retval);
@@ -28,7 +31,7 @@ TEST(Camera, configure) {
 
 TEST(Camera, changeMode) {
   cv::Mat image;
-  awesomo::Camera camera;
+  Camera camera;
 
   camera.configure(TEST_CONFIG_PATH);
   camera.initialize();
@@ -45,7 +48,7 @@ TEST(Camera, changeMode) {
 
 TEST(Camera, getFrame) {
   cv::Mat image;
-  awesomo::Camera camera;
+  Camera camera;
 
   camera.configure(TEST_CONFIG_PATH);
   camera.initialize();
@@ -55,9 +58,11 @@ TEST(Camera, getFrame) {
 }
 
 // TEST(Camera, run) {
-//   awesomo::Camera camera;
+//   Camera camera;
 //
 //   camera.configure(TEST_CONFIG_PATH);
 //   camera.initialize();
 //   camera.run();
 // }
+
+}  // end of awesomo namespace
