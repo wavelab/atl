@@ -59,7 +59,7 @@ int MITDetector::configure(std::string config_file) {
 
 int MITDetector::illuminationInvarientTransform(cv::Mat &input, cv::Mat &output, float alpha) {
   // this code is adapted from  Maddern et al 2014 Icra Paper
-  //     // Illumination invarient imaging
+  // Illumination invarient imaging
   cv::Mat log_ch_1;
   cv::Mat log_ch_2;
   cv::Mat log_ch_3;
@@ -108,18 +108,23 @@ int MITDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
       case -4: return -1;
     }
   }
-  // if (image_gray.empty()) {
-  //   cv::cvtColor(image, image_gray, cv::COLOR_BGR2GRAY);
-  // }
+  if (image_gray.empty()) {
+    cv::cvtColor(image, image_gray, cv::COLOR_BGR2GRAY);
+  }
 
-  lambda_1 = 420;
-  lambda_2 = 530;
-  lambda_3 = 640;
+  // lambda_1 = 420;
+  // lambda_2 = 530;
+  // lambda_3 = 640;
+  //
+  // alpha = (lambda_1 * lambda_3 - lambda_1 * lambda_2) /
+  //         (lambda_2 * lambda_3 - lambda_1 * lambda_2);
 
-  alpha = (lambda_1 * lambda_3 - lambda_1 * lambda_2) /
-          (lambda_2 * lambda_3 - lambda_1 * lambda_2);
+  // this->illuminationInvarientTransform(image, image_gray, alpha);
 
-  this->illuminationInvarientTransform(image, image_gray, alpha);
+  // this->illuminationInvarientTransform(image, image_gray, alpha);
+
+  // extract tags
+  detections = this->detector->extractTags(image_gray);
 
   // calculate tag pose
   for (int i = 0; i < detections.size(); i++) {
