@@ -15,8 +15,23 @@ public:
   PointGreyCamera(void);
   ~PointGreyCamera(void);
   int initialize(void);
-  int getFrame(cv::Mat &image);
-  int setVideoMode(int mode);
+  int setBrightness(double brightness);
+  int setFrameRate(double fps);
+  int setExposure(double exposure);
+  int setShutter(double shutter_ms);
+  int setGain(double gain_db);
+  int getBrightness(double &brightness);
+  int getFrameRate(double &fps);
+  int getExposure(double &exposure);
+  int getShutter(double &shutter_ms);
+  int getGain(double &gain_db);
+  int printFormat7Capabilities(void);
+  int setProperty(const FlyCapture2::PropertyType prop_type,
+                  bool on,
+                  bool auto_on,
+                  double value);
+  FlyCapture2::Property getProperty(const FlyCapture2::PropertyType &prop_type);
+  FlyCapture2::PropertyInfo getPropertyInfo(const FlyCapture2::PropertyType &prop_type);
   int setFormat7(std::string pixel_format,
                  int crop_width,
                  int crop_height,
@@ -32,18 +47,8 @@ public:
              int height,
              bool center_ROI);
   std::pair<int, int> centerROI(int size, int max_size, int step);
-  int setFrameRate(bool auto_frame_rate, double frame_rate);
-  int setExposure(bool auto_exposure, double exposure);
-  int setGain(bool auto_gain, double gain);
-  int setShutter(bool auto_shutter, double shutter);
-  int printFormat7Capabilities(void);
   int changeMode(std::string mode);
-  int setProperty(const FlyCapture2::PropertyType prop_type,
-                  bool on,
-                  bool auto_on,
-                  double value);
-  FlyCapture2::Property getProperty(const FlyCapture2::PropertyType &prop_type);
-  FlyCapture2::PropertyInfo getPropertyInfo(const FlyCapture2::PropertyType &prop_type);
+  int getFrame(cv::Mat &image);
   int run(void);
 };
 

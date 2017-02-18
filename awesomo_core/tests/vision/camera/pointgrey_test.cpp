@@ -21,7 +21,7 @@ TEST(PointGreyCamera, constructor) {
   ASSERT_FLOAT_EQ(0.0, camera.last_tic);
 
   ASSERT_EQ(NULL, camera.pointgrey);
-  ASSERT_FLOAT_EQ(0.5, camera.shutter_speed);
+  ASSERT_FLOAT_EQ(10.0, camera.shutter_speed);
 }
 
 TEST(PointGreyCamera, configure) {
@@ -30,6 +30,80 @@ TEST(PointGreyCamera, configure) {
 
   retval = camera.configure(TEST_CONFIG_PATH);
   ASSERT_EQ(0, retval);
+}
+
+TEST(PointGreyCamera, initialize) {
+  int retval;
+  PointGreyCamera camera;
+
+  camera.configure(TEST_CONFIG_PATH);
+  retval = camera.initialize();
+  ASSERT_EQ(0, retval);
+}
+
+TEST(PointGreyCamera, brightness) {
+  int retval;
+  double brightness;
+  PointGreyCamera camera;
+
+  camera.configure(TEST_CONFIG_PATH);
+  camera.initialize();
+  camera.setBrightness(0.5);
+  camera.getBrightness(brightness);
+
+  ASSERT_FLOAT_EQ(0.5, brightness);
+}
+
+TEST(PointGreyCamera, frameRate) {
+  int retval;
+  double fps;
+  PointGreyCamera camera;
+
+  camera.configure(TEST_CONFIG_PATH);
+  camera.initialize();
+  camera.setFrameRate(10);
+  camera.getFrameRate(fps);
+
+  ASSERT_FLOAT_EQ(10, fps);
+}
+
+TEST(PointGreyCamera, exposure) {
+  int retval;
+  double exposure;
+  PointGreyCamera camera;
+
+  camera.configure(TEST_CONFIG_PATH);
+  camera.initialize();
+  camera.setExposure(1.0);
+  camera.getExposure(exposure);
+
+  ASSERT_FLOAT_EQ(1.0, exposure);
+}
+
+TEST(PointGreyCamera, shutter) {
+  int retval;
+  double shutter;
+  PointGreyCamera camera;
+
+  camera.configure(TEST_CONFIG_PATH);
+  camera.initialize();
+  camera.setShutter(10);
+  camera.getShutter(shutter);
+
+  ASSERT_NEAR(10, shutter, 0.2);
+}
+
+TEST(PointGreyCamera, gain) {
+  int retval;
+  double gain;
+  PointGreyCamera camera;
+
+  camera.configure(TEST_CONFIG_PATH);
+  camera.initialize();
+  camera.setGain(5.0);
+  camera.getGain(gain);
+
+  ASSERT_NEAR(5.0, gain, 0.1);
 }
 
 // TEST(PointGreyCamera, changeMode) {
@@ -60,7 +134,7 @@ TEST(PointGreyCamera, getFrame) {
   // cv::imshow("Image", image);
   // cv::waitKey(100000);
 
-  // ASSERT_FALSE(image.empty());
+  ASSERT_FALSE(image.empty());
 }
 
 TEST(PointGreyCamera, run) {
@@ -68,7 +142,7 @@ TEST(PointGreyCamera, run) {
 
   camera.configure(TEST_CONFIG_PATH);
   camera.initialize();
-  // camera.config.imshow = true;
+  camera.config.imshow = true;
   camera.run();
 }
 

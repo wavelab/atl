@@ -58,4 +58,4 @@ install_sophus
 install_fast
 install_g2o
 install_vikit
-install_svo
+# install_svo
