@@ -5,6 +5,17 @@
   <param name="debug_mode" value="false" />
   <param name="quad_frame" value="NED" />
   <param name="fcu_type" value="DJI" />
+  
+  <node pkg="dji_sdk" type="dji_sdk_node" name="dji_sdk" output="screen">
+		<!-- node parameters -->
+		<param name="serial_name" type="string" value="/dev/ttyUSB0"/>
+		<param name="baud_rate" type="int" value="230400"/>
+		<param name="app_id" type="int" value="1037276"/>
+		<param name="app_version" type="int" value="1"/>
+		<param name="app_bundle_id" type="string" value="Not required in this SDK version"/>
+		<param name="enc_key" type="string" value="63f09dc38bf513c75736b2d285bd9508fc7876b81fb5435ad6d18f931aac6fe9"/>
+		<param name="groundstation_enable" type="int" value="1"/>
+  </node>
 
   <!-- controller node -->
   <param name="control_config_dir" value="$(find awesomo_configs)/configs/quadrotor_anastasia" />
