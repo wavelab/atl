@@ -102,6 +102,7 @@ public:
   int px4OffboardModeOn(void);
   int djiDisarm(void);
   int djiOffboardModeOn(void);
+  int djiOffboardModeOff(void);
   int waitForEstimator(void);
   void setEstimatorOn(void);
   void setEstimatorOff(void);

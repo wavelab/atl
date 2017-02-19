@@ -175,6 +175,14 @@ int ControlNode::djiOffboardModeOn(void) {
   return 0;
 }
 
+int ControlNode::djiOffboardModeOff(void) {
+  if (this->dji->release_sdk_permission_control() != true) {
+    return -1;
+  }
+
+  return 0;
+}
+
 int ControlNode::waitForEstimator(void) {
   int attempts;
 
@@ -316,11 +324,13 @@ void ControlNode::djiRadioCallback(const dji_sdk::RCChannels &msg) {
   if (this->armed) {
     if (msg.gear < 0) {
       this->armed = false;
+      this->djiOffboardModeOff();
     }
   } else {
     if (msg.gear > 0) {
       this->armed = true;
       this->quadrotor.setMode(DISCOVER_MODE);
+      this->djiOffboardModeOn();
     }
   }
 }
