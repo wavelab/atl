@@ -10,6 +10,8 @@
 #include <mavros_msgs/CommandBool.h>
 #include <mavros_msgs/RCIn.h>
 
+#include <dji_sdk/dji_drone.h>
+
 #include <awesomo_msgs/AprilTagPose.h>
 #include <awesomo_msgs/PCtrlStats.h>
 #include <awesomo_msgs/PCtrlSettings.h>
@@ -27,9 +29,10 @@ namespace awesomo {
 #define NODE_RATE 100
 
 // PUBLISH TOPICS
-#define SETPOINT_ATTITUDE_TOPIC "/mavros/setpoint_attitude/attitude"
-#define SETPOINT_THROTTLE_TOPIC "/mavros/setpoint_attitude/att_throttle"
-#define SETPOINT_POSITION_TOPIC "/mavros/setpoint_position/local"
+#define PX4_SETPOINT_ATTITUDE_TOPIC "/mavros/setpoint_attitude/attitude"
+#define PX4_SETPOINT_THROTTLE_TOPIC "/mavros/setpoint_attitude/att_throttle"
+#define PX4_SETPOINT_POSITION_TOPIC "/mavros/setpoint_position/local"
+
 #define PCTRL_STATS_TOPIC "/awesomo/position_controller/stats"
 #define PCTRL_GET_TOPIC "/awesomo/control/position_controller/get"
 #define QUADROTOR_POSE "/awesomo/control/quad_pose"
@@ -37,14 +40,15 @@ namespace awesomo {
 #define ESTIMATOR_OFF_TOPIC "/awesomo/estimator/off"
 
 // SUBSCRIBE TOPICS
-#define MODE_TOPIC "/mavros/set_mode"
-#define ARM_TOPIC "/mavros/cmd/arming"
-#define QMODE_TOPIC "/awesomo/control/mode"
-#define STATE_TOPIC "/mavros/state"
-#define POSE_TOPIC "/mavros/local_position/pose"
-#define VELOCITY_TOPIC "/mavros/local_position/velocity"
+#define PX4_MODE_TOPIC "/mavros/set_mode"
+#define PX4_ARM_TOPIC "/mavros/cmd/arming"
+#define PX4_STATE_TOPIC "/mavros/state"
+#define PX4_POSE_TOPIC "/mavros/local_position/pose"
+#define PX4_VELOCITY_TOPIC "/mavros/local_position/velocity"
+#define PX4_RADIO_TOPIC "/mavros/rc/in"
+
+#define MODE_TOPIC "/awesomo/control/mode"
 #define HEADING_TOPIC "/awesomo/control/heading/set"
-#define RADIO_TOPIC "/mavros/rc/in"
 #define TARGET_BODY_POSITION_TOPIC "/awesomo/estimate/landing_target/position/body"
 #define TARGET_BODY_VELOCITY_TOPIC "/awesomo/estimate/landing_target/velocity/body"
 #define TARGET_DETECTED_TOPIC "/awesomo/estimate/landing_target/detected"
@@ -61,33 +65,49 @@ public:
 
   Quadrotor quadrotor;
   std::string quad_frame;
+  std::string fcu_type;
 
   int rc_in[16];
   bool armed;
 
-  mavros_msgs::State mavros_state;
-  ros::ServiceClient mode_client;
-  ros::ServiceClient arming_client;
+  mavros_msgs::State px4_state;
+  ros::ServiceClient px4_mode_client;
+  ros::ServiceClient px4_arming_client;
+
+  DJIDrone *dji;
 
   ControlNode(int argc, char **argv) : ROSNode(argc, argv) {
+    this->quad_frame = "";
+    this->fcu_type = "";
+
     for (int i = 0; i < 16; i++) {
       this->rc_in[i] = 0.0f;
     }
+    this->armed = false;
+
+    this->dji = NULL;
   }
 
   int configure(std::string node_name, int hz);
-  void waitForFCU(void);
-  void waitForEstimator(void);
-  int disarm(void);
-  int setOffboardModeOn(void);
+  int configurePX4Topics(void);
+  int px4Connect(void);
+  int px4Disarm(void);
+  int px4OffboardModeOn(void);
+  int djiDisarm(void);
+  int djiOffboardModeOn(void);
+  int waitForEstimator(void);
   void setEstimatorOn(void);
   void setEstimatorOff(void);
+  void px4StateCallback(const mavros_msgs::State::ConstPtr &msg);
+  void px4PoseCallback(const geometry_msgs::PoseStamped &msg);
+  void px4VelocityCallback(const geometry_msgs::TwistStamped &msg);
+  void px4RadioCallback(const mavros_msgs::RCIn &msg);
+  void djiUpdatePose(void);
+  void djiUpdateVelocity(void);
+  void djiUpdateRadio(void);
+  void djiUpdate(void);
   void modeCallback(const std_msgs::String &msg);
-  void stateCallback(const mavros_msgs::State::ConstPtr &msg);
-  void poseCallback(const geometry_msgs::PoseStamped &msg);
-  void velocityCallback(const geometry_msgs::TwistStamped &msg);
   void headingCallback(const std_msgs::Float64 &msg);
-  void radioCallback(const mavros_msgs::RCIn &msg);
   void targetPositionCallback(const geometry_msgs::Vector3 &msg);
   void targetVelocityCallback(const geometry_msgs::Vector3 &msg);
   void targetDetectedCallback(const std_msgs::Bool &msg);
@@ -96,6 +116,9 @@ public:
   void positionControllerSetCallback(const awesomo_msgs::PCtrlSettings &msg);
   void trackingControllerSetCallback(const awesomo_msgs::TCtrlSettings &msg);
   void landingControllerSetCallback(const awesomo_msgs::LCtrlSettings &msg);
+  void publishAttitudeSetpoint(void);
+  void publishQuadrotorPose(void);
+  void publishPX4DummyMsg(void);
   int loopCallback(void);
   void publishStats(void);
 };

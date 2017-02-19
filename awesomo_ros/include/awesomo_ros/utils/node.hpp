@@ -12,6 +12,11 @@
 namespace awesomo {
 
 #define INFO_CONFIG "Configuring ROS Node [%s]!"
+#define ROS_GET_PARAM(X, Y)                         \
+  if (this->ros_nh->getParam(X, Y) == false) {      \
+    ROS_ERROR("Failed to get ROS param [%s]", #X);  \
+    return -1;                                      \
+  }
 #define RUN_ROS_NODE(NODE_CLASS, NODE_NAME, NODE_RATE) \
   int main(int argc, char **argv) { \
     NODE_CLASS node(argc, argv); \

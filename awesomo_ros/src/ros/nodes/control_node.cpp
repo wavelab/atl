@@ -12,39 +12,38 @@ int ControlNode::configure(const std::string node_name, int hz) {
   }
 
   // quadrotor
-  this->ros_nh->getParam("/control_config_dir", config_path);
-  this->ros_nh->getParam("/quad_frame", this->quad_frame);
+  ROS_GET_PARAM("/control_config_dir", config_path);
+  ROS_GET_PARAM("/quad_frame", this->quad_frame);
+  ROS_GET_PARAM("/fcu_type", this->fcu_type);
   if (this->quadrotor.configure(config_path) != 0) {
     ROS_ERROR(FCONFQUAD);
     return -2;
   }
 
-  // services
-  // clang-format off
-  this->mode_client = this->ros_nh->serviceClient<mavros_msgs::SetMode>(MODE_TOPIC);
-  this->arming_client = this->ros_nh->serviceClient<mavros_msgs::CommandBool>(ARM_TOPIC);
-  // clang-format on
+  // configure PX4 or DJI topics
+  if (this->fcu_type == "PX4") {
+    this->configurePX4Topics();
+
+  } else if (this->fcu_type == "DJI") {
+    this->dji = new DJIDrone(*this->ros_nh);
+
+  } else {
+    ROS_ERROR("Invalid [fcu_type]: %s", this->fcu_type.c_str());
+    return -1;
+
+  }
 
   // publishers
-  // clang-format off
-  this->registerPublisher<geometry_msgs::PoseStamped>(SETPOINT_ATTITUDE_TOPIC);
-  this->registerPublisher<std_msgs::Float64>(SETPOINT_THROTTLE_TOPIC);
-  this->registerPublisher<geometry_msgs::PoseStamped>(SETPOINT_POSITION_TOPIC);
   this->registerPublisher<awesomo_msgs::PCtrlStats>(PCTRL_STATS_TOPIC);
   this->registerPublisher<awesomo_msgs::PCtrlSettings>(PCTRL_GET_TOPIC);
   this->registerPublisher<geometry_msgs::PoseStamped>(QUADROTOR_POSE);
   this->registerPublisher<std_msgs::Bool>(ESTIMATOR_ON_TOPIC);
   this->registerPublisher<std_msgs::Bool>(ESTIMATOR_OFF_TOPIC);
- // clang-format on
 
   // subscribers
   // clang-format off
-  this->registerSubscriber(QMODE_TOPIC, &ControlNode::modeCallback, this);
-  this->registerSubscriber(STATE_TOPIC, &ControlNode::stateCallback, this);
-  this->registerSubscriber(POSE_TOPIC, &ControlNode::poseCallback, this);
-  this->registerSubscriber(VELOCITY_TOPIC, &ControlNode::velocityCallback, this);
+  this->registerSubscriber(MODE_TOPIC, &ControlNode::modeCallback, this);
   this->registerSubscriber(HEADING_TOPIC, &ControlNode::headingCallback, this);
-  this->registerSubscriber(RADIO_TOPIC, &ControlNode::radioCallback, this);
   this->registerSubscriber(TARGET_BODY_POSITION_TOPIC, &ControlNode::targetPositionCallback, this);
   this->registerSubscriber(TARGET_BODY_VELOCITY_TOPIC, &ControlNode::targetVelocityCallback, this);
   this->registerSubscriber(TARGET_DETECTED_TOPIC, &ControlNode::targetDetectedCallback, this);
@@ -55,59 +54,71 @@ int ControlNode::configure(const std::string node_name, int hz) {
   this->registerSubscriber(LCTRL_SET_TOPIC, &ControlNode::landingControllerSetCallback, this);
   // clang-format on
 
-  this->armed = false;
   // loop callback
-  // clang-format off
   this->registerLoopCallback(std::bind(&ControlNode::loopCallback, this));
-  // clang-format on
 
-  // wait till connected to FCU and Estimator
-  // this->waitForFCU();
+  // connect to FCU
+  if (this->fcu_type == "PX4" && this->px4Connect() != 0) {
+    return -2;
+  } else if (this->fcu_type == "DJI") {
+
+  }
+
+  // connect to estimator
   this->waitForEstimator();
 
   this->configured = true;
   return 0;
 }
 
-void ControlNode::waitForFCU(void) {
-  int waited_for;
+int ControlNode::configurePX4Topics(void) {
+  // clang-format off
+  // services
+  this->px4_mode_client = this->ros_nh->serviceClient<mavros_msgs::SetMode>(PX4_MODE_TOPIC);
+  this->px4_arming_client = this->ros_nh->serviceClient<mavros_msgs::CommandBool>(PX4_ARM_TOPIC);
+
+  // publishers
+  this->registerPublisher<geometry_msgs::PoseStamped>(PX4_SETPOINT_ATTITUDE_TOPIC);
+  this->registerPublisher<std_msgs::Float64>(PX4_SETPOINT_THROTTLE_TOPIC);
+  this->registerPublisher<geometry_msgs::PoseStamped>(PX4_SETPOINT_POSITION_TOPIC);
+
+  // subscribers
+  this->registerSubscriber(PX4_STATE_TOPIC, &ControlNode::px4StateCallback, this);
+  this->registerSubscriber(PX4_POSE_TOPIC, &ControlNode::px4PoseCallback, this);
+  this->registerSubscriber(PX4_VELOCITY_TOPIC, &ControlNode::px4VelocityCallback, this);
+  this->registerSubscriber(PX4_RADIO_TOPIC, &ControlNode::px4RadioCallback, this);
+  // clang-format on
+
+  return 0;
+}
+
+int ControlNode::px4Connect(void) {
+  int attempts;
 
   // pre-check
   if (this->sim_mode) {
-    return;
+    return 0;
   }
 
   // wait fo FCU
-  waited_for = 0;
-  log_info("Waiting for FCU ...");
-
-  while (this->mavros_state.connected != true) {
-    if (waited_for == 10) {
-      log_info("Failed to connect to FCU for 10 seconds ...");
-      exit(-1);
+  attempts = 0;
+  log_info("Waiting for PX4 FCU ...");
+  while (this->px4_state.connected != true) {
+    if (attempts == 10) {
+      log_info("Failed to connect to PX4 FCU for 10 seconds ...");
+      return -1;
     }
 
     sleep(1);
     ros::spinOnce();
-    waited_for++;
+    attempts++;
   }
 
-  log_info("Connected to FCU!");
+  log_info("Connected to PX4 FCU!");
+  return 0;
 }
 
-void ControlNode::waitForEstimator(void) {
-  // wait for estimator
-  log_info("Waiting for Estimator ...");
-  while (this->ros_pubs[ESTIMATOR_ON_TOPIC].getNumSubscribers() == 0) {
-    ros::spinOnce();
-    sleep(1);
-  }
-
-  // switch estimator on
-  this->setEstimatorOn();
-}
-
-int ControlNode::disarm(void) {
+int ControlNode::px4Disarm(void) {
   mavros_msgs::CommandBool msg;
 
   // setup
@@ -115,27 +126,66 @@ int ControlNode::disarm(void) {
   msg.request.value = false;
 
   // disarm
-  if (this->arming_client.call(msg)) {
-    log_info("Awesomo disarmed!");
+  if (this->px4_arming_client.call(msg)) {
+    log_info("PX4 FCU disarmed!");
     return 0;
   } else {
-    log_err("Failed to disarm awesomo!");
+    log_err("Failed to disarm PX4 FCU!");
     return -1;
   }
 }
 
-int ControlNode::setOffboardModeOn(void) {
+int ControlNode::px4OffboardModeOn(void) {
   mavros_msgs::SetMode msg;
-
-  // setup
   msg.request.custom_mode = "OFFBOARD";
-  if (this->mode_client.call(msg) && msg.response.success) {
-    log_info("OFFBOARD MODE ON!");
+
+  if (this->px4_mode_client.call(msg) && msg.response.success) {
+    log_info("PX4 FCU OFFBOARD MODE ON!");
     return 0;
   } else {
-    log_err("Failed to enable offboard mode!");
+    log_err("Failed to enable PX4 FCU offboard mode!");
     return -1;
   }
+}
+
+int ControlNode::djiDisarm(void) {
+  if (this->dji->drone_disarm() != true) {
+    return -1;
+  }
+
+  return 0;
+}
+
+int ControlNode::djiOffboardModeOn(void) {
+  if (this->dji->request_sdk_permission_control() != true) {
+    return -1;
+  }
+
+  return 0;
+}
+
+int ControlNode::waitForEstimator(void) {
+  int attempts;
+
+  // wait for estimator
+  log_info("Waiting for Estimator ...");
+  attempts = 0;
+
+  while (this->ros_pubs[ESTIMATOR_ON_TOPIC].getNumSubscribers() == 0) {
+    if (attempts == 10) {
+      log_info("Failed to connect to EstimatorNode for 10 seconds ...");
+      return -1;
+    }
+
+    ros::spinOnce();
+    sleep(1);
+    attempts++;
+  }
+
+  // switch estimator on
+  this->setEstimatorOn();
+
+  return 0;
 }
 
 void ControlNode::setEstimatorOn(void) {
@@ -148,6 +198,126 @@ void ControlNode::setEstimatorOff(void) {
   std_msgs::Bool msg;
   msg.data = true;
   this->ros_pubs[ESTIMATOR_OFF_TOPIC].publish(msg);
+}
+
+void ControlNode::px4StateCallback(const mavros_msgs::State::ConstPtr &msg) {
+  this->px4_state = *msg;
+}
+
+void ControlNode::px4PoseCallback(const geometry_msgs::PoseStamped &msg) {
+  Pose pose;
+  Vec3 position;
+  Quaternion orientation;
+
+  // convert message to pose
+  convertMsg(msg, pose);
+  if (this->quad_frame == "NWU") {
+    nwu2enu(pose.position, position);
+    pose.position = position;
+
+  } else if (this->quad_frame == "NED") {
+    ned2enu(pose.position, position);
+    ned2nwu(pose.orientation, orientation);
+    pose.position = position;
+    pose.orientation = orientation;
+
+  }
+
+  this->quadrotor.setPose(pose);
+}
+
+void ControlNode::px4VelocityCallback(const geometry_msgs::TwistStamped &msg) {
+  Vec3 vel_nwu, vel_ned, vel_enu;
+
+  if (this->quad_frame == "NWU") {
+    convertMsg(msg.twist.linear, vel_nwu);
+    nwu2enu(vel_nwu, vel_enu);
+    this->quadrotor.setVelocity(vel_enu);
+
+  } else if (this->quad_frame == "NED") {
+    convertMsg(msg.twist.linear, vel_ned);
+    ned2enu(vel_ned, vel_enu);
+    this->quadrotor.setVelocity(vel_enu);
+
+  }
+}
+
+void ControlNode::px4RadioCallback(const mavros_msgs::RCIn &msg) {
+  for (int i = 0; i < 16; i++) {
+    this->rc_in[i] = msg.channels[i];
+  }
+
+  if (this->armed) {
+    if (this->rc_in[6] < 1500) {
+      this->armed = false;
+      this->quadrotor.setMode(HOVER_MODE);
+    }
+  } else {
+    if (this->rc_in[6] > 1500) {
+      this->armed = true;
+      this->quadrotor.setMode(DISCOVER_MODE);
+    }
+  }
+}
+
+void ControlNode::djiUpdatePose(void) {
+  Pose pose;
+  Vec3 position;
+  Quaternion orientation;
+
+  // convert DJI msg to Pose
+  pose.position(0) = this->dji->local_position.x;
+  pose.position(1) = this->dji->local_position.y;
+  pose.position(2) = this->dji->local_position.z;
+
+  pose.orientation.x() = this->dji->attitude_quaternion.q0;
+  pose.orientation.y() = this->dji->attitude_quaternion.q1;
+  pose.orientation.z() = this->dji->attitude_quaternion.q2;
+  pose.orientation.w() = this->dji->attitude_quaternion.q3;
+
+  // transform pose position and orientation
+  // from NED to ENU and NWU
+  ned2enu(pose.position, position);
+  ned2nwu(pose.orientation, orientation);
+  pose.position = position;
+  pose.orientation = orientation;
+
+  // upate
+  this->quadrotor.setPose(pose);
+}
+
+void ControlNode::djiUpdateVelocity(void) {
+  Vec3 vel_ned, vel_enu;
+
+  // convert DJI msg to Eigen vector
+  vel_ned(0) = this->dji->velocity.vx;
+  vel_ned(1) = this->dji->velocity.vy;
+  vel_ned(2) = this->dji->velocity.vz;
+
+  // transform velocity in NED to ENU
+  ned2enu(vel_ned, vel_enu);
+
+  // update
+  this->quadrotor.setVelocity(vel_enu);
+}
+
+void ControlNode::djiUpdateRadio(void) {
+  if (this->armed) {
+    if (this->dji->rc_channels.gear < 0) {
+      this->armed = false;
+    }
+  } else {
+    if (this->dji->rc_channels.gear > 0) {
+      this->armed = true;
+      this->quadrotor.setMode(DISCOVER_MODE);
+    }
+  }
+}
+
+void ControlNode::djiUpdate(void) {
+  this->djiUpdatePose();
+  this->djiUpdateVelocity();
+  this->djiUpdateRadio();
 }
 
 void ControlNode::modeCallback(const std_msgs::String &msg) {
@@ -175,63 +345,11 @@ void ControlNode::modeCallback(const std_msgs::String &msg) {
   }
 }
 
-void ControlNode::stateCallback(const mavros_msgs::State::ConstPtr &msg) {
-  this->mavros_state = *msg;
-}
-
-void ControlNode::poseCallback(const geometry_msgs::PoseStamped &msg) {
-  Pose pose;
-  Vec3 pos;
-
-  // convert message to pose
-  convertMsg(msg, pose);
-  if (this->quad_frame == "NWU") {
-    nwu2enu(pose.position, pos);
-  } else if (this->quad_frame == "NED") {
-    ned2enu(pose.position, pos);
-  }
-  pose.position = pos;
-
-  this->quadrotor.setPose(pose);
-}
-
-void ControlNode::velocityCallback(const geometry_msgs::TwistStamped &msg) {
-  Vec3 vel_nwu, vel_ned, vel_enu;
-
-  if (this->quad_frame == "NWU") {
-    convertMsg(msg.twist.linear, vel_nwu);
-    nwu2enu(vel_nwu, vel_enu);
-    this->quadrotor.setVelocity(vel_enu);
-
-  } else if (this->quad_frame == "NED") {
-    convertMsg(msg.twist.linear, vel_ned);
-    ned2enu(vel_ned, vel_enu);
-    this->quadrotor.setVelocity(vel_enu);
-
-  }
-}
 
 void ControlNode::headingCallback(const std_msgs::Float64 &msg) {
   double heading;
   convertMsg(msg, heading);
   this->quadrotor.setHeading(heading);
-}
-
-void ControlNode::radioCallback(const mavros_msgs::RCIn &msg) {
-  for (int i = 0; i < 16; i++) {
-    this->rc_in[i] = msg.channels[i];
-  }
-
-  if (this->armed) {
-    if (this->rc_in[6] < 1500) {
-      this->armed = false;
-    }
-  } else {
-    if (this->rc_in[6] > 1500) {
-      this->armed = true;
-      this->quadrotor.setMode(HOVER_MODE);
-    }
-  }
 }
 
 void ControlNode::targetPositionCallback(const geometry_msgs::Vector3 &msg) {
@@ -273,16 +391,98 @@ void ControlNode::landingControllerSetCallback(
   convertMsg(msg, this->quadrotor.landing_controller);
 }
 
-int ControlNode::loopCallback(void) {
+void ControlNode::publishAttitudeSetpoint(void) {
   int seq;
-  double dt;
+  Vec3 euler;
+  Quaternion q_ned;
   AttitudeCommand att_cmd;
   std_msgs::Float64 thr_msg;
   geometry_msgs::PoseStamped att_msg;
-  geometry_msgs::PoseStamped quad_pose_msg;
 
   // setup
   seq = this->ros_seq;
+  att_cmd = this->quadrotor.att_cmd;
+
+  if (this->fcu_type == "PX4") {
+    buildMsg(seq, ros::Time::now(), att_cmd, att_msg, thr_msg);
+    this->ros_pubs[PX4_SETPOINT_ATTITUDE_TOPIC].publish(att_msg);
+    this->ros_pubs[PX4_SETPOINT_THROTTLE_TOPIC].publish(thr_msg);
+
+  } else if (this->fcu_type == "DJI") {
+    // transform orientation from NWU to NED
+    nwu2ned(att_cmd.orientation, q_ned);
+    quat2euler(q_ned, 321, euler);
+
+    //  DJI Control Mode Byte
+    //
+    //    bit 7:6  0b00: HORI_ATTI_TILT_ANG
+    //             0b01: HORI_VEL
+    //             0b10: HORI_POS
+    //
+    //    bit 5:4  0b00: VERT_VEL
+    //             0b01: VERT_POS
+    //             0b10: VERT_THRUST
+    //
+    //    bit 3    0b0: YAW_ANG
+    //             0b1: YAW_RATE
+    //
+    //    bit 2:1  0b00: horizontal frame is ground frame
+    //             0b01: horizontal frame is body frame
+    //
+    //    bit 0    0b0: non-stable mode
+    //             0b1: stable mode
+    //
+    //  We used:
+    //
+    //    HORIZ_ATTI_TILT_ANG
+    //    VERT_THRUST
+    //    YAW_ANG
+    //    ground frame
+    //    non-stable mode
+    //
+    //  ends up being: 0b00100000 -> 0x20
+
+    // clang-format off
+    this->dji->attitude_control(
+      0x20,               // control mode byte (see above comment)
+      rad2deg(euler(0)),  // roll (deg)
+      rad2deg(euler(1)),  // pitch (deg)
+      att_cmd.throttle,   // throttle (0 - 100)
+      rad2deg(euler(2))   // yaw (deg)
+    );
+    // clang-format on
+
+  } else {
+    ROS_ERROR("Invalid [fcu_type]: %s", this->fcu_type.c_str());
+  }
+
+}
+
+void ControlNode::publishQuadrotorPose(void) {
+  geometry_msgs::PoseStamped msg;
+  buildMsg(this->ros_seq, ros::Time::now(), this->quadrotor.pose, msg);
+  this->ros_pubs[QUADROTOR_POSE].publish(msg);
+}
+
+void ControlNode::publishPX4DummyMsg(void) {
+  geometry_msgs::PoseStamped msg;
+
+  msg.pose.position.x = 0.0;
+  msg.pose.position.y = 0.0;
+  msg.pose.position.z = 2.0;
+
+  msg.pose.orientation.x = 0.0;
+  msg.pose.orientation.y = 0.0;
+  msg.pose.orientation.z = 0.0;
+  msg.pose.orientation.w = 1.0;
+
+  this->ros_pubs[PX4_SETPOINT_POSITION_TOPIC].publish(msg);
+}
+
+int ControlNode::loopCallback(void) {
+  double dt;
+
+  // setup
   dt = (ros::Time::now() - this->ros_last_updated).toSec();
 
   // step
@@ -293,29 +493,12 @@ int ControlNode::loopCallback(void) {
   }
 
   // publish msgs
-  att_cmd = this->quadrotor.att_cmd;
-  buildMsg(seq, ros::Time::now(), att_cmd, att_msg, thr_msg);
-  buildMsg(seq, ros::Time::now(), this->quadrotor.pose, quad_pose_msg);
-
   if (this->armed || this->sim_mode) {
-      this->ros_pubs[SETPOINT_ATTITUDE_TOPIC].publish(att_msg);
-      this->ros_pubs[SETPOINT_THROTTLE_TOPIC].publish(thr_msg);
-      this->ros_pubs[QUADROTOR_POSE].publish(quad_pose_msg);
-      this->publishStats();
+    this->publishAttitudeSetpoint();
+    this->publishStats();
 
-  } else {
-      geometry_msgs::PoseStamped msg;
-
-      msg.pose.position.x = 0.0;
-      msg.pose.position.y = 0.0;
-      msg.pose.position.z = 2.0;
-
-      msg.pose.orientation.x = 0.0;
-      msg.pose.orientation.y = 0.0;
-      msg.pose.orientation.z = 0.0;
-      msg.pose.orientation.w = 1.0;
-
-      this->ros_pubs[SETPOINT_POSITION_TOPIC].publish(msg);
+  } else if (this->fcu_type == "PX4") {
+    this->publishPX4DummyMsg();
   }
 
   return 0;

@@ -23,10 +23,10 @@ int IMUNode::configure(std::string node_name, int hz) {
   log_info("Zero-ing complete!");
 
   // ros node
+  ROS_GET_PARAM("/quad_frame", this->quad_frame);
   if (ROSNode::configure(node_name, hz) != 0) {
     return -1;
   }
-  this->ros_nh->getParam("/quad_frame", this->quad_frame);
 
   // register publisher and subscribers
   // clang-format off
@@ -96,7 +96,7 @@ void IMUNode::quadPoseCallback(const geometry_msgs::PoseStamped &msg) {
     q.w() = msg.pose.orientation.w;
     q.x() = msg.pose.orientation.x;
     q.y() = msg.pose.orientation.y;
-    q.z() = msg.pose.orientation.z;
+    q.z() = -msg.pose.orientation.z;
   }
 
   this->publishPosition(pos);

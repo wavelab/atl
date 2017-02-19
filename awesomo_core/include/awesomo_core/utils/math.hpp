@@ -37,9 +37,11 @@ int quat2euler(Quaternion q, int euler_seq, Vec3 &euler);
 int quat2rot(Quaternion q, Mat3 &R);
 void enu2nwu(Vec3 enu, Vec3 &nwu);
 void cf2nwu(Vec3 cf, Vec3 &nwu);
+void cf2enu(Vec3 cf, Vec3 &nwu);
 void nwu2enu(Vec3 nwu, Vec3 &enu);
 void ned2enu(Vec3 ned, Vec3 &enu);
-void cf2enu(Vec3 cf, Vec3 &nwu);
+void nwu2ned(Quaternion nwu, Quaternion &ned);
+void ned2nwu(Quaternion ned, Quaternion &enu);
 void target2body(Vec3 target_pos_if,
                  Vec3 body_pos_if,
                  Quaternion body_orientation_if,

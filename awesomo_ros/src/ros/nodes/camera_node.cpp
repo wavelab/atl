@@ -11,7 +11,7 @@ int CameraNode::configure(std::string node_name, int hz) {
   }
 
   // camera
-  this->ros_nh->getParam("/camera_config_dir", config_path);
+  ROS_GET_PARAM("/camera_config_dir", config_path);
   if (this->camera.configure(config_path) != 0) {
     ROS_ERROR("Failed to configure Camera!");
     return -2;
@@ -34,7 +34,6 @@ int CameraNode::configure(std::string node_name, int hz) {
 
 int CameraNode::publishImage(void) {
   sensor_msgs::ImageConstPtr img_msg;
-
 
   // encode position and orientation into image (first 11 pixels in first row)
   // if (this->gimbal_mode) {

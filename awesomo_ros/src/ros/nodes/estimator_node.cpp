@@ -18,15 +18,15 @@ int EstimatorNode::configure(std::string node_name, int hz) {
   this->quad_pose.orientation.z() = 0.0;
 
   // estimator
-  this->ros_nh->getParam("/tracker_mode", this->mode);
-  this->ros_nh->getParam("/quad_frame", this->quad_frame);
+  ROS_GET_PARAM("/tracker_mode", this->mode);
+  ROS_GET_PARAM("/quad_frame", this->quad_frame);
   this->initialized = false;
   this->state = ESTIMATOR_OFF;
 
   switch (this->mode) {
     case KF_MODE:
       log_info("Estimator running in KF_MODE!");
-      this->ros_nh->getParam("/kf_tracker_config", config_file);
+      ROS_GET_PARAM("/kf_tracker_config", config_file);
       if (this->kf_tracker.configure(config_file) != 0) {
         log_err("Failed to configure KalmanFilterTracker!");
         return -2;
@@ -35,7 +35,7 @@ int EstimatorNode::configure(std::string node_name, int hz) {
 
     case EKF_MODE:
       log_info("Estimator running in EKF_MODE!");
-      this->ros_nh->getParam("/ekf_tracker_config", config_file);
+      ROS_GET_PARAM("/ekf_tracker_config", config_file);
       if (this->ekf_tracker.configure(config_file) != 0) {
         log_err("Failed to configure ExtendedKalmanFilterTracker!");
         return -2;

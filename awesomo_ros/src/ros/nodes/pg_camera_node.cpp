@@ -1,5 +1,6 @@
 #include "awesomo_ros/nodes/pg_camera_node.hpp"
 
+
 namespace awesomo {
 
 int PGCameraNode::configure(std::string node_name, int hz) {
@@ -11,7 +12,7 @@ int PGCameraNode::configure(std::string node_name, int hz) {
   }
 
   // camera
-  this->ros_nh->getParam("/camera_config_dir", config_path);
+  ROS_GET_PARAM("/camera_config_dir", config_path);
   if (this->camera.configure(config_path) != 0) {
     ROS_ERROR("Failed to configure Camera!");
     return -2;

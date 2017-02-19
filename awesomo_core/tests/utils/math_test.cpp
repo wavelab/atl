@@ -4,7 +4,7 @@
 
 namespace awesomo {
 
-TEST(Utils, deg2radAndrad2deg) {
+TEST(Utils_math, deg2radAndrad2deg) {
   double d_deg;
   double d_rad;
 
@@ -13,7 +13,7 @@ TEST(Utils, deg2radAndrad2deg) {
   ASSERT_FLOAT_EQ(d_deg, rad2deg(d_rad));
 }
 
-TEST(Utils, euler2quat) {
+TEST(Utils_math, euler2quat) {
   float roll;
   float pitch;
   float yaw;
@@ -45,8 +45,35 @@ TEST(Utils, euler2quat) {
   ASSERT_FLOAT_EQ(-0.5, q.w());
 }
 
+TEST(Utils_math, sandbox) {
+  double roll, pitch, yaw;
+  Vec3 euler;
+  Quaternion q_nwu, q_ned;
 
-TEST(Utils, euler2rot) {
+  roll = deg2rad(10.0);
+  pitch = deg2rad(20.0);
+  yaw = deg2rad(30.0);
+  euler << roll, pitch, yaw;
+
+  // NWU
+  euler2quat(euler, 321, q_nwu);
+
+  // NWU to NED
+  nwu2ned(q_nwu, q_ned);
+  quat2euler(q_ned, 321, euler);
+  ASSERT_FLOAT_EQ(10, rad2deg(euler(0)));
+  ASSERT_FLOAT_EQ(-20, rad2deg(euler(1)));
+  ASSERT_FLOAT_EQ(-30, rad2deg(euler(2)));
+
+  // NED to NWU
+  ned2nwu(q_ned, q_nwu);
+  quat2euler(q_nwu, 321, euler);
+  ASSERT_FLOAT_EQ(10, rad2deg(euler(0)));
+  ASSERT_FLOAT_EQ(20, rad2deg(euler(1)));
+  ASSERT_FLOAT_EQ(30, rad2deg(euler(2)));
+}
+
+TEST(Utils_math, euler2rot) {
   double roll;
   double pitch;
   double yaw;
@@ -89,7 +116,7 @@ TEST(Utils, euler2rot) {
   ASSERT_FLOAT_EQ(r23, rot(2, 2));
 }
 
-TEST(Utils, enu2nwu) {
+TEST(Utils_math, enu2nwu) {
   Vec3 enu, nwu;
 
   enu << 1.0, 2.0, 3.0;
@@ -100,7 +127,7 @@ TEST(Utils, enu2nwu) {
   ASSERT_FLOAT_EQ(3.0, nwu(2));
 }
 
-TEST(Utils, nwu2enu) {
+TEST(Utils_math, nwu2enu) {
   Vec3 enu, nwu;
 
   nwu << 1.0, 2.0, 3.0;
@@ -111,7 +138,7 @@ TEST(Utils, nwu2enu) {
   ASSERT_FLOAT_EQ(3.0, enu(2));
 }
 
-TEST(Utils, cf2enu) {
+TEST(Utils_math, cf2enu) {
   Vec3 cf, enu;
 
   cf << 1.0, 2.0, 3.0;
@@ -122,7 +149,7 @@ TEST(Utils, cf2enu) {
   ASSERT_FLOAT_EQ(-2.0, enu(2));
 }
 
-TEST(Utils, target2body) {
+TEST(Utils_math, target2body) {
   Vec3 target_pos_if;
   Vec3 body_pos_if;
   Vec3 euler;
@@ -208,7 +235,7 @@ TEST(Utils, target2body) {
   ASSERT_FLOAT_EQ(0.0, target_pos_bf(2));
 }
 
-TEST(Utils, target2bodyplanar) {
+TEST(Utils_math, target2bodyplanar) {
   Vec3 target_pos_if;
   Vec3 body_pos_if;
   Vec3 euler;
@@ -294,7 +321,7 @@ TEST(Utils, target2bodyplanar) {
   ASSERT_FLOAT_EQ(0.0, target_pos_bpf(2));
 }
 
-TEST(Utils, target2inertial) {
+TEST(Utils_math, target2inertial) {
   Vec3 target_pos_bf, target_pos_if, body_pos_if, euler;
   Quaternion quat;
 
@@ -381,7 +408,7 @@ TEST(Utils, target2inertial) {
   ASSERT_FLOAT_EQ(0.0, target_pos_if(2));
 }
 
-TEST(Utils, wrapTo180) {
+TEST(Utils_math, wrapTo180) {
   double retval;
 
   // normal cases
@@ -408,7 +435,7 @@ TEST(Utils, wrapTo180) {
   ASSERT_FLOAT_EQ(90.0, retval);
 }
 
-TEST(Utils, wrapTo360) {
+TEST(Utils_math, wrapTo360) {
   double retval;
 
   // normal cases
@@ -435,7 +462,7 @@ TEST(Utils, wrapTo360) {
   ASSERT_FLOAT_EQ(270.0, retval);
 }
 
-TEST(Utils, cross_track_error) {
+TEST(Utils_math, cross_track_error) {
   Vec2 pos, p1, p2;
 
   pos << 2, 2;
@@ -449,7 +476,7 @@ TEST(Utils, cross_track_error) {
   ASSERT_TRUE(0.0 < cross_track_error(p1, p2, pos));
 }
 
-TEST(Utils, point_left_right) {
+TEST(Utils_math, point_left_right) {
   Vec2 pos, p1, p2;
 
   pos << 2, 3;
@@ -483,7 +510,7 @@ TEST(Utils, point_left_right) {
   ASSERT_EQ(0, point_left_right(p1, p2, pos));
 }
 
-TEST(Utils, closest_point) {
+TEST(Utils_math, closest_point) {
   int retval;
   Vec2 p1, p2, p3, closest;
 

@@ -7,7 +7,7 @@
 
 namespace awesomo {
 
-TEST(Pose, checkPose) {
+TEST(Utils_data_Pose, checkPose) {
   Pose testPose;
   Quaternion q_test;
   Vec3 euler;

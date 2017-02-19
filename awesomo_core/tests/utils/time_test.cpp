@@ -4,7 +4,7 @@
 
 namespace awesomo {
 
-TEST(Utils, ticAndtoc) {
+TEST(Utils_time, ticAndtoc) {
   struct timespec start;
 
   tic(&start);

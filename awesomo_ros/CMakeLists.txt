@@ -17,6 +17,7 @@ FIND_PACKAGE(
     image_transport
     cv_bridge
     tf
+    dji_sdk
     awesomo_core
     awesomo_msgs
 )

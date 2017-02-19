@@ -4,12 +4,12 @@
 
 namespace awesomo {
 
-TEST(Filesystem, file_exists) {
+TEST(Utils_filesystem, file_exists) {
   ASSERT_TRUE(file_exists("tests/configs/control/position_controller.yaml"));
   ASSERT_FALSE(file_exists("tests/configs/control/bogus.yaml"));
 }
 
-TEST(Filesystem, path_split) {
+TEST(Utils_filesystem, path_split) {
   std::vector<std::string> splits;
 
   splits = path_split("/a/b/c.yaml");
@@ -19,7 +19,7 @@ TEST(Filesystem, path_split) {
   ASSERT_EQ("c.yaml", splits[2]);
 }
 
-TEST(Filesystem, paths_combine) {
+TEST(Utils_filesystem, paths_combine) {
   std::string out;
 
   paths_combine("/a/b/c", "../", out);

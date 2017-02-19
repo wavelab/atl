@@ -11,7 +11,7 @@ int GimbalNode::configure(std::string node_name, int hz) {
   }
 
   // gimbal
-  this->ros_nh->getParam("/gimbal_config", config_file);
+  ROS_GET_PARAM("/gimbal_config", config_file);
   if (this->gimbal.configure(config_file) != 0) {
     ROS_ERROR("Failed to configure Gimbal!");
     return -2;

@@ -5,7 +5,7 @@
 #define TEST_CONFIG "tests/configs/config/config.yaml"
 
 
-TEST(ConfigParam, constructor) {
+TEST(Utils_config_ConfigParam, constructor) {
   awesomo::ConfigParam param;
 
   ASSERT_EQ(awesomo::TYPE_NOT_SET, param.type);
@@ -35,14 +35,14 @@ TEST(ConfigParam, constructor) {
   ASSERT_EQ(NULL, param.matx);
 }
 
-TEST(ConfigParser, constructor) {
+TEST(Utils_config_ConfigParser, constructor) {
   awesomo::ConfigParser parser;
 
   ASSERT_FALSE(parser.configured);
   ASSERT_FALSE(parser.loaded);
 }
 
-TEST(ConfigParser, addParam) {
+TEST(Utils_config_ConfigParser, addParam) {
   bool b;
   int i;
   float f;
@@ -97,7 +97,7 @@ TEST(ConfigParser, addParam) {
   ASSERT_TRUE(parser.params[0].b != NULL);
 }
 
-TEST(ConfigParser, getYamlNode) {
+TEST(Utils_config_ConfigParser, getYamlNode) {
   YAML::Node node1, node2;
   awesomo::ConfigParser parser;
 
@@ -110,7 +110,7 @@ TEST(ConfigParser, getYamlNode) {
   ASSERT_FLOAT_EQ(2.0, node2.as<float>());
 }
 
-TEST(ConfigParser, loadPrimitive) {
+TEST(Utils_config_ConfigParser, loadPrimitive) {
   int i;
   float f;
   double d;
@@ -154,7 +154,7 @@ TEST(ConfigParser, loadPrimitive) {
   ASSERT_EQ("hello world!", s);
 }
 
-TEST(ConfigParser, loadArray) {
+TEST(Utils_config_ConfigParser, loadArray) {
   std::vector<bool> b_array;
   std::vector<int> i_array;
   std::vector<float> f_array;
@@ -224,7 +224,7 @@ TEST(ConfigParser, loadArray) {
   ASSERT_EQ("4.0", s_array[3]);
 }
 
-TEST(ConfigParser, loadVector) {
+TEST(Utils_config_ConfigParser, loadVector) {
   awesomo::Vec2 vec2;
   awesomo::Vec3 vec3;
   awesomo::Vec4 vec4;
@@ -280,7 +280,7 @@ TEST(ConfigParser, loadVector) {
   }
 }
 
-TEST(ConfigParser, loadMatrix) {
+TEST(Utils_config_ConfigParser, loadMatrix) {
   int index;
   awesomo::Mat2 mat2;
   awesomo::Mat3 mat3;
@@ -366,7 +366,7 @@ TEST(ConfigParser, loadMatrix) {
   }
 }
 
-TEST(ConfigParser, load) {
+TEST(Utils_config_ConfigParser, load) {
   int retval;
   bool b;
   int i;

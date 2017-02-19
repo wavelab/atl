@@ -3,7 +3,7 @@
 
 namespace awesomo {
 
-TEST(Stats, linreg) {
+TEST(Utils_stats, linreg) {
   Eigen::Vector2d p;
   std::vector<Eigen::Vector2d> points;
   double m;
