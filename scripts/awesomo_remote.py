@@ -282,7 +282,7 @@ if __name__ == "__main__":
     # quad.set_heading(0)
     # quad.set_mode("TRACKING_MODE")
 
-    # quad.set_hover_point([0.0, 10, 4.5])
+    quad.set_hover_point([0.0, 0.0, 0])
 
     # import time
     # for i in range(2):

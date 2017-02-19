@@ -26,7 +26,7 @@ namespace awesomo {
 
 // NODE SETTINGS
 #define NODE_NAME "awesomo_control"
-#define NODE_RATE 100
+#define NODE_RATE 50
 
 // PUBLISH TOPICS
 #define PX4_SETPOINT_ATTITUDE_TOPIC "/mavros/setpoint_attitude/attitude"

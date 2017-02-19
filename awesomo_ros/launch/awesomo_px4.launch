@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- settings -->
+  <param name="sim_mode" value="false" />
+  <param name="debug_mode" value="false" />
+  <param name="quad_frame" value="NWU" />
+
+  <!-- mavros -->
+  <arg name="fcu_url" default="/dev/ttyACM0:57600" />
+  <arg name="gcs_url" default="" />
+  <arg name="tgt_system" default="1" />
+  <arg name="tgt_component" default="1" />
+  <arg name="log_output" default="screen" />
+  <include file="$(find mavros)/launch/node.launch">
+    <arg name="pluginlists_yaml" value="$(find mavros)/launch/px4_pluginlists.yaml" />
+    <arg name="config_yaml" value="$(find mavros)/launch/px4_config.yaml" />
+    <arg name="fcu_url" value="$(arg fcu_url)" />
+    <arg name="gcs_url" value="$(arg gcs_url)" />
+    <arg name="tgt_system" value="$(arg tgt_system)" />
+    <arg name="tgt_component" value="$(arg tgt_component)" />
+    <arg name="log_output" value="$(arg log_output)" />
+  </include>
+
+  <!-- controller node -->
+  <param name="control_config_dir" value="$(find awesomo_configs)/configs/quadrotor_anastasia" />
+  <node pkg="awesomo_ros" name="awesomo_control" type="control_node" output="screen" required="true" />
+
+  <!-- apriltag node -->
+  <param name="apriltag_config" value="$(find awesomo_configs)/configs/apriltag/config.yaml" />
+  <node pkg="awesomo_ros" name="awesomo_apriltag" type="apriltag_node" output="screen" required="true" />
+
+  <!-- estimate node -->
+  <param name="tracker_mode" value="1" />
+  <param name="kf_tracker_config" value="$(find awesomo_configs)/configs/estimator/kf_tracker.yaml" />
+  <param name="ekf_tracker_config" value="$(find awesomo_configs)/configs/estimator/ekf_tracker.yaml" />
+  <node pkg="awesomo_ros" name="awesomo_estimator" type="estimator_node" output="screen" required="true" />
+
+  <!-- pg camera node -->
+  <param name="camera_config_dir" value="$(find awesomo_configs)/configs/camera/pointgrey_chameleon" />
+  <node pkg="awesomo_ros" name="awesomo_camera" type="pg_camera_node" output="screen" required="true" />
+
+  <!-- gimbal node -->
+  <param name="gimbal_config" value="$(find awesomo_configs)/configs/gimbal/config.yaml" />
+  <node pkg="awesomo_ros" name="awesomo_gimbal" type="gimbal_node" output="screen" required="true" />
+
+  <!-- imu node -->
+  <node pkg="awesomo_ros" name="awesomo_imu" type="imu_node" output="screen" launch-prefix="sudo -E" required="true" />
+</launch>

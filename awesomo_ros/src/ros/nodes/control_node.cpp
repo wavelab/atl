@@ -64,7 +64,7 @@ int ControlNode::configure(const std::string node_name, int hz) {
   }
 
   // connect to estimator
-  this->waitForEstimator();
+  // this->waitForEstimator();
 
   this->configured = true;
   return 0;
@@ -169,16 +169,20 @@ int ControlNode::djiDisarm(void) {
 
 int ControlNode::djiOffboardModeOn(void) {
   if (this->dji->request_sdk_permission_control() != true) {
+    log_err("Failed to release DJI SDK control!");
     return -1;
   }
+  log_info("Obtained DJI SDK control!");
 
   return 0;
 }
 
 int ControlNode::djiOffboardModeOff(void) {
   if (this->dji->release_sdk_permission_control() != true) {
+    log_err("Failed to release DJI SDK control!");
     return -1;
   }
+  log_info("Released DJI SDK control!");
 
   return 0;
 }
@@ -461,7 +465,7 @@ void ControlNode::publishAttitudeSetpoint(void) {
       0x20,               // control mode byte (see above comment)
       rad2deg(euler(0)),  // roll (deg)
       rad2deg(euler(1)),  // pitch (deg)
-      att_cmd.throttle,   // throttle (0 - 100)
+      att_cmd.throttle * 100,   // throttle (0 - 100)
       rad2deg(euler(2))   // yaw (deg)
     );
     // clang-format on
