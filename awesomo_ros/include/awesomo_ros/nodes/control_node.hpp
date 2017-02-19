@@ -47,6 +47,11 @@ namespace awesomo {
 #define PX4_VELOCITY_TOPIC "/mavros/local_position/velocity"
 #define PX4_RADIO_TOPIC "/mavros/rc/in"
 
+#define DJI_POSITION_TOPIC "/dji_sdk/local_position"
+#define DJI_ATTITUDE_TOPIC "/dji_sdk/attitude_quaternion"
+#define DJI_VELOCITY_TOPIC "/dji_sdk/velocity"
+#define DJI_RADIO_TOPIC "/dji_sdk/rc_channels"
+
 #define MODE_TOPIC "/awesomo/control/mode"
 #define HEADING_TOPIC "/awesomo/control/heading/set"
 #define TARGET_BODY_POSITION_TOPIC "/awesomo/estimate/landing_target/position/body"
@@ -90,6 +95,7 @@ public:
 
   int configure(std::string node_name, int hz);
   int configurePX4Topics(void);
+  int configureDJITopics(void);
   int px4Connect(void);
   int px4Disarm(void);
   int px4OffboardModeOn(void);
@@ -102,10 +108,10 @@ public:
   void px4PoseCallback(const geometry_msgs::PoseStamped &msg);
   void px4VelocityCallback(const geometry_msgs::TwistStamped &msg);
   void px4RadioCallback(const mavros_msgs::RCIn &msg);
-  void djiUpdatePose(void);
-  void djiUpdateVelocity(void);
-  void djiUpdateRadio(void);
-  void djiUpdate(void);
+  void djiPositionCallback(const dji_sdk::LocalPosition &msg);
+  void djiAttitudeCallback(const dji_sdk::AttitudeQuaternion &msg);
+  void djiVelocityCallback(const dji_sdk::Velocity &msg);
+  void djiRadioCallback(const dji_sdk::RCChannels &msg);
   void modeCallback(const std_msgs::String &msg);
   void headingCallback(const std_msgs::Float64 &msg);
   void targetPositionCallback(const geometry_msgs::Vector3 &msg);

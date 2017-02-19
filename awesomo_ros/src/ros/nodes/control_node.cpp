@@ -26,6 +26,7 @@ int ControlNode::configure(const std::string node_name, int hz) {
 
   } else if (this->fcu_type == "DJI") {
     this->dji = new DJIDrone(*this->ros_nh);
+    this->configureDJITopics();
 
   } else {
     ROS_ERROR("Invalid [fcu_type]: %s", this->fcu_type.c_str());
@@ -87,6 +88,18 @@ int ControlNode::configurePX4Topics(void) {
   this->registerSubscriber(PX4_POSE_TOPIC, &ControlNode::px4PoseCallback, this);
   this->registerSubscriber(PX4_VELOCITY_TOPIC, &ControlNode::px4VelocityCallback, this);
   this->registerSubscriber(PX4_RADIO_TOPIC, &ControlNode::px4RadioCallback, this);
+  // clang-format on
+
+  return 0;
+}
+
+int ControlNode::configureDJITopics(void) {
+  // subscribers
+  // clang-format off
+  this->registerSubscriber(DJI_POSITION_TOPIC, &ControlNode::djiPositionCallback, this);
+  this->registerSubscriber(DJI_ATTITUDE_TOPIC, &ControlNode::djiAttitudeCallback, this);
+  this->registerSubscriber(DJI_VELOCITY_TOPIC, &ControlNode::djiVelocityCallback, this);
+  this->registerSubscriber(DJI_RADIO_TOPIC, &ControlNode::djiRadioCallback, this);
   // clang-format on
 
   return 0;
@@ -260,39 +273,39 @@ void ControlNode::px4RadioCallback(const mavros_msgs::RCIn &msg) {
   }
 }
 
-void ControlNode::djiUpdatePose(void) {
-  Pose pose;
-  Vec3 position;
-  Quaternion orientation;
+void ControlNode::djiPositionCallback(const dji_sdk::LocalPosition &msg) {
+  Vec3 pos_ned, pos_enu;
 
-  // convert DJI msg to Pose
-  pose.position(0) = this->dji->local_position.x;
-  pose.position(1) = this->dji->local_position.y;
-  pose.position(2) = this->dji->local_position.z;
+  pos_ned(0) = msg.x;
+  pos_ned(1) = msg.y;
+  pos_ned(2) = msg.z;
+  ned2enu(pos_ned, pos_enu);
 
-  pose.orientation.x() = this->dji->attitude_quaternion.q0;
-  pose.orientation.y() = this->dji->attitude_quaternion.q1;
-  pose.orientation.z() = this->dji->attitude_quaternion.q2;
-  pose.orientation.w() = this->dji->attitude_quaternion.q3;
+  this->quadrotor.pose.position = pos_enu;
+}
+
+void ControlNode::djiAttitudeCallback(const dji_sdk::AttitudeQuaternion &msg) {
+  Quaternion orientation_ned, orientation_nwu;
+
+  orientation_ned.x() = msg.q0;
+  orientation_ned.y() = msg.q1;
+  orientation_ned.z() = msg.q2;
+  orientation_ned.w() = msg.q3;
 
   // transform pose position and orientation
   // from NED to ENU and NWU
-  ned2enu(pose.position, position);
-  ned2nwu(pose.orientation, orientation);
-  pose.position = position;
-  pose.orientation = orientation;
+  ned2nwu(orientation_ned, orientation_nwu);
 
-  // upate
-  this->quadrotor.setPose(pose);
+  this->quadrotor.pose.orientation = orientation_nwu;
 }
 
-void ControlNode::djiUpdateVelocity(void) {
+void ControlNode::djiVelocityCallback(const dji_sdk::Velocity &msg) {
   Vec3 vel_ned, vel_enu;
 
   // convert DJI msg to Eigen vector
-  vel_ned(0) = this->dji->velocity.vx;
-  vel_ned(1) = this->dji->velocity.vy;
-  vel_ned(2) = this->dji->velocity.vz;
+  vel_ned(0) = msg.vx;
+  vel_ned(1) = msg.vy;
+  vel_ned(2) = msg.vz;
 
   // transform velocity in NED to ENU
   ned2enu(vel_ned, vel_enu);
@@ -301,23 +314,17 @@ void ControlNode::djiUpdateVelocity(void) {
   this->quadrotor.setVelocity(vel_enu);
 }
 
-void ControlNode::djiUpdateRadio(void) {
+void ControlNode::djiRadioCallback(const dji_sdk::RCChannels &msg) {
   if (this->armed) {
-    if (this->dji->rc_channels.gear < 0) {
+    if (msg.gear < 0) {
       this->armed = false;
     }
   } else {
-    if (this->dji->rc_channels.gear > 0) {
+    if (msg.gear > 0) {
       this->armed = true;
       this->quadrotor.setMode(DISCOVER_MODE);
     }
   }
-}
-
-void ControlNode::djiUpdate(void) {
-  this->djiUpdatePose();
-  this->djiUpdateVelocity();
-  this->djiUpdateRadio();
 }
 
 void ControlNode::modeCallback(const std_msgs::String &msg) {
