@@ -18,7 +18,7 @@ namespace awesomo {
 
 // NODE SETTINGS
 #define NODE_NAME "awesomo_estimator"
-#define NODE_RATE 200
+#define NODE_RATE 100
 
 // PUBLISH TOPICS
 #define LT_INERTIAL_POSITION_TOPIC "/awesomo/estimate/landing_target/position/inertial"
@@ -30,10 +30,10 @@ namespace awesomo {
 #define QUAD_HEADING_TOPIC "/awesomo/control/heading/set"
 
 // SUBSCRIBE TOPICS
+#define QUAD_POSE_TOPIC "/awesomo/quadrotor/pose/local"
+#define QUAD_VELOCITY_TOPIC "/awesomo/quadrotor/velocity/local"
 #define ESTIMATOR_ON_TOPIC "/awesomo/estimator/on"
 #define ESTIMATOR_OFF_TOPIC "/awesomo/estimator/off"
-#define QUAD_POSE_TOPIC "/mavros/local_position/pose"
-#define QUAD_VELOCITY_TOPIC "/mavros/local_position/velocity"
 #define TARGET_IF_POS_TOPIC "/awesomo/apriltag/target/position/inertial"
 #define TARGET_IF_YAW_TOPIC "/awesomo/apriltag/target/yaw/inertial"
 
@@ -77,10 +77,10 @@ public:
   int configure(std::string node_name, int hz);
   void initLTKF(Vec3 target_pos_wf);
   void resetLTKF(Vec3 target_pos_wf);
-  void onCallback(const std_msgs::Bool &msg);
-  void offCallback(const std_msgs::Bool &msg);
   void quadPoseCallback(const geometry_msgs::PoseStamped &msg);
   void quadVelocityCallback(const geometry_msgs::TwistStamped &msg);
+  void onCallback(const std_msgs::Bool &msg);
+  void offCallback(const std_msgs::Bool &msg);
   void targetInertialPosCallback(const geometry_msgs::Vector3 &msg);
   void targetInertialYawCallback(const std_msgs::Float64 &msg);
   void publishLTKFInertialPositionEstimate(void);

@@ -31,13 +31,13 @@ int ControlNode::configure(const std::string node_name, int hz) {
   } else {
     ROS_ERROR("Invalid [fcu_type]: %s", this->fcu_type.c_str());
     return -1;
-
   }
 
   // publishers
   this->registerPublisher<awesomo_msgs::PCtrlStats>(PCTRL_STATS_TOPIC);
   this->registerPublisher<awesomo_msgs::PCtrlSettings>(PCTRL_GET_TOPIC);
   this->registerPublisher<geometry_msgs::PoseStamped>(QUADROTOR_POSE);
+  this->registerPublisher<geometry_msgs::TwistStamped>(QUADROTOR_VELOCITY);
   this->registerPublisher<std_msgs::Bool>(ESTIMATOR_ON_TOPIC);
   this->registerPublisher<std_msgs::Bool>(ESTIMATOR_OFF_TOPIC);
 
@@ -61,8 +61,6 @@ int ControlNode::configure(const std::string node_name, int hz) {
   // connect to FCU
   if (this->fcu_type == "PX4" && this->px4Connect() != 0) {
     return -2;
-  } else if (this->fcu_type == "DJI") {
-
   }
 
   // connect to estimator
@@ -352,7 +350,6 @@ void ControlNode::modeCallback(const std_msgs::String &msg) {
   }
 }
 
-
 void ControlNode::headingCallback(const std_msgs::Float64 &msg) {
   double heading;
   convertMsg(msg, heading);
@@ -471,6 +468,16 @@ void ControlNode::publishQuadrotorPose(void) {
   this->ros_pubs[QUADROTOR_POSE].publish(msg);
 }
 
+void ControlNode::publishQuadrotorVelocity(void) {
+  geometry_msgs::TwistStamped msg;
+
+  msg.twist.linear.x = this->quadrotor.velocity(0);
+  msg.twist.linear.y = this->quadrotor.velocity(1);
+  msg.twist.linear.z = this->quadrotor.velocity(2);
+
+  this->ros_pubs[QUADROTOR_VELOCITY].publish(msg);
+}
+
 void ControlNode::publishPX4DummyMsg(void) {
   geometry_msgs::PoseStamped msg;
 
@@ -491,6 +498,10 @@ int ControlNode::loopCallback(void) {
 
   // setup
   dt = (ros::Time::now() - this->ros_last_updated).toSec();
+
+  // publish pose and velocity
+  this->publishQuadrotorPose();
+  this->publishQuadrotorVelocity();
 
   // step
   if (this->quadrotor.step(dt) != 0) {

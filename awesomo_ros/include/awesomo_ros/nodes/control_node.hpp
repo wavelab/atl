@@ -35,7 +35,8 @@ namespace awesomo {
 
 #define PCTRL_STATS_TOPIC "/awesomo/position_controller/stats"
 #define PCTRL_GET_TOPIC "/awesomo/control/position_controller/get"
-#define QUADROTOR_POSE "/awesomo/control/quad_pose"
+#define QUADROTOR_POSE "/awesomo/quadrotor/pose/local"
+#define QUADROTOR_VELOCITY "/awesomo/quadrotor/velocity/local"
 #define ESTIMATOR_ON_TOPIC "/awesomo/estimator/on"
 #define ESTIMATOR_OFF_TOPIC "/awesomo/estimator/off"
 
@@ -68,12 +69,8 @@ class ControlNode : public ROSNode {
 public:
   bool configured;
 
-  Quadrotor quadrotor;
   std::string quad_frame;
   std::string fcu_type;
-
-  int rc_in[16];
-  bool armed;
 
   mavros_msgs::State px4_state;
   ros::ServiceClient px4_mode_client;
@@ -81,16 +78,20 @@ public:
 
   DJIDrone *dji;
 
+  Quadrotor quadrotor;
+  int rc_in[16];
+  bool armed;
+
   ControlNode(int argc, char **argv) : ROSNode(argc, argv) {
     this->quad_frame = "";
     this->fcu_type = "";
+
+    this->dji = NULL;
 
     for (int i = 0; i < 16; i++) {
       this->rc_in[i] = 0.0f;
     }
     this->armed = false;
-
-    this->dji = NULL;
   }
 
   int configure(std::string node_name, int hz);
@@ -124,6 +125,7 @@ public:
   void landingControllerSetCallback(const awesomo_msgs::LCtrlSettings &msg);
   void publishAttitudeSetpoint(void);
   void publishQuadrotorPose(void);
+  void publishQuadrotorVelocity(void);
   void publishPX4DummyMsg(void);
   int loopCallback(void);
   void publishStats(void);

@@ -118,6 +118,14 @@ void EstimatorNode::resetLTKF(Vec3 x0) {
   this->initLTKF(x0);
 }
 
+void EstimatorNode::quadPoseCallback(const geometry_msgs::PoseStamped &msg) {
+  convertMsg(msg, this->quad_pose);
+}
+
+void EstimatorNode::quadVelocityCallback(const geometry_msgs::TwistStamped &msg) {
+  convertMsg(msg.twist.linear, this->quad_velocity);
+}
+
 void EstimatorNode::onCallback(const std_msgs::Bool &msg) {
   bool data;
 
@@ -144,30 +152,6 @@ void EstimatorNode::offCallback(const std_msgs::Bool &msg) {
     this->initialized = false;
     this->publishGimbalSetpointAttitudeMsg(setpoints);
   }
-}
-
-void EstimatorNode::quadPoseCallback(const geometry_msgs::PoseStamped &msg) {
-  Vec3 pos;
-
-  convertMsg(msg, this->quad_pose);
-  if (this->quad_frame == "NWU") {
-    nwu2enu(this->quad_pose.position, pos);
-  } else if (this->quad_frame == "NED") {
-    ned2enu(this->quad_pose.position, pos);
-  }
-  this->quad_pose.position = pos;
-}
-
-void EstimatorNode::quadVelocityCallback(const geometry_msgs::TwistStamped &msg) {
-  Vec3 vel;
-
-  convertMsg(msg.twist.linear, this->quad_velocity);
-  if (this->quad_frame == "NWU") {
-    nwu2enu(this->quad_velocity, vel);
-  } else if (this->quad_frame == "NED") {
-    ned2enu(this->quad_velocity, vel);
-  }
-  this->quad_velocity = vel;
 }
 
 void EstimatorNode::targetInertialPosCallback(const geometry_msgs::Vector3 &msg) {
