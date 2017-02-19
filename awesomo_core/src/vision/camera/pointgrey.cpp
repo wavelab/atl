@@ -61,7 +61,7 @@ int PointGreyCamera::initialize(void) {
   this->setExposure(this->config.exposure_value);
   this->setGain(this->config.gain_value);
   this->setShutter(this->shutter_speed);
-  this->setFormat7(2, "RAW8", 1024, 768);
+  this->setFormat7(1, "RAW8", 1024, 768);
 
   // start camera
   error = this->pointgrey->StartCapture();
@@ -425,7 +425,7 @@ int PointGreyCamera::getFrame(cv::Mat &image) {
 
   // resize the image to reflect camera mode
   image_size = cv::Size(this->config.image_width, this->config.image_height);
-  cv::resize(image, image, image_size);
+  cv::resize(image, image, image_size, 0, 0, cv::INTER_NEAREST);
 
   return 0;
 }
