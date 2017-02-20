@@ -1,4 +1,5 @@
-- downward facing camera for gazebo
-- make svo work in simulation
-- redo trajectories
+- print tag
+- charge camera batteries
+- create DJI version on prototype
+- refactor estimator to work in relative frame
 - update paper
