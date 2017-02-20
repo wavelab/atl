@@ -28,7 +28,6 @@ namespace awesomo {
     return 0; \
   }
 
-
 class ROSNode {
 public:
   bool configured;
@@ -46,6 +45,8 @@ public:
 
   std::map<std::string, ::ros::Publisher> ros_pubs;
   std::map<std::string, ::ros::Subscriber> ros_subs;
+  std::map<std::string, ::ros::ServiceServer> ros_servers;
+  std::map<std::string, ::ros::ServiceClient> ros_clients;
 
   image_transport::Publisher img_pub;
   image_transport::Subscriber img_sub;
@@ -108,6 +109,41 @@ public:
     // register subscriber
     subscriber = this->ros_nh->subscribe(topic, queue_size, fp, obj);
     this->ros_subs[topic] = subscriber;
+
+    return 0;
+  }
+
+  template <class T, class MReq, class MRes>
+  int registerServer(const std::string &service_topic,
+                     bool (T::*fp)(MReq &, MRes &),
+                     T *obj) {
+    ::ros::ServiceServer server;
+
+    // pre-check
+    if (this->configured == false) {
+      return -1;
+    }
+
+    // register service server
+    server = this->ros_nh->advertiseService(service_topic, fp, obj);
+    this->ros_servers[service_topic] = server;
+
+    return 0;
+  }
+
+  template <typename M>
+  int registerClient(const std::string &service_topic,
+                     bool persistent=false) {
+    ::ros::ServiceClient client;
+
+    // pre-check
+    if (this->configured == false) {
+      return -1;
+    }
+
+    // register service server
+    client = this->ros_nh->serviceClient<M>(service_topic);
+    this->ros_clients[service_topic] = client;
 
     return 0;
   }

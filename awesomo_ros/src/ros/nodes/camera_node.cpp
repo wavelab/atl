@@ -20,6 +20,7 @@ int CameraNode::configure(std::string node_name, int hz) {
 
   // register publisher and subscribers
   this->registerImagePublisher(CAMERA_IMAGE_TOPIC);
+  this->registerSubscriber(GIMBAL_POSITION_TOPIC, &CameraNode::gimbalPositionCallback, this);
   this->registerSubscriber(GIMBAL_FRAME_ORIENTATION_TOPIC, &CameraNode::gimbalFrameCallback, this);
   this->registerSubscriber(GIMBAL_JOINT_ORIENTATION_TOPIC, &CameraNode::gimbalJointCallback, this);
   this->registerSubscriber(APRILTAG_TOPIC , &CameraNode::aprilTagCallback, this);
@@ -65,21 +66,15 @@ int CameraNode::publishImage(void) {
 }
 
 void CameraNode::gimbalPositionCallback(const geometry_msgs::Vector3 &msg) {
-
+  convertMsg(msg, this->gimbal_position);
 }
 
 void CameraNode::gimbalFrameCallback(const geometry_msgs::Quaternion &msg) {
-  this->gimbal_frame_orientation.w() = msg.w;
-  this->gimbal_frame_orientation.x() = msg.x;
-  this->gimbal_frame_orientation.y() = msg.y;
-  this->gimbal_frame_orientation.z() = msg.z;
+  convertMsg(msg, this->gimbal_frame_orientation);
 }
 
 void CameraNode::gimbalJointCallback(const geometry_msgs::Quaternion &msg) {
-  this->gimbal_joint_orientation.w() = msg.w;
-  this->gimbal_joint_orientation.x() = msg.x;
-  this->gimbal_joint_orientation.y() = msg.y;
-  this->gimbal_joint_orientation.z() = msg.z;
+  convertMsg(msg, this->gimbal_joint_orientation);
 }
 
 void CameraNode::aprilTagCallback(const awesomo_msgs::AprilTagPose &msg) {
