@@ -111,6 +111,7 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
     cv::waitKey(1);
   }
 
+  // extract gimbal stats from image
   gimbal_position(0) = image_ptr->image.at<double>(0, 0);
   gimbal_position(1) = image_ptr->image.at<double>(0, 1);
   gimbal_position(2) = image_ptr->image.at<double>(0, 2);
@@ -125,7 +126,7 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
   gimbal_joint.y() = image_ptr->image.at<double>(0, 9);
   gimbal_joint.z() = image_ptr->image.at<double>(0, 10);
 
-  // Remove the data from the image
+  // remove the gimbal stats from image
   image_ptr->image.at<double>(0, 0) = 0;
   image_ptr->image.at<double>(0, 1) = 0;
   image_ptr->image.at<double>(0, 2) = 0;
@@ -151,7 +152,6 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
 
   // transform tag in camera frame to body planar frame
   target_cf << tags[0].position(0), tags[0].position(1), tags[0].position(2);
-
   target_bpf = Gimbal::getTargetInBPF(this->camera_offset,
                                       target_cf,
                                       gimbal_joint);
