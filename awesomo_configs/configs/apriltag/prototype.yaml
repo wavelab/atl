@@ -10,5 +10,5 @@ tag_sizes: [0.1, 0.857]
 
 camera_config: "../camera/prototype"
 illum_invar: true
-imshow: true
-# imshow: false
+# imshow: true
+imshow: false

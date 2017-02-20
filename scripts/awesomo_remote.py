@@ -257,6 +257,71 @@ def lz_circle_path(radius, velocity):
     return (velocity, angular_velocity)
 
 
+def lz_circle(radius, velocity):
+    velocity, angular_velocity = lz_circle_path(velocity, radius)
+    lz.set_velocity(velocity)
+    lz.set_angular_velocity(angular_velocity)
+
+
+def lz_straight_line(velocity):
+    lz.set_velocity(velocity)
+    lz.set_position([0, 0, 0])
+
+
+def side_to_side(quad, altitude, dist):
+    for i in range(10):
+        side_1 = [dist, 0.0, altitude]
+        quad.set_hover_point(side_1)
+        print(side_1)
+        sleep(5)
+
+        side_2 = [-dist, 0.0, altitude]
+        quad.set_hover_point(side_2)
+        print(side_2)
+        sleep(5)
+
+
+def square(quad, altitude, width):
+    for i in range(10):
+        wp1 = [width, width, altitude]
+        quad.set_hover_point(wp1)
+        print(wp1)
+        sleep(5)
+
+        wp2 = [-width, width, altitude]
+        quad.set_hover_point(wp2)
+        print(wp2)
+        sleep(5)
+
+        wp3 = [-width, -width, altitude]
+        quad.set_hover_point(wp3)
+        print(wp3)
+        sleep(5)
+
+        wp4 = [width, -width, altitude]
+        quad.set_hover_point(wp4)
+        print(wp4)
+        sleep(5)
+
+
+def init_svo(lz):
+    for i in range(2):
+        lz.set_position([0, 0, 0])
+        sleep(1)
+
+        lz.set_position([0, -0.4, 0])
+        sleep(1)
+
+        lz.set_position([-0.4, 0, 0])
+        sleep(1)
+
+        lz.set_position([0, 0.4, 0])
+        sleep(1)
+
+        lz.set_position([0.4, 0, 0])
+        sleep(1)
+
+
 if __name__ == "__main__":
     rospy.init_node("awesomo_remote")
     lz = LandingZone()
@@ -266,42 +331,10 @@ if __name__ == "__main__":
     mavros = MAVROS()
     rospy.sleep(0.5)
 
-    # mavros.set_local_pose(0, 0, 0)
-    # camera.set_mode("320x240")
-    # camera.set_mode("160x160")
+    # quad.set_hover_point([0.0, 0.0, 2.0])
 
-    # gimbal.set_attitude([0.0, 0.0])
+    square(quad, 3, 1)
 
-    # lz.set_velocity(0.5)
-    # lz.set_position([0, 0, 0])
-
-    # velocity, angular_velocity = lz_circle_path(10, 0.5)
-    # lz.set_velocity(velocity)
-    # lz.set_angular_velocity(angular_velocity)
-
-    # quad.set_heading(0)
-    # quad.set_mode("TRACKING_MODE")
-
-    quad.set_hover_point([0.0, 0.0, 0])
-
-    # import time
-    # for i in range(2):
-    #     lz.set_position([0, 0, 0])
-    #     time.sleep(1)
-    #
-    #     lz.set_position([0, -0.4, 0])
-    #     time.sleep(1)
-    #
-    #     lz.set_position([-0.4, 0, 0])
-    #     time.sleep(1)
-    #
-    #     lz.set_position([0, 0.4, 0])
-    #     time.sleep(1)
-    #
-    #     lz.set_position([0.4, 0, 0])
-    #     time.sleep(1)
-
-    # quad.set_hover_height(3.0)
     # quad.set_pctrl_settings({
     #     "roll": {
     #         "min": -30,
@@ -324,8 +357,6 @@ if __name__ == "__main__":
     #         "k_d": 0.2
     #     }
     # })
-    # sleep(5)
-    # quad.set_hover_point([1.0, 0.0, 5.0])
 
     # quad.set_tctrl_settings({
     #     "roll": {
@@ -355,44 +386,6 @@ if __name__ == "__main__":
     #     },
     #     "vy": {
     #         "k_p": 0.5,
-    #         "k_i": 0.0,
-    #         "k_d": 0.0
-    #     },
-    #     "vz": {
-    #         "k_p": 0.2,
-    #         "k_i": 0.0,
-    #         "k_d": 0.0
-    #     }
-    # })
-
-    # quad.set_lctrl_settings({
-    #     "roll": {
-    #         "min": -30,
-    #         "max": 30,
-    #         "k_p": 0.1,
-    #         "k_i": 0.0,
-    #         "k_d": 0.05
-    #     },
-    #     "pitch": {
-    #         "min": -30,
-    #         "max": 30,
-    #         "k_p": 0.1,
-    #         "k_i": 0.0,
-    #         "k_d": 0.05
-    #     },
-    #     "throttle": {
-    #         "hover": 0.5,
-    #         "k_p": 0.4,
-    #         "k_i": 0.0,
-    #         "k_d": 0.2
-    #     },
-    #     "vx": {
-    #         "k_p": 0.2,
-    #         "k_i": 0.0,
-    #         "k_d": 0.0
-    #     },
-    #     "vy": {
-    #         "k_p": 0.2,
     #         "k_i": 0.0,
     #         "k_d": 0.0
     #     },

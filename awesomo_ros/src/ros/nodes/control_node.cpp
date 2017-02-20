@@ -64,7 +64,7 @@ int ControlNode::configure(const std::string node_name, int hz) {
   }
 
   // connect to estimator
-  // this->waitForEstimator();
+  this->waitForEstimator();
 
   this->configured = true;
   return 0;
@@ -244,6 +244,9 @@ void ControlNode::px4PoseCallback(const geometry_msgs::PoseStamped &msg) {
     pose.position = position;
     pose.orientation = orientation;
 
+  } else {
+    log_err("Invalid ROS [/quad_frame] param value: %s", this->quad_frame.c_str());
+
   }
 
   this->quadrotor.setPose(pose);
@@ -261,6 +264,9 @@ void ControlNode::px4VelocityCallback(const geometry_msgs::TwistStamped &msg) {
     convertMsg(msg.twist.linear, vel_ned);
     ned2enu(vel_ned, vel_enu);
     this->quadrotor.setVelocity(vel_enu);
+
+  } else {
+    log_err("Invalid ROS [/quad_frame] param value: %s", this->quad_frame.c_str());
 
   }
 }
@@ -297,10 +303,10 @@ void ControlNode::djiPositionCallback(const dji_sdk::LocalPosition &msg) {
 void ControlNode::djiAttitudeCallback(const dji_sdk::AttitudeQuaternion &msg) {
   Quaternion orientation_ned, orientation_nwu;
 
-  orientation_ned.x() = msg.q0;
-  orientation_ned.y() = msg.q1;
-  orientation_ned.z() = msg.q2;
-  orientation_ned.w() = msg.q3;
+  orientation_ned.w() = msg.q0;
+  orientation_ned.x() = msg.q1;
+  orientation_ned.y() = msg.q2;
+  orientation_ned.z() = msg.q3;
 
   // transform pose position and orientation
   // from NED to ENU and NWU
@@ -462,11 +468,11 @@ void ControlNode::publishAttitudeSetpoint(void) {
 
     // clang-format off
     this->dji->attitude_control(
-      0x20,               // control mode byte (see above comment)
-      rad2deg(euler(0)),  // roll (deg)
-      rad2deg(euler(1)),  // pitch (deg)
-      att_cmd.throttle * 100,   // throttle (0 - 100)
-      rad2deg(euler(2))   // yaw (deg)
+      0x20,                    // control mode byte (see above comment)
+      rad2deg(euler(0)),       // roll (deg)
+      rad2deg(euler(1)),       // pitch (deg)
+      att_cmd.throttle * 100,  // throttle (0 - 100)
+      rad2deg(euler(2))        // yaw (deg)
     );
     // clang-format on
 
@@ -519,7 +525,7 @@ int ControlNode::loopCallback(void) {
 
   // step
   if (this->quadrotor.step(dt) != 0) {
-      return -1;
+    return -1;
   } else if (this->quadrotor.current_mode == DISARM_MODE) {
     this->setEstimatorOff();
   }
@@ -528,7 +534,6 @@ int ControlNode::loopCallback(void) {
   if (this->armed || this->sim_mode) {
     this->publishAttitudeSetpoint();
     this->publishStats();
-
   } else if (this->fcu_type == "PX4") {
     this->publishPX4DummyMsg();
   }
