@@ -64,6 +64,10 @@ int CameraNode::publishImage(void) {
   return 0;
 }
 
+void CameraNode::gimbalPositionCallback(const geometry_msgs::Vector3 &msg) {
+
+}
+
 void CameraNode::gimbalFrameCallback(const geometry_msgs::Quaternion &msg) {
   this->gimbal_frame_orientation.w() = msg.w;
   this->gimbal_frame_orientation.x() = msg.x;

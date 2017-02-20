@@ -22,6 +22,7 @@ int PGCameraNode::configure(std::string node_name, int hz) {
   // register publisher and subscribers
   // clang-format off
   this->registerImagePublisher(CAMERA_IMAGE_TOPIC);
+  this->registerSubscriber(GIMBAL_POSITION_TOPIC, &PGCameraNode::gimbalPositionCallback, this);
   this->registerSubscriber(GIMBAL_FRAME_ORIENTATION_TOPIC, &PGCameraNode::gimbalFrameCallback, this);
   this->registerSubscriber(GIMBAL_JOINT_ORIENTATION_TOPIC, &PGCameraNode::gimbalJointCallback, this);
   this->registerSubscriber(LT_BODY_POSITION_TOPIC , &PGCameraNode::targetPositionCallback, this);
@@ -40,7 +41,6 @@ int PGCameraNode::publishImage(void) {
   sensor_msgs::ImageConstPtr img_msg;
 
   // encode position and orientation into image (first 11 pixels in first row)
-  // if (this->gimbal_mode) {
   this->image.at<double>(0, 0) = this->gimbal_position(0);
   this->image.at<double>(0, 1) = this->gimbal_position(1);
   this->image.at<double>(0, 2) = this->gimbal_position(2);
@@ -54,7 +54,6 @@ int PGCameraNode::publishImage(void) {
   this->image.at<double>(0, 8) = this->gimbal_joint_orientation.x();
   this->image.at<double>(0, 9) = this->gimbal_joint_orientation.y();
   this->image.at<double>(0, 10) = this->gimbal_joint_orientation.z();
-  // }
 
   // clang-format off
   img_msg = cv_bridge::CvImage(
@@ -68,18 +67,16 @@ int PGCameraNode::publishImage(void) {
   return 0;
 }
 
+void PGCameraNode::gimbalPositionCallback(const geometry_msgs::Vector3 &msg) {
+  convertMsg(msg, this->gimbal_position);
+}
+
 void PGCameraNode::gimbalFrameCallback(const geometry_msgs::Quaternion &msg) {
-  this->gimbal_frame_orientation.w() = msg.w;
-  this->gimbal_frame_orientation.x() = msg.x;
-  this->gimbal_frame_orientation.y() = msg.y;
-  this->gimbal_frame_orientation.z() = msg.z;
+  convertMsg(msg, this->gimbal_frame_orientation);
 }
 
 void PGCameraNode::gimbalJointCallback(const geometry_msgs::Quaternion &msg) {
-  this->gimbal_joint_orientation.w() = msg.w;
-  this->gimbal_joint_orientation.x() = msg.x;
-  this->gimbal_joint_orientation.y() = msg.y;
-  this->gimbal_joint_orientation.z() = msg.z;
+  convertMsg(msg, this->gimbal_joint_orientation);
 }
 
 void PGCameraNode::targetPositionCallback(const geometry_msgs::Vector3 &msg) {

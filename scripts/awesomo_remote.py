@@ -258,7 +258,7 @@ def lz_circle_path(radius, velocity):
 
 
 def lz_circle(radius, velocity):
-    velocity, angular_velocity = lz_circle_path(velocity, radius)
+    velocity, angular_velocity = lz_circle_path(radius, velocity)
     lz.set_velocity(velocity)
     lz.set_angular_velocity(angular_velocity)
 
@@ -333,7 +333,8 @@ if __name__ == "__main__":
 
     # quad.set_hover_point([0.0, 0.0, 2.0])
 
-    square(quad, 3, 1)
+    # square(quad, 3, 1)
+    lz_circle(20, 1.0)
 
     # quad.set_pctrl_settings({
     #     "roll": {

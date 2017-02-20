@@ -31,9 +31,9 @@ int IMUNode::configure(std::string node_name, int hz) {
   // register publisher and subscribers
   // clang-format off
   this->registerPublisher<geometry_msgs::Vector3>(IMU_TOPIC);
+  this->registerPublisher<geometry_msgs::Vector3>(POSITION_TOPIC);
   this->registerPublisher<geometry_msgs::Quaternion>(FRAME_ORIENTATION_TOPIC);
   this->registerPublisher<geometry_msgs::Quaternion>(JOINT_ORIENTATION_TOPIC);
-  this->registerPublisher<geometry_msgs::Vector3>(POSITION_TOPIC);
   this->registerSubscriber(QUAD_POSE_TOPIC, &IMUNode::quadPoseCallback, this);
   // clang-format on
 
@@ -51,6 +51,13 @@ int IMUNode::publishIMU(Vec3 euler) {
   return 0;
 }
 
+int IMUNode::publishPosition(Vec3 pos) {
+  geometry_msgs::Vector3 msg;
+  buildMsg(pos, msg);
+  this->ros_pubs[POSITION_TOPIC].publish(msg);
+  return 0;
+}
+
 int IMUNode::publishFrameOrientation(Quaternion q) {
   geometry_msgs::Quaternion msg;
   buildMsg(q, msg);
@@ -65,39 +72,18 @@ int IMUNode::publishJointOrientation(Quaternion q) {
   return 0;
 }
 
-int IMUNode::publishPosition(Vec3 pos) {
-  geometry_msgs::Vector3 msg;
-  buildMsg(pos, msg);
-  this->ros_pubs[POSITION_TOPIC].publish(msg);
-  return 0;
-}
-
 void IMUNode::quadPoseCallback(const geometry_msgs::PoseStamped &msg) {
   Vec3 pos;
   Quaternion q;
 
-  if (this->quad_frame == "NWU") {
-    // transform from NWU to ENU
-    pos(0) = -msg.pose.position.y;
-    pos(1) = msg.pose.position.x;
-    pos(2) = msg.pose.position.z;
+  pos(0)  = msg.pose.position.x;
+  pos(1)  = msg.pose.position.y;
+  pos(2)  = msg.pose.position.z;
 
-    q.w() = msg.pose.orientation.w;
-    q.x() = msg.pose.orientation.x;
-    q.y() = msg.pose.orientation.y;
-    q.z() = msg.pose.orientation.z;
-
-  } else if (this->quad_frame == "NED") {
-    // transform from NED to ENU
-    pos(0)  = msg.pose.position.y;
-    pos(1)  = msg.pose.position.x;
-    pos(2)  = -msg.pose.position.z;
-
-    q.w() = msg.pose.orientation.w;
-    q.x() = msg.pose.orientation.x;
-    q.y() = msg.pose.orientation.y;
-    q.z() = -msg.pose.orientation.z;
-  }
+  q.w() = msg.pose.orientation.w;
+  q.x() = msg.pose.orientation.x;
+  q.y() = msg.pose.orientation.y;
+  q.z() = msg.pose.orientation.z;
 
   this->publishPosition(pos);
   this->publishFrameOrientation(q);

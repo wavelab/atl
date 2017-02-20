@@ -6,8 +6,8 @@
   <!-- settings -->
   <param name="sim_mode" value="true" />
   <param name="debug_mode" value="false" />
-  <param name="quad_frame" value="NED" />
-  <param name="fcu_type" value="DJI" />
+  <param name="quad_frame" value="NWU" />
+  <param name="fcu_type" value="PX4" />
 
   <!-- prototype -->
   <param name="gimbal_mode" value="true" />
@@ -17,7 +17,7 @@
 
   <node pkg="prototype_ros" name="prototype_gazebo" type="run_gazebo.sh" output="screen" required="true" />
   <node pkg="prototype_ros" name="prototype_world" type="world_node" output="screen" required="true" />
-  <node pkg="prototype_ros" name="prototype_quadrotor" type="dji_quadrotor_node" output="screen" required="true" />
+  <node pkg="prototype_ros" name="prototype_quadrotor" type="px4_quadrotor_node" output="screen" required="true" />
   <node pkg="prototype_ros" name="prototype_lz" type="lz_node" output="screen" required="true">
     <remap from="/prototype/lz/pose" to="/awesomo/lz/pose" />
     <remap from="/prototype/lz/position/set" to="/awesomo/lz/position/set" />

@@ -23,6 +23,7 @@ namespace awesomo {
 
 // SUBSCRIBE TOPICS
 #define APRILTAG_TOPIC "/awesomo/apriltag/target"
+#define GIMBAL_POSITION_TOPIC "/awesomo/quadrotor/pose/local"
 #define GIMBAL_FRAME_ORIENTATION_TOPIC "/awesomo/gimbal/frame/orientation/inertial"
 #define GIMBAL_JOINT_ORIENTATION_TOPIC "/awesomo/gimbal/joint/orientation/inertial"
 #define APRILTAG_TOPIC "/awesomo/apriltag/target"
@@ -42,6 +43,7 @@ public:
   int configure(std::string node_name, int hz);
   int publishImage(void);
   void imageCallback(const sensor_msgs::ImageConstPtr &msg);
+  void gimbalPositionCallback(const geometry_msgs::Vector3 &msg);
   void gimbalFrameCallback(const geometry_msgs::Quaternion &msg);
   void gimbalJointCallback(const geometry_msgs::Quaternion &msg);
   void aprilTagCallback(const awesomo_msgs::AprilTagPose &msg);

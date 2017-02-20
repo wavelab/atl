@@ -21,11 +21,9 @@ namespace awesomo {
 // PUBLISH TOPICS
 #define CAMERA_IMU_TOPIC "/awesomo/gimbal/joint/imu"
 
-
 // SUBSCRIBE TOPICS
 #define SETPOINT_TOPIC "/awesomo/gimbal/setpoint/attitude"
 #define TRACK_TOPIC "/awesomo/gimbal/target/track"
-
 #define SHUTDOWN_TOPIC "/awesomo/gimbal/shutdown"
 
 
@@ -38,7 +36,6 @@ public:
   GimbalNode(int argc, char **argv) : ROSNode(argc, argv) {}
   ~GimbalNode(void);
   int configure(std::string node_name, int hz);
-  void quadPoseCallback(const geometry_msgs::PoseStamped &msg);
   void setAttitudeCallback(const geometry_msgs::Vector3 &msg);
   void trackTargetCallback(const geometry_msgs::Vector3 &msg);
   int loopCallback(void);

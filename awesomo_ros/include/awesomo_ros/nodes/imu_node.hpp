@@ -17,12 +17,12 @@ namespace awesomo {
 
 // PUBLISH TOPICS
 #define IMU_TOPIC "/awesomo/imu"
+#define POSITION_TOPIC "/awesomo/gimbal/position/inertial"
 #define FRAME_ORIENTATION_TOPIC "/awesomo/gimbal/frame/orientation/inertial"
 #define JOINT_ORIENTATION_TOPIC "/awesomo/gimbal/joint/orientation/inertial"
-#define POSITION_TOPIC "/awesomo/gimbal/position/inertial"
 
 // SUBSCRIBE TOPICS
-#define QUAD_POSE_TOPIC "/mavros/local_position/pose"
+#define QUAD_POSE_TOPIC "/awesomo/quadrotor/pose/local"
 
 class IMUNode : public ROSNode {
 public:
@@ -32,9 +32,9 @@ public:
   IMUNode(int argc, char **argv) : ROSNode(argc, argv) {}
   int configure(std::string node_name, int hz);
   int publishIMU(Vec3 euler);
+  int publishPosition(Vec3 pos);
   int publishFrameOrientation(Quaternion q);
   int publishJointOrientation(Quaternion q);
-  int publishPosition(Vec3 pos);
   void quadPoseCallback(const geometry_msgs::PoseStamped &msg);
   int loopCallback(void);
 };

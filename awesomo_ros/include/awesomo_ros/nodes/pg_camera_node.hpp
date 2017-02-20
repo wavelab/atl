@@ -23,6 +23,7 @@ namespace awesomo {
 
 // SUBSCRIBE TOPICS
 #define APRILTAG_TOPIC "/awesomo/apriltag/target"
+#define GIMBAL_POSITION_TOPIC "/awesomo/gimbal/position/inertial"
 #define GIMBAL_FRAME_ORIENTATION_TOPIC "/awesomo/gimbal/frame/orientation/inertial"
 #define GIMBAL_JOINT_ORIENTATION_TOPIC "/awesomo/gimbal/joint/orientation/inertial"
 #define LT_BODY_POSITION_TOPIC "/awesomo/estimate/landing_target/position/body"
@@ -34,22 +35,26 @@ public:
   PointGreyCamera camera;
   cv::Mat image;
 
+  Vec3 gimbal_position;
   Quaternion gimbal_frame_orientation;
   Quaternion gimbal_joint_orientation;
-  Vec3 gimbal_position;
+
   bool target_detected;
   Vec3 target_pos_bf;
 
   PGCameraNode(int argc, char **argv) : ROSNode(argc, argv) {
+    this->gimbal_position = Vec3();
     this->gimbal_frame_orientation = Quaternion();
     this->gimbal_joint_orientation = Quaternion();
-    this->gimbal_position = Vec3();
+
     this->target_detected = false;
     this->target_pos_bf = Vec3();
   }
+
   int configure(std::string node_name, int hz);
   int publishImage(void);
   void imageCallback(const sensor_msgs::ImageConstPtr &msg);
+  void gimbalPositionCallback(const geometry_msgs::Vector3 &msg);
   void gimbalFrameCallback(const geometry_msgs::Quaternion &msg);
   void gimbalJointCallback(const geometry_msgs::Quaternion &msg);
   void targetPositionCallback(const geometry_msgs::Vector3 &msg);
