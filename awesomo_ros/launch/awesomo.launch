@@ -8,7 +8,7 @@
 
   <!-- dji sdk -->
   <node pkg="dji_sdk" type="dji_sdk_node" name="dji_sdk" output="screen">
-    <param name="serial_name" type="string" value="/dev/ttyUSB0"/>
+    <param name="serial_name" type="string" value="/dev/ttyUSB1"/>
     <param name="baud_rate" type="int" value="230400"/>
     <param name="app_id" type="int" value="1037276"/>
     <param name="app_version" type="int" value="1"/>
@@ -31,14 +31,14 @@
   <param name="ekf_tracker_config" value="$(find awesomo_configs)/configs/estimator/ekf_tracker.yaml" />
   <node pkg="awesomo_ros" name="awesomo_estimator" type="estimator_node" output="screen" required="true" />
 
-  <!-- <!&#45;&#45; pg camera node &#45;&#45;> -->
-  <!-- <param name="camera_config_dir" value="$(find awesomo_configs)/configs/camera/pointgrey_chameleon" /> -->
-  <!-- <node pkg="awesomo_ros" name="awesomo_camera" type="pg_camera_node" output="screen" required="true" /> -->
-  <!--  -->
-  <!-- <!&#45;&#45; gimbal node &#45;&#45;> -->
-  <!-- <param name="gimbal_config" value="$(find awesomo_configs)/configs/gimbal/config.yaml" /> -->
-  <!-- <node pkg="awesomo_ros" name="awesomo_gimbal" type="gimbal_node" output="screen" required="true" /> -->
-  <!--  -->
-  <!-- <!&#45;&#45; imu node &#45;&#45;> -->
-  <!-- <node pkg="awesomo_ros" name="awesomo_imu" type="imu_node" output="screen" launch&#45;prefix="sudo &#45;E" required="true" /> -->
+  <!-- pg camera node -->
+  <param name="camera_config_dir" value="$(find awesomo_configs)/configs/camera/pointgrey_chameleon" />
+  <node pkg="awesomo_ros" name="awesomo_camera" type="pg_camera_node" output="screen" required="true" />
+
+  <!-- gimbal node -->
+  <param name="gimbal_config" value="$(find awesomo_configs)/configs/gimbal/config.yaml" />
+  <node pkg="awesomo_ros" name="awesomo_gimbal" type="gimbal_node" output="screen" required="true" />
+
+  <!-- imu node -->
+  <node pkg="awesomo_ros" name="awesomo_imu" type="imu_node" output="screen" launch-prefix="sudo -E" required="true" />
 </launch>

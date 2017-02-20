@@ -23,10 +23,10 @@ int IMUNode::configure(std::string node_name, int hz) {
   log_info("Zero-ing complete!");
 
   // ros node
-  ROS_GET_PARAM("/quad_frame", this->quad_frame);
   if (ROSNode::configure(node_name, hz) != 0) {
     return -1;
   }
+  ROS_GET_PARAM("/quad_frame", this->quad_frame);
 
   // register publisher and subscribers
   // clang-format off
@@ -98,6 +98,8 @@ int IMUNode::loopCallback(void) {
     euler2quat(euler, 321, q);
     this->publishIMU(euler);
     this->publishJointOrientation(q);
+  } else {
+    log_info("Failed to poll IMU for data!");
   }
 
   return 0;
