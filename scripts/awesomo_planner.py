@@ -60,7 +60,7 @@ def desired_system(p0_z, pf_z, v, dt, vz_max=-1.0):
 
     # initial point
     traj.append(p0)
-    desired.append([p0[0], vx, p0[1], vz, az, theta])
+    desired.append([p0[0], vx, p0[1], 0, az, theta])
     z = p0[1]
 
     # create points along the desired line path
@@ -115,20 +115,21 @@ def plot_desired_trajectory(traj):
     plt.show()
 
 
-def plot_optimization_results(traj, x, T, n, m):
+def plot_optimization_results(traj, x, T, n, m, save_plot=False, plt_name=""):
     # setup
     x = x.reshape(T, n + m).T
     traj = traj.T
     dt = 0.1
     t = [i * dt for i in range(T)]
 
-    plt.figure(1)
-
+    fig = plt.figure(figsize=(8, 10), dpi=80)
     plt.subplot(411)
-    plt.tight_layout()
+    plt.tight_layout(h_pad=5.0)
 
     plt.plot(traj[0], traj[1], label="desired")
     plt.plot(x[0], x[2], label="optimized")
+    plt.xlim([0, traj[0][-1]])
+    plt.ylim([0, None])
     plt.title("Landing Trajectory")
     plt.legend(loc=0)
     plt.xlabel("x")
@@ -137,6 +138,7 @@ def plot_optimization_results(traj, x, T, n, m):
     plt.subplot(412)
     plt.plot(t, x[1], label="vx")
     plt.plot(t, x[3], label="vz")
+    plt.xlim([0, t[-1]])
     plt.title("Velocity")
     plt.legend(loc=0)
     plt.xlabel("t")
@@ -145,6 +147,7 @@ def plot_optimization_results(traj, x, T, n, m):
     plt.subplot(413)
     plt.title("Theta Input")
     plt.plot(t, x[5], label="theta")
+    plt.xlim([0, t[-1] + 0.1])
     plt.legend(loc=0)
     plt.xlabel("t")
     plt.ylabel("radians")
@@ -152,11 +155,19 @@ def plot_optimization_results(traj, x, T, n, m):
     plt.subplot(414)
     plt.title("Thrust Input")
     plt.plot(t, x[4], label="az")
+    plt.xlim([0, t[-1] + 0.1])
+    plt.ylim([0, 20])
     plt.legend(loc=0)
     plt.xlabel("t")
     plt.ylabel("acceleration")
 
-    plt.show()
+    if save_plot:
+        plt.savefig(plt_name + ".png",
+                    dpi=fig.dpi,
+                    bbox_inches="tight",
+                    pad_inches=0.5)
+    else:
+        plt.show()
 
 
 def plot_inputs_based_trajectory(T, dt, n, m, x0, result):
@@ -190,11 +201,11 @@ def cost_func(x, args):
     cost += 0.0 * np.linalg.norm(states[2] - traj[1])  # dz
 
     # control input cost
-    cost += 0.0 * np.linalg.norm(states[4])  # az
-    cost += 1.0 * np.linalg.norm(states[5])  # theta
+    cost += 0.5 * np.linalg.norm(states[4] - 10.0)  # az
+    cost += 1.0 * np.linalg.norm(states[5])         # theta
 
     # control input difference cost
-    cost += 1.0 * np.linalg.norm(np.diff(states[4]))  # az
+    cost += 0.0 * np.linalg.norm(np.diff(states[4]))  # az
     cost += 1.0 * np.linalg.norm(np.diff(states[5]))  # theta
 
     # end cost to bias to matched landing ??
@@ -243,7 +254,7 @@ def ine_constraints(x, *args):
     return retval
 
 
-def optimize(p0_z, pf_z, v, dt, vz_max=-1.0):
+def optimize(p0_z, pf_z, v, dt, save_plot=True, plot_name="", vz_max=-1.5):
     n = 4       # num of states
     m = 2       # num of inputs
 
@@ -280,7 +291,7 @@ def optimize(p0_z, pf_z, v, dt, vz_max=-1.0):
 
         # equality constraint for end position
         {"type": "eq", "fun": lambda x: np.array([x[-6] - x0[-1][0]])},  # x
-        {"type": "eq", "fun": lambda x: np.array([x[-5] - 0.0])},        # vx
+        {"type": "eq", "fun": lambda x: np.array([x[-5] - v])},          # vx
         {"type": "eq", "fun": lambda x: np.array([x[-4] - 0.0])},        # z
         {"type": "eq", "fun": lambda x: np.array([x[-3] - 0.0])},        # vz
         {"type": "eq", "fun": lambda x: np.array([x[-2] - 0.0])},        # az
@@ -298,7 +309,7 @@ def optimize(p0_z, pf_z, v, dt, vz_max=-1.0):
                                       bounds=bounds)
 
     # plot optimization results
-    plot_optimization_results(traj, results.x, T, n, m)
+    plot_optimization_results(traj, results.x, T, n, m, save_plot, plot_name)
     # plot_inputs_based_trajectory(T, dt, n, m, x0, results)
 
     return (T, n, m, v, dt, results.x)
@@ -334,7 +345,7 @@ def record_optimized_results(T, n, m, v, dt, results, fpath):
 def generate_trajectory_combinations():
     p0_z = frange(5, 6, 1, 1)
     pf_z = [0.0]
-    v = frange(1, 5, 1)
+    v = frange(0, 5, 1, 1)
 
     conditions = [p0_z, pf_z, v]
     conditions = list(itertools.product(*conditions))
@@ -348,10 +359,10 @@ if __name__ == "__main__":
 
     p0_z = 5.0
     pf_z = 0.0
-    v = 0.0
-    T, n, m, v, dt, results = optimize(p0_z, pf_z, v, dt)
-    # filepath = basedir + "0.csv"
-    # record_optimized_results(T, n, m, v, dt, results, filepath)
+    v = 1.0
+    T, n, m, v, dt, results = optimize(p0_z, pf_z, v, dt, True, str(index))
+    filepath = basedir + "0.csv"
+    record_optimized_results(T, n, m, v, dt, results, filepath)
 
     # # prep index file
     # index_file = open(basedir + "index.csv", "wb")
@@ -366,11 +377,12 @@ if __name__ == "__main__":
     #     filepath = basedir + str(index) + ".csv"
     #     index_line = "{0},{1},{2}\n".format(index, p0_z, v)
     #     index_file.write(bytes(index_line, "UTF-8"))
-    #     index += 1
     #
     #     print("Optimizing starting height {0} @ {1}ms^-1".format(p0_z, v))
-    #     T, n, m, v, dt, results = optimize(p0_z, pf_z, v, dt)
+    #     T, n, m, v, dt, results = optimize(p0_z, pf_z, v, dt, True, str(index))
     #     record_optimized_results(T, n, m, v, dt, results, filepath)
+    #
+    #     index += 1
     #
     # # close index file
     # index_file.close()

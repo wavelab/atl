@@ -334,9 +334,10 @@ if __name__ == "__main__":
     # quad.set_hover_point([0.0, 0.0, 2.0])
 
     # square(quad, 3, 1)
-    # lz_circle(20, 1.0)
+    # lz_circle(10, 1.0)
+    lz_straight_line(1.0)
 
-    side_to_side(quad, 4.0, 2.0)
+    # side_to_side(quad, 4.0, 2.0)
     # square(quad, 4.0, 2.0)
 
     # quad.set_pctrl_settings({
