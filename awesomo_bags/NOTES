@@ -1,0 +1,9 @@
+170220-position_controller_tuning_1.bag
+
+   Position Controller tuning straight out of the box, did not calibrate for
+   interference. Setpoints were x = [-2, 2], y = 0, z = 4, 5 seconds apart
+
+170220-position_controller_tuning_2.bag
+
+   Same as previous flight but this flight was pre-calibrated with
+   intereference, except for USB3.0 camera
