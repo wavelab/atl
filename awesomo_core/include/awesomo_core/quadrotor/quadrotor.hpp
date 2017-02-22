@@ -66,7 +66,7 @@ public:
   struct timespec landing_tic;
 
   enum Mode current_mode;
-  double heading;
+  double yaw;
   Pose pose;
   Vec3 velocity;
   Vec3 hover_position;
@@ -78,7 +78,7 @@ public:
   int setMode(enum Mode mode);
   int setPose(Pose pose);
   int setVelocity(Vec3 velocity);
-  int setHeading(double heading);
+  int setYaw(double yaw);
   int setTargetPosition(Vec3 position);
   int setTargetVelocity(Vec3 velocity);
   int setTargetDetected(bool detected);
@@ -89,6 +89,7 @@ public:
   int stepDiscoverMode(double dt);
   int stepTrackingMode(double dt);
   int stepLandingMode(double dt);
+  int reset(void);
   int step(double dt);
 };
 

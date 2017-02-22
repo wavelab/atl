@@ -44,7 +44,7 @@ int ControlNode::configure(const std::string node_name, int hz) {
   // subscribers
   // clang-format off
   this->registerSubscriber(MODE_TOPIC, &ControlNode::modeCallback, this);
-  this->registerSubscriber(HEADING_TOPIC, &ControlNode::headingCallback, this);
+  this->registerSubscriber(HEADING_TOPIC, &ControlNode::yawCallback, this);
   this->registerSubscriber(TARGET_BODY_POSITION_TOPIC, &ControlNode::targetPositionCallback, this);
   this->registerSubscriber(TARGET_BODY_VELOCITY_TOPIC, &ControlNode::targetVelocityCallback, this);
   this->registerSubscriber(TARGET_DETECTED_TOPIC, &ControlNode::targetDetectedCallback, this);
@@ -370,10 +370,10 @@ void ControlNode::modeCallback(const std_msgs::String &msg) {
   }
 }
 
-void ControlNode::headingCallback(const std_msgs::Float64 &msg) {
-  double heading;
-  convertMsg(msg, heading);
-  this->quadrotor.setHeading(heading);
+void ControlNode::yawCallback(const std_msgs::Float64 &msg) {
+  double yaw;
+  convertMsg(msg, yaw);
+  this->quadrotor.setYaw(yaw);
 }
 
 void ControlNode::targetPositionCallback(const geometry_msgs::Vector3 &msg) {
@@ -515,6 +515,13 @@ void ControlNode::publishPX4DummyMsg(void) {
 
 int ControlNode::loopCallback(void) {
   double dt;
+
+  // pre-check
+  if (this->armed == false && this->sim_mode == false) {
+    this->quadrotor.reset();
+    this->setEstimatorOff();
+    return 0;
+  }
 
   // setup
   dt = (ros::Time::now() - this->ros_last_updated).toSec();

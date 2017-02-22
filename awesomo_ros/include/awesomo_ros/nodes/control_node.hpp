@@ -115,7 +115,7 @@ public:
   void djiVelocityCallback(const dji_sdk::Velocity &msg);
   void djiRadioCallback(const dji_sdk::RCChannels &msg);
   void modeCallback(const std_msgs::String &msg);
-  void headingCallback(const std_msgs::Float64 &msg);
+  void yawCallback(const std_msgs::Float64 &msg);
   void targetPositionCallback(const geometry_msgs::Vector3 &msg);
   void targetVelocityCallback(const geometry_msgs::Vector3 &msg);
   void targetDetectedCallback(const std_msgs::Bool &msg);

@@ -100,6 +100,16 @@ TEST(Quadrotor, setVelocity) {
   ASSERT_FLOAT_EQ(3.0, quadrotor.velocity(2));
 }
 
+TEST(Quadrotor, setYaw) {
+  Quadrotor quadrotor;
+
+  quadrotor.configure(TEST_CONFIG_PATH);
+  ASSERT_FLOAT_EQ(0, quadrotor.yaw);
+
+  quadrotor.setYaw(1);
+  ASSERT_FLOAT_EQ(1, quadrotor.yaw);
+}
+
 TEST(Quadrotor, setTargetPosition) {
   Quadrotor quadrotor;
   Vec3 target_position;

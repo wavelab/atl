@@ -117,9 +117,9 @@ class Quadrotor(ROSNode):
         msg.data = mode
         self.pubs[self.mode_topic].publish(msg)
 
-    def set_heading(self, heading):
+    def set_yaw(self, yaw):
         msg = Float64()
-        msg.data = heading * (pi / 180.0)
+        msg.data = yaw * (pi / 180.0)
         self.pubs[self.heading_topic].publish(msg)
 
     def set_hover_point(self, hover_point):
@@ -332,10 +332,11 @@ if __name__ == "__main__":
     rospy.sleep(0.5)
 
     # quad.set_hover_point([0.0, 0.0, 2.0])
+    quad.set_yaw(0)
 
     # square(quad, 3, 1)
     # lz_circle(10, 1.0)
-    lz_straight_line(1.0)
+    # lz_straight_line(1.0)
 
     # side_to_side(quad, 4.0, 2.0)
     # square(quad, 4.0, 2.0)

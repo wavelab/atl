@@ -94,16 +94,16 @@ int Trajectory::update(Vec3 pos, Vec2 &wp_pos, Vec2 &wp_vel, Vec2 &q_pos) {
   }
 
   // std::cout << "pos: " << pos.transpose() << std::endl;
-  std::cout << "p0: " << this->p0.block(0, 0, 2, 1).transpose() << std::endl;
-  std::cout << "q_pos: " << q_pos.transpose() << std::endl;
+  // std::cout << "p0: " << this->p0.block(0, 0, 2, 1).transpose() << std::endl;
+  // std::cout << "q_pos: " << q_pos.transpose() << std::endl;
   // std::cout << "wp_start: " << wp_pos_start.transpose() << std::endl;
   // std::cout << "wp_end: " << wp_pos_end.transpose() << std::endl;
   // std::cout << "wp_last: " << wp_pos_last.transpose() << std::endl;
   // std::cout << "wp_vel: " << wp_vel.transpose() << std::endl;
-  std::cout << "wp: " << wp_pos.transpose() << std::endl;
-  std::cout << "target_bf: " << this->target_bf.at(0).transpose() << std::endl;
+  // std::cout << "wp: " << wp_pos.transpose() << std::endl;
+  // std::cout << "target_bf: " << this->target_bf.at(0).transpose() << std::endl;
   // std::cout << "waypoints: " << this->pos.size() << std::endl;
-  std::cout << std::endl;
+  // std::cout << std::endl;
 
   return 0;
 }
@@ -518,7 +518,6 @@ AttitudeCommand LandingController::calculate(Vec3 target_pos_bf,
   retval = this->trajectory.update(pos, wp_pos, wp_vel, q_pos);
 
   // calculate position and velocity errors
-  // perrors(0) = wp_pos(0) - q_pos(0);
   perrors(0) = this->trajectory.target_bf.at(0)(0) + target_pos_bf(0);
   perrors(1) = target_pos_bf(1);
   perrors(2) = wp_pos(1) - q_pos(1);

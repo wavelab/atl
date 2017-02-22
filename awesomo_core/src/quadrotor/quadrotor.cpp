@@ -24,7 +24,7 @@ Quadrotor::Quadrotor(void) {
   this->landing_tic = (struct timespec){0};
 
   this->current_mode = DISCOVER_MODE;
-  this->heading = 0.0;
+  this->yaw = 0.0;
   this->pose = Pose();
   this->hover_position << 0.0, 0.0, 0.0;
   this->landing_target = LandingTarget();
@@ -122,16 +122,14 @@ int Quadrotor::setVelocity(Vec3 velocity) {
   return 0;
 }
 
-int Quadrotor::setHeading(double heading) {
+int Quadrotor::setYaw(double yaw) {
   // pre-check
   if (this->configured == false) {
     return -1;
-  } else if (this->current_mode == LANDING_MODE) {
-    return -2;
   }
 
-  // set pose
-  this->heading = heading;
+  // set yaw
+  this->yaw = yaw;
 
   return 0;
 }
@@ -223,7 +221,7 @@ int Quadrotor::stepHoverMode(double dt) {
   this->position_controller.calculate(
     this->hover_position,
     this->pose,
-    this->heading,
+    this->yaw,
     dt
   );
   // clang-format on
@@ -281,7 +279,7 @@ int Quadrotor::stepTrackingMode(double dt) {
     this->landing_target.velocity_bf,
     this->pose.position,
     this->hover_position,
-    this->heading,
+    this->yaw,
     dt
   );
 
@@ -336,7 +334,7 @@ int Quadrotor::stepLandingMode(double dt) {
     this->landing_target.velocity_bf,
     this->pose.position,
     this->hover_position,
-    this->heading,
+    this->yaw,
     dt
   );
 
@@ -364,6 +362,14 @@ int Quadrotor::stepLandingMode(double dt) {
     this->landing_tic = (struct timespec){0};
     this->hover_position(2) = this->recover_height;
   }
+
+  return 0;
+}
+
+int Quadrotor::reset(void) {
+  this->position_controller.reset();
+  this->tracking_controller.reset();
+  this->landing_controller.reset();
 
   return 0;
 }

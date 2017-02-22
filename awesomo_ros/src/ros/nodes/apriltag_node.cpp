@@ -30,7 +30,7 @@ int AprilTagNode::configure(const std::string &node_name, int hz) {
 
   // downward facing camera (gimbal is NWU frame)
   // NWU frame: (x - forward, y - left, z - up)
-  this->camera_offset = Pose(0.0, deg2rad(90.0), 0.0, 0.0, 0.0, 0.0);
+  this->camera_offset = Pose(0.0, deg2rad(90.0), 0.0, 0.2, 0.0, 0.0);
 
   return 0;
 }
