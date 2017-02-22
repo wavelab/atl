@@ -12,6 +12,7 @@ MITDetector::MITDetector(void) {
   this->prev_tag_image_height = 0;
 
   this->tag_configs.clear();
+  this->tag_sanity_check = FLT_MAX;
   this->camera_mode = "";
   this->camera_modes.clear();
   this->camera_configs.clear();
@@ -29,6 +30,7 @@ int MITDetector::configure(std::string config_file) {
   // load config
   parser.addParam<std::vector<int>>("tag_ids", &tag_ids);
   parser.addParam<std::vector<float>>("tag_sizes", &tag_sizes);
+  parser.addParam<double>("tag_sanity_check", &this->tag_sanity_check);
   parser.addParam<std::string>("camera_config", &camera_config);
   parser.addParam<bool>("illum_invar", &this->illum_invar);
   parser.addParam<bool>("imshow", &this->imshow);
@@ -179,6 +181,11 @@ int MITDetector::obtainPose(AprilTags::TagDetection tag, TagPose &tag_pose) {
   transform = tag.getRelativeTransform(tag_size, fx, fy, cx, cy);
   t = transform.col(3).head(3);
   R = transform.block(0, 0, 3, 3);
+
+  // sanity check - calculate euclidean distance between prev and current tag
+  if ((t - this->prev_tag.position).norm() > this->tag_sanity_check) {
+    return -1;
+  }
 
   // tag is in camera frame
   // camera frame:  (z - forward, x - right, y - down)

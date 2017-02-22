@@ -1,5 +1,7 @@
 tag_family: "Tag16h5"
 
+tag_sanity_check: 20  # euclidean distance in meters
+
 # normal black and white tag
 # tag_ids: [0]
 # tag_sizes: [0.951]

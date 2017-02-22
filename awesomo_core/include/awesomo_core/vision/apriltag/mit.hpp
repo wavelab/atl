@@ -32,6 +32,7 @@ public:
   int prev_tag_image_height;
 
   std::map<int, float> tag_configs;
+  double tag_sanity_check;
   std::string camera_mode;
   std::vector<std::string> camera_modes;
   std::map<std::string, CameraConfig> camera_configs;
@@ -40,9 +41,9 @@ public:
 
   MITDetector(void);
   int configure(std::string config_file);
-  int obtainPose(AprilTags::TagDetection tag, TagPose &tag_pose);
   int illuminationInvariantTransform(cv::Mat &image);
   int extractTags(cv::Mat &image, std::vector<TagPose> &tags);
+  int obtainPose(AprilTags::TagDetection tag, TagPose &tag_pose);
   int changeMode(cv::Mat &image);
   int maskImage(TagPose tag_pose, cv::Mat &image, double padding=0.2);
   void printTag(TagPose tag);
