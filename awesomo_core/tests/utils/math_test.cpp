@@ -4,6 +4,22 @@
 
 namespace awesomo {
 
+TEST(Utils_math, median) {
+  std::vector<double> v;
+
+  v.push_back(6);
+  v.push_back(3);
+  v.push_back(4);
+  v.push_back(1);
+  v.push_back(5);
+  v.push_back(8);
+
+  ASSERT_FLOAT_EQ(4.5, median(v));
+
+  v.push_back(9);
+  ASSERT_FLOAT_EQ(5.0, median(v));
+}
+
 TEST(Utils_math, deg2radAndrad2deg) {
   double d_deg;
   double d_rad;

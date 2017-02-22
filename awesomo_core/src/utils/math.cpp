@@ -22,6 +22,25 @@ int fltcmp(double f1, double f2) {
   }
 }
 
+double median(std::vector<double> v) {
+  double a, b;
+
+  // sort values
+  std::sort(v.begin(), v.end());
+
+  // obtain median
+  if (v.size() % 2 == 1) {
+    // return middle value
+    return v[v.size() / 2];
+
+  } else {
+    // grab middle two values and calc mean
+    a = v[v.size() / 2];
+    b = v[(v.size() / 2) - 1];
+    return (a + b) / 2.0;
+  }
+}
+
 double deg2rad(double d) {
   return d * (M_PI / 180);
 }

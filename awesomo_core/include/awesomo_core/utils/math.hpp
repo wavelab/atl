@@ -27,6 +27,7 @@ typedef Eigen::Quaterniond Quaternion;
 int randi(int ub, int lb);
 double randf(double ub, double lb);
 int fltcmp(double f1, double f2);
+double median(std::vector<double> v);
 double deg2rad(double d);
 double rad2deg(double r);
 void load_matrix(std::vector<double> x, int rows, int cols, MatX &y);

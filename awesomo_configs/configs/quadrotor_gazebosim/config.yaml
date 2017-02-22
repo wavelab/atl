@@ -6,5 +6,5 @@ auto_land: false
 auto_disarm: false
 
 target_lost_threshold: 1000.0
-min_discover_time: 1000.0
+min_discover_time: 2000.0
 min_tracking_time: 10000.0

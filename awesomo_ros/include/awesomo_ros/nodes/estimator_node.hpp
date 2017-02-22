@@ -49,6 +49,11 @@ public:
 
   Pose quad_pose;
   Vec3 quad_velocity;
+
+  std::vector<double> target_pos_x_init;
+  std::vector<double> target_pos_y_init;
+  std::vector<double> target_pos_z_init;
+
   bool target_detected;
   bool target_losted;
   Vec3 target_pos_bpf;
@@ -56,6 +61,7 @@ public:
   double target_yaw_wf;
   Vec3 target_pos_wf;
   Vec3 target_last_pos_wf;
+
   struct timespec target_last_updated;
   double target_lost_threshold;
 
@@ -91,8 +97,10 @@ public:
   void publishGimbalSetpointAttitudeMsg(Vec3 setpoints);
   void publishQuadYawMsg(void);
   void trackTarget(void);
+  void reset(void);
   int estimateKF(double dt);
   int estimateEKF(double dt);
+  int estimate(void);
   int loopCallback(void);
 };
 

@@ -70,6 +70,7 @@ public:
   int mode;
   int nb_states;
   int nb_dimensions;
+  double sanity_dist;
   std::string config_file;
 
   VecX mu;
@@ -92,6 +93,7 @@ public:
   int initialize(VecX mu);
   int checkDimensions(void);
   int reset(VecX mu);
+  int sanityCheck(Vec3 prev_pos, Vec3 curr_pos);
   int estimate(MatX A, VecX y);
 };
 

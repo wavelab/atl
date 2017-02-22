@@ -38,7 +38,6 @@ void buildMsg(int seq,
               ros::Time time,
               Pose pose,
               geometry_msgs::PoseStamped &msg) {
-
   msg.header.seq = seq;
   msg.header.stamp = time;
   msg.header.frame_id = "awesomo_quadrotor_pose";

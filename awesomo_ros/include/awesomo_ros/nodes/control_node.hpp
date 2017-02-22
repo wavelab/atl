@@ -53,6 +53,7 @@ namespace awesomo {
 #define DJI_VELOCITY_TOPIC "/dji_sdk/velocity"
 #define DJI_RADIO_TOPIC "/dji_sdk/rc_channels"
 
+#define ARM_TOPIC "/awesomo/control/arm"
 #define MODE_TOPIC "/awesomo/control/mode"
 #define YAW_TOPIC "/awesomo/control/yaw/set"
 #define TARGET_BODY_POSITION_TOPIC "/awesomo/estimate/landing_target/position/body"
@@ -114,6 +115,7 @@ public:
   void djiAttitudeCallback(const dji_sdk::AttitudeQuaternion &msg);
   void djiVelocityCallback(const dji_sdk::Velocity &msg);
   void djiRadioCallback(const dji_sdk::RCChannels &msg);
+  void armCallback(const std_msgs::Bool &msg);
   void modeCallback(const std_msgs::String &msg);
   void yawCallback(const std_msgs::Float64 &msg);
   void targetPositionCallback(const geometry_msgs::Vector3 &msg);

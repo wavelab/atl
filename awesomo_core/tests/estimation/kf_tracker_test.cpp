@@ -46,6 +46,25 @@ static void recordTimeStep(std::ofstream &output_file,
   output_file << est(2) << std::endl;
 }
 
+TEST(KalmanFilterTracker, sanityCheck) {
+  int retval;
+  KalmanFilterTracker tracker;
+  Vec3 prev_pos, curr_pos;
+
+  tracker.configure(TEST_CONFIG);
+  tracker.initialized = true;
+
+  prev_pos << 0, 0, 0;
+  curr_pos << 0, 0, 5;
+  retval = tracker.sanityCheck(prev_pos, curr_pos);
+  ASSERT_EQ(0, retval);
+
+  prev_pos << 0, 0, 0;
+  curr_pos << 10, 20, 30;
+  retval = tracker.sanityCheck(prev_pos, curr_pos);
+  ASSERT_EQ(-2, retval);
+}
+
 TEST(KalmanFilterTracker, estimate) {
   float dt;
   KalmanFilterTracker tracker;

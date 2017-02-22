@@ -5,6 +5,7 @@ from math import pi
 import rospy
 from std_msgs.msg import Float64
 from std_msgs.msg import String
+from std_msgs.msg import Bool
 from geometry_msgs.msg import Vector3
 from geometry_msgs.msg import PoseStamped
 from awesomo_msgs.msg import PCtrlSettings
@@ -96,6 +97,7 @@ class Gimbal(ROSNode):
 class Quadrotor(ROSNode):
     def __init__(self):
         super(Quadrotor, self).__init__()
+        self.arm_topic = "/awesomo/control/arm"
         self.mode_topic = "/awesomo/control/mode"
         self.heading_topic = "/awesomo/control/heading/set"
         self.hover_point_topic = "/awesomo/control/hover/set"
@@ -104,6 +106,7 @@ class Quadrotor(ROSNode):
         self.tctrl_set_topic = "/awesomo/control/tracking_controller/set"
         self.lctrl_set_topic = "/awesomo/control/landing_controller/set"
 
+        self.register_publisher(self.arm_topic, Bool)
         self.register_publisher(self.mode_topic, String)
         self.register_publisher(self.heading_topic, Float64)
         self.register_publisher(self.hover_point_topic, Vector3)
@@ -111,6 +114,11 @@ class Quadrotor(ROSNode):
         self.register_publisher(self.pctrl_set_topic, PCtrlSettings)
         self.register_publisher(self.tctrl_set_topic, TCtrlSettings)
         self.register_publisher(self.lctrl_set_topic, LCtrlSettings)
+
+    def set_arm(self, arm):
+        msg = Bool()
+        msg.data = arm
+        self.pubs[self.arm_topic].publish(msg)
 
     def set_mode(self, mode):
         msg = String()
@@ -331,12 +339,13 @@ if __name__ == "__main__":
     mavros = MAVROS()
     rospy.sleep(0.5)
 
-    # quad.set_hover_point([0.0, 0.0, 2.0])
+    quad.set_arm(True)
+    # quad.set_mode("TRACKING")
+    # quad.set_hover_point([0.0, 0.0, 5.0])
     # quad.set_yaw(-20)
-    # quad.set_mode("HOVER")
 
     # square(quad, 3, 1)
-    lz_circle(2, 1.0)
+    # lz_circle(2, 1.0)
     # lz_straight_line(1.0)
 
     # side_to_side(quad, 4.0, 2.0)

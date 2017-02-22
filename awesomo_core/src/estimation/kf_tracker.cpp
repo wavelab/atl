@@ -10,6 +10,7 @@ KalmanFilterTracker::KalmanFilterTracker(void) {
   this->mode = -1;
   this->nb_states = 0;
   this->nb_dimensions = 0;
+  this->sanity_dist = FLT_MAX;
   this->config_file = "";
 
   this->mu = VecX::Zero(1);
@@ -35,6 +36,7 @@ int KalmanFilterTracker::configure(std::string config_file) {
   // parse and load config file
   parser.addParam<int>("nb_states", &this->nb_states);
   parser.addParam<int>("nb_dimensions", &this->nb_dimensions);
+  parser.addParam<double>("sanity_dist", &this->sanity_dist);
   parser.addParam<MatX>("motion_noise_matrix", &this->R);
   parser.addParam<MatX>("measurement_matrix", &this->C);
   parser.addParam<MatX>("measurement_noise_matrix", &this->Q);
@@ -131,6 +133,23 @@ int KalmanFilterTracker::reset(VecX mu) {
     this->initialized = false;
     return -2;
   }
+}
+
+int KalmanFilterTracker::sanityCheck(Vec3 prev_pos, Vec3 curr_pos) {
+  double dist;
+
+  // pre-check
+  if (this->initialized == false) {
+    return -1;
+  }
+
+  // sanity check
+  dist = (prev_pos - curr_pos).norm();
+  if (dist > this->sanity_dist) {
+    return -2;
+  }
+
+  return 0;
 }
 
 int KalmanFilterTracker::estimate(MatX A, VecX y) {
