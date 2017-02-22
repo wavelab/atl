@@ -44,7 +44,7 @@ int ControlNode::configure(const std::string node_name, int hz) {
   // subscribers
   // clang-format off
   this->registerSubscriber(MODE_TOPIC, &ControlNode::modeCallback, this);
-  this->registerSubscriber(HEADING_TOPIC, &ControlNode::yawCallback, this);
+  this->registerSubscriber(YAW_TOPIC, &ControlNode::yawCallback, this);
   this->registerSubscriber(TARGET_BODY_POSITION_TOPIC, &ControlNode::targetPositionCallback, this);
   this->registerSubscriber(TARGET_BODY_VELOCITY_TOPIC, &ControlNode::targetVelocityCallback, this);
   this->registerSubscriber(TARGET_DETECTED_TOPIC, &ControlNode::targetDetectedCallback, this);
@@ -519,9 +519,9 @@ int ControlNode::loopCallback(void) {
   // pre-check
   if (this->armed == false && this->sim_mode == false) {
     this->quadrotor.reset();
+    this->setEstimatorOff();
     return 0;
   }
-    this->setEstimatorOff();
 
   // setup
   dt = (ros::Time::now() - this->ros_last_updated).toSec();

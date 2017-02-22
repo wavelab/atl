@@ -55,7 +55,7 @@ int EstimatorNode::configure(std::string node_name, int hz) {
   this->registerPublisher<geometry_msgs::Vector3>(LT_BODY_VELOCITY_TOPIC);
   this->registerPublisher<std_msgs::Bool>(LT_DETECTED_TOPIC);
   this->registerPublisher<geometry_msgs::Vector3>(GIMBAL_SETPOINT_ATTITUDE_TOPIC);
-  this->registerPublisher<std_msgs::Float64>(QUAD_HEADING_TOPIC);
+  this->registerPublisher<std_msgs::Float64>(QUAD_YAW_TOPIC);
   this->registerSubscriber(ESTIMATOR_ON_TOPIC, &EstimatorNode::onCallback, this);
   this->registerSubscriber(ESTIMATOR_OFF_TOPIC, &EstimatorNode::offCallback, this);
   this->registerSubscriber(QUAD_POSE_TOPIC, &EstimatorNode::quadPoseCallback, this);
@@ -288,7 +288,7 @@ void EstimatorNode::publishGimbalSetpointAttitudeMsg(Vec3 setpoints) {
   this->ros_pubs[GIMBAL_SETPOINT_ATTITUDE_TOPIC].publish(msg);
 }
 
-void EstimatorNode::publishQuadHeadingMsg(void) {
+void EstimatorNode::publishQuadYawMsg(void) {
   std_msgs::Float64 msg;
 
   // pre-check
@@ -297,11 +297,8 @@ void EstimatorNode::publishQuadHeadingMsg(void) {
   }
 
   // build and publish msg
-  switch (mode) {
-    case KF_MODE: buildMsg(this->target_yaw_wf, msg); break;
-    case EKF_MODE: buildMsg(this->target_yaw_wf, msg); break;
-  }
-  this->ros_pubs[QUAD_HEADING_TOPIC].publish(msg);
+  buildMsg(this->target_yaw_wf, msg);
+  this->ros_pubs[QUAD_YAW_TOPIC].publish(msg);
 }
 
 void EstimatorNode::trackTarget(void) {
@@ -315,7 +312,7 @@ void EstimatorNode::trackTarget(void) {
   setpoints(2) = 0.0;                                // yaw
 
   this->publishGimbalSetpointAttitudeMsg(setpoints);
-  this->publishQuadHeadingMsg();
+  this->publishQuadYawMsg();
 }
 
 int EstimatorNode::estimateKF(double dt) {

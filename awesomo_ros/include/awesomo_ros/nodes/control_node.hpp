@@ -54,7 +54,7 @@ namespace awesomo {
 #define DJI_RADIO_TOPIC "/dji_sdk/rc_channels"
 
 #define MODE_TOPIC "/awesomo/control/mode"
-#define HEADING_TOPIC "/awesomo/control/heading/set"
+#define YAW_TOPIC "/awesomo/control/yaw/set"
 #define TARGET_BODY_POSITION_TOPIC "/awesomo/estimate/landing_target/position/body"
 #define TARGET_BODY_VELOCITY_TOPIC "/awesomo/estimate/landing_target/velocity/body"
 #define TARGET_DETECTED_TOPIC "/awesomo/estimate/landing_target/detected"

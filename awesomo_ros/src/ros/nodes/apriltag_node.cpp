@@ -74,7 +74,7 @@ void AprilTagNode::publishTargetInertialYawMsg(TagPose tag,
   quat2euler(tag.orientation, 321, tag_euler);
 
   // build and publish msg
-  yaw_if = wrapTo180(gimbal_frame_euler(2) - tag_euler(2));
+  yaw_if = wrapTo180(rad2deg(gimbal_frame_euler(2) - tag_euler(2)));
   msg.data = deg2rad(yaw_if);
   this->ros_pubs[TARGET_IF_YAW_TOPIC].publish(msg);
 }

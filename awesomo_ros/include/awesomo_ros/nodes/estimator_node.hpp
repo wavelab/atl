@@ -27,7 +27,7 @@ namespace awesomo {
 #define LT_BODY_VELOCITY_TOPIC "/awesomo/estimate/landing_target/velocity/body"
 #define LT_DETECTED_TOPIC "/awesomo/estimate/landing_target/detected"
 #define GIMBAL_SETPOINT_ATTITUDE_TOPIC "/awesomo/gimbal/setpoint/attitude"
-#define QUAD_HEADING_TOPIC "/awesomo/control/heading/set"
+#define QUAD_YAW_TOPIC "/awesomo/control/yaw/set"
 
 // SUBSCRIBE TOPICS
 #define QUAD_POSE_TOPIC "/awesomo/quadrotor/pose/local"
@@ -89,7 +89,7 @@ public:
   void publishLTKFBodyVelocityEstimate(void);
   void publishLTDetected(void);
   void publishGimbalSetpointAttitudeMsg(Vec3 setpoints);
-  void publishQuadHeadingMsg(void);
+  void publishQuadYawMsg(void);
   void trackTarget(void);
   int estimateKF(double dt);
   int estimateEKF(double dt);
