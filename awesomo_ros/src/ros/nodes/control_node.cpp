@@ -43,6 +43,7 @@ int ControlNode::configure(const std::string node_name, int hz) {
 
   // subscribers
   // clang-format off
+  this->registerSubscriber(ARM_TOPIC, &ControlNode::armCallback, this);
   this->registerSubscriber(MODE_TOPIC, &ControlNode::modeCallback, this);
   this->registerSubscriber(YAW_TOPIC, &ControlNode::yawCallback, this);
   this->registerSubscriber(TARGET_BODY_POSITION_TOPIC, &ControlNode::targetPositionCallback, this);
@@ -347,6 +348,26 @@ void ControlNode::djiRadioCallback(const dji_sdk::RCChannels &msg) {
   }
 }
 
+void ControlNode::armCallback(const std_msgs::Bool &msg) {
+  if (msg.data == true) {
+    this->armed = true;
+    this->setEstimatorOn();
+
+    if (this->fcu_type == "DJI" && this->sim_mode == false) {
+      this->djiOffboardModeOn();
+    }
+
+  } else {
+    this->armed = false;
+    this->setEstimatorOff();
+
+    if (this->fcu_type == "DJI" && this->sim_mode == false) {
+      this->djiOffboardModeOff();
+    }
+
+  }
+}
+
 void ControlNode::modeCallback(const std_msgs::String &msg) {
   std::string mode;
 
@@ -518,19 +539,20 @@ void ControlNode::publishPX4DummyMsg(void) {
 int ControlNode::loopCallback(void) {
   double dt;
 
+  // publish pose and velocity
+  this->publishQuadrotorPose();
+  this->publishQuadrotorVelocity();
+
   // pre-check
   if (this->armed == false) {
     this->quadrotor.reset();
     this->setEstimatorOff();
     return 0;
   }
+  this->setEstimatorOn();
 
   // setup
   dt = (ros::Time::now() - this->ros_last_updated).toSec();
-
-  // publish pose and velocity
-  this->publishQuadrotorPose();
-  this->publishQuadrotorVelocity();
 
   // step
   if (this->quadrotor.step(dt) != 0) {

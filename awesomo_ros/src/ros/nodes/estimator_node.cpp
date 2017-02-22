@@ -155,6 +155,11 @@ void EstimatorNode::offCallback(const std_msgs::Bool &msg) {
 }
 
 void EstimatorNode::targetInertialPosCallback(const geometry_msgs::Vector3 &msg) {
+  // pre-check
+  if (this->state == ESTIMATOR_OFF) {
+    return;
+  }
+
   // update target
   this->target_detected = true;
   this->target_losted = false;
@@ -162,9 +167,31 @@ void EstimatorNode::targetInertialPosCallback(const geometry_msgs::Vector3 &msg)
   tic(&this->target_last_updated);
 
   // initialize estimator
-  if (this->initialized == false) {
+  if (this->initialized == false && this->target_pos_x_init.size() == 30) {
+    // calculate target position median in x, y, z
+    // assuming quadrotor has not moved much
+    this->target_pos_wf(0) = median(this->target_pos_x_init);
+    this->target_pos_wf(1) = median(this->target_pos_y_init);
+    this->target_pos_wf(2) = median(this->target_pos_z_init);
+
     this->initLTKF(this->target_pos_wf);
+
+    this->target_pos_x_init.clear();
+    this->target_pos_y_init.clear();
+    this->target_pos_z_init.clear();
+
+  // observe target position
+  } else if (this->initialized == false && this->target_pos_x_init.size() < 30) {
+    this->target_pos_x_init.push_back(this->target_pos_wf(0));
+    this->target_pos_y_init.push_back(this->target_pos_wf(1));
+    this->target_pos_z_init.push_back(this->target_pos_wf(2));
+
+    log_info("Observed target position: %.2f, %.2f, %.2f", this->target_pos_wf(0),
+                                                           this->target_pos_wf(1),
+                                                           this->target_pos_wf(2));
+
   }
+
 }
 
 void EstimatorNode::targetInertialYawCallback(const std_msgs::Float64 &msg) {
@@ -309,18 +336,35 @@ void EstimatorNode::trackTarget(void) {
   dist = this->target_pos_bpf.norm();
   setpoints(0) = asin(this->target_pos_bpf(1) / dist);   // roll
   setpoints(1) = -asin(this->target_pos_bpf(0) / dist);  // pitch
-  setpoints(2) = 0.0;                                // yaw
+  setpoints(2) = 0.0;                                    // yaw
 
   this->publishGimbalSetpointAttitudeMsg(setpoints);
   this->publishQuadYawMsg();
 }
 
+void EstimatorNode::reset(void) {
+  Vec3 setpoints;
+
+  // reset estimator
+  this->initialized = false;
+  this->target_losted = true;
+  this->target_detected = false;
+  this->target_pos_wf << 0.0, 0.0, 0.0;
+
+  // reset gimbal
+  setpoints << 0, 0, 0;
+  this->publishGimbalSetpointAttitudeMsg(setpoints);
+}
+
 int EstimatorNode::estimateKF(double dt) {
   MatX A(9, 9), C(3, 9);
-  Vec3 y;
+  Vec3 y, prev_pos, curr_pos;
 
   // transition matrix - constant acceleration
   MATRIX_A_CONSTANT_ACCELERATION_XYZ(A);
+
+  // setup
+  prev_pos = this->target_last_pos_wf;
 
   // check measurement
   if (this->target_detected) {
@@ -345,6 +389,12 @@ int EstimatorNode::estimateKF(double dt) {
   // estimate
   this->kf_tracker.C = C;
   this->kf_tracker.estimate(A, y);
+
+  // sanity check estimates
+  curr_pos = this->kf_tracker.mu.block(0, 0, 3, 1);
+  if (this->kf_tracker.sanityCheck(prev_pos, curr_pos) == -2) {
+    return -1;
+  }
 
   return 0;
 }
@@ -381,12 +431,20 @@ int EstimatorNode::estimateEKF(double dt) {
   return 0;
 }
 
-int EstimatorNode::loopCallback(void) {
+int EstimatorNode::estimate(void) {
   double dt;
+  int retval;
 
   // pre-check
   if (this->initialized == false) {
     return 0;
+  }
+
+  // check if target is losted
+  if (mtoc(&this->target_last_updated) > this->target_lost_threshold) {
+    log_info("Target lost, resetting estimator!");
+    this->reset();
+    return -1;
   }
 
   // setup
@@ -394,24 +452,28 @@ int EstimatorNode::loopCallback(void) {
 
   // estimate
   switch (this->mode) {
-    case KF_MODE: this->estimateKF(dt); break;
-    case EKF_MODE: this->estimateEKF(dt); break;
+    case KF_MODE: retval = this->estimateKF(dt); break;
+    case EKF_MODE: retval = this->estimateEKF(dt); break;
   }
 
-  // check if target is losted
-  if (mtoc(&this->target_last_updated) > this->target_lost_threshold) {
-    log_info("Target lost, resetting estimator!");
-    this->initialized = false;
-    this->target_losted = true;
-
-    // reset gimbal
-    Vec3 setpoints;
-    setpoints << 0, 0, 0;
-    this->publishGimbalSetpointAttitudeMsg(setpoints);
+  // sanity check target estimates
+  if (retval != 0) {
+    log_info("Bad estimates, resetting estimator!");
+    this->reset();
+    return -2;
   }
 
-  // publish
-  if (this->initialized) {
+  return 0;
+}
+
+int EstimatorNode::loopCallback(void) {
+  // pre-check
+  if (this->initialized == false) {
+    return 0;
+  }
+
+  // estimate and publish
+  if (this->initialized && this->estimate() == 0) {
     this->publishLTKFInertialPositionEstimate();
     this->publishLTKFInertialVelocityEstimate();
     this->publishLTKFBodyPositionEstimate();

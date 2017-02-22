@@ -1,5 +1,6 @@
 nb_states: 9
 nb_dimensions: 3
+sanity_dist: 100
 
 motion_noise_matrix:
     rows: 9
@@ -15,8 +16,6 @@ motion_noise_matrix:
         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0,
         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0
    ]
-
-# x, y ,z , vx, vy, vz, ax, ay, az
 
 measurement_matrix:
     rows: 3
