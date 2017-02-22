@@ -332,7 +332,8 @@ if __name__ == "__main__":
     rospy.sleep(0.5)
 
     # quad.set_hover_point([0.0, 0.0, 2.0])
-    quad.set_yaw(0)
+    quad.set_yaw(-20)
+    # quad.set_mode("HOVER")
 
     # square(quad, 3, 1)
     # lz_circle(10, 1.0)

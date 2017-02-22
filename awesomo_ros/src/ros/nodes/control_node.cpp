@@ -519,9 +519,9 @@ int ControlNode::loopCallback(void) {
   // pre-check
   if (this->armed == false && this->sim_mode == false) {
     this->quadrotor.reset();
-    this->setEstimatorOff();
     return 0;
   }
+    this->setEstimatorOff();
 
   // setup
   dt = (ros::Time::now() - this->ros_last_updated).toSec();
