@@ -335,12 +335,14 @@ void ControlNode::djiRadioCallback(const dji_sdk::RCChannels &msg) {
     if (msg.gear < 0) {
       this->armed = false;
       this->djiOffboardModeOff();
+      this->setEstimatorOff();
     }
   } else {
     if (msg.gear > 0) {
       this->armed = true;
       this->quadrotor.setMode(DISCOVER_MODE);
       this->djiOffboardModeOn();
+      this->setEstimatorOn();
     }
   }
 }
@@ -517,7 +519,7 @@ int ControlNode::loopCallback(void) {
   double dt;
 
   // pre-check
-  if (this->armed == false && this->sim_mode == false) {
+  if (this->armed == false) {
     this->quadrotor.reset();
     this->setEstimatorOff();
     return 0;
