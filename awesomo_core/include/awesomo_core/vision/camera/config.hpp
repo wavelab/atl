@@ -20,6 +20,7 @@ public:
   int image_width;
   int image_height;
 
+  float shutter_speed;
   float exposure_value;
   float gain_value;
   Vec3 lambda;

@@ -1,31 +1,31 @@
 roll_controller:
-    k_p: 0.1
+    k_p: 0.05
     k_i: 0.0
-    k_d: 0.0
+    k_d: 0.01
 
 pitch_controller:
-    k_p: 0.1
+    k_p: 0.05
     k_i: 0.0
-    k_d: 0.0
+    k_d: 0.01
 
 throttle_controller:
     hover_throttle: 0.4
-    k_p: 0.35
+    k_p: 0.1
     k_i: 0.0
-    k_d: 0.1
+    k_d: 0.05
 
 vx_controller:
-    k_p: 0.1
+    k_p: 0.0
     k_i: 0.0
     k_d: 0.0
 
 vy_controller:
-    k_p: 0.1
+    k_p: 0.0
     k_i: 0.0
     k_d: 0.0
 
 vz_controller:
-    k_p: 0.1
+    k_p: 0.0
     k_i: 0.0
     k_d: 0.0
 
