@@ -180,6 +180,7 @@ void EstimatorNode::targetBodyPosCallback(const geometry_msgs::Vector3 &msg) {
   convertMsg(msg, this->target_measured);
   tic(&this->target_last_updated);
 
+
   // initialize estimator
   if (this->initialized == false) {
     this->initLTKF(this->target_measured);
