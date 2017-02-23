@@ -81,6 +81,7 @@ public:
   AttitudeCommand att_cmd;
 
   TrajectoryIndex traj_index;
+  Vec3 trajectory_threshold;
   Trajectory trajectory;
 
   bool blackbox_enable;
@@ -101,16 +102,13 @@ public:
              double dt);
   Vec4 calculatePositionErrors(Vec3 errors, double yaw, double dt);
   Vec4 calculateVelocityErrors(Vec3 errors, double yaw, double dt);
-  AttitudeCommand calculate(Vec3 pos_errors,
-                            Vec3 vel_errors,
-                            double yaw,
-                            double dt);
-  AttitudeCommand calculate(Vec3 target_pos_bf,
-                            Vec3 target_vel_bf,
-                            Vec3 pos,
-                            Vec3 pos_prev,
-                            double yaw,
-                            double dt);
+  int calculate(Vec3 pos_errors, Vec3 vel_errors, double yaw, double dt);
+  int calculate(Vec3 target_pos_bf,
+                Vec3 target_vel_bf,
+                Vec3 pos,
+                Vec3 pos_prev,
+                double yaw,
+                double dt);
   void reset(void);
   void printOutputs(void);
   void printErrors(void);

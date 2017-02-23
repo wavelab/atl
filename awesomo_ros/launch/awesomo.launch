@@ -5,6 +5,7 @@
   <param name="debug_mode" value="false" />
   <param name="quad_frame" value="NED" />
   <param name="fcu_type" value="DJI" />
+  <param name="estimate_frame" value="BODY" />
 
   <!-- dji sdk -->
   <node pkg="dji_sdk" type="dji_sdk_node" name="dji_sdk" output="screen">

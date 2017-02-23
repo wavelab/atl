@@ -229,6 +229,7 @@ LandingController::LandingController(void) {
   this->att_cmd = AttitudeCommand();
 
   this->traj_index;
+  this->trajectory_threshold << 1.0, 1.0, 1.0;
   this->trajectory;
 
   this->blackbox_enable = false;
@@ -237,7 +238,7 @@ LandingController::LandingController(void) {
 }
 
 LandingController::~LandingController(void) {
-  if (this->blackbox) {
+  if (this->blackbox_enable && this->blackbox) {
     this->blackbox.close();
   }
 }
@@ -285,7 +286,11 @@ int LandingController::configure(std::string config_file) {
   parser.addParam<double>("throttle_limit.max", &this->throttle_limit[1]);
 
   parser.addParam<std::string>("trajectory_index", &traj_index_file);
-  parser.addParam<std::string>("blackbox_file", &blackbox_file);
+  parser.addParam<Vec3>("trajectory_threshold", &this->trajectory_threshold);
+
+  parser.addParam<bool>("blackbox_enable", &this->blackbox_enable);
+  parser.addParam<double>("blackbox_rate", &this->blackbox_rate, true);
+  parser.addParam<std::string>("blackbox_file", &blackbox_file, true);
   // clang-format on
   if (parser.load(config_file) != 0) {
     return -1;
@@ -299,9 +304,19 @@ int LandingController::configure(std::string config_file) {
   }
 
   // prepare blackbox file
-  if (this->prepBlackbox(blackbox_file) != 0) {
-    log_err("Failed to open blackbox file at [%s]", blackbox_file.c_str());
-    return -3;
+  if (this->blackbox_enable) {
+    if (blackbox_file == "") {
+      log_err("blackbox file is not set!");
+      return -3;
+    } else if (this->prepBlackbox(blackbox_file) != 0) {
+      log_err("Failed to open blackbox file at [%s]", blackbox_file.c_str());
+      return -3;
+    }
+
+    if (this->blackbox_rate == FLT_MAX) {
+      log_err("blackbox rate is not set!");
+      return -3;
+    }
   }
 
   // convert roll and pitch limits from degrees to radians
@@ -489,24 +504,24 @@ Vec4 LandingController::calculateVelocityErrors(Vec3 errors,
   return this->vctrl_outputs;
 }
 
-AttitudeCommand LandingController::calculate(Vec3 pos_errors,
-                                             Vec3 vel_errors,
-                                             double yaw,
-                                             double dt) {
+int LandingController::calculate(Vec3 pos_errors,
+                                 Vec3 vel_errors,
+                                 double yaw,
+                                 double dt) {
   this->calculatePositionErrors(pos_errors, yaw, dt);
   this->calculateVelocityErrors(vel_errors, yaw, dt);
   this->att_cmd = AttitudeCommand(this->pctrl_outputs + this->vctrl_outputs);
-  return this->att_cmd;
+  return 0;
 }
 
-AttitudeCommand LandingController::calculate(Vec3 target_pos_bf,
-                                             Vec3 target_vel_bf,
-                                             Vec3 pos,
-                                             Vec3 pos_prev,
-                                             double yaw,
-                                             double dt) {
+int LandingController::calculate(Vec3 target_pos_bf,
+                                 Vec3 target_vel_bf,
+                                 Vec3 pos,
+                                 Vec3 pos_prev,
+                                 double yaw,
+                                 double dt) {
   int retval;
-  Vec3 vel, perrors, verrors;
+  Vec3 vel, p_errors, v_errors;
   Vec2 wp_pos, wp_pos_last, wp_vel, q_pos;
 
   // calculate velocity
@@ -517,20 +532,30 @@ AttitudeCommand LandingController::calculate(Vec3 target_pos_bf,
   // obtain position and velocity waypoints
   retval = this->trajectory.update(pos, wp_pos, wp_vel, q_pos);
 
-  // calculate position and velocity errors
-  perrors(0) = this->trajectory.target_bf.at(0)(0) + target_pos_bf(0);
-  perrors(1) = target_pos_bf(1);
-  perrors(2) = wp_pos(1) - q_pos(1);
+  // calculate position errors
+  p_errors(0) = this->trajectory.target_bf.at(0)(0) + target_pos_bf(0);
+  p_errors(1) = target_pos_bf(1);
+  p_errors(2) = wp_pos(1) - q_pos(1);
 
-  verrors(0) = wp_vel(0) - (vel.block(0, 0, 2, 1).norm());
-  verrors(1) = target_vel_bf(1);
-  verrors(2) = wp_vel(1) - vel(2);
+  // calculate velocity errors
+  v_errors(0) = wp_vel(0) - (vel.block(0, 0, 2, 1).norm());
+  v_errors(1) = target_vel_bf(1);
+  v_errors(2) = wp_vel(1) - vel(2);
 
   // calculate control outputs and record
-  this->calculate(perrors, verrors, yaw, dt);
+  this->calculate(p_errors, v_errors, yaw, dt);
   this->record(pos, vel, wp_pos, wp_vel, target_pos_bf, target_vel_bf, dt);
 
-  return this->att_cmd;
+  // check if we are too far off track with trajectory
+  if (p_errors(0) > this->trajectory_threshold(0)) {
+    return -1;
+  } else if (p_errors(1) > this->trajectory_threshold(1)) {
+    return -1;
+  } else if (p_errors(2) > this->trajectory_threshold(2)) {
+    return -1;
+  }
+
+  return 0;
 }
 
 void LandingController::reset(void) {

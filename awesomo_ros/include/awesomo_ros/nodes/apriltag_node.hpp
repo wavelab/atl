@@ -21,8 +21,8 @@ namespace awesomo {
 // PUBLISH TOPICS
 #define TARGET_POSE_TOPIC "/awesomo/apriltag/target"
 #define TARGET_IF_POS_TOPIC "/awesomo/apriltag/target/position/inertial"
-#define TARGET_BPF_POS_TOPIC "/awesomo/apriltag/target/position/body"
 #define TARGET_IF_YAW_TOPIC "/awesomo/apriltag/target/yaw/inertial"
+#define TARGET_BPF_POS_TOPIC "/awesomo/apriltag/target/position/body"
 #define TARGET_BPF_YAW_TOPIC "/awesomo/apriltag/target/yaw/body"
 
 // SUBSCRIBE TOPICS
@@ -40,8 +40,8 @@ public:
   void publishTargetInertialPositionMsg(Vec3 gimbal_position,
                                         Quaternion gimbal_orientation,
                                         Vec3 target_bf);
-  void publishTargetBodyPositionMsg(Vec3 target_bf);
   void publishTargetInertialYawMsg(TagPose tag, Quaternion gimbal_frame);
+  void publishTargetBodyPositionMsg(Vec3 target_bpf);
   void publishTargetBodyYawMsg(TagPose tag);
   void imageCallback(const sensor_msgs::ImageConstPtr &msg);
 };

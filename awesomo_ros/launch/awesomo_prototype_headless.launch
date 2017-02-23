@@ -2,6 +2,7 @@
 <launch>
   <!-- sync gazebo time with ros -->
   <param name="use_sim_time" value="true" />
+  <param name="estimate_frame" value="INERTIAL" />
 
   <!-- prototype -->
   <param name="sim_mode" value="true" />
