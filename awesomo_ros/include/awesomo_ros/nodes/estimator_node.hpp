@@ -42,6 +42,7 @@ public:
   int mode;
   int state;
   bool initialized;
+  std::string estimate_frame;
 
   std::string quad_frame;
   KalmanFilterTracker kf_tracker;

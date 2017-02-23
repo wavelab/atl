@@ -20,6 +20,7 @@ int EstimatorNode::configure(std::string node_name, int hz) {
   // estimator
   ROS_GET_PARAM("/tracker_mode", this->mode);
   ROS_GET_PARAM("/quad_frame", this->quad_frame);
+  ROS_GET_PARAM("/estimate_frame", this->estimate_frame);
   this->initialized = false;
   this->state = ESTIMATOR_OFF;
 

@@ -12,6 +12,7 @@ int AprilTagNode::configure(const std::string &node_name, int hz) {
 
   // detector
   ROS_GET_PARAM("/apriltag_config", apriltag_config);
+  ROS_GET_PARAM("/estimate_frame", this->estimate_frame);
   if (this->detector.configure(apriltag_config) != 0) {
     ROS_ERROR("Failed to configure AprilTag Detector!");
     return -2;
@@ -20,9 +21,11 @@ int AprilTagNode::configure(const std::string &node_name, int hz) {
   // subscribers and publishers
   // clang-format off
   this->registerPublisher<awesomo_msgs::AprilTagPose>(TARGET_POSE_TOPIC);
-  this->registerPublisher<geometry_msgs::Vector3>(TARGET_IF_POS_TOPIC);
+  if (this->estimate_frame == "INERTIAL") {
+    this->registerPublisher<geometry_msgs::Vector3>(TARGET_IF_POS_TOPIC);
+    this->registerPublisher<std_msgs::Float64>(TARGET_IF_YAW_TOPIC);
+  }
   this->registerPublisher<geometry_msgs::Vector3>(TARGET_BPF_POS_TOPIC);
-  this->registerPublisher<std_msgs::Float64>(TARGET_IF_YAW_TOPIC);
   this->registerPublisher<std_msgs::Float64>(TARGET_BPF_YAW_TOPIC);
   this->registerImageSubscriber(CAMERA_IMAGE_TOPIC, &AprilTagNode::imageCallback, this);
   this->registerShutdown(SHUTDOWN);
@@ -30,7 +33,7 @@ int AprilTagNode::configure(const std::string &node_name, int hz) {
 
   // downward facing camera (gimbal is NWU frame)
   // NWU frame: (x - forward, y - left, z - up)
-  this->camera_offset = Pose(0.0, deg2rad(90.0), 0.0, 0.2, 0.0, 0.0);
+  this->camera_offset = Pose(0.0, deg2rad(90.0), 0.0, 0.1, 0.0, 0.0);
 
   return 0;
 }
@@ -154,11 +157,13 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
 
   // publish tag pose
   this->publishTagPoseMsg(tags[0]);
-  this->publishTargetInertialPositionMsg(gimbal_position,
-                                         gimbal_frame,
-                                         target_bpf);
+  if (this->estimate_frame == "INERTIAL") {
+    this->publishTargetInertialPositionMsg(gimbal_position,
+                                           gimbal_frame,
+                                           target_bpf);
+    this->publishTargetInertialYawMsg(tags[0], gimbal_frame);
+  }
   this->publishTargetBodyPositionMsg(target_bpf);
-  this->publishTargetInertialYawMsg(tags[0], gimbal_frame);
   this->publishTargetBodyYawMsg(tags[0]);
 }
 

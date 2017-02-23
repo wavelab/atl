@@ -2,6 +2,7 @@
 <launch>
   <!-- configs -->
   <param name="debug_mode" value="true" />
+  <param name="estimate_frame" value="inertial" />
   <param name="apriltag_config" value="$(find awesomo_configs)/configs/apriltag/config.yaml" />
 
   <!-- node -->
