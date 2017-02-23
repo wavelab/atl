@@ -16,7 +16,7 @@ namespace awesomo {
 
 // NODE SETTINGS
 #define NODE_NAME "awesomo_gimbal"
-#define NODE_RATE 100
+#define NODE_RATE 20
 
 // PUBLISH TOPICS
 #define SBGC_IMU_TOPIC "/awesomo/sbgc/imu"
