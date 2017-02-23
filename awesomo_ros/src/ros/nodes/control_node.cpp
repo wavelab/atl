@@ -355,6 +355,7 @@ void ControlNode::armCallback(const std_msgs::Bool &msg) {
 
     if (this->fcu_type == "DJI" && this->sim_mode == false) {
       this->djiOffboardModeOn();
+      this->quadrotor.setMode(HOVER_MODE);
     }
 
   } else {

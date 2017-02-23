@@ -97,17 +97,17 @@ if __name__ == "__main__":
     rospy.sleep(0.5)
 
     quad.set_arm(True)
-    quad.set_hover_point([0.0, 0.0, 5.0])
+    # quad.set_hover_point([0.0, 0.0, 5.0])
 
     # quad.set_hover_point([0.0, 0.0, 5.0])
 
-    sleep(5)
-    # quad.set_mode("TRACKING")
+    # sleep(5)
+    # quad.set_mode("HOVER")
     # quad.set_hover_point([0.0, 0.0, 5.0])
     # quad.set_yaw(-20)
 
     # square(quad, 3, 1)
-    lz_circle(10, 1.0)
+    # lz_circle(10, 1.0)
     # lz_straight_line(1.0)
     # lz.set_position([0, 0, 0])
 

@@ -2,6 +2,7 @@
 rosbag record \
     /awesomo/quadrotor/pose/local \
     /awesomo/quadrotor/velocity/local \
+    /awesomo/imu \
     /awesomo/apriltag/target \
     /awesomo/apriltag/target/position/inertial \
     /awesomo/apriltag/target/position/body \
