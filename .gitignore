@@ -26,4 +26,4 @@ octave-workspace
 # misc
 .ropeproject
 
-
+*.pyc

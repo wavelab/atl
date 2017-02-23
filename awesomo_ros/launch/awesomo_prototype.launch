@@ -8,6 +8,7 @@
   <param name="debug_mode" value="false" />
   <param name="quad_frame" value="NED" />
   <param name="fcu_type" value="DJI" />
+  <param name="estimate_frame" value="BODY" />
 
   <!-- prototype -->
   <param name="gimbal_mode" value="true" />
