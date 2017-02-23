@@ -33,7 +33,6 @@ class AprilTagNode : public ROSNode {
 public:
   MITDetector detector;
   Pose camera_offset;
-  std::string estimate_frame;
 
   AprilTagNode(int argc, char **argv) : ROSNode(argc, argv) {}
   int configure(const std::string &node_name, int hz);

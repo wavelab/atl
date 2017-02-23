@@ -12,7 +12,6 @@ int AprilTagNode::configure(const std::string &node_name, int hz) {
 
   // detector
   ROS_GET_PARAM("/apriltag_config", apriltag_config);
-  ROS_GET_PARAM("/estimate_frame", this->estimate_frame);
   if (this->detector.configure(apriltag_config) != 0) {
     ROS_ERROR("Failed to configure AprilTag Detector!");
     return -2;
@@ -21,10 +20,8 @@ int AprilTagNode::configure(const std::string &node_name, int hz) {
   // subscribers and publishers
   // clang-format off
   this->registerPublisher<awesomo_msgs::AprilTagPose>(TARGET_POSE_TOPIC);
-  if (this->estimate_frame == "INERTIAL") {
-    this->registerPublisher<geometry_msgs::Vector3>(TARGET_IF_POS_TOPIC);
-    this->registerPublisher<std_msgs::Float64>(TARGET_IF_YAW_TOPIC);
-  }
+  this->registerPublisher<geometry_msgs::Vector3>(TARGET_IF_POS_TOPIC);
+  this->registerPublisher<std_msgs::Float64>(TARGET_IF_YAW_TOPIC);
   this->registerPublisher<geometry_msgs::Vector3>(TARGET_BPF_POS_TOPIC);
   this->registerPublisher<std_msgs::Float64>(TARGET_BPF_YAW_TOPIC);
   this->registerImageSubscriber(CAMERA_IMAGE_TOPIC, &AprilTagNode::imageCallback, this);
@@ -157,12 +154,10 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
 
   // publish tag pose
   this->publishTagPoseMsg(tags[0]);
-  if (this->estimate_frame == "INERTIAL") {
-    this->publishTargetInertialPositionMsg(gimbal_position,
-                                           gimbal_frame,
-                                           target_bpf);
-    this->publishTargetInertialYawMsg(tags[0], gimbal_frame);
-  }
+  this->publishTargetInertialPositionMsg(gimbal_position,
+                                          gimbal_frame,
+                                          target_bpf);
+  this->publishTargetInertialYawMsg(tags[0], gimbal_frame);
   this->publishTargetBodyPositionMsg(target_bpf);
   this->publishTargetBodyYawMsg(tags[0]);
 }
