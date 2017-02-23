@@ -96,13 +96,12 @@ if __name__ == "__main__":
     mavros = MAVROS()
     rospy.sleep(0.5)
 
+    quad.set_arm(True)
     quad.set_hover_point([0.0, 0.0, 5.0])
 
-    # quad.set_arm(True)
-=======
     # quad.set_hover_point([0.0, 0.0, 5.0])
 
-    sleep(2)
+    sleep(5)
     # quad.set_mode("TRACKING")
     # quad.set_hover_point([0.0, 0.0, 5.0])
     # quad.set_yaw(-20)

@@ -125,6 +125,7 @@ TEST(LandingController, constructor) {
 
   ASSERT_FLOAT_EQ(0.0, controller.pctrl_dt);
   ASSERT_FLOAT_EQ(0.0, controller.vctrl_dt);
+  ASSERT_FLOAT_EQ(0.0, controller.blackbox_dt);
 
   ASSERT_FLOAT_EQ(0.0, controller.x_controller.k_p);
   ASSERT_FLOAT_EQ(0.0, controller.x_controller.k_i);
@@ -174,6 +175,13 @@ TEST(LandingController, constructor) {
   ASSERT_FLOAT_EQ(0.0, controller.vctrl_outputs(1));
   ASSERT_FLOAT_EQ(0.0, controller.vctrl_outputs(2));
   ASSERT_FLOAT_EQ(0.0, controller.vctrl_outputs(3));
+
+  ASSERT_FLOAT_EQ(1.0, controller.trajectory_threshold(0));
+  ASSERT_FLOAT_EQ(1.0, controller.trajectory_threshold(1));
+  ASSERT_FLOAT_EQ(1.0, controller.trajectory_threshold(2));
+
+  ASSERT_FALSE(controller.blackbox_enable);
+  ASSERT_FLOAT_EQ(FLT_MAX, controller.blackbox_rate);
 }
 
 TEST(LandingController, configure) {
@@ -185,6 +193,7 @@ TEST(LandingController, configure) {
 
   ASSERT_FLOAT_EQ(0.0, controller.pctrl_dt);
   ASSERT_FLOAT_EQ(0.0, controller.vctrl_dt);
+  ASSERT_FLOAT_EQ(0.0, controller.blackbox_dt);
 
   ASSERT_FLOAT_EQ(0.1, controller.x_controller.k_p);
   ASSERT_FLOAT_EQ(0.2, controller.x_controller.k_i);
@@ -229,6 +238,13 @@ TEST(LandingController, configure) {
   ASSERT_FLOAT_EQ(0.0, controller.pctrl_outputs(1));
   ASSERT_FLOAT_EQ(0.0, controller.pctrl_outputs(2));
   ASSERT_FLOAT_EQ(0.0, controller.pctrl_outputs(3));
+
+  ASSERT_FLOAT_EQ(0.5, controller.trajectory_threshold(0));
+  ASSERT_FLOAT_EQ(0.5, controller.trajectory_threshold(1));
+  ASSERT_FLOAT_EQ(0.5, controller.trajectory_threshold(2));
+
+  ASSERT_TRUE(controller.blackbox_enable);
+  ASSERT_FLOAT_EQ(0.2, controller.blackbox_rate);
 }
 
 TEST(LandingController, loadTrajectory) {

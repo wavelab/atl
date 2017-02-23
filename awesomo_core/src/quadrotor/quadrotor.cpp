@@ -321,6 +321,7 @@ int Quadrotor::stepTrackingMode(double dt) {
 }
 
 int Quadrotor::stepLandingMode(double dt) {
+  int retval;
   bool conditions[3];
 
   // pre-check
@@ -329,7 +330,7 @@ int Quadrotor::stepLandingMode(double dt) {
   }
 
   // land on target
-  this->att_cmd = this->landing_controller.calculate(
+  retval = this->landing_controller.calculate(
     this->landing_target.position_bf,
     this->landing_target.velocity_bf,
     this->pose.position,
@@ -337,6 +338,7 @@ int Quadrotor::stepLandingMode(double dt) {
     this->yaw,
     dt
   );
+  this->att_cmd = this->landing_controller.att_cmd;
 
   // update hover position and tracking timer
   this->setHoverPosition(this->pose.position);
@@ -349,6 +351,7 @@ int Quadrotor::stepLandingMode(double dt) {
   conditions[1] = this->landing_target.losted == false;
   conditions[2] = this->landing_target.position_bf.norm() < 0.1;
 
+  // check conditions
   if (this->conditionsMet(conditions, 3) && this->auto_disarm) {
     // transition to disarm mode
     this->setMode(DISARM_MODE);
@@ -361,6 +364,15 @@ int Quadrotor::stepLandingMode(double dt) {
     this->setMode(DISCOVER_MODE);
     this->landing_tic = (struct timespec){0};
     this->hover_position(2) = this->recover_height;
+
+  } else if (retval != 0) {
+    // transition back to discovery mode
+    log_info("Failed to follow landing trajectory!");
+    log_info("Transitioning back to [DISCOVER_MODE]!");
+    this->setMode(DISCOVER_MODE);
+    this->landing_tic = (struct timespec){0};
+    this->hover_position(2) = this->recover_height;
+
   }
 
   return 0;
