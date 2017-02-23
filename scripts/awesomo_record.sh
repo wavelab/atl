@@ -3,6 +3,10 @@ rosbag record \
     /awesomo/quadrotor/pose/local \
     /awesomo/quadrotor/velocity/local \
     /awesomo/apriltag/target \
+    /awesomo/apriltag/target/position/inertial \
+    /awesomo/apriltag/target/position/body \
+    /awesomo/apriltag/target/yaw/inertial \
+    /awesomo/apriltag/target/yaw/body \
     /awesomo/gimbal/setpoint/attitude \
     /awesomo/gimbal/position/inertial \
     /awesomo/gimbal/frame/orientation/inertial \
@@ -15,4 +19,5 @@ rosbag record \
     /dji_sdk/local_position \
     /dji_sdk/global_position \
     /dji_sdk/attitude_quaternion \
+    /dji_sdk/compass \
     /dji_sdk/velocity

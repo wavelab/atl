@@ -378,13 +378,13 @@ int EstimatorNode::estimateKF(double dt) {
     // clang-format on
 
   } else {
-
     // clang-format off
     C << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
     // clang-format on
-    y << 0.0, 0.0, 0.0; // to prevent unitialized values from entering kf
+    y << 0.0, 0.0, 0.0;  // to prevent uninitialized values from entering kf
+
   }
 
   // estimate

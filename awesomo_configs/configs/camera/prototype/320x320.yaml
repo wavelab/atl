@@ -2,6 +2,7 @@ index: 0
 image_width: 320
 image_height: 320
 
+shutter_speed: 0
 exposure_value: 0.0
 gain_value: 0.0
 lambda: [0.0, 0.0, 0.0]
