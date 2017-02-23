@@ -6,6 +6,8 @@
   <param name="quad_frame" value="NED" />
   <param name="fcu_type" value="DJI" />
   <param name="estimate_frame" value="BODY" />
+  <param name="gimbal_imu" value="SBGC" />
+  <!-- <param name="gimbal_imu" value="HACK" /> -->
 
   <!-- dji sdk -->
   <node pkg="dji_sdk" type="dji_sdk_node" name="dji_sdk" output="screen">

@@ -262,7 +262,7 @@ TEST(Utils_math, target2bodyplanar) {
   target_pos_if << 2.0, 1.0, 0.0;
   body_pos_if << 1.0, 2.0, 0.0;
 
-  // TEST EULER VERSION OF target2body()
+  // TEST EULER VERSION OF target2bodyplanar()
   // test 0 degree
   euler << 0.0, 0.0, deg2rad(0.0);
   target2bodyplanar(target_pos_if, body_pos_if, euler, target_pos_bpf);
