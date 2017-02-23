@@ -10,6 +10,7 @@ CameraConfig::CameraConfig(void) {
   this->image_width = 0;
   this->image_height = 0;
 
+  this->shutter_speed = 0.0;
   this->exposure_value = 0.0;
   this->gain_value = 0.0;
   this->lambda << 0.0, 0.0, 0.0;
@@ -33,6 +34,7 @@ int CameraConfig::load(std::string config_file) {
   parser.addParam<int>("image_width", &this->image_width);
   parser.addParam<int>("image_height", &this->image_height);
 
+  parser.addParam<float>("shutter_speed", &this->shutter_speed, true);
   parser.addParam<float>("exposure_value", &this->exposure_value);
   parser.addParam<float>("gain_value", &this->gain_value);
   parser.addParam<Vec3>("lambda", &this->lambda);

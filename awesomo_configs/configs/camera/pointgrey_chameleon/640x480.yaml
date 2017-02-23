@@ -2,8 +2,15 @@ index: 0
 image_width: 640
 image_height: 480
 
-exposure_value: 4.5 # in mili seconds
-gain_value: 6.0
+# outdoors, cloudy
+# exposure_value: 1.0 # in mili seconds
+# shutter_speed: 0.3 # in mili seconds
+# gain_value: 1.0
+
+# wavelab
+exposure_value: 1.0 # in mili seconds
+shutter_speed: 5 # in mili seconds
+gain_value: 20.0
 lambda: [0.0, 0.0, 0.0]
 alpha: 4.0
 
@@ -27,5 +34,6 @@ projection_matrix:
 
 
 imshow: false
+# imshow: true
 snapshot: false
 showfps: true

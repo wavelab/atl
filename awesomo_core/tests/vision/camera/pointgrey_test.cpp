@@ -21,7 +21,6 @@ TEST(PointGreyCamera, constructor) {
   ASSERT_FLOAT_EQ(0.0, camera.last_tic);
 
   ASSERT_EQ(NULL, camera.pointgrey);
-  ASSERT_FLOAT_EQ(10.0, camera.shutter_speed);
 }
 
 TEST(PointGreyCamera, configure) {

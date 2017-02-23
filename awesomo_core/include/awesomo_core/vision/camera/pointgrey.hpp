@@ -10,7 +10,6 @@ namespace awesomo {
 class PointGreyCamera : public Camera {
 public:
   FlyCapture2::Camera *pointgrey;
-  double shutter_speed;
 
   PointGreyCamera(void);
   ~PointGreyCamera(void);

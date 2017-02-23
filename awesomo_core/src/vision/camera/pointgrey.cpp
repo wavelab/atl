@@ -5,7 +5,6 @@ namespace awesomo {
 
 PointGreyCamera::PointGreyCamera(void) {
   this->pointgrey = NULL;
-  this->shutter_speed = 10.0;
 }
 
 PointGreyCamera::~PointGreyCamera(void) {
@@ -60,7 +59,7 @@ int PointGreyCamera::initialize(void) {
   this->setFrameRate(200);
   this->setExposure(this->config.exposure_value);
   this->setGain(this->config.gain_value);
-  this->setShutter(this->shutter_speed);
+  this->setShutter(this->config.shutter_speed);
   this->setFormat7(1, "RAW8", 1024, 768);
 
   // start camera

@@ -167,7 +167,7 @@ void EstimatorNode::targetInertialPosCallback(const geometry_msgs::Vector3 &msg)
   tic(&this->target_last_updated);
 
   // initialize estimator
-  if (this->initialized == false && this->target_pos_x_init.size() == 30) {
+  if (this->initialized == false && this->target_pos_x_init.size() == 10) {
     // calculate target position median in x, y, z
     // assuming quadrotor has not moved much
     this->target_pos_wf(0) = median(this->target_pos_x_init);
@@ -181,7 +181,7 @@ void EstimatorNode::targetInertialPosCallback(const geometry_msgs::Vector3 &msg)
     this->target_pos_z_init.clear();
 
   // observe target position
-  } else if (this->initialized == false && this->target_pos_x_init.size() < 30) {
+  } else if (this->initialized == false && this->target_pos_x_init.size() < 10) {
     this->target_pos_x_init.push_back(this->target_pos_wf(0));
     this->target_pos_y_init.push_back(this->target_pos_wf(1));
     this->target_pos_z_init.push_back(this->target_pos_wf(2));
@@ -256,7 +256,6 @@ void EstimatorNode::publishLTKFBodyPositionEstimate(void) {
       est_pos(2) = this->ekf_tracker.mu(2);
       break;
   }
-
   // transform target position from inertial frame to body planar frame
   target2bodyplanar(est_pos,
                     this->quad_pose.position,
@@ -379,11 +378,13 @@ int EstimatorNode::estimateKF(double dt) {
     // clang-format on
 
   } else {
+
     // clang-format off
     C << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
     // clang-format on
+    y << 0.0, 0.0, 0.0; // to prevent unitialized values from entering kf
   }
 
   // estimate
@@ -401,7 +402,7 @@ int EstimatorNode::estimateKF(double dt) {
 
 int EstimatorNode::estimateEKF(double dt) {
   VecX y(4), g(9), h(4);
-  MatX G(9, 9), H(4, 9);
+    MatX G(9, 9), H(4, 9);
 
   // setup
   H = MatX::Zero(4, 9);
