@@ -3,6 +3,10 @@ rosbag record \
     /awesomo/quadrotor/pose/local \
     /awesomo/quadrotor/velocity/local \
     /awesomo/apriltag/target \
+    /awesomo/apriltag/target/position/body \
+    /awesomo/apriltag/target/position/inertial \
+    /awesomo/apriltag/target/yaw/body \
+    /awesomo/apriltag/target/yaw/inertial \
     /awesomo/gimbal/setpoint/attitude \
     /awesomo/gimbal/position/inertial \
     /awesomo/gimbal/frame/orientation/inertial \

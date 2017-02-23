@@ -166,29 +166,31 @@ void EstimatorNode::targetInertialPosCallback(const geometry_msgs::Vector3 &msg)
   convertMsg(msg, this->target_pos_wf);
   tic(&this->target_last_updated);
 
+
   // initialize estimator
-  if (this->initialized == false && this->target_pos_x_init.size() == 10) {
+  // if (this->initialized == false && this->target_pos_x_init.size() == 10) {
+  if (this->initialized == false) {
     // calculate target position median in x, y, z
     // assuming quadrotor has not moved much
-    this->target_pos_wf(0) = median(this->target_pos_x_init);
-    this->target_pos_wf(1) = median(this->target_pos_y_init);
-    this->target_pos_wf(2) = median(this->target_pos_z_init);
+    // this->target_pos_wf(0) = median(this->target_pos_x_init);
+    // this->target_pos_wf(1) = median(this->target_pos_y_init);
+    // this->target_pos_wf(2) = median(this->target_pos_z_init);
 
     this->initLTKF(this->target_pos_wf);
 
-    this->target_pos_x_init.clear();
-    this->target_pos_y_init.clear();
-    this->target_pos_z_init.clear();
+    // this->target_pos_x_init.clear();
+    // this->target_pos_y_init.clear();
+    // this->target_pos_z_init.clear();
 
-  // observe target position
-  } else if (this->initialized == false && this->target_pos_x_init.size() < 10) {
-    this->target_pos_x_init.push_back(this->target_pos_wf(0));
-    this->target_pos_y_init.push_back(this->target_pos_wf(1));
-    this->target_pos_z_init.push_back(this->target_pos_wf(2));
-
-    log_info("Observed target position: %.2f, %.2f, %.2f", this->target_pos_wf(0),
-                                                           this->target_pos_wf(1),
-                                                           this->target_pos_wf(2));
+  // // observe target position
+  // } else if (this->initialized == false && this->target_pos_x_init.size() < 10) {
+  //   this->target_pos_x_init.push_back(this->target_pos_wf(0));
+  //   this->target_pos_y_init.push_back(this->target_pos_wf(1));
+  //   this->target_pos_z_init.push_back(this->target_pos_wf(2));
+  //
+  //   log_info("Observed target position: %.2f, %.2f, %.2f", this->target_pos_wf(0),
+  //                                                          this->target_pos_wf(1),
+  //                                                          this->target_pos_wf(2));
 
   }
 
