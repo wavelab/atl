@@ -186,19 +186,6 @@ void buildMsg(TrackingController tc, awesomo_msgs::TCtrlSettings &msg) {
 }
 
 void buildMsg(LandingController lc, awesomo_msgs::LCtrlSettings &msg) {
-  msg.roll_controller.k_p = lc.x_controller.k_p;
-  msg.roll_controller.k_i = lc.x_controller.k_i;
-  msg.roll_controller.k_d = lc.x_controller.k_d;
-
-  msg.pitch_controller.k_p = lc.y_controller.k_p;
-  msg.pitch_controller.k_i = lc.y_controller.k_i;
-  msg.pitch_controller.k_d = lc.y_controller.k_d;
-
-  msg.throttle_controller.k_p = lc.z_controller.k_p;
-  msg.throttle_controller.k_i = lc.z_controller.k_i;
-  msg.throttle_controller.k_d = lc.z_controller.k_d;
-  msg.hover_throttle = lc.hover_throttle;
-
   msg.vx_controller.k_p = lc.vx_controller.k_p;
   msg.vx_controller.k_i = lc.vx_controller.k_i;
   msg.vx_controller.k_d = lc.vx_controller.k_d;
@@ -332,19 +319,6 @@ int convertMsg(awesomo_msgs::TCtrlSettings msg, TrackingController &tc) {
 }
 
 int convertMsg(awesomo_msgs::LCtrlSettings msg, LandingController &lc) {
-  lc.y_controller.k_p = msg.roll_controller.k_p;
-  lc.y_controller.k_i = msg.roll_controller.k_i;
-  lc.y_controller.k_d = msg.roll_controller.k_d;
-
-  lc.x_controller.k_p = msg.pitch_controller.k_p;
-  lc.x_controller.k_i = msg.pitch_controller.k_i;
-  lc.x_controller.k_d = msg.pitch_controller.k_d;
-
-  lc.z_controller.k_p = msg.throttle_controller.k_p;
-  lc.z_controller.k_i = msg.throttle_controller.k_i;
-  lc.z_controller.k_d = msg.throttle_controller.k_d;
-  lc.hover_throttle = msg.hover_throttle;
-
   lc.vx_controller.k_p = msg.vx_controller.k_p;
   lc.vx_controller.k_i = msg.vx_controller.k_i;
   lc.vx_controller.k_d = msg.vx_controller.k_d;

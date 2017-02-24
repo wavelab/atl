@@ -262,15 +262,11 @@ int Quadrotor::stepDiscoverMode(double dt) {
 int Quadrotor::stepTrackingMode(double dt) {
   int retval;
   bool conditions[3];
-  Vec3 velocity;
 
   // pre-check
   if (this->configured == false) {
     return -1;
   }
-
-  // calculate velocity
-  velocity = (this->pose.position - this->hover_position) / dt;
 
   // track target
   this->att_cmd = this->tracking_controller.calculate(
@@ -298,7 +294,7 @@ int Quadrotor::stepTrackingMode(double dt) {
     retval = this->landing_controller.loadTrajectory(
       this->pose.position,
       this->landing_target.position_bf,
-      velocity.block(0, 0, 2, 1).norm()
+      this->velocity.block(0, 0, 2, 1).norm()
     );
 
     // transition to landing mode
@@ -335,7 +331,7 @@ int Quadrotor::stepLandingMode(double dt) {
     this->landing_target.position_bf,
     this->landing_target.velocity_bf,
     this->pose.position,
-    this->hover_position,
+    this->velocity,
     this->yaw,
     dt
   );

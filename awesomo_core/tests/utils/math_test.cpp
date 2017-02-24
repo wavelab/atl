@@ -554,6 +554,15 @@ TEST(Utils_math, closest_point) {
   ASSERT_EQ(2, retval);
   ASSERT_FLOAT_EQ(6.0, closest(0));
   ASSERT_FLOAT_EQ(0.0, closest(1));
+
+  // if point 1 and 2 are same
+  p1 << 0, 0;
+  p2 << 0, 0;
+  p3 << 0, 2;
+  retval = closest_point(p1, p2, p3, closest);
+  ASSERT_EQ(-1, retval);
+  ASSERT_FLOAT_EQ(0.0, closest(0));
+  ASSERT_FLOAT_EQ(0.0, closest(1));
 }
 
 }  // end of awesomo namespace

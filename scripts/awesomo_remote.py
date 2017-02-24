@@ -94,14 +94,14 @@ if __name__ == "__main__":
     quad = Quadrotor()
     gimbal = Gimbal()
     mavros = MAVROS()
-    rospy.sleep(0.5)
+    rospy.sleep(1.0)
 
     quad.set_arm(True)
-    # quad.set_hover_point([0.0, 0.0, 5.0])
+    # quad.set_hover_point([1.0, 0.0, 4.0])
 
     # quad.set_hover_point([0.0, 0.0, 5.0])
-
-    # sleep(5)
+    #
+    sleep(2)
     # quad.set_mode("HOVER")
     # quad.set_hover_point([0.0, 0.0, 5.0])
     # quad.set_yaw(-20)
