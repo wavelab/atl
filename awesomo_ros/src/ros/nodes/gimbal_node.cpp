@@ -116,10 +116,10 @@ int GimbalNode::loopCallback(void) {
   }
 
   // publish gimbal joint orientation
-  if (this->gimbal.updateGimbalStates() == 0) {
-    euler(0) = this->gimbal.imu_gyro(0);
-    euler(1) = this->gimbal.imu_gyro(1);
-    euler(2) = this->gimbal.imu_gyro(2);
+  if (this->gimbal_imu == "SBGC" && this->gimbal.updateGimbalStates() == 0) {
+    euler(0) = this->gimbal.camera_angles(0);
+    euler(1) = this->gimbal.camera_angles(1);
+    euler(2) = this->gimbal.camera_angles(2);
     euler2quat(euler, 321, q);
 
     this->publishIMU(euler);
