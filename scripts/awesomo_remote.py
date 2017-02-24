@@ -108,7 +108,7 @@ if __name__ == "__main__":
 
     # square(quad, 3, 1)
     # lz_circle(10, 1.0)
-    # lz_straight_line(1.0)
+    lz_straight_line(1.0)
     # lz.set_position([0, 0, 0])
 
     # side_to_side(quad, 4.0, 2.0)

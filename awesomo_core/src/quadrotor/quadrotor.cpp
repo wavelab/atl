@@ -251,6 +251,7 @@ int Quadrotor::stepDiscoverMode(double dt) {
 
   if (this->conditionsMet(conditions, 3) && this->auto_track) {
     // transition to tracking mode
+    log_info("Transitioning to [TRACKING MODE]!");
     this->setMode(TRACKING_MODE);
     this->discover_tic = (struct timespec){0};
   }
@@ -262,7 +263,6 @@ int Quadrotor::stepTrackingMode(double dt) {
   int retval;
   bool conditions[3];
   Vec3 velocity;
-  double v;
 
   // pre-check
   if (this->configured == false) {
@@ -271,12 +271,10 @@ int Quadrotor::stepTrackingMode(double dt) {
 
   // calculate velocity
   velocity = (this->pose.position - this->hover_position) / dt;
-  v = velocity.block(0, 0, 2, 1).norm();
 
   // track target
   this->att_cmd = this->tracking_controller.calculate(
     this->landing_target.position_bf,
-    this->landing_target.velocity_bf,
     this->pose.position,
     this->hover_position,
     this->yaw,
@@ -294,16 +292,18 @@ int Quadrotor::stepTrackingMode(double dt) {
   conditions[1] = this->landing_target.losted == false;
   conditions[2] = mtoc(&this->tracking_tic) > this->min_tracking_time;
 
+  // check conditions
   if (this->conditionsMet(conditions, 3) && this->auto_land) {
     // load trajectory
     retval = this->landing_controller.loadTrajectory(
       this->pose.position,
       this->landing_target.position_bf,
-      v
+      velocity.block(0, 0, 2, 1).norm()
     );
 
+    // transition to landing mode
     if (retval == 0) {
-      // transition to landing mode
+      log_info("Transitioning to [LANDING MODE]!");
       this->setMode(LANDING_MODE);
       this->tracking_tic = (struct timespec){0};
     }
@@ -315,6 +315,7 @@ int Quadrotor::stepTrackingMode(double dt) {
     this->setMode(DISCOVER_MODE);
     this->tracking_tic = (struct timespec){0};
     this->hover_position(2) = this->recover_height;
+
   }
 
   return 0;

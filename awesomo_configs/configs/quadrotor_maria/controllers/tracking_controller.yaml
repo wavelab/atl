@@ -14,21 +14,6 @@ throttle_controller:
     k_i: 0.0
     k_d: 0.05
 
-vx_controller:
-    k_p: 0.0
-    k_i: 0.0
-    k_d: 0.0
-
-vy_controller:
-    k_p: 0.0
-    k_i: 0.0
-    k_d: 0.0
-
-vz_controller:
-    k_p: 0.0
-    k_i: 0.0
-    k_d: 0.0
-
 roll_limit:
     min: -30.0
     max: 30.0
@@ -36,9 +21,5 @@ roll_limit:
 pitch_limit:
     min: -30.0
     max: 30.0
-
-throttle_limit:
-    min: -1.0
-    max: 1.0
 
 track_offset: [0.0, 0.0, 0.0]
