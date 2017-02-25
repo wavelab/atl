@@ -186,8 +186,8 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
   // publish tag pose
   this->publishTagPoseMsg(tags[0]);
   this->publishTargetInertialPositionMsg(gimbal_position,
-                                          gimbal_frame,
-                                          target_bpf);
+                                         gimbal_frame,
+                                         target_bpf);
   this->publishTargetInertialYawMsg(tags[0], gimbal_frame);
   this->publishTargetBodyPositionMsg(target_bpf);
   this->publishTargetBodyPositionEncoderMsg(target_bpf_encoder);
