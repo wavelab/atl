@@ -22,8 +22,10 @@ int GimbalNode::configure(std::string node_name, int hz) {
   // register publisher and subscribers
   // clang-format off
   this->registerPublisher<geometry_msgs::Vector3>(SBGC_IMU_TOPIC);
+  this->registerPublisher<geometry_msgs::Vector3>(SBGC_RAW_ENCODER_TOPIC);
   this->registerPublisher<geometry_msgs::Vector3>(POSITION_TOPIC);
   this->registerPublisher<geometry_msgs::Quaternion>(FRAME_ORIENTATION_TOPIC);
+  this->registerPublisher<geometry_msgs::Quaternion>(ENCODER_ORIENTATION_TOPIC);
 
   if (this->gimbal_imu == "SBGC") {
     this->registerPublisher<geometry_msgs::Quaternion>(JOINT_ORIENTATION_TOPIC);
@@ -58,6 +60,13 @@ int GimbalNode::publishIMU(Vec3 euler) {
   return 0;
 }
 
+int GimbalNode::publishRawEncoder(Vec3 encoder_euler){
+  geometry_msgs::Vector3 msg;
+  buildMsg(encoder_euler, msg);
+  this->ros_pubs[SBGC_RAW_ENCODER_TOPIC].publish(msg);
+  return 0;
+}
+
 int GimbalNode::publishPosition(Vec3 pos) {
   geometry_msgs::Vector3 msg;
   buildMsg(pos, msg);
@@ -76,6 +85,13 @@ int GimbalNode::publishJointOrientation(Quaternion q) {
   geometry_msgs::Quaternion msg;
   buildMsg(q, msg);
   this->ros_pubs[JOINT_ORIENTATION_TOPIC].publish(msg);
+  return 0;
+}
+
+int GimbalNode::publishEncoderOrientation(Quaternion q) {
+  geometry_msgs::Quaternion msg;
+  buildMsg(q, msg);
+  this->ros_pubs[ENCODER_ORIENTATION_TOPIC].publish(msg);
   return 0;
 }
 
@@ -109,22 +125,35 @@ void GimbalNode::trackTargetCallback(const geometry_msgs::Vector3 &msg) {
 int GimbalNode::loopCallback(void) {
   Vec3 euler;
   Quaternion q;
+  Vec3 encoder_euler;
+  Quaternion encoder_q;
 
   // set gimbal attitude
   if (this->enable_tracker) {
     this->gimbal.setAngle(this->set_points(0), this->set_points(1));
   }
+  usleep(50000);
 
   // publish gimbal joint orientation
   if (this->gimbal_imu == "SBGC" && this->gimbal.updateGimbalStates() == 0) {
     euler(0) = this->gimbal.camera_angles(0);
     euler(1) = this->gimbal.camera_angles(1);
-    euler(2) = this->gimbal.camera_angles(2);
+    // euler(2) = this->gimbal.camera_angles(2);
+    euler(2) = 0;
     euler2quat(euler, 321, q);
-
     this->publishIMU(euler);
     this->publishJointOrientation(q);
+
+    encoder_euler(0) = this->gimbal.encoder_angles(0);
+    encoder_euler(1) = this->gimbal.encoder_angles(1);
+    // encoder_euler(2) = this->gimbal.encoder_angles(2);
+    encoder_euler(2) = 0.0; // There is no yaw encoder (yet)
+    euler2quat(encoder_euler, 321, encoder_q);
+
+    this->publishRawEncoder(encoder_euler);
+    this->publishEncoderOrientation(encoder_q);
   }
+  usleep(40000);
 
   return 0;
 }
