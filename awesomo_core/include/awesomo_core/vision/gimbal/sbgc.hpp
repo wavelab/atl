@@ -139,6 +139,7 @@ public:
   Eigen::Vector3d camera_angles;
   Eigen::Vector3d frame_angles;
   Eigen::Vector3d rc_angles;
+  Eigen::Vector3d encoder_angles;
 
   int cycle_time;
   int i2c_error_count;
@@ -173,6 +174,7 @@ public:
   int reset(void);
   int getBoardInfo(void);
   int getRealtimeData(void);
+  int getRealtimeData4(void);
   int setAngle(double roll, double pitch, double yaw);
   int setSpeedAngle(double roll,
                     double pitch,
