@@ -28,12 +28,13 @@ public:
   std::deque<Vec2> pos;
   std::deque<Vec2> vel;
   std::deque<Vec2> inputs;
-  std::deque<Vec2> target_bf;
+  std::deque<Vec2> rel_pos;
+  std::deque<Vec2> rel_vel;
   Vec3 p0;
 
   Trajectory(void);
   int load(std::string filepath, Vec3 pos);
-  int update(Vec3 pos, Vec2 &wp_pos, Vec2 &wp_vel, Vec2 &q_pos);
+  int update(Vec3 pos, Vec2 &wp_pos, Vec2 &wp_vel, Vec2 &wp_inputs);
   void reset(void);
 };
 
@@ -57,14 +58,8 @@ class LandingController {
 public:
   bool configured;
 
-  double pctrl_dt;
-  double vctrl_dt;
+  double dt;
   double blackbox_dt;
-
-  PID x_controller;
-  PID y_controller;
-  PID z_controller;
-  double hover_throttle;
 
   PID vx_controller;
   PID vy_controller;
@@ -74,10 +69,8 @@ public:
   double pitch_limit[2];
   double throttle_limit[2];
 
-  Vec3 pctrl_setpoints;
-  Vec4 pctrl_outputs;
-  Vec3 vctrl_setpoints;
-  Vec4 vctrl_outputs;
+  Vec3 setpoints;
+  Vec4 outputs;
   AttitudeCommand att_cmd;
 
   TrajectoryIndex traj_index;
@@ -100,13 +93,11 @@ public:
              Vec3 target_pos_bf,
              Vec3 target_vel_bf,
              double dt);
-  Vec4 calculatePositionErrors(Vec3 errors, double yaw, double dt);
   Vec4 calculateVelocityErrors(Vec3 errors, double yaw, double dt);
-  int calculate(Vec3 pos_errors, Vec3 vel_errors, double yaw, double dt);
   int calculate(Vec3 target_pos_bf,
                 Vec3 target_vel_bf,
                 Vec3 pos,
-                Vec3 pos_prev,
+                Vec3 vel,
                 double yaw,
                 double dt);
   void reset(void);

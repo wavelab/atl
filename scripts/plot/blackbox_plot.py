@@ -55,19 +55,27 @@ def plot_blackbox(data_file):
         data["wp_pos_x"][i] += p0[0]
 
     # plot
-    plt.subplot("211")
+    plt.subplot("311")
     plt.tight_layout()
     plt.plot(data["y"], data["z"], label="quadrotor")
     plt.plot(data["wp_pos_x"], data["wp_pos_y"], label="waypoints")
     plt.legend(loc=0)
-    plt.title("Position")
+    plt.title("Position vs Waypoints")
 
-    plt.subplot("212")
+    plt.subplot("312")
     plt.plot(data["t"], data["vy"], label="vy")
     plt.plot(data["t"], data["vz"], label="vz")
-    plt.plot(data["t"], data["wp_vel_x"], label="vy_desired")
+    plt.plot(data["t"], data["wp_vel_x"], label="vx_desired")
     plt.plot(data["t"], data["wp_vel_y"], label="vz_desired")
-    plt.title("Velocity")
+    plt.title("Waypoint Velocity vs Velocity Achieved")
+    plt.legend(loc=0)
+
+    plt.subplot("313")
+    plt.plot(data["t"], data["vy"], label="vy")
+    plt.plot(data["t"], data["vz"], label="vz")
+    plt.plot(data["t"], data["target_vel_bf_x"], label="vx_desired")
+    plt.plot(data["t"], data["target_vel_bf_z"], label="vz_desired")
+    plt.title("Target Velocity vs Velocity Achieved")
     plt.legend(loc=0)
 
     plt.show()
