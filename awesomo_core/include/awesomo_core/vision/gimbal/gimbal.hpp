@@ -28,6 +28,7 @@ public:
   Vec3 camera_angles;
   Vec3 frame_angles;
   Vec3 rc_angles;
+  Vec3 encoder_angles;
 
   Gimbal(void);
   ~Gimbal(void);

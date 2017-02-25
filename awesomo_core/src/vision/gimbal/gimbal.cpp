@@ -182,7 +182,7 @@ int Gimbal::updateGimbalStates(void) {
 
   // get real time data from SimpleBGC
   // usleep(80000);
-  retval = this->sbgc.getRealtimeData();
+  retval = this->sbgc.getRealtimeData4();
   if (retval != 0) {
     return -1;
   }
@@ -207,6 +207,10 @@ int Gimbal::updateGimbalStates(void) {
   this->rc_angles(0) = deg2rad(this->sbgc.data.rc_angles(0));
   this->rc_angles(1) = deg2rad(this->sbgc.data.rc_angles(1));
   this->rc_angles(2) = deg2rad(this->sbgc.data.rc_angles(2));
+
+  this->encoder_angles(0) = deg2rad(this->sbgc.data.encoder_angles(0));
+  this->encoder_angles(1) = deg2rad(this->sbgc.data.encoder_angles(1));
+  this->encoder_angles(2) = deg2rad(this->sbgc.data.encoder_angles(2));
 
   return 0;
 }
