@@ -415,7 +415,7 @@ void inertial2body(Vec3 enu_if,
        0, 0, 1;
   nwu_if(0) = enu_if(1);
   nwu_if(1) = -enu_if(0);
-  nwu_if(1) = enu_if(2);
+  nwu_if(2) = enu_if(2);
 
   nwu_bf = R * nwu_if;
 }

@@ -428,13 +428,45 @@ TEST(Utils_math, inertial2body) {
   Vec3 enu_if, nwu_bf, euler;
   Quaternion orientation_if;
 
-  euler << 0, 0, deg2rad(-90);
+  // test 0 yaw
+  euler << 0, 0, deg2rad(0);
   euler2quat(euler, 321, orientation_if);
-  enu_if << 0, 1, 0;
+  enu_if << 1, 0, 0;
   inertial2body(enu_if, orientation_if, nwu_bf);
 
-  // std::cout << enu_if.transpose() << std::endl;
-  // std::cout << nwu_bf.transpose() << std::endl;
+  ASSERT_FLOAT_EQ(0, round(nwu_bf(0)));
+  ASSERT_FLOAT_EQ(-1, round(nwu_bf(1)));
+  ASSERT_FLOAT_EQ(0, round(nwu_bf(2)));
+
+  // test 90 deg yaw
+  euler << 0, 0, deg2rad(90);
+  euler2quat(euler, 321, orientation_if);
+  enu_if << 1, 0, 0;
+  inertial2body(enu_if, orientation_if, nwu_bf);
+
+  ASSERT_FLOAT_EQ(-1, round(nwu_bf(0)));
+  ASSERT_FLOAT_EQ(0, round(nwu_bf(1)));
+  ASSERT_FLOAT_EQ(0, round(nwu_bf(2)));
+
+  // test 180 deg yaw
+  euler << 0, 0, deg2rad(180);
+  euler2quat(euler, 321, orientation_if);
+  enu_if << 1, 0, 0;
+  inertial2body(enu_if, orientation_if, nwu_bf);
+
+  ASSERT_FLOAT_EQ(0, round(nwu_bf(0)));
+  ASSERT_FLOAT_EQ(1, round(nwu_bf(1)));
+  ASSERT_FLOAT_EQ(0, round(nwu_bf(2)));
+
+  // test -90 deg yaw
+  euler << 0, 0, deg2rad(-90);
+  euler2quat(euler, 321, orientation_if);
+  enu_if << 1, 0, 0;
+  inertial2body(enu_if, orientation_if, nwu_bf);
+
+  ASSERT_FLOAT_EQ(1, round(nwu_bf(0)));
+  ASSERT_FLOAT_EQ(0, round(nwu_bf(1)));
+  ASSERT_FLOAT_EQ(0, round(nwu_bf(2)));
 }
 
 TEST(Utils_math, wrapTo180) {

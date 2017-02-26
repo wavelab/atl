@@ -471,15 +471,10 @@ int LandingController::calculate(Vec3 target_pos_bf,
   euler2quat(euler, 321, q);
   inertial2body(vel, q, vel_bf);
 
-  // std::cout << "yaw: " << yaw << std::endl;
-  // std::cout << "vel if: " << vel.transpose() << std::endl;
-  // std::cout << "vel bf: " << vel_bf.transpose() << std::endl;
-  // std::cout << std::endl;
-
-  // // calculate velocity errors (inertial version)
-  // v_errors(0) = wp_vel(0) - vel_bf(0);
-  // v_errors(1) = target_pos_bf(1);
-  // v_errors(2) = wp_vel(1) - vel(2);
+  // calculate velocity errors (inertial version)
+  v_errors(0) = wp_vel(0) - vel_bf(0);
+  v_errors(1) = target_pos_bf(1);
+  v_errors(2) = wp_vel(1) - vel(2);
 
   // // calculate velocity errors (relative version)
   // v_errors(0) = -1 * (rel_vel(0) - target_vel_bf(0));
@@ -487,9 +482,9 @@ int LandingController::calculate(Vec3 target_pos_bf,
   // v_errors(2) = -1 * (rel_vel(1) - target_vel_bf(2));
 
   // calculate velocity errors (hybrid version)
-  v_errors(0) = -1 * (rel_vel(0) - target_vel_bf(0));
-  v_errors(1) = target_pos_bf(1);
-  v_errors(2) = wp_vel(1) - vel(2);
+  // v_errors(0) = -1 * (rel_vel(0) - target_vel_bf(0));
+  // v_errors(1) = target_pos_bf(1);
+  // v_errors(2) = wp_vel(1) - vel(2);
 
   // calculate control outputs
   this->calculateVelocityErrors(v_errors, yaw, dt);
