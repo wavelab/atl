@@ -83,15 +83,15 @@ int BaseDetector::illuminationInvariantTransform(cv::Mat &image) {
   channels[1].convertTo(channels[1], CV_32F);
   channels[2].convertTo(channels[2], CV_32F);
 
-  channels[0].row(0).setTo(cv::Scalar(10));
-  channels[1].row(0).setTo(cv::Scalar(10));
-  channels[2].row(0).setTo(cv::Scalar(10));
+  channels[0].row(0).setTo(cv::Scalar(10)) / 255.0;
+  channels[1].row(0).setTo(cv::Scalar(10)) / 255.0;
+  channels[2].row(0).setTo(cv::Scalar(10)) / 255.0;
 
   cv::log(channels[0], log_ch_1);
   cv::log(channels[1], log_ch_2);
   cv::log(channels[2], log_ch_3);
 
-  image = log_ch_2 - alpha * log_ch_3 - (1 - alpha) * log_ch_1;
+  image = 0.5 + log_ch_2 - alpha * log_ch_3 - (1 - alpha) * log_ch_1;
   cv::normalize(image, image, 0, 255, cv::NORM_MINMAX, CV_8UC1);
 
   // double min, max;
