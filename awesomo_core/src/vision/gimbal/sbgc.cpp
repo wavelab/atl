@@ -295,7 +295,6 @@ int SBGC::readFrame(uint8_t read_length, SBGCFrame &frame) {
   // pre-check
   nb_bytes = read(this->serial, buffer, read_length);
   if (nb_bytes <= 0 || nb_bytes != read_length) {
-    std::cout << nb_bytes << std::endl;
     // std::cout << "failed to read SBGC frame!" << std::endl;
     return -1;
   }
@@ -538,6 +537,57 @@ int SBGC::getRealtimeData(void) {
 
   return 0;
 }
+
+int SBGC::getAnglesExt(void) {
+  int retval;
+  SBGCFrame frame;
+  // SBGCRealtimeData data;
+
+  // request real time data
+  frame.buildFrame(CMD_GET_ANGLES_EXT);
+  retval = this->sendFrame(frame);
+  if (retval == -1) {
+    std::cout << "failed to request SBGC realtime data!" << std::endl;
+    return -1;
+  }
+  // obtain real time data
+  retval = this->readFrame(54, frame);
+  if (retval == -1) {
+    std::cout << "failed to parse SBGC frame for realtime data!" << std::endl;
+    return -1;
+  }
+
+  // roll
+  this->data.camera_angles(0) = S16BIT(frame.data, 1, 0);
+  this->data.rc_angles(0) = S16BIT(frame.data, 3, 2);
+  this->data.encoder_angles(0) = S16BIT(frame.data, 8, 4);
+
+  // pitch
+  this->data.camera_angles(1) = S16BIT(frame.data, 19, 18);
+  this->data.rc_angles(1) = S16BIT(frame.data, 21, 20);
+  this->data.encoder_angles(1) = S16BIT(frame.data, 26, 22);
+
+  this->data.camera_angles(2) = S16BIT(frame.data, 37, 36);
+  this->data.rc_angles(2) = S16BIT(frame.data, 39, 38);
+  this->data.encoder_angles(2) = S16BIT(frame.data, 44, 40);
+
+  this->data.camera_angles(0) = (DEG_PER_BIT) * this->data.camera_angles(0);
+  this->data.camera_angles(1) = (DEG_PER_BIT) * this->data.camera_angles(1);
+  this->data.camera_angles(2) = (DEG_PER_BIT) * this->data.camera_angles(2);
+
+  this->data.rc_angles(0) = (DEG_PER_BIT) * this->data.rc_angles(0);
+  this->data.rc_angles(1) = (DEG_PER_BIT) * this->data.rc_angles(1);
+  this->data.rc_angles(2) = (DEG_PER_BIT) * this->data.rc_angles(2);
+
+  this->data.encoder_angles(0) = (DEG_PER_BIT) * this->data.encoder_angles(0);
+  this->data.encoder_angles(1) = (DEG_PER_BIT) * this->data.encoder_angles(1);
+  this->data.encoder_angles(2) = (DEG_PER_BIT) * this->data.encoder_angles(2);
+
+  this->data.printData();
+
+  return 0;
+}
+
 
 int SBGC::setAngle(double roll, double pitch, double yaw) {
   SBGCFrame frame;

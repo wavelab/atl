@@ -6,8 +6,7 @@
   <param name="quad_frame" value="NED" />
   <param name="fcu_type" value="DJI" />
   <param name="estimate_frame" value="BODY" />
-  <!-- <param name="gimbal_imu" value="SBGC" /> -->
-  <param name="gimbal_imu" value="HACK" />
+  <param name="gimbal_imu" value="SBGC" />
   <param name="gimbal_enable_tracker" value="true" />
 
   <!-- dji sdk -->
@@ -44,5 +43,5 @@
   <node pkg="awesomo_ros" name="awesomo_gimbal" type="gimbal_node" output="screen" required="true" />
 
   <!-- imu node -->
-  <node pkg="awesomo_ros" name="awesomo_imu" type="imu_node" output="screen" launch-prefix="sudo -E" required="true" />
+  <!-- <node pkg="awesomo_ros" name="awesomo_imu" type="imu_node" output="screen" launch&#45;prefix="sudo &#45;E" required="true" /> -->
 </launch>
