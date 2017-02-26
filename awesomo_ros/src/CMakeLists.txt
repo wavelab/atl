@@ -5,6 +5,7 @@ SET(
     flycapture
     ${catkin_LIBRARIES}
     ${OpenCV_LIBS}
+    apriltag
     apriltags_mit
     apriltags_swathmore
     CGAL

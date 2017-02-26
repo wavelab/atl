@@ -61,8 +61,9 @@ ADD_LIBRARY(
     src/utils/time.cpp
     # vision
     src/vision/apriltag/base_detector.cpp
-    src/vision/apriltag/swathmore.cpp
+    src/vision/apriltag/michigan.cpp
     src/vision/apriltag/mit.cpp
+    src/vision/apriltag/swathmore.cpp
     src/vision/camera/camera.cpp
     src/vision/camera/config.cpp
     src/vision/camera/ximea.cpp
@@ -76,6 +77,7 @@ SET(DEPS
     ${OpenCV_LIBS}
     m3api
     flycapture
+    apriltag
     apriltags_mit
     apriltags_swathmore
     CGAL
