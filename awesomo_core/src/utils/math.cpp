@@ -403,20 +403,18 @@ void inertial2body(Vec3 enu_if,
                    Quaternion orientation_if,
                    Vec3 &nwu_bf) {
   Mat3 R;
-  Vec3 nwu_if;
-  Vec3 euler;
-  double yaw;
+  Vec3 euler, nwu_if;
 
+  // create rotation matrix
   quat2euler(orientation_if, 321, euler);
-  yaw = euler(2);
+  euler2rot(euler, 123, R);
 
-  R << cos(yaw), sin(yaw), 0,
-       -sin(yaw), cos(yaw), 0,
-       0, 0, 1;
+  // convert inertial ENU to NWU
   nwu_if(0) = enu_if(1);
   nwu_if(1) = -enu_if(0);
   nwu_if(2) = enu_if(2);
 
+  // transform inertal to body
   nwu_bf = R * nwu_if;
 }
 

@@ -57,6 +57,7 @@ public:
 class LandingController {
 public:
   bool configured;
+  std::string mode;
 
   double dt;
   double blackbox_dt;
