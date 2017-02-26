@@ -33,6 +33,8 @@ public:
   std::vector<std::string> camera_modes;
   std::map<std::string, CameraConfig> camera_configs;
   bool illum_invar;
+  bool windowing;
+  double window_padding;
   bool imshow;
 
   BaseDetector(void);

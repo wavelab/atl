@@ -33,8 +33,8 @@ int MITDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
   }
 
   // mask image if tag was last detected
-  if (this->prev_tag.detected) {
-    retval = this->maskImage(this->prev_tag, image);
+  if (this->prev_tag.detected && this->windowing) {
+    retval = this->maskImage(this->prev_tag, image, this->window_padding);
     if (retval == -4) {
       return -1;
     }

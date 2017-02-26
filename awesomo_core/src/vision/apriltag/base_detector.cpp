@@ -15,6 +15,8 @@ BaseDetector::BaseDetector(void) {
   this->camera_mode = "";
   this->camera_modes.clear();
   this->camera_configs.clear();
+  this->windowing = false;
+  this->window_padding = FLT_MAX;
   this->illum_invar = false;
   this->imshow = false;
 }
@@ -32,6 +34,8 @@ int BaseDetector::configure(std::string config_file) {
   parser.addParam<double>("tag_sanity_check", &this->tag_sanity_check);
   parser.addParam<std::string>("camera_config", &camera_config);
   parser.addParam<bool>("illum_invar", &this->illum_invar);
+  parser.addParam<bool>("windowing", &this->windowing);
+  parser.addParam<double>("window_padding", &this->window_padding);
   parser.addParam<bool>("imshow", &this->imshow);
   if (parser.load(config_file) != 0) {
     return -1;
