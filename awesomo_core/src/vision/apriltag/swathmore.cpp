@@ -8,6 +8,10 @@ SwathmoreDetector::SwathmoreDetector(void) {
 }
 
 int SwathmoreDetector::configure(std::string config_file) {
+  if (BaseDetector::configure(config_file) != 0) {
+    return -1;
+  }
+
   // tag family
   std::string *family_str = new std::string("Tag16h5");
   TagFamily *family = new TagFamily(*family_str);
