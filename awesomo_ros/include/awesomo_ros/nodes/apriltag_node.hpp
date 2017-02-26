@@ -32,7 +32,7 @@ namespace awesomo {
 
 class AprilTagNode : public ROSNode {
 public:
-  SwathmoreDetector detector;
+  MITDetector detector;
   Pose camera_offset;
 
   AprilTagNode(int argc, char **argv) : ROSNode(argc, argv) {}

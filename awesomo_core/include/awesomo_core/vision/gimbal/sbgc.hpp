@@ -42,6 +42,7 @@ namespace awesomo {
 #define CMD_TRIGGER_PIN 84
 #define CMD_EXECUTE_MENU 69
 #define CMD_GET_ANGLES 73
+#define CMD_GET_ANGLES_EXT 61
 #define CMD_CONFIRM 67
 // board v3.x only
 #define CMD_BOARD_INFO_3 20
@@ -175,6 +176,7 @@ public:
   int getBoardInfo(void);
   int getRealtimeData(void);
   int getRealtimeData4(void);
+  int getAnglesExt(void);
   int setAngle(double roll, double pitch, double yaw);
   int setSpeedAngle(double roll,
                     double pitch,

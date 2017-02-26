@@ -180,12 +180,15 @@ int Gimbal::updateGimbalStates(void) {
   int retval;
   const double k_gravity = 9.80665;
 
-  // get real time data from SimpleBGC
-  // usleep(80000);
   retval = this->sbgc.getRealtimeData4();
   if (retval != 0) {
     return -1;
   }
+
+  // retval = this->sbgc.getAnglesExt();
+  // if (retval != 0) {
+  //   return -1;
+  // }
 
   // convert from G's to m/s^2
   this->imu_accel(0) = this->sbgc.data.accel(0) * k_gravity;
