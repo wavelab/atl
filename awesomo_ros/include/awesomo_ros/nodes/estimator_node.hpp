@@ -34,8 +34,8 @@ namespace awesomo {
 #define QUAD_VELOCITY_TOPIC "/awesomo/quadrotor/velocity/local"
 #define ESTIMATOR_ON_TOPIC "/awesomo/estimator/on"
 #define ESTIMATOR_OFF_TOPIC "/awesomo/estimator/off"
-#define TARGET_BF_POS_TOPIC "/awesomo/apriltag/target/position/body_encoders"
-// #define TARGET_BF_POS_TOPIC "/awesomo/apriltag/target/position/body"
+// #define TARGET_BF_POS_TOPIC "/awesomo/apriltag/target/position/body_encoders"
+#define TARGET_BF_POS_TOPIC "/awesomo/apriltag/target/position/body"
 #define TARGET_IF_POS_TOPIC "/awesomo/apriltag/target/position/inertial"
 #define TARGET_IF_YAW_TOPIC "/awesomo/apriltag/target/yaw/inertial"
 

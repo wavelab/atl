@@ -57,11 +57,11 @@ TEST(MITDetector, illuminationInvarientTransform) {
 
   // test and assert
   detector.illuminationInvariantTransform(image);
-  tags = detector.detector->extractTags(image);
+  cv::imshow("image", image);
+  cv::waitKey(1000000);
 
-  ASSERT_EQ(1, tags.size());
-  // cv::imshow("image", image_gray);
-  // cv::waitKey(1000000);
+  tags = detector.detector->extractTags(image);
+  ASSERT_EQ(2, tags.size());
 }
 
 TEST(MITDetector, extractTags) {

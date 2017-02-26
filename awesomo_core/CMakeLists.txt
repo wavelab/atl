@@ -60,7 +60,7 @@ ADD_LIBRARY(
     src/utils/stats.cpp
     src/utils/time.cpp
     # vision
-    # src/vision/apriltag/swathmore.cpp
+    src/vision/apriltag/swathmore.cpp
     src/vision/apriltag/mit.cpp
     src/vision/camera/camera.cpp
     src/vision/camera/config.cpp
@@ -76,6 +76,7 @@ SET(DEPS
     m3api
     flycapture
     apriltags_mit
+    apriltags_swathmore
     CGAL
     nlopt
     yaml-cpp

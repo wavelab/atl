@@ -20,5 +20,5 @@ tag_sizes: [0.045, 0.342] # Tag made of tape
 
 camera_config: "../camera/pointgrey_chameleon"
 illum_invar: false
-# imshow: false
-imshow: true
+imshow: false
+# imshow: true

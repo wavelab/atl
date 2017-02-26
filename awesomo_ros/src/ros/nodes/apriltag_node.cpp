@@ -149,7 +149,7 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
 
   // remove the gimbal states from image
   for (int i = 0; i < 22; i++) {
-    image_ptr->image.at<double>(0, i) = 0;
+    image_ptr->image.at<double>(0, i) = 1;
   }
 
   // detect tags
