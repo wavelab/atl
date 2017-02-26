@@ -20,6 +20,8 @@ public:
   SBGC sbgc;
   Pose camera_offset;
   double limits[6];
+  bool enable_tracking;
+
   Vec3 setpoints;
   Vec3 target_bpf;
 

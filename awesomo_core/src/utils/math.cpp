@@ -399,6 +399,27 @@ void target2inertial(Vec3 target_pos_bf,
   target_pos_if = (R * target_enu) + body_pos_if;
 }
 
+void inertial2body(Vec3 enu_if,
+                   Quaternion orientation_if,
+                   Vec3 &nwu_bf) {
+  Mat3 R;
+  Vec3 nwu_if;
+  Vec3 euler;
+  double yaw;
+
+  quat2euler(orientation_if, 321, euler);
+  yaw = euler(2);
+
+  R << cos(yaw), sin(yaw), 0,
+       -sin(yaw), cos(yaw), 0,
+       0, 0, 1;
+  nwu_if(0) = enu_if(1);
+  nwu_if(1) = -enu_if(0);
+  nwu_if(1) = enu_if(2);
+
+  nwu_bf = R * nwu_if;
+}
+
 double wrapTo180(double euler_angle) {
   return fmod((euler_angle + 180.0), 360.0) - 180.0;
 }

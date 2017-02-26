@@ -457,7 +457,8 @@ int LandingController::calculate(Vec3 target_pos_bf,
                                  double yaw,
                                  double dt) {
   int retval;
-  Vec3 p_errors, v_errors;
+  Vec3 p_errors, v_errors, vel_bf, euler;
+  Quaternion q;
   Vec2 wp_pos, wp_vel, wp_inputs, rel_pos, rel_vel;
 
   // obtain position and velocity waypoints
@@ -465,27 +466,41 @@ int LandingController::calculate(Vec3 target_pos_bf,
   rel_pos = this->trajectory.rel_pos.at(0);
   rel_vel = this->trajectory.rel_vel.at(0);
 
-  // calculate velocity errors (inertial version)
-  v_errors(0) = wp_vel(0) - vel.block(0, 0, 2, 1).norm();
-  v_errors(1) = target_pos_bf(1);
-  v_errors(2) = wp_vel(1) - vel(2);
+  // calculate velocity in body frame
+  euler << 0, 0, yaw;
+  euler2quat(euler, 321, q);
+  inertial2body(vel, q, vel_bf);
+
+  // std::cout << "yaw: " << yaw << std::endl;
+  // std::cout << "vel if: " << vel.transpose() << std::endl;
+  // std::cout << "vel bf: " << vel_bf.transpose() << std::endl;
+  // std::cout << std::endl;
+
+  // // calculate velocity errors (inertial version)
+  // v_errors(0) = wp_vel(0) - vel_bf(0);
+  // v_errors(1) = target_pos_bf(1);
+  // v_errors(2) = wp_vel(1) - vel(2);
 
   // // calculate velocity errors (relative version)
   // v_errors(0) = -1 * (rel_vel(0) - target_vel_bf(0));
   // v_errors(1) = target_pos_bf(1);
   // v_errors(2) = -1 * (rel_vel(1) - target_vel_bf(2));
 
+  // calculate velocity errors (hybrid version)
+  v_errors(0) = -1 * (rel_vel(0) - target_vel_bf(0));
+  v_errors(1) = target_pos_bf(1);
+  v_errors(2) = wp_vel(1) - vel(2);
+
   // calculate control outputs
   this->calculateVelocityErrors(v_errors, yaw, dt);
   this->outputs(0) += 0.0;                 // roll
   this->outputs(1) += -1 * wp_inputs(1);   // pitch
-  this->outputs(2) += 0.0;                 // yaw
+  this->outputs(2) += yaw;                 // yaw
   this->outputs(3) += wp_inputs(0);        // thrust
   this->att_cmd = AttitudeCommand(this->outputs);
 
   // record
   this->record(pos, vel, wp_pos, wp_vel, target_pos_bf, target_vel_bf, dt);
-  this->printOutputs();
 
   // calculate trajectory errors
   p_errors(0) = rel_pos(0) + target_pos_bf(0);
@@ -494,10 +509,13 @@ int LandingController::calculate(Vec3 target_pos_bf,
 
   // check if we are too far off track with trajectory
   if (p_errors(0) > this->trajectory_threshold(0)) {
+    log_err("Trajectory threshold body x reached!");
     return -1;
   } else if (p_errors(1) > this->trajectory_threshold(1)) {
+    log_err("Trajectory threshold body y reached!");
     return -1;
   } else if (p_errors(2) > this->trajectory_threshold(2)) {
+    log_err("Trajectory threshold body z reached!");
     return -1;
   }
 

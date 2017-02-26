@@ -13,7 +13,6 @@ int GimbalNode::configure(std::string node_name, int hz) {
   // gimbal
   ROS_GET_PARAM("/gimbal_config", config_file);
   ROS_GET_PARAM("/gimbal_imu", this->gimbal_imu);
-  ROS_GET_PARAM("/gimbal_enable_tracker", this->enable_tracker);
   if (this->gimbal.configure(config_file) != 0) {
     ROS_ERROR("Failed to configure Gimbal!");
     return -2;
@@ -129,31 +128,28 @@ int GimbalNode::loopCallback(void) {
   Quaternion encoder_q;
 
   // set gimbal attitude
-  if (this->enable_tracker) {
-    this->gimbal.setAngle(this->set_points(0), this->set_points(1));
-  }
-  usleep(50000);
+  this->gimbal.setAngle(this->set_points(0), this->set_points(1));
 
   // publish gimbal joint orientation
   if (this->gimbal_imu == "SBGC" && this->gimbal.updateGimbalStates() == 0) {
+    // imu reading
     euler(0) = this->gimbal.camera_angles(0);
     euler(1) = this->gimbal.camera_angles(1);
-    // euler(2) = this->gimbal.camera_angles(2);
     euler(2) = 0;
     euler2quat(euler, 321, q);
     this->publishIMU(euler);
     this->publishJointOrientation(q);
 
+    // encoder reading
     encoder_euler(0) = this->gimbal.encoder_angles(0);
     encoder_euler(1) = this->gimbal.encoder_angles(1);
-    // encoder_euler(2) = this->gimbal.encoder_angles(2);
     encoder_euler(2) = 0.0; // There is no yaw encoder (yet)
     euler2quat(encoder_euler, 321, encoder_q);
 
+    // publish imu and encoder readings
     this->publishRawEncoder(encoder_euler);
     this->publishEncoderOrientation(encoder_q);
   }
-  usleep(40000);
 
   return 0;
 }

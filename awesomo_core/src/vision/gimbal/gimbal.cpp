@@ -9,6 +9,8 @@ Gimbal::Gimbal(void) {
   this->sbgc = SBGC();
   this->camera_offset = Pose();
   std::fill_n(this->limits, 6, 0);
+  this->enable_tracking = false;
+
   this->setpoints = Vec3();
   this->target_bpf = Vec3();
 
@@ -17,6 +19,7 @@ Gimbal::Gimbal(void) {
   camera_angles = Vec3();
   frame_angles = Vec3();
   rc_angles = Vec3();
+  encoder_angles = Vec3();
 }
 
 Gimbal::~Gimbal(void) {
@@ -31,6 +34,7 @@ int Gimbal::configure(std::string config_file) {
 
   // parse config file
   parser.addParam<std::string>("device_path", &device_path);
+  parser.addParam<bool>("enable_tracking", &this->enable_tracking);
   parser.addParam<double>("camera_offset.roll", &roll);
   parser.addParam<double>("camera_offset.pitch", &pitch);
   parser.addParam<double>("camera_offset.yaw", &yaw);
@@ -165,13 +169,18 @@ int Gimbal::getTargetInBPF(Vec3 target_cf, Vec3 &target_bpf) {
 int Gimbal::trackTarget(Vec3 target_bpf) {
   double dist;
 
+  // pre-check
+  if (this->enable_tracking == false) {
+    return 0;
+  }
+
   // calculate roll pitch yaw setpoints
+  // Note: setpoints are assuming Gimbal are in NWU frame
+  // NWU frame: (x - forward, y - left, z - up)
   dist = target_bpf.norm();
   this->setpoints(0) = asin(target_bpf(1) / dist);  // roll setpoint
   this->setpoints(1) = asin(target_bpf(0) / dist);  // pitch setpoint
   this->setpoints(2) = 0.0;  // yaw setpoint - unsupported at the moment
-  // Note: setpoints are assuming Gimbal are in NWU frame
-  // NWU frame: (x - forward, y - left, z - up)
 
   return 0;
 }
@@ -219,11 +228,15 @@ int Gimbal::updateGimbalStates(void) {
 }
 
 int Gimbal::setAngle(double roll, double pitch) {
+  // pre-check
+  if (this->enable_tracking == false) {
+    return 0;
+  }
+
   this->setpoints(0) = roll * 180 / M_PI;
   this->setpoints(1) = pitch * 180 / M_PI;
   this->setpoints(2) = 0.0 * 180 / M_PI;
 
-  // usleep(20000);
   return this->sbgc.setAngle(
     this->setpoints(0),
     this->setpoints(1),

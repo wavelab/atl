@@ -67,6 +67,9 @@ void target2inertial(Vec3 target_pos_bf,
                      Vec3 body_pos_if,
                      Quaternion body_orientation_if,
                      Vec3 &target_pos_if);
+void inertial2body(Vec3 enu_if,
+                   Quaternion orientation_if,
+                   Vec3 &nwu_bf);
 double wrapTo180(double euler_angle);
 double wrapTo360(double euler_angle);
 double cross_track_error(Vec2 p1, Vec2 p2, Vec2 pos);

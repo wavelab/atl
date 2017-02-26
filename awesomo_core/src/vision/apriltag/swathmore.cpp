@@ -91,7 +91,9 @@ int SwathmoreDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
 }
 
 int SwathmoreDetector::obtainPose(TagDetection tag, TagPose &tag_pose) {
-  cv::Mat R, T;
+  Vec3 t;
+  Mat3 R;
+  cv::Mat cv_R, cv_T;
   CameraConfig camera_config;
   double fx, fy, tag_size;
 
@@ -110,13 +112,25 @@ int SwathmoreDetector::obtainPose(TagDetection tag, TagPose &tag_pose) {
   }
 
   // caculate pose
-  CameraUtil::homographyToPoseCV(fx, fy, tag_size, tag.homography, R, T);
+  CameraUtil::homographyToPoseCV(fx, fy, tag_size, tag.homography, cv_R, cv_T);
+
+  // sanity check - calculate euclidean distance between prev and current tag
+  // clang-format on
+  t << cv_T.at<double>(0), cv_T.at<double>(1), cv_T.at<double>(2);
+  R << cv_R.at<double>(0, 0), cv_R.at<double>(0, 1), cv_R.at<double>(0, 2),
+       cv_R.at<double>(1, 0), cv_R.at<double>(1, 1), cv_R.at<double>(1, 2),
+       cv_R.at<double>(2, 0), cv_R.at<double>(2, 1), cv_R.at<double>(2, 2);
+  // clang-format off
+  if ((t - this->prev_tag.position).norm() > this->tag_sanity_check) {
+    return -1;
+  }
 
   // tag is in camera frame
   // camera frame:  (z - forward, x - right, y - down)
   tag_pose.id = tag.id;
   tag_pose.detected = true;
-  tag_pose.position << T.at<double>(0), T.at<double>(1), T.at<double>(2);
+  tag_pose.position = t;
+  tag_pose.orientation = Quaternion(R);
 
   return 0;
 }

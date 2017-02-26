@@ -36,7 +36,6 @@ class GimbalNode : public ROSNode {
 public:
   std::string quad_frame;
   std::string gimbal_imu;
-  bool enable_tracker;
   Gimbal gimbal;
   Vec3 set_points;
 

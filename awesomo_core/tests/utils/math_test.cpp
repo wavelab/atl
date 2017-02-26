@@ -424,6 +424,19 @@ TEST(Utils_math, target2inertial) {
   ASSERT_FLOAT_EQ(0.0, target_pos_if(2));
 }
 
+TEST(Utils_math, inertial2body) {
+  Vec3 enu_if, nwu_bf, euler;
+  Quaternion orientation_if;
+
+  euler << 0, 0, deg2rad(-90);
+  euler2quat(euler, 321, orientation_if);
+  enu_if << 0, 1, 0;
+  inertial2body(enu_if, orientation_if, nwu_bf);
+
+  // std::cout << enu_if.transpose() << std::endl;
+  // std::cout << nwu_bf.transpose() << std::endl;
+}
+
 TEST(Utils_math, wrapTo180) {
   double retval;
 
