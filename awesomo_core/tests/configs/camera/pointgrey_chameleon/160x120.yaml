@@ -2,6 +2,7 @@ index: 0
 image_width: 160
 image_height: 120
 
+shutter_speed: 0
 exposure_value: 2.5 # in mili seconds
 gain_value: 20.0
 lambda: [0.0, 0.0, 0.0]

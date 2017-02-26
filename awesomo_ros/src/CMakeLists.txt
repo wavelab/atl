@@ -5,8 +5,8 @@ SET(
     flycapture
     ${catkin_LIBRARIES}
     ${OpenCV_LIBS}
-    # apriltags_swathmore
     apriltags_mit
+    apriltags_swathmore
     CGAL
     yaml-cpp
     m3api

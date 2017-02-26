@@ -95,13 +95,19 @@ int MITDetector::illuminationInvariantTransform(cv::Mat &image) {
   image = log_ch_2 - alpha * log_ch_3 - (1 - alpha) * log_ch_1;
   cv::normalize(image, image, 0, 255, cv::NORM_MINMAX, CV_8UC1);
 
+  // double min, max;
+  // cv::minMaxLoc(image, &min, &max);
+  // std::cout << "min: " << min << std::endl;
+  // std::cout << "max: " << max << std::endl;
+  // image = (image - min) / (max - min);
+
   return 0;
 }
 
 int MITDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
   int retval;
   TagPose pose;
-  cv::Mat masked, image_gray;
+  cv::Mat image_gray;
   std::vector<AprilTags::TagDetection> detections;
 
   // change mode based on image size

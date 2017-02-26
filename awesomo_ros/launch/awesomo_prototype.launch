@@ -28,9 +28,9 @@
   <node pkg="prototype_ros" name="prototype_camera" type="camera_node" output="screen" required="true">
     <remap from="/prototype/camera/image" to="/awesomo/camera/image" />
   </node>
-  <node pkg="prototype_ros" name="prototype_df_camera" type="df_camera_node" output="screen" required="true">
-    <remap from="/prototype/df_camera/image" to="/awesomo/df_camera/image" />
-  </node>
+  <!-- <node pkg="prototype_ros" name="prototype_df_camera" type="df_camera_node" output="screen" required="true"> -->
+  <!--   <remap from="/prototype/df_camera/image" to="/awesomo/df_camera/image" /> -->
+  <!-- </node> -->
   <node pkg="prototype_ros" name="prototype_gimbal" type="gimbal_node" output="screen" required="true" >
     <remap from="/prototype/gimbal/position/inertial" to="/awesomo/gimbal/position/inertial" />
     <remap from="/prototype/gimbal/frame/orientation/inertial" to="/awesomo/gimbal/frame/orientation/inertial" />

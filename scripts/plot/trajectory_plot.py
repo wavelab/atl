@@ -259,8 +259,8 @@ if __name__ == "__main__":
     rosbag_parser(bag, params)
 
     plt.style.use("ggplot")
-    # plot_quad_tag_xy(quad_data, tag_data)
-    # plot_quad_tag_xyz(quad_data, tag_data)
-    # plot_quad_tag_3d(quad_data, tag_data)
+    plot_quad_tag_xy(quad_data, tag_data)
+    plot_quad_tag_xyz(quad_data, tag_data)
+    plot_quad_tag_3d(quad_data, tag_data)
     plot_est_tag_xyz(est_data, tag_data)
     plt.show()

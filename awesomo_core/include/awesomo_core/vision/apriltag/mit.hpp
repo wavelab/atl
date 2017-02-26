@@ -45,7 +45,7 @@ public:
   int extractTags(cv::Mat &image, std::vector<TagPose> &tags);
   int obtainPose(AprilTags::TagDetection tag, TagPose &tag_pose);
   int changeMode(cv::Mat &image);
-  int maskImage(TagPose tag_pose, cv::Mat &image, double padding=0.2);
+  int maskImage(TagPose tag_pose, cv::Mat &image, double padding=0.5);
   void printTag(TagPose tag);
 };
 
