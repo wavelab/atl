@@ -7,7 +7,9 @@ from rosbag_parser import rosbag_parser
 
 # bag = rosbag.Bag("../awesomo_data/170220-position_controller_tuning_1.bag")
 # bag = rosbag.Bag("../awesomo_data/170220-position_controller_tuning_2.bag")
-bag = rosbag.Bag("/home/chutsu/Dropbox/awesomo_bags/tracking_inertial_mode.bag")
+# bag = rosbag.Bag("/home/chutsu/Dropbox/awesomo_bags/tracking_inertial_mode.bag")
+# bag = rosbag.Bag("/home/chutsu/Dropbox/awesomo_bags/tracking_blown_by_wind.bag")
+bag = rosbag.Bag("/home/chutsu/Dropbox/awesomo_bags/tracking_better_but_losted.bag")
 
 
 class PoseStampedData:
@@ -247,20 +249,20 @@ if __name__ == "__main__":
             "callback": tag_data.parse_inertial},
         {"topic": "/awesomo/apriltag/target/position/body",
             "callback": tag_data.parse_body},
-        {"topic": "/awesomo/estimate/landing_target/position/inertial",
-            "callback": est_data.parse_position_inertial},
+        # {"topic": "/awesomo/estimate/landing_target/position/inertial",
+        #     "callback": est_data.parse_position_inertial},
         {"topic": "/awesomo/estimate/landing_target/position/body",
             "callback": est_data.parse_position_body},
-        {"topic": "/awesomo/estimate/landing_target/velocity/inertial",
-            "callback": est_data.parse_velocity_inertial},
+        # {"topic": "/awesomo/estimate/landing_target/velocity/inertial",
+        #     "callback": est_data.parse_velocity_inertial},
         {"topic": "/awesomo/estimate/landing_target/velocity/body",
             "callback": est_data.parse_velocity_body}
     ]
     rosbag_parser(bag, params)
 
     plt.style.use("ggplot")
-    plot_quad_tag_xy(quad_data, tag_data)
-    plot_quad_tag_xyz(quad_data, tag_data)
+    # plot_quad_tag_xy(quad_data, tag_data)
+    # plot_quad_tag_xyz(quad_data, tag_data)
     plot_quad_tag_3d(quad_data, tag_data)
     plot_est_tag_xyz(est_data, tag_data)
     plt.show()

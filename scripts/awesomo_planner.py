@@ -198,11 +198,11 @@ def cost_func(x, args):
 
     # position error cost
     cost += 0.0 * np.linalg.norm(states[0] - traj[0])  # dx
-    cost += 1.0 * np.linalg.norm(states[2] - traj[1])  # dz
+    cost += 0.0 * np.linalg.norm(states[2] - traj[1])  # dz
 
     # control input cost
-    cost += 0.0 * np.linalg.norm(states[4] - 10.0)  # az
-    cost += 1.0 * np.linalg.norm(states[5])         # theta
+    cost += 0.1 * np.linalg.norm(states[4])  # az
+    cost += 1.0 * np.linalg.norm(states[5])  # theta
 
     # control input difference cost
     cost += 0.0 * np.linalg.norm(np.diff(states[4]))  # az
@@ -338,7 +338,6 @@ def record_optimized_results(T, n, m, v, dt, results, fpath):
             x_ok = ((prev_x[0] - x[0]) != 0)
             z_ok = ((prev_x[2] - x[2]) != 0)
 
-        print(target_x, x[0])
         if x_ok and z_ok:
             f.write(bytes(str(x[0]) + ",", "UTF-8"))         # x
             f.write(bytes(str(x[1]) + ",", "UTF-8"))         # vx
@@ -371,7 +370,7 @@ def generate_trajectory_combinations():
 if __name__ == "__main__":
     basedir = "./trajectory/"
     index = 0
-    dt = 0.1
+    dt = 0.08
 
     p0_z = 5.0
     pf_z = 0.0
