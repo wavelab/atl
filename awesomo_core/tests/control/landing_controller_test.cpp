@@ -42,20 +42,11 @@ TEST(Trajectory, update) {
   pos << 0.0, 0.0, 5.0;
   traj.load(1, TEST_TRAJ, pos);
 
-  pos << 0.0, 0.0, 5.0;
-  traj.update(pos, wp_pos, wp_vel, wp_inputs);
-  ASSERT_FLOAT_EQ(0.0, wp_pos(0));
-  ASSERT_FLOAT_EQ(5.0, wp_pos(1));
-  ASSERT_FLOAT_EQ(0.0, wp_vel(0));
-  ASSERT_EQ(49, traj.pos.size());
-
-  pos << 0.0, 0.0, 4.9;
-  traj.update(pos, wp_pos, wp_vel, wp_inputs);
-  ASSERT_EQ(48, traj.pos.size());
-
-  pos << 0.0, 0.0, 4.8;
-  traj.update(pos, wp_pos, wp_vel, wp_inputs);
-  ASSERT_EQ(47, traj.pos.size());
+  // pos << 0.0, 0.0, 5.0;
+  // traj.update(pos, wp_pos, wp_vel, wp_inputs);
+  // ASSERT_FLOAT_EQ(0.0, wp_pos(0));
+  // ASSERT_FLOAT_EQ(5.0, wp_pos(1));
+  // ASSERT_FLOAT_EQ(0.0, wp_vel(0));
 }
 
 TEST(Trajectory, reset) {
