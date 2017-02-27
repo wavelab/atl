@@ -25,6 +25,8 @@ namespace awesomo {
 class Trajectory {
 public:
   bool loaded;
+  int index;
+
   std::deque<Vec2> pos;
   std::deque<Vec2> vel;
   std::deque<Vec2> inputs;
@@ -33,7 +35,7 @@ public:
   Vec3 p0;
 
   Trajectory(void);
-  int load(std::string filepath, Vec3 pos);
+  int load(int index, std::string filepath, Vec3 pos);
   int update(Vec3 pos, Vec2 &wp_pos, Vec2 &wp_vel, Vec2 &wp_inputs);
   void reset(void);
 };
@@ -87,12 +89,12 @@ public:
   int configure(std::string config_file);
   int loadTrajectory(Vec3 pos, Vec3 target_pos_bf, double v);
   int prepBlackbox(std::string blackbox_file);
+  int recordTrajectoryIndex(void);
   int record(Vec3 pos,
              Vec3 vel,
-             Vec2 wp_pos,
-             Vec2 wp_vel,
              Vec3 target_pos_bf,
              Vec3 target_vel_bf,
+             double yaw,
              double dt);
   Vec4 calculateVelocityErrors(Vec3 errors, double yaw, double dt);
   int calculate(Vec3 target_pos_bf,

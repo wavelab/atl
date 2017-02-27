@@ -21,8 +21,9 @@ TEST(Trajectory, load) {
   Vec3 pos;
 
   pos << 1.0, 2.0, 3.0;
-  retval = traj.load(TEST_TRAJ, pos);
+  retval = traj.load(1, TEST_TRAJ, pos);
   ASSERT_EQ(0, retval);
+  ASSERT_EQ(1, traj.index);
   ASSERT_FLOAT_EQ(1.0, traj.p0(0));
   ASSERT_FLOAT_EQ(2.0, traj.p0(1));
   ASSERT_FLOAT_EQ(3.0, traj.p0(2));
@@ -39,7 +40,7 @@ TEST(Trajectory, update) {
   Vec2 wp_pos, wp_vel, wp_inputs;
 
   pos << 0.0, 0.0, 5.0;
-  traj.load(TEST_TRAJ, pos);
+  traj.load(1, TEST_TRAJ, pos);
 
   pos << 0.0, 0.0, 5.0;
   traj.update(pos, wp_pos, wp_vel, wp_inputs);
@@ -62,7 +63,7 @@ TEST(Trajectory, reset) {
   Vec3 pos;
 
   pos << 1.0, 2.0, 3.0;
-  traj.load(TEST_TRAJ, pos);
+  traj.load(1, TEST_TRAJ, pos);
   traj.reset();
   ASSERT_EQ(0, traj.pos.size());
   ASSERT_EQ(0, traj.vel.size());
