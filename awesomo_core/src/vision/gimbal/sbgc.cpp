@@ -386,6 +386,86 @@ int SBGC::getBoardInfo(void) {
   return 0;
 }
 
+int SBGC::getRealtimeData4(void) {
+  int retval;
+  SBGCFrame frame;
+  // SBGCRealtimeData data;
+
+  // request real time data
+  frame.buildFrame(CMD_REALTIME_DATA_4);
+  retval = this->sendFrame(frame);
+  if (retval == -1) {
+    std::cout << "failed to request SBGC realtime data!" << std::endl;
+    return -1;
+  }
+  // obtain real time data
+  retval = this->readFrame(129, frame);
+  if (retval == -1) {
+    std::cout << "failed to parse SBGC frame for realtime data!" << std::endl;
+    return -1;
+  }
+  // parse real time data
+  // accelerometer and gyroscope
+  this->data.accel(0) = S16BIT(frame.data, 1, 0);
+  this->data.gyro(0) = S16BIT(frame.data, 3, 2);
+  this->data.accel(1) = S16BIT(frame.data, 5, 4);
+  this->data.gyro(1) = S16BIT(frame.data, 7, 6);
+  this->data.accel(2) = S16BIT(frame.data, 9, 8);
+  this->data.gyro(2) = S16BIT(frame.data, 11, 10);
+
+  this->data.accel(0) = (ACC_UNIT) * this->data.accel(0);
+  this->data.accel(1) = (ACC_UNIT) * this->data.accel(1);
+  this->data.accel(2) = (ACC_UNIT) * this->data.accel(2);
+
+  this->data.gyro(0) = (GYRO_UNIT) * this->data.gyro(0);
+  this->data.gyro(1) = (GYRO_UNIT) * this->data.gyro(1);
+  this->data.gyro(2) = (GYRO_UNIT) * this->data.gyro(2);
+
+  // angles
+  this->data.camera_angles(0) = S16BIT(frame.data, 33, 32);
+  this->data.camera_angles(1) = S16BIT(frame.data, 35, 34);
+  this->data.camera_angles(2) = S16BIT(frame.data, 37, 36);
+
+  this->data.frame_angles(0) = S16BIT(frame.data, 39, 38);
+  this->data.frame_angles(1) = S16BIT(frame.data, 41, 40);
+  this->data.frame_angles(2) = S16BIT(frame.data, 43, 42);
+
+  this->data.rc_angles(0) = S16BIT(frame.data, 45, 44);
+  this->data.rc_angles(1) = S16BIT(frame.data, 47, 45);
+  this->data.rc_angles(2) = S16BIT(frame.data, 49, 46);
+
+  this->data.encoder_angles(0) = S16BIT(frame.data, 64, 63);
+  this->data.encoder_angles(1) = S16BIT(frame.data, 66, 65);
+  this->data.encoder_angles(2) = S16BIT(frame.data, 68, 67);
+
+
+  this->data.camera_angles(0) = (DEG_PER_BIT) * this->data.camera_angles(0);
+  this->data.camera_angles(1) = (DEG_PER_BIT) * this->data.camera_angles(1);
+  this->data.camera_angles(2) = (DEG_PER_BIT) * this->data.camera_angles(2);
+
+  this->data.frame_angles(0) = (DEG_PER_BIT) * this->data.frame_angles(0);
+  this->data.frame_angles(1) = (DEG_PER_BIT) * this->data.frame_angles(1);
+  this->data.frame_angles(2) = (DEG_PER_BIT) * this->data.frame_angles(2);
+
+  this->data.rc_angles(0) = (DEG_PER_BIT) * this->data.rc_angles(0);
+  this->data.rc_angles(1) = (DEG_PER_BIT) * this->data.rc_angles(1);
+  this->data.rc_angles(2) = (DEG_PER_BIT) * this->data.rc_angles(2);
+
+  this->data.encoder_angles(0) = (DEG_PER_BIT) * this->data.encoder_angles(0);
+  this->data.encoder_angles(1) = (DEG_PER_BIT) * this->data.encoder_angles(1);
+  this->data.encoder_angles(2) = (DEG_PER_BIT) * this->data.encoder_angles(2);
+
+
+  // misc
+  this->data.cycle_time = U16BIT(frame.data, 51, 50);
+  this->data.i2c_error_count = U16BIT(frame.data, 53, 52);
+  this->data.system_error = U16BIT(frame.data, 15, 14);
+  this->data.battery_level = U16BIT(frame.data, 56, 55);
+
+  // this->data.printData();
+
+  return 0;
+}
 int SBGC::getRealtimeData(void) {
   int retval;
   SBGCFrame frame;
@@ -398,7 +478,6 @@ int SBGC::getRealtimeData(void) {
     std::cout << "failed to request SBGC realtime data!" << std::endl;
     return -1;
   }
-
   // obtain real time data
   retval = this->readFrame(68, frame);
   if (retval == -1) {
@@ -458,6 +537,57 @@ int SBGC::getRealtimeData(void) {
 
   return 0;
 }
+
+int SBGC::getAnglesExt(void) {
+  int retval;
+  SBGCFrame frame;
+  // SBGCRealtimeData data;
+
+  // request real time data
+  frame.buildFrame(CMD_GET_ANGLES_EXT);
+  retval = this->sendFrame(frame);
+  if (retval == -1) {
+    std::cout << "failed to request SBGC realtime data!" << std::endl;
+    return -1;
+  }
+  // obtain real time data
+  retval = this->readFrame(54, frame);
+  if (retval == -1) {
+    std::cout << "failed to parse SBGC frame for realtime data!" << std::endl;
+    return -1;
+  }
+
+  // roll
+  this->data.camera_angles(0) = S16BIT(frame.data, 1, 0);
+  this->data.rc_angles(0) = S16BIT(frame.data, 3, 2);
+  this->data.encoder_angles(0) = S16BIT(frame.data, 8, 4);
+
+  // pitch
+  this->data.camera_angles(1) = S16BIT(frame.data, 19, 18);
+  this->data.rc_angles(1) = S16BIT(frame.data, 21, 20);
+  this->data.encoder_angles(1) = S16BIT(frame.data, 26, 22);
+
+  this->data.camera_angles(2) = S16BIT(frame.data, 37, 36);
+  this->data.rc_angles(2) = S16BIT(frame.data, 39, 38);
+  this->data.encoder_angles(2) = S16BIT(frame.data, 44, 40);
+
+  this->data.camera_angles(0) = (DEG_PER_BIT) * this->data.camera_angles(0);
+  this->data.camera_angles(1) = (DEG_PER_BIT) * this->data.camera_angles(1);
+  this->data.camera_angles(2) = (DEG_PER_BIT) * this->data.camera_angles(2);
+
+  this->data.rc_angles(0) = (DEG_PER_BIT) * this->data.rc_angles(0);
+  this->data.rc_angles(1) = (DEG_PER_BIT) * this->data.rc_angles(1);
+  this->data.rc_angles(2) = (DEG_PER_BIT) * this->data.rc_angles(2);
+
+  this->data.encoder_angles(0) = (DEG_PER_BIT) * this->data.encoder_angles(0);
+  this->data.encoder_angles(1) = (DEG_PER_BIT) * this->data.encoder_angles(1);
+  this->data.encoder_angles(2) = (DEG_PER_BIT) * this->data.encoder_angles(2);
+
+  this->data.printData();
+
+  return 0;
+}
+
 
 int SBGC::setAngle(double roll, double pitch, double yaw) {
   SBGCFrame frame;

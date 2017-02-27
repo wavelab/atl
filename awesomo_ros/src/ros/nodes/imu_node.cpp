@@ -6,6 +6,13 @@ namespace awesomo {
 int IMUNode::configure(std::string node_name, int hz) {
   std::string config_path;
 
+  // ros node
+  if (ROSNode::configure(node_name, hz) != 0) {
+    return -1;
+  }
+  ROS_GET_PARAM("/quad_frame", this->quad_frame);
+  ROS_GET_PARAM("/gimbal_imu", this->gimbal_imu);
+
   // imu
   if (this->imu.configure() != 0) {
     log_err("Failed to configure IMU!");
@@ -22,19 +29,16 @@ int IMUNode::configure(std::string node_name, int hz) {
   this->imu.pitch_offset = -1 * this->imu.pitch;
   log_info("Zero-ing complete!");
 
-  // ros node
-  if (ROSNode::configure(node_name, hz) != 0) {
-    return -1;
-  }
-  ROS_GET_PARAM("/quad_frame", this->quad_frame);
 
   // register publisher and subscribers
   // clang-format off
   this->registerPublisher<geometry_msgs::Vector3>(IMU_TOPIC);
-  this->registerPublisher<geometry_msgs::Vector3>(POSITION_TOPIC);
-  this->registerPublisher<geometry_msgs::Quaternion>(FRAME_ORIENTATION_TOPIC);
-  this->registerPublisher<geometry_msgs::Quaternion>(JOINT_ORIENTATION_TOPIC);
-  this->registerSubscriber(QUAD_POSE_TOPIC, &IMUNode::quadPoseCallback, this);
+  if (this->gimbal_imu == "HACK") {
+    this->registerPublisher<geometry_msgs::Quaternion>(JOINT_ORIENTATION_TOPIC);
+  } else if (this->gimbal_imu != "SBGC") {
+    log_err("Invalid gimbal imu mode [%s]", this->gimbal_imu.c_str());
+    return -3;
+  }
   // clang-format on
 
   // loop callback
@@ -51,42 +55,11 @@ int IMUNode::publishIMU(Vec3 euler) {
   return 0;
 }
 
-int IMUNode::publishPosition(Vec3 pos) {
-  geometry_msgs::Vector3 msg;
-  buildMsg(pos, msg);
-  this->ros_pubs[POSITION_TOPIC].publish(msg);
-  return 0;
-}
-
-int IMUNode::publishFrameOrientation(Quaternion q) {
-  geometry_msgs::Quaternion msg;
-  buildMsg(q, msg);
-  this->ros_pubs[FRAME_ORIENTATION_TOPIC].publish(msg);
-  return 0;
-}
-
 int IMUNode::publishJointOrientation(Quaternion q) {
   geometry_msgs::Quaternion msg;
   buildMsg(q, msg);
   this->ros_pubs[JOINT_ORIENTATION_TOPIC].publish(msg);
   return 0;
-}
-
-void IMUNode::quadPoseCallback(const geometry_msgs::PoseStamped &msg) {
-  Vec3 pos;
-  Quaternion q;
-
-  pos(0)  = msg.pose.position.x;
-  pos(1)  = msg.pose.position.y;
-  pos(2)  = msg.pose.position.z;
-
-  q.w() = msg.pose.orientation.w;
-  q.x() = msg.pose.orientation.x;
-  q.y() = msg.pose.orientation.y;
-  q.z() = msg.pose.orientation.z;
-
-  this->publishPosition(pos);
-  this->publishFrameOrientation(q);
 }
 
 int IMUNode::loopCallback(void) {
@@ -97,7 +70,9 @@ int IMUNode::loopCallback(void) {
     euler << -1 * deg2rad(this->imu.roll), deg2rad(this->imu.pitch), 0.0;
     euler2quat(euler, 321, q);
     this->publishIMU(euler);
-    this->publishJointOrientation(q);
+    if (this->gimbal_imu == "HACK") {
+      this->publishJointOrientation(q);
+    }
   } else {
     log_info("Failed to poll IMU for data!");
   }

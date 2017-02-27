@@ -4,30 +4,11 @@
 namespace awesomo {
 
 SwathmoreDetector::SwathmoreDetector(void) {
-  this->configured = false;
-
   this->detector = NULL;
-
-  this->tag_configs.clear();
-  this->camera_mode = "";
-  this->camera_modes.clear();
-  this->camera_configs.clear();
-  this->imshow = false;
 }
 
 int SwathmoreDetector::configure(std::string config_file) {
-  Camera camera;
-  ConfigParser parser;
-  std::vector<int> tag_ids;
-  std::vector<float> tag_sizes;
-  std::string config_dir, camera_config;
-
-  // load config
-  parser.addParam<std::vector<int>>("tag_ids", &tag_ids);
-  parser.addParam<std::vector<float>>("tag_sizes", &tag_sizes);
-  parser.addParam<std::string>("camera_config", &camera_config);
-  parser.addParam<bool>("imshow", &this->imshow);
-  if (parser.load(config_file) != 0) {
+  if (BaseDetector::configure(config_file) != 0) {
     return -1;
   }
 
@@ -43,55 +24,76 @@ int SwathmoreDetector::configure(std::string config_file) {
   family->setErrorRecoveryFraction(0.5);
   this->detector = new TagDetector(*family, *params);
 
-  // tag configs
-  for (int i = 0; i < tag_ids.size(); i++) {
-    this->tag_configs[tag_ids[i]] = tag_sizes[i];
-  }
-
-  // parse camera configs
-  config_dir = std::string(dirname((char *) config_file.c_str()));
-  paths_combine(config_dir, camera_config, camera_config);
-  if (camera.configure(camera_config) != 0) {
-    return -1;
-  }
-  this->camera_mode = camera.modes[0];
-  this->camera_modes = camera.modes;
-  this->camera_configs = camera.configs;
-
-  this->configured = true;
   return 0;
 }
 
-std::vector<TagPose> SwathmoreDetector::extractTags(cv::Mat &image) {
+int SwathmoreDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
+  int retval;
   TagPose pose;
   cv::Mat image_gray;
   cv::Point2d optical_center;
   TagDetectionArray detections;
-  std::vector<TagPose> pose_estimates;
+  CameraConfig camera_config;
 
   // setup
-  optical_center.x = image.cols * 0.5;
-  optical_center.y = image.rows * 0.5;
+  camera_config = this->camera_configs[this->camera_mode];
+  optical_center.x = camera_config.camera_matrix.at<double>(0, 2);
+  optical_center.y = camera_config.camera_matrix.at<double>(1, 2);
+
+  // change mode based on image size
+  this->changeMode(image);
+
+  // tranform illumination invariant tag
+  if (this->illum_invar) {
+    this->illuminationInvariantTransform(image);
+  }
+
+  // mask image if tag was last detected
+  if (this->prev_tag.detected && this->windowing) {
+    retval = this->maskImage(this->prev_tag, image, this->window_padding);
+    if (retval == -4) {
+      return -1;
+    }
+  }
+
+  // convert image to gray-scale
+  if (image.channels() == 3) {
+    cv::cvtColor(image, image_gray, cv::COLOR_BGR2GRAY);
+  } else {
+    image_gray = image;
+  }
 
   // extract tags
-  cv::cvtColor(image, image_gray, cv::COLOR_BGR2GRAY);
   this->detector->process(image_gray, optical_center, detections);
 
   // calculate tag pose
   for (int i = 0; i < detections.size(); i++) {
     if (this->obtainPose(detections[i], pose) == 0) {
-      pose_estimates.push_back(pose);
-    }
+      tags.push_back(pose);
 
-    // only need 1 tag
-    break;
+      // keep track of last tag
+      this->prev_tag = pose;
+      this->prev_tag_image_width = image.cols;
+      this->prev_tag_image_height = image.rows;
+
+      // only need 1 tag
+      break;
+    }
   }
 
-  return pose_estimates;
+  // imshow
+  if (this->imshow) {
+    cv::imshow("SwathmoreDetector", image_gray);
+    cv::waitKey(1);
+  }
+
+  return 0;
 }
 
 int SwathmoreDetector::obtainPose(TagDetection tag, TagPose &tag_pose) {
-  cv::Mat R, T;
+  Vec3 t;
+  Mat3 R;
+  cv::Mat cv_R, cv_T;
   CameraConfig camera_config;
   double fx, fy, tag_size;
 
@@ -110,25 +112,27 @@ int SwathmoreDetector::obtainPose(TagDetection tag, TagPose &tag_pose) {
   }
 
   // caculate pose
-  CameraUtil::homographyToPoseCV(fx, fy, tag_size, tag.homography, R, T);
+  CameraUtil::homographyToPoseCV(fx, fy, tag_size, tag.homography, cv_R, cv_T);
+
+  // sanity check - calculate euclidean distance between prev and current tag
+  // clang-format on
+  t << cv_T.at<double>(0), cv_T.at<double>(1), cv_T.at<double>(2);
+  R << cv_R.at<double>(0, 0), cv_R.at<double>(0, 1), cv_R.at<double>(0, 2),
+       cv_R.at<double>(1, 0), cv_R.at<double>(1, 1), cv_R.at<double>(1, 2),
+       cv_R.at<double>(2, 0), cv_R.at<double>(2, 1), cv_R.at<double>(2, 2);
+  // clang-format off
+  if ((t - this->prev_tag.position).norm() > this->tag_sanity_check) {
+    return -1;
+  }
 
   // tag is in camera frame
   // camera frame:  (z - forward, x - right, y - down)
   tag_pose.id = tag.id;
   tag_pose.detected = true;
-  tag_pose.position << T.at<double>(0), T.at<double>(1), T.at<double>(2);
+  tag_pose.position = t;
+  tag_pose.orientation = Quaternion(R);
 
   return 0;
-}
-
-void SwathmoreDetector::printTag(TagPose tag) {
-  std::cout << "id: " << tag.id << " ";
-  std::cout << "[";
-  std::cout << "x= " << tag.position(0) << " ";
-  std::cout << "y= " << tag.position(1) << " ";
-  std::cout << "z= " << tag.position(2);
-  std::cout << "]";
-  std::cout << std::endl;
 }
 
 }  // end of awesomo namespace

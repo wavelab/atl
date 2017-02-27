@@ -18,35 +18,19 @@
 #include "awesomo_core/utils/utils.hpp"
 #include "awesomo_core/vision/camera/camera.hpp"
 #include "awesomo_core/vision/apriltag/data.hpp"
+#include "awesomo_core/vision/apriltag/base_detector.hpp"
 
 
 namespace awesomo {
 
-class MITDetector {
+class MITDetector : public BaseDetector {
 public:
-  bool configured;
-
   AprilTags::TagDetector *detector;
-  TagPose prev_tag;
-  int prev_tag_image_width;
-  int prev_tag_image_height;
-
-  std::map<int, float> tag_configs;
-  double tag_sanity_check;
-  std::string camera_mode;
-  std::vector<std::string> camera_modes;
-  std::map<std::string, CameraConfig> camera_configs;
-  bool illum_invar;
-  bool imshow;
 
   MITDetector(void);
   int configure(std::string config_file);
-  int illuminationInvariantTransform(cv::Mat &image);
   int extractTags(cv::Mat &image, std::vector<TagPose> &tags);
   int obtainPose(AprilTags::TagDetection tag, TagPose &tag_pose);
-  int changeMode(cv::Mat &image);
-  int maskImage(TagPose tag_pose, cv::Mat &image, double padding=0.2);
-  void printTag(TagPose tag);
 };
 
 }  // end of awesomo namespace

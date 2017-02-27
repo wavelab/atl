@@ -6,16 +6,18 @@ namespace awesomo {
 // TRAJECTORY
 Trajectory::Trajectory(void) {
   this->loaded = false;
+  this->index = -1;
   this->pos.clear();
   this->vel.clear();
   this->inputs.clear();
-  this->target_bf.clear();
+  this->rel_pos.clear();
+  this->rel_vel.clear();
   this->p0 << 0.0, 0.0, 0.0;
 }
 
-int Trajectory::load(std::string filepath, Vec3 p0) {
+int Trajectory::load(int index, std::string filepath, Vec3 p0) {
   MatX traj_data;
-  Vec2 p, v, u, target_bf;
+  Vec2 p, v, u, rel_p, rel_v;
 
   // pre-check
   if (file_exists(filepath) == false) {
@@ -31,29 +33,34 @@ int Trajectory::load(std::string filepath, Vec3 p0) {
   // - vz
   // - az
   // - theta
-  // - target_bf_x
-  // - target_bf_z
+  // - rel_x
+  // - rel_z
+  // - rel_vx
+  // - rel_vz
   this->reset();
+  this->index = index;
   csv2mat(filepath, true, traj_data);
   if (traj_data.rows() == 0) {
     log_err(ETROWS, filepath.c_str());
     return -2;
-  } else if (traj_data.cols() != 8) {
+  } else if (traj_data.cols() != 10) {
     log_err(ETCOLS, filepath.c_str());
     return -2;
   }
 
   // set trajectory class
   for (int i = 0; i < traj_data.rows(); i++) {
-    p << traj_data(i, 0), traj_data(i, 2);
-    v << traj_data(i, 1), traj_data(i, 3);
-    u << traj_data(i, 4), traj_data(i, 5);
-    target_bf << traj_data(i, 6), traj_data(i, 7);
+    p << traj_data(i, 0), traj_data(i, 2);      // x, z
+    v << traj_data(i, 1), traj_data(i, 3);      // vx, vz
+    u << traj_data(i, 4), traj_data(i, 5);      // az, theta
+    rel_p << traj_data(i, 6), traj_data(i, 7);  // rel_x, rel_z
+    rel_v << traj_data(i, 8), traj_data(i, 9);  // rel_vx, rel_vz
 
     this->pos.push_back(p);
     this->vel.push_back(v);
     this->inputs.push_back(u);
-    this->target_bf.push_back(target_bf);
+    this->rel_pos.push_back(rel_p);
+    this->rel_vel.push_back(rel_v);
   }
 
   this->p0 = p0;
@@ -61,9 +68,9 @@ int Trajectory::load(std::string filepath, Vec3 p0) {
   return 0;
 }
 
-int Trajectory::update(Vec3 pos, Vec2 &wp_pos, Vec2 &wp_vel, Vec2 &q_pos) {
+int Trajectory::update(Vec3 pos, Vec2 &wp_pos, Vec2 &wp_vel, Vec2 &wp_inputs) {
   int retval;
-  Vec2 wp_pos_start, wp_pos_end, wp_pos_last;
+  Vec2 wp_pos_start, wp_pos_end, wp_pos_last, q_pos;
 
   // pre-check
   if (this->loaded == false) {
@@ -71,6 +78,7 @@ int Trajectory::update(Vec3 pos, Vec2 &wp_pos, Vec2 &wp_vel, Vec2 &q_pos) {
   } else if (this->pos.size() < 2) {
     wp_pos = this->pos.at(0);
     wp_vel = this->vel.at(0);
+    wp_inputs = this->inputs.at(0);
     return 0;
   }
 
@@ -81,28 +89,30 @@ int Trajectory::update(Vec3 pos, Vec2 &wp_pos, Vec2 &wp_vel, Vec2 &q_pos) {
   q_pos(0) = (this->p0.block(0, 0, 2, 1) - pos.block(0, 0, 2, 1)).norm();
   q_pos(1) = pos(2);
 
-  // find next waypoint position and velocity
+  // find next waypoint position, velocity and inputs
   retval = closest_point(wp_pos_start, wp_pos_end, q_pos, wp_pos);
   wp_vel = this->vel.at(1);
+  wp_inputs = this->inputs.at(1);
 
   // update trajectory waypoints
   if (retval == 2) {
     this->pos.pop_front();
     this->vel.pop_front();
     this->inputs.pop_front();
-    this->target_bf.pop_front();
+    this->rel_pos.pop_front();
+    this->rel_vel.pop_front();
   }
 
+  // debug
   // std::cout << "pos: " << pos.transpose() << std::endl;
-  // std::cout << "p0: " << this->p0.block(0, 0, 2, 1).transpose() << std::endl;
-  // std::cout << "q_pos: " << q_pos.transpose() << std::endl;
   // std::cout << "wp_start: " << wp_pos_start.transpose() << std::endl;
   // std::cout << "wp_end: " << wp_pos_end.transpose() << std::endl;
-  // std::cout << "wp_last: " << wp_pos_last.transpose() << std::endl;
   // std::cout << "wp_vel: " << wp_vel.transpose() << std::endl;
   // std::cout << "wp: " << wp_pos.transpose() << std::endl;
-  // std::cout << "target_bf: " << this->target_bf.at(0).transpose() << std::endl;
-  // std::cout << "waypoints: " << this->pos.size() << std::endl;
+  // std::cout << "rel_pos: " << this->rel_pos.at(0).transpose() << std::endl;
+  // std::cout << "rel_vel: " << this->rel_vel.at(0).transpose() << std::endl;
+  // std::cout << "inputs: " << this->inputs.at(0).transpose() << std::endl;
+  // std::cout << "nb waypoints left: " << this->pos.size() << std::endl;
   // std::cout << std::endl;
 
   return 0;
@@ -113,7 +123,8 @@ void Trajectory::reset(void) {
   this->pos.clear();
   this->vel.clear();
   this->inputs.clear();
-  this->target_bf.clear();
+  this->rel_pos.clear();
+  this->rel_vel.clear();
   this->p0 << 0.0, 0.0, 0.0;
 }
 
@@ -190,7 +201,7 @@ int TrajectoryIndex::find(Vec3 pos, double v, Trajectory &traj) {
   // load trajectory
   traj_file = this->traj_dir + "/";
   traj_file += std::to_string((int) matches[0]) + ".csv";
-  if (traj.load(traj_file, pos) != 0) {
+  if (traj.load(matches[0], traj_file, pos) != 0) {
     return -3;
   }
 
@@ -202,14 +213,8 @@ int TrajectoryIndex::find(Vec3 pos, double v, Trajectory &traj) {
 LandingController::LandingController(void) {
   this->configured = false;
 
-  this->pctrl_dt = 0.0;
-  this->vctrl_dt = 0.0;
+  this->dt = 0.0;
   this->blackbox_dt = 0.0;
-
-  this->x_controller = PID(0.0, 0.0, 0.0);
-  this->y_controller = PID(0.0, 0.0, 0.0);
-  this->z_controller = PID(0.0, 0.0, 0.0);
-  this->hover_throttle = 0.0;
 
   this->vx_controller = PID(0.0, 0.0, 0.0);
   this->vy_controller = PID(0.0, 0.0, 0.0);
@@ -222,13 +227,12 @@ LandingController::LandingController(void) {
   this->throttle_limit[0] = 0.0;
   this->throttle_limit[1] = 0.0;
 
-  this->pctrl_setpoints << 0.0, 0.0, 0.0;
-  this->pctrl_outputs << 0.0, 0.0, 0.0, 0.0;
-  this->vctrl_setpoints << 0.0, 0.0, 0.0;
-  this->vctrl_outputs << 0.0, 0.0, 0.0, 0.0;
+  this->setpoints << 0.0, 0.0, 0.0;
+  this->outputs << 0.0, 0.0, 0.0, 0.0;
   this->att_cmd = AttitudeCommand();
 
   this->traj_index;
+  this->trajectory_threshold << 1.0, 1.0, 1.0;
   this->trajectory;
 
   this->blackbox_enable = false;
@@ -237,7 +241,7 @@ LandingController::LandingController(void) {
 }
 
 LandingController::~LandingController(void) {
-  if (this->blackbox) {
+  if (this->blackbox_enable && this->blackbox) {
     this->blackbox.close();
   }
 }
@@ -250,19 +254,6 @@ int LandingController::configure(std::string config_file) {
 
   // load config
   // clang-format off
-  parser.addParam<double>("roll_controller.k_p", &this->y_controller.k_p);
-  parser.addParam<double>("roll_controller.k_i", &this->y_controller.k_i);
-  parser.addParam<double>("roll_controller.k_d", &this->y_controller.k_d);
-
-  parser.addParam<double>("pitch_controller.k_p", &this->x_controller.k_p);
-  parser.addParam<double>("pitch_controller.k_i", &this->x_controller.k_i);
-  parser.addParam<double>("pitch_controller.k_d", &this->x_controller.k_d);
-
-  parser.addParam<double>("throttle_controller.k_p", &this->z_controller.k_p);
-  parser.addParam<double>("throttle_controller.k_i", &this->z_controller.k_i);
-  parser.addParam<double>("throttle_controller.k_d", &this->z_controller.k_d);
-  parser.addParam<double>("throttle_controller.hover_throttle", &this->hover_throttle);
-
   parser.addParam<double>("vx_controller.k_p", &this->vx_controller.k_p);
   parser.addParam<double>("vx_controller.k_i", &this->vx_controller.k_i);
   parser.addParam<double>("vx_controller.k_d", &this->vx_controller.k_d);
@@ -285,7 +276,11 @@ int LandingController::configure(std::string config_file) {
   parser.addParam<double>("throttle_limit.max", &this->throttle_limit[1]);
 
   parser.addParam<std::string>("trajectory_index", &traj_index_file);
-  parser.addParam<std::string>("blackbox_file", &blackbox_file);
+  parser.addParam<Vec3>("trajectory_threshold", &this->trajectory_threshold);
+
+  parser.addParam<bool>("blackbox_enable", &this->blackbox_enable);
+  parser.addParam<double>("blackbox_rate", &this->blackbox_rate, true);
+  parser.addParam<std::string>("blackbox_file", &blackbox_file, true);
   // clang-format on
   if (parser.load(config_file) != 0) {
     return -1;
@@ -299,9 +294,19 @@ int LandingController::configure(std::string config_file) {
   }
 
   // prepare blackbox file
-  if (this->prepBlackbox(blackbox_file) != 0) {
-    log_err("Failed to open blackbox file at [%s]", blackbox_file.c_str());
-    return -3;
+  if (this->blackbox_enable) {
+    if (blackbox_file == "") {
+      log_err("blackbox file is not set!");
+      return -3;
+    } else if (this->prepBlackbox(blackbox_file) != 0) {
+      log_err("Failed to open blackbox file at [%s]", blackbox_file.c_str());
+      return -3;
+    }
+
+    if (this->blackbox_rate == FLT_MAX) {
+      log_err("blackbox rate is not set!");
+      return -3;
+    }
   }
 
   // convert roll and pitch limits from degrees to radians
@@ -311,10 +316,8 @@ int LandingController::configure(std::string config_file) {
   this->pitch_limit[1] = deg2rad(this->pitch_limit[1]);
 
   // initialize setpoints to zero
-  this->pctrl_setpoints << 0.0, 0.0, 0.0;
-  this->pctrl_outputs << 0.0, 0.0, 0.0, 0.0;
-  this->vctrl_setpoints << 0.0, 0.0, 0.0;
-  this->vctrl_outputs << 0.0, 0.0, 0.0, 0.0;
+  this->setpoints << 0.0, 0.0, 0.0;
+  this->outputs << 0.0, 0.0, 0.0, 0.0;
 
   this->configured = true;
   return 0;
@@ -357,29 +360,27 @@ int LandingController::prepBlackbox(std::string blackbox_file) {
   this->blackbox << "vx" << ",";
   this->blackbox << "vy" << ",";
   this->blackbox << "vz" << ",";
-  this->blackbox << "wp_pos_x" << ",";
-  this->blackbox << "wp_pos_y" << ",";
-  this->blackbox << "wp_pos_z" << ",";
-  this->blackbox << "wp_vel_x" << ",";
-  this->blackbox << "wp_vel_y" << ",";
-  this->blackbox << "wp_vel_z" << ",";
-  this->blackbox << "target_pos_bf_x" << ",";
-  this->blackbox << "target_pos_bf_y" << ",";
-  this->blackbox << "target_pos_bf_z" << ",";
-  this->blackbox << "target_vel_bf_x" << ",";
-  this->blackbox << "target_vel_bf_y" << ",";
-  this->blackbox << "target_vel_bf_z" << ",";
+  this->blackbox << "target_x_bf" << ",";
+  this->blackbox << "target_y_bf" << ",";
+  this->blackbox << "target_z_bf" << ",";
+  this->blackbox << "target_vx_bf" << ",";
+  this->blackbox << "target_vy_bf" << ",";
+  this->blackbox << "target_vz_bf" << ",";
+  this->blackbox << "yaw";
   this->blackbox << std::endl;
 
   return 0;
 }
 
+int LandingController::recordTrajectoryIndex(void) {
+  this->blackbox << "trajectory index: " << this->trajectory.index << std::endl;
+}
+
 int LandingController::record(Vec3 pos,
                               Vec3 vel,
-                              Vec2 wp_pos,
-                              Vec2 wp_vel,
                               Vec3 target_pos_bf,
                               Vec3 target_vel_bf,
+                              double yaw,
                               double dt) {
   // pre-check
   this->blackbox_dt += dt;
@@ -395,60 +396,17 @@ int LandingController::record(Vec3 pos,
   this->blackbox << vel(0) << ",";
   this->blackbox << vel(1) << ",";
   this->blackbox << vel(2) << ",";
-  this->blackbox << wp_pos(0) << ",";
-  this->blackbox << wp_pos(1) << ",";
-  this->blackbox << wp_vel(0) << ",";
-  this->blackbox << wp_vel(1) << ",";
   this->blackbox << target_pos_bf(0) << ",";
   this->blackbox << target_pos_bf(1) << ",";
   this->blackbox << target_pos_bf(2) << ",";
   this->blackbox << target_vel_bf(0) << ",";
   this->blackbox << target_vel_bf(1) << ",";
   this->blackbox << target_vel_bf(2) << ",";
+  this->blackbox << yaw;
   this->blackbox << std::endl;
   this->blackbox_dt = 0.0;
 
   return 0;
-}
-
-Vec4 LandingController::calculatePositionErrors(Vec3 errors,
-                                                double yaw,
-                                                double dt) {
-  double r, p, y, t;
-  Vec3 euler;
-  Mat3 R;
-
-  // check rate
-  this->pctrl_dt += dt;
-  if (this->pctrl_dt < 0.01) {
-    return this->pctrl_outputs;
-  }
-
-  // roll, pitch, yaw and throttle (assuming NWU frame)
-  // clang-format off
-  r = -this->y_controller.calculate(errors(1), 0.0, this->pctrl_dt);
-  p = this->x_controller.calculate(errors(0), 0.0, this->pctrl_dt);
-  y = yaw;
-  t = this->hover_throttle + this->z_controller.calculate(errors(2), 0.0, this->pctrl_dt);
-  t /= fabs(cos(r) * cos(p));  // adjust throttle for roll and pitch
-  // clang-format o
-
-  // limit roll, pitch
-  r = (r < this->roll_limit[0]) ? this->roll_limit[0] : r;
-  r = (r > this->roll_limit[1]) ? this->roll_limit[1] : r;
-  p = (p < this->pitch_limit[0]) ? this->pitch_limit[0] : p;
-  p = (p > this->pitch_limit[1]) ? this->pitch_limit[1] : p;
-
-  // limit throttle
-  t = (t < 0) ? 0.0 : t;
-  t = (t > 1.0) ? 1.0 : t;
-
-  // keep track of setpoints and outputs
-  this->pctrl_setpoints = errors;
-  this->pctrl_outputs << r, p, y, t;
-  this->pctrl_dt = 0.0;
-
-  return pctrl_outputs;
 }
 
 Vec4 LandingController::calculateVelocityErrors(Vec3 errors,
@@ -459,17 +417,17 @@ Vec4 LandingController::calculateVelocityErrors(Vec3 errors,
   Mat3 R;
 
   // check rate
-  this->vctrl_dt += dt;
-  if (this->vctrl_dt < 0.01) {
-    return this->vctrl_outputs;
+  this->dt += dt;
+  if (this->dt < 0.01) {
+    return this->outputs;
   }
 
   // roll, pitch, yaw and throttle (assuming NWU frame)
   // clang-format off
-  r = -this->vy_controller.calculate(errors(1), 0.0, this->vctrl_dt);
-  p = this->vx_controller.calculate(errors(0), 0.0, this->vctrl_dt);
+  r = -this->vy_controller.calculate(errors(1), 0.0, this->dt);
+  p = this->vx_controller.calculate(errors(0), 0.0, this->dt);
   y = 0.0;
-  t = this->vz_controller.calculate(errors(2), 0.0, this->vctrl_dt);
+  t = this->vz_controller.calculate(errors(2), 0.0, this->dt);
   t /= fabs(cos(r) * cos(p));  // adjust throttle for roll and pitch
   // clang-format on
 
@@ -482,62 +440,86 @@ Vec4 LandingController::calculateVelocityErrors(Vec3 errors,
   t = (t > this->throttle_limit[1]) ? this->throttle_limit[1] : t;
 
   // keep track of setpoints and outputs
-  this->vctrl_setpoints = errors;
-  this->vctrl_outputs << r, p, y, t;
-  this->vctrl_dt = 0.0;
+  this->setpoints = errors;
+  this->outputs << r, p, y, t;
+  this->dt = 0.0;
 
-  return this->vctrl_outputs;
+  return this->outputs;
 }
 
-AttitudeCommand LandingController::calculate(Vec3 pos_errors,
-                                             Vec3 vel_errors,
-                                             double yaw,
-                                             double dt) {
-  this->calculatePositionErrors(pos_errors, yaw, dt);
-  this->calculateVelocityErrors(vel_errors, yaw, dt);
-  this->att_cmd = AttitudeCommand(this->pctrl_outputs + this->vctrl_outputs);
-  return this->att_cmd;
-}
-
-AttitudeCommand LandingController::calculate(Vec3 target_pos_bf,
-                                             Vec3 target_vel_bf,
-                                             Vec3 pos,
-                                             Vec3 pos_prev,
-                                             double yaw,
-                                             double dt) {
+int LandingController::calculate(Vec3 target_pos_bf,
+                                 Vec3 target_vel_bf,
+                                 Vec3 pos,
+                                 Vec3 vel,
+                                 double yaw,
+                                 double dt) {
   int retval;
-  Vec3 vel, perrors, verrors;
-  Vec2 wp_pos, wp_pos_last, wp_vel, q_pos;
-
-  // calculate velocity
-  vel(0) = (pos(0) - pos_prev(0)) / dt;
-  vel(1) = (pos(1) - pos_prev(1)) / dt;
-  vel(2) = (pos(2) - pos_prev(2)) / dt;
+  Quaternion q;
+  Vec3 p_errors, v_errors, vel_bf, euler;
+  Vec2 wp_pos, wp_vel, wp_inputs, wp_rel_pos, wp_rel_vel;
 
   // obtain position and velocity waypoints
-  retval = this->trajectory.update(pos, wp_pos, wp_vel, q_pos);
+  retval = this->trajectory.update(pos, wp_pos, wp_vel, wp_inputs);
+  wp_rel_pos = this->trajectory.rel_pos.at(0);
+  wp_rel_vel = this->trajectory.rel_vel.at(0);
 
-  // calculate position and velocity errors
-  perrors(0) = this->trajectory.target_bf.at(0)(0) + target_pos_bf(0);
-  perrors(1) = target_pos_bf(1);
-  perrors(2) = wp_pos(1) - q_pos(1);
+  // calculate velocity in body frame
+  euler << 0, 0, yaw;
+  euler2quat(euler, 321, q);
+  inertial2body(vel, q, vel_bf);
 
-  verrors(0) = wp_vel(0) - (vel.block(0, 0, 2, 1).norm());
-  verrors(1) = target_vel_bf(1);
-  verrors(2) = wp_vel(1) - vel(2);
+  // calculate velocity errors (inertial version)
+  v_errors(0) = wp_vel(0) - vel_bf(0);
+  v_errors(1) = target_pos_bf(1);
+  v_errors(2) = wp_vel(1) - vel(2);
 
-  // calculate control outputs and record
-  this->calculate(perrors, verrors, yaw, dt);
-  this->record(pos, vel, wp_pos, wp_vel, target_pos_bf, target_vel_bf, dt);
+  // // calculate velocity errors (relative version)
+  // v_errors(0) = -1 * (wp_rel_vel(0) - target_vel_bf(0));
+  // v_errors(1) = target_pos_bf(1);
+  // v_errors(2) = -1 * (wp_rel_vel(1) - target_vel_bf(2));
 
-  return this->att_cmd;
+  // calculate velocity errors (hybrid version)
+  // v_errors(0) = -1 * (wp_rel_vel(0) - target_vel_bf(0));
+  // v_errors(1) = target_pos_bf(1);
+  // v_errors(2) = wp_vel(1) - vel(2);
+
+  // calculate feed-back controls
+  this->outputs = this->calculateVelocityErrors(v_errors, yaw, dt);
+
+  // add in feed-forward controls
+  this->outputs(0) += 0.0;                 // roll
+  this->outputs(1) += -1 * wp_inputs(1);   // pitch
+  this->outputs(2) += yaw;                 // yaw
+  this->outputs(3) += wp_inputs(0);        // thrust
+  this->att_cmd = AttitudeCommand(this->outputs);
+
+  // record
+  this->record(pos, vel, target_pos_bf, target_vel_bf, yaw, dt);
+
+  // calculate trajectory errors
+  p_errors(0) = wp_rel_pos(0) + target_pos_bf(0);
+  p_errors(1) = target_pos_bf(1);
+  p_errors(2) = wp_rel_pos(1) - pos(2);
+
+  // check if we are too far off track with trajectory
+  if (p_errors(0) > this->trajectory_threshold(0)) {
+    log_err("Trajectory error in the x-axis is too large!");
+    log_err("error: %f > %f", p_errors(0), this->trajectory_threshold(0));
+    return -1;
+  } else if (p_errors(1) > this->trajectory_threshold(1)) {
+    log_err("Trajectory error in the y-axis is too large!");
+    log_err("error: %f > %f", p_errors(1), this->trajectory_threshold(1));
+    return -1;
+  } else if (p_errors(2) > this->trajectory_threshold(2)) {
+    log_err("Trajectory error in the z-axis is too large!");
+    log_err("error: %f > %f", p_errors(2), this->trajectory_threshold(2));
+    return -1;
+  }
+
+  return 0;
 }
 
 void LandingController::reset(void) {
-  this->x_controller.reset();
-  this->y_controller.reset();
-  this->z_controller.reset();
-
   this->vx_controller.reset();
   this->vy_controller.reset();
   this->vz_controller.reset();
@@ -546,9 +528,9 @@ void LandingController::reset(void) {
 void LandingController::printOutputs(void) {
   double r, p, t;
 
-  r = rad2deg(this->pctrl_outputs(0));
-  p = rad2deg(this->pctrl_outputs(1));
-  t = this->pctrl_outputs(3);
+  r = rad2deg(this->outputs(0));
+  p = rad2deg(this->outputs(1));
+  t = this->outputs(3);
 
   std::cout << "roll: " << std::setprecision(2) << r << "\t";
   std::cout << "pitch: " << std::setprecision(2) << p << "\t";
@@ -558,29 +540,29 @@ void LandingController::printOutputs(void) {
 void LandingController::printErrors(void) {
   double p, i, d;
 
-  p = this->x_controller.error_p;
-  i = this->x_controller.error_i;
-  d = this->x_controller.error_d;
+  p = this->vx_controller.error_p;
+  i = this->vx_controller.error_i;
+  d = this->vx_controller.error_d;
 
-  std::cout << "x_controller: " << std::endl;
+  std::cout << "vx_controller: " << std::endl;
   std::cout << "\terror_p: " << std::setprecision(2) << p << "\t";
   std::cout << "\terror_i: " << std::setprecision(2) << i << "\t";
   std::cout << "\terror_d: " << std::setprecision(2) << i << std::endl;
 
-  p = this->y_controller.error_p;
-  i = this->y_controller.error_i;
-  d = this->y_controller.error_d;
+  p = this->vy_controller.error_p;
+  i = this->vy_controller.error_i;
+  d = this->vy_controller.error_d;
 
-  std::cout << "y_controller: " << std::endl;
+  std::cout << "vy_controller: " << std::endl;
   std::cout << "\terror_p: " << std::setprecision(2) << p << "\t";
   std::cout << "\terror_i: " << std::setprecision(2) << i << "\t";
   std::cout << "\terror_d: " << std::setprecision(2) << i << std::endl;
 
-  p = this->z_controller.error_p;
-  i = this->z_controller.error_i;
-  d = this->z_controller.error_d;
+  p = this->vz_controller.error_p;
+  i = this->vz_controller.error_i;
+  d = this->vz_controller.error_d;
 
-  std::cout << "z_controller: " << std::endl;
+  std::cout << "vz_controller: " << std::endl;
   std::cout << "\terror_p: " << std::setprecision(2) << p << "\t";
   std::cout << "\terror_i: " << std::setprecision(2) << i << "\t";
   std::cout << "\terror_d: " << std::setprecision(2) << i << std::endl;

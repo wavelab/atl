@@ -34,6 +34,8 @@ namespace awesomo {
 #define QUAD_VELOCITY_TOPIC "/awesomo/quadrotor/velocity/local"
 #define ESTIMATOR_ON_TOPIC "/awesomo/estimator/on"
 #define ESTIMATOR_OFF_TOPIC "/awesomo/estimator/off"
+// #define TARGET_BF_POS_TOPIC "/awesomo/apriltag/target/position/body_encoders"
+#define TARGET_BF_POS_TOPIC "/awesomo/apriltag/target/position/body"
 #define TARGET_IF_POS_TOPIC "/awesomo/apriltag/target/position/inertial"
 #define TARGET_IF_YAW_TOPIC "/awesomo/apriltag/target/yaw/inertial"
 
@@ -43,7 +45,9 @@ public:
   int state;
   bool initialized;
 
+  std::string estimate_frame;
   std::string quad_frame;
+
   KalmanFilterTracker kf_tracker;
   ExtendedKalmanFilterTracker ekf_tracker;
 
@@ -59,14 +63,18 @@ public:
   Vec3 target_pos_bpf;
   Vec3 target_vel_bpf;
   double target_yaw_wf;
-  Vec3 target_pos_wf;
-  Vec3 target_last_pos_wf;
+  Vec3 target_measured;
+  Vec3 target_last_measured;
 
   struct timespec target_last_updated;
   double target_lost_threshold;
 
   EstimatorNode(int argc, char **argv) : ROSNode(argc, argv) {
+    this->estimate_frame = "";
+    this->quad_frame = "";
+
     this->kf_tracker = KalmanFilterTracker();
+    this->ekf_tracker = ExtendedKalmanFilterTracker();
 
     this->quad_pose = Pose();
     this->target_detected = false;
@@ -74,19 +82,20 @@ public:
     this->target_pos_bpf << 0.0, 0.0, 0.0;
     this->target_vel_bpf << 0.0, 0.0, 0.0;
     this->target_yaw_wf = 0.0;
-    this->target_pos_wf << 0.0, 0.0, 0.0;
-    this->target_last_pos_wf << 0.0, 0.0, 0.0;
+    this->target_measured << 0.0, 0.0, 0.0;
+    this->target_last_measured << 0.0, 0.0, 0.0;
     this->target_last_updated = (struct timespec){0};
     this->target_lost_threshold = 1000.0;
   }
 
   int configure(std::string node_name, int hz);
-  void initLTKF(Vec3 target_pos_wf);
-  void resetLTKF(Vec3 target_pos_wf);
+  void initLTKF(Vec3 target_measured);
+  void resetLTKF(Vec3 target_measured);
   void quadPoseCallback(const geometry_msgs::PoseStamped &msg);
   void quadVelocityCallback(const geometry_msgs::TwistStamped &msg);
   void onCallback(const std_msgs::Bool &msg);
   void offCallback(const std_msgs::Bool &msg);
+  void targetBodyPosCallback(const geometry_msgs::Vector3 &msg);
   void targetInertialPosCallback(const geometry_msgs::Vector3 &msg);
   void targetInertialYawCallback(const std_msgs::Float64 &msg);
   void publishLTKFInertialPositionEstimate(void);

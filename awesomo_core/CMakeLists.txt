@@ -21,7 +21,7 @@ INCLUDE_DIRECTORIES(
     /usr/local/include
     /usr/include/eigen3
     /usr/include/flycapture/
-    /usr/include/m3api/
+    # /usr/include/m3api/
 )
 
 # LIBRARY
@@ -60,11 +60,13 @@ ADD_LIBRARY(
     src/utils/stats.cpp
     src/utils/time.cpp
     # vision
-    # src/vision/apriltag/swathmore.cpp
+    src/vision/apriltag/base_detector.cpp
+    src/vision/apriltag/michigan.cpp
     src/vision/apriltag/mit.cpp
+    src/vision/apriltag/swathmore.cpp
     src/vision/camera/camera.cpp
     src/vision/camera/config.cpp
-    src/vision/camera/ximea.cpp
+    # src/vision/camera/ximea.cpp
     src/vision/camera/pointgrey.cpp
     src/vision/gimbal/gimbal.cpp
     src/vision/gimbal/sbgc.cpp
@@ -73,9 +75,11 @@ SET(DEPS
     ${PROJECT_NAME}
     ${catkin_LIBRARIES}
     ${OpenCV_LIBS}
-    m3api
+    # m3api
     flycapture
+    apriltag
     apriltags_mit
+    apriltags_swathmore
     CGAL
     nlopt
     yaml-cpp

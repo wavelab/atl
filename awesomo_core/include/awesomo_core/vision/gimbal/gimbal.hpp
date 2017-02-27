@@ -20,6 +20,8 @@ public:
   SBGC sbgc;
   Pose camera_offset;
   double limits[6];
+  bool enable_tracking;
+
   Vec3 setpoints;
   Vec3 target_bpf;
 
@@ -28,6 +30,7 @@ public:
   Vec3 camera_angles;
   Vec3 frame_angles;
   Vec3 rc_angles;
+  Vec3 encoder_angles;
 
   Gimbal(void);
   ~Gimbal(void);

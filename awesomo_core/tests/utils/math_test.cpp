@@ -262,7 +262,7 @@ TEST(Utils_math, target2bodyplanar) {
   target_pos_if << 2.0, 1.0, 0.0;
   body_pos_if << 1.0, 2.0, 0.0;
 
-  // TEST EULER VERSION OF target2body()
+  // TEST EULER VERSION OF target2bodyplanar()
   // test 0 degree
   euler << 0.0, 0.0, deg2rad(0.0);
   target2bodyplanar(target_pos_if, body_pos_if, euler, target_pos_bpf);
@@ -424,6 +424,51 @@ TEST(Utils_math, target2inertial) {
   ASSERT_FLOAT_EQ(0.0, target_pos_if(2));
 }
 
+TEST(Utils_math, inertial2body) {
+  Vec3 enu_if, nwu_bf, euler;
+  Quaternion orientation_if;
+
+  // test 0 yaw
+  euler << 0, 0, deg2rad(0);
+  euler2quat(euler, 321, orientation_if);
+  enu_if << 1, 0, 0;
+  inertial2body(enu_if, orientation_if, nwu_bf);
+
+  ASSERT_FLOAT_EQ(0, round(nwu_bf(0)));
+  ASSERT_FLOAT_EQ(-1, round(nwu_bf(1)));
+  ASSERT_FLOAT_EQ(0, round(nwu_bf(2)));
+
+  // test 90 deg yaw
+  euler << 0, 0, deg2rad(90);
+  euler2quat(euler, 321, orientation_if);
+  enu_if << 1, 0, 0;
+  inertial2body(enu_if, orientation_if, nwu_bf);
+
+  ASSERT_FLOAT_EQ(-1, round(nwu_bf(0)));
+  ASSERT_FLOAT_EQ(0, round(nwu_bf(1)));
+  ASSERT_FLOAT_EQ(0, round(nwu_bf(2)));
+
+  // test 180 deg yaw
+  euler << 0, 0, deg2rad(180);
+  euler2quat(euler, 321, orientation_if);
+  enu_if << 1, 0, 0;
+  inertial2body(enu_if, orientation_if, nwu_bf);
+
+  ASSERT_FLOAT_EQ(0, round(nwu_bf(0)));
+  ASSERT_FLOAT_EQ(1, round(nwu_bf(1)));
+  ASSERT_FLOAT_EQ(0, round(nwu_bf(2)));
+
+  // test -90 deg yaw
+  euler << 0, 0, deg2rad(-90);
+  euler2quat(euler, 321, orientation_if);
+  enu_if << 1, 0, 0;
+  inertial2body(enu_if, orientation_if, nwu_bf);
+
+  ASSERT_FLOAT_EQ(1, round(nwu_bf(0)));
+  ASSERT_FLOAT_EQ(0, round(nwu_bf(1)));
+  ASSERT_FLOAT_EQ(0, round(nwu_bf(2)));
+}
+
 TEST(Utils_math, wrapTo180) {
   double retval;
 
@@ -553,6 +598,15 @@ TEST(Utils_math, closest_point) {
   retval = closest_point(p1, p2, p3, closest);
   ASSERT_EQ(2, retval);
   ASSERT_FLOAT_EQ(6.0, closest(0));
+  ASSERT_FLOAT_EQ(0.0, closest(1));
+
+  // if point 1 and 2 are same
+  p1 << 0, 0;
+  p2 << 0, 0;
+  p3 << 0, 2;
+  retval = closest_point(p1, p2, p3, closest);
+  ASSERT_EQ(-1, retval);
+  ASSERT_FLOAT_EQ(0.0, closest(0));
   ASSERT_FLOAT_EQ(0.0, closest(1));
 }
 

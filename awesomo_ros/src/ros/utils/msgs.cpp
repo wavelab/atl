@@ -142,22 +142,22 @@ void buildMsg(TrackingController tc, awesomo_msgs::TCtrlStats &msg) {
   msg.roll_p_error = tc.y_controller.error_p;
   msg.roll_i_error = tc.y_controller.error_i;
   msg.roll_d_error = tc.y_controller.error_d;
-  msg.roll_output = rad2deg(tc.pctrl_outputs(0));
-  msg.roll_setpoint = tc.pctrl_setpoints(0);
+  msg.roll_output = rad2deg(tc.outputs(0));
+  msg.roll_setpoint = tc.setpoints(0);
 
   // pitch
   msg.pitch_p_error = tc.x_controller.error_p;
   msg.pitch_i_error = tc.x_controller.error_i;
   msg.pitch_d_error = tc.x_controller.error_d;
-  msg.pitch_output = rad2deg(tc.pctrl_outputs(1));
-  msg.pitch_setpoint = tc.pctrl_setpoints(1);
+  msg.pitch_output = rad2deg(tc.outputs(1));
+  msg.pitch_setpoint = tc.setpoints(1);
 
   // thrust
   msg.throttle_p_error = tc.z_controller.error_p;
   msg.throttle_i_error = tc.z_controller.error_i;
   msg.throttle_d_error = tc.z_controller.error_d;
-  msg.throttle_output = tc.pctrl_outputs(3);
-  msg.throttle_setpoint = tc.pctrl_setpoints(2);
+  msg.throttle_output = tc.outputs(3);
+  msg.throttle_setpoint = tc.setpoints(2);
 }
 
 void buildMsg(TrackingController tc, awesomo_msgs::TCtrlSettings &msg) {
@@ -174,26 +174,11 @@ void buildMsg(TrackingController tc, awesomo_msgs::TCtrlSettings &msg) {
   msg.throttle_controller.k_d = tc.z_controller.k_d;
   msg.hover_throttle = tc.hover_throttle;
 
-  msg.vx_controller.k_p = tc.vx_controller.k_p;
-  msg.vx_controller.k_i = tc.vx_controller.k_i;
-  msg.vx_controller.k_d = tc.vx_controller.k_d;
-
-  msg.vy_controller.k_p = tc.vy_controller.k_p;
-  msg.vy_controller.k_i = tc.vy_controller.k_i;
-  msg.vy_controller.k_d = tc.vy_controller.k_d;
-
-  msg.vz_controller.k_p = tc.vz_controller.k_p;
-  msg.vz_controller.k_i = tc.vz_controller.k_i;
-  msg.vz_controller.k_d = tc.vz_controller.k_d;
-
   msg.roll_controller.min = tc.roll_limit[0];
   msg.roll_controller.max = tc.roll_limit[1];
 
   msg.pitch_controller.min = tc.pitch_limit[0];
   msg.pitch_controller.max = tc.pitch_limit[1];
-
-  msg.throttle_controller.min = tc.throttle_limit[0];
-  msg.throttle_controller.max = tc.throttle_limit[1];
 
   msg.track_offset.x = tc.track_offset(0);
   msg.track_offset.y = tc.track_offset(1);
@@ -201,19 +186,6 @@ void buildMsg(TrackingController tc, awesomo_msgs::TCtrlSettings &msg) {
 }
 
 void buildMsg(LandingController lc, awesomo_msgs::LCtrlSettings &msg) {
-  msg.roll_controller.k_p = lc.x_controller.k_p;
-  msg.roll_controller.k_i = lc.x_controller.k_i;
-  msg.roll_controller.k_d = lc.x_controller.k_d;
-
-  msg.pitch_controller.k_p = lc.y_controller.k_p;
-  msg.pitch_controller.k_i = lc.y_controller.k_i;
-  msg.pitch_controller.k_d = lc.y_controller.k_d;
-
-  msg.throttle_controller.k_p = lc.z_controller.k_p;
-  msg.throttle_controller.k_i = lc.z_controller.k_i;
-  msg.throttle_controller.k_d = lc.z_controller.k_d;
-  msg.hover_throttle = lc.hover_throttle;
-
   msg.vx_controller.k_p = lc.vx_controller.k_p;
   msg.vx_controller.k_i = lc.vx_controller.k_i;
   msg.vx_controller.k_d = lc.vx_controller.k_d;
@@ -331,26 +303,11 @@ int convertMsg(awesomo_msgs::TCtrlSettings msg, TrackingController &tc) {
   tc.z_controller.k_d = msg.throttle_controller.k_d;
   tc.hover_throttle = msg.hover_throttle;
 
-  tc.vx_controller.k_p = msg.vx_controller.k_p;
-  tc.vx_controller.k_i = msg.vx_controller.k_i;
-  tc.vx_controller.k_d = msg.vx_controller.k_d;
-
-  tc.vy_controller.k_p = msg.vy_controller.k_p;
-  tc.vy_controller.k_i = msg.vy_controller.k_i;
-  tc.vy_controller.k_d = msg.vy_controller.k_d;
-
-  tc.vz_controller.k_p = msg.vz_controller.k_p;
-  tc.vz_controller.k_i = msg.vz_controller.k_i;
-  tc.vz_controller.k_d = msg.vz_controller.k_d;
-
   tc.roll_limit[0] = deg2rad(msg.roll_controller.min);
   tc.roll_limit[1] = deg2rad(msg.roll_controller.max);
 
   tc.pitch_limit[0] = deg2rad(msg.pitch_controller.min);
   tc.pitch_limit[1] = deg2rad(msg.pitch_controller.max);
-
-  tc.throttle_limit[0] = msg.throttle_controller.min;
-  tc.throttle_limit[1] = msg.throttle_controller.max;
 
   // clang-format off
   tc.track_offset << msg.track_offset.x,
@@ -362,19 +319,6 @@ int convertMsg(awesomo_msgs::TCtrlSettings msg, TrackingController &tc) {
 }
 
 int convertMsg(awesomo_msgs::LCtrlSettings msg, LandingController &lc) {
-  lc.y_controller.k_p = msg.roll_controller.k_p;
-  lc.y_controller.k_i = msg.roll_controller.k_i;
-  lc.y_controller.k_d = msg.roll_controller.k_d;
-
-  lc.x_controller.k_p = msg.pitch_controller.k_p;
-  lc.x_controller.k_i = msg.pitch_controller.k_i;
-  lc.x_controller.k_d = msg.pitch_controller.k_d;
-
-  lc.z_controller.k_p = msg.throttle_controller.k_p;
-  lc.z_controller.k_i = msg.throttle_controller.k_i;
-  lc.z_controller.k_d = msg.throttle_controller.k_d;
-  lc.hover_throttle = msg.hover_throttle;
-
   lc.vx_controller.k_p = msg.vx_controller.k_p;
   lc.vx_controller.k_i = msg.vx_controller.k_i;
   lc.vx_controller.k_d = msg.vx_controller.k_d;

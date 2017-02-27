@@ -18,27 +18,19 @@
 #include "awesomo_core/utils/utils.hpp"
 #include "awesomo_core/vision/camera/camera.hpp"
 #include "awesomo_core/vision/apriltag/data.hpp"
+#include "awesomo_core/vision/apriltag/base_detector.hpp"
 
 
 namespace awesomo {
 
-class SwathmoreDetector {
+class SwathmoreDetector : public BaseDetector {
 public:
-  bool configured;
-
   TagDetector *detector;
-
-  std::map<int, float> tag_configs;
-  std::string camera_mode;
-  std::vector<std::string> camera_modes;
-  std::map<std::string, CameraConfig> camera_configs;
-  bool imshow;
 
   SwathmoreDetector(void);
   int configure(std::string config_file);
+  int extractTags(cv::Mat &image, std::vector<TagPose> &tags);
   int obtainPose(TagDetection tag, TagPose &tag_pose);
-  std::vector<TagPose> extractTags(cv::Mat &image);
-  void printTag(TagPose tag);
 };
 
 }  // end of awesomo namespace

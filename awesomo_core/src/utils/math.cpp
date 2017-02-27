@@ -399,6 +399,25 @@ void target2inertial(Vec3 target_pos_bf,
   target_pos_if = (R * target_enu) + body_pos_if;
 }
 
+void inertial2body(Vec3 enu_if,
+                   Quaternion orientation_if,
+                   Vec3 &nwu_bf) {
+  Mat3 R;
+  Vec3 euler, nwu_if;
+
+  // create rotation matrix
+  quat2euler(orientation_if, 321, euler);
+  euler2rot(euler, 123, R);
+
+  // convert inertial ENU to NWU
+  nwu_if(0) = enu_if(1);
+  nwu_if(1) = -enu_if(0);
+  nwu_if(2) = enu_if(2);
+
+  // transform inertal to body
+  nwu_bf = R * nwu_if;
+}
+
 double wrapTo180(double euler_angle) {
   return fmod((euler_angle + 180.0), 360.0) - 180.0;
 }
@@ -449,25 +468,33 @@ int point_left_right(Vec2 a, Vec2 b, Vec2 c) {
   return -1;
 }
 
-int closest_point(Vec2 a, Vec2 b, Vec2 p, Vec2 &closest) {
+int closest_point(Vec2 a, Vec2 b, Vec2 p, Vec2 &closest, bool limit) {
   Vec2 v1, v2, result;
   double t;
+
+  // pre-check
+  if ((a - b).norm() == 0) {
+    closest = a;
+    return -1;
+  }
 
   // calculate closest point
   v1 = p - a;
   v2 = b - a;
   t = v1.dot(v2) / v2.squaredNorm();
-  closest = a + t * v2;
 
   // check if point p is:
   // 1. before point a
   // 2. after point b
   // 3. middle of point a, b
   if (t < 0) {
+    closest = (limit) ? a : a + t * v2;
     return 1;
   } else if (t > 1) {
+    closest = (limit) ? b : a + t * v2;
     return 2;
   } else {
+    closest = a + t * v2;
     return 0;
   }
 }

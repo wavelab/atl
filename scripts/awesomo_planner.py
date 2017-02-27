@@ -198,10 +198,10 @@ def cost_func(x, args):
 
     # position error cost
     cost += 0.0 * np.linalg.norm(states[0] - traj[0])  # dx
-    cost += 0.0 * np.linalg.norm(states[2] - traj[1])  # dz
+    cost += 1.0 * np.linalg.norm(states[2] - traj[1])  # dz
 
     # control input cost
-    cost += 0.5 * np.linalg.norm(states[4] - 10.0)  # az
+    cost += 0.0 * np.linalg.norm(states[4] - 10.0)  # az
     cost += 1.0 * np.linalg.norm(states[5])         # theta
 
     # control input difference cost
@@ -254,7 +254,7 @@ def ine_constraints(x, *args):
     return retval
 
 
-def optimize(p0_z, pf_z, v, dt, save_plot=True, plot_name="", vz_max=-1.5):
+def optimize(p0_z, pf_z, v, dt, save_plot=False, plot_name="", vz_max=-1.2):
     n = 4       # num of states
     m = 2       # num of inputs
 
@@ -318,26 +318,42 @@ def optimize(p0_z, pf_z, v, dt, save_plot=True, plot_name="", vz_max=-1.5):
 def record_optimized_results(T, n, m, v, dt, results, fpath):
     # setup
     f = open(fpath, "wb")
-    header = "x,vx,z,vz,az,theta,tbf_x,tbf_z\n"
+    header = "x,vx,z,vz,thrust,theta,rel_x,rel_z,rel_vx,rel_vz\n"
     f.write(bytes(header, "UTF-8"))
 
-    target_x = 0.0
     states = results.reshape(T, n + m)
+    target_x = 0.0
 
+    prev_x = None
     for x in states:
-        target_x += v * dt
-        tbf_x = target_x - x[0]
-        tbf_z = 0.0 - x[2]
+        x_ok = True
+        z_ok = True
 
-        f.write(bytes(str(x[0]) + ",", "UTF-8"))   # x
-        f.write(bytes(str(x[1]) + ",", "UTF-8"))   # vx
-        f.write(bytes(str(x[2]) + ",", "UTF-8"))   # z
-        f.write(bytes(str(x[3]) + ",", "UTF-8"))   # vz
-        f.write(bytes(str(x[4]) + ",", "UTF-8"))   # az
-        f.write(bytes(str(x[5]) + ",", "UTF-8"))   # theta
-        f.write(bytes(str(tbf_x) + ",", "UTF-8"))  # tbf_x
-        f.write(bytes(str(tbf_z), "UTF-8"))        # tbf_z
-        f.write(bytes("\n", "UTF-8"))
+        rel_x = target_x - x[0]
+        rel_z = 0.0 - x[2]
+        rel_vx = v - x[1]
+        rel_vz = 0.0 - x[3]
+
+        if prev_x is not None:
+            x_ok = ((prev_x[0] - x[0]) != 0)
+            z_ok = ((prev_x[2] - x[2]) != 0)
+
+        print(target_x, x[0])
+        if x_ok and z_ok:
+            f.write(bytes(str(x[0]) + ",", "UTF-8"))         # x
+            f.write(bytes(str(x[1]) + ",", "UTF-8"))         # vx
+            f.write(bytes(str(x[2]) + ",", "UTF-8"))         # z
+            f.write(bytes(str(x[3]) + ",", "UTF-8"))         # vz
+            f.write(bytes(str(x[4] / 20.0) + ",", "UTF-8"))  # thrust
+            f.write(bytes(str(x[5]) + ",", "UTF-8"))         # theta
+            f.write(bytes(str(rel_x) + ",", "UTF-8"))        # rel_x
+            f.write(bytes(str(rel_z) + ",", "UTF-8"))        # rel_z
+            f.write(bytes(str(rel_vx) + ",", "UTF-8"))       # rel_vx
+            f.write(bytes(str(rel_vz), "UTF-8"))             # rel_vz
+            f.write(bytes("\n", "UTF-8"))
+
+        prev_x = x
+        target_x += v * dt
 
     f.close()
 
@@ -360,9 +376,8 @@ if __name__ == "__main__":
     p0_z = 5.0
     pf_z = 0.0
     v = 1.0
-    T, n, m, v, dt, results = optimize(p0_z, pf_z, v, dt, True, str(index))
-    filepath = basedir + "0.csv"
-    record_optimized_results(T, n, m, v, dt, results, filepath)
+    T, n, m, v, dt, results = optimize(p0_z, pf_z, v, dt)
+    record_optimized_results(T, n, m, v, dt, results, "test.csv")
 
     # # prep index file
     # index_file = open(basedir + "index.csv", "wb")

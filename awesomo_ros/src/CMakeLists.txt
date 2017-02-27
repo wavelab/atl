@@ -2,14 +2,15 @@ SET(
     DEPS
     awesomo_ros_utils
     awesomo_core
+    # m3api
     flycapture
     ${catkin_LIBRARIES}
     ${OpenCV_LIBS}
-    # apriltags_swathmore
+    apriltag
     apriltags_mit
+    apriltags_swathmore
     CGAL
     yaml-cpp
-    m3api
 )
 
 # ROS NODES
@@ -40,8 +41,8 @@ TARGET_LINK_LIBRARIES(imu_node ${DEPS})
 ADD_EXECUTABLE(pg_camera_node ros/nodes/pg_camera_node.cpp)
 TARGET_LINK_LIBRARIES(pg_camera_node ${DEPS})
 
-ADD_EXECUTABLE(ximea_camera_node ros/nodes/ximea_camera_node.cpp)
-TARGET_LINK_LIBRARIES(ximea_camera_node ${DEPS})
+# ADD_EXECUTABLE(ximea_camera_node ros/nodes/ximea_camera_node.cpp)
+# TARGET_LINK_LIBRARIES(ximea_camera_node ${DEPS})
 
 # ROS UTILS
 ADD_LIBRARY(

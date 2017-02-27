@@ -16,12 +16,17 @@ namespace awesomo {
 
 // NODE SETTINGS
 #define NODE_NAME "awesomo_gimbal"
-#define NODE_RATE 100
+#define NODE_RATE 40
 
 // PUBLISH TOPICS
-#define CAMERA_IMU_TOPIC "/awesomo/gimbal/joint/imu"
-
+#define SBGC_IMU_TOPIC "/awesomo/sbgc/imu"
+#define SBGC_RAW_ENCODER_TOPIC "awesomo/sbgc/encoders/rpy"
+#define POSITION_TOPIC "/awesomo/gimbal/position/inertial"
+#define FRAME_ORIENTATION_TOPIC "/awesomo/gimbal/frame/orientation/inertial"
+#define JOINT_ORIENTATION_TOPIC "/awesomo/gimbal/joint/orientation/inertial"
+#define ENCODER_ORIENTATION_TOPIC "awesomo/gimbal/joint/orientation/body"
 // SUBSCRIBE TOPICS
+#define QUAD_POSE_TOPIC "/awesomo/quadrotor/pose/local"
 #define SETPOINT_TOPIC "/awesomo/gimbal/setpoint/attitude"
 #define TRACK_TOPIC "/awesomo/gimbal/target/track"
 #define SHUTDOWN_TOPIC "/awesomo/gimbal/shutdown"
@@ -30,12 +35,20 @@ namespace awesomo {
 class GimbalNode : public ROSNode {
 public:
   std::string quad_frame;
+  std::string gimbal_imu;
   Gimbal gimbal;
   Vec3 set_points;
 
   GimbalNode(int argc, char **argv) : ROSNode(argc, argv) {}
   ~GimbalNode(void);
   int configure(std::string node_name, int hz);
+  int publishIMU(Vec3 euler);
+  int publishRawEncoder(Vec3 encoder_euler);
+  int publishPosition(Vec3 pos);
+  int publishFrameOrientation(Quaternion q);
+  int publishJointOrientation(Quaternion q);
+  int publishEncoderOrientation(Quaternion q);
+  void quadPoseCallback(const geometry_msgs::PoseStamped &msg);
   void setAttitudeCallback(const geometry_msgs::Vector3 &msg);
   void trackTargetCallback(const geometry_msgs::Vector3 &msg);
   int loopCallback(void);
