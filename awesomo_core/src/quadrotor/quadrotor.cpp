@@ -262,11 +262,18 @@ int Quadrotor::stepDiscoverMode(double dt) {
 int Quadrotor::stepTrackingMode(double dt) {
   int retval;
   bool conditions[3];
+  Quaternion q;
+  Vec3 euler, vel_bf;
 
   // pre-check
   if (this->configured == false) {
     return -1;
   }
+
+  // calculate velocity in body frame
+  euler << 0, 0, this->yaw;
+  euler2quat(euler, 321, q);
+  inertial2body(this->velocity, q, vel_bf);
 
   // track target
   this->att_cmd = this->tracking_controller.calculate(
@@ -294,12 +301,13 @@ int Quadrotor::stepTrackingMode(double dt) {
     retval = this->landing_controller.loadTrajectory(
       this->pose.position,
       this->landing_target.position_bf,
-      this->velocity.block(0, 0, 2, 1).norm()
+      vel_bf(0)
     );
 
     // transition to landing mode
     if (retval == 0) {
       log_info("Transitioning to [LANDING MODE]!");
+      this->landing_controller.recordTrajectoryIndex();
       this->setMode(LANDING_MODE);
       this->tracking_tic = (struct timespec){0};
     }
