@@ -360,12 +360,18 @@ int LandingController::prepBlackbox(std::string blackbox_file) {
   this->blackbox << "vx" << ",";
   this->blackbox << "vy" << ",";
   this->blackbox << "vz" << ",";
+  this->blackbox << "wp_pos_x" << ",";
+  this->blackbox << "wp_pos_z" << ",";
+  this->blackbox << "wp_vel_x" << ",";
+  this->blackbox << "wp_vel_z" << ",";
   this->blackbox << "target_x_bf" << ",";
   this->blackbox << "target_y_bf" << ",";
   this->blackbox << "target_z_bf" << ",";
   this->blackbox << "target_vx_bf" << ",";
   this->blackbox << "target_vy_bf" << ",";
   this->blackbox << "target_vz_bf" << ",";
+  this->blackbox << "roll";
+  this->blackbox << "pitch";
   this->blackbox << "yaw";
   this->blackbox << std::endl;
 
@@ -378,9 +384,13 @@ int LandingController::recordTrajectoryIndex(void) {
 
 int LandingController::record(Vec3 pos,
                               Vec3 vel,
+                              Vec2 wp_pos,
+                              Vec2 wp_vel,
+                              Vec2 wp_inputs,
                               Vec3 target_pos_bf,
                               Vec3 target_vel_bf,
-                              double yaw,
+                              Vec3 rpy,
+                              double thrust,
                               double dt) {
   // pre-check
   this->blackbox_dt += dt;
@@ -396,13 +406,22 @@ int LandingController::record(Vec3 pos,
   this->blackbox << vel(0) << ",";
   this->blackbox << vel(1) << ",";
   this->blackbox << vel(2) << ",";
+  this->blackbox << wp_pos(0) << ",";
+  this->blackbox << wp_pos(1) << ",";
+  this->blackbox << wp_vel(0) << ",";
+  this->blackbox << wp_vel(1) << ",";
+  this->blackbox << wp_inputs(0) << ",";
+  this->blackbox << wp_inputs(1) << ",";
   this->blackbox << target_pos_bf(0) << ",";
   this->blackbox << target_pos_bf(1) << ",";
   this->blackbox << target_pos_bf(2) << ",";
   this->blackbox << target_vel_bf(0) << ",";
   this->blackbox << target_vel_bf(1) << ",";
   this->blackbox << target_vel_bf(2) << ",";
-  this->blackbox << yaw;
+  this->blackbox << rpy(0) << ",";
+  this->blackbox << rpy(1) << ",";
+  this->blackbox << rpy(2) << ",";
+  this->blackbox << thrust;
   this->blackbox << std::endl;
   this->blackbox_dt = 0.0;
 
@@ -451,6 +470,7 @@ int LandingController::calculate(Vec3 target_pos_bf,
                                  Vec3 target_vel_bf,
                                  Vec3 pos,
                                  Vec3 vel,
+                                 Quaternion orientation,
                                  double yaw,
                                  double dt) {
   int retval;
@@ -473,12 +493,12 @@ int LandingController::calculate(Vec3 target_pos_bf,
   v_errors(1) = target_pos_bf(1);
   v_errors(2) = wp_vel(1) - vel(2);
 
-  // // calculate velocity errors (relative version)
+  // // // calculate velocity errors (relative version)
   // v_errors(0) = -1 * (wp_rel_vel(0) - target_vel_bf(0));
   // v_errors(1) = target_pos_bf(1);
   // v_errors(2) = -1 * (wp_rel_vel(1) - target_vel_bf(2));
 
-  // calculate velocity errors (hybrid version)
+  // // calculate velocity errors (hybrid version)
   // v_errors(0) = -1 * (wp_rel_vel(0) - target_vel_bf(0));
   // v_errors(1) = target_pos_bf(1);
   // v_errors(2) = wp_vel(1) - vel(2);
@@ -494,7 +514,19 @@ int LandingController::calculate(Vec3 target_pos_bf,
   this->att_cmd = AttitudeCommand(this->outputs);
 
   // record
-  this->record(pos, vel, target_pos_bf, target_vel_bf, yaw, dt);
+  Vec3 rpy;
+  quat2euler(orientation, 321, rpy);
+  wp_inputs(1) = this->outputs(1);
+  this->record(pos,
+               vel,
+               wp_pos,
+               wp_vel,
+               wp_inputs,
+               target_pos_bf,
+               target_vel_bf,
+               rpy,
+               this->outputs(3),
+               dt);
 
   // calculate trajectory errors
   p_errors(0) = wp_rel_pos(0) + target_pos_bf(0);

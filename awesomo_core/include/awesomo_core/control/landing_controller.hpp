@@ -92,15 +92,20 @@ public:
   int recordTrajectoryIndex(void);
   int record(Vec3 pos,
              Vec3 vel,
+             Vec2 wp_pos,
+             Vec2 wp_vel,
+             Vec2 wp_inputs,
              Vec3 target_pos_bf,
              Vec3 target_vel_bf,
-             double yaw,
+             Vec3 rpy,
+             double thrust,
              double dt);
   Vec4 calculateVelocityErrors(Vec3 errors, double yaw, double dt);
   int calculate(Vec3 target_pos_bf,
                 Vec3 target_vel_bf,
                 Vec3 pos,
                 Vec3 vel,
+                Quaternion orientation,
                 double yaw,
                 double dt);
   void reset(void);

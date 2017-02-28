@@ -307,7 +307,7 @@ int Quadrotor::stepTrackingMode(double dt) {
     // transition to landing mode
     if (retval == 0) {
       log_info("Transitioning to [LANDING MODE]!");
-      this->landing_controller.recordTrajectoryIndex();
+      // this->landing_controller.recordTrajectoryIndex();
       this->setMode(LANDING_MODE);
       this->tracking_tic = (struct timespec){0};
     }
@@ -340,6 +340,7 @@ int Quadrotor::stepLandingMode(double dt) {
     this->landing_target.velocity_bf,
     this->pose.position,
     this->velocity,
+    this->pose.orientation,
     this->yaw,
     dt
   );

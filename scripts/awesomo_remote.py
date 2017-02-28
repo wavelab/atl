@@ -99,7 +99,7 @@ if __name__ == "__main__":
     quad.set_arm(True)
     # quad.set_hover_point([0.0, 0.0, 10.0])
 
-    quad.set_hover_point([1.0, 0.0, 5.0])
+    # quad.set_hover_point([1.0, 0.0, 5.0])
 
     # sleep(2)
     # quad.set_mode("HOVER")
@@ -108,7 +108,7 @@ if __name__ == "__main__":
 
     # square(quad, 3, 1)
     # lz_circle(20, 1.0)
-    # lz_straight_line(1.0)
+    lz_straight_line(1.0)
     # lz.set_position([0, 0, 0])
 
     # side_to_side(quad, 4.0, 2.0)

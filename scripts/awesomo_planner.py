@@ -198,10 +198,10 @@ def cost_func(x, args):
 
     # position error cost
     cost += 0.0 * np.linalg.norm(states[0] - traj[0])  # dx
-    cost += 0.0 * np.linalg.norm(states[2] - traj[1])  # dz
+    cost += 1.0 * np.linalg.norm(states[2] - traj[1])  # dz
 
     # control input cost
-    cost += 0.1 * np.linalg.norm(states[4])  # az
+    cost += 1.0 * np.linalg.norm(states[4])  # az
     cost += 1.0 * np.linalg.norm(states[5])  # theta
 
     # control input difference cost

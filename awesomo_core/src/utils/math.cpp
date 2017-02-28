@@ -418,6 +418,24 @@ void inertial2body(Vec3 enu_if,
   nwu_bf = R * nwu_if;
 }
 
+void inertial2body(Vec3 enu_if,
+                   Vec3 orientation_if,
+                   Vec3 &nwu_bf) {
+  Mat3 R;
+  Vec3 nwu_if;
+
+  // create rotation matrix
+  euler2rot(orientation_if, 123, R);
+
+  // convert inertial ENU to NWU
+  nwu_if(0) = enu_if(1);
+  nwu_if(1) = -enu_if(0);
+  nwu_if(2) = enu_if(2);
+
+  // transform inertal to body
+  nwu_bf = R * nwu_if;
+}
+
 double wrapTo180(double euler_angle) {
   return fmod((euler_angle + 180.0), 360.0) - 180.0;
 }
