@@ -436,7 +436,7 @@ void ControlNode::trackingControllerSetCallback(
 
 void ControlNode::landingControllerSetCallback(
   const awesomo_msgs::LCtrlSettings &msg) {
-  convertMsg(msg, this->quadrotor.landing_controller);
+  // convertMsg(msg, this->quadrotor.landing_controller);
 }
 
 void ControlNode::publishAttitudeSetpoint(void) {

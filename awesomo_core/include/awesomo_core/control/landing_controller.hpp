@@ -64,9 +64,21 @@ public:
   double dt;
   double blackbox_dt;
 
-  PID vx_controller;
-  PID vy_controller;
-  PID vz_controller;
+  double vx_error_prev;
+  double vy_error_prev;
+  double vz_error_prev;
+
+  double vx_k_p;
+  double vx_k_i;
+  double vx_k_d;
+
+  double vy_k_p;
+  double vy_k_i;
+  double vy_k_d;
+
+  double vz_k_p;
+  double vz_k_i;
+  double vz_k_d;
 
   double roll_limit[2];
   double pitch_limit[2];
@@ -100,7 +112,10 @@ public:
              Vec3 rpy,
              double thrust,
              double dt);
-  Vec4 calculateVelocityErrors(Vec3 errors, double yaw, double dt);
+  Vec4 calculateVelocityErrors(Vec3 v_errors,
+                               Vec3 p_errors,
+                               double yaw,
+                               double dt);
   int calculate(Vec3 target_pos_bf,
                 Vec3 target_vel_bf,
                 Vec3 pos,

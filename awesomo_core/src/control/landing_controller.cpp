@@ -216,9 +216,21 @@ LandingController::LandingController(void) {
   this->dt = 0.0;
   this->blackbox_dt = 0.0;
 
-  this->vx_controller = PID(0.0, 0.0, 0.0);
-  this->vy_controller = PID(0.0, 0.0, 0.0);
-  this->vz_controller = PID(0.0, 0.0, 0.0);
+  this->vx_error_prev = 0.0;
+  this->vy_error_prev = 0.0;
+  this->vz_error_prev = 0.0;
+
+  this->vx_k_p = 0.0;
+  this->vx_k_i = 0.0;
+  this->vx_k_d = 0.0;
+
+  this->vy_k_p = 0.0;
+  this->vy_k_i = 0.0;
+  this->vy_k_d = 0.0;
+
+  this->vz_k_p = 0.0;
+  this->vz_k_i = 0.0;
+  this->vz_k_d = 0.0;
 
   this->roll_limit[0] = 0.0;
   this->roll_limit[1] = 0.0;
@@ -254,17 +266,17 @@ int LandingController::configure(std::string config_file) {
 
   // load config
   // clang-format off
-  parser.addParam<double>("vx_controller.k_p", &this->vx_controller.k_p);
-  parser.addParam<double>("vx_controller.k_i", &this->vx_controller.k_i);
-  parser.addParam<double>("vx_controller.k_d", &this->vx_controller.k_d);
+  parser.addParam<double>("vx_controller.k_p", &this->vx_k_p);
+  parser.addParam<double>("vx_controller.k_i", &this->vx_k_i);
+  parser.addParam<double>("vx_controller.k_d", &this->vx_k_d);
 
-  parser.addParam<double>("vy_controller.k_p", &this->vy_controller.k_p);
-  parser.addParam<double>("vy_controller.k_i", &this->vy_controller.k_i);
-  parser.addParam<double>("vy_controller.k_d", &this->vy_controller.k_d);
+  parser.addParam<double>("vy_controller.k_p", &this->vy_k_p);
+  parser.addParam<double>("vy_controller.k_i", &this->vy_k_i);
+  parser.addParam<double>("vy_controller.k_d", &this->vy_k_d);
 
-  parser.addParam<double>("vz_controller.k_p", &this->vz_controller.k_p);
-  parser.addParam<double>("vz_controller.k_i", &this->vz_controller.k_i);
-  parser.addParam<double>("vz_controller.k_d", &this->vz_controller.k_d);
+  parser.addParam<double>("vz_controller.k_p", &this->vz_k_p);
+  parser.addParam<double>("vz_controller.k_i", &this->vz_k_i);
+  parser.addParam<double>("vz_controller.k_d", &this->vz_k_d);
 
   parser.addParam<double>("roll_limit.min", &this->roll_limit[0]);
   parser.addParam<double>("roll_limit.max", &this->roll_limit[1]);
@@ -428,7 +440,8 @@ int LandingController::record(Vec3 pos,
   return 0;
 }
 
-Vec4 LandingController::calculateVelocityErrors(Vec3 errors,
+Vec4 LandingController::calculateVelocityErrors(Vec3 v_errors,
+                                                Vec3 p_errors,
                                                 double yaw,
                                                 double dt) {
   double r, p, y, t;
@@ -441,14 +454,30 @@ Vec4 LandingController::calculateVelocityErrors(Vec3 errors,
     return this->outputs;
   }
 
-  // roll, pitch, yaw and throttle (assuming NWU frame)
-  // clang-format off
-  r = -this->vy_controller.calculate(errors(1), 0.0, this->dt);
-  p = this->vx_controller.calculate(errors(0), 0.0, this->dt);
+  // roll
+  r = this->vy_k_p * v_errors(1);
+  r += this->vy_k_i * p_errors(1);
+  r += this->vy_k_d * (v_errors(1) - this->vy_error_prev) / this->dt;
+  r = -1 * r;
+
+  // pitch
+  p = this->vx_k_p * v_errors(0);
+  p += this->vx_k_i * p_errors(0);
+  p += this->vx_k_d * (v_errors(0) - this->vx_error_prev) / this->dt;
+
+  // yaw
   y = 0.0;
-  t = this->vz_controller.calculate(errors(2), 0.0, this->dt);
+
+  // throttle
+  t = this->vz_k_p * v_errors(2);
+  t += this->vz_k_i * p_errors(2);
+  t += this->vz_k_d * (v_errors(2) - this->vz_error_prev) / this->dt;
   t /= fabs(cos(r) * cos(p));  // adjust throttle for roll and pitch
-  // clang-format on
+
+  // keep track of previous errors
+  this->vx_error_prev = v_errors(1);
+  this->vy_error_prev = v_errors(0);
+  this->vz_error_prev = v_errors(2);
 
   // limit roll, pitch, throttle
   r = (r < this->roll_limit[0]) ? this->roll_limit[0] : r;
@@ -459,7 +488,7 @@ Vec4 LandingController::calculateVelocityErrors(Vec3 errors,
   t = (t > this->throttle_limit[1]) ? this->throttle_limit[1] : t;
 
   // keep track of setpoints and outputs
-  this->setpoints = errors;
+  this->setpoints = v_errors;
   this->outputs << r, p, y, t;
   this->dt = 0.0;
 
@@ -490,10 +519,10 @@ int LandingController::calculate(Vec3 target_pos_bf,
 
   // calculate velocity errors (inertial version)
   v_errors(0) = wp_vel(0) - vel_bf(0);
-  v_errors(1) = target_pos_bf(1);
+  v_errors(1) = target_vel_bf(1);
   v_errors(2) = wp_vel(1) - vel(2);
 
-  // // // calculate velocity errors (relative version)
+  // calculate velocity errors (relative version)
   // v_errors(0) = -1 * (wp_rel_vel(0) - target_vel_bf(0));
   // v_errors(1) = target_pos_bf(1);
   // v_errors(2) = -1 * (wp_rel_vel(1) - target_vel_bf(2));
@@ -503,8 +532,13 @@ int LandingController::calculate(Vec3 target_pos_bf,
   // v_errors(1) = target_pos_bf(1);
   // v_errors(2) = wp_vel(1) - vel(2);
 
+  // calculate position errors
+  p_errors(0) = wp_rel_pos(0) + target_pos_bf(0);
+  p_errors(1) = target_pos_bf(1);
+  p_errors(2) = wp_rel_pos(1) - pos(2);
+
   // calculate feed-back controls
-  this->outputs = this->calculateVelocityErrors(v_errors, yaw, dt);
+  this->outputs = this->calculateVelocityErrors(v_errors, p_errors, yaw, dt);
 
   // add in feed-forward controls
   this->outputs(0) += 0.0;                 // roll
@@ -516,22 +550,18 @@ int LandingController::calculate(Vec3 target_pos_bf,
   // record
   Vec3 rpy;
   quat2euler(orientation, 321, rpy);
-  wp_inputs(1) = this->outputs(1);
-  this->record(pos,
-               vel,
-               wp_pos,
-               wp_vel,
-               wp_inputs,
-               target_pos_bf,
-               target_vel_bf,
-               rpy,
-               this->outputs(3),
-               dt);
-
-  // calculate trajectory errors
-  p_errors(0) = wp_rel_pos(0) + target_pos_bf(0);
-  p_errors(1) = target_pos_bf(1);
-  p_errors(2) = wp_rel_pos(1) - pos(2);
+  this->record(
+    pos,
+    vel,
+    wp_pos,
+    wp_vel,
+    wp_inputs,
+    target_pos_bf,
+    target_vel_bf,
+    rpy,
+    this->outputs(3),
+    dt
+  );
 
   // check if we are too far off track with trajectory
   if (p_errors(0) > this->trajectory_threshold(0)) {
@@ -552,9 +582,9 @@ int LandingController::calculate(Vec3 target_pos_bf,
 }
 
 void LandingController::reset(void) {
-  this->vx_controller.reset();
-  this->vy_controller.reset();
-  this->vz_controller.reset();
+  // this->vx_controller.reset();
+  // this->vy_controller.reset();
+  // this->vz_controller.reset();
 }
 
 void LandingController::printOutputs(void) {
@@ -569,35 +599,35 @@ void LandingController::printOutputs(void) {
   std::cout << "throttle: " << std::setprecision(2) << t << std::endl;
 }
 
-void LandingController::printErrors(void) {
-  double p, i, d;
-
-  p = this->vx_controller.error_p;
-  i = this->vx_controller.error_i;
-  d = this->vx_controller.error_d;
-
-  std::cout << "vx_controller: " << std::endl;
-  std::cout << "\terror_p: " << std::setprecision(2) << p << "\t";
-  std::cout << "\terror_i: " << std::setprecision(2) << i << "\t";
-  std::cout << "\terror_d: " << std::setprecision(2) << i << std::endl;
-
-  p = this->vy_controller.error_p;
-  i = this->vy_controller.error_i;
-  d = this->vy_controller.error_d;
-
-  std::cout << "vy_controller: " << std::endl;
-  std::cout << "\terror_p: " << std::setprecision(2) << p << "\t";
-  std::cout << "\terror_i: " << std::setprecision(2) << i << "\t";
-  std::cout << "\terror_d: " << std::setprecision(2) << i << std::endl;
-
-  p = this->vz_controller.error_p;
-  i = this->vz_controller.error_i;
-  d = this->vz_controller.error_d;
-
-  std::cout << "vz_controller: " << std::endl;
-  std::cout << "\terror_p: " << std::setprecision(2) << p << "\t";
-  std::cout << "\terror_i: " << std::setprecision(2) << i << "\t";
-  std::cout << "\terror_d: " << std::setprecision(2) << i << std::endl;
-}
+// void LandingController::printErrors(void) {
+//   double p, i, d;
+//
+//   p = this->vx_controller.error_p;
+//   i = this->vx_controller.error_i;
+//   d = this->vx_controller.error_d;
+//
+//   std::cout << "vx_controller: " << std::endl;
+//   std::cout << "\terror_p: " << std::setprecision(2) << p << "\t";
+//   std::cout << "\terror_i: " << std::setprecision(2) << i << "\t";
+//   std::cout << "\terror_d: " << std::setprecision(2) << i << std::endl;
+//
+//   p = this->vy_controller.error_p;
+//   i = this->vy_controller.error_i;
+//   d = this->vy_controller.error_d;
+//
+//   std::cout << "vy_controller: " << std::endl;
+//   std::cout << "\terror_p: " << std::setprecision(2) << p << "\t";
+//   std::cout << "\terror_i: " << std::setprecision(2) << i << "\t";
+//   std::cout << "\terror_d: " << std::setprecision(2) << i << std::endl;
+//
+//   p = this->vz_controller.error_p;
+//   i = this->vz_controller.error_i;
+//   d = this->vz_controller.error_d;
+//
+//   std::cout << "vz_controller: " << std::endl;
+//   std::cout << "\terror_p: " << std::setprecision(2) << p << "\t";
+//   std::cout << "\terror_i: " << std::setprecision(2) << i << "\t";
+//   std::cout << "\terror_d: " << std::setprecision(2) << i << std::endl;
+// }
 
 }  // end of awesomo namespace

@@ -185,28 +185,28 @@ void buildMsg(TrackingController tc, awesomo_msgs::TCtrlSettings &msg) {
   msg.track_offset.z = tc.track_offset(2);
 }
 
-void buildMsg(LandingController lc, awesomo_msgs::LCtrlSettings &msg) {
-  msg.vx_controller.k_p = lc.vx_controller.k_p;
-  msg.vx_controller.k_i = lc.vx_controller.k_i;
-  msg.vx_controller.k_d = lc.vx_controller.k_d;
-
-  msg.vy_controller.k_p = lc.vy_controller.k_p;
-  msg.vy_controller.k_i = lc.vy_controller.k_i;
-  msg.vy_controller.k_d = lc.vy_controller.k_d;
-
-  msg.vz_controller.k_p = lc.vz_controller.k_p;
-  msg.vz_controller.k_i = lc.vz_controller.k_i;
-  msg.vz_controller.k_d = lc.vz_controller.k_d;
-
-  msg.roll_controller.min = lc.roll_limit[0];
-  msg.roll_controller.max = lc.roll_limit[1];
-
-  msg.pitch_controller.min = lc.pitch_limit[0];
-  msg.pitch_controller.max = lc.pitch_limit[1];
-
-  msg.throttle_controller.min = lc.throttle_limit[0];
-  msg.throttle_controller.max = lc.throttle_limit[1];
-}
+// void buildMsg(LandingController lc, awesomo_msgs::LCtrlSettings &msg) {
+//   msg.vx_controller.k_p = lc.vx_controller.k_p;
+//   msg.vx_controller.k_i = lc.vx_controller.k_i;
+//   msg.vx_controller.k_d = lc.vx_controller.k_d;
+//
+//   msg.vy_controller.k_p = lc.vy_controller.k_p;
+//   msg.vy_controller.k_i = lc.vy_controller.k_i;
+//   msg.vy_controller.k_d = lc.vy_controller.k_d;
+//
+//   msg.vz_controller.k_p = lc.vz_controller.k_p;
+//   msg.vz_controller.k_i = lc.vz_controller.k_i;
+//   msg.vz_controller.k_d = lc.vz_controller.k_d;
+//
+//   msg.roll_controller.min = lc.roll_limit[0];
+//   msg.roll_controller.max = lc.roll_limit[1];
+//
+//   msg.pitch_controller.min = lc.pitch_limit[0];
+//   msg.pitch_controller.max = lc.pitch_limit[1];
+//
+//   msg.throttle_controller.min = lc.throttle_limit[0];
+//   msg.throttle_controller.max = lc.throttle_limit[1];
+// }
 
 int convertMsg(std_msgs::Bool msg, bool &b) {
   b = msg.data;
@@ -318,29 +318,29 @@ int convertMsg(awesomo_msgs::TCtrlSettings msg, TrackingController &tc) {
   return 0;
 }
 
-int convertMsg(awesomo_msgs::LCtrlSettings msg, LandingController &lc) {
-  lc.vx_controller.k_p = msg.vx_controller.k_p;
-  lc.vx_controller.k_i = msg.vx_controller.k_i;
-  lc.vx_controller.k_d = msg.vx_controller.k_d;
-
-  lc.vy_controller.k_p = msg.vy_controller.k_p;
-  lc.vy_controller.k_i = msg.vy_controller.k_i;
-  lc.vy_controller.k_d = msg.vy_controller.k_d;
-
-  lc.vz_controller.k_p = msg.vz_controller.k_p;
-  lc.vz_controller.k_i = msg.vz_controller.k_i;
-  lc.vz_controller.k_d = msg.vz_controller.k_d;
-
-  lc.roll_limit[0] = deg2rad(msg.roll_controller.min);
-  lc.roll_limit[1] = deg2rad(msg.roll_controller.max);
-
-  lc.pitch_limit[0] = deg2rad(msg.pitch_controller.min);
-  lc.pitch_limit[1] = deg2rad(msg.pitch_controller.max);
-
-  lc.throttle_limit[0] = msg.throttle_controller.min;
-  lc.throttle_limit[1] = msg.throttle_controller.max;
-
-  return 0;
-}
+// int convertMsg(awesomo_msgs::LCtrlSettings msg, LandingController &lc) {
+//   lc.vx_controller.k_p = msg.vx_controller.k_p;
+//   lc.vx_controller.k_i = msg.vx_controller.k_i;
+//   lc.vx_controller.k_d = msg.vx_controller.k_d;
+//
+//   lc.vy_controller.k_p = msg.vy_controller.k_p;
+//   lc.vy_controller.k_i = msg.vy_controller.k_i;
+//   lc.vy_controller.k_d = msg.vy_controller.k_d;
+//
+//   lc.vz_controller.k_p = msg.vz_controller.k_p;
+//   lc.vz_controller.k_i = msg.vz_controller.k_i;
+//   lc.vz_controller.k_d = msg.vz_controller.k_d;
+//
+//   lc.roll_limit[0] = deg2rad(msg.roll_controller.min);
+//   lc.roll_limit[1] = deg2rad(msg.roll_controller.max);
+//
+//   lc.pitch_limit[0] = deg2rad(msg.pitch_controller.min);
+//   lc.pitch_limit[1] = deg2rad(msg.pitch_controller.max);
+//
+//   lc.throttle_limit[0] = msg.throttle_controller.min;
+//   lc.throttle_limit[1] = msg.throttle_controller.max;
+//
+//   return 0;
+// }
 
 }  // end of awesomo namespace
