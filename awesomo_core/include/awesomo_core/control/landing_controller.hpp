@@ -68,6 +68,8 @@ public:
   double vy_error_prev;
   double vz_error_prev;
 
+  double vx_error_sum;
+
   double vx_k_p;
   double vx_k_i;
   double vx_k_d;

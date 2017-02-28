@@ -79,15 +79,21 @@ def plot_blackbox(data_file):
     #     data["wp_theta"][i] = data["wp_theta"][i] = p0[0]
 
     # plot
+    plt.style.use("ggplot")
     plt.subplot("411")
     plt.tight_layout()
-    plt.plot(data["y"], data["z"], label="quadrotor")
-    plt.plot(data["wp_pos_x"], data["wp_pos_z"], label="waypoints")
+    # plt.plot(data["y"], data["z"], label="quadrotor")
+    # plt.plot(data["wp_pos_x"], data["wp_pos_z"], label="waypoints")
+    # plt.legend(loc=0)
+    # plt.title("Position vs Waypoints")
+    plt.plot(data["t"], data["x"], label="x")
+    plt.plot(data["t"], data["y"], label="y")
+    plt.plot(data["t"], data["z"], label="z")
     plt.legend(loc=0)
-    plt.title("Position vs Waypoints")
+    plt.title("Position vs Time")
 
     plt.subplot("412")
-    plt.plot(data["t"], data["vy"], label="vy")
+    plt.plot(data["t"], data["vy"], label="vx")
     plt.plot(data["t"], data["vz"], label="vz")
     plt.plot(data["t"], data["wp_vel_x"], label="vx_desired")
     plt.plot(data["t"], data["wp_vel_z"], label="vz_desired")
@@ -104,7 +110,7 @@ def plot_blackbox(data_file):
 
     plt.subplot("414")
     plt.plot(data["t"], data["thrust"], label="thrust actual")
-    # plt.plot(data["t"], data["wp_thrust"], label="thrust desired")
+    plt.plot(data["t"], data["wp_thrust"], label="thrust desired")
     plt.title("Thrust")
     plt.legend(loc=0)
 

@@ -69,8 +69,11 @@ int Trajectory::load(int index, std::string filepath, Vec3 p0) {
 }
 
 int Trajectory::update(Vec3 pos, Vec2 &wp_pos, Vec2 &wp_vel, Vec2 &wp_inputs) {
-  int retval;
-  Vec2 wp_pos_start, wp_pos_end, wp_pos_last, q_pos;
+  double wp_percent;
+  Vec2 q_pos;
+  Vec2 wp_pos_start, wp_pos_end;
+  Vec2 wp_vel_start, wp_vel_end;
+  Vec2 wp_inputs_start, wp_inputs_end;
 
   // pre-check
   if (this->loaded == false) {
@@ -85,17 +88,23 @@ int Trajectory::update(Vec3 pos, Vec2 &wp_pos, Vec2 &wp_vel, Vec2 &wp_inputs) {
   // setup
   wp_pos_start = this->pos.at(0);
   wp_pos_end = this->pos.at(1);
-  wp_pos_last = this->pos.back();
+
+  wp_vel_start = this->vel.at(0);
+  wp_vel_end = this->vel.at(1);
+
+  wp_inputs_start = this->inputs.at(0);
+  wp_inputs_end = this->inputs.at(1);
+
   q_pos(0) = (this->p0.block(0, 0, 2, 1) - pos.block(0, 0, 2, 1)).norm();
   q_pos(1) = pos(2);
 
   // find next waypoint position, velocity and inputs
-  retval = closest_point(wp_pos_start, wp_pos_end, q_pos, wp_pos);
-  wp_vel = this->vel.at(1);
-  wp_inputs = this->inputs.at(1);
+  wp_percent = closest_point(wp_pos_start, wp_pos_end, q_pos, wp_pos);
+  wp_vel = linear_interpolation(wp_vel_start, wp_vel_end, wp_percent);
+  wp_inputs = linear_interpolation(wp_inputs_start, wp_inputs_end, wp_percent);
 
   // update trajectory waypoints
-  if (retval == 2) {
+  if (wp_percent > 1.0) {
     this->pos.pop_front();
     this->vel.pop_front();
     this->inputs.pop_front();
@@ -461,8 +470,9 @@ Vec4 LandingController::calculateVelocityErrors(Vec3 v_errors,
   r = -1 * r;
 
   // pitch
+  this->vx_error_sum += v_errors(0);
   p = this->vx_k_p * v_errors(0);
-  p += this->vx_k_i * p_errors(0);
+  p += this->vx_k_i * this->vx_error_sum;
   p += this->vx_k_d * (v_errors(0) - this->vx_error_prev) / this->dt;
 
   // yaw
@@ -522,16 +532,6 @@ int LandingController::calculate(Vec3 target_pos_bf,
   v_errors(1) = target_vel_bf(1);
   v_errors(2) = wp_vel(1) - vel(2);
 
-  // calculate velocity errors (relative version)
-  // v_errors(0) = -1 * (wp_rel_vel(0) - target_vel_bf(0));
-  // v_errors(1) = target_pos_bf(1);
-  // v_errors(2) = -1 * (wp_rel_vel(1) - target_vel_bf(2));
-
-  // // calculate velocity errors (hybrid version)
-  // v_errors(0) = -1 * (wp_rel_vel(0) - target_vel_bf(0));
-  // v_errors(1) = target_pos_bf(1);
-  // v_errors(2) = wp_vel(1) - vel(2);
-
   // calculate position errors
   p_errors(0) = wp_rel_pos(0) + target_pos_bf(0);
   p_errors(1) = target_pos_bf(1);
@@ -541,15 +541,14 @@ int LandingController::calculate(Vec3 target_pos_bf,
   this->outputs = this->calculateVelocityErrors(v_errors, p_errors, yaw, dt);
 
   // add in feed-forward controls
-  this->outputs(0) += 0.0;                 // roll
-  this->outputs(1) += -1 * wp_inputs(1);   // pitch
-  this->outputs(2) += yaw;                 // yaw
-  this->outputs(3) += wp_inputs(0);        // thrust
+  this->outputs(0) += 0.0;           // roll
+  this->outputs(1) += wp_inputs(1);  // pitch
+  this->outputs(2) += yaw;           // yaw
+  this->outputs(3) += wp_inputs(0);  // thrust
   this->att_cmd = AttitudeCommand(this->outputs);
 
   // record
-  Vec3 rpy;
-  quat2euler(orientation, 321, rpy);
+  quat2euler(orientation, 321, euler);
   this->record(
     pos,
     vel,
@@ -558,7 +557,7 @@ int LandingController::calculate(Vec3 target_pos_bf,
     wp_inputs,
     target_pos_bf,
     target_vel_bf,
-    rpy,
+    euler,
     this->outputs(3),
     dt
   );

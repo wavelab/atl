@@ -571,43 +571,54 @@ TEST(Utils_math, point_left_right) {
   ASSERT_EQ(0, point_left_right(p1, p2, pos));
 }
 
-TEST(Utils_math, closest_point) {
-  int retval;
-  Vec2 p1, p2, p3, closest;
+// TEST(Utils_math, closest_point) {
+//   int retval;
+//   Vec2 p1, p2, p3, closest;
+//
+//   // setup
+//   p1 << 0, 0;
+//   p2 << 5, 0;
+//
+//   // point middle of point a, b
+//   p3 << 2, 2;
+//   retval = closest_point(p1, p2, p3, closest);
+//   ASSERT_EQ(0, retval);
+//   ASSERT_FLOAT_EQ(2.0, closest(0));
+//   ASSERT_FLOAT_EQ(0.0, closest(1));
+//
+//   // point before of point a
+//   p3 << -1, 2;
+//   retval = closest_point(p1, p2, p3, closest);
+//   ASSERT_EQ(1, retval);
+//   ASSERT_FLOAT_EQ(-1.0, closest(0));
+//   ASSERT_FLOAT_EQ(0.0, closest(1));
+//
+//   // point after point b
+//   p3 << 6, 2;
+//   retval = closest_point(p1, p2, p3, closest);
+//   ASSERT_EQ(2, retval);
+//   ASSERT_FLOAT_EQ(6.0, closest(0));
+//   ASSERT_FLOAT_EQ(0.0, closest(1));
+//
+//   // if point 1 and 2 are same
+//   p1 << 0, 0;
+//   p2 << 0, 0;
+//   p3 << 0, 2;
+//   retval = closest_point(p1, p2, p3, closest);
+//   ASSERT_EQ(-1, retval);
+//   ASSERT_FLOAT_EQ(0.0, closest(0));
+//   ASSERT_FLOAT_EQ(0.0, closest(1));
+// }
 
-  // setup
-  p1 << 0, 0;
-  p2 << 5, 0;
+TEST(Utils_math, linear_interpolation) {
+  Vec2 a, b, result;
 
-  // point middle of point a, b
-  p3 << 2, 2;
-  retval = closest_point(p1, p2, p3, closest);
-  ASSERT_EQ(0, retval);
-  ASSERT_FLOAT_EQ(2.0, closest(0));
-  ASSERT_FLOAT_EQ(0.0, closest(1));
+  a << 0, 5;
+  b << 5, 0;
+  result = linear_interpolation(a, b, 0.8);
 
-  // point before of point a
-  p3 << -1, 2;
-  retval = closest_point(p1, p2, p3, closest);
-  ASSERT_EQ(1, retval);
-  ASSERT_FLOAT_EQ(-1.0, closest(0));
-  ASSERT_FLOAT_EQ(0.0, closest(1));
+  std::cout << result << std::endl;
 
-  // point after point b
-  p3 << 6, 2;
-  retval = closest_point(p1, p2, p3, closest);
-  ASSERT_EQ(2, retval);
-  ASSERT_FLOAT_EQ(6.0, closest(0));
-  ASSERT_FLOAT_EQ(0.0, closest(1));
-
-  // if point 1 and 2 are same
-  p1 << 0, 0;
-  p2 << 0, 0;
-  p3 << 0, 2;
-  retval = closest_point(p1, p2, p3, closest);
-  ASSERT_EQ(-1, retval);
-  ASSERT_FLOAT_EQ(0.0, closest(0));
-  ASSERT_FLOAT_EQ(0.0, closest(1));
 }
 
 }  // end of awesomo namespace

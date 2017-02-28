@@ -1,11 +1,11 @@
 vx_controller:
     k_p: 0.1
-    k_i: 0.2
-    k_d: 0.0
+    k_i: 0.01
+    k_d: 0.01
 
 vy_controller:
     k_p: 0.1
-    k_i: 0.2
+    k_i: 0.01
     k_d: 0.0
 
 vz_controller:

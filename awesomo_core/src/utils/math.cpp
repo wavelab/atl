@@ -486,9 +486,40 @@ int point_left_right(Vec2 a, Vec2 b, Vec2 c) {
   return -1;
 }
 
-int closest_point(Vec2 a, Vec2 b, Vec2 p, Vec2 &closest, bool limit) {
-  Vec2 v1, v2, result;
+// int closest_point(Vec2 a, Vec2 b, Vec2 p, Vec2 &closest, bool limit) {
+//   Vec2 v1, v2, result;
+//   double t;
+//
+//   // pre-check
+//   if ((a - b).norm() == 0) {
+//     closest = a;
+//     return -1;
+//   }
+//
+//   // calculate closest point
+//   v1 = p - a;
+//   v2 = b - a;
+//   t = v1.dot(v2) / v2.squaredNorm();
+//
+//   // check if point p is:
+//   // 1. before point a
+//   // 2. after point b
+//   // 3. middle of point a, b
+//   if (t < 0) {
+//     closest = (limit) ? a : a + t * v2;
+//     return 1;
+//   } else if (t > 1) {
+//     closest = (limit) ? b : a + t * v2;
+//     return 2;
+//   } else {
+//     closest = a + t * v2;
+//     return 0;
+//   }
+// }
+
+double closest_point(Vec2 a, Vec2 b, Vec2 p, Vec2 &closest) {
   double t;
+  Vec2 v1, v2;
 
   // pre-check
   if ((a - b).norm() == 0) {
@@ -500,21 +531,13 @@ int closest_point(Vec2 a, Vec2 b, Vec2 p, Vec2 &closest, bool limit) {
   v1 = p - a;
   v2 = b - a;
   t = v1.dot(v2) / v2.squaredNorm();
+  closest = a + t * v2;
 
-  // check if point p is:
-  // 1. before point a
-  // 2. after point b
-  // 3. middle of point a, b
-  if (t < 0) {
-    closest = (limit) ? a : a + t * v2;
-    return 1;
-  } else if (t > 1) {
-    closest = (limit) ? b : a + t * v2;
-    return 2;
-  } else {
-    closest = a + t * v2;
-    return 0;
-  }
+  return t;
+}
+
+Vec2 linear_interpolation(Vec2 a, Vec2 b, double mu) {
+   return a * (1 - mu) + b * mu;
 }
 
 }  // eof awesomo
