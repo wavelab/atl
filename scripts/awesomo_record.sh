@@ -19,6 +19,7 @@ rosbag record \
     /awesomo/estimate/landing_target/position/body \
     /awesomo/estimate/landing_target/velocity/inertial \
     /awesomo/estimate/landing_target/velocity/body \
+    /awesomo/lz/pose \
     /dji_sdk/local_position \
     /dji_sdk/global_position \
     /dji_sdk/attitude_quaternion \

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 import csv
+from math import pi
+
 import matplotlib.pylab as plt
 from mpl_toolkits.mplot3d import Axes3D
 
@@ -38,6 +40,8 @@ def plot_blackbox(data_file):
     }
 
     # parse data
+    row_index = 0
+    row_end = 250
     for row in reader:
         data["dt"].append(float(row[0]))
         data["x"].append(float(row[1]))
@@ -63,6 +67,11 @@ def plot_blackbox(data_file):
         data["yaw"].append(float(row[21]))
         data["thrust"].append(float(row[22]))
 
+        if row_index > row_end:
+            break
+        else:
+            row_index += 1
+
     # convert dt to time series
     t = 0
     for i in range(len(data["dt"])):
@@ -74,23 +83,31 @@ def plot_blackbox(data_file):
     for i in range(len(data["dt"])):
         data["wp_pos_x"][i] += p0[0]
 
-    # # correct pitch
-    # for i in range(len(data["dt"])):
-    #     data["wp_theta"][i] = data["wp_theta"][i] = p0[0]
+    # correct pitch
+    for i in range(len(data["dt"])):
+        data["wp_theta"][i] = data["wp_theta"][i] * 180 / pi
+        data["roll"][i] = data["roll"][i] * 180 / pi
+        data["pitch"][i] = data["pitch"][i] * 180 / pi
+        data["yaw"][i] = data["yaw"][i] * 180 / pi
 
     # plot
     plt.style.use("ggplot")
+
+    plt.figure(figsize=(7.0, 10.0))
     plt.subplot("411")
     plt.tight_layout()
-    # plt.plot(data["y"], data["z"], label="quadrotor")
-    # plt.plot(data["wp_pos_x"], data["wp_pos_z"], label="waypoints")
-    # plt.legend(loc=0)
-    # plt.title("Position vs Waypoints")
-    plt.plot(data["t"], data["x"], label="x")
-    plt.plot(data["t"], data["y"], label="y")
-    plt.plot(data["t"], data["z"], label="z")
+    plt.plot(data["y"], data["z"], label="quadrotor")
+    plt.plot(data["wp_pos_x"], data["wp_pos_z"], label="waypoints")
+    plt.xlabel("Position in x (m)")
+    plt.ylabel("Position in z (m)")
+    plt.xlim(122.5, 174)
     plt.legend(loc=0)
-    plt.title("Position vs Time")
+    plt.title("Position vs Waypoints")
+    # plt.plot(data["t"], data["x"], label="x")
+    # plt.plot(data["t"], data["y"], label="y")
+    # plt.plot(data["t"], data["z"], label="z")
+    # plt.legend(loc=0)
+    # plt.title("Position vs Time")
 
     plt.subplot("412")
     plt.plot(data["t"], data["vy"], label="vx")
@@ -98,20 +115,29 @@ def plot_blackbox(data_file):
     plt.plot(data["t"], data["wp_vel_x"], label="vx_desired")
     plt.plot(data["t"], data["wp_vel_z"], label="vz_desired")
     plt.title("Waypoint Velocity vs Velocity Achieved")
+    plt.xlabel("Time (s)")
+    plt.ylabel("Velocity (m/s)")
+    plt.xlim(0, 4.0)
     plt.legend(loc=0)
 
     plt.subplot("413")
-    plt.plot(data["t"], data["roll"], label="roll actual")
+    # plt.plot(data["t"], data["roll"], label="roll actual")
     plt.plot(data["t"], data["pitch"], label="pitch actual")
-    plt.plot(data["t"], data["yaw"], label="yaw actual")
+    # plt.plot(data["t"], data["yaw"], label="yaw actual")
     plt.plot(data["t"], data["wp_theta"], label="pitch desired")
     plt.title("Attitude")
+    plt.xlabel("Time (s)")
+    plt.ylabel("Angle (deg)")
+    plt.xlim(0, 4.0)
     plt.legend(loc=0)
 
     plt.subplot("414")
     plt.plot(data["t"], data["thrust"], label="thrust actual")
     plt.plot(data["t"], data["wp_thrust"], label="thrust desired")
     plt.title("Thrust")
+    plt.xlabel("Time (s)")
+    plt.ylabel("Normalized Thrust")
+    plt.xlim(0, 4.0)
     plt.legend(loc=0)
 
     # 3d plot
@@ -120,7 +146,9 @@ def plot_blackbox(data_file):
     # wp_data = [[], [], []]
     #
     # plot_3d(quad_data, wp_data)
-    plt.show()
+    plt.subplots_adjust(bottom=0.08, left=0.1, top=0.96, hspace=0.7)
+    plt.savefig("landing_plot.png")
+    # plt.show()
 
 
 if __name__ == "__main__":

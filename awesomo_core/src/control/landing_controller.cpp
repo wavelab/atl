@@ -229,6 +229,8 @@ LandingController::LandingController(void) {
   this->vy_error_prev = 0.0;
   this->vz_error_prev = 0.0;
 
+  this->vx_error_sum = 0.0;
+
   this->vx_k_p = 0.0;
   this->vx_k_i = 0.0;
   this->vx_k_d = 0.0;
@@ -485,8 +487,8 @@ Vec4 LandingController::calculateVelocityErrors(Vec3 v_errors,
   t /= fabs(cos(r) * cos(p));  // adjust throttle for roll and pitch
 
   // keep track of previous errors
-  this->vx_error_prev = v_errors(1);
-  this->vy_error_prev = v_errors(0);
+  this->vx_error_prev = v_errors(0);
+  this->vy_error_prev = v_errors(1);
   this->vz_error_prev = v_errors(2);
 
   // limit roll, pitch, throttle

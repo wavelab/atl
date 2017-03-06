@@ -129,7 +129,6 @@ void two_wheel_process_model(ExtendedKalmanFilterTracker &ekf,
   g(7) = ekf.mu(7);
   g(8) = ekf.mu(8);
 
-
   // G - linearized process model
   // clang-format off
   G << 1, 0, 0, -dt * ekf.mu(4) * sin(ekf.mu(3)), dt * cos(ekf.mu(3)), 0,  0,  0,  0,

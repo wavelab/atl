@@ -56,7 +56,8 @@ def desired_system(p0_z, pf_z, v, dt, vz_max=-1.0):
     vx = (pf[0] - p0[0]) / (T * dt)
     vz = (pf[1] - p0[1]) / (T * dt)
     az = 10.0
-    theta = asin(vx / az)
+    # theta = asin(vx / az)
+    theta = 0.2
 
     # initial point
     traj.append(p0)
@@ -197,15 +198,15 @@ def cost_func(x, args):
     traj = args["traj"].T
 
     # position error cost
-    cost += 0.0 * np.linalg.norm(states[0] - traj[0])  # dx
-    cost += 1.0 * np.linalg.norm(states[2] - traj[1])  # dz
+    cost += 0.1 * np.linalg.norm(states[0] - traj[0])  # dx
+    cost += 0.1 * np.linalg.norm(states[2] - traj[1])  # dz
 
     # control input cost
-    cost += 1.0 * np.linalg.norm(states[4])  # az
+    cost += 0.5 * np.linalg.norm(states[4])  # az
     cost += 1.0 * np.linalg.norm(states[5])  # theta
 
     # control input difference cost
-    cost += 0.0 * np.linalg.norm(np.diff(states[4]))  # az
+    cost += 1.0 * np.linalg.norm(np.diff(states[4]))  # az
     cost += 1.0 * np.linalg.norm(np.diff(states[5]))  # theta
 
     # end cost to bias to matched landing ??
@@ -231,8 +232,8 @@ def ine_constraints(x, *args):
     # calculate vector valued inequality constraints
     x_prev = x[0]
     for x_curr in x[1:]:
-        c_dx = 0.5
-        c_dz = 0.2
+        c_dx = 0.2
+        c_dz = 0.0
         g = 10.0
 
         h_ge = 0.5
@@ -245,7 +246,7 @@ def ine_constraints(x, *args):
             x_prev[1],
             x_prev[4] * sin(x_prev[5]) - c_dx * x_prev[1],
             x_prev[3],
-            (x_prev[4] * cos(x_prev[5])) * (1 + a_ge) - g - c_dz * x_prev[3]
+            (x_prev[4] * cos(x_prev[5])) * (1 + pow(a_ge, 2)) - g - c_dz * x_prev[3]
         ]) * dt
 
         retval = np.append(retval, state_feas - state_curr)
@@ -272,7 +273,7 @@ def optimize(p0_z, pf_z, v, dt, save_plot=False, plot_name="", vz_max=-1.2):
     # input bounds
     input_bounds = (
         (0, 20),  # az
-        (-0.5235, 0.5235)  # theta
+        (-1.0472, 1.0472)  # theta
     )
 
     # generate bounds for all time steps
@@ -294,7 +295,7 @@ def optimize(p0_z, pf_z, v, dt, save_plot=False, plot_name="", vz_max=-1.2):
         {"type": "eq", "fun": lambda x: np.array([x[-5] - v])},          # vx
         {"type": "eq", "fun": lambda x: np.array([x[-4] - 0.0])},        # z
         {"type": "eq", "fun": lambda x: np.array([x[-3] - 0.0])},        # vz
-        {"type": "eq", "fun": lambda x: np.array([x[-2] - 0.0])},        # az
+        {"type": "eq", "fun": lambda x: np.array([x[-2] - 10.0])},        # az
         {"type": "eq", "fun": lambda x: np.array([x[-1] - 0.0])},        # theta
 
         # nonlinear equality constraint for motion
@@ -360,7 +361,7 @@ def record_optimized_results(T, n, m, v, dt, results, fpath):
 def generate_trajectory_combinations():
     p0_z = frange(5, 6, 1, 1)
     pf_z = [0.0]
-    v = frange(0, 5, 1, 1)
+    v = frange(1, 11, 1, 1)
 
     conditions = [p0_z, pf_z, v]
     conditions = list(itertools.product(*conditions))
@@ -374,7 +375,7 @@ if __name__ == "__main__":
 
     p0_z = 5.0
     pf_z = 0.0
-    v = 1.0
+    v = 10.0
     T, n, m, v, dt, results = optimize(p0_z, pf_z, v, dt)
     record_optimized_results(T, n, m, v, dt, results, "test.csv")
 

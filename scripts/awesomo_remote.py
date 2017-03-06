@@ -30,7 +30,6 @@ def lz_circle(radius, velocity):
 
 def lz_straight_line(velocity):
     lz.set_velocity(velocity)
-    lz.set_position([0, 0, 0])
 
 
 def side_to_side(quad, altitude, dist):
@@ -101,14 +100,52 @@ if __name__ == "__main__":
 
     # quad.set_hover_point([1.0, 0.0, 5.0])
 
-    # sleep(2)
     # quad.set_mode("HOVER")
     # quad.set_hover_point([0.0, 0.0, 5.0])
     # quad.set_yaw(-20)
 
     # square(quad, 3, 1)
-    # lz_circle(20, 1.0)
-    lz_straight_line(1.0)
+
+    radius = 10.0
+    velocity = 1.0
+
+    velocity, angular_velocity = lz_circle_path(radius, velocity)
+    lz.set_velocity(velocity)
+    lz.set_angular_velocity(angular_velocity)
+
+    sleep(10)
+
+    lz.set_velocity(velocity)
+    lz.set_angular_velocity(-1.0 * angular_velocity)
+
+    # sleep(1)
+    # lz_straight_line(0.5)
+    # sleep(1)
+    # lz_straight_line(1.0)
+    # sleep(1)
+    # lz_straight_line(2.0)
+    # sleep(1)
+    # lz_straight_line(2.5)
+    # sleep(1)
+    # lz_straight_line(3.0)
+    # sleep(1)
+    # lz_straight_line(3.5)
+    # sleep(1)
+    # lz_straight_line(4.0)
+    # sleep(1)
+    # lz_straight_line(4.5)
+    # sleep(1)
+    # lz_straight_line(5.0)
+    # sleep(1)
+    # lz_straight_line(6.0)
+    # sleep(1)
+    # lz_straight_line(7.0)
+    # sleep(1)
+    # lz_straight_line(8.0)
+    # sleep(1)
+    # lz_straight_line(9.0)
+    # sleep(1)
+    # lz_straight_line(10.0)
     # lz.set_position([0, 0, 0])
 
     # side_to_side(quad, 4.0, 2.0)
