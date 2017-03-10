@@ -1,4 +1,5 @@
-- print tag
-- charge camera batteries
-- refactor estimator to work in relative frame
-- update paper
+- extract dji and px4 node
+- make kf and ekf node
+- utilize ros services in estimator
+- convert ros nodes to nodelets
+- rewrite tests using python
