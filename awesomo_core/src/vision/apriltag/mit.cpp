@@ -23,6 +23,7 @@ int MITDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
   TagPose pose;
   cv::Mat image_gray;
   std::vector<AprilTags::TagDetection> detections;
+  std::vector<AprilTags::TagDetection> detections_undistorted;
 
   // change mode based on image size
   this->changeMode(image);
@@ -47,13 +48,23 @@ int MITDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
     image_gray = image;
   }
 
-  // extract tags
+  cv::Mat undistorted;
+  CameraConfig camera_config;
+  cv::Vec4d distortion_params;
+
+  camera_config = this->camera_configs[this->camera_mode];
+  // distortion_params = cv::Vec4d(-0.234490, 0.197606, -0.000956, -0.001423);
+  distortion_params = cv::Vec4d(-0.322520, 0.102037, 0.000097, 0.003677);
+  cv::undistort(image_gray, undistorted, camera_config.camera_matrix, distortion_params);
+      // extract tags
   detections = this->detector->extractTags(image_gray);
+  detections_undistorted = this->detector->extractTags(undistorted);
 
   // calculate tag pose
   for (int i = 0; i < detections.size(); i++) {
     if (this->obtainPose(detections[i], pose) == 0) {
       tags.push_back(pose);
+      std::cout << "distorted pose " <<  pose.position.transpose() << std::endl;
 
       // keep track of last tag
       this->prev_tag = pose;
@@ -63,11 +74,29 @@ int MITDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
       // only need 1 tag
       break;
     }
+
   }
+  for (int i = 0; i < detections_undistorted.size(); i++) {
+    if (this->obtainPose(detections_undistorted[i], pose) == 0) {
+      tags.push_back(pose);
+      std::cout << "un distorted pose " <<  pose.position.transpose() << std::endl;
+
+      // keep track of last tag
+      this->prev_tag = pose;
+      this->prev_tag_image_width = image.cols;
+      this->prev_tag_image_height = image.rows;
+
+      // only need 1 tag
+      break;
+    }
+
+  }
+
 
   // imshow
   if (this->imshow) {
-    cv::imshow("MITDetector", image_gray);
+    cv::imshow("MITDetectorOriginal", image_gray);
+    cv::imshow("MITDetector", undistorted);
     cv::waitKey(1);
   }
 
