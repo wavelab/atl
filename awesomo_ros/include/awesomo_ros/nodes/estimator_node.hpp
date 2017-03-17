@@ -21,8 +21,6 @@ namespace awesomo {
 #define NODE_RATE 100
 
 // PUBLISH TOPICS
-#define LT_INERTIAL_POSITION_TOPIC "/awesomo/estimate/landing_target/position/inertial"
-#define LT_INERTIAL_VELOCITY_TOPIC "/awesomo/estimate/landing_target/velocity/inertial"
 #define LT_BODY_POSITION_TOPIC "/awesomo/estimate/landing_target/position/body"
 #define LT_BODY_VELOCITY_TOPIC "/awesomo/estimate/landing_target/velocity/body"
 #define LT_DETECTED_TOPIC "/awesomo/estimate/landing_target/detected"
@@ -34,9 +32,7 @@ namespace awesomo {
 #define QUAD_VELOCITY_TOPIC "/awesomo/quadrotor/velocity/local"
 #define ESTIMATOR_ON_TOPIC "/awesomo/estimator/on"
 #define ESTIMATOR_OFF_TOPIC "/awesomo/estimator/off"
-// #define TARGET_BF_POS_TOPIC "/awesomo/apriltag/target/position/body_encoders"
 #define TARGET_BF_POS_TOPIC "/awesomo/apriltag/target/position/body"
-#define TARGET_IF_POS_TOPIC "/awesomo/apriltag/target/position/inertial"
 #define TARGET_IF_YAW_TOPIC "/awesomo/apriltag/target/yaw/inertial"
 
 class EstimatorNode : public ROSNode {
@@ -45,7 +41,6 @@ public:
   int state;
   bool initialized;
 
-  std::string estimate_frame;
   std::string quad_frame;
 
   KalmanFilterTracker kf_tracker;
@@ -70,7 +65,6 @@ public:
   double target_lost_threshold;
 
   EstimatorNode(int argc, char **argv) : ROSNode(argc, argv) {
-    this->estimate_frame = "";
     this->quad_frame = "";
 
     this->kf_tracker = KalmanFilterTracker();
@@ -98,8 +92,6 @@ public:
   void targetBodyPosCallback(const geometry_msgs::Vector3 &msg);
   void targetInertialPosCallback(const geometry_msgs::Vector3 &msg);
   void targetInertialYawCallback(const std_msgs::Float64 &msg);
-  void publishLTKFInertialPositionEstimate(void);
-  void publishLTKFInertialVelocityEstimate(void);
   void publishLTKFBodyPositionEstimate(void);
   void publishLTKFBodyVelocityEstimate(void);
   void publishLTDetected(void);

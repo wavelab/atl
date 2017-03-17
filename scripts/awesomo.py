@@ -290,6 +290,20 @@ class Quadrotor(ROSNode):
         self.pubs[self.lctrl_set_topic].publish(msg)
 
 
+class World(ROSNode):
+    def __init__(self):
+        super(World, self).__init__()
+        self.model_pose_topic = "/prototype/world/model/pose"
+        self.register_publisher(self.model_pose_topic, Vector3)
+
+    def set_model_pose(self, x, y, z):
+        msg = Vector3()
+        msg.x = x
+        msg.y = y
+        msg.z = z
+        self.pubs[self.model_pose_topic].publish(msg)
+
+
 class MAVROS(ROSNode):
     def __init__(self):
         super(MAVROS, self).__init__()

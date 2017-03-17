@@ -1,4 +1,3 @@
-- extract dji and px4 node
 - make kf and ekf node
 - utilize ros services in estimator
 - convert ros nodes to nodelets

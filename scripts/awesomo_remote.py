@@ -8,6 +8,7 @@ from awesomo import Camera
 from awesomo import LandingZone
 from awesomo import Gimbal
 from awesomo import Quadrotor
+from awesomo import World
 from awesomo import MAVROS
 
 
@@ -93,6 +94,7 @@ if __name__ == "__main__":
     quad = Quadrotor()
     gimbal = Gimbal()
     mavros = MAVROS()
+    world = World()
     rospy.sleep(1.0)
 
     quad.set_arm(True)
@@ -106,17 +108,28 @@ if __name__ == "__main__":
 
     # square(quad, 3, 1)
 
-    radius = 10.0
-    velocity = 1.0
+    # radius = 10.0
+    # velocity = 1.0
+    #
+    # velocity, angular_velocity = lz_circle_path(radius, velocity)
+    # lz.set_velocity(velocity)
+    # lz.set_angular_velocity(angular_velocity)
+    #
+    # sleep(10)
+    #
+    # lz.set_velocity(velocity)
+    # lz.set_angular_velocity(-1.0 * angular_velocity)
 
-    velocity, angular_velocity = lz_circle_path(radius, velocity)
-    lz.set_velocity(velocity)
-    lz.set_angular_velocity(angular_velocity)
-
-    sleep(10)
-
-    lz.set_velocity(velocity)
-    lz.set_angular_velocity(-1.0 * angular_velocity)
+    world.set_model_pose(0, 0, 2)
+    sleep(1)
+    world.set_model_pose(1, 1, 2)
+    sleep(1)
+    world.set_model_pose(-1, 1, 2)
+    sleep(1)
+    world.set_model_pose(1, -1, 2)
+    sleep(1)
+    world.set_model_pose(-1, -1, 2)
+    sleep(1)
 
     # sleep(1)
     # lz_straight_line(0.5)

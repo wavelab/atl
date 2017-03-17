@@ -10,17 +10,12 @@ int EstimatorNode::configure(std::string node_name, int hz) {
     return -1;
   }
 
-  // set quad pose to zero so that when mavros is not active, this node still produces output
-  this->quad_pose.position  << 0.0, 0.0, 0.0;
-  this->quad_pose.orientation.w() = 0.0;
-  this->quad_pose.orientation.x() = 0.0;
-  this->quad_pose.orientation.y() = 0.0;
-  this->quad_pose.orientation.z() = 0.0;
+  this->quad_pose = Pose();
+  this->quad_velocity << 0, 0, 0;
 
   // estimator
   ROS_GET_PARAM("/tracker_mode", this->mode);
   ROS_GET_PARAM("/quad_frame", this->quad_frame);
-  ROS_GET_PARAM("/estimate_frame", this->estimate_frame);
   this->initialized = false;
   this->state = ESTIMATOR_OFF;
 
@@ -50,31 +45,16 @@ int EstimatorNode::configure(std::string node_name, int hz) {
 
   // publishers and subscribers
   // clang-format off
-  log_info("Estimating target in [%s FRAME]!", this->estimate_frame.c_str());
-  if (this->estimate_frame == "INERTIAL") {
-    this->registerPublisher<geometry_msgs::Vector3>(LT_INERTIAL_POSITION_TOPIC);
-    this->registerPublisher<geometry_msgs::Vector3>(LT_INERTIAL_VELOCITY_TOPIC);
-    this->registerSubscriber(TARGET_IF_POS_TOPIC, &EstimatorNode::targetInertialPosCallback, this);
-
-  } else if (this->estimate_frame == "BODY") {
-    this->registerSubscriber(TARGET_BF_POS_TOPIC, &EstimatorNode::targetBodyPosCallback, this);
-
-  } else {
-    log_info("Invalid estimate frame [%s]", this->estimate_frame.c_str());
-    return -3;
-
-  }
-
   this->registerPublisher<geometry_msgs::Vector3>(LT_BODY_POSITION_TOPIC);
   this->registerPublisher<geometry_msgs::Vector3>(LT_BODY_VELOCITY_TOPIC);
   this->registerPublisher<std_msgs::Bool>(LT_DETECTED_TOPIC);
   this->registerPublisher<geometry_msgs::Vector3>(GIMBAL_SETPOINT_ATTITUDE_TOPIC);
   this->registerPublisher<std_msgs::Float64>(QUAD_YAW_TOPIC);
-
   this->registerSubscriber(ESTIMATOR_ON_TOPIC, &EstimatorNode::onCallback, this);
   this->registerSubscriber(ESTIMATOR_OFF_TOPIC, &EstimatorNode::offCallback, this);
   this->registerSubscriber(QUAD_POSE_TOPIC, &EstimatorNode::quadPoseCallback, this);
   this->registerSubscriber(QUAD_VELOCITY_TOPIC, &EstimatorNode::quadVelocityCallback, this);
+  this->registerSubscriber(TARGET_BF_POS_TOPIC, &EstimatorNode::targetBodyPosCallback, this);
   this->registerSubscriber(TARGET_IF_YAW_TOPIC, &EstimatorNode::targetInertialYawCallback, this);
   this->registerLoopCallback(std::bind(&EstimatorNode::loopCallback, this));
   // clang-format on
@@ -209,46 +189,6 @@ void EstimatorNode::targetInertialYawCallback(const std_msgs::Float64 &msg) {
   convertMsg(msg, this->target_yaw_wf);
 }
 
-void EstimatorNode::publishLTKFInertialPositionEstimate(void) {
-  geometry_msgs::Vector3 msg;
-
-  switch (this->mode) {
-    case KF_MODE:
-      msg.x = this->kf_tracker.mu(0);
-      msg.y = this->kf_tracker.mu(1);
-      msg.z = this->kf_tracker.mu(2);
-      break;
-
-    case EKF_MODE:
-      msg.x = this->ekf_tracker.mu(0);
-      msg.y = this->ekf_tracker.mu(1);
-      msg.z = this->ekf_tracker.mu(2);
-      break;
-  }
-
-  this->ros_pubs[LT_INERTIAL_POSITION_TOPIC].publish(msg);
-}
-
-void EstimatorNode::publishLTKFInertialVelocityEstimate(void) {
-  geometry_msgs::Vector3 msg;
-
-  switch (this->mode) {
-    case KF_MODE:
-      msg.x = this->kf_tracker.mu(3);
-      msg.y = this->kf_tracker.mu(4);
-      msg.z = this->kf_tracker.mu(5);
-      break;
-
-    case EKF_MODE:
-      msg.x = this->ekf_tracker.mu(4) * cos(this->ekf_tracker.mu(3));
-      msg.y = this->ekf_tracker.mu(4) * sin(this->ekf_tracker.mu(3));
-      msg.z = this->ekf_tracker.mu(5);
-      break;
-  }
-
-  this->ros_pubs[LT_INERTIAL_VELOCITY_TOPIC].publish(msg);
-}
-
 void EstimatorNode::publishLTKFBodyPositionEstimate(void) {
   geometry_msgs::Vector3 msg;
   Vec3 est_pos;
@@ -268,20 +208,10 @@ void EstimatorNode::publishLTKFBodyPositionEstimate(void) {
       break;
   }
 
-  if (this->estimate_frame == "INERTIAL") {
-    // transform target position from inertial frame to body planar frame
-    target2bodyplanar(est_pos,
-                      this->quad_pose.position,
-                      this->quad_pose.orientation,
-                      this->target_pos_bpf);
-
-  } else {
-    // estimate is already in body planar frame
-    this->target_pos_bpf(0) = est_pos(0);
-    this->target_pos_bpf(1) = est_pos(1);
-    this->target_pos_bpf(2) = est_pos(2);
-
-  }
+  // estimate in body planar frame
+  this->target_pos_bpf(0) = est_pos(0);
+  this->target_pos_bpf(1) = est_pos(1);
+  this->target_pos_bpf(2) = est_pos(2);
 
   // build and publish msg
   buildMsg(this->target_pos_bpf, msg);
@@ -308,19 +238,10 @@ void EstimatorNode::publishLTKFBodyVelocityEstimate(void) {
     std::cout << "Estimator ON" << std::endl;
   }
 
-  if (this->estimate_frame == "INERTIAL") {
-    // transform target velocity from inertial frame to body planar frame
-    target2bodyplanar(est_vel,
-                      this->quad_velocity,
-                      this->quad_pose.orientation,
-                      this->target_vel_bpf);
-  } else {
-    // estimate is already in body planar frame
-    this->target_vel_bpf(0) = est_vel(0);
-    this->target_vel_bpf(1) = est_vel(1);
-    this->target_vel_bpf(2) = est_vel(2);
-
-  }
+  // estimate in body planar frame
+  this->target_vel_bpf(0) = est_vel(0);
+  this->target_vel_bpf(1) = est_vel(1);
+  this->target_vel_bpf(2) = est_vel(2);
 
   // build and publish msg
   buildMsg(this->target_vel_bpf, msg);
@@ -502,10 +423,6 @@ int EstimatorNode::loopCallback(void) {
 
   // estimate and publish
   if (this->initialized && this->estimate() == 0) {
-    if (this->estimate_frame == "INERTIAL") {
-      this->publishLTKFInertialPositionEstimate();
-      this->publishLTKFInertialVelocityEstimate();
-    }
     this->publishLTKFBodyPositionEstimate();
     this->publishLTKFBodyVelocityEstimate();
     this->trackTarget();
