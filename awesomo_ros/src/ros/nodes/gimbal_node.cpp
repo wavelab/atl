@@ -128,7 +128,8 @@ int GimbalNode::loopCallback(void) {
   Quaternion encoder_q;
 
   // set gimbal attitude
-  this->gimbal.setAngle(this->set_points(0), this->set_points(1));
+  // this->gimbal.setAngle(this->set_points(0), this->set_points(1));
+  // usleep(25000);
 
   // publish gimbal joint orientation
   if (this->gimbal_imu == "SBGC" && this->gimbal.updateGimbalStates() == 0) {

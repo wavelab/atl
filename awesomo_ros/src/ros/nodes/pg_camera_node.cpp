@@ -76,10 +76,15 @@ int PGCameraNode::publishImage(void) {
   this->image.at<double>(0, 21) = this->quadrotor_orientation.z();
 
   // clang-format off
+  //
+  cv::Mat im_grey;
+  cv::cvtColor(this->image, im_grey, CV_BGR2GRAY);
   img_msg = cv_bridge::CvImage(
     std_msgs::Header(),
-    "bgr8",
-    this->image
+    // "bgr8",
+    // this->image,
+    "mono8",
+    im_grey
   ).toImageMsg();
   this->img_pub.publish(img_msg);
   // clang-format on

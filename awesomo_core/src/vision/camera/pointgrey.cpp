@@ -60,7 +60,9 @@ int PointGreyCamera::initialize(void) {
   this->setExposure(this->config.exposure_value);
   this->setGain(this->config.gain_value);
   this->setShutter(this->config.shutter_speed);
-  this->setFormat7(1, "RAW8", 1024, 768);
+  // this->setFormat7(1, "RAW8", 1024, 768);
+  this->setFormat7(1, "RAW8", 752, 480);
+  // this->setFormat7(1, "RAW8", 752, 480);
 
   // start camera
   error = this->pointgrey->StartCapture();
@@ -327,8 +329,8 @@ int PointGreyCamera::setFormat7(int mode,
   }
   settings.width = width;
   settings.height =  height;
-  settings.offsetX = 0;
-  settings.offsetY = 0;
+  settings.offsetX = 136;
+  settings.offsetY = 144;
   if (pixel_format == "MONO8") {
     settings.pixelFormat = FlyCapture2::PIXEL_FORMAT_MONO8;
   } else if (pixel_format == "MONO16") {
@@ -424,7 +426,7 @@ int PointGreyCamera::getFrame(cv::Mat &image) {
 
   // resize the image to reflect camera mode
   image_size = cv::Size(this->config.image_width, this->config.image_height);
-  cv::resize(image, image, image_size, 0, 0, cv::INTER_NEAREST);
+  // cv::resize(image, image, image_size, 0, 0, cv::INTER_NEAREST);
 
   return 0;
 }

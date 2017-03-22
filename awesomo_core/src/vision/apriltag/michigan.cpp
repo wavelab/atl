@@ -22,6 +22,15 @@ int MichiganDetector::configure(std::string config_file) {
   this->family = tag16h5_create();
   apriltag_detector_add_family(this->detector, this->family);
 
+  //  detector configuration
+  this->detector->nthreads = 8;
+  this->detector->quad_decimate = 0;
+  this->detector->quad_sigma = 0; // bluring
+  // this->detector->debug = getopt_get_bool(getopt, "debug");
+  this->detector->refine_edges = 0;
+  this->detector->refine_decode = 0;
+  this->detector->refine_pose = 0;
+
   return 0;
 }
 
@@ -38,9 +47,10 @@ int MichiganDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
     this->illuminationInvariantTransform(image);
   }
 
+
   // mask image if tag was last detected
-  if (this->prev_tag.detected) {
-    retval = this->maskImage(this->prev_tag, image);
+  if (this->prev_tag.detected && this->windowing) {
+    retval = this->maskImage(this->prev_tag, image, this->window_padding);
     if (retval == -4) {
       return -1;
     }
@@ -66,9 +76,15 @@ int MichiganDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
   for (int i = 0; i < zarray_size(detections); i++) {
       apriltag_detection_t *det;
       zarray_get(detections, i, &det);
-      this->obtainPose(det, pose);
-      // only need 1 tag
-      break;
+      if (this->obtainPose(det, pose) == 0) {
+        this->prev_tag = pose;
+        this->prev_tag_image_width = image.cols;
+        this->prev_tag_image_height = image.rows;
+
+        tags.push_back(pose);
+        // only need 1 tag
+        break;
+      }
   }
   // imshow
   if (this->imshow) {
@@ -84,72 +100,73 @@ int MichiganDetector::obtainPose(apriltag_detection_t *det, TagPose &tag_pose) {
   Mat4 transform;
   Vec3 t;
   Mat3 R;
+  double tag_size;
+  double  s;
+
   CameraConfig camera_config;
-  double fx, fy, cx, cy, tag_size, s;
+  cv::Vec4f distortion_param;
   std::vector<cv::Point3f> obj_pts;
   std::vector<cv::Point2f> img_pts;
-
-
+  cv::Mat rvec;
+  cv::Mat tvec;
 
   // setup
   camera_config = this->camera_configs[this->camera_mode];
-  // fx = camera_config.camera_matrix.at<double>(0, 0);
-  // fy = camera_config.camera_matrix.at<double>(1, 1);
-  // cx = camera_config.camera_matrix.at<double>(0, 2);
-  // cy = camera_config.camera_matrix.at<double>(1, 2);
+  distortion_param(0) = camera_config.distortion_coefficients.at<double>(0, 0);
+  distortion_param(1) = camera_config.distortion_coefficients.at<double>(0, 1);
+  distortion_param(2) = camera_config.distortion_coefficients.at<double>(0, 2);
+  distortion_param(3) = camera_config.distortion_coefficients.at<double>(0, 3);
   tag_size = 0.0;
 
   // get tag size according to tag id
-  // if (this->tag_configs.find(tag.id) == this->tag_configs.end()) {
-  //   // log_err("ERROR! Tag size for [%d] not configured!", (int) tag.id);
-  //   return -2;
-  // } else {
-  //   tag_size = this->tag_configs[tag.id] / 2;
-  // }
-  //
-  tag_size = 0.5;
+  if (this->tag_configs.find(det->id) == this->tag_configs.end()) {
+    // log_err("ERROR! Tag size for [%d] not configured!", (int) det->id);
+    return -2;
+  } else {
+    tag_size = this->tag_configs[det->id] / 2;
+  }
 
+  // object points in real world (location of each corner of the tag)
   obj_pts.push_back(cv::Point3f(-tag_size, -tag_size, 0));
   obj_pts.push_back(cv::Point3f(tag_size, -tag_size, 0));
   obj_pts.push_back(cv::Point3f(tag_size, tag_size, 0));
   obj_pts.push_back(cv::Point3f(-tag_size, tag_size, 0));
 
+  // location of the above points in the image
   img_pts.push_back(cv::Point2f(det->p[0][0], det->p[0][1]));
   img_pts.push_back(cv::Point2f(det->p[1][0], det->p[1][1]));
   img_pts.push_back(cv::Point2f(det->p[2][0], det->p[2][1]));
   img_pts.push_back(cv::Point2f(det->p[3][0], det->p[3][1]));
 
-
-  // distortion parameters
-  cv::Vec4f distParam(0, 0, 0, 0);
-
-
-  cv::Mat rvec, tvec;
   // recovering the relative transform of a tag:
-  cv::solvePnP(obj_pts, img_pts, camera_config.camera_matrix, distParam, rvec, tvec, false, CV_ITERATIVE);
+  cv::solvePnP(obj_pts, img_pts, camera_config.camera_matrix, distortion_param, rvec, tvec, false, CV_ITERATIVE);
 
+  // get rotation matrix
   cv::Matx33d r;
   cv::Rodrigues(rvec, r);
 
   // Eigen::Matrix3d wRo;
   R << r(0,0), r(0,1), r(0,2),
-         r(1,0), r(1,1), r(1,2),
-         r(2,0), r(2,1), r(2,2);
+       r(1,0), r(1,1), r(1,2),
+       r(2,0), r(2,1), r(2,2);
 
   // translational component
   t << tvec.at<double>(0), tvec.at<double>(1), tvec.at<double>(2);
 
   // sanity check - calculate euclidean distance between prev and current tag
-  // if ((t - this->prev_tag.position).norm() > this->tag_sanity_check) {
-  //   return -1;
-  // }
+  if ((t - this->prev_tag.position).norm() > this->tag_sanity_check) {
+    return -1;
+  }
+  t << tvec.at<double>(0), tvec.at<double>(1), tvec.at<double>(2);
 
   // tag is in camera frame
   // camera frame:  (z - forward, x - right, y - down)
-  // tag_pose.id = tag.id;
+  tag_pose.id = det->id;
   tag_pose.detected = true;
   tag_pose.position = t;
   tag_pose.orientation = Quaternion(R);
+  Vec3 euler_out;
+  quat2euler(Quaternion(R), 123, euler_out);
 
   return 0;
 }

@@ -105,7 +105,7 @@ Vec3 Gimbal::getTargetInBPF(Pose camera_offset,
 
   // transform target in camera frame to body frame
   p = Gimbal::getTargetInBF(camera_offset, target_cf);
-
+  // R = R.transpose();
   // transform target in camera frame to body planar frame
   return R * p;
 }
@@ -122,6 +122,7 @@ Vec3 Gimbal::getTargetInIF(Vec3 target_bpf,
   euler2rot(euler, 321, R);
 
   // compensate yaw in target from body planar frame to inertial frame
+  // target = R * target_bpf;
   target = R * target_bpf;
 
   // convert target from NWU to ENU

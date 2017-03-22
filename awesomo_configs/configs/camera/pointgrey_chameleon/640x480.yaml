@@ -8,9 +8,9 @@ image_height: 480
 # gain_value: 1.0
 
 # wavelab
-exposure_value: 1.0 # in mili seconds
+exposure_value: 2.0 # in mili seconds
 shutter_speed: 5 # in mili seconds
-gain_value: 20.0
+gain_value: 30.0
 
 # night-time
 # exposure_value: 1.0 # in mili seconds
@@ -24,12 +24,12 @@ alpha: 4.0
 camera_matrix:
   rows: 3
   cols: 3
-  data: [728.885076, 0.000000, 310.013428, 0.000000, 727.362657, 232.005279, 0.000000, 0.000000, 1.000000]
+  data: [728.885076, 0.000000, 317.27, 0.000000, 727.362657, 236.005279, 0.000000, 0.000000, 1.000000]
 distortion_model: plumb_bob
 distortion_coefficients:
   rows: 1
   cols: 5
-  data: [-0.234490, 0.197606, -0.000965, -0.001423, 0.000000]
+  data: [-0.234490, 0.197606, -0.000564, 0.00058, 0.000000]
 rectification_matrix:
   rows: 3
   cols: 3
