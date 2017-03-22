@@ -28,8 +28,8 @@ install_apriltags()
     rm -rf apriltags
     svn --trust-server-cert --non-interactive co $REPO_URL
     cd apriltags
-    export BUILD_PREFIX=$BUILD_PATH/apriltags/build
-    mkdir -p $BUILD_PREFIX
+    # do some hackery for opencv
+    sed -i 's/find_package\(OpenCV\)/find_package\(OpenCV 2.4 REQUIRED\)/g' CMakeLists.txt
     make
 
     # install
@@ -38,6 +38,7 @@ install_apriltags()
     mkdir -p $INC_DEST
     sudo cp -r ./build/include/AprilTags/*.h $INC_DEST
     sudo cp -r ./build/lib/libapriltags.a $LIB_DEST
+
 
     # do some hackery and change header file references
     sudo find $INC_DEST -type f -exec sed -i $REGEX_STRING {} +
