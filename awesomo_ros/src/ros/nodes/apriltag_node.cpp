@@ -62,6 +62,9 @@ void AprilTagNode::publishTargetInertialPositionMsg(Vec3 gimbal_position,
                                     gimbal_position,
                                     gimbal_frame);
 
+  std::cout << "\n \n target_bpf: \t" << target_bpf.transpose() << std::endl;
+  std::cout << "\n gimbal_position: \t" << gimbal_position.transpose()<< std::endl;
+  std::cout << "\n target_if_position: \t" << target_if.transpose()<< std::endl;
   // build and publish msg
   buildMsg(target_if, msg);
   this->ros_pubs[TARGET_IF_POS_TOPIC].publish(msg);
@@ -286,9 +289,8 @@ int AprilTagNode::rotateMocapGimbalPosition() {
 
   euler2rot(euler, 123, Mocap_to_Camera_Frame_R);
   Mocap_to_Camera_Frame_T.block<3, 3>(0, 0) = Mocap_to_Camera_Frame_R;
-  cam_position = Mocap_to_Camera_Frame_T.inverse() * this->gimbal_position.homogeneous();
-  this->gimbal_position = cam_position.block<3, 1>(0, 0);
-  std::cout << "\n \n " << this->gimbal_position << std::endl;
+  cam_position = Mocap_to_Camera_Frame_T * this->gimbal_position.homogeneous();
+  // this->gimbal_position = cam_position.block<3, 1>(0, 0);
   return 0;
 }
 
