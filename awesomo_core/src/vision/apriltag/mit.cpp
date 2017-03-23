@@ -64,7 +64,6 @@ int MITDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
   for (int i = 0; i < detections.size(); i++) {
     if (this->obtainPose(detections[i], pose) == 0) {
       tags.push_back(pose);
-      std::cout << "distorted pose " <<  pose.position.transpose() << std::endl;
 
       // keep track of last tag
       this->prev_tag = pose;
