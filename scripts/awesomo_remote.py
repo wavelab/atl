@@ -120,15 +120,27 @@ if __name__ == "__main__":
     # lz.set_velocity(velocity)
     # lz.set_angular_velocity(-1.0 * angular_velocity)
 
-    world.set_model_pose(0, 0, 2)
+    model_name = "camera"
+    pos = [0, 0, 2]
+    rpy = [0, 0, 0]
+
+    world.set_model_pose(model_name, pos, rpy)
     sleep(1)
-    world.set_model_pose(1, 1, 2)
+
+    pos = [1, 1, 2]
+    world.set_model_pose(model_name, pos, rpy)
     sleep(1)
-    world.set_model_pose(-1, 1, 2)
+
+    pos = [-1, 1, 2]
+    world.set_model_pose(model_name, pos, rpy)
     sleep(1)
-    world.set_model_pose(1, -1, 2)
+
+    pos = [-1, -1, 2]
+    world.set_model_pose(model_name, pos, rpy)
     sleep(1)
-    world.set_model_pose(-1, -1, 2)
+
+    pos = [1, -1, 2]
+    world.set_model_pose(model_name, pos, rpy)
     sleep(1)
 
     # sleep(1)

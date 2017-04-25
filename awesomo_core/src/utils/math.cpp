@@ -142,7 +142,7 @@ int euler2rot(Vec3 euler, int euler_seq, Mat3 &R) {
     R32 = sin(phi) * cos(theta);
     R33 = cos(phi) * cos(theta);
 
-  } else if (euler_seq = 123) {
+  } else if (euler_seq == 123) {
     // euler 1-2-3
     R11 = cos(theta) * cos(psi);
     R12 = cos(theta) * sin(psi);

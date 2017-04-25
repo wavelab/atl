@@ -12,6 +12,7 @@ from geometry_msgs.msg import PoseStamped
 from awesomo_msgs.msg import PCtrlSettings
 from awesomo_msgs.msg import TCtrlSettings
 from awesomo_msgs.msg import LCtrlSettings
+from prototype_ros.msg import ModelPose
 
 
 class CarrotController:
@@ -294,13 +295,21 @@ class World(ROSNode):
     def __init__(self):
         super(World, self).__init__()
         self.model_pose_topic = "/prototype/world/model/pose"
-        self.register_publisher(self.model_pose_topic, Vector3)
+        self.register_publisher(self.model_pose_topic, ModelPose)
 
-    def set_model_pose(self, x, y, z):
-        msg = Vector3()
-        msg.x = x
-        msg.y = y
-        msg.z = z
+    def set_model_pose(self, model_name, pos, rpy):
+        msg = ModelPose()
+
+        msg.model_name.data = model_name
+
+        msg.position.x = pos[0]
+        msg.position.y = pos[1]
+        msg.position.z = pos[2]
+
+        msg.orientation.x = rpy[0]
+        msg.orientation.y = rpy[1]
+        msg.orientation.z = rpy[2]
+
         self.pubs[self.model_pose_topic].publish(msg)
 
 
