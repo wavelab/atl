@@ -1,5 +1,5 @@
 #include "awesomo_ros/nodes/pg_camera_node.hpp"
-
+#include <sys/stat.h>
 
 namespace awesomo {
 
@@ -13,11 +13,16 @@ int PGCameraNode::configure(std::string node_name, int hz) {
 
   // camera
   ROS_GET_PARAM("/camera_config_dir", config_path);
+  ROS_GET_PARAM("/photobooth", this->photobooth);
   if (this->camera.configure(config_path) != 0) {
     ROS_ERROR("Failed to configure Camera!");
     return -2;
   };
   this->camera.initialize();
+
+  if (this->photobooth) {
+    int retval = mkdir("/tmp/calibration", ACCESSPERMS);
+  }
 
   // register publisher and subscribers
   // clang-format off
@@ -156,8 +161,20 @@ int PGCameraNode::loopCallback(void) {
     }
   }
 
-  // this->camera.showImage(this->image);
+
   this->camera.getFrame(this->image);
+
+  if (this->photobooth) {
+    this->camera.showImage(this->image);
+    int key = cv::waitKey(100);
+    // std::cout << key << std::endl;
+    if (key == 32) {
+      cv::imwrite("/tmp/calibration/image_"
+          + std::to_string(this->image_number)
+          + ".jpg", this->image);
+      this->image_number += 1;
+    }
+  }
   this->publishImage();
 
   return 0;

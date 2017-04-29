@@ -51,6 +51,8 @@ public:
 
   bool target_detected;
   Vec3 target_pos_bf;
+  bool photobooth = false;
+  int image_number = 0;
 
   PGCameraNode(int argc, char **argv) : ROSNode(argc, argv) {
     this->gimbal_position = Vec3();
