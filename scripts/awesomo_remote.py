@@ -94,10 +94,11 @@ if __name__ == "__main__":
     quad = Quadrotor()
     gimbal = Gimbal()
     mavros = MAVROS()
-    world = World()
+    # world = World()
     rospy.sleep(1.0)
 
     quad.set_arm(True)
+    # lz.set_position([0, 0, 0])
     # quad.set_hover_point([0.0, 0.0, 10.0])
 
     # quad.set_hover_point([1.0, 0.0, 5.0])
@@ -110,38 +111,38 @@ if __name__ == "__main__":
 
     # radius = 10.0
     # velocity = 1.0
-    #
+
     # velocity, angular_velocity = lz_circle_path(radius, velocity)
-    # lz.set_velocity(velocity)
+    lz.set_velocity(1.0)
     # lz.set_angular_velocity(angular_velocity)
-    #
+
     # sleep(10)
     #
     # lz.set_velocity(velocity)
     # lz.set_angular_velocity(-1.0 * angular_velocity)
 
-    model_name = "camera"
-    pos = [0, 0, 2]
-    rpy = [0, 0, 0]
-
-    world.set_model_pose(model_name, pos, rpy)
-    sleep(1)
-
-    pos = [1, 1, 2]
-    world.set_model_pose(model_name, pos, rpy)
-    sleep(1)
-
-    pos = [-1, 1, 2]
-    world.set_model_pose(model_name, pos, rpy)
-    sleep(1)
-
-    pos = [-1, -1, 2]
-    world.set_model_pose(model_name, pos, rpy)
-    sleep(1)
-
-    pos = [1, -1, 2]
-    world.set_model_pose(model_name, pos, rpy)
-    sleep(1)
+    # model_name = "camera"
+    # pos = [0, 0, 2]
+    # rpy = [0, 0, 0]
+    #
+    # world.set_model_pose(model_name, pos, rpy)
+    # sleep(1)
+    #
+    # pos = [1, 1, 2]
+    # world.set_model_pose(model_name, pos, rpy)
+    # sleep(1)
+    #
+    # pos = [-1, 1, 2]
+    # world.set_model_pose(model_name, pos, rpy)
+    # sleep(1)
+    #
+    # pos = [-1, -1, 2]
+    # world.set_model_pose(model_name, pos, rpy)
+    # sleep(1)
+    #
+    # pos = [1, -1, 2]
+    # world.set_model_pose(model_name, pos, rpy)
+    # sleep(1)
 
     # sleep(1)
     # lz_straight_line(0.5)
