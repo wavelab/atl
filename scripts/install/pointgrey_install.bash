@@ -18,11 +18,11 @@ install_pointgrey_drivers()
             -y
 
         # extract and install flycapture
-        PACKAGE_NAME="flycapture2-2.10.3.266-amd64"
+        PACKAGE_NAME="flycapture2-2.11.3.121-amd64"
         PACKAGE_EXT=".tgz"
         mkdir -p $PACKAGE_DIR
         cd $PACKAGE_DIR
-        tar -xzf flycapture2-2.10.3.266-amd64.tgz
+        tar -xzf flycapture2-2.11.3.121-amd64-pkg.tgz
         cd $PACKAGE_NAME
 
     elif [ $UBUNTU_VERSION == "14.04" ]; then
@@ -42,6 +42,9 @@ install_pointgrey_drivers()
         cd $PACKAGE_DIR
         unzip ${PACKAGE_NAME}${PACAKGE_EXT}
         cd $PACKAGE_NAME
+    else
+        echo "Ubuntu version not supported $UBUNTU_VERSION"
+        exit -1
     fi
 
     sh install_flycapture.sh << EOF

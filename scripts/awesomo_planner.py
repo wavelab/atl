@@ -295,7 +295,7 @@ def optimize(p0_z, pf_z, v, dt, save_plot=False, plot_name="", vz_max=-1.2):
         {"type": "eq", "fun": lambda x: np.array([x[-5] - v])},          # vx
         {"type": "eq", "fun": lambda x: np.array([x[-4] - 0.0])},        # z
         {"type": "eq", "fun": lambda x: np.array([x[-3] - 0.0])},        # vz
-        {"type": "eq", "fun": lambda x: np.array([x[-2] - 10.0])},        # az
+        {"type": "eq", "fun": lambda x: np.array([x[-2] - 10.0])},       # az
         {"type": "eq", "fun": lambda x: np.array([x[-1] - 0.0])},        # theta
 
         # nonlinear equality constraint for motion
