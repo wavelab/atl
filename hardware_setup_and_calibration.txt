@@ -1,0 +1,41 @@
+## 
+DJI Hardware:
+
+The manual for the N3 can be found here: http://dl.djicdn.com/downloads/N3/N3+User+manual.pdf
+
+Summary:
+    To calibrate compass, which should be done daily, flick the red switch on 
+    the futaba controller, or the mode switch on the dji controller 3 times up 
+    and down. If successful, the led will now be solid yellow. Pick up the quad, 
+    and rotate it around 360 degrees until the light turns green. Pitch the quad 
+    down degrees and rotate again. The light will now blink green if there is a
+    gps lock and you are in position mode, or yellow if it is in attitude mode
+    
+    MODES: Red switch - all the way up is in position mode (slow blinking green)
+                      - Down and midway, sport mode. Same as position but it
+                      breaks the offboard control. Offboard controll only works
+                      when the mode is in P. Be careful, if you in position mode, 
+                      the offboard commands can arm the quad and make it take off
+    
+    Blinking: When flying, red blinking means low battery, the quad may land itself soon. 
+    Green - slow = gps lock and position mode
+    Green - fast = gps lock sport mode
+    Yellow - slow? -- attitude mode, you have no gps so postion will not be held
+    
+
+
+SBGC - 
+    Download and install SBGC GUI 2 60b4 to work with the gimbal using the sbgc
+    interface You probably do not need to touch this unless you really fuck up
+    
+    Button - 1 push, turn motors on and off
+    Button - 2 push - calibrate gyro
+    Button - 3 push - point straight down
+    Button - 4 push, - set the setpoint
+    
+    
+    Turn the motors off if you will not be doing much with it for a while or 
+    you might burn the motors. Especially if you are lifting the lens up. 
+    
+ 
+    
