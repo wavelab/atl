@@ -99,7 +99,7 @@ if __name__ == "__main__":
 
     quad.set_arm(True)
     # lz.set_position([0, 0, 0])
-    # quad.set_hover_point([0.0, 0.0, 10.0])
+    quad.set_hover_point([0.0, 0.0, 10.0])
 
     # quad.set_hover_point([1.0, 0.0, 5.0])
 
@@ -113,7 +113,7 @@ if __name__ == "__main__":
     # velocity = 1.0
 
     # velocity, angular_velocity = lz_circle_path(radius, velocity)
-    lz.set_velocity(1.0)
+    # lz.set_velocity(1.0)
     # lz.set_angular_velocity(angular_velocity)
 
     # sleep(10)
