@@ -1,5 +1,5 @@
-#ifndef __atl_ROS_NODES_APRILTAG_NODE_HPP__
-#define __atl_ROS_NODES_APRILTAG_NODE_HPP__
+#ifndef ATL_ROS_NODES_APRILTAG_NODE_HPP
+#define ATL_ROS_NODES_APRILTAG_NODE_HPP
 
 #include <ros/ros.h>
 #include <cv_bridge/cv_bridge.h>

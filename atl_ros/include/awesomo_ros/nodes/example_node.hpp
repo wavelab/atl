@@ -1,5 +1,5 @@
-#ifndef __atl_ROS_EXAMPLE_NODE_HPP__
-#define __atl_ROS_EXAMPLE_NODE_HPP__
+#ifndef ATL_ROS_EXAMPLE_NODE_HPP
+#define ATL_ROS_EXAMPLE_NODE_HPP
 
 #include <ros/ros.h>
 #include <std_msgs/String.h>

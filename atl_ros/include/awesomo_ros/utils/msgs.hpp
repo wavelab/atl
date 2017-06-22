@@ -1,5 +1,5 @@
-#ifndef __atl_ROS_UTILS_MSGS_HPP__
-#define __atl_ROS_UTILS_MSGS_HPP__
+#ifndef ATL_ROS_UTILS_MSGS_HPP
+#define ATL_ROS_UTILS_MSGS_HPP
 
 #include <std_msgs/Bool.h>
 #include <std_msgs/String.h>

@@ -1,5 +1,5 @@
-#ifndef __atl_ROS_UTILS_NODE_HPP__
-#define __atl_ROS_UTILS_NODE_HPP__
+#ifndef ATL_ROS_UTILS_NODE_HPP
+#define ATL_ROS_UTILS_NODE_HPP
 
 #include <functional>
 

@@ -1,5 +1,5 @@
-#ifndef __atl_ROS_UTILS_MATH_HPP__
-#define __atl_ROS_UTILS_MATH_HPP__
+#ifndef ATL_ROS_UTILS_MATH_HPP
+#define ATL_ROS_UTILS_MATH_HPP
 
 #include <random>
 
