@@ -68,22 +68,22 @@ SET(WAVESIM_GAZEBO_PLUGIN_DEPS
     ${OpenCV_LIBS}
     yaml-cpp
     pthread)
-# ADD_LIBRARY(box_gplugin SHARED src/plugins/box_gplugin.cpp)
-# ADD_DEPENDENCIES(box_gplugin wavesim_gazebo_msgs)
-# TARGET_LINK_LIBRARIES(box_gplugin ${WAVESIM_GAZEBO_PLUGIN_DEPS})
+ADD_LIBRARY(box_gplugin SHARED src/plugins/box_gplugin.cpp)
+ADD_DEPENDENCIES(box_gplugin wavesim_gazebo_msgs)
+TARGET_LINK_LIBRARIES(box_gplugin ${WAVESIM_GAZEBO_PLUGIN_DEPS})
 
 ADD_LIBRARY(camera_gplugin SHARED src/plugins/camera_gplugin.cpp)
 ADD_DEPENDENCIES(camera_gplugin wavesim_gazebo_msgs)
 TARGET_LINK_LIBRARIES(camera_gplugin ${WAVESIM_GAZEBO_PLUGIN_DEPS})
 
-# ADD_LIBRARY(df_camera_gplugin SHARED src/plugins/df_camera_gplugin.cpp)
-# ADD_DEPENDENCIES(df_camera_gplugin wavesim_gazebo_msgs)
-# TARGET_LINK_LIBRARIES(df_camera_gplugin ${WAVESIM_GAZEBO_PLUGIN_DEPS})
-#
+ADD_LIBRARY(df_camera_gplugin SHARED src/plugins/df_camera_gplugin.cpp)
+ADD_DEPENDENCIES(df_camera_gplugin wavesim_gazebo_msgs)
+TARGET_LINK_LIBRARIES(df_camera_gplugin ${WAVESIM_GAZEBO_PLUGIN_DEPS})
+
 # ADD_LIBRARY(gimbal_gplugin SHARED src/plugins/gimbal_gplugin.cpp)
 # ADD_DEPENDENCIES(gimbal_gplugin wavesim_gazebo_msgs)
 # TARGET_LINK_LIBRARIES(gimbal_gplugin ${WAVESIM_GAZEBO_PLUGIN_DEPS})
-#
+
 # ADD_LIBRARY(lz_gplugin SHARED src/plugins/lz_gplugin.cpp)
 # ADD_DEPENDENCIES(lz_gplugin wavesim_gazebo_msgs)
 # TARGET_LINK_LIBRARIES(lz_gplugin ${WAVESIM_GAZEBO_PLUGIN_DEPS})
