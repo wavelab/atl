@@ -1,4 +1,4 @@
-#include "atl_core/vision/gimbal/sbgc.hpp"
+#include "atl/vision/gimbal/sbgc.hpp"
 
 
 namespace atl {

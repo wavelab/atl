@@ -2,8 +2,8 @@
 #include <fstream>
 #include <iostream>
 
-#include "atl_core/atl_test.hpp"
-#include "atl_core/estimation/ekf_tracker.hpp"
+#include "atl/atl_test.hpp"
+#include "atl/estimation/ekf_tracker.hpp"
 
 #define TEST_CONFIG "tests/configs/estimation/ekf_tracker.yaml"
 #define TEST_CONFIG2 "tests/configs/estimation/ekf_tracker2.yaml"

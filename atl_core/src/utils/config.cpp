@@ -1,4 +1,4 @@
-#include "atl_core/utils/config.hpp"
+#include "atl/utils/config.hpp"
 
 
 namespace atl {

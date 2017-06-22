@@ -1,6 +1,6 @@
-#include "atl_core/atl_test.hpp"
-#include "atl_core/vision/camera/camera.hpp"
-#include "atl_core/vision/apriltag/mit.hpp"
+#include "atl/atl_test.hpp"
+#include "atl/vision/camera/camera.hpp"
+#include "atl/vision/apriltag/mit.hpp"
 
 #define TEST_CONFIG "tests/configs/apriltag/config.yaml"
 #define TEST_IMAGE_CENTER "tests/data/apriltag/center.png"

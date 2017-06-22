@@ -1,4 +1,4 @@
-#include "atl_core/vision/camera/ximea.hpp"
+#include "atl/vision/camera/ximea.hpp"
 
 
 namespace atl {

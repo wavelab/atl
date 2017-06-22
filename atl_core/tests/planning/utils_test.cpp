@@ -1,5 +1,5 @@
-#include "atl_core/atl_test.hpp"
-#include "atl_core/planning/utils.hpp"
+#include "atl/atl_test.hpp"
+#include "atl/planning/utils.hpp"
 
 namespace atl {
 

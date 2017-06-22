@@ -51,12 +51,12 @@ TARGET_LINK_LIBRARIES(wavesim_gazebo_msgs ${PROTOBUF_LIBRARY})
 
 # CLIENTS
 SET(WAVESIM_GAZEBO_CLIENT_SRCS
-    src/clients/camera_gclient.cpp
-    src/clients/df_camera_gclient.cpp
-    src/clients/gimbal_gclient.cpp
-    src/clients/lz_gclient.cpp
-    src/clients/quadrotor_gclient.cpp
-    src/clients/world_gclient.cpp)
+    src/clients/camera_gclient.cpp)
+    # src/clients/df_camera_gclient.cpp
+    # src/clients/gimbal_gclient.cpp
+    # src/clients/lz_gclient.cpp
+    # src/clients/quadrotor_gclient.cpp
+    # src/clients/world_gclient.cpp)
 ADD_LIBRARY(wavesim_gazebo_clients STATIC ${WAVESIM_GAZEBO_CLIENT_SRCS})
 ADD_DEPENDENCIES(wavesim_gazebo_clients wavesim_gazebo_msgs)
 
@@ -68,29 +68,29 @@ SET(WAVESIM_GAZEBO_PLUGIN_DEPS
     ${OpenCV_LIBS}
     yaml-cpp
     pthread)
-ADD_LIBRARY(box_gplugin SHARED src/plugins/box_gplugin.cpp)
-ADD_DEPENDENCIES(box_gplugin wavesim_gazebo_msgs)
-TARGET_LINK_LIBRARIES(box_gplugin ${WAVESIM_GAZEBO_PLUGIN_DEPS})
+# ADD_LIBRARY(box_gplugin SHARED src/plugins/box_gplugin.cpp)
+# ADD_DEPENDENCIES(box_gplugin wavesim_gazebo_msgs)
+# TARGET_LINK_LIBRARIES(box_gplugin ${WAVESIM_GAZEBO_PLUGIN_DEPS})
 
 ADD_LIBRARY(camera_gplugin SHARED src/plugins/camera_gplugin.cpp)
 ADD_DEPENDENCIES(camera_gplugin wavesim_gazebo_msgs)
 TARGET_LINK_LIBRARIES(camera_gplugin ${WAVESIM_GAZEBO_PLUGIN_DEPS})
 
-ADD_LIBRARY(df_camera_gplugin SHARED src/plugins/df_camera_gplugin.cpp)
-ADD_DEPENDENCIES(df_camera_gplugin wavesim_gazebo_msgs)
-TARGET_LINK_LIBRARIES(df_camera_gplugin ${WAVESIM_GAZEBO_PLUGIN_DEPS})
-
-ADD_LIBRARY(gimbal_gplugin SHARED src/plugins/gimbal_gplugin.cpp)
-ADD_DEPENDENCIES(gimbal_gplugin wavesim_gazebo_msgs)
-TARGET_LINK_LIBRARIES(gimbal_gplugin ${WAVESIM_GAZEBO_PLUGIN_DEPS})
-
-ADD_LIBRARY(lz_gplugin SHARED src/plugins/lz_gplugin.cpp)
-ADD_DEPENDENCIES(lz_gplugin wavesim_gazebo_msgs)
-TARGET_LINK_LIBRARIES(lz_gplugin ${WAVESIM_GAZEBO_PLUGIN_DEPS})
-
-ADD_LIBRARY(quadrotor_gplugin SHARED src/plugins/quadrotor_gplugin.cpp)
-ADD_DEPENDENCIES(quadrotor_gplugin wavesim_gazebo_msgs)
-TARGET_LINK_LIBRARIES(quadrotor_gplugin ${WAVESIM_GAZEBO_PLUGIN_DEPS})
+# ADD_LIBRARY(df_camera_gplugin SHARED src/plugins/df_camera_gplugin.cpp)
+# ADD_DEPENDENCIES(df_camera_gplugin wavesim_gazebo_msgs)
+# TARGET_LINK_LIBRARIES(df_camera_gplugin ${WAVESIM_GAZEBO_PLUGIN_DEPS})
+#
+# ADD_LIBRARY(gimbal_gplugin SHARED src/plugins/gimbal_gplugin.cpp)
+# ADD_DEPENDENCIES(gimbal_gplugin wavesim_gazebo_msgs)
+# TARGET_LINK_LIBRARIES(gimbal_gplugin ${WAVESIM_GAZEBO_PLUGIN_DEPS})
+#
+# ADD_LIBRARY(lz_gplugin SHARED src/plugins/lz_gplugin.cpp)
+# ADD_DEPENDENCIES(lz_gplugin wavesim_gazebo_msgs)
+# TARGET_LINK_LIBRARIES(lz_gplugin ${WAVESIM_GAZEBO_PLUGIN_DEPS})
+#
+# ADD_LIBRARY(quadrotor_gplugin SHARED src/plugins/quadrotor_gplugin.cpp)
+# ADD_DEPENDENCIES(quadrotor_gplugin wavesim_gazebo_msgs)
+# TARGET_LINK_LIBRARIES(quadrotor_gplugin ${WAVESIM_GAZEBO_PLUGIN_DEPS})
 
 # ADD_LIBRARY(world_gplugin SHARED src/plugins/world_gplugin.cpp)
 # ADD_DEPENDENCIES(world_gplugin wavesim_gazebo_msgs)
@@ -110,12 +110,12 @@ INSTALL(DIRECTORY models
 INSTALL(DIRECTORY worlds
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 INSTALL(TARGETS
-        box_gplugin
+        # box_gplugin
         camera_gplugin
-        df_camera_gplugin
-        gimbal_gplugin
-        lz_gplugin
-        quadrotor_gplugin
+        # df_camera_gplugin
+        # gimbal_gplugin
+        # lz_gplugin
+        # quadrotor_gplugin
         # world_gplugin
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/plugins)
 INSTALL(DIRECTORY include/${PROJECT_NAME}/

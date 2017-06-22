@@ -1,5 +1,5 @@
-#include "atl_core/atl_test.hpp"
-#include "atl_core/control/pid_controller.hpp"
+#include "atl/atl_test.hpp"
+#include "atl/control/pid_controller.hpp"
 
 
 TEST(PID, constructor) {

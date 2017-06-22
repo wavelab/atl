@@ -1,4 +1,4 @@
-#include "atl_core/sensor/i2c.hpp"
+#include "atl/sensor/i2c.hpp"
 
 
 namespace atl {

@@ -1,4 +1,4 @@
-#include "atl_core/sensor/MPU6050.hpp"
+#include "atl/sensor/MPU6050.hpp"
 
 
 namespace atl {

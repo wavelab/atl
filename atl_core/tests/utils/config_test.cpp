@@ -1,6 +1,6 @@
-#include "atl_core/atl_test.hpp"
-#include "atl_core/utils/data.hpp"
-#include "atl_core/utils/config.hpp"
+#include "atl/atl_test.hpp"
+#include "atl/utils/data.hpp"
+#include "atl/utils/config.hpp"
 
 #define TEST_CONFIG "tests/configs/config/config.yaml"
 

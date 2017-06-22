@@ -1,4 +1,4 @@
-#include "atl_ros/nodes/control_node.hpp"
+#include "atl/ros/nodes/control_node.hpp"
 
 
 namespace atl {

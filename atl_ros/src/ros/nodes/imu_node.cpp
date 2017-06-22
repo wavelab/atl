@@ -1,4 +1,4 @@
-#include "atl_ros/nodes/imu_node.hpp"
+#include "atl/ros/nodes/imu_node.hpp"
 
 
 namespace atl {

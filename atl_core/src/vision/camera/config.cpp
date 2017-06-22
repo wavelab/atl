@@ -1,4 +1,4 @@
-#include "atl_core/vision/camera/config.hpp"
+#include "atl/vision/camera/config.hpp"
 
 
 namespace atl {

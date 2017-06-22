@@ -1,5 +1,5 @@
-#include "atl_core/atl_test.hpp"
-#include "atl_core/control/position_controller.hpp"
+#include "atl/atl_test.hpp"
+#include "atl/control/position_controller.hpp"
 
 #define TEST_CONFIG "tests/configs/control/position_controller.yaml"
 

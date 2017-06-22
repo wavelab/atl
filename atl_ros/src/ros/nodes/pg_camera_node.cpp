@@ -1,4 +1,4 @@
-#include "atl_ros/nodes/pg_camera_node.hpp"
+#include "atl/ros/nodes/pg_camera_node.hpp"
 #include <sys/stat.h>
 
 namespace atl {

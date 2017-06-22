@@ -1,4 +1,4 @@
-#include "atl_ros/nodes/camera_node.hpp"
+#include "atl/ros/nodes/camera_node.hpp"
 
 namespace atl {
 

@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "atl_ros/utils/node.hpp"
+#include "atl/ros/utils/node.hpp"
 
 namespace atl {
 

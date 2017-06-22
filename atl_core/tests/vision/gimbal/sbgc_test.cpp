@@ -1,5 +1,5 @@
-#include "atl_core/atl_test.hpp"
-#include "atl_core/vision/gimbal/sbgc.hpp"
+#include "atl/atl_test.hpp"
+#include "atl/vision/gimbal/sbgc.hpp"
 
 
 

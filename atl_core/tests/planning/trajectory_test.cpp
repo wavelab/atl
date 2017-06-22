@@ -1,5 +1,5 @@
-#include "atl_core/atl_test.hpp"
-#include "atl_core/planning/trajectory.hpp"
+#include "atl/atl_test.hpp"
+#include "atl/planning/trajectory.hpp"
 #include <nlopt.hpp>
 
 #define TEST_TRAJECTORY_OUTPUT_FILE "/tmp/trajectory.output"

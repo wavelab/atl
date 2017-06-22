@@ -1,4 +1,4 @@
-#include "atl_ros/nodes/ximea_camera_node.hpp"
+#include "atl/ros/nodes/ximea_camera_node.hpp"
 
 namespace atl {
 

@@ -1,5 +1,5 @@
-#include "atl_core/atl_test.hpp"
-#include "atl_core/estimation/ekf.hpp"
+#include "atl/atl_test.hpp"
+#include "atl/estimation/ekf.hpp"
 
 #define TEST_EKF_OUTPUT_FILE "/tmp/estimation_ekf_test.output"
 

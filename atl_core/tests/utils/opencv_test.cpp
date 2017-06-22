@@ -1,5 +1,5 @@
-#include "atl_core/atl_test.hpp"
-#include "atl_core/utils/opencv.hpp"
+#include "atl/atl_test.hpp"
+#include "atl/utils/opencv.hpp"
 
 
 namespace atl {}  // end of namespace

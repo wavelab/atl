@@ -1,4 +1,4 @@
-#include "atl_core/vision/camera/pointgrey.hpp"
+#include "atl/vision/camera/pointgrey.hpp"
 
 
 namespace atl {

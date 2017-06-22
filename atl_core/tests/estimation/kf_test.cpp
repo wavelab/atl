@@ -2,8 +2,8 @@
 #include <fstream>
 #include <iostream>
 
-#include "atl_core/atl_test.hpp"
-#include "atl_core/estimation/kf.hpp"
+#include "atl/atl_test.hpp"
+#include "atl/estimation/kf.hpp"
 
 #define TEST_KF_OUTPUT_FILE "/tmp/estimation_kf_test.output"
 

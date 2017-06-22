@@ -1,6 +1,6 @@
-#include "atl_core/atl_test.hpp"
-#include "atl_core/utils/opencv.hpp"
-#include "atl_core/vision/camera/config.hpp"
+#include "atl/atl_test.hpp"
+#include "atl/utils/opencv.hpp"
+#include "atl/vision/camera/config.hpp"
 
 #define TEST_CONFIG "tests/configs/camera/webcam/640x480.yaml"
 

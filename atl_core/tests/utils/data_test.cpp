@@ -1,5 +1,5 @@
-#include "atl_core/atl_test.hpp"
-#include "atl_core/utils/data.hpp"
+#include "atl/atl_test.hpp"
+#include "atl/utils/data.hpp"
 
 #define TEST_DATA "tests/data/utils/matrix.dat"
 #define TEST_OUTPUT "/tmp/matrix.dat"

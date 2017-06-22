@@ -5,7 +5,7 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/TwistStamped.h>
 
-#include "atl_ros/utils/node.hpp"
+#include "atl/ros/utils/node.hpp"
 
 
 namespace atl {

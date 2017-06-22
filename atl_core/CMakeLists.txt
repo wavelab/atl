@@ -40,7 +40,6 @@ ADD_LIBRARY(
     src/estimation/kf.cpp
     src/estimation/kf_tracker.cpp
     # planning
-    src/planning/ga.cpp
     src/planning/model.cpp
     src/planning/optimizer.cpp
     src/planning/trajectory.cpp
@@ -102,7 +101,6 @@ ADD_EXECUTABLE(
     tests/estimation/kf_test.cpp
     tests/estimation/kf_tracker_test.cpp
     # PLANNING
-    tests/planning/ga_test.cpp
     tests/planning/model_test.cpp
     tests/planning/optimizer_test.cpp
     tests/planning/trajectory_test.cpp
@@ -140,6 +138,6 @@ INSTALL(
     RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
 )
 INSTALL(
-    DIRECTORY include/${PROJECT_NAME}/
+    DIRECTORY include/atl/
     DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
 )

@@ -1,6 +1,6 @@
-# ATL[![Build Status](https://travis-ci.com/wavelab/atl.svg?token=vyEJ7ehiK1iW6rTBostS&branch=ros)](https://travis-ci.com/wavelab/atl)
+# ATL
 
-**Autonomous Tracking and landing (ATL)** for multi-rotors
+**A**utonomous **T**racking and **l**anding (ATL) for multi-rotors.
 
 
 ## Install

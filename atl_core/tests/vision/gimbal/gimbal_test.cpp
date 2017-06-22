@@ -1,5 +1,5 @@
-#include "atl_core/atl_test.hpp"
-#include "atl_core/vision/gimbal/gimbal.hpp"
+#include "atl/atl_test.hpp"
+#include "atl/vision/gimbal/gimbal.hpp"
 
 #define TEST_CONFIG "tests/configs/gimbal/config.yaml"
 

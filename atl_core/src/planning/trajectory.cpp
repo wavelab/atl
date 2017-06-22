@@ -1,4 +1,4 @@
-#include "atl_core/planning/trajectory.hpp"
+#include "atl/planning/trajectory.hpp"
 
 
 namespace atl {

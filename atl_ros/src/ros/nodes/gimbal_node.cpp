@@ -1,4 +1,4 @@
-#include "atl_ros/nodes/gimbal_node.hpp"
+#include "atl/ros/nodes/gimbal_node.hpp"
 
 namespace atl {
 
