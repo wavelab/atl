@@ -1,4 +1,11 @@
-- make kf and ekf node
-- utilize ros services in estimator
-- convert ros nodes to nodelets
-- rewrite tests using python
+- Convert ROS Nodes to nodeletes
+    - apriltag
+    - camera
+    - control
+    - estimator
+    - gimal
+    - imu
+    - pg_camera
+    - ximea_camera
+- Create transform classes for transforms
+- Figure out how to write Python ROS node tests
