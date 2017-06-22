@@ -1,0 +1,7 @@
+#ifndef TEST_SETTINGS_H
+#define TEST_SETTINGS_H
+
+#define TEST_WORLD_DIR "@TEST_WORLD_DIR@"
+#define TEST_DATA_DIR "@TEST_DATA_DIR@"
+
+#endif

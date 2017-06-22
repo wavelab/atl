@@ -13,19 +13,19 @@ import numpy as np
 
 from rosbag_parser import rosbag_parser
 
-# bag = rosbag.Bag("../awesomo_data/170220-position_controller_tuning_1.bag")
-# bag = rosbag.Bag("../awesomo_data/170220-position_controller_tuning_2.bag")
-# bag = rosbag.Bag("/home/chutsu/Dropbox/awesomo_bags/tracking_inertial_mode.bag")
-# bag = rosbag.Bag("/home/chutsu/Dropbox/awesomo_bags/tracking_blown_by_wind.bag")
-# bag = rosbag.Bag("/home/chutsu/Dropbox/awesomo_bags/tracking_better_but_losted.bag")
-# bag = rosbag.Bag("/home/chutsu/Dropbox/awesomo_bags/long_track_active_gimbal.bag")
-# bag = rosbag.Bag("/home/chutsu/Dropbox/awesomo_bags/long-track_starting_with_vear_to_left.bag")
+# bag = rosbag.Bag("../atl_data/170220-position_controller_tuning_1.bag")
+# bag = rosbag.Bag("../atl_data/170220-position_controller_tuning_2.bag")
+# bag = rosbag.Bag("/home/chutsu/Dropbox/atl_bags/tracking_inertial_mode.bag")
+# bag = rosbag.Bag("/home/chutsu/Dropbox/atl_bags/tracking_blown_by_wind.bag")
+# bag = rosbag.Bag("/home/chutsu/Dropbox/atl_bags/tracking_better_but_losted.bag")
+# bag = rosbag.Bag("/home/chutsu/Dropbox/atl_bags/long_track_active_gimbal.bag")
+# bag = rosbag.Bag("/home/chutsu/Dropbox/atl_bags/long-track_starting_with_vear_to_left.bag")
 
-# bag =rosbag.Bag("/home/chutsu/Dropbox/awesomo_bags/simulation/s_curve-radius_10-velocity_1.bag")
-bag = rosbag.Bag("/home/chutsu/Dropbox/awesomo_bags/simulation/straight_line_10.bag")
-# bag = rosbag.Bag("/home/chutsu/Dropbox/awesomo_bags/simulation/circle-radius_12-velocity_1.bag")
+# bag =rosbag.Bag("/home/chutsu/Dropbox/atl_bags/simulation/s_curve-radius_10-velocity_1.bag")
+bag = rosbag.Bag("/home/chutsu/Dropbox/atl_bags/simulation/straight_line_10.bag")
+# bag = rosbag.Bag("/home/chutsu/Dropbox/atl_bags/simulation/circle-radius_12-velocity_1.bag")
 
-traj_file = "../awesomo_configs/configs/trajectory/9.csv"
+traj_file = "../atl_configs/configs/trajectory/9.csv"
 
 
 def figsize(scale):
@@ -191,10 +191,10 @@ class Vec3Data:
 
 class QuadData:
     def __init__(self):
-        # "/awesomo/quadrotor/pose/local"
+        # "/atl/quadrotor/pose/local"
         self.pose = PoseStampedData()
 
-        # "/awesomo/quadrotor/velocity/local"
+        # "/atl/quadrotor/velocity/local"
         self.velocity = TwistStampedData()
 
     def parse_pose(self, ros_msg, ros_time):
@@ -215,10 +215,10 @@ class LZData:
 
 class TagData:
     def __init__(self):
-        # "/awesomo/apriltag/target/position/inertial"
+        # "/atl/apriltag/target/position/inertial"
         self.position_if = Vec3Data()
 
-        # "/awesomo/apriltag/target/position/body"
+        # "/atl/apriltag/target/position/body"
         self.position_bf = Vec3Data()
 
     def parse_inertial(self, ros_msg, ros_time):
@@ -230,16 +230,16 @@ class TagData:
 
 class EstimateData:
     def __init__(self):
-        # "/awesomo/estimate/landing_target/position/inertial"
+        # "/atl/estimate/landing_target/position/inertial"
         self.position_if = Vec3Data()
 
-        # "/awesomo/estimate/landing_target/position/body"
+        # "/atl/estimate/landing_target/position/body"
         self.position_bf = Vec3Data()
 
-        # "/awesomo/estimate/landing_target/velocity/inertal"
+        # "/atl/estimate/landing_target/velocity/inertal"
         self.vel_if = Vec3Data()
 
-        # "/awesomo/estimate/landing_target/velocity/body"
+        # "/atl/estimate/landing_target/velocity/body"
         self.vel_bf = Vec3Data()
 
     def parse_position_inertial(self, ros_msg, ros_time):
@@ -520,23 +520,23 @@ if __name__ == "__main__":
     lz_data = LZData()
 
     params = [
-        {"topic": "/awesomo/quadrotor/pose/local",
+        {"topic": "/atl/quadrotor/pose/local",
          "callback": quad_data.parse_pose},
-        {"topic": "/awesomo/quadrotor/velocity/local",
+        {"topic": "/atl/quadrotor/velocity/local",
             "callback": quad_data.parse_velocity},
-        {"topic": "/awesomo/apriltag/target/position/inertial",
+        {"topic": "/atl/apriltag/target/position/inertial",
             "callback": tag_data.parse_inertial},
-        {"topic": "/awesomo/apriltag/target/position/body",
+        {"topic": "/atl/apriltag/target/position/body",
             "callback": tag_data.parse_body},
-        # {"topic": "/awesomo/estimate/landing_target/position/inertial",
+        # {"topic": "/atl/estimate/landing_target/position/inertial",
         #     "callback": est_data.parse_position_inertial},
-        {"topic": "/awesomo/estimate/landing_target/position/body",
+        {"topic": "/atl/estimate/landing_target/position/body",
             "callback": est_data.parse_position_body},
-        # {"topic": "/awesomo/estimate/landing_target/velocity/inertial",
+        # {"topic": "/atl/estimate/landing_target/velocity/inertial",
         #     "callback": est_data.parse_velocity_inertial},
-        {"topic": "/awesomo/estimate/landing_target/velocity/body",
+        {"topic": "/atl/estimate/landing_target/velocity/body",
             "callback": est_data.parse_velocity_body},
-        {"topic": "/awesomo/lz/pose",
+        {"topic": "/atl/lz/pose",
             "callback": lz_data.parse_pose}
     ]
 

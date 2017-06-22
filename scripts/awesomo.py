@@ -9,9 +9,9 @@ from std_msgs.msg import String
 from std_msgs.msg import Bool
 from geometry_msgs.msg import Vector3
 from geometry_msgs.msg import PoseStamped
-from awesomo_msgs.msg import PCtrlSettings
-from awesomo_msgs.msg import TCtrlSettings
-from awesomo_msgs.msg import LCtrlSettings
+from atl_msgs.msg import PCtrlSettings
+from atl_msgs.msg import TCtrlSettings
+from atl_msgs.msg import LCtrlSettings
 from prototype_ros.msg import ModelPose
 
 
@@ -32,7 +32,7 @@ class ROSNode(object):
 class Camera(ROSNode):
     def __init__(self):
         super(Camera, self).__init__()
-        self.image_topic = "/awesomo/camera/image"
+        self.image_topic = "/atl/camera/image"
         self.mode_topic = "/prototype/camera/mode"
 
         self.register_publisher(self.mode_topic, String)
@@ -46,9 +46,9 @@ class Camera(ROSNode):
 class LandingZone(ROSNode):
     def __init__(self):
         super(LandingZone, self).__init__()
-        self.position_topic = "/awesomo/lz/position/set"
-        self.velocity_topic = "/awesomo/lz/velocity/set"
-        self.angular_velocity_topic = "/awesomo/lz/angular_velocity/set"
+        self.position_topic = "/atl/lz/position/set"
+        self.velocity_topic = "/atl/lz/velocity/set"
+        self.angular_velocity_topic = "/atl/lz/angular_velocity/set"
 
         self.register_publisher(self.position_topic, Vector3)
         self.register_publisher(self.velocity_topic, Float64)
@@ -75,8 +75,8 @@ class LandingZone(ROSNode):
 class Gimbal(ROSNode):
     def __init__(self):
         super(Gimbal, self).__init__()
-        self.attitude_topic = "/awesomo/gimbal/setpoint/attitude"
-        self.track_topic = "/awesomo/gimbal/track"
+        self.attitude_topic = "/atl/gimbal/setpoint/attitude"
+        self.track_topic = "/atl/gimbal/track"
 
         self.register_publisher(self.attitude_topic, Vector3)
         self.register_publisher(self.track_topic, Vector3)
@@ -99,14 +99,14 @@ class Gimbal(ROSNode):
 class Quadrotor(ROSNode):
     def __init__(self):
         super(Quadrotor, self).__init__()
-        self.arm_topic = "/awesomo/control/arm"
-        self.mode_topic = "/awesomo/control/mode"
-        self.heading_topic = "/awesomo/control/heading/set"
-        self.hover_point_topic = "/awesomo/control/hover/set"
-        self.hover_height_topic = "/awesomo/control/hover/height/set"
-        self.pctrl_set_topic = "/awesomo/control/position_controller/set"
-        self.tctrl_set_topic = "/awesomo/control/tracking_controller/set"
-        self.lctrl_set_topic = "/awesomo/control/landing_controller/set"
+        self.arm_topic = "/atl/control/arm"
+        self.mode_topic = "/atl/control/mode"
+        self.heading_topic = "/atl/control/heading/set"
+        self.hover_point_topic = "/atl/control/hover/set"
+        self.hover_height_topic = "/atl/control/hover/height/set"
+        self.pctrl_set_topic = "/atl/control/position_controller/set"
+        self.tctrl_set_topic = "/atl/control/tracking_controller/set"
+        self.lctrl_set_topic = "/atl/control/landing_controller/set"
 
         self.register_publisher(self.arm_topic, Bool)
         self.register_publisher(self.mode_topic, String)

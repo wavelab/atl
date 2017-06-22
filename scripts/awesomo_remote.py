@@ -4,12 +4,12 @@ from time import sleep
 
 import rospy
 
-from awesomo import Camera
-from awesomo import LandingZone
-from awesomo import Gimbal
-from awesomo import Quadrotor
-from awesomo import World
-from awesomo import MAVROS
+from atl import Camera
+from atl import LandingZone
+from atl import Gimbal
+from atl import Quadrotor
+from atl import World
+from atl import MAVROS
 
 
 def lz_circle_path(radius, velocity):
@@ -88,7 +88,7 @@ def init_svo(lz):
 
 
 if __name__ == "__main__":
-    rospy.init_node("awesomo_remote")
+    rospy.init_node("atl_remote")
     lz = LandingZone()
     camera = Camera()
     quad = Quadrotor()

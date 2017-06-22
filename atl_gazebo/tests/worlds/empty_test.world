@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <world name="default">
+    <!-- global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <plugin name="world_gplugin" filename="libworld_gplugin.so"></plugin>
+  </world>
+</sdf>

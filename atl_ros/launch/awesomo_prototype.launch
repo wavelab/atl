@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- sync gazebo time with ros -->
+  <param name="use_sim_time" value="true" />
+
+  <!-- settings -->
+  <param name="sim_mode" value="true" />
+  <param name="debug_mode" value="false" />
+  <param name="quad_frame" value="NED" />
+  <param name="fcu_type" value="DJI" />
+  <param name="estimate_frame" value="BODY" />
+
+  <param name="gimbal_mode" value="true" />
+  <param name="gimbal_position_topic" value="/atl/gimbal/position/inertial" />
+  <param name="gimbal_frame_orientation_topic" value="/atl/gimbal/frame/orientation/inertial" />
+  <param name="gimbal_joint_orientation_topic" value="/atl/gimbal/joint/orientation/inertial" />
+
+  <!-- gazebo -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="worlds/simulation.world"/>
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/>
+    <arg name="headless" value="false"/>
+    <arg name="debug" value="false"/>
+  </include>
+
+  <node pkg="wavesim_ros" name="wavesim_quadrotor" type="wavesim_dji_quadrotor_node" output="screen" required="true" />
+  <node pkg="wavesim_ros" name="wavesim_lz" type="wavesim_lz_node" output="screen" required="true">
+    <remap from="/wavesim/lz/pose" to="/atl/lz/pose" />
+    <remap from="/wavesim/lz/position/set" to="/atl/lz/position/set" />
+    <remap from="/wavesim/lz/velocity/set" to="/atl/lz/velocity/set" />
+    <remap from="/wavesim/lz/angular_velocity/set" to="/atl/lz/angular_velocity/set" />
+  </node>
+  <node pkg="wavesim_ros" name="wavesim_camera" type="wavesim_camera_node" output="screen" required="true">
+    <remap from="/wavesim/camera/image" to="/atl/camera/image" />
+  </node>
+  <node pkg="wavesim_ros" name="wavesim_gimbal" type="wavesim_gimbal_node" output="screen" required="true" >
+    <remap from="/wavesim/gimbal/position/inertial" to="/atl/gimbal/position/inertial" />
+    <remap from="/wavesim/gimbal/frame/orientation/inertial" to="/atl/gimbal/frame/orientation/inertial" />
+    <remap from="/wavesim/gimbal/joint/orientation/inertial" to="/atl/gimbal/joint/orientation/inertial" />
+    <remap from="/wavesim/gimbal/setpoint/attitude" to="/atl/gimbal/setpoint/attitude" />
+    <remap from="/wavesim/gimbal/target/track" to="/atl/gimbal/target/track" />
+  </node>
+
+  <!-- control node -->
+  <param name="control_config_dir" value="$(find atl_configs)/configs/quadrotor_gazebosim" />
+  <node pkg="atl_ros" name="atl_control" type="control_node" output="screen" required="true"/>
+
+  <!-- apriltag node -->
+  <param name="apriltag_config" value="$(find atl_configs)/configs/apriltag/prototype.yaml" />
+  <node pkg="atl_ros" name="atl_apriltag" type="apriltag_node" output="screen" required="true"/>
+
+  <!-- estimate node -->
+  <param name="tracker_mode" value="1" />
+  <param name="kf_tracker_config" value="$(find atl_configs)/configs/estimator/kf_tracker_prototype.yaml" />
+  <param name="ekf_tracker_config" value="$(find atl_configs)/configs/estimator/ekf_tracker_prototype.yaml" />
+  <node pkg="atl_ros" name="atl_estimator" type="estimator_node" output="screen" required="true"/>
+</launch>

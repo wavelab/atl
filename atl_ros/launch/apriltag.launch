@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- configs -->
+  <param name="debug_mode" value="true" />
+  <param name="estimate_frame" value="inertial" />
+  <param name="apriltag_config" value="$(find atl_configs)/configs/apriltag/config.yaml" />
+
+  <!-- node -->
+  <node pkg="atl_ros" name="atl_apriltag" type="apriltag_node" output="screen" />
+</launch>

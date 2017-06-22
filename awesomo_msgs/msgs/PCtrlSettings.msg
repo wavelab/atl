@@ -1,4 +1,0 @@
-awesomo_msgs/PIDSettings roll_controller
-awesomo_msgs/PIDSettings pitch_controller
-awesomo_msgs/PIDSettings throttle_controller
-float32 hover_throttle

@@ -1,0 +1,176 @@
+<?xml version="1.0"?>
+<sdf version='1.6'>
+  <model name="gimbal">
+    <static>false</static>
+    <link name="roll_motor">
+      <pose>0 0 0.021 1.5707 0 0 </pose>
+      <inertial>
+        <mass>0.0038</mass>
+      </inertial>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://gimbal/meshes/gimbal_motor.dae</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <uri>model://gimbal/meshes/gimbal_motor.dae</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="bracket">
+      <pose>0 0 0.021 -1.5707  0 0 </pose>
+      <inertial>
+        <mass>0.0008</mass>
+      </inertial>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://gimbal/meshes/bracket.dae</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <uri>model://gimbal/meshes/bracket.dae</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="pitch_motor">
+      <pose>0.026 0.035 0.022 0 1.5708 0 </pose>
+      <inertial>
+        <mass>0.0038</mass>
+      </inertial>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://gimbal/meshes/gimbal_motor.dae</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <uri>model://gimbal/meshes/gimbal_motor.dae</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="camera_mount">
+      <pose>0.026 0.035 0.022 0 1.5708 3.14159 </pose>
+      <inertial>
+        <mass>0.0008</mass>
+      </inertial>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://gimbal/meshes/camera_mount.dae</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <uri>model://gimbal/meshes/camera_mount.dae</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="cam">
+      <pose>0.022 0.022 0.035 0 1.5708 1.5708 </pose>
+      <inertial>
+        <mass>0.0050</mass>
+      </inertial>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://gimbal/meshes/pg_chameleon3.dae</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <uri>model://gimbal/meshes/pg_chameleon3.dae</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+      </collision>
+
+      <sensor name="cam" type="camera" >
+        <pose>0.017 0.022 .022 0 0 0 </pose>
+        <camera>
+          <horizontal_fov>1.047</horizontal_fov>
+          <image>
+            <width>640</width>
+            <height>640</height>
+          </image>
+          <clip>
+            <near>0.01</near>
+            <far>200</far>
+          </clip>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.0</stddev>
+          </noise>
+        </camera>
+        <always_on>1</always_on>
+        <update_rate>60</update_rate>
+        <visualize>true</visualize>
+        <plugin name="camera_plugin" filename="libcamera_gplugin.so" />
+      </sensor>
+    </link>
+
+    <joint type="revolute" name="roll_motor_joint">
+      <pose>0 0 0 0 0 0</pose>
+      <parent>roll_motor</parent>
+      <child>bracket</child>
+      <axis>
+        <xyz>0 0 1 </xyz>
+      </axis>
+    </joint>
+
+    <joint type="fixed" name="90_bracket">
+      <frame name="roll_motor" />
+      <pose>0 0 0 0 0 0</pose>
+      <parent>bracket</parent>
+      <child>pitch_motor</child>
+    </joint>
+
+    <joint type="revolute" name="pitch_motor_joint">
+      <pose>0 0 0 0 0 0</pose>
+      <parent>pitch_motor</parent>
+      <child>camera_mount</child>
+      <axis>
+        <xyz>0 0 1 </xyz>
+      </axis>
+    </joint>
+
+    <joint type="fixed" name="cam_mount">
+      <pose>0 0 0 0 0 0</pose>
+      <parent>camera_mount</parent>
+      <child>cam</child>
+    </joint>
+    <plugin name="gimbal_plugin" filename="libgimbal_gplugin.so"/>
+  </model>
+</sdf>

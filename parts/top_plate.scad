@@ -1,22 +1,164 @@
-$fn = 64;
+include <common.scad>;
 
 // plate parameters
-plate_width = 110.0;
+plate_width = 130.0;
 plate_depth = 3.0;
 
-module M25Hole(x, y, z, depth) {
-    translate([x, y, z]) {
-        cylinder(h = depth, d = 3.0, center = true);
+
+module CableRoutingHoles(plate_width, plate_depth) {
+    routing_width = plate_width - 45.0;
+    hole_width = 20;
+    hole_length = 5;
+
+    // inner cable fastening holes
+    translate([routing_width / 2.0, 0.0, plate_depth / 2.0]) {
+        cube(size=[hole_length, hole_width, plate_depth], center=true);
+        translate([0.0, hole_width / 2.0, -plate_depth / 2.0]) {
+            cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+        }
+        translate([0.0, -hole_width / 2.0, -plate_depth / 2.0]) {
+            cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+        }
     }
 }
 
-module M6Hole(x, y, z, depth) {
-    translate([x, y, z]) {
-        cylinder(h = depth, d = 7.0, center = true);
+module CableFasteningHoles(plate_width, plate_depth) {
+    inner_width = plate_width - 18.0;
+    outer_width = plate_width - 10.0;
+    hole_width = 40;
+    hole_length = 1.5;
+
+    // inner cable fastening holes
+    translate([inner_width / 2.0, 0.0, plate_depth / 2.0]) {
+        cube(size=[hole_length, hole_width, plate_depth], center=true);
+        translate([0.0, hole_width / 2.0, -plate_depth / 2.0]) {
+            cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+        }
+        translate([0.0, -hole_width / 2.0, -plate_depth / 2.0]) {
+            cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+        }
+    }
+
+    translate([-inner_width / 2.0, 0.0, plate_depth / 2.0]) {
+        cube(size=[hole_length, hole_width, plate_depth], center=true);
+        translate([0.0, hole_width / 2.0, -plate_depth / 2.0]) {
+            cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+        }
+        translate([0.0, -hole_width / 2.0, -plate_depth / 2.0]) {
+            cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+        }
+    }
+
+    translate([0.0, inner_width / 2.0, plate_depth / 2.0]) {
+        cube(size=[hole_width, hole_length, plate_depth], center=true);
+        translate([hole_width / 2.0, 0.0, -plate_depth / 2.0]) {
+            cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+        }
+        translate([-hole_width / 2.0, 0.0, -plate_depth / 2.0]) {
+            cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+        }
+    }
+
+    translate([0.0, -inner_width / 2.0, plate_depth / 2.0]) {
+        cube(size=[hole_width, hole_length, plate_depth], center=true);
+        translate([hole_width / 2.0, 0.0, -plate_depth / 2.0]) {
+            cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+        }
+        translate([-hole_width / 2.0, 0.0, -plate_depth / 2.0]) {
+            cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+        }
+    }
+
+    // outer cable fastening holes
+    translate([outer_width / 2.0, 0.0, plate_depth / 2.0]) {
+        cube(size=[hole_length, hole_width, plate_depth], center=true);
+        translate([0.0, hole_width / 2.0, -plate_depth / 2.0]) {
+            cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+        }
+        translate([0.0, -hole_width / 2.0, -plate_depth / 2.0]) {
+            cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+        }
+    }
+
+    translate([-outer_width / 2.0, 0.0, plate_depth / 2.0]) {
+        cube(size=[hole_length, hole_width, plate_depth], center=true);
+        translate([0.0, hole_width / 2.0, -plate_depth / 2.0]) {
+            cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+        }
+        translate([0.0, -hole_width / 2.0, -plate_depth / 2.0]) {
+            cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+        }
+    }
+
+    translate([0.0, outer_width / 2.0, plate_depth / 2.0]) {
+        cube(size=[hole_width, hole_length, plate_depth], center=true);
+        translate([hole_width / 2.0, 0.0, -plate_depth / 2.0]) {
+            cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+        }
+        translate([-hole_width / 2.0, 0.0, -plate_depth / 2.0]) {
+            cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+        }
+    }
+
+    translate([0.0, -outer_width / 2.0, plate_depth / 2.0]) {
+        cube(size=[hole_width, hole_length, plate_depth], center=true);
+        translate([hole_width / 2.0, 0.0, -plate_depth / 2.0]) {
+            cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+        }
+        translate([-hole_width / 2.0, 0.0, -plate_depth / 2.0]) {
+            cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+        }
     }
 }
 
-module TopPlateScrewHoles(plate_width, plate_depth, plate_diagonal) {
+module ESCMountHoles(plate_depth) {
+    esc_width = 56;
+    esc_length = 65;
+    hole_width = 30;
+    hole_length = 3;
+
+    translate([esc_width / 2.0, 0.0, plate_depth / 2.0]) {
+        cube(size=[hole_length, hole_width, plate_depth], center=true);
+        translate([0.0, hole_width / 2.0, -plate_depth / 2.0]) {
+            cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+        }
+        translate([0.0, -hole_width / 2.0, -plate_depth / 2.0]) {
+            cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+        }
+    }
+
+    translate([-esc_width / 2.0, 0.0, plate_depth / 2.0]) {
+        cube(size=[hole_length, hole_width, plate_depth], center=true);
+        translate([0.0, hole_width / 2.0, -plate_depth / 2.0]) {
+            cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+        }
+        translate([0.0, -hole_width / 2.0, -plate_depth / 2.0]) {
+            cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+        }
+    }
+
+    translate([0.0, esc_length / 2.0, plate_depth / 2.0]) {
+        cube(size=[hole_width, hole_length, plate_depth], center=true);
+        translate([hole_width / 2.0, 0.0, -plate_depth / 2.0]) {
+            cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+        }
+        translate([-hole_width / 2.0, 0.0, -plate_depth / 2.0]) {
+            cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+        }
+    }
+
+    translate([0.0, -esc_length / 2.0, plate_depth / 2.0]) {
+        cube(size=[hole_width, hole_length, plate_depth], center=true);
+        translate([hole_width / 2.0, 0.0, -plate_depth / 2.0]) {
+            cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+        }
+        translate([-hole_width / 2.0, 0.0, -plate_depth / 2.0]) {
+            cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+        }
+    }
+}
+
+module ArmScrewHoles(plate_width, plate_depth, plate_diagonal) {
     base_line = 23.0;
     top_line = 16.0;
     between_line = 20.0;
@@ -52,19 +194,6 @@ module TopPlateScrewHoles(plate_width, plate_depth, plate_diagonal) {
     M25Hole(top_line / 2, G, plate_depth / 2.0, plate_depth);
 }
 
-module StackHoles(plate_width, plate_depth, plate_diagonal) {
-    between_line = 20.0;
-
-    E = 5.5;
-    F = (plate_diagonal / 2.0) - E;
-    H = F - (between_line / 2.0);
-
-    M6Hole(H, 0.0, plate_depth / 2.0, plate_depth);
-    M6Hole(-H, 0.0, plate_depth / 2.0, plate_depth);
-    M6Hole(0.0, H, plate_depth / 2.0, plate_depth);
-    M6Hole(0.0, -H, plate_depth / 2.0, plate_depth);
-}
-
 module TopPlate(plate_width, plate_depth) {
     difference() {
         // plate
@@ -85,10 +214,13 @@ module TopPlate(plate_width, plate_depth) {
         translate([0.0, -B / 2.0, plate_depth / 2.0]) { cube([D, C, plate_depth], true); }
         translate([0.0, B/ 2.0, plate_depth / 2.0]) { cube([D, C, plate_depth], true); }
 
-        // screw holes
-        TopPlateScrewHoles(plate_width, plate_depth, B - C);
-
-        // stack holes
+        // holes
+        rotate(45) {
+            // CableRoutingHoles(plate_width, plate_depth);
+            CableFasteningHoles(plate_width, plate_depth);
+            ESCMountHoles(plate_depth);
+        }
+        ArmScrewHoles(plate_width, plate_depth, B - C);
         StackHoles(plate_width, plate_depth, B - C);
     }
 }

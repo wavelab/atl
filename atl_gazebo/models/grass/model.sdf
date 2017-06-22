@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<sdf version="1.5">
+  <model name="grass">
+    <static>true</static>
+    <link name="link">
+
+      <!-- collision -->
+      <collision name="collision">
+        <geometry>
+          <plane>
+            <normal>0 0 1</normal>
+            <size>100 100</size>
+          </plane>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>100.0</mu>
+              <mu2>50.0</mu2>
+              <slip1>0.0</slip1>
+              <slip2>0.0</slip2>
+            </ode>
+          </friction>
+          <contact>
+            <ode>
+              <max_vel>0.0</max_vel>
+            </ode>
+          </contact>
+        </surface>
+      </collision>
+
+      <!-- visual -->
+      <visual name="visual">
+        <cast_shadows>true</cast_shadows>
+        <geometry>
+          <plane>
+            <normal>0 0 1</normal>
+            <size>100 100</size>
+          </plane>
+        </geometry>
+        <material>
+            <script>
+                <uri>model://grass/materials/scripts</uri>
+                <uri>model://grass/materials/textures</uri>
+                <name>Grass/Image</name>
+            </script>
+        </material>
+      </visual>
+
+    </link>
+  </model>
+</sdf>

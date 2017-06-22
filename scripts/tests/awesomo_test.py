@@ -5,10 +5,10 @@ import unittest
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 import numpy as np
-from awesomo import CarrotController
+from atl import CarrotController
 
 
-class AwesomoTests(unittest.TestCase):
+class atlTests(unittest.TestCase):
     def setUp(self):
         waypoints = [
             np.array([0, 0]),

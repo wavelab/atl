@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<sdf version="1.5">
+  <world name="wave_sim">
+    <!-- global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- ground plane -->
+    <model name="grass">
+        <include>
+            <uri>model://grass</uri>
+        </include>
+    </model>
+
+    <!-- quadrotor -->
+    <model name="quad">
+       <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+       <include>
+           <uri>model://quad</uri>
+           <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+       </include>
+    </model>
+    
+    <!-- landing zone -->
+    <model name="landing">
+      <include>
+        <uri>model://landing</uri>
+        <pose>0.0 2.0 0.0 0.0 0.0 0.0</pose>
+      </include>
+
+      <!-- plugins -->
+      <!-- <plugin name="landing_plugin" filename="liblanding_plugin.so"/> -->
+    </model>
+  </world>
+</sdf>

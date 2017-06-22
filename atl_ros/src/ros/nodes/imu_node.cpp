@@ -1,0 +1,85 @@
+#include "atl_ros/nodes/imu_node.hpp"
+
+
+namespace atl {
+
+int IMUNode::configure(std::string node_name, int hz) {
+  std::string config_path;
+
+  // ros node
+  if (ROSNode::configure(node_name, hz) != 0) {
+    return -1;
+  }
+  ROS_GET_PARAM("/quad_frame", this->quad_frame);
+  ROS_GET_PARAM("/gimbal_imu", this->gimbal_imu);
+
+  // imu
+  if (this->imu.configure() != 0) {
+    log_err("Failed to configure IMU!");
+    return -1;
+  }
+
+  // zero imu - assuming it is zero-ed
+  log_info("Zero-ing IMU! DO NOT MOVE THE QUADROTOR!");
+  sleep(5);
+  for (int i = 0; i < 1000; i++) {
+    this->imu.getData();
+  }
+  this->imu.roll_offset = -1 * this->imu.roll;
+  this->imu.pitch_offset = -1 * this->imu.pitch;
+  log_info("Zero-ing complete!");
+
+
+  // register publisher and subscribers
+  // clang-format off
+  this->registerPublisher<geometry_msgs::Vector3>(IMU_TOPIC);
+  if (this->gimbal_imu == "HACK") {
+    this->registerPublisher<geometry_msgs::Quaternion>(JOINT_ORIENTATION_TOPIC);
+  } else if (this->gimbal_imu != "SBGC") {
+    log_err("Invalid gimbal imu mode [%s]", this->gimbal_imu.c_str());
+    return -3;
+  }
+  // clang-format on
+
+  // loop callback
+  this->registerLoopCallback(std::bind(&IMUNode::loopCallback, this));
+
+  this->configured = true;
+  return 0;
+}
+
+int IMUNode::publishIMU(Vec3 euler) {
+  geometry_msgs::Vector3 msg;
+  buildMsg(euler, msg);
+  this->ros_pubs[IMU_TOPIC].publish(msg);
+  return 0;
+}
+
+int IMUNode::publishJointOrientation(Quaternion q) {
+  geometry_msgs::Quaternion msg;
+  buildMsg(q, msg);
+  this->ros_pubs[JOINT_ORIENTATION_TOPIC].publish(msg);
+  return 0;
+}
+
+int IMUNode::loopCallback(void) {
+  Vec3 euler;
+  Quaternion q;
+
+  if (this->imu.getData() == 0) {
+    euler << -1 * deg2rad(this->imu.roll), deg2rad(this->imu.pitch), 0.0;
+    euler2quat(euler, 321, q);
+    this->publishIMU(euler);
+    if (this->gimbal_imu == "HACK") {
+      this->publishJointOrientation(q);
+    }
+  } else {
+    log_info("Failed to poll IMU for data!");
+  }
+
+  return 0;
+}
+
+} // eof atl namespace
+
+RUN_ROS_NODE(atl::IMUNode, NODE_NAME, NODE_RATE);

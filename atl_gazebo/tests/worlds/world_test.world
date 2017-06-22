@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <world name="default">
+    <!-- global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- ground plane -->
+    <model name="grass">
+        <include>
+            <uri>model://grass</uri>
+        </include>
+    </model>
+
+    <!-- box -->
+    <model name="box">
+        <link name="link">
+            <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+
+            <inertial>
+                <mass>0.1</mass>
+                <inertia>
+                    <ixx>1.0</ixx>
+                    <ixy>0.0</ixy>
+                    <ixz>0.0</ixz>
+                    <iyy>1.0</iyy>
+                    <iyz>0.0</iyz>
+                    <izz>1.0</izz>
+                </inertia>
+            </inertial>
+
+            <collision name="collision">
+                <geometry>
+                    <box>
+                        <size>0.5 0.5 0.5</size>
+                    </box>
+                </geometry>
+            </collision>
+
+            <visual name="visual">
+                <geometry>
+                    <box>
+                        <size>0.5 0.5 0.5</size>
+                    </box>
+                </geometry>
+            </visual>
+
+        </link>
+        <plugin name="box_gplugin" filename="libbox_gplugin.so"></plugin>
+    </model>
+
+    <plugin name="world_gplugin" filename="libworld_gplugin.so"></plugin>
+  </world>
+</sdf>

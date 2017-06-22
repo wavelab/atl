@@ -6,4 +6,4 @@
 
 ## Publish Topics
 
-- `awesomo/camera/image`
+- `atl/camera/image`

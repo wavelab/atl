@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- settings -->
+  <param name="use_sim_time" value="false" />
+
+  <!-- target node -->
+  <param name="sim_mode" value="false" />
+  <param name="debug_mode" value="false" />
+  <param name="estimator_config" value="$(find atl_configs)/configs/estimator/kf_tracker.yaml" />
+  <node pkg="atl_ros" name="atl_estimator" type="estimator_node" output="screen" />
+
+  <!-- test node -->
+  <test pkg="atl_ros" test-name="atl_estimator_test" type="estimator_test" cwd="node"/>
+</launch>

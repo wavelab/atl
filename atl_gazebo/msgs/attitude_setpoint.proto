@@ -1,0 +1,9 @@
+package wavesim_msgs.msgs;
+
+message AttitudeSetpoint
+{
+    required double roll = 1;
+    required double pitch = 2;
+    required double yaw = 3;
+    required double throttle = 4;
+}

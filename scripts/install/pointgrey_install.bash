@@ -2,7 +2,7 @@
 set -e  # halt on first error
 UBUNTU_VERSION=`lsb_release --release | cut -f2`
 
-PACKAGE_DIR=$PWD/awesomo_deps
+PACKAGE_DIR=$PWD/atl_deps
 
 install_pointgrey_drivers()
 {

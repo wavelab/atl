@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e  # halt on first error
-BUILD_PATH="$PWD/awesomo_deps"
+BUILD_PATH="$PWD/atl_deps"
 
 
 install_dependencies()
@@ -11,7 +11,7 @@ install_dependencies()
 
 install_apriltags()
 {
-    # create build directory for awesomo
+    # create build directory for atl
     mkdir -p $BUILD_PATH
     cd $BUILD_PATH
 

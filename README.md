@@ -1,6 +1,6 @@
-# awesomo [![Build Status](https://travis-ci.com/wavelab/awesomo.svg?token=vyEJ7ehiK1iW6rTBostS&branch=ros)](https://travis-ci.com/wavelab/awesomo)
+# ATL[![Build Status](https://travis-ci.com/wavelab/atl.svg?token=vyEJ7ehiK1iW6rTBostS&branch=ros)](https://travis-ci.com/wavelab/atl)
 
-Quadrotor autonomous landing project.
+**Autonomous Tracking and landing (ATL)** for multi-rotors
 
 
 ## Install
@@ -8,13 +8,13 @@ Quadrotor autonomous landing project.
 The following instructions assumes you have installed ROS.
 
     cd <your catkin workspace>/src
-    git clone https://github.com/wavelab/awesomo
+    git clone https://github.com/wavelab/atl
     cd ..
     catkin_make
     catkin_make tests
     catkin_make install
 
-In short the above navigates to your catkin workspace's `src`, clones `awesomo`
+In short the above navigates to your catkin workspace's `src`, clones `atl`
 and finally runs `catkin_make` to build the project, tests and installs configs
 and launch files.
 
@@ -27,10 +27,10 @@ Once you have performed the above instructions you can run ROS node tests via:
 
 Or alternatively you can launch individual tests via:
 
-    rostest awesomo_ros apriltag_test.launch
-    rostest awesomo_ros camera_test.launch
-    rostest awesomo_ros estimator_test.launch
-    rostest awesomo_ros gimbal_test.launch
+    rostest atl_ros apriltag_test.launch
+    rostest atl_ros camera_test.launch
+    rostest atl_ros estimator_test.launch
+    rostest atl_ros gimbal_test.launch
 
 
 ## License

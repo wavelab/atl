@@ -6,9 +6,9 @@
 
 ## Publish Topics
 
-- `/awesomo/gimbal/pose`
+- `/atl/gimbal/pose`
 
 
 ## Subscribe Topics
 
-- `/awesomo/gimbal/setpoint/angle`
+- `/atl/gimbal/setpoint/angle`

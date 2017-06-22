@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e  # halt on the first mistake
-BUILD_PATH="$HOME/awesomo_build"
+BUILD_PATH="$HOME/atl_build"
 QGROUND_FILE="qgroundcontrol.tar.bz2"
 DOWNLOAD_URL="http://qgroundcontrol.s3.amazonaws.com/master/$QGROUND_FILE"
 

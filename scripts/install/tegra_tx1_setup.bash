@@ -72,15 +72,15 @@ install_atim()
     catkin_make install
 }
 
-install_awesomo()
+install_atl()
 {
     cd $HOME/catkin_ws/src
 
-    # install awesomo dependensies
+    # install atl dependensies
     sudo apt-get install ros-indio-mavros-*
 
-    # install awesomo
-    git clone https://github.com/wavelab/awesomo.git
+    # install atl
+    git clone https://github.com/wavelab/atl.git
     cd $HOME/catkin_ws
     catkin_make install
 }
@@ -88,7 +88,7 @@ install_awesomo()
 setup_wifi()
 {
     # connect using the command line interface of network manager
-    nmcli d wifi connect AwesomoTower
+    nmcli d wifi connect atlTower
 }
 
 setup_permissions()
@@ -103,5 +103,5 @@ add_repositories
 install_ros
 setup_catkin
 install_atim
-install_awesomo
+install_atl
 setup_wifi

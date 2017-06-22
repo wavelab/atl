@@ -1,12 +1,12 @@
 #!/bin/bash
 set -e  # halt on first error
-BUILD_PATH="$PWD/awesomo_deps"
+BUILD_PATH="$PWD/atl_deps"
 REPO_VER=2016-12-01
 REPO_URL="https://april.eecs.umich.edu/media/apriltag/apriltag-$REPO_VER.tgz"
 
 install_apriltags()
 {
-    # create build directory for awesomo
+    # create build directory for atl
     mkdir -p $BUILD_PATH
 
     # download and build michigan apriltags

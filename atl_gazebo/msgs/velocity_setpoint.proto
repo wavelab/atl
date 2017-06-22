@@ -1,0 +1,8 @@
+package wavesim_msgs.msgs;
+
+message VelocitySetpoint
+{
+    required double vx = 1;
+    required double vy = 2;
+    required double vz = 3;
+}

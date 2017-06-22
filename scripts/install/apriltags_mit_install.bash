@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e  # halt on first error
-BUILD_PATH="$PWD/awesomo_deps"
+BUILD_PATH="$PWD/atl_deps"
 REPO_URL=https://svn.csail.mit.edu/apriltags
 INC_DEST=/usr/local/include/apriltags_mit
 LIB_DEST=/usr/local/lib/libapriltags_mit.a
@@ -20,7 +20,7 @@ install_dependencies()
 
 install_apriltags()
 {
-    # create build directory for awesomo
+    # create build directory for atl
     mkdir -p $BUILD_PATH
 
     # download and build mit apriltags

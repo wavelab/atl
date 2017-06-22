@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<launch>
+  <node pkg="svo_ros" type="vo" name="svo" clear_params="true" output="screen">
+    <!-- camera topic to subscribe to -->
+    <param name="cam_topic" value="/atl/camera/image" />
+
+    <!-- camera calibration file -->
+    <rosparam file="$(find atl_configs)/configs/camera_pinhole.yaml" />
+
+    <!-- default parameter settings: choose between vo_fast and vo_accurate -->
+    <rosparam file="$(find atl_configs)/configs/vo_fast.yaml" />
+  </node>
+</launch>

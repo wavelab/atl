@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- settings -->
+  <param name="use_sim_time" value="false" />
+
+  <!-- target node -->
+  <param name="debug_mode" value="false" />
+  <param name="apriltag_config" value="$(find atl_configs)/configs/apriltag/prototype.yaml" />
+  <node pkg="atl_ros" name="atl_apriltag" type="apriltag_node" output="screen" />
+
+  <!-- test node -->
+  <test pkg="atl_ros" test-name="atl_apriltag_test" type="apriltag_test" cwd="node"/>
+</launch>

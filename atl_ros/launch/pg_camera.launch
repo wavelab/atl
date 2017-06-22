@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- configs -->
+  <param name="use_sim_time" value="false" />
+  <param name="sim_mode" value="false" />
+  <param name="debug_mode" value="false" />
+  <param name="camera_config_dir" value="$(find atl_configs)/configs/camera/pointgrey_chameleon" />
+  <!-- <param name="photobooth" value="false" /> -->
+  <param name="photobooth" value="true" />
+
+  <!-- ros node -->
+  <node pkg="atl_ros" name="atl_camera" type="pg_camera_node" output="screen" required="true" />
+</launch>

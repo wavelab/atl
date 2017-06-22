@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+  <param name="debug_mode" type="bool" value="false" />
+  <param name="sim_mode" type="bool" value="true" />
+
+  <node name="gazebo" type="run_gazebo.sh" pkg="wavesim_ros" output="screen" />
+  <node name="world" type="world_node" pkg="wavesim_ros" output="screen" />
+  <node name="gimbal" type="gimbal_node" pkg="wavesim_ros" output="screen" />
+</launch>

@@ -1,0 +1,11 @@
+package wavesim_msgs.msgs;
+
+message RPYPose
+{
+    required double x = 1;
+    required double y = 2;
+    required double z = 3;
+    required double roll = 4;
+    required double pitch = 5;
+    required double yaw = 6;
+}

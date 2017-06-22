@@ -6,9 +6,9 @@
 
 ## Publish Topics
 
-- `awesomo/apriltag/pose`
+- `atl/apriltag/pose`
 
 
 ## Subscribe Topics
 
-- `awesomo/camera/image`
+- `atl/camera/image`

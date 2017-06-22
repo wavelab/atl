@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e  # halt on first error
 
-PACKAGE_DIR=$PWD/awesomo_deps
+PACKAGE_DIR=$PWD/atl_deps
 PACKAGE_NAME=XIMEA_Linux_SP.tgz
 
 install_ximea_drivers()

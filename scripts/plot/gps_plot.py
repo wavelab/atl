@@ -4,8 +4,8 @@ import csv
 import gmplot
 
 
-gps_file = "../awesomo_data/170223-gps_log_test_1.csv"
-# gps_file = "../awesomo_data/170223-gps_log_test_2.csv"
+gps_file = "../atl_data/170223-gps_log_test_1.csv"
+# gps_file = "../atl_data/170223-gps_log_test_2.csv"
 
 def parse_gps_data(data_file):
     # setup

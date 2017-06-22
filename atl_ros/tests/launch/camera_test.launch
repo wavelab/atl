@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- settings -->
+  <param name="use_sim_time" value="false" />
+
+  <!-- target node -->
+  <param name="sim_mode" value="false" />
+  <param name="debug_mode" value="false" />
+  <param name="camera_config_dir" value="$(find atl_configs)/configs/camera/logitech_c270" />
+  <node pkg="atl_ros" name="atl_camera" type="camera_node" output="screen" />
+
+  <!-- test node -->
+  <test pkg="atl_ros" test-name="atl_camera_test" type="camera_test" cwd="node"/>
+</launch>

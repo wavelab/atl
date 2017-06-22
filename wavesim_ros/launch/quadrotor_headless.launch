@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<launch>
+  <param name="debug_mode" value="true" />
+  <param name="sim_mode" value="true" />
+
+  <node pkg="wavesim_ros" name="wavesim_gazebo" type="run_gzserver.sh" output="screen" required="true" />
+  <node pkg="wavesim_ros" name="wavesim_world" type="world_node" output="screen" required="true" />
+  <node pkg="wavesim_ros" name="wavesim_quadrotor" type="quadrotor_node" output="screen" required="true" />
+  <node pkg="wavesim_ros" name="wavesim_gimbal" type="gimbal_node" output="screen" required="true" />
+  <node pkg="wavesim_ros" name="wavesim_camera" type="camera_node" output="screen" required="true" />
+</launch>

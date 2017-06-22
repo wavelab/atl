@@ -1,0 +1,90 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <model name="quad">
+    <allow_auto_disable>true</allow_auto_disable>
+
+    <link name="chasis">
+      <pose>0 0 0.182466 0 0 0</pose>
+      <inertial>
+        <mass>1.316</mass>
+        <inertia>
+          <ixx>0.0128</ixx>
+          <iyy>0.0128</iyy>
+          <izz>0.0218</izz>
+        </inertia>
+      </inertial>
+
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <uri>model://quad/meshes/base.dae</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>100.0</mu>
+              <mu2>50.0</mu2>
+              <slip1>0.0</slip1>
+              <slip2>0.0</slip2>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+
+      <visual name="visual">
+        <cast_shadows>true</cast_shadows>
+        <geometry>
+          <mesh>
+            <uri>model://quad/meshes/base.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+
+    <include>
+      <uri>model://gimbal</uri>
+      <pose>0.1 0.0 0.12 0 0 -1.57059</pose>
+    </include>
+
+    <link name="df_camera">
+      <pose>-0.08 0.0 0.15 0 1.57059 0</pose>
+      <visual name="visual">
+        <pose>0 0 0 0 -1.57059 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.018</radius>
+            <length>0.035</length>
+          </cylinder>
+        </geometry>
+      </visual>
+      <sensor name="camera" type="camera">
+        <camera>
+          <horizontal_fov>1.91986</horizontal_fov>
+          <image>
+            <width>640</width>
+            <height>480</height>
+          </image>
+          <clip>
+            <near>0.01</near>
+            <far>200</far>
+          </clip>
+          <noise>
+            <type>gaussian</type>
+            <mean>0</mean>
+            <stddev>0.01</stddev>
+          </noise>
+        </camera>
+        <always_on>1</always_on>
+        <update_rate>60</update_rate>
+        <plugin name="df_camera_plugin" filename="libdf_camera_gplugin.so"/>
+      </sensor>
+    </link>
+
+    <joint name="gimbal_joint" type="fixed">
+      <child>gimbal::roll_motor</child>
+      <parent>chasis</parent>
+    </joint>
+    <plugin name="quadrotor_plugin" filename="libquadrotor_gplugin.so"/>
+  </model>
+</sdf>

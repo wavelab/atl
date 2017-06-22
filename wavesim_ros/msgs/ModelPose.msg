@@ -1,0 +1,3 @@
+std_msgs/String model_name
+geometry_msgs/Vector3 position
+geometry_msgs/Vector3 orientation

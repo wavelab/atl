@@ -1,3 +1,0 @@
-[submodule "awesomo_deps/googletest"]
-	path = awesomo_deps/googletest
-	url = https://github.com/google/googletest.git

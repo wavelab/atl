@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <world name="default">
+    <!-- global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- ground plane -->
+    <model name="grass">
+        <include>
+            <uri>model://grass</uri>
+        </include>
+    </model>
+
+    <!-- camera -->
+    <model name="box">
+        <link name="link">
+            <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+
+            <inertial>
+                <mass>1.0</mass>
+                <inertia>
+                    <ixx>0.083</ixx>
+                    <ixy>0.0</ixy>
+                    <ixz>0.0</ixz>
+                    <iyy>0.083</iyy>
+                    <iyz>0.0</iyz>
+                    <izz>0.083</izz>
+                </inertia>
+            </inertial>
+
+            <collision name="collision">
+                <geometry>
+                    <box>
+                        <size>1 1 1</size>
+                    </box>
+                </geometry>
+            </collision>
+
+            <visual name="visual">
+                <geometry>
+                    <box>
+                        <size>1 1 1</size>
+                    </box>
+                </geometry>
+            </visual>
+
+            <sensor name='camera' type='camera'>
+                <camera>
+                    <horizontal_fov>1.047</horizontal_fov>
+                    <image>
+                        <width>640</width>
+                        <height>480</height>
+                        <format>R8G8B8</format>
+                    </image>
+                </camera>
+                <always_on>1</always_on>
+                <update_rate>100</update_rate>
+
+                <plugin name="camera_gplugin" filename="libcamera_gplugin.so"></plugin>
+            </sensor>
+        </link>
+    </model>
+
+    <plugin name="world_gplugin" filename="libworld_gplugin.so"></plugin>
+  </world>
+</sdf>

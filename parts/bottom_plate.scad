@@ -1,18 +1,22 @@
-// $fn = 64;
+use <common.scad>
 
 // plate parameters
-plate_width = 110.0;
+plate_width = 130.0;
 plate_depth = 3.0;
 
-module M25ScrewHole(x, y, z, depth) {
-    translate([x, y, z]) {
-        cylinder(h = depth, d = 2.5, center = true);
-    }
-}
 
-module M6Hole(x, y, z, depth) {
-    translate([x, y, z]) {
-        cylinder(h = depth, d = 7.0, center = true);
+module CableRoutingHoles(plate_width, plate_depth) {
+    routing_width = plate_width - 45.0;
+    hole_width = 5;
+
+    // inner cable fastening holes
+    translate([routing_width / 2.0, 0.0, 0.0]) {
+        translate([0.0, hole_width / 2.0, -plate_depth / 2.0]) {
+            #cylinder(r=hole_width / 2.0, h=plate_depth, center=true);
+        }
+        translate([0.0, -routing_width / 2.0, 0.0]) {
+            #cylinder(r=hole_width / 2.0, h=plate_depth, center=true);
+        }
     }
 }
 
@@ -25,17 +29,17 @@ module BottomPlateScrewHoles(plate_width, plate_depth, plate_diagonal) {
     G = F - between_line;
 
     // outer screw holes
-    M25ScrewHole(F, -base_line / 2.0, plate_depth / 2.0, plate_depth);
-    M25ScrewHole(F, base_line / 2.0, plate_depth / 2.0, plate_depth);
+    M25Hole(F, -base_line / 2.0, plate_depth / 2.0, plate_depth);
+    M25Hole(F, base_line / 2.0, plate_depth / 2.0, plate_depth);
 
-    M25ScrewHole(-F, -base_line / 2.0, plate_depth / 2.0, plate_depth);
-    M25ScrewHole(-F, base_line / 2.0, plate_depth / 2.0, plate_depth);
+    M25Hole(-F, -base_line / 2.0, plate_depth / 2.0, plate_depth);
+    M25Hole(-F, base_line / 2.0, plate_depth / 2.0, plate_depth);
 
-    M25ScrewHole(-base_line / 2.0, F, plate_depth / 2.0, plate_depth);
-    M25ScrewHole(base_line / 2.0, F, plate_depth / 2.0, plate_depth);
+    M25Hole(-base_line / 2.0, F, plate_depth / 2.0, plate_depth);
+    M25Hole(base_line / 2.0, F, plate_depth / 2.0, plate_depth);
 
-    M25ScrewHole(-base_line / 2.0, -F, plate_depth / 2.0, plate_depth);
-    M25ScrewHole(base_line / 2.0, -F, plate_depth / 2.0, plate_depth);
+    M25Hole(-base_line / 2.0, -F, plate_depth / 2.0, plate_depth);
+    M25Hole(base_line / 2.0, -F, plate_depth / 2.0, plate_depth);
 }
 
 module StackHoles(plate_width, plate_depth, plate_diagonal) {
@@ -119,12 +123,23 @@ module BottomPlate(plate_width, plate_depth) {
         C = 30.0;
         D = 30.0;
 
-        translate([B / 2.0, 0.0, plate_depth / 2.0]) { cube([C, D, plate_depth], true); }
-        translate([-B / 2.0, 0.0, plate_depth / 2.0]) { cube([C, D, plate_depth], true); }
-        translate([0.0, -B / 2.0, plate_depth / 2.0]) { cube([D, C, plate_depth], true); }
-        translate([0.0, B/ 2.0, plate_depth / 2.0]) { cube([D, C, plate_depth], true); }
+        translate([B / 2.0, 0.0, plate_depth / 2.0]) {
+            cube([C, D, plate_depth], true);
+        }
+        translate([-B / 2.0, 0.0, plate_depth / 2.0]) {
+            cube([C, D, plate_depth], true);
+        }
+        translate([0.0, -B / 2.0, plate_depth / 2.0]) {
+            cube([D, C, plate_depth], true);
+        }
+        translate([0.0, B/ 2.0, plate_depth / 2.0]) {
+            cube([D, C, plate_depth], true);
+        }
 
         // holes
+        rotate(45) {
+            CableRoutingHoles(plate_width, plate_depth);
+        }
         BottomPlateScrewHoles(plate_width, plate_depth, B - C);
         StackHoles(plate_width, plate_depth, B - C);
         BatteryStrapHoles(plate_width, plate_depth, B - C);

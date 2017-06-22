@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- configs -->
+  <param name="debug_mode" value="true" />
+  <param name="sim_mode" value="true" />
+  <param name="gimbal_config" value="$(find atl_configs)/configs/gimbal/config.yaml" />
+
+  <!-- node -->
+  <node pkg="atl_ros" name="atl_gimbal" type="gimbal_node" output="screen" />
+
+  <!-- test node -->
+  <test pkg="atl_ros" test-name="atl_gimbal_test" type="gimbal_test" cwd="node"/>
+</launch>

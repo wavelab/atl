@@ -1,0 +1,12 @@
+package wavesim_msgs.msgs;
+
+message ModelPose
+{
+    required string model_name = 1;
+    required double x = 2;
+    required double y = 3;
+    required double z = 4;
+    required double roll = 5;
+    required double pitch = 6;
+    required double yaw = 7;
+}

@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <world name="default">
+    <!-- global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- ground plane -->
+    <model name="grass">
+        <include>
+            <uri>model://grass</uri>
+        </include>
+    </model>
+
+    <!-- quadrotor -->
+    <model name="quadrotor">
+       <pose>0.0 0.0 3.0 0.0 0.0 0.0</pose>
+
+      <!-- quadrotor -->
+      <include>
+        <uri>model://quad</uri>
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+      </include>
+
+    </model>
+
+    <!-- landing zone -->
+    <model name="landing">
+      <include>
+        <uri>model://landing</uri>
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+      </include>
+    </model>
+
+    <plugin name="world_gplugin" filename="libworld_gplugin.so"></plugin>
+  </world>
+</sdf>

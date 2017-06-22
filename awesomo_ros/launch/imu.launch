@@ -1,5 +1,0 @@
-<?xml version="1.0"?>
-<launch>
-  <param name="quad_frame" value="NWU" />
-  <node pkg="awesomo_ros" name="awesomo_imu" type="imu_node" output="screen" launch-prefix="sudo -E" required="true" />
-</launch>

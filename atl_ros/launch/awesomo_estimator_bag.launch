@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- settings -->
+  <param name="sim_mode" value="false" />
+  <param name="debug_mode" value="false" />
+  <param name="quad_frame" value="NED" />
+  <param name="fcu_type" value="DJI" />
+  <param name="gimbal_imu" value="IMU" />
+
+  <!-- <!&#45;&#45; dji sdk &#45;&#45;> -->
+  <!-- <node pkg="dji_sdk" type="dji_sdk_node" name="dji_sdk" output="screen"> -->
+  <!--   <param name="serial_name" type="string" value="/dev/ttyUSB1"/> -->
+  <!--   <param name="baud_rate" type="int" value="230400"/> -->
+  <!--   <param name="app_id" type="int" value="1037276"/> -->
+  <!--   <param name="app_version" type="int" value="1"/> -->
+  <!--   <param name="app_bundle_id" type="string" value="Not required in this SDK version"/> -->
+  <!--   <param name="enc_key" type="string" value="63f09dc38bf513c75736b2d285bd9508fc7876b81fb5435ad6d18f931aac6fe9"/> -->
+  <!--   <param name="groundstation_enable" type="int" value="1"/> -->
+  <!-- </node> -->
+
+  <!-- controller node -->
+  <!-- <param name="control_config_dir" value="$(find atl_configs)/configs/quadrotor_maria" /> -->
+  <!-- <node pkg="atl_ros" name="atl_control" type="control_node" output="screen" required="true" /> -->
+  <!--  -->
+  <!-- <!&#45;&#45; apriltag node &#45;&#45;> -->
+  <!-- <param name="apriltag_config" value="$(find atl_configs)/configs/apriltag/config.yaml" /> -->
+  <!-- <node pkg="atl_ros" name="atl_apriltag" type="apriltag_node" output="screen" required="true" /> -->
+
+  <!-- estimate node -->
+    <param name="tracker_mode" value="1" />
+    <param name="kf_tracker_config" value="$(find atl_configs)/configs/estimator/kf_tracker.yaml" />
+    <param name="ekf_tracker_config" value="$(find atl_configs)/configs/estimator/ekf_tracker.yaml" />
+    <node pkg="atl_ros" name="atl_estimator" type="estimator_node" output="screen" required="true" >
+        <remap from="/atl/estimate/landing_target/position/body" to="/estimate/position/body"/>
+        <remap from="/atl/estimate/landing_target/position/inertial" to="/estimate/position/inertial"/>
+        <remap from="/atl/estimate/landing_target/velocity/body" to="/estimate/velocity/body"/>
+        <remap from="/atl/estimate/landing_target/velocity/inertial" to="/estimate/velocity/inertial"/>
+    </node>
+  <!-- <!&#45;&#45; pg camera node &#45;&#45;> -->
+  <!-- <param name="camera_config_dir" value="$(find atl_configs)/configs/camera/pointgrey_chameleon" /> -->
+  <!-- <node pkg="atl_ros" name="atl_camera" type="pg_camera_node" output="screen" required="true" /> -->
+  <!--  -->
+  <!-- <!&#45;&#45; gimbal node &#45;&#45;> -->
+  <!-- <param name="gimbal_config" value="$(find atl_configs)/configs/gimbal/config.yaml" /> -->
+  <!-- <node pkg="atl_ros" name="atl_gimbal" type="gimbal_node" output="screen" required="true" /> -->
+  <!--  -->
+  <!-- <!&#45;&#45; imu node &#45;&#45;> -->
+  <!-- <node pkg="atl_ros" name="atl_imu" type="imu_node" output="screen" launch&#45;prefix="sudo &#45;E" required="true" /> -->
+</launch>

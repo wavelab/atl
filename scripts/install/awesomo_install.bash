@@ -22,8 +22,8 @@ sudo apt-get install -y \
     ros-$ROS_VERSION-mavros-msgs
 
 # link repo to catkin workspace
-if [ ! -d "$CATKIN_PATH/src/awesomo" ]; then
-    ln -sfn "$REPO_PATH" "$CATKIN_PATH/src/awesomo"
+if [ ! -d "$CATKIN_PATH/src/atl" ]; then
+    ln -sfn "$REPO_PATH" "$CATKIN_PATH/src/atl"
 fi
 
 # compile

@@ -1,7 +1,7 @@
-# awesomo
+# atl
 
 ## API
-### `awesomo_core`
+### `atl_core`
 - control
 - estimation
 - planning
@@ -10,7 +10,7 @@
 - utils
 - vision
 
-### `awesomo_ros`
+### `atl_ros`
 - nodes
 - utils
 
