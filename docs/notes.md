@@ -59,6 +59,9 @@ Weights:
     TX1 (without heatsink): 116g
     TX1 (with heatsink):    182g
 
+
+## Anastasia on STEROIDS?
+
 **If we don't want to worry about weight**, we can use **DJI E800 Motors**, it
 has a max thrust of **2.1kg** for each motor, a total of **8.4kg** max thrust
 (all four motors).
