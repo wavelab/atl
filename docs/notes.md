@@ -81,10 +81,12 @@ Ideally I would like to build 2 quads simultaneously based off a DJI F450 Frame.
 2. Simple Downward facing camera
 
 
+
 ## Questions that needs answers **urgently**
 
-### Do we need a Global Shutter camera? Or is a cheap 120FPS rolling shutter camera going to cut it?
+### Do we need a Global Shutter camera?
 
+Or is a cheap 120FPS rolling shutter camera going to cut it?
 E.g. How do I evaluate if rolling shutter is good enough?
 
 ### What are we comparing against?
@@ -94,7 +96,10 @@ E.g. How do I evaluate if rolling shutter is good enough?
 - SVO
 - DSO
 
-### Where are we going to do it? Single downward facing camera on the quad and fly in  a square and ROS-bag it?
+
+### Where are we going to do it?
+
+Single downward facing camera on the quad and fly in  a square and ROS-bag it?
 
 ![E5 Car Park](images/e5-carpark.png)
 

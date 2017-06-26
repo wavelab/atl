@@ -1,0 +1,23 @@
+roll_controller:
+    k_p: 0.1
+    k_i: 0.2
+    k_d: 0.3
+pitch_controller:
+    k_p: 0.1
+    k_i: 0.2
+    k_d: 0.3
+throttle_controller:
+    hover_throttle: 0.6
+    k_p: 0.1
+    k_i: 0.2
+    k_d: 0.3
+
+roll_limit:
+    min: -20.0
+    max: 20.0
+
+pitch_limit:
+    min: -20.0
+    max: 20.0
+
+track_offset: [1.0, 2.0, 3.0]

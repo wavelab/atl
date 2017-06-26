@@ -1,0 +1,36 @@
+index: 0
+image_width: 160
+image_height: 120
+
+shutter_speed: 0
+exposure_value: 1.0
+gain_value: 2.0
+lambda: [1.0, 2.0, 3.0]
+alpha: 4.0
+
+camera_matrix:
+  rows: 3
+  cols: 3
+  data: [122.502944, 0.000000, 83.871120,
+         0.000000, 122.444900, 65.126596,
+         0.000000, 0.000000, 1.000000]
+distortion_coefficients:
+  rows: 1
+  cols: 5
+  data: [-0.367234, 0.145812, -0.000856, 0.001102, 0.000000]
+rectification_matrix:
+  rows: 3
+  cols: 3
+  data: [1.000000, 0.000000, 0.000000,
+         0.000000, 1.000000, 0.000000,
+         0.000000, 0.000000, 1.000000]
+projection_matrix:
+  rows: 3
+  cols: 4
+  data: [100.600052, 0.000000, 85.153133, 0.000000,
+         0.000000, 109.543533, 65.597548, 0.000000,
+         0.000000, 0.000000, 1.000000, 0.000000]
+
+imshow: true
+snapshot: false
+showfps: true
