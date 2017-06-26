@@ -1,6 +1,6 @@
 # ATL
 
-**A**utonomous **T**racking and **l**anding (ATL) for multi-rotors.
+**A**utonomous **T**racking and **L**anding (ATL) for multi-rotors.
 
 
 ## Install
