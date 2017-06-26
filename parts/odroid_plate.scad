@@ -5,6 +5,82 @@ plate_width = 130.0;
 plate_depth = 3.0;
 
 
+module CableRoutingHoles(plate_width, plate_depth) {
+  routing_width = plate_width - 35.0;
+  hole_width = 20;
+  hole_length = 5;
+
+  // inner cable fastening holes
+  translate([routing_width / 2.0, 0.0, plate_depth / 2.0]) {
+    cube(size=[hole_length, hole_width, plate_depth], center=true);
+    translate([0.0, hole_width / 2.0, -plate_depth / 2.0]) {
+      cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+    }
+    translate([0.0, -hole_width / 2.0, -plate_depth / 2.0]) {
+      cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+    }
+  }
+
+  translate([-routing_width / 2.0, 0.0, plate_depth / 2.0]) {
+    cube(size=[hole_length, hole_width, plate_depth], center=true);
+    translate([0.0, hole_width / 2.0, -plate_depth / 2.0]) {
+      cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+    }
+    translate([0.0, -hole_width / 2.0, -plate_depth / 2.0]) {
+      cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+    }
+  }
+}
+
+module CableFasteningHoles(plate_width, plate_depth) {
+  inner_width = plate_width - 60.0;
+  outer_width = plate_width - 55.0;
+  hole_width = 40;
+  hole_length = 1.5;
+
+  // inner cable fastening holes
+  translate([0.0, inner_width / 2.0, plate_depth / 2.0]) {
+    cube(size=[hole_width, hole_length, plate_depth], center=true);
+    translate([hole_width / 2.0, 0.0, -plate_depth / 2.0]) {
+      cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+    }
+    translate([-hole_width / 2.0, 0.0, -plate_depth / 2.0]) {
+      cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+    }
+  }
+
+  translate([0.0, -inner_width / 2.0, plate_depth / 2.0]) {
+    cube(size=[hole_width, hole_length, plate_depth], center=true);
+    translate([hole_width / 2.0, 0.0, -plate_depth / 2.0]) {
+      cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+    }
+    translate([-hole_width / 2.0, 0.0, -plate_depth / 2.0]) {
+      cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+    }
+  }
+
+  // outer cable fastening holes
+  translate([0.0, outer_width / 2.0, plate_depth / 2.0]) {
+    cube(size=[hole_width, hole_length, plate_depth], center=true);
+    translate([hole_width / 2.0, 0.0, -plate_depth / 2.0]) {
+      cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+    }
+    translate([-hole_width / 2.0, 0.0, -plate_depth / 2.0]) {
+      cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+    }
+  }
+
+  translate([0.0, -outer_width / 2.0, plate_depth / 2.0]) {
+    cube(size=[hole_width, hole_length, plate_depth], center=true);
+    translate([hole_width / 2.0, 0.0, -plate_depth / 2.0]) {
+      cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+    }
+    translate([-hole_width / 2.0, 0.0, -plate_depth / 2.0]) {
+      cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+    }
+  }
+}
+
 module ArmScrewHoles(plate_width, plate_depth, plate_diagonal) {
     base_line = 23.0;
     top_line = 16.0;
@@ -62,6 +138,8 @@ module TopPlate(plate_width, plate_depth) {
         translate([0.0, B/ 2.0, plate_depth / 2.0]) { cube([D, C, plate_depth], true); }
 
         // holes
+        rotate(45) CableFasteningHoles(plate_width, plate_depth);
+        rotate(-45) CableRoutingHoles(plate_width, plate_depth);
         OdroidXU4MountHoles(plate_depth);
         ArmScrewHoles(plate_width, plate_depth, B - C);
         StackHoles(plate_width, plate_depth, B - C);

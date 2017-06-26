@@ -2,7 +2,7 @@
 
 build_stl() {
     echo "Generating STL file for [$1]"
-    openscad $1 -o stl_files/${1%.scad}.stl
+    openscad $1  -D'$fn=64' -o stl_files/${1%.scad}.stl
     echo "STL [stl_files/${1%.scad}.stl] done!"
 }
 

@@ -15,7 +15,6 @@
 - utils
 
 ## Reference
-- Ordoid
-- Papers
-- [Hardware](#docs/reference/hardware)
-- [coorindate frame](#docs/reference/coordinate_frame)
+- [Notes](#notes)
+- [Hardware](#reference/hardware)
+- [coorindate frame](#reference/coordinate_frame)
