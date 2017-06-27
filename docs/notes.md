@@ -50,7 +50,7 @@ Weights:
     2-Axis Gimbal system with encoders
       40 + (54 * 2) + (5 * 2) = 158
       
-    Stan's Gimbal System: 380g
+    Stan's Gimbal System: 320g
 
     2-Axis Gimbal system without encoders
       40 + (36 * 2) + (5 * 2) = 122g
