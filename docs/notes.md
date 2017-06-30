@@ -48,7 +48,9 @@ Weights:
     IMU sensors:            5g
 
     2-Axis Gimbal system with encoders
-      40 + (54 * 2) + (5 * 2) = 158g
+      40 + (54 * 2) + (5 * 2) = 158
+      
+    Stan's Gimbal System: 320g
 
     2-Axis Gimbal system without encoders
       40 + (36 * 2) + (5 * 2) = 122g
@@ -58,6 +60,9 @@ Weights:
     Odroid XU4 (with case): 84g
     TX1 (without heatsink): 116g
     TX1 (with heatsink):    182g
+
+
+## Anastasia on STEROIDS?
 
 **If we don't want to worry about weight**, we can use **DJI E800 Motors**, it
 has a max thrust of **2.1kg** for each motor, a total of **8.4kg** max thrust
