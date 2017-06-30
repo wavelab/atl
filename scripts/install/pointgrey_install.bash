@@ -10,6 +10,8 @@ install_pointgrey_drivers()
     if [ $UBUNTU_VERSION == "16.04" ]; then
         sudo apt-get install -qq \
             libraw1394-11 \
+            libglade2-dev \
+            libglademm-2.4-dev \
             libgtkmm-2.4-1v5 \
             libglademm-2.4-1v5 \
             libgtkglextmm-x11-1.2-dev \

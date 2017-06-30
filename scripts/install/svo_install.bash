@@ -3,15 +3,6 @@ set -e
 ROS_DISTRO="kinetic"
 CATKIN_WS=$HOME/catkin_ws/
 
-install_dependencies()
-{
-    sudo apt-get install -y \
-        git \
-        cmake \
-        libeigen3-dev
-
-}
-
 install_sophus()
 {
     cd /usr/local/src/
@@ -61,6 +52,19 @@ install_vikit()
     fi
 }
 
+install_dependencies()
+{
+    sudo apt-get install -y \
+        git \
+        cmake \
+        libeigen3-dev
+
+	install_sophus
+	install_fast
+	install_g2o
+	install_vikit
+}
+
 install_svo()
 {
     sudo apt-get install ros-$ROS_DISTRO-cmake-modules
@@ -68,12 +72,14 @@ install_svo()
     if [ ! -d rpg_svo ]; then
         git clone https://github.com/uzh-rpg/rpg_svo.git
     fi
+
+    # build svo
+    cd $CATKIN_WS
+    source /opt/ros/kinetic/setup.bash
+    catkin_make
 }
 
 
 # RUN
-install_sophus
-install_fast
-install_g2o
-install_vikit
+install_dependencies
 install_svo
