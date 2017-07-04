@@ -107,12 +107,22 @@ module CableFasteningHoles(plate_width, plate_depth) {
       cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
     }
   }
+
+  rotate(90) translate([-inner_width / 2.0, 0.0, plate_depth / 2.0]) {
+    cube(size=[hole_length, hole_width, plate_depth], center=true);
+    translate([0.0, hole_width / 2.0, -plate_depth / 2.0]) {
+      cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+    }
+    translate([0.0, -hole_width / 2.0, -plate_depth / 2.0]) {
+      cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+    }
+  }
 }
 
 module CableRoutingHoles(plate_width, plate_depth) {
-  routing_width = plate_width - 35.0;
+  routing_width = plate_width - 40.0;
   hole_width = 35;
-  hole_length = 7;
+  hole_length = 10;
 
   // inner cable fastening holes
   translate([routing_width / 2.0, 0.0, plate_depth / 2.0]) {
@@ -136,6 +146,16 @@ module CableRoutingHoles(plate_width, plate_depth) {
   }
 
   rotate(180) translate([routing_width / 2.0, 0.0, plate_depth / 2.0]) {
+    cube(size=[hole_length, hole_width, plate_depth], center=true);
+    translate([0.0, hole_width / 2.0, -plate_depth / 2.0]) {
+      cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+    }
+    translate([0.0, -hole_width / 2.0, -plate_depth / 2.0]) {
+      cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
+    }
+  }
+
+  rotate(270) translate([routing_width / 2.0, 0.0, plate_depth / 2.0]) {
     cube(size=[hole_length, hole_width, plate_depth], center=true);
     translate([0.0, hole_width / 2.0, -plate_depth / 2.0]) {
       cylinder(r=hole_length / 2.0, h=plate_depth, center=false);

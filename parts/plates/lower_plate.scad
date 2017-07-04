@@ -54,7 +54,7 @@ module LowerPlate(plate_width, plate_depth) {
     StackHoles(plate_width, plate_depth, B - C);
 
     translate([15, -15, 0])
-      #OdroidXU4MountHoles(plate_depth);
+      OdroidXU4MountHoles(plate_depth);
       // rotate(180)
   }
 }

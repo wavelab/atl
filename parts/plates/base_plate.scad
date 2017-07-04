@@ -32,16 +32,17 @@ module BasePlate(plate_width, plate_depth) {
       cube([D, C, plate_depth], true);
     }
 
-    translate([plate_width * 0.2, 0.0, plate_depth / 2.0]) {
+    // center holes
+    translate([plate_width * 0.3, 0.0, plate_depth / 2.0]) {
       cylinder(r=6, plate_depth, center=true);
     }
-    translate([0.0, plate_width * 0.2, plate_depth / 2.0]) {
+    translate([0.0, plate_width * 0.3, plate_depth / 2.0]) {
       cylinder(r=6, plate_depth, center=true);
     }
-    translate([-plate_width * 0.2, 0.0, plate_depth / 2.0]) {
+    translate([-plate_width * 0.3, 0.0, plate_depth / 2.0]) {
       cylinder(r=6, plate_depth, center=true);
     }
-    translate([0.0, -plate_width * 0.2, plate_depth / 2.0]) {
+    translate([0.0, -plate_width * 0.3, plate_depth / 2.0]) {
       cylinder(r=6, plate_depth, center=true);
     }
 

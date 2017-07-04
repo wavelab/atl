@@ -7,53 +7,6 @@ plate_depth = 3.0;
 battery_length = 146;
 battery_width = 40;
 
-module CableRoutingHoles(plate_width, plate_depth) {
-  routing_width = plate_width - 35.0;
-  hole_width = 35;
-  hole_length = 7;
-
-  // inner cable fastening holes
-  translate([routing_width / 2.0, 0.0, plate_depth / 2.0]) {
-    cube(size=[hole_length, hole_width, plate_depth], center=true);
-    translate([0.0, hole_width / 2.0, -plate_depth / 2.0]) {
-      cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
-    }
-    translate([0.0, -hole_width / 2.0, -plate_depth / 2.0]) {
-      cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
-    }
-  }
-
-  rotate(90) translate([routing_width / 2.0, 0.0, plate_depth / 2.0]) {
-    cube(size=[hole_length, hole_width, plate_depth], center=true);
-    translate([0.0, hole_width / 2.0, -plate_depth / 2.0]) {
-      cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
-    }
-    translate([0.0, -hole_width / 2.0, -plate_depth / 2.0]) {
-      cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
-    }
-  }
-
-  rotate(180) translate([routing_width / 2.0, 0.0, plate_depth / 2.0]) {
-    cube(size=[hole_length, hole_width, plate_depth], center=true);
-    translate([0.0, hole_width / 2.0, -plate_depth / 2.0]) {
-      cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
-    }
-    translate([0.0, -hole_width / 2.0, -plate_depth / 2.0]) {
-      cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
-    }
-  }
-
-  rotate(270) translate([routing_width / 2.0, 0.0, plate_depth / 2.0]) {
-    cube(size=[hole_length, hole_width, plate_depth], center=true);
-    translate([0.0, hole_width / 2.0, -plate_depth / 2.0]) {
-      cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
-    }
-    translate([0.0, -hole_width / 2.0, -plate_depth / 2.0]) {
-      cylinder(r=hole_length / 2.0, h=plate_depth, center=false);
-    }
-  }
-}
-
 module BatteryPlate(plate_width, plate_depth) {
   difference() {
     // plate
@@ -81,6 +34,21 @@ module BatteryPlate(plate_width, plate_depth) {
     translate([0.0, B/ 2.0, plate_depth / 2.0]) {
       cube([D, C, plate_depth], true);
     }
+
+    // center holes
+    translate([plate_width * 0.3, 0.0, plate_depth / 2.0]) {
+      cylinder(r=6, plate_depth, center=true);
+    }
+    translate([0.0, plate_width * 0.3, plate_depth / 2.0]) {
+      cylinder(r=6, plate_depth, center=true);
+    }
+    translate([-plate_width * 0.3, 0.0, plate_depth / 2.0]) {
+      cylinder(r=6, plate_depth, center=true);
+    }
+    translate([0.0, -plate_width * 0.3, plate_depth / 2.0]) {
+      cylinder(r=6, plate_depth, center=true);
+    }
+
 
     // holes
     rotate(-135) {
