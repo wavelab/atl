@@ -2,7 +2,7 @@
 
 namespace atl {
 
-int CameraNode::configure(std::string node_name, int hz) {
+int CameraNode::configure(const std::string &node_name, int hz) {
   std::string config_path;
 
   // ros node
@@ -100,7 +100,7 @@ int CameraNode::loopCallback(void) {
 
   }
 
-  // this->camera.showImage(this->image);
+  this->camera.showImage(this->image);
   this->camera.getFrame(this->image);
   this->publishImage();
 

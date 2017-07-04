@@ -36,7 +36,7 @@ public:
   bool showfps;
 
   CameraConfig(void);
-  int load(std::string config_file);
+  int load(const std::string &config_file);
   void print(void);
 };
 

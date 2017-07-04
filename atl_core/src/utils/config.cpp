@@ -351,7 +351,7 @@ int ConfigParser::load(std::string config_file) {
         break;
     }
 
-    if (retval != 0) {
+    if (retval == -1) {
       return retval;
     }
   }

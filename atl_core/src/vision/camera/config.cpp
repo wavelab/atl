@@ -25,7 +25,7 @@ CameraConfig::CameraConfig(void) {
   this->snapshot = false;
 }
 
-int CameraConfig::load(std::string config_file) {
+int CameraConfig::load(const std::string &config_file) {
   ConfigParser parser;
 
   // config variables
@@ -35,8 +35,8 @@ int CameraConfig::load(std::string config_file) {
   parser.addParam<int>("image_height", &this->image_height);
 
   parser.addParam<float>("shutter_speed", &this->shutter_speed, true);
-  parser.addParam<float>("exposure_value", &this->exposure_value);
-  parser.addParam<float>("gain_value", &this->gain_value);
+  parser.addParam<float>("exposure_value", &this->exposure_value, true);
+  parser.addParam<float>("gain_value", &this->gain_value, true);
   parser.addParam<Vec3>("lambda", &this->lambda);
   parser.addParam<float>("alpha", &this->alpha);
 

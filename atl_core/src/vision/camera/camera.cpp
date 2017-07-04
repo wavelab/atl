@@ -184,7 +184,7 @@ int Camera::showImage(cv::Mat &image) {
   // show image
   if (this->config.imshow && image.rows && image.cols) {
     cv::imshow("Camera", image);
-    cv::waitKey(1);
+    cv::waitKey(2);
   }
 }
 

@@ -40,7 +40,7 @@ public:
   TagPose tag;
 
   CameraNode(int argc, char **argv) : ROSNode(argc, argv) {}
-  int configure(std::string node_name, int hz);
+  int configure(const std::string &node_name, int hz);
   int publishImage(void);
   void imageCallback(const sensor_msgs::ImageConstPtr &msg);
   void gimbalPositionCallback(const geometry_msgs::Vector3 &msg);
