@@ -5,6 +5,7 @@
   <param name="sim_mode" value="false" />
   <param name="debug_mode" value="false" />
   <param name="camera_config_dir" value="$(find atl_configs)/configs/camera/pointgrey_chameleon" />
+
   <!-- <param name="photobooth" value="false" /> -->
   <param name="photobooth" value="true" />
 

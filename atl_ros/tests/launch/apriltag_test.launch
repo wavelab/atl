@@ -5,7 +5,7 @@
 
   <!-- target node -->
   <param name="debug_mode" value="false" />
-  <param name="apriltag_config" value="$(find atl_configs)/configs/apriltag/prototype.yaml" />
+  <param name="/apriltag/config" value="$(find atl_configs)/configs/apriltag/prototype.yaml" />
   <node pkg="atl_ros" name="atl_apriltag" type="apriltag_node" output="screen" />
 
   <!-- test node -->

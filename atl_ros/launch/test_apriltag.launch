@@ -1,10 +1,13 @@
 <?xml version="1.0"?>
 <launch>
-  <!-- configs -->
+  <!-- settings -->
   <param name="debug_mode" value="true" />
-  <param name="estimate_frame" value="inertial" />
-  <param name="apriltag_config" value="$(find atl_configs)/configs/apriltag/config.yaml" />
 
-  <!-- node -->
+  <!-- camera node -->
+  <param name="/camera/config_dir" value="$(find atl_configs)/configs/camera/webcam" />
+  <node pkg="atl_ros" name="atl_camera" type="camera_node" output="screen" required="true" />
+
+  <!-- apriltag node -->
+  <param name="/apriltag/config" value="$(find atl_configs)/configs/apriltag/config.yaml" />
   <node pkg="atl_ros" name="atl_apriltag" type="apriltag_node" output="screen" />
 </launch>

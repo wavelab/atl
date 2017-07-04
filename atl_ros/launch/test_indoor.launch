@@ -10,17 +10,17 @@
   <node pkg="atl_ros" name="atl_fake_mavros" type="fake_mavros_node" output="screen" required="true" />
 
   <!-- controller node -->
-  <param name="control_config_dir" value="$(find atl_configs)/configs/quadrotor_anastasia" />
+  <param name="/control/config_dir" value="$(find atl_configs)/configs/quadrotor_anastasia" />
   <node pkg="atl_ros" name="atl_control" type="control_node" output="screen" required="true" />
 
   <!-- apriltag node -->
-  <param name="apriltag_config" value="$(find atl_configs)/configs/apriltag/config.yaml" />
+  <param name="/apriltag/config" value="$(find atl_configs)/configs/apriltag/config.yaml" />
   <node pkg="atl_ros" name="atl_apriltag" type="apriltag_node" output="screen" required="true" />
 
   <!-- estimate node -->
   <param name="tracker_mode" value="1" />
-  <param name="kf_tracker_config" value="$(find atl_configs)/configs/estimator/kf_tracker.yaml" />
-  <param name="ekf_tracker_config" value="$(find atl_configs)/configs/estimator/ekf_tracker.yaml" />
+  <param name="/estimator/kf/config" value="$(find atl_configs)/configs/estimator/kf_tracker.yaml" />
+  <param name="/estimator/ekf/config" value="$(find atl_configs)/configs/estimator/ekf_tracker.yaml" />
   <node pkg="atl_ros" name="atl_estimator" type="estimator_node" output="screen" required="true" />
 
   <!-- pg camera node -->
@@ -28,7 +28,7 @@
   <node pkg="atl_ros" name="atl_camera" type="pg_camera_node" output="screen" required="true" />
 
   <!-- gimbal node -->
-  <param name="gimbal_config" value="$(find atl_configs)/configs/gimbal/config.yaml" />
+  <param name="/gimbal/config" value="$(find atl_configs)/configs/gimbal/config.yaml" />
   <node pkg="atl_ros" name="atl_gimbal" type="gimbal_node" output="screen" required="true" />
 
   <!-- imu node -->

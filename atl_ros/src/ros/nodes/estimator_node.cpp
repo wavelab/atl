@@ -22,7 +22,7 @@ int EstimatorNode::configure(std::string node_name, int hz) {
   switch (this->mode) {
     case KF_MODE:
       log_info("Estimator running in KF_MODE!");
-      ROS_GET_PARAM("/kf_tracker_config", config_file);
+      ROS_GET_PARAM("/estimator/kf/config", config_file);
       if (this->kf_tracker.configure(config_file) != 0) {
         log_err("Failed to configure KalmanFilterTracker!");
         return -2;
@@ -31,7 +31,7 @@ int EstimatorNode::configure(std::string node_name, int hz) {
 
     case EKF_MODE:
       log_info("Estimator running in EKF_MODE!");
-      ROS_GET_PARAM("/ekf_tracker_config", config_file);
+      ROS_GET_PARAM("/estimator/ekf/config", config_file);
       if (this->ekf_tracker.configure(config_file) != 0) {
         log_err("Failed to configure ExtendedKalmanFilterTracker!");
         return -2;

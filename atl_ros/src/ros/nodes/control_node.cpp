@@ -12,9 +12,9 @@ int ControlNode::configure(const std::string node_name, int hz) {
   }
 
   // quadrotor
-  ROS_GET_PARAM("/control_config_dir", config_path);
   ROS_GET_PARAM("/quad_frame", this->quad_frame);
   ROS_GET_PARAM("/fcu_type", this->fcu_type);
+  ROS_GET_PARAM("/control/config_dir", config_path);
   if (this->quadrotor.configure(config_path) != 0) {
     ROS_ERROR(FCONFQUAD);
     return -2;
