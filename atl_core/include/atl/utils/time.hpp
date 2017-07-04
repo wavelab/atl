@@ -11,5 +11,5 @@ float toc(struct timespec *tic);
 float mtoc(struct timespec *tic);
 double time_now(void);
 
-}  // end of atl namespace
+}  // namespace atl
 #endif

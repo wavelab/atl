@@ -1,5 +1,5 @@
-#ifndef atl_ROS_NODES_DF_CAMERA_NODE_HPP
-#define atl_ROS_NODES_DF_CAMERA_NODE_HPP
+#ifndef ATL_GAZEBO_BRIDGE_DF_CAMERA_NODE_HPP
+#define ATL_GAZEBO_BRIDGE_DF_CAMERA_NODE_HPP
 
 #include <ros/ros.h>
 #include <cv_bridge/cv_bridge.h>
@@ -10,8 +10,8 @@
 #include <geometry_msgs/Vector3.h>
 #include <image_transport/image_transport.h>
 
-#include "wave/utils/math.hpp"
-#include "atl_ros/utils/node.hpp"
+#include "atl/utils/math.hpp"
+#include "atl/ros/utils/node.hpp"
 #include "atl_gazebo/clients/df_camera_gclient.hpp"
 
 namespace atl {
@@ -35,6 +35,6 @@ public:
   void imageCallback(ConstImagePtr &msg);
 };
 
-}  // end of ros namespace
-}  // end of atl namespace
+}  // namespace ros
+}  // namespace atl
 #endif

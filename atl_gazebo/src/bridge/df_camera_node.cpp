@@ -1,4 +1,4 @@
-#include "atl_ros/nodes/df_camera_node.hpp"
+#include "atl_gazebo/bridge/df_camera_node.hpp"
 
 namespace atl {
 namespace ros {
@@ -49,7 +49,7 @@ void DFCameraNode::imageCallback(ConstImagePtr &msg) {
   }
 }
 
-}  // end of ros namespace
-}  // end of atl namespace
+}  // namespace ros
+}  // namespace atl
 
-ROS_NODE_RUN(atl::ros::DFCameraNode, NODE_NAME, NODE_RATE);
+RUN_ROS_NODE(atl::ros::DFCameraNode, NODE_NAME, NODE_RATE);

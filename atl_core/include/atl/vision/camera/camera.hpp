@@ -41,5 +41,5 @@ public:
   int showImage(cv::Mat &image);
 };
 
-}  // end of atl namespace
+}  // namespace atl
 #endif

@@ -171,5 +171,5 @@ void QuadrotorGPlugin::setVelocityCallback(VelocitySetpointPtr &msg) {
 }
 
 GZ_REGISTER_MODEL_PLUGIN(QuadrotorGPlugin);
-}  // end of gaz namespace
-}  // end of atl namespace
+}  // namespace gaz
+}  // namespace atl

@@ -208,5 +208,5 @@ public:
   int load(std::string config_file);
 };
 
-}  // end of atl namespace
+}  // namespace atl
 #endif

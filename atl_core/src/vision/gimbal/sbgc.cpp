@@ -692,4 +692,4 @@ int SBGC::setSpeedAngle(double roll,
   return 0;
 }
 
-}  // end of atl namespace
+}  // namespace atl

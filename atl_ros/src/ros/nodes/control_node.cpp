@@ -594,6 +594,6 @@ void ControlNode::publishStats(void) {
   // this->ros_pubs[PCTRL_GET].publish(pcs_settings_msg);
 }
 
-}  // end of atl namespace
+}  // namespace atl
 
 RUN_ROS_NODE(atl::ControlNode, NODE_NAME, NODE_RATE);

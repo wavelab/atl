@@ -25,7 +25,7 @@ void ExampleNode::sayCallback(const std_msgs::String &msg) {
   std::cout << msg.data << std::endl;
 }
 
-}  // end of atl namespace
+}  // namespace atl
 
 int main(int argc, char **argv) {
   atl::ExampleNode node(argc, argv);

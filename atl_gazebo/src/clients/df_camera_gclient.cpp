@@ -55,5 +55,5 @@ void DFCameraGClient::imageCallback(ConstImagePtr &msg) {
   delete img_data;
 }
 
-}  // end of gaz namespace
-}  // end of atl namespace
+}  // namespace gaz
+}  // namespace atl

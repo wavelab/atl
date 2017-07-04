@@ -81,5 +81,5 @@ int point_left_right(Vec2 p1, Vec2 p2, Vec2 pos);
 double closest_point(Vec2 p1, Vec2 p2, Vec2 p3, Vec2 &closest);
 Vec2 linear_interpolation(Vec2 a, Vec2 b, double mu);
 
-}  // end of atl namespace
+}  // namespace atl
 #endif

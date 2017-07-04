@@ -63,8 +63,8 @@ TEST_F(CameraTest, test) {
   ASSERT_FALSE(image.empty());
 }
 
-}  // end of gaz namespace
-}  // end of atl namespace
+}  // namespace gaz
+}  // namespace atl
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);

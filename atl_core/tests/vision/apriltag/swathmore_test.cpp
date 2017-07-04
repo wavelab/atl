@@ -83,4 +83,4 @@ TEST(SwathmoreDetector, extractTags) {
   ASSERT_NEAR(2.30, tags[0].position(2), 0.15);
 }
 
-}  // end of atl namespace
+}  // namespace atl

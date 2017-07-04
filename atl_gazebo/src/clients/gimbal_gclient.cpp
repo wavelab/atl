@@ -70,5 +70,5 @@ void GimbalGClient::jointOrientationCallback(ConstQuaternionPtr &msg) {
   this->joint_orientation.z() = msg->z();
 }
 
-}  // end of gaz namespace
-}  // end of atl namespace
+}  // namespace gaz
+}  // namespace atl

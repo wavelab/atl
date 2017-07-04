@@ -14,6 +14,7 @@
 #include <atl/atl_core.hpp>
 
 #include <atl_msgs/AprilTagPose.h>
+#include <atl_msgs/ModelPose.h>
 #include <atl_msgs/LCtrlSettings.h>
 #include <atl_msgs/PCtrlStats.h>
 #include <atl_msgs/PCtrlSettings.h>
@@ -61,5 +62,5 @@ int convertMsg(atl_msgs::PCtrlSettings msg, PositionController &pc);
 int convertMsg(atl_msgs::TCtrlSettings msg, TrackingController &tc);
 int convertMsg(atl_msgs::LCtrlSettings msg, LandingController &lc);
 
-}  // end of atl namespace
+}  // namespace atl
 #endif

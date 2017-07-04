@@ -27,7 +27,7 @@ TEST_F(NodeTest, test) {
   ASSERT_TRUE(true);
 }
 
-}  // end of atl namespace
+}  // namespace atl
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);

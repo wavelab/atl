@@ -159,4 +159,4 @@ void PositionController::printErrors(void) {
   std::cout << "\terror_d: " << std::setprecision(2) << i << std::endl;
 }
 
-}  // end of atl namespace
+}  // namespace atl

@@ -1,4 +1,4 @@
-#include "atl_ros/nodes/gimbal_node.hpp"
+#include "atl_gazebo/bridge/gimbal_node.hpp"
 
 namespace atl {
 namespace ros {
@@ -66,21 +66,18 @@ void GimbalNode::quadPoseCallback(const geometry_msgs::PoseStamped &msg) {
 }
 
 void GimbalNode::setAttitudeCallback(const geometry_msgs::Vector3 msg) {
-  Vec3 euler;
-  euler << msg.x, msg.y, msg.z;
-
   if (this->enable_tracking) {
+    Vec3 euler{msg.x, msg.y, msg.z};
     GimbalGClient::setAttitude(euler);
   }
 }
 
 void GimbalNode::trackTargetCallback(const geometry_msgs::Vector3 msg) {
-  Vec3 target_cf;
-  target_cf << msg.x, msg.y, msg.z;
+  Vec3 target_cf{msg.x, msg.y, msg.z};
   GimbalGClient::trackTarget(target_cf);
 }
 
-}  // end of ros namespace
-}  // end of atl namespace
+}  // namespace ros
+}  // namespace atl
 
-ROS_NODE_RUN(atl::ros::GimbalNode, NODE_NAME, NODE_RATE);
+RUN_ROS_NODE(atl::ros::GimbalNode, NODE_NAME, NODE_RATE);

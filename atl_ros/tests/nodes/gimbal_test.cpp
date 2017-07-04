@@ -82,7 +82,7 @@ TEST_F(NodeTest, frameOrientationMsg) {
 }
 
 
-}  // end of atl namespace
+}  // namespace atl
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);

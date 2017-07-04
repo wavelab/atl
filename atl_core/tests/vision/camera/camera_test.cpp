@@ -65,4 +65,4 @@ TEST(Camera, getFrame) {
 //   camera.run();
 // }
 
-}  // end of atl namespace
+}  // namespace atl

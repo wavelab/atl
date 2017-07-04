@@ -154,4 +154,4 @@ int MichiganDetector::obtainPose(apriltag_detection_t *det, TagPose &tag_pose) {
   return 0;
 }
 
-}  // end of atl namespace
+}  // namespace atl

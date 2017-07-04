@@ -47,44 +47,40 @@
       <pose>0.1 0.0 0.12 0 0 -1.57059</pose>
     </include>
 
-    <link name="df_camera">
-      <pose>-0.08 0.0 0.15 0 1.57059 0</pose>
-      <visual name="visual">
-        <pose>0 0 0 0 -1.57059 0</pose>
-        <geometry>
-          <cylinder>
-            <radius>0.018</radius>
-            <length>0.035</length>
-          </cylinder>
-        </geometry>
-      </visual>
-      <sensor name="camera" type="camera">
-        <camera>
-          <horizontal_fov>1.91986</horizontal_fov>
-          <image>
-            <width>640</width>
-            <height>480</height>
-          </image>
-          <clip>
-            <near>0.01</near>
-            <far>200</far>
-          </clip>
-          <noise>
-            <type>gaussian</type>
-            <mean>0</mean>
-            <stddev>0.01</stddev>
-          </noise>
-        </camera>
-        <always_on>1</always_on>
-        <update_rate>60</update_rate>
-        <plugin name="df_camera_plugin" filename="libdf_camera_gplugin.so"/>
-      </sensor>
-    </link>
+    <!-- <link name="df_camera"> -->
+    <!--   <pose>&#45;0.08 0.0 0.15 0 1.57059 0</pose> -->
+    <!--   <visual name="visual"> -->
+    <!--     <pose>0 0 0 0 &#45;1.57059 0</pose> -->
+    <!--     <geometry> -->
+    <!--       <cylinder> -->
+    <!--         <radius>0.018</radius> -->
+    <!--         <length>0.035</length> -->
+    <!--       </cylinder> -->
+    <!--     </geometry> -->
+    <!--   </visual> -->
+    <!--   <sensor name="camera" type="camera"> -->
+    <!--     <camera> -->
+    <!--       <horizontal_fov>1.91986</horizontal_fov> -->
+    <!--       <image> -->
+    <!--         <width>640</width> -->
+    <!--         <height>480</height> -->
+    <!--       </image> -->
+    <!--       <clip> -->
+    <!--         <near>0.01</near> -->
+    <!--         <far>200</far> -->
+    <!--       </clip> -->
+    <!--       <noise> -->
+    <!--         <type>gaussian</type> -->
+    <!--         <mean>0</mean> -->
+    <!--         <stddev>0.01</stddev> -->
+    <!--       </noise> -->
+    <!--     </camera> -->
+    <!--     <always_on>1</always_on> -->
+    <!--     <update_rate>60</update_rate> -->
+    <!--     <plugin name="df_camera_plugin" filename="libdf_camera_gplugin.so"/> -->
+    <!--   </sensor> -->
+    <!-- </link> -->
 
-    <joint name="gimbal_joint" type="fixed">
-      <child>gimbal::roll_motor</child>
-      <parent>chasis</parent>
-    </joint>
     <plugin name="quadrotor_plugin" filename="libquadrotor_gplugin.so"/>
   </model>
 </sdf>

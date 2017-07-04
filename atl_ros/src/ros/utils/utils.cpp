@@ -1,4 +1,4 @@
-#include "atl_ros/utils/utils.hpp"
+#include "atl/ros/utils/utils.hpp"
 
 
 namespace atl {
@@ -56,5 +56,5 @@ int gaz2ros(Quaternion gaz_quat, Quaternion &ros_quat) {
   return 0;
 }
 
-}  // end of ros namespace
-}  // end of atl namespace
+}  // namespace ros
+}  // namespace atl

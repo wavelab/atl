@@ -68,5 +68,5 @@ void LZGClient::setAngularVelocity(double ang_vel) {
   this->gaz_pubs[ANGULAR_VEL_SET_GTOPIC]->Publish(msg);
 }
 
-}  // end of gaz namespace
-}  // end of atl namespace
+}  // namespace gaz
+}  // namespace atl

@@ -144,4 +144,4 @@ int MITDetector::obtainPose(AprilTags::TagDetection tag, TagPose &tag_pose) {
   return 0;
 }
 
-}  // end of atl namespace
+}  // namespace atl

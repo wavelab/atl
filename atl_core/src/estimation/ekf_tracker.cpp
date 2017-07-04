@@ -153,4 +153,4 @@ void two_wheel_measurement_model(ExtendedKalmanFilterTracker &ekf,
   h = H * ekf.mu_p;
 }
 
-}  // end of atl namespace
+}  // namespace atl

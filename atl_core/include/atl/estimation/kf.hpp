@@ -31,5 +31,5 @@ public:
   int estimate(MatX A, VecX y);
 };
 
-}  // end of atl namespace
+}  // namespace atl
 #endif

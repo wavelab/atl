@@ -326,4 +326,4 @@ TEST(Gimbal, trackTarget) {
   std::cout << gimbal.setpoints.transpose() << std::endl;
 }
 
-}  // end of atl namespace
+}  // namespace atl

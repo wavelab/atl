@@ -104,4 +104,4 @@ TEST(ExtendedKalmanFilter, estimate) {
   output_file.close();
 }
 
-}  // end of atl namespace
+}  // namespace atl

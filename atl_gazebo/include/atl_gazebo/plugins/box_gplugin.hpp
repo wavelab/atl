@@ -23,6 +23,6 @@ public:
   void onUpdate(const gazebo::common::UpdateInfo &info);
 };
 
-}  // end of gaz namespace
-}  // end of atl namespace
+}  // namespace gaz
+}  // namespace atl
 #endif

@@ -26,5 +26,5 @@ public:
   void reset(void);
 };
 
-}  // end of atl namespace
+}  // namespace atl
 #endif

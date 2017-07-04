@@ -209,5 +209,5 @@ public:
   int8_t record(std::string output_path, int nb_samples);
 };
 
-}  // end of atl namespace
+}  // namespace atl
 #endif

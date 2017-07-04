@@ -48,5 +48,5 @@ public:
   void imageCallback(const sensor_msgs::ImageConstPtr &msg);
 };
 
-}  // end of atl namespace
+}  // namespace atl
 #endif

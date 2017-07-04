@@ -191,4 +191,4 @@ int mat2csv(std::string file_path, MatX data) {
   return 0;
 }
 
-}  // end of atl namespace
+}  // namespace atl

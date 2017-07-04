@@ -32,5 +32,5 @@ public:
   int run(void);
 };
 
-}  // end of atl namespace
+}  // namespace atl
 #endif

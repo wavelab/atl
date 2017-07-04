@@ -97,5 +97,5 @@ void two_wheel_measurement_model(ExtendedKalmanFilterTracker &ekf,
                                  VecX &h);
 
 
-}  // end of atl namespace
+}  // namespace atl
 #endif

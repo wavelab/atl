@@ -126,4 +126,4 @@ TEST(Utils_data, mat2csv) {
   }
 }
 
-}  // end of atl namespace
+}  // namespace atl

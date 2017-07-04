@@ -125,4 +125,4 @@ int Simulator::simulate(double dt, double tend, MatX U, MatX &X) {
 }
 
 
-}  // end of atl namespace
+}  // namespace atl

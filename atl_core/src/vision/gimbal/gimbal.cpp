@@ -254,4 +254,4 @@ void Gimbal::printSetpoints(void) {
   std::cout << "]" << std::endl;
 }
 
-}  // end of atl namespace
+}  // namespace atl

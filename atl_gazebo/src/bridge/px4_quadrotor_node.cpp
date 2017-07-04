@@ -1,4 +1,4 @@
-#include "atl_ros/nodes/px4_quadrotor_node.hpp"
+#include "atl_gazebo/bridge/px4_quadrotor_node.hpp"
 
 namespace atl {
 namespace ros {
@@ -12,7 +12,7 @@ int PX4QuadrotorNode::configure(const std::string &node_name, int hz) {
   ROSNode::registerPublisher<geometry_msgs::PoseStamped>(PX4_POSE_RTOPIC);
   ROSNode::registerPublisher<geometry_msgs::TwistStamped>(PX4_VELOCITY_RTOPIC);
   ROSNode::registerSubscriber(PX4_ATTITUDE_SETPOINT_RTOPIC, &PX4QuadrotorNode::attitudeSetpointCallback, this, 1);
-  ROSNode::registerSubscriber(PX4_THROTTLE_SETPOINT_RTOPIC, &PX4QuadrotorNode::throttleSetpointCallback, this), 1;
+  ROSNode::registerSubscriber(PX4_THROTTLE_SETPOINT_RTOPIC, &PX4QuadrotorNode::throttleSetpointCallback, this, 1);
   ROSNode::registerSubscriber(PX4_POSITION_SETPOINT_RTOPIC, &PX4QuadrotorNode::positionSetpointCallback, this, 1);
   ROSNode::registerSubscriber(PX4_VELOCITY_SETPOINT_RTOPIC, &PX4QuadrotorNode::velocitySetpointCallback, this, 1);
   // clang-format on
@@ -154,7 +154,7 @@ void PX4QuadrotorNode::velocitySetpointCallback(
   this->setVelocity(gaz_vel(0), gaz_vel(1), gaz_vel(2));
 }
 
-}  // end of ros namespace
-}  // end of atl namespace
+}  // namespace ros
+}  // namespace atl
 
-ROS_NODE_RUN(atl::ros::PX4QuadrotorNode, NODE_NAME, NODE_RATE);
+RUN_ROS_NODE(atl::ros::PX4QuadrotorNode, NODE_NAME, NODE_RATE);

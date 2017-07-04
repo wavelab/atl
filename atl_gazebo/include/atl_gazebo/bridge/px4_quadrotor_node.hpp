@@ -1,5 +1,5 @@
-#ifndef atl_ROS_NODES_PX4_QUADROTOR_NODE_HPP
-#define atl_ROS_NODES_PX4_QUADROTOR_NODE_HPP
+#ifndef ATL_GAZEBO_BRIDGE_PX4_QUADROTOR_NODE_HPP
+#define ATL_GAZEBO_BRIDGE_PX4_QUADROTOR_NODE_HPP
 
 #include <cmath>
 
@@ -12,16 +12,15 @@
 #include <geometry_msgs/TwistStamped.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 
-#include "wave/utils/utils.hpp"
-#include "atl_ros/utils/node.hpp"
-#include "atl_ros/utils/utils.hpp"
+#include "atl/utils/utils.hpp"
+#include "atl/ros/utils/node.hpp"
+#include "atl/ros/utils/msgs.hpp"
+#include "atl/ros/utils/utils.hpp"
 #include "atl_gazebo/clients/quadrotor_gclient.hpp"
 
 
 namespace atl {
 namespace ros {
-
-using namespace wave;
 
 // NODE SETTINGS
 #define NODE_NAME "atl_px4_quadrotor"
@@ -54,6 +53,6 @@ public:
   void velocitySetpointCallback(geometry_msgs::TwistStamped msg);
 };
 
-}  // end of ros namespace
-}  // end of atl namespace
+}  // namespace ros
+}  // namespace atl
 #endif

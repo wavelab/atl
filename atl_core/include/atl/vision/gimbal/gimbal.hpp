@@ -51,5 +51,5 @@ public:
   void printSetpoints(void);
 };
 
-}  // end of atl namespace
+}  // namespace atl
 #endif

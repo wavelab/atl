@@ -105,4 +105,4 @@ int I2C::writeBytes(char reg_addr, char *data, size_t length) {
   return 0;
 }
 
-}  // end of atl namespace
+}  // namespace atl

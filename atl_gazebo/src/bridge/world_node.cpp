@@ -1,4 +1,4 @@
-#include "atl_ros/nodes/world_node.hpp"
+#include "atl_gazebo/bridge/world_node.hpp"
 
 namespace atl {
 namespace ros {
@@ -69,10 +69,10 @@ void WorldNode::resetCallback(const std_msgs::Bool &msg) {
   }
 }
 
-void WorldNode::modelPoseCallback(const atl_ros::ModelPose &msg) {
+void WorldNode::modelPoseCallback(const atl_msgs::ModelPose &msg) {
   std::string model_name = msg.model_name.data;
-  Vec3 pos << msg.position.x, msg.position.y, msg.position.z;
-  Vec3 rpy << msg.orientation.x, msg.orientation.y, msg.orientation.z;
+  Vec3 pos{msg.position.x, msg.position.y, msg.position.z};
+  Vec3 rpy{msg.orientation.x, msg.orientation.y, msg.orientation.z};
   WorldGClient::setModelPose(model_name, pos, rpy);
 }
 
@@ -90,7 +90,7 @@ void WorldNode::clearWorldCallback(const std_msgs::Bool &msg) {
   }
 }
 
-}  // end of ros namespace
-}  // end of atl namespace
+}  // namespace ros
+}  // namespace atl
 
-ROS_NODE_RUN(atl::ros::WorldNode, NODE_NAME, NODE_RATE);
+RUN_ROS_NODE(atl::ros::WorldNode, NODE_NAME, NODE_RATE);

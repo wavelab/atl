@@ -1,5 +1,5 @@
-#ifndef atl_GAZEBO_CAMERA_CLIENT_HPP
-#define atl_GAZEBO_CAMERA_CLIENT_HPP
+#ifndef ATL_GAZEBO_CAMERA_CLIENT_HPP
+#define ATL_GAZEBO_CAMERA_CLIENT_HPP
 
 #include <string>
 #include <vector>
@@ -29,6 +29,6 @@ public:
   virtual void imageCallback(ConstImagePtr &msg);
 };
 
-}  // end of gaz namespace
-}  // end of atl namespace
+}  // namespace gaz
+}  // namespace atl
 #endif

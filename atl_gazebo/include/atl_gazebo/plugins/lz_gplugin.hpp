@@ -42,6 +42,6 @@ public:
   void angularVelocityCallback(ConstAnyPtr &msg);
 };
 
-}  // end of gaz namespace
-}  // end of atl namespace
+}  // namespace gaz
+}  // namespace atl
 #endif

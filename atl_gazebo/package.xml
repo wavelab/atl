@@ -11,11 +11,25 @@
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>rospy</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>message_runtime</build_depend>
+  <build_depend>image_transport</build_depend>
+  <build_depend>cv_bridge</build_depend>
   <build_depend>atl_core</build_depend>
+  <build_depend>atl_ros</build_depend>
+  <build_depend>atl_msgs</build_depend>
 
   <run_depend>roscpp</run_depend>
   <run_depend>rospy</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>geometry_msgs</run_depend>
+  <run_depend>message_runtime</run_depend>
+  <run_depend>image_transport</run_depend>
+  <run_depend>cv_bridge</run_depend>
   <run_depend>atl_core</run_depend>
+  <run_depend>atl_ros</run_depend>
+  <run_depend>atl_msgs</run_depend>
 
   <!-- license -->
   <license>LGPLv3</license>

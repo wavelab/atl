@@ -27,5 +27,5 @@ public:
   int measurementUpdate(VecX h, MatX H, VecX y);
 };
 
-}  // end of atl namespace
+}  // namespace atl
 #endif

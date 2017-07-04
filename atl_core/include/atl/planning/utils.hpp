@@ -10,5 +10,5 @@ std::vector<Eigen::Vector2d> bezier_cubic_curve(Eigen::Vector2d p0,
                                                 Eigen::Vector2d p2,
                                                 Eigen::Vector2d p3);
 
-}  // end of atl namespace
+}  // namespace atl
 #endif

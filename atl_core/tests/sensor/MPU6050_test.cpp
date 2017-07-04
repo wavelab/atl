@@ -11,4 +11,4 @@ TEST(MPU6050, configure) {
   ASSERT_EQ(0.0, retval);
 }
 
-}  // end of atl namespace
+}  // namespace atl

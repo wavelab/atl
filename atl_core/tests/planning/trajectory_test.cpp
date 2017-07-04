@@ -238,4 +238,4 @@ TEST(Trajectory, trajectory_constraint_func) {
 //   trajectory_record_optimization(TEST_OPTIMIZED_OUTPUT_FILE, x, 100);
 // }
 
-}  // end of atl namespace
+}  // namespace atl

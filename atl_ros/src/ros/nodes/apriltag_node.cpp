@@ -194,6 +194,6 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
   this->publishTargetBodyYawMsg(tags[0]);
 }
 
-}  // end of atl namespace
+}  // namespace atl
 
 RUN_ROS_NODE(atl::AprilTagNode, NODE_NAME, NODE_RATE);

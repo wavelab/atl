@@ -54,4 +54,4 @@ int ExtendedKalmanFilter::measurementUpdate(VecX h, MatX H, VecX y) {
   return 0;
 }
 
-}  // end of atl namespace
+}  // namespace atl

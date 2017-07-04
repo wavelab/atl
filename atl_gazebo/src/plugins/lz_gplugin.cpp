@@ -119,5 +119,5 @@ void LZGPlugin::angularVelocityCallback(ConstAnyPtr &msg) {
 }
 
 GZ_REGISTER_MODEL_PLUGIN(LZGPlugin)
-}  // end of gaz namespace
-}  // end of atl namespace
+}  // namespace gaz
+}  // namespace atl

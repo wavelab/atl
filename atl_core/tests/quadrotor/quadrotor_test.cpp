@@ -201,4 +201,4 @@ TEST(Quadrotor, conditionsMet) {
   ASSERT_TRUE(quadrotor.conditionsMet(conditions, 3));
 }
 
-}  // end of atl namespace
+}  // namespace atl

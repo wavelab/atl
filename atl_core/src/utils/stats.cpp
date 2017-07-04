@@ -48,4 +48,4 @@ int linreg(std::vector<Vec2> pts, double *m, double *c, double *r) {
   return 0;
 }
 
-}  // end of atl namespace
+}  // namespace atl

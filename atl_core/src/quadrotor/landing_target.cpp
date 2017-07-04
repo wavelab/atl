@@ -61,4 +61,4 @@ void LandingTarget::update(bool detected) {
   this->isTargetLosted();
 }
 
-}  // end of atl namespace
+}  // namespace atl

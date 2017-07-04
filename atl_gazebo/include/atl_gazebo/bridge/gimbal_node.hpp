@@ -1,5 +1,5 @@
-#ifndef atl_ROS_NODES_GIMBAL_NODE_HPP
-#define atl_ROS_NODES_GIMBAL_NODE_HPP
+#ifndef ATL_GAZEBO_BRIDGE_GIMBAL_NODE_HPP
+#define ATL_GAZEBO_BRIDGE_GIMBAL_NODE_HPP
 
 #include <Eigen/Geometry>
 
@@ -9,14 +9,13 @@
 #include <geometry_msgs/Quaternion.h>
 #include <geometry_msgs/PoseStamped.h>
 
-#include "atl_ros/utils/node.hpp"
+#include "atl/utils/utils.hpp"
+#include "atl/ros/utils/node.hpp"
 #include "atl_gazebo/clients/gimbal_gclient.hpp"
 
 
 namespace atl {
 namespace ros {
-
-using namespace wave;
 
 #define ROLL_JOINT "quad_with_gimbal_cam::gimbal_camera::roll_motor_joint"
 #define PITCH_JOINT "quad_with_gimbal_cam::gimbal_camera::pitch_motor_joint"
@@ -50,6 +49,6 @@ public:
   void trackTargetCallback(const geometry_msgs::Vector3 msg);
 };
 
-}  // end of ros namespace
-}  // end of atl namespace
+}  // namespace ros
+}  // namespace atl
 #endif

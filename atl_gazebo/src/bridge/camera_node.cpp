@@ -1,4 +1,4 @@
-#include "atl_ros/nodes/camera_node.hpp"
+#include "atl_gazebo/bridge/camera_node.hpp"
 
 namespace atl {
 namespace ros {
@@ -117,7 +117,7 @@ void CameraNode::imageCallback(ConstImagePtr &msg) {
   }
 }
 
-}  // end of ros namespace
-}  // end of atl namespace
+}  // namespace ros
+}  // namespace atl
 
-ROS_NODE_RUN(atl::ros::CameraNode, NODE_NAME, NODE_RATE);
+RUN_ROS_NODE(atl::ros::CameraNode, NODE_NAME, NODE_RATE);

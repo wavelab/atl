@@ -200,4 +200,4 @@ int trajectory_record_optimization(std::string file_path,
   return 0;
 }
 
-}  // end of atl namespace
+}  // namespace atl

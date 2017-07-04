@@ -46,6 +46,6 @@ public:
                   const std::string &format);
 };
 
-}  // end of gaz namespace
-}  // end of atl namespace
+}  // namespace gaz
+}  // namespace atl
 #endif

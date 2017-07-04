@@ -176,4 +176,4 @@ int KalmanFilterTracker::estimate(MatX A, VecX y) {
   return 0;
 }
 
-}  // end of atl namespace
+}  // namespace atl

@@ -1,4 +1,4 @@
-#include "atl_ros/nodes/dji_quadrotor_node.hpp"
+#include "atl_gazebo/bridge/dji_quadrotor_node.hpp"
 
 
 namespace atl {
@@ -105,7 +105,7 @@ bool DJIQuadrotorNode::attitudeControlCallback(
   return true;
 }
 
-}  // end of ros namespace
-}  // end of atl namespace
+}  // namespace ros
+}  // namespace atl
 
-ROS_NODE_RUN(atl::ros::DJIQuadrotorNode, NODE_NAME, NODE_RATE);
+RUN_ROS_NODE(atl::ros::DJIQuadrotorNode, NODE_NAME, NODE_RATE);

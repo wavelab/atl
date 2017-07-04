@@ -64,5 +64,5 @@ int trajectory_record_optimization(std::string file_path,
                                    int nb_rows);
 
 
-}  // end of atl namespace
+}  // namespace atl
 #endif

@@ -33,5 +33,5 @@ public:
   int obtainPose(AprilTags::TagDetection tag, TagPose &tag_pose);
 };
 
-}  // end of atl namespace
+}  // namespace atl
 #endif

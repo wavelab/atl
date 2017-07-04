@@ -1,4 +1,4 @@
-#include "atl_ros/nodes/lz_node.hpp"
+#include "atl_gazebo/bridge/lz_node.hpp"
 
 namespace atl {
 namespace ros {
@@ -59,7 +59,7 @@ void LZNode::angularVelocityCallback(const std_msgs::Float64 &msg) {
   this->setAngularVelocity(msg.data);
 }
 
-}  // end of ros namespace
-}  // end of atl namespace
+}  // namespace ros
+}  // namespace atl
 
-ROS_NODE_RUN(atl::ros::LZNode, NODE_NAME, NODE_RATE);
+RUN_ROS_NODE(atl::ros::LZNode, NODE_NAME, NODE_RATE);

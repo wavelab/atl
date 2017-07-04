@@ -28,5 +28,5 @@ public:
 };
 ;
 
-}  // end of atl namespace
+}  // namespace atl
 #endif

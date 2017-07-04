@@ -14,7 +14,7 @@ int EstimatorNode::configure(std::string node_name, int hz) {
   this->quad_velocity << 0, 0, 0;
 
   // estimator
-  ROS_GET_PARAM("/tracker_mode", this->mode);
+  ROS_GET_PARAM("/estimator/tracker_mode", this->mode);
   ROS_GET_PARAM("/quad_frame", this->quad_frame);
   this->initialized = false;
   this->state = ESTIMATOR_OFF;
@@ -436,6 +436,6 @@ int EstimatorNode::loopCallback(void) {
   return 0;
 }
 
-}  // end of atl namespace
+}  // namespace atl
 
 RUN_ROS_NODE(atl::EstimatorNode, NODE_NAME, NODE_RATE);

@@ -45,5 +45,5 @@ public:
   void printTag(TagPose tag);
 };
 
-}  // end of atl namespace
+}  // namespace atl
 #endif

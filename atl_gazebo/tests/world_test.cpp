@@ -81,8 +81,8 @@ TEST_F(WorldTest, ClearAndLoadWorld) {
   this->client.loadWorld("worlds/quadrotor_test.world");
 }
 
-}  // end of gaz namespace
-}  // end of atl namespace
+}  // namespace gaz
+}  // namespace atl
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);

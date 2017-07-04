@@ -153,4 +153,4 @@ TEST(PointGreyCamera, run) {
   camera.run();
 }
 
-}  // end of atl namespace
+}  // namespace atl

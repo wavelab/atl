@@ -49,5 +49,5 @@ public:
   int loopCallback(void);
 };
 
-}  // end of atl namespace
+}  // namespace atl
 #endif

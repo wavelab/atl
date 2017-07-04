@@ -126,6 +126,6 @@ int XimeaCameraNode::loopCallback(void) {
   return 0;
 }
 
-}  // end of atl namespace
+}  // namespace atl
 
 RUN_ROS_NODE(atl::XimeaCameraNode, NODE_NAME, NODE_RATE);

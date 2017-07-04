@@ -1,20 +1,18 @@
-#ifndef atl_ROS_NODES_LZ_NODE_HPP
-#define atl_ROS_NODES_LZ_NODE_HPP
+#ifndef ATL_GAZEBO_BRIDGE_LZ_NODE_HPP
+#define ATL_GAZEBO_BRIDGE_LZ_NODE_HPP
 
 #include <ros/ros.h>
 #include <std_msgs/Float64.h>
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/Vector3.h>
 
-#include "wave/utils/utils.hpp"
-#include "atl_ros/utils/node.hpp"
+#include "atl/utils/utils.hpp"
+#include "atl/ros/utils/node.hpp"
 #include "atl_gazebo/clients/lz_gclient.hpp"
 
 
 namespace atl {
 namespace ros {
-
-using namespace wave;
 
 // NODE SETTINGS
 #define NODE_NAME "atl_lz"
@@ -38,6 +36,6 @@ public:
   void angularVelocityCallback(const std_msgs::Float64 &msg);
 };
 
-}  // end of ros namespace
-}  // end of atl namespace
+}  // namespace ros
+}  // namespace atl
 #endif

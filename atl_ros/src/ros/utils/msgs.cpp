@@ -343,4 +343,4 @@ int convertMsg(atl_msgs::TCtrlSettings msg, TrackingController &tc) {
 //   return 0;
 // }
 
-}  // end of atl namespace
+}  // namespace atl

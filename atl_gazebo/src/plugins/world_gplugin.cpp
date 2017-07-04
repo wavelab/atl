@@ -92,5 +92,5 @@ void WorldGPlugin::worldClearCallback(ConstRequestPtr &msg) {
 }
 
 GZ_REGISTER_WORLD_PLUGIN(WorldGPlugin)
-}  // end of gaz namespace
-}  // end of atl namespace
+}  // namespace gaz
+}  // namespace atl

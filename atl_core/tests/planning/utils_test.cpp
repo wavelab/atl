@@ -23,4 +23,4 @@ TEST(BezierCubicCurve, test) {
   }
 }
 
-}  // end of atl namespace
+}  // namespace atl

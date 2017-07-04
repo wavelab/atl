@@ -94,5 +94,5 @@ void DFCameraGPlugin::onNewFrame(const unsigned char *image,
 }
 
 GZ_REGISTER_SENSOR_PLUGIN(DFCameraGPlugin)
-}  // end of gaz namespace
+}  // namespace gaz
 }  // end of atl namepspace

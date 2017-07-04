@@ -151,4 +151,4 @@ TEST(MITDetector, maskImage) {
   // cv::waitKey(100000);
 }
 
-}  // end of atl namespace
+}  // namespace atl

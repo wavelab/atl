@@ -621,4 +621,4 @@ TEST(Utils_math, linear_interpolation) {
 
 }
 
-}  // end of atl namespace
+}  // namespace atl

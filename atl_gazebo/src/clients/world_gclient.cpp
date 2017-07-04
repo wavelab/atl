@@ -246,5 +246,5 @@ void WorldGClient::worldStatsCallback(ConstWorldStatisticsPtr &msg) {
   this->time.iterations = msg->iterations();
 }
 
-}  // end of gaz namespace
-}  // end of atl namespace
+}  // namespace gaz
+}  // namespace atl

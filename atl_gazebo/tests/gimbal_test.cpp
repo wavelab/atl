@@ -46,8 +46,8 @@ TEST_F(GimbalTest, setRollPitch) {
   this->client->setAttitude(euler_if);
 }
 
-}  // end of gaz namespace
-}  // end of atl namespace
+}  // namespace gaz
+}  // namespace atl
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);

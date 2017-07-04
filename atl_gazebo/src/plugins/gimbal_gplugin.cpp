@@ -26,7 +26,7 @@ void GimbalGPlugin::Load(gazebo::physics::ModelPtr model,
   this->gimbal.states(2) = this->pitch_joint->Position(0);
   this->gimbal.joint_setpoints(0) = 0.0;
   this->gimbal.joint_setpoints(1) = 0.0;
-  this->gimbal.joint_setpoints(2) = 0.0;
+  // this->gimbal.joint_setpoints(2) = 0.0;
 
   // gazebo node
   // clang-format off
@@ -44,19 +44,19 @@ void GimbalGPlugin::simulate(double dt) {
     return;
   }
 
-  // set gimbal frame orientation
-  ignition::math::Pose3d pose = this->model->WorldPose();
-  Quaternion q{pose.Rot().W(), pose.Rot().X(), pose.Rot().Y(), pose.Rot().Z()};
-  this->gimbal.setFrameOrientation(q);
-
-  // attitude control and update
-  Vec2 motor_inputs = this->gimbal.attitudeControllerControl(dt);
-  this->gimbal.update(motor_inputs, dt);
-
-  // set model pose
-  Vec4 gimbal_state = this->gimbal.getState();
-  this->roll_joint->SetPosition(0, gimbal_state(0));
-  this->pitch_joint->SetPosition(0, gimbal_state(2));
+  // // set gimbal frame orientation
+  // ignition::math::Pose3d pose = this->model->WorldPose();
+  // Quaternion q{pose.Rot().W(), pose.Rot().X(), pose.Rot().Y(), pose.Rot().Z()};
+  // this->gimbal.setFrameOrientation(q);
+  //
+  // // attitude control and update
+  // Vec2 motor_inputs = this->gimbal.attitudeControllerControl(dt);
+  // this->gimbal.update(motor_inputs, dt);
+  //
+  // // set model pose
+  // Vec4 gimbal_state = this->gimbal.getState();
+  // this->roll_joint->SetPosition(0, gimbal_state(0));
+  // this->pitch_joint->SetPosition(0, gimbal_state(2));
 }
 
 void GimbalGPlugin::onUpdate(const gazebo::common::UpdateInfo &info) {
@@ -131,5 +131,5 @@ void GimbalGPlugin::trackTargetCallback(ConstVector3dPtr &msg) {
 }
 
 GZ_REGISTER_MODEL_PLUGIN(GimbalGPlugin)
-}  // end of gaz namespace
-}  // end of atl namespace
+}  // namespace gaz
+}  // namespace atl

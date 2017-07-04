@@ -427,4 +427,4 @@ int Quadrotor::step(double dt) {
   return retval;
 }
 
-}  // end of atl namespace
+}  // namespace atl

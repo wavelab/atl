@@ -33,5 +33,5 @@ public:
   int obtainPose(TagDetection tag, TagPose &tag_pose);
 };
 
-}  // end of atl namespace
+}  // namespace atl
 #endif

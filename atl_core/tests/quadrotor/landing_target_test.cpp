@@ -175,4 +175,4 @@ TEST(LandingTarget, update) {
   ASSERT_EQ(0, landing_target.last_seen.tv_nsec);
 }
 
-}  // end of atl namespace
+}  // namespace atl

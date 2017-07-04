@@ -113,7 +113,7 @@ TEST_F(NodeTest, bodyMsg) {
   ASSERT_NEAR(-3.0, this->body_msg.z, 0.2);
 }
 
-}  // end of atl namespace
+}  // namespace atl
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);

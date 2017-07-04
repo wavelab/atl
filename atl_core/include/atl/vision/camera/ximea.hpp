@@ -34,5 +34,5 @@ public:
   int checkState(XI_RETURN retval, std::string where);
 };
 
-}  // end of atl namespace
+}  // namespace atl
 #endif

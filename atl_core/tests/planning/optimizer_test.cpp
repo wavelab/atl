@@ -11,4 +11,4 @@ TEST(POpt, test) {
 }
 
 
-}  // end of atl namespace
+}  // namespace atl

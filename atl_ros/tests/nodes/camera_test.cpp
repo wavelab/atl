@@ -46,7 +46,7 @@ TEST_F(NodeTest, poseMsg) {
   ASSERT_EQ(480, this->image.rows);
 }
 
-}  // end of atl namespace
+}  // namespace atl
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);

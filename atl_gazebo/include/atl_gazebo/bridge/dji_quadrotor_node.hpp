@@ -1,5 +1,5 @@
-#ifndef atl_ROS_NODES_DJI_QUADROTOR_NODE_HPP
-#define atl_ROS_NODES_DJI_QUADROTOR_NODE_HPP
+#ifndef ATL_GAZEBO_BRIDGE_DJI_QUADROTOR_NODE_HPP
+#define ATL_GAZEBO_BRIDGE_DJI_QUADROTOR_NODE_HPP
 
 #include <cmath>
 #include <random>
@@ -20,9 +20,8 @@
 #include <dji_sdk/AttitudeQuaternion.h>
 #include <dji_sdk/Velocity.h>
 
-#include "wave/utils/utils.hpp"
-#include "atl_ros/utils/node.hpp"
-#include "atl_ros/utils/utils.hpp"
+#include "atl/utils/utils.hpp"
+#include "atl/ros/utils/node.hpp"
 #include "atl_gazebo/clients/quadrotor_gclient.hpp"
 
 
@@ -51,6 +50,6 @@ public:
                                dji_sdk::AttitudeControl::Response &response);
 };
 
-}  // end of ros namespace
-}  // end of atl namespace
+}  // namespace ros
+}  // namespace atl
 #endif

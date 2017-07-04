@@ -145,4 +145,4 @@ TEST(Simulator, simulate) {
   // ASSERT_TRUE(sim.vel_error > 0);
 }
 
-}  // end of atl namespace
+}  // namespace atl

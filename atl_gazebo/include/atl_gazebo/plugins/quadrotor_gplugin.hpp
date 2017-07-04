@@ -7,14 +7,12 @@
 #include <gazebo/common/common.hh>
 #include <gazebo/physics/physics.hh>
 
-#include "wave/utils/utils.hpp"
-#include "wave/kinematics/quadrotor.hpp"
+#include "atl/utils/utils.hpp"
+#include "atl_gazebo/kinematics/quadrotor.hpp"
 #include "atl_gazebo/gazebo_node.hpp"
 
 namespace atl {
 namespace gaz {
-
-using namespace wave;
 
 #define POSE_MSG atl_msgs::msgs::RPYPose
 #define VELOCITY_MSG gazebo::msgs::Vector3d
@@ -49,6 +47,6 @@ public:
   void setVelocityCallback(VelocitySetpointPtr &msg);
 };
 
-}  // end of gaz namespace
-}  // end of atl namespace
+}  // namespace gaz
+}  // namespace atl
 #endif

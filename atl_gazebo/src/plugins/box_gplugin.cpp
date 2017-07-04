@@ -18,10 +18,10 @@ void BoxGPlugin::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
 }
 
 void BoxGPlugin::onUpdate(const gazebo::common::UpdateInfo &info) {
-  this->model->SetLinearVel(gazebo::math::Vector3(0.0, 0.0, 0.1));
-  this->model->SetAngularVel(gazebo::math::Vector3(0.0, 0.0, 0.2));
+  this->model->SetLinearVel(ignition::math::Vector3d(0.0, 0.0, 0.1));
+  this->model->SetAngularVel(ignition::math::Vector3d(0.0, 0.0, 0.2));
 }
 
 GZ_REGISTER_MODEL_PLUGIN(BoxGPlugin)
-}  // end of gaz namespace
-}  // end of atl namespace
+}  // namespace gaz
+}  // namespace atl

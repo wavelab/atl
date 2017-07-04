@@ -157,5 +157,5 @@ public:
   int loop(void);
 };
 
-}  // end of atl namespace
+}  // namespace atl
 #endif

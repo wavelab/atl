@@ -229,4 +229,4 @@ void BaseDetector::printTag(TagPose tag) {
   std::cout << std::endl;
 }
 
-}  // end of atl namespace
+}  // namespace atl

@@ -75,5 +75,5 @@ void CameraGPlugin::onNewFrame(const unsigned char *image_raw,
 }
 
 GZ_REGISTER_SENSOR_PLUGIN(CameraGPlugin)
-}  // end of gaz namespace
+}  // namespace gaz
 }  // end of atl namepspace

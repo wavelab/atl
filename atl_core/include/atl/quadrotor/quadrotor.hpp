@@ -93,5 +93,5 @@ public:
   int step(double dt);
 };
 
-}  // end of atl namespace
+}  // namespace atl
 #endif

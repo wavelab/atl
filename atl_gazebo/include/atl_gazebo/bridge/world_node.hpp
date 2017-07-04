@@ -1,5 +1,5 @@
-#ifndef atl_ROS_NODES_WORLD_NODE_HPP
-#define atl_ROS_NODES_WORLD_NODE_HPP
+#ifndef ATL_GAZEBO_BRIDGE_WORLD_NODE_HPP
+#define ATL_GAZEBO_BRIDGE_WORLD_NODE_HPP
 
 #include <stdlib.h>
 
@@ -10,14 +10,13 @@
 #include <geometry_msgs/Vector3.h>
 #include <rosgraph_msgs/Clock.h>
 
-#include "atl_ros/ModelPose.h"
-#include "atl_ros/utils/node.hpp"
+#include "atl/utils/utils.hpp"
+#include "atl/ros/utils/node.hpp"
+#include "atl/ros/utils/msgs.hpp"
 #include "atl_gazebo/clients/world_gclient.hpp"
 
 namespace atl {
 namespace ros {
-
-using namespace wave;
 
 // NODE SETTINGS
 #define NODE_NAME "atl_world"
@@ -44,11 +43,11 @@ public:
   void pauseCallback(const std_msgs::Bool &msg);
   void unPauseCallback(const std_msgs::Bool &msg);
   void resetCallback(const std_msgs::Bool &msg);
-  void modelPoseCallback(const atl_ros::ModelPose &msg);
+  void modelPoseCallback(const atl_msgs::ModelPose &msg);
   void loadWorldCallback(const std_msgs::String &msg);
   void clearWorldCallback(const std_msgs::Bool &msg);
 };
 
-}  // end of ros namespace
-}  // end of atl namespace
+}  // namespace ros
+}  // namespace atl
 #endif

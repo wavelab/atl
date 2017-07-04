@@ -1,10 +1,6 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.3)
 PROJECT(atl_msgs)
 
-IF (CMAKE_COMPILER_IS_GNUCXX)
-    ADD_DEFINITIONS(-std=gnu++0x)
-ENDIF()
-
 # DEPENDENCIES
 FIND_PACKAGE(
     catkin
@@ -22,6 +18,7 @@ ADD_MESSAGE_FILES(
     FILES
     AprilTagPose.msg
     LCtrlSettings.msg
+    ModelPose.msg
     PCtrlStats.msg
     PCtrlSettings.msg
     PIDSettings.msg

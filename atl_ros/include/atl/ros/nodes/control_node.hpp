@@ -134,5 +134,5 @@ public:
   void publishStats(void);
 };
 
-}  // end of atl namespace
+}  // namespace atl
 #endif
