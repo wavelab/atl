@@ -1,6 +1,6 @@
-#include "wavesim_ros/nodes/lz_node.hpp"
+#include "atl_ros/nodes/lz_node.hpp"
 
-namespace wavesim {
+namespace atl {
 namespace ros {
 
 int LZNode::configure(const std::string &node_name, int hz) {
@@ -60,6 +60,6 @@ void LZNode::angularVelocityCallback(const std_msgs::Float64 &msg) {
 }
 
 }  // end of ros namespace
-}  // end of wavesim namespace
+}  // end of atl namespace
 
-ROS_NODE_RUN(wavesim::ros::LZNode, NODE_NAME, NODE_RATE);
+ROS_NODE_RUN(atl::ros::LZNode, NODE_NAME, NODE_RATE);

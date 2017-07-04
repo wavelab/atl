@@ -1,7 +1,7 @@
-#include "wavesim_gazebo/clients/camera_gclient.hpp"
+#include "atl_gazebo/clients/camera_gclient.hpp"
 
 
-namespace wavesim {
+namespace atl {
 namespace gaz {
 
 CameraGClient::CameraGClient(void) {
@@ -55,4 +55,4 @@ void CameraGClient::imageCallback(ConstImagePtr &msg) {
 }
 
 }  // end of gaz namespace
-}  // end of wavesim namespace
+}  // end of atl namespace

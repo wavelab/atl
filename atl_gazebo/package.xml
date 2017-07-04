@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <package>
   <!-- details -->
-  <name>wavesim_gazebo</name>
+  <name>atl_gazebo</name>
   <version>0.0.1</version>
-  <description>The wavesim_gazebo package</description>
+  <description>ATL gazebo package</description>
   <maintainer email="chutsu@gmail.com">Chris Choi</maintainer>
   <maintainer email="stan.j.brown@gmail.com">Stan Brown</maintainer>
 
@@ -11,9 +11,11 @@
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>rospy</build_depend>
+  <build_depend>atl_core</build_depend>
 
   <run_depend>roscpp</run_depend>
   <run_depend>rospy</run_depend>
+  <run_depend>atl_core</run_depend>
 
   <!-- license -->
   <license>LGPLv3</license>

@@ -1,7 +1,7 @@
-#include "wavesim_gazebo/plugins/lz_gplugin.hpp"
+#include "atl_gazebo/plugins/lz_gplugin.hpp"
 
 
-namespace wavesim {
+namespace atl {
 namespace gaz {
 
 LZGPlugin::LZGPlugin(void) {
@@ -9,8 +9,6 @@ LZGPlugin::LZGPlugin(void) {
 }
 
 void LZGPlugin::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
-  gazebo::math::Pose pose;
-
   // clang-format off
   this->model = model;
   this->update_conn = gazebo::event::Events::ConnectWorldUpdateBegin(
@@ -19,10 +17,10 @@ void LZGPlugin::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
   // clang-format on
 
   // initialize robot
-  pose = this->model->GetWorldPose();
-  this->robot_states(0) = pose.pos.x;  // position x
-  this->robot_states(1) = pose.pos.y;  // position y
-  this->robot_states(2) = pose.rot.z;  // heading
+  ignition::math::Pose3d pose = this->model->WorldPose();
+  this->robot_states(0) = pose.Pos().X();  // position x
+  this->robot_states(1) = pose.Pos().Y();  // position y
+  this->robot_states(2) = pose.Rot().Z();  // heading
   this->robot_inputs(0) = 0.0;         // velocity
   this->robot_inputs(1) = 0.0;         // angular velocity
 
@@ -37,7 +35,6 @@ void LZGPlugin::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
 }
 
 void LZGPlugin::onUpdate(const gazebo::common::UpdateInfo &info) {
-  gazebo::math::Pose pose;
   gazebo::common::Time diff;
   double dt;
   Vec3 x, u, euler;
@@ -66,9 +63,9 @@ void LZGPlugin::onUpdate(const gazebo::common::UpdateInfo &info) {
   this->robot_states = x;
 
   // set robot pose
-  pose = this->model->GetWorldPose();
-  pose.pos.x = this->robot_states(0);
-  pose.pos.y = this->robot_states(1);
+  ignition::math::Pose3d pose = this->model->WorldPose();
+  pose.Pos().X() = this->robot_states(0);
+  pose.Pos().Y() = this->robot_states(1);
 
   // make yaw be between +/- 180.0
   euler << 0.0, 0.0, this->robot_states(2);
@@ -76,39 +73,36 @@ void LZGPlugin::onUpdate(const gazebo::common::UpdateInfo &info) {
 
   // convert to quaternion
   euler2quat(euler, 321, q);
-  pose.rot.z = q.z();
+  pose.Rot().Z() = q.z();
 
   this->model->SetWorldPose(pose);
   this->publishPose();
 }
 
 void LZGPlugin::publishPose(void) {
-  gazebo::msgs::Pose msg;
-  gazebo::math::Pose pose;
+  ignition::math::Pose3d pose = this->model->WorldPose();
 
-  pose = this->model->GetWorldPose();
-  msg.mutable_position()->set_x(pose.pos.x);
-  msg.mutable_position()->set_y(pose.pos.y);
-  msg.mutable_position()->set_z(pose.pos.z);
-  msg.mutable_orientation()->set_w(pose.rot.w);
-  msg.mutable_orientation()->set_x(pose.rot.x);
-  msg.mutable_orientation()->set_y(pose.rot.y);
-  msg.mutable_orientation()->set_z(pose.rot.z);
+  gazebo::msgs::Pose msg;
+  msg.mutable_position()->set_x(pose.Pos().X());
+  msg.mutable_position()->set_y(pose.Pos().Y());
+  msg.mutable_position()->set_z(pose.Pos().Z());
+  msg.mutable_orientation()->set_w(pose.Rot().W());
+  msg.mutable_orientation()->set_x(pose.Rot().X());
+  msg.mutable_orientation()->set_y(pose.Rot().Y());
+  msg.mutable_orientation()->set_z(pose.Rot().Z());
 
   this->gaz_pubs[POSE_GTOPIC]->Publish(msg);
 }
 
 void LZGPlugin::positionCallback(ConstVector3dPtr &msg) {
-  gazebo::math::Pose pose;
-
   // parse msg and set robot position in model
   this->robot_states(0) = msg->x();
   this->robot_states(1) = msg->y();
 
   // set robot position in gazebo
-  pose = this->model->GetWorldPose();
-  pose.pos.x = this->robot_states(0);
-  pose.pos.y = this->robot_states(1);
+  ignition::math::Pose3d pose = this->model->WorldPose();
+  pose.Pos().X() = this->robot_states(0);
+  pose.Pos().Y() = this->robot_states(1);
   this->model->SetWorldPose(pose);
 }
 
@@ -126,4 +120,4 @@ void LZGPlugin::angularVelocityCallback(ConstAnyPtr &msg) {
 
 GZ_REGISTER_MODEL_PLUGIN(LZGPlugin)
 }  // end of gaz namespace
-}  // end of wavesim namespace
+}  // end of atl namespace

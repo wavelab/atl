@@ -1,6 +1,6 @@
-#include "wavesim_ros/nodes/world_node.hpp"
+#include "atl_ros/nodes/world_node.hpp"
 
-namespace wavesim {
+namespace atl {
 namespace ros {
 
 int WorldNode::configure(const std::string &node_name, int hz) {
@@ -69,7 +69,7 @@ void WorldNode::resetCallback(const std_msgs::Bool &msg) {
   }
 }
 
-void WorldNode::modelPoseCallback(const wavesim_ros::ModelPose &msg) {
+void WorldNode::modelPoseCallback(const atl_ros::ModelPose &msg) {
   std::string model_name = msg.model_name.data;
   Vec3 pos << msg.position.x, msg.position.y, msg.position.z;
   Vec3 rpy << msg.orientation.x, msg.orientation.y, msg.orientation.z;
@@ -91,6 +91,6 @@ void WorldNode::clearWorldCallback(const std_msgs::Bool &msg) {
 }
 
 }  // end of ros namespace
-}  // end of wavesim namespace
+}  // end of atl namespace
 
-ROS_NODE_RUN(wavesim::ros::WorldNode, NODE_NAME, NODE_RATE);
+ROS_NODE_RUN(atl::ros::WorldNode, NODE_NAME, NODE_RATE);

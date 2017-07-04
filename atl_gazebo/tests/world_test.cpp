@@ -1,13 +1,13 @@
 #include <gtest/gtest.h>
 
 #include "test_settings.hpp"
-#include "wavesim_gazebo/gazebo_test.hpp"
-#include "wavesim_gazebo/clients/world_gclient.hpp"
+#include "atl_gazebo/gazebo_test.hpp"
+#include "atl_gazebo/clients/world_gclient.hpp"
 
 #define TEST_WORLD "tests/worlds/world_test.world"
 
 
-namespace wavesim {
+namespace atl {
 namespace gaz {
 
 class WorldTest : public ::testing::Test {
@@ -17,7 +17,7 @@ protected:
 
   WorldTest(void) {
     // setup gazebo world
-    this->test_world = "wavesim_gazebo/" + std::string(TEST_WORLD);
+    this->test_world = "atl_gazebo/" + std::string(TEST_WORLD);
 
     // setup world client
     if (this->client.configure() == -1) {
@@ -82,7 +82,7 @@ TEST_F(WorldTest, ClearAndLoadWorld) {
 }
 
 }  // end of gaz namespace
-}  // end of wavesim namespace
+}  // end of atl namespace
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);

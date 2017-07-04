@@ -1,7 +1,7 @@
-#include "wavesim_gazebo/clients/gimbal_gclient.hpp"
+#include "atl_gazebo/clients/gimbal_gclient.hpp"
 
 
-namespace wavesim {
+namespace atl {
 namespace gaz {
 
 GimbalGClient::GimbalGClient(void) {
@@ -71,4 +71,4 @@ void GimbalGClient::jointOrientationCallback(ConstQuaternionPtr &msg) {
 }
 
 }  // end of gaz namespace
-}  // end of wavesim namespace
+}  // end of atl namespace

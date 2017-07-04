@@ -1,14 +1,14 @@
 #include <gtest/gtest.h>
 
 #include "test_settings.hpp"
-#include "wavesim_gazebo/gazebo_test.hpp"
-#include "wavesim_gazebo/clients/camera_gclient.hpp"
+#include "atl_gazebo/gazebo_test.hpp"
+#include "atl_gazebo/clients/camera_gclient.hpp"
 
 #define TEST_IMAGE "tests/data/camera_test.png"
 #define TEST_WORLD "tests/worlds/camera_test.world"
 
 
-namespace wavesim {
+namespace atl {
 namespace gaz {
 
 class CameraTest : public ::testing::Test {
@@ -19,7 +19,7 @@ protected:
   std::string test_world;
 
   CameraTest(void) {
-    this->test_world = "wavesim_gazebo/" + std::string(TEST_WORLD);
+    this->test_world = "atl_gazebo/" + std::string(TEST_WORLD);
   }
 
   virtual ~CameraTest(void) {
@@ -64,7 +64,7 @@ TEST_F(CameraTest, test) {
 }
 
 }  // end of gaz namespace
-}  // end of wavesim namespace
+}  // end of atl namespace
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);

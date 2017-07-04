@@ -1,7 +1,7 @@
-#include "wavesim_gazebo/clients/quadrotor_gclient.hpp"
+#include "atl_gazebo/clients/quadrotor_gclient.hpp"
 
 
-namespace wavesim {
+namespace atl {
 namespace gaz {
 
 QuadrotorGClient::QuadrotorGClient(void) {
@@ -127,4 +127,4 @@ int QuadrotorGClient::setVelocity(double vx, double vy, double vz) {
 }
 
 }  // end of gaz namespace
-}  // end of wavesim namespace
+}  // end of atl namespace

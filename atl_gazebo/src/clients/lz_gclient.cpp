@@ -1,7 +1,7 @@
-#include "wavesim_gazebo/clients/lz_gclient.hpp"
+#include "atl_gazebo/clients/lz_gclient.hpp"
 
 
-namespace wavesim {
+namespace atl {
 namespace gaz {
 
 LZGClient::LZGClient(void) {
@@ -69,4 +69,4 @@ void LZGClient::setAngularVelocity(double ang_vel) {
 }
 
 }  // end of gaz namespace
-}  // end of wavesim namespace
+}  // end of atl namespace

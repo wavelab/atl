@@ -1,13 +1,13 @@
 #include <gtest/gtest.h>
 
 #include "test_settings.hpp"
-#include "wavesim_gazebo/gazebo_test.hpp"
-#include "wavesim_gazebo/clients/quadrotor_gclient.hpp"
+#include "atl_gazebo/gazebo_test.hpp"
+#include "atl_gazebo/clients/quadrotor_gclient.hpp"
 
 #define TEST_WORLD "/quadrotor_test.world"
 
 
-namespace wavesim {
+namespace atl {
 namespace gaz {
 
 class QuadrotorTest : public ::testing::Test {
@@ -77,7 +77,7 @@ TEST_F(QuadrotorTest, setPosition) {
 // }
 
 }  // end of gaz namespace
-}  // end of wavesim namespace
+}  // end of atl namespace
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);

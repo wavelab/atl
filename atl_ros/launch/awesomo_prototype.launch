@@ -25,22 +25,22 @@
     <arg name="debug" value="false"/>
   </include>
 
-  <node pkg="wavesim_ros" name="wavesim_quadrotor" type="wavesim_dji_quadrotor_node" output="screen" required="true" />
-  <node pkg="wavesim_ros" name="wavesim_lz" type="wavesim_lz_node" output="screen" required="true">
-    <remap from="/wavesim/lz/pose" to="/atl/lz/pose" />
-    <remap from="/wavesim/lz/position/set" to="/atl/lz/position/set" />
-    <remap from="/wavesim/lz/velocity/set" to="/atl/lz/velocity/set" />
-    <remap from="/wavesim/lz/angular_velocity/set" to="/atl/lz/angular_velocity/set" />
+  <node pkg="atl_ros" name="atl_quadrotor" type="atl_dji_quadrotor_node" output="screen" required="true" />
+  <node pkg="atl_ros" name="atl_lz" type="atl_lz_node" output="screen" required="true">
+    <remap from="/atl/lz/pose" to="/atl/lz/pose" />
+    <remap from="/atl/lz/position/set" to="/atl/lz/position/set" />
+    <remap from="/atl/lz/velocity/set" to="/atl/lz/velocity/set" />
+    <remap from="/atl/lz/angular_velocity/set" to="/atl/lz/angular_velocity/set" />
   </node>
-  <node pkg="wavesim_ros" name="wavesim_camera" type="wavesim_camera_node" output="screen" required="true">
-    <remap from="/wavesim/camera/image" to="/atl/camera/image" />
+  <node pkg="atl_ros" name="atl_camera" type="atl_camera_node" output="screen" required="true">
+    <remap from="/atl/camera/image" to="/atl/camera/image" />
   </node>
-  <node pkg="wavesim_ros" name="wavesim_gimbal" type="wavesim_gimbal_node" output="screen" required="true" >
-    <remap from="/wavesim/gimbal/position/inertial" to="/atl/gimbal/position/inertial" />
-    <remap from="/wavesim/gimbal/frame/orientation/inertial" to="/atl/gimbal/frame/orientation/inertial" />
-    <remap from="/wavesim/gimbal/joint/orientation/inertial" to="/atl/gimbal/joint/orientation/inertial" />
-    <remap from="/wavesim/gimbal/setpoint/attitude" to="/atl/gimbal/setpoint/attitude" />
-    <remap from="/wavesim/gimbal/target/track" to="/atl/gimbal/target/track" />
+  <node pkg="atl_ros" name="atl_gimbal" type="atl_gimbal_node" output="screen" required="true" >
+    <remap from="/atl/gimbal/position/inertial" to="/atl/gimbal/position/inertial" />
+    <remap from="/atl/gimbal/frame/orientation/inertial" to="/atl/gimbal/frame/orientation/inertial" />
+    <remap from="/atl/gimbal/joint/orientation/inertial" to="/atl/gimbal/joint/orientation/inertial" />
+    <remap from="/atl/gimbal/setpoint/attitude" to="/atl/gimbal/setpoint/attitude" />
+    <remap from="/atl/gimbal/target/track" to="/atl/gimbal/target/track" />
   </node>
 
   <!-- control node -->

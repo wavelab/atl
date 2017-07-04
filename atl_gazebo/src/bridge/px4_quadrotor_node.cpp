@@ -1,6 +1,6 @@
-#include "wavesim_ros/nodes/px4_quadrotor_node.hpp"
+#include "atl_ros/nodes/px4_quadrotor_node.hpp"
 
-namespace wavesim {
+namespace atl {
 namespace ros {
 
 int PX4QuadrotorNode::configure(const std::string &node_name, int hz) {
@@ -155,6 +155,6 @@ void PX4QuadrotorNode::velocitySetpointCallback(
 }
 
 }  // end of ros namespace
-}  // end of wavesim namespace
+}  // end of atl namespace
 
-ROS_NODE_RUN(wavesim::ros::PX4QuadrotorNode, NODE_NAME, NODE_RATE);
+ROS_NODE_RUN(atl::ros::PX4QuadrotorNode, NODE_NAME, NODE_RATE);

@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e #halt on first error
+set -e # halt on first error
 
 PACAKGE=flycapture.2.9.3.13_armhf
 POINTGREY_USER=ubuntu

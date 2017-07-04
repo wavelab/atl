@@ -1,6 +1,6 @@
-#include "wavesim_gazebo/plugins/box_gplugin.hpp"
+#include "atl_gazebo/plugins/box_gplugin.hpp"
 
-namespace wavesim {
+namespace atl {
 namespace gaz {
 
 BoxGPlugin::BoxGPlugin(void) {
@@ -24,4 +24,4 @@ void BoxGPlugin::onUpdate(const gazebo::common::UpdateInfo &info) {
 
 GZ_REGISTER_MODEL_PLUGIN(BoxGPlugin)
 }  // end of gaz namespace
-}  // end of wavesim namespace
+}  // end of atl namespace

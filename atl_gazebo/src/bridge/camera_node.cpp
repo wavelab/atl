@@ -1,6 +1,6 @@
-#include "wavesim_ros/nodes/camera_node.hpp"
+#include "atl_ros/nodes/camera_node.hpp"
 
-namespace wavesim {
+namespace atl {
 namespace ros {
 
 int CameraNode::configure(const std::string &node_name, int hz) {
@@ -118,6 +118,6 @@ void CameraNode::imageCallback(ConstImagePtr &msg) {
 }
 
 }  // end of ros namespace
-}  // end of wavesim namespace
+}  // end of atl namespace
 
-ROS_NODE_RUN(wavesim::ros::CameraNode, NODE_NAME, NODE_RATE);
+ROS_NODE_RUN(atl::ros::CameraNode, NODE_NAME, NODE_RATE);

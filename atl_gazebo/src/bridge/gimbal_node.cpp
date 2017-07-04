@@ -1,6 +1,6 @@
-#include "wavesim_ros/nodes/gimbal_node.hpp"
+#include "atl_ros/nodes/gimbal_node.hpp"
 
-namespace wavesim {
+namespace atl {
 namespace ros {
 
 int GimbalNode::configure(const std::string &node_name, int hz) {
@@ -81,6 +81,6 @@ void GimbalNode::trackTargetCallback(const geometry_msgs::Vector3 msg) {
 }
 
 }  // end of ros namespace
-}  // end of wavesim namespace
+}  // end of atl namespace
 
-ROS_NODE_RUN(wavesim::ros::GimbalNode, NODE_NAME, NODE_RATE);
+ROS_NODE_RUN(atl::ros::GimbalNode, NODE_NAME, NODE_RATE);

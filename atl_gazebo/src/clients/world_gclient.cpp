@@ -1,7 +1,7 @@
-#include "wavesim_gazebo/clients/world_gclient.hpp"
+#include "atl_gazebo/clients/world_gclient.hpp"
 
 
-namespace wavesim {
+namespace atl {
 namespace gaz {
 
 WorldGClient::WorldGClient(void) {
@@ -214,7 +214,7 @@ int WorldGClient::removeModel(std::string model_name) {
 }
 
 int WorldGClient::setModelPose(std::string model_name, Vec3 pos, Vec3 rpy) {
-  wavesim_msgs::msgs::ModelPose msg;
+  atl_msgs::msgs::ModelPose msg;
 
   msg.set_model_name(model_name);
   msg.set_x(pos(0));
@@ -247,4 +247,4 @@ void WorldGClient::worldStatsCallback(ConstWorldStatisticsPtr &msg) {
 }
 
 }  // end of gaz namespace
-}  // end of wavesim namespace
+}  // end of atl namespace

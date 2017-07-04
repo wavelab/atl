@@ -1,18 +1,18 @@
 #include <gtest/gtest.h>
 #include "test_settings.hpp"
 
-#include "wavesim_gazebo/gazebo_test.hpp"
-#include "wavesim_gazebo/clients/gimbal_gclient.hpp"
+#include "atl_gazebo/gazebo_test.hpp"
+#include "atl_gazebo/clients/gimbal_gclient.hpp"
 
 #define TEST_WORLD "/gimbal_test.world"
 
-namespace wavesim {
+namespace atl {
 namespace gaz {
 
 class GimbalTest : public ::testing::Test {
   protClient *client;
-  Gawavesimwavesim *gazebo_test;
-  stwavesimd::string test_world;
+  Gaatlwavesim *gazebo_test;
+  statld::string test_world;
 
   GimbalTest(void) {}
   virtual ~GimbalTest(void) {}
@@ -40,14 +40,14 @@ class GimbalTest : public ::testing::Test {
 };
 
 TEST_F(GimbalTest, setRollPitch) {
-  wavesim::Vec3 euler_if;
+  atl::Vec3 euler_if;
 
   euler_if << 20, 20, 0;
   this->client->setAttitude(euler_if);
 }
 
 }  // end of gaz namespace
-}  // end of wavesim namespace
+}  // end of atl namespace
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);

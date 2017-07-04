@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
   <name>atl_core</name>
-  <version>0.0.0</version>
-  <description>atl core library package</description>
+  <version>0.0.1</version>
+  <description>ATL core package</description>
 
   <!-- contact info -->
   <maintainer email="chutsu@gmail.com">Chris Choi</maintainer>

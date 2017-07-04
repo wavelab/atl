@@ -1,6 +1,6 @@
-#include "wavesim_gazebo/plugins/df_camera_gplugin.hpp"
+#include "atl_gazebo/plugins/df_camera_gplugin.hpp"
 
-namespace wavesim {
+namespace atl {
 namespace gaz {
 
 DFCameraGPlugin::DFCameraGPlugin(void) {
@@ -95,4 +95,4 @@ void DFCameraGPlugin::onNewFrame(const unsigned char *image,
 
 GZ_REGISTER_SENSOR_PLUGIN(DFCameraGPlugin)
 }  // end of gaz namespace
-}  // end of wavesim namepspace
+}  // end of atl namepspace

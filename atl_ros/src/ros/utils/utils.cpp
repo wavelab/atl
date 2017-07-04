@@ -1,7 +1,7 @@
-#include "wavesim_ros/utils/utils.hpp"
+#include "atl_ros/utils/utils.hpp"
 
 
-namespace wavesim {
+namespace atl {
 namespace ros {
 
 int ros2gaz(Vec3 ros, Vec3 &gaz) {
@@ -57,4 +57,4 @@ int gaz2ros(Quaternion gaz_quat, Quaternion &ros_quat) {
 }
 
 }  // end of ros namespace
-}  // end of wavesim namespace
+}  // end of atl namespace

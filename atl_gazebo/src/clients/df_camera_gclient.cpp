@@ -1,7 +1,7 @@
-#include "wavesim_gazebo/clients/df_camera_gclient.hpp"
+#include "atl_gazebo/clients/df_camera_gclient.hpp"
 
 
-namespace wavesim {
+namespace atl {
 namespace gaz {
 
 DFCameraGClient::DFCameraGClient(void) {
@@ -56,4 +56,4 @@ void DFCameraGClient::imageCallback(ConstImagePtr &msg) {
 }
 
 }  // end of gaz namespace
-}  // end of wavesim namespace
+}  // end of atl namespace

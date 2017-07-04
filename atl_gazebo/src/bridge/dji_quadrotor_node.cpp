@@ -1,7 +1,7 @@
-#include "wavesim_ros/nodes/dji_quadrotor_node.hpp"
+#include "atl_ros/nodes/dji_quadrotor_node.hpp"
 
 
-namespace wavesim {
+namespace atl {
 namespace ros {
 
 int DJIQuadrotorNode::configure(const std::string &node_name, int hz) {
@@ -106,6 +106,6 @@ bool DJIQuadrotorNode::attitudeControlCallback(
 }
 
 }  // end of ros namespace
-}  // end of wavesim namespace
+}  // end of atl namespace
 
-ROS_NODE_RUN(wavesim::ros::DJIQuadrotorNode, NODE_NAME, NODE_RATE);
+ROS_NODE_RUN(atl::ros::DJIQuadrotorNode, NODE_NAME, NODE_RATE);

@@ -1,6 +1,6 @@
-#include "wavesim_ros/nodes/df_camera_node.hpp"
+#include "atl_ros/nodes/df_camera_node.hpp"
 
-namespace wavesim {
+namespace atl {
 namespace ros {
 
 int DFCameraNode::configure(const std::string &node_name, int hz) {
@@ -50,6 +50,6 @@ void DFCameraNode::imageCallback(ConstImagePtr &msg) {
 }
 
 }  // end of ros namespace
-}  // end of wavesim namespace
+}  // end of atl namespace
 
-ROS_NODE_RUN(wavesim::ros::DFCameraNode, NODE_NAME, NODE_RATE);
+ROS_NODE_RUN(atl::ros::DFCameraNode, NODE_NAME, NODE_RATE);

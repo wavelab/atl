@@ -1,7 +1,7 @@
-#include "wavesim_gazebo/plugins/world_gplugin.hpp"
+#include "atl_gazebo/plugins/world_gplugin.hpp"
 
 
-namespace wavesim {
+namespace atl {
 namespace gaz {
 
 WorldGPlugin::WorldGPlugin(void) {
@@ -93,4 +93,4 @@ void WorldGPlugin::worldClearCallback(ConstRequestPtr &msg) {
 
 GZ_REGISTER_WORLD_PLUGIN(WorldGPlugin)
 }  // end of gaz namespace
-}  // end of wavesim namespace
+}  // end of atl namespace

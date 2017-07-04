@@ -11,8 +11,8 @@ FILE(COPY worlds DESTINATION ${PROJECT_BINARY_DIR}/tests/)
 SET(
     TEST_DEPS
     wave
-    wavesim_gazebo_clients
-    wavesim_gazebo_msgs
+    atl_gazebo_clients
+    atl_gazebo_msgs
     ${GAZEBO_LIBRARIES}
     gtest
     pthread

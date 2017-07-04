@@ -1,6 +1,6 @@
-#include "wavesim_gazebo/plugins/gimbal_gplugin.hpp"
+#include "atl_gazebo/plugins/gimbal_gplugin.hpp"
 
-namespace wavesim {
+namespace atl {
 namespace gaz {
 
 GimbalGPlugin::GimbalGPlugin(void) {
@@ -9,9 +9,6 @@ GimbalGPlugin::GimbalGPlugin(void) {
 
 void GimbalGPlugin::Load(gazebo::physics::ModelPtr model,
                          sdf::ElementPtr sdf) {
-  gazebo::math::Pose pose;
-  gazebo::math::Vector3 rpy;
-
   // set model and bind world update callback
   // clang-format off
   this->model = model;
@@ -25,9 +22,8 @@ void GimbalGPlugin::Load(gazebo::physics::ModelPtr model,
 
   // gimbal model intial pose
   this->model->SetGravityMode(false);
-  this->gimbal = wave::GimbalModel();
-  this->gimbal.states(0) = this->roll_joint->GetAngle(0).Radian();
-  this->gimbal.states(2) = this->pitch_joint->GetAngle(0).Radian();
+  this->gimbal.states(0) = this->roll_joint->Position(0);
+  this->gimbal.states(2) = this->pitch_joint->Position(0);
   this->gimbal.joint_setpoints(0) = 0.0;
   this->gimbal.joint_setpoints(1) = 0.0;
   this->gimbal.joint_setpoints(2) = 0.0;
@@ -43,27 +39,22 @@ void GimbalGPlugin::Load(gazebo::physics::ModelPtr model,
 }
 
 void GimbalGPlugin::simulate(double dt) {
-  Vec3 motor_inputs;
-  VecX gimbal_state;
-  gazebo::math::Pose pose;
-  Quaternion q;
-
   // pre-check
   if (dt < 0.0) {
     return;
   }
 
   // set gimbal frame orientation
-  pose = this->model->GetWorldPose();
-  gazQuat2EigenQuat(pose.rot, q);
+  ignition::math::Pose3d pose = this->model->WorldPose();
+  Quaternion q{pose.Rot().W(), pose.Rot().X(), pose.Rot().Y(), pose.Rot().Z()};
   this->gimbal.setFrameOrientation(q);
 
   // attitude control and update
-  motor_inputs = this->gimbal.attitudeControllerControl(dt);
+  Vec2 motor_inputs = this->gimbal.attitudeControllerControl(dt);
   this->gimbal.update(motor_inputs, dt);
 
   // set model pose
-  gimbal_state = this->gimbal.getState();
+  Vec4 gimbal_state = this->gimbal.getState();
   this->roll_joint->SetPosition(0, gimbal_state(0));
   this->pitch_joint->SetPosition(0, gimbal_state(2));
 }
@@ -84,15 +75,15 @@ void GimbalGPlugin::onUpdate(const gazebo::common::UpdateInfo &info) {
 }
 
 void GimbalGPlugin::publishFrameOrientation(void) {
-  gazebo::math::Quaternion q;
+  ignition::math::Quaternion<double> q;
   QUATERNION_MSG msg;
 
   // build msg
-  q = this->model->GetWorldPose().rot;
-  msg.set_w(q.w);
-  msg.set_x(q.x);
-  msg.set_y(q.y);
-  msg.set_z(q.z);
+  q = this->model->WorldPose().Rot();
+  msg.set_w(q.W());
+  msg.set_x(q.X());
+  msg.set_y(q.Y());
+  msg.set_z(q.Z());
 
   // publish msg
   this->gaz_pubs[FRAME_ORIENTATION_GTOPIC]->Publish(msg);
@@ -107,8 +98,8 @@ void GimbalGPlugin::publishJointOrientation(void) {
   quat2euler(this->gimbal.frame_orientation, 321, frame_euler_if);
 
   // obtain joint orientation
-  joint_euler_bf(0) = this->roll_joint->GetAngle(0).Radian();
-  joint_euler_bf(1) = this->pitch_joint->GetAngle(0).Radian();
+  joint_euler_bf(0) = this->roll_joint->Position(0);
+  joint_euler_bf(1) = this->pitch_joint->Position(0);
   joint_euler_bf(2) = 0.0;
 
   // convert joint orientation from body frame to inertial frame
@@ -130,17 +121,15 @@ void GimbalGPlugin::publishJointOrientation(void) {
 }
 
 void GimbalGPlugin::setAttitudeCallback(ConstVector3dPtr &msg) {
-  Vec3 euler_if;
-  euler_if << msg->x(), msg->y(), msg->z();
+  Vec2 euler_if(msg->x(), msg->y());
   this->gimbal.setAttitude(euler_if);
 }
 
 void GimbalGPlugin::trackTargetCallback(ConstVector3dPtr &msg) {
-  Vec3 target_cf;
-  target_cf << msg->x(), msg->y(), msg->z();
+  Vec3 target_cf(msg->x(), msg->y(), msg->z());
   this->gimbal.trackTarget(target_cf);
 }
 
 GZ_REGISTER_MODEL_PLUGIN(GimbalGPlugin)
 }  // end of gaz namespace
-}  // end of wavesim namespace
+}  // end of atl namespace

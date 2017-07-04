@@ -1,35 +1,27 @@
-#include "wavesim_gazebo/plugins/quadrotor_gplugin.hpp"
+#include "atl_gazebo/plugins/quadrotor_gplugin.hpp"
 
 
-namespace wavesim {
+namespace atl {
 namespace gaz {
 
-VecX pose2Vec(gazebo::math::Pose pose) {
-  gazebo::math::Vector3 pos;
-  gazebo::math::Vector3 rpy;
-  VecX eigen_pose(6);
+VecX pose2Vec(ignition::math::Pose3d pose) {
+  ignition::math::Vector3d pos = pose.Pos();
+  ignition::math::Vector3d rpy = pose.Rot().Euler();
 
-  pos = pose.pos;
-  rpy = pose.rot.GetAsEuler();
-  eigen_pose << pos.x, pos.y, pos.z, rpy.x, rpy.y, rpy.z;
+  VecX eigen_pose(6);
+  eigen_pose << pos.X(), pos.Y(), pos.Z(), rpy.X(), rpy.Y(), rpy.Z();
 
   return eigen_pose;
 }
 
-gazebo::math::Pose vec2pose(VecX pose) {
-  float x, y, z;
-  float phi, theta, psi;
-  gazebo::math::Pose gazebo_pose;
-
-  x = pose(0);
-  y = pose(1);
-  z = pose(2);
-  phi = pose(3);
-  theta = pose(4);
-  psi = pose(5);
-  gazebo_pose = gazebo::math::Pose(x, y, z, phi, theta, psi);
-
-  return gazebo_pose;
+ignition::math::Pose3d vec2pose(VecX pose) {
+  double x = pose(0);
+  double y = pose(1);
+  double z = pose(2);
+  double phi = pose(3);
+  double theta = pose(4);
+  double psi = pose(5);
+  return ignition::math::Pose3d(x, y, z, phi, theta, psi);
 }
 
 QuadrotorGPlugin::QuadrotorGPlugin(void) {
@@ -38,8 +30,6 @@ QuadrotorGPlugin::QuadrotorGPlugin(void) {
 
 void QuadrotorGPlugin::Load(gazebo::physics::ModelPtr model,
                             sdf::ElementPtr sdf) {
-  gazebo::math::Pose pose;
-  VecX quad_pose(6);
 
   // set model and bind world update callback
   // clang-format off
@@ -51,10 +41,13 @@ void QuadrotorGPlugin::Load(gazebo::physics::ModelPtr model,
 
   // set quadrotor model initial pose
   this->model->SetGravityMode(false);
-  pose = this->model->GetWorldPose();
+  ignition::math::Pose3d pose = this->model->WorldPose();
+
+  VecX quad_pose(6);
   quad_pose = pose2Vec(pose);
+
   this->body = this->model->GetChildLink("quad::chasis");
-  this->quadrotor = wave::quadrotor::QuadrotorModel(quad_pose);
+  this->quadrotor = QuadrotorModel(quad_pose);
 
   // gazebo node
   // clang-format off
@@ -78,33 +71,31 @@ void QuadrotorGPlugin::onUpdate(const gazebo::common::UpdateInfo &info) {
 }
 
 void QuadrotorGPlugin::simulate(double dt) {
-  VecX motor_inputs(4);
   VecX quad_pose;
-  gazebo::math::Pose gazebo_pose;
+  ignition::math::Pose3d gazebo_pose;
 
   // pre-check
   if (dt < 0.0) {
     return;
   }
 
-  // set quadrotor orientation using last calculated
-  // keep the following code block above the `this->quadrotor.update()` had
-  // the
-  // 3D model been set using the calculated position in the Quadrotor class it
-  // would go through objects and cause collision detection to go wild
+  // set quadrotor orientation using last calculated keep the following code
+  // block above the `this->quadrotor.update()` had the 3D model been set using
+  // the calculated position in the Quadrotor class it would go through objects
+  // and cause collision detection to go wild
   quad_pose = this->quadrotor.getPose();
-  gazebo_pose = this->model->GetWorldPose();
-  gazebo_pose = gazebo::math::Pose(gazebo_pose.pos.x,
-                                   gazebo_pose.pos.y,
-                                   gazebo_pose.pos.z,
-                                   quad_pose(3),
-                                   quad_pose(4),
-                                   quad_pose(5));
+  gazebo_pose = this->model->WorldPose();
+  gazebo_pose = ignition::math::Pose3d(gazebo_pose.Pos().X(),
+                                       gazebo_pose.Pos().Y(),
+                                       gazebo_pose.Pos().Z(),
+                                       quad_pose(3),
+                                       quad_pose(4),
+                                       quad_pose(5));
   this->model->SetWorldPose(gazebo_pose);
 
   // simulate quadrotor
   // TODO: switch to attitude controller when in offboard mode
-  motor_inputs = this->quadrotor.attitudeControllerControl(dt);
+  Vec4 motor_inputs = this->quadrotor.attitudeControllerControl(dt);
   // motor_inputs = this->quadrotor.positionControllerControl(dt);
   // motor_inputs = this->quadrotor.velocityControllerControl(dt);
   this->quadrotor.update(motor_inputs, dt);
@@ -140,7 +131,7 @@ void QuadrotorGPlugin::simulate(double dt) {
 }
 
 void QuadrotorGPlugin::publishPose(void) {
-  wavesim_msgs::msgs::RPYPose msg;
+  atl_msgs::msgs::RPYPose msg;
 
   msg.set_x(this->quadrotor.position(0));
   msg.set_y(this->quadrotor.position(1));
@@ -181,4 +172,4 @@ void QuadrotorGPlugin::setVelocityCallback(VelocitySetpointPtr &msg) {
 
 GZ_REGISTER_MODEL_PLUGIN(QuadrotorGPlugin);
 }  // end of gaz namespace
-}  // end of wavesim namespace
+}  // end of atl namespace

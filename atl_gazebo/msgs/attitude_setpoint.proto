@@ -1,4 +1,4 @@
-package wavesim_msgs.msgs;
+package atl_msgs.msgs;
 
 message AttitudeSetpoint
 {

@@ -22,7 +22,6 @@ install_pointgrey_drivers()
         # extract and install flycapture
         PACKAGE_NAME="flycapture2-2.11.3.121-amd64"
         PACKAGE_EXT=".tgz"
-        mkdir -p $PACKAGE_DIR
         cd $PACKAGE_DIR
         tar -xzf flycapture2-2.11.3.121-amd64-pkg.tgz
         cd $PACKAGE_NAME
@@ -40,7 +39,6 @@ install_pointgrey_drivers()
         # extract and install flycapture
         PACKAGE_NAME="flycapture2-2.8.3.1-amd64"
         PACKAGE_EXT=".zip"
-        mkdir -p $PACKAGE_DIR
         cd $PACKAGE_DIR
         unzip ${PACKAGE_NAME}${PACAKGE_EXT}
         cd $PACKAGE_NAME
