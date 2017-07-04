@@ -78,7 +78,6 @@ SET(ATL_GAZEBO_PLUGINS_DEPS
     atl_gazebo_msgs
     atl_gazebo_controls
     atl_gazebo_kinematics
-    wave
     ${GAZEBO_LIBRARIES}
     ${OpenCV_LIBS}
     yaml-cpp
@@ -111,7 +110,7 @@ ADD_LIBRARY(world_gplugin SHARED src/plugins/world_gplugin.cpp)
 ADD_DEPENDENCIES(world_gplugin atl_gazebo_msgs)
 TARGET_LINK_LIBRARIES(world_gplugin ${ATL_GAZEBO_PLUGINS_DEPS})
 
-# atl GAZEBO LIBRARY
+# ATL GAZEBO LIBRARY
 ADD_LIBRARY(atl_gazebo
             STATIC
             ${ATL_GAZEBO_CLIENTS_SRCS}
@@ -130,7 +129,7 @@ INSTALL(TARGETS
         df_camera_gplugin
         gimbal_gplugin
         lz_gplugin
-        # quadrotor_gplugin
+        quadrotor_gplugin
         world_gplugin
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/plugins)
 INSTALL(DIRECTORY include/${PROJECT_NAME}/
