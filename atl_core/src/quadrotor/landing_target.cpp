@@ -8,8 +8,8 @@ LandingTarget::LandingTarget(void) {
   this->velocity_bf << 0.0, 0.0, 0.0;
   this->detected = false;
   this->losted = true;
-  this->first_seen = (struct timespec){0};
-  this->last_seen = (struct timespec){0};
+  this->first_seen = (struct timespec){0, 0};
+  this->last_seen = (struct timespec){0, 0};
 
   this->lost_threshold = 1000.0;
 }
@@ -40,8 +40,8 @@ void LandingTarget::reset(void) {
   this->velocity_bf << 0.0, 0.0, 0.0;
   this->detected = false;
   this->losted = true;
-  this->first_seen = (struct timespec){0};
-  this->last_seen = (struct timespec){0};
+  this->first_seen = (struct timespec){0, 0};
+  this->last_seen = (struct timespec){0, 0};
 }
 
 void LandingTarget::update(bool detected) {

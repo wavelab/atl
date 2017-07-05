@@ -1,4 +1,4 @@
-#include "atl/utils/filesystem.hpp"
+#include "atl/utils/file.hpp"
 
 
 namespace atl {
@@ -6,7 +6,8 @@ namespace atl {
 bool file_exists(const std::string &fp) {
   FILE *file;
 
-  if (file = fopen(fp.c_str(), "r")) {
+  file = fopen(fp.c_str(), "r");
+  if (file != NULL) {
     fclose(file);
     return true;
   } else {
@@ -19,7 +20,7 @@ std::vector<std::string> path_split(const std::string path) {
   std::vector<std::string> splits;
 
   s = "";
-  for (int i = 0; i < path.length(); i++) {
+  for (size_t i = 0; i < path.length(); i++) {
     if (s != "" && path[i] == '/') {
       splits.push_back(s);
       s = "";
@@ -35,7 +36,6 @@ std::vector<std::string> path_split(const std::string path) {
 void paths_combine(const std::string path1,
                    const std::string path2,
                    std::string &out) {
-  int i;
   int dirs_up;
   std::vector<std::string> splits1;
   std::vector<std::string> splits2;
@@ -47,7 +47,7 @@ void paths_combine(const std::string path1,
 
   // obtain number of directory ups in path 2
   dirs_up = 0;
-  for (int i = 0; i < splits2.size(); i++) {
+  for (size_t i = 0; i < splits2.size(); i++) {
     if (splits2[i] == "..") {
       dirs_up++;
     }
@@ -62,19 +62,19 @@ void paths_combine(const std::string path1,
   if (path1[0] == '/') {
     out += "/";
   }
-  for (int i = 0; i < splits1.size(); i++) {
+  for (size_t i = 0; i < splits1.size(); i++) {
     out += splits1[i];
     out += "/";
   }
 
   // append path2 to out
-  for (int i = dirs_up; i < splits2.size(); i++) {
+  for (size_t i = dirs_up; i < splits2.size(); i++) {
     out += splits2[i];
     out += "/";
   }
 
   // remove trailing slashes
-  for (int i = out.length() - 1; i > 0; i--) {
+  for (size_t i = out.length() - 1; i > 0; i--) {
     if (out[i] == '/') {
       out.pop_back();
     } else {

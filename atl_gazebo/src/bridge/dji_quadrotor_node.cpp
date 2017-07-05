@@ -88,7 +88,7 @@ bool DJIQuadrotorNode::attitudeControlCallback(
 
   // pre-check
   if (request.flag != 0x20) {
-    LOG_ERROR("Attitude control byte other than [0x20] is not supported!");
+    log_err("Attitude control byte other than [0x20] is not supported!");
     response.result = false;
     return false;
   }

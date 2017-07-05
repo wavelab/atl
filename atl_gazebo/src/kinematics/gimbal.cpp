@@ -2,7 +2,7 @@
 
 namespace atl {
 
-// Attitude Controller
+// ATTITUDE CONTROLLER
 Vec2 Gimbal2AxisController::update(Vec2 setpoints, Vec2 actual, double dt) {
     // limit rate to 100Hz
     // increment coUNTer and only take action when 0.001s accumulates

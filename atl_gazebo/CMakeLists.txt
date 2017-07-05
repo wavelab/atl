@@ -27,7 +27,7 @@ FIND_PACKAGE(catkin
 # INCLUDES
 INCLUDE_DIRECTORIES(include)
 INCLUDE_DIRECTORIES(/usr/include/eigen3)
-INCLUDE_DIRECTORIES(${catkin_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(AFTER SYSTEM ${catkin_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${OpenCV_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${GAZEBO_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}/msgs)
@@ -101,23 +101,23 @@ ADD_DEPENDENCIES(df_camera_node atl_gazebo_clients)
 
 ADD_EXECUTABLE(dji_quadrotor_node src/bridge/dji_quadrotor_node.cpp)
 TARGET_LINK_LIBRARIES(dji_quadrotor_node ${ATL_GAZEBO_DEPS})
-ADD_DEPENDENCIES(dji_quadrotor_node node atl_gazebo_clients)
+ADD_DEPENDENCIES(dji_quadrotor_node atl_gazebo_clients)
 
 ADD_EXECUTABLE(gimbal_node src/bridge/gimbal_node.cpp)
 TARGET_LINK_LIBRARIES(gimbal_node ${ATL_GAZEBO_DEPS})
-ADD_DEPENDENCIES(gimbal_node node atl_gazebo_clients)
+ADD_DEPENDENCIES(gimbal_node atl_gazebo_clients)
 
 ADD_EXECUTABLE(lz_node src/bridge/lz_node.cpp)
 TARGET_LINK_LIBRARIES(lz_node ${ATL_GAZEBO_DEPS})
-ADD_DEPENDENCIES(lz_node node atl_gazebo_clients)
+ADD_DEPENDENCIES(lz_node atl_gazebo_clients)
 
 ADD_EXECUTABLE(px4_quadrotor_node src/bridge/px4_quadrotor_node.cpp)
 TARGET_LINK_LIBRARIES(px4_quadrotor_node ${ATL_GAZEBO_DEPS})
-ADD_DEPENDENCIES(px4_quadrotor_node node atl_gazebo_clients)
+ADD_DEPENDENCIES(px4_quadrotor_node atl_gazebo_clients)
 
 ADD_EXECUTABLE(world_node src/bridge/world_node.cpp)
 TARGET_LINK_LIBRARIES(world_node ${ATL_GAZEBO_DEPS})
-ADD_DEPENDENCIES(world_node node atl_gazebo_clients)
+ADD_DEPENDENCIES(world_node atl_gazebo_clients)
 
 
 # CLIENTS

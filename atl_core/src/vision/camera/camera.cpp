@@ -41,7 +41,7 @@ int Camera::configure(std::string config_path) {
   }
 
   // load camera configs
-  for (int i = 0; i < camera_modes.size(); i++) {
+  for (size_t i = 0; i < camera_modes.size(); i++) {
     config = CameraConfig();
     config_file = config_path + "/" + camera_configs[i];
     if (config.load(config_file) != 0) {
@@ -86,6 +86,8 @@ int Camera::initialize(void) {
     log_info("Camera initialized!\n");
     return 0;
   }
+
+  return 0;
 }
 
 int Camera::shutdown(void) {
@@ -94,6 +96,8 @@ int Camera::shutdown(void) {
     this->capture = NULL;
     this->initialized = false;
   }
+
+  return 0;
 }
 
 int Camera::changeMode(std::string mode) {
@@ -106,11 +110,11 @@ int Camera::changeMode(std::string mode) {
   this->config = this->configs[mode];
   this->capture->set(CV_CAP_PROP_FRAME_WIDTH, this->config.image_width);
   this->capture->set(CV_CAP_PROP_FRAME_HEIGHT, this->config.image_height);
+
+  return 0;
 }
 
 int Camera::getFrame(cv::Mat &image) {
-  bool change_mode;
-
   // pre-check
   if (this->configured == false) {
     return -1;
@@ -125,10 +129,6 @@ int Camera::getFrame(cv::Mat &image) {
 }
 
 int Camera::run(void) {
-  int frame_count;
-  double t;
-  double last_tic;
-
   // pre-check
   if (this->configured == false) {
     return -1;
@@ -137,8 +137,8 @@ int Camera::run(void) {
   }
 
   // setup
-  frame_count = 0;
-  last_tic = time_now();
+  int frame_count = 0;
+  double last_tic = time_now();
 
   // run
   while (true) {
@@ -171,6 +171,8 @@ int Camera::showFPS(double &last_tic, int &frame_count) {
     last_tic = t;
     frame_count = 0;
   }
+
+  return 0;
 }
 
 int Camera::showImage(cv::Mat &image) {
@@ -186,6 +188,8 @@ int Camera::showImage(cv::Mat &image) {
     cv::imshow("Camera", image);
     cv::waitKey(2);
   }
+
+  return 0;
 }
 
 }  // namespace atl

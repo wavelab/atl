@@ -70,10 +70,6 @@ int TrackingController::configure(std::string config_file) {
 AttitudeCommand TrackingController::calculate(Vec3 errors,
                                               double yaw,
                                               double dt) {
-  double r, p, y, t;
-  Vec3 euler;
-  Mat3 R;
-
   // check rate
   this->dt += dt;
   if (this->dt < 0.01) {
@@ -85,10 +81,10 @@ AttitudeCommand TrackingController::calculate(Vec3 errors,
 
   // roll, pitch, yaw and throttle (assuming NWU frame)
   // clang-format off
-  r = -this->y_controller.calculate(errors(1), 0.0, this->dt);
-  p = this->x_controller.calculate(errors(0), 0.0, this->dt);
-  y = yaw;
-  t = this->hover_throttle + this->z_controller.calculate(errors(2), 0.0, this->dt);
+  double r = -this->y_controller.calculate(errors(1), 0.0, this->dt);
+  double p = this->x_controller.calculate(errors(0), 0.0, this->dt);
+  double y = yaw;
+  double t = this->hover_throttle + this->z_controller.calculate(errors(2), 0.0, this->dt);
   t /= fabs(cos(r) * cos(p));  // adjust throttle for roll and pitch
   // clang-format o
 
@@ -143,16 +139,14 @@ void TrackingController::printOutputs(void) {
 }
 
 void TrackingController::printErrors(void) {
-  double p, i, d;
-
-  p = this->x_controller.error_p;
-  i = this->x_controller.error_i;
-  d = this->x_controller.error_d;
+  double p = this->x_controller.error_p;
+  double i = this->x_controller.error_i;
+  double d = this->x_controller.error_d;
 
   std::cout << "x_controller: " << std::endl;
   std::cout << "\terror_p: " << std::setprecision(2) << p << "\t";
   std::cout << "\terror_i: " << std::setprecision(2) << i << "\t";
-  std::cout << "\terror_d: " << std::setprecision(2) << i << std::endl;
+  std::cout << "\terror_d: " << std::setprecision(2) << d << std::endl;
 
   p = this->y_controller.error_p;
   i = this->y_controller.error_i;
@@ -161,7 +155,7 @@ void TrackingController::printErrors(void) {
   std::cout << "y_controller: " << std::endl;
   std::cout << "\terror_p: " << std::setprecision(2) << p << "\t";
   std::cout << "\terror_i: " << std::setprecision(2) << i << "\t";
-  std::cout << "\terror_d: " << std::setprecision(2) << i << std::endl;
+  std::cout << "\terror_d: " << std::setprecision(2) << d << std::endl;
 
   p = this->z_controller.error_p;
   i = this->z_controller.error_i;
@@ -170,7 +164,7 @@ void TrackingController::printErrors(void) {
   std::cout << "z_controller: " << std::endl;
   std::cout << "\terror_p: " << std::setprecision(2) << p << "\t";
   std::cout << "\terror_i: " << std::setprecision(2) << i << "\t";
-  std::cout << "\terror_d: " << std::setprecision(2) << i << std::endl;
+  std::cout << "\terror_d: " << std::setprecision(2) << d << std::endl;
 }
 
 }  // namespace atl

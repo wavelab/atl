@@ -59,14 +59,14 @@ int KalmanFilterTracker::initialize(VecX mu) {
   this->mu = mu;
 
   this->B = MatX::Zero(this->nb_states, this->nb_states);
-  this->R;  // set during configuration
+  // this->R;  // set during configuration
 
-  this->C;  // set during configuration
-  this->Q;  // set during configuration
+  // this->C;  // set during configuration
+  // this->Q;  // set during configuration
 
   this->S = MatX::Identity(this->nb_states, this->nb_states);
   this->I = MatX::Identity(this->nb_states, this->nb_states);
-  this->K;
+  // this->K;
 
   this->mu_p = VecX::Zero(this->nb_states);
   this->S_p = MatX::Zero(this->nb_states, this->nb_states);
@@ -133,6 +133,8 @@ int KalmanFilterTracker::reset(VecX mu) {
     this->initialized = false;
     return -2;
   }
+
+  return 0;
 }
 
 int KalmanFilterTracker::sanityCheck(Vec3 prev_pos, Vec3 curr_pos) {

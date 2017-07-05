@@ -13,11 +13,8 @@ AttitudeCommand::AttitudeCommand(void) {
 }
 
 AttitudeCommand::AttitudeCommand(Vec4 command) {
-  Vec3 euler;
-  double throttle;
-
   // quaternion
-  euler << command(0), command(1), command(2);  // roll, pitch, yaw
+  Vec3 euler{command(0), command(1), command(2)};  // roll, pitch, yaw
   euler2quat(euler, 321, this->orientation);
 
   // throttle
@@ -110,7 +107,7 @@ int csvcols(std::string file_path) {
 
   // obtain number of commas
   std::getline(infile, line);
-  for (int i = 0; i < line.length(); i++) {
+  for (size_t i = 0; i < line.length(); i++) {
     if (line[i] == ',') {
       found_separator = true;
       nb_elements++;

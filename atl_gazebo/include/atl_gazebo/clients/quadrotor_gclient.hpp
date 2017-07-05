@@ -14,13 +14,11 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/opencv.hpp>
 
-#include "wave/utils/utils.hpp"
+#include "atl/utils/utils.hpp"
 #include "atl_gazebo/gazebo_node.hpp"
 
 namespace atl {
 namespace gaz {
-
-using namespace wave;
 
 // MESSAGES TYPES
 #define POSE_MSG atl_msgs::msgs::Pose

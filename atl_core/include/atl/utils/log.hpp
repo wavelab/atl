@@ -1,5 +1,5 @@
-#ifndef ATL_UTILS_LOGGING_HPP
-#define ATL_UTILS_LOGGING_HPP
+#ifndef ATL_UTILS_LOG_HPP
+#define ATL_UTILS_LOG_HPP
 
 #define __FILENAME__ \
   (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)

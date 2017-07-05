@@ -6,10 +6,10 @@ namespace atl {
 Quadrotor::Quadrotor(void) {
   this->configured = false;
 
-  this->position_controller;
-  this->tracking_controller;
-  this->landing_controller;
-  this->att_cmd;
+  // this->position_controller;
+  // this->tracking_controller;
+  // this->landing_controller;
+  // this->att_cmd;
 
   this->recover_height = 0.0;
   this->auto_track = false;
@@ -19,9 +19,9 @@ Quadrotor::Quadrotor(void) {
   this->min_discover_time = FLT_MAX;
   this->min_tracking_time = FLT_MAX;
 
-  this->discover_tic = (struct timespec){0};
-  this->tracking_tic = (struct timespec){0};
-  this->landing_tic = (struct timespec){0};
+  this->discover_tic = (struct timespec){0, 0};
+  this->tracking_tic = (struct timespec){0, 0};
+  this->landing_tic = (struct timespec){0, 0};
 
   this->current_mode = DISCOVER_MODE;
   this->yaw = 0.0;
@@ -94,6 +94,9 @@ int Quadrotor::setMode(enum Mode mode) {
     case LANDING_MODE:
       log_info(INFO_LMODE);
       break;
+    default:
+      log_err(EINVMODE);
+      return -2;
   }
 
   return 0;
@@ -253,7 +256,7 @@ int Quadrotor::stepDiscoverMode(double dt) {
     // transition to tracking mode
     log_info("Transitioning to [TRACKING MODE]!");
     this->setMode(TRACKING_MODE);
-    this->discover_tic = (struct timespec){0};
+    this->discover_tic = (struct timespec){0, 0};
   }
 
   return 0;
@@ -309,7 +312,7 @@ int Quadrotor::stepTrackingMode(double dt) {
       log_info("Transitioning to [LANDING MODE]!");
       // this->landing_controller.recordTrajectoryIndex();
       this->setMode(LANDING_MODE);
-      this->tracking_tic = (struct timespec){0};
+      this->tracking_tic = (struct timespec){0, 0};
     }
 
   } else if (this->landing_target.isTargetLosted()) {
@@ -317,7 +320,7 @@ int Quadrotor::stepTrackingMode(double dt) {
     log_info("Landing Target is losted!");
     log_info("Transitioning back to [DISCOVER_MODE]!");
     this->setMode(DISCOVER_MODE);
-    this->tracking_tic = (struct timespec){0};
+    this->tracking_tic = (struct timespec){0, 0};
     this->hover_position(2) = this->recover_height;
 
   }
@@ -361,14 +364,14 @@ int Quadrotor::stepLandingMode(double dt) {
   if (this->conditionsMet(conditions, 3) && this->auto_disarm) {
     // transition to disarm mode
     this->setMode(DISARM_MODE);
-    this->landing_tic = (struct timespec){0};
+    this->landing_tic = (struct timespec){0, 0};
 
   } else if (this->landing_target.isTargetLosted()) {
     // transition back to discovery mode
     log_info("Landing Target is losted!");
     log_info("Transitioning back to [DISCOVER_MODE]!");
     this->setMode(DISCOVER_MODE);
-    this->landing_tic = (struct timespec){0};
+    this->landing_tic = (struct timespec){0, 0};
     this->hover_position(2) = this->recover_height;
 
   } else if (retval != 0) {
@@ -376,7 +379,7 @@ int Quadrotor::stepLandingMode(double dt) {
     log_info("Failed to follow landing trajectory!");
     log_info("Transitioning back to [DISCOVER_MODE]!");
     this->setMode(DISCOVER_MODE);
-    this->landing_tic = (struct timespec){0};
+    this->landing_tic = (struct timespec){0, 0};
     this->hover_position(2) = this->recover_height;
 
   }

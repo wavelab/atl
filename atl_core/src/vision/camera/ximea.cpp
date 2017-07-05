@@ -7,7 +7,6 @@ XimeaCamera::XimeaCamera(void) {
   this->ximea= NULL;
 }
 
-
 int XimeaCamera::initialize(void) {
   int ds_type;
   int ds_rate;
@@ -17,7 +16,6 @@ int XimeaCamera::initialize(void) {
   int image_width;
   int offset_x;
   int offset_y;
-
 
   // setup
   ds_type = 0;
@@ -104,9 +102,7 @@ int XimeaCamera::checkState(XI_RETURN retval, std::string where) {
   }
 }
 
-
-int XimeaCamera::setGain(float gain_db)
-{
+int XimeaCamera::setGain(float gain_db) {
   XI_RETURN retval;
 
   retval = xiSetParamFloat(this->ximea, XI_PRM_GAIN, gain_db);
@@ -129,7 +125,6 @@ int XimeaCamera::changeMode(std::string mode) {
   this->config = this->configs[mode];
   return 0;
 }
-
 
 int XimeaCamera::getFrame(cv::Mat &image) {
   int retval;

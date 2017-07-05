@@ -67,7 +67,7 @@ int SwathmoreDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
   this->detector->process(image_gray, optical_center, detections);
 
   // calculate tag pose
-  for (int i = 0; i < detections.size(); i++) {
+  for (size_t i = 0; i < detections.size(); i++) {
     if (this->obtainPose(detections[i], pose) == 0) {
       tags.push_back(pose);
 

@@ -16,7 +16,7 @@ int linreg(std::vector<Vec2> pts, double *m, double *c, double *r) {
   double sumy = 0.0;  /* sum of y */
   double sumy2 = 0.0; /* sum of y^2 */
 
-  for (int i = 0; i < pts.size(); i++) {
+  for (size_t i = 0; i < pts.size(); i++) {
     p = pts[i];
     sumx += p(0);
     sumx2 += sqr(p(0));

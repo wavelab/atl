@@ -10,8 +10,8 @@
 #include <opencv2/highgui/highgui.hpp>
 
 #include "atl/utils/math.hpp"
-#include "atl/utils/logging.hpp"
-#include "atl/utils/filesystem.hpp"
+#include "atl/utils/log.hpp"
+#include "atl/utils/file.hpp"
 
 
 namespace atl {

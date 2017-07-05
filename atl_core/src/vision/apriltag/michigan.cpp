@@ -30,6 +30,8 @@ int MichiganDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
   TagPose pose;
   cv::Mat image_gray;
 
+  UNUSED(tags);
+
   // change mode based on image size
   this->changeMode(image);
 
@@ -67,8 +69,7 @@ int MichiganDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
       apriltag_detection_t *det;
       zarray_get(detections, i, &det);
       this->obtainPose(det, pose);
-      // only need 1 tag
-      break;
+      break;  // only need 1 tag
   }
   // imshow
   if (this->imshow) {
@@ -84,20 +85,19 @@ int MichiganDetector::obtainPose(apriltag_detection_t *det, TagPose &tag_pose) {
   Mat4 transform;
   Vec3 t;
   Mat3 R;
-  CameraConfig camera_config;
-  double fx, fy, cx, cy, tag_size, s;
+  // double fx, fy, cx, cy, s;
   std::vector<cv::Point3f> obj_pts;
   std::vector<cv::Point2f> img_pts;
 
 
 
   // setup
-  camera_config = this->camera_configs[this->camera_mode];
+  CameraConfig camera_config = this->camera_configs[this->camera_mode];
   // fx = camera_config.camera_matrix.at<double>(0, 0);
   // fy = camera_config.camera_matrix.at<double>(1, 1);
   // cx = camera_config.camera_matrix.at<double>(0, 2);
   // cy = camera_config.camera_matrix.at<double>(1, 2);
-  tag_size = 0.0;
+  double tag_size = 0.0;
 
   // get tag size according to tag id
   // if (this->tag_configs.find(tag.id) == this->tag_configs.end()) {

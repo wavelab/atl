@@ -287,20 +287,16 @@ int SBGC::sendFrame(SBGCFrame &cmd) {
 }
 
 int SBGC::readFrame(uint8_t read_length, SBGCFrame &frame) {
-  int retval;
-  uint8_t byte;
-  int16_t nb_bytes;
-  uint8_t buffer[150];
-
   // pre-check
-  nb_bytes = read(this->serial, buffer, read_length);
+  uint8_t buffer[150];
+  int16_t nb_bytes = read(this->serial, buffer, read_length);
   if (nb_bytes <= 0 || nb_bytes != read_length) {
     // std::cout << "failed to read SBGC frame!" << std::endl;
     return -1;
   }
 
   // parse sbgc frame
-  retval = frame.parseFrame(buffer);
+  int retval = frame.parseFrame(buffer);
   if (retval == -1) {
     // std::cout << "failed to parse SBGC frame!" << std::endl;
     return -1;
@@ -344,8 +340,6 @@ int SBGC::off(void) {
 }
 
 int SBGC::reset(void) {
-  int retval;
-
   if (this->off() || this->on()) {
     std::cout << "failed to reset SBGC!" << std::endl;
     return -1;

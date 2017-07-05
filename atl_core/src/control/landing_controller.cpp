@@ -254,13 +254,13 @@ LandingController::LandingController(void) {
   this->outputs << 0.0, 0.0, 0.0, 0.0;
   this->att_cmd = AttitudeCommand();
 
-  this->traj_index;
+  // this->traj_index;
   this->trajectory_threshold << 1.0, 1.0, 1.0;
-  this->trajectory;
+  // this->trajectory;
 
   this->blackbox_enable = false;
   this->blackbox_rate = FLT_MAX;
-  this->blackbox;
+  // this->blackbox;
 }
 
 LandingController::~LandingController(void) {
@@ -353,6 +353,7 @@ int LandingController::loadTrajectory(Vec3 pos,
 
   // find trajectory
   retval = this->traj_index.find(pos, v, this->trajectory);
+  UNUSED(target_pos_bf);
 
   // check retval
   if (retval == -2) {
@@ -403,6 +404,7 @@ int LandingController::prepBlackbox(std::string blackbox_file) {
 
 int LandingController::recordTrajectoryIndex(void) {
   this->blackbox << "trajectory index: " << this->trajectory.index << std::endl;
+  return 0;
 }
 
 int LandingController::record(Vec3 pos,
@@ -455,9 +457,7 @@ Vec4 LandingController::calculateVelocityErrors(Vec3 v_errors,
                                                 Vec3 p_errors,
                                                 double yaw,
                                                 double dt) {
-  double r, p, y, t;
-  Vec3 euler;
-  Mat3 R;
+  UNUSED(yaw);
 
   // check rate
   this->dt += dt;
@@ -466,22 +466,22 @@ Vec4 LandingController::calculateVelocityErrors(Vec3 v_errors,
   }
 
   // roll
-  r = this->vy_k_p * v_errors(1);
+  double r = this->vy_k_p * v_errors(1);
   r += this->vy_k_i * p_errors(1);
   r += this->vy_k_d * (v_errors(1) - this->vy_error_prev) / this->dt;
   r = -1 * r;
 
   // pitch
   this->vx_error_sum += v_errors(0);
-  p = this->vx_k_p * v_errors(0);
+  double p = this->vx_k_p * v_errors(0);
   p += this->vx_k_i * this->vx_error_sum;
   p += this->vx_k_d * (v_errors(0) - this->vx_error_prev) / this->dt;
 
   // yaw
-  y = 0.0;
+  double y = 0.0;
 
   // throttle
-  t = this->vz_k_p * v_errors(2);
+  double t = this->vz_k_p * v_errors(2);
   t += this->vz_k_i * p_errors(2);
   t += this->vz_k_d * (v_errors(2) - this->vz_error_prev) / this->dt;
   t /= fabs(cos(r) * cos(p));  // adjust throttle for roll and pitch
@@ -514,13 +514,12 @@ int LandingController::calculate(Vec3 target_pos_bf,
                                  Quaternion orientation,
                                  double yaw,
                                  double dt) {
-  int retval;
   Quaternion q;
   Vec3 p_errors, v_errors, vel_bf, euler;
   Vec2 wp_pos, wp_vel, wp_inputs, wp_rel_pos, wp_rel_vel;
 
   // obtain position and velocity waypoints
-  retval = this->trajectory.update(pos, wp_pos, wp_vel, wp_inputs);
+  int retval = this->trajectory.update(pos, wp_pos, wp_vel, wp_inputs);
   wp_rel_pos = this->trajectory.rel_pos.at(0);
   wp_rel_vel = this->trajectory.rel_vel.at(0);
 
@@ -579,7 +578,7 @@ int LandingController::calculate(Vec3 target_pos_bf,
     return -1;
   }
 
-  return 0;
+  return retval;
 }
 
 void LandingController::reset(void) {

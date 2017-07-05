@@ -56,12 +56,12 @@ int MITDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
   // distortion_params = cv::Vec4d(-0.234490, 0.197606, -0.000956, -0.001423);
   // distortion_params = cv::Vec4d(-0.322520, 0.102037, 0.000097, 0.003677);
   // cv::undistort(image_gray, undistorted, camera_config.camera_matrix, distortion_params);
-      // extract tags
+  // extract tags
   detections = this->detector->extractTags(image_gray);
   // detections_undistorted = this->detector->extractTags(undistorted);
 
   // calculate tag pose
-  for (int i = 0; i < detections.size(); i++) {
+  for (size_t i = 0; i < detections.size(); i++) {
     if (this->obtainPose(detections[i], pose) == 0) {
       tags.push_back(pose);
 
@@ -73,7 +73,6 @@ int MITDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
       // only need 1 tag
       break;
     }
-
   }
   // for (int i = 0; i < detections_undistorted.size(); i++) {
   //   if (this->obtainPose(detections_undistorted[i], pose) == 0) {

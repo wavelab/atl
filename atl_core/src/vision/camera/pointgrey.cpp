@@ -29,7 +29,6 @@ PointGreyCamera::~PointGreyCamera(void) {
 }
 
 int PointGreyCamera::initialize(void) {
-  int camera_index;
   FlyCapture2::Error error;
   FlyCapture2::Property property;
   FlyCapture2::Property gain_property;
@@ -116,7 +115,6 @@ int PointGreyCamera::setFrameRate(double fps) {
 }
 
 int PointGreyCamera::setExposure(double exposure_val) {
-  int retval;
   FlyCapture2::Property property;
   FlyCapture2::Error error;
 
@@ -138,7 +136,6 @@ int PointGreyCamera::setExposure(double exposure_val) {
 }
 
 int PointGreyCamera::setShutter(double shutter_ms) {
-  int retval;
   FlyCapture2::Property property;
   FlyCapture2::Error error;
 
@@ -160,7 +157,6 @@ int PointGreyCamera::setShutter(double shutter_ms) {
 }
 
 int PointGreyCamera::setGain(double gain_db) {
-  int retval;
   FlyCapture2::Property property;
   FlyCapture2::Error error;
 
@@ -217,7 +213,6 @@ int PointGreyCamera::getFrameRate(double &fps) {
 }
 
 int PointGreyCamera::getExposure(double &exposure_val) {
-  int retval;
   FlyCapture2::Property property;
   FlyCapture2::Error error;
 
@@ -236,7 +231,6 @@ int PointGreyCamera::getExposure(double &exposure_val) {
 }
 
 int PointGreyCamera::getShutter(double &shutter_ms) {
-  int retval;
   FlyCapture2::Property property;
   FlyCapture2::Error error;
 
@@ -255,7 +249,6 @@ int PointGreyCamera::getShutter(double &shutter_ms) {
 }
 
 int PointGreyCamera::getGain(double &gain_db) {
-  int retval;
   FlyCapture2::Property property;
   FlyCapture2::Error error;
 
@@ -302,7 +295,6 @@ int PointGreyCamera::setFormat7(int mode,
                                 std::string pixel_format,
                                 int width,
                                 int height) {
-  bool supported;
   bool valid;
   unsigned int packet_size;
   float psize_percentage;
@@ -431,7 +423,6 @@ int PointGreyCamera::getFrame(cv::Mat &image) {
 
 int PointGreyCamera::run(void) {
   int frame_count;
-  double t;
   double last_tic;
 
   // pre-check

@@ -49,12 +49,12 @@ int ExtendedKalmanFilterTracker::initialize(VecX mu) {
   // initialize
   this->mu = mu;
 
-  this->R;  // set during configuration
-  this->Q;  // set during configuration
+  // this->R;  // set during configuration
+  // this->Q;  // set during configuration
 
   this->S = MatX::Identity(this->nb_states, this->nb_states);
   this->I = MatX::Identity(this->nb_states, this->nb_states);
-  this->K;
+  // this->K;
 
   this->mu_p = VecX::Zero(this->nb_states);
   this->S_p = MatX::Zero(this->nb_states, this->nb_states);
@@ -75,6 +75,8 @@ int ExtendedKalmanFilterTracker::reset(VecX mu) {
     this->initialized = false;
     return -2;
   }
+
+  return 0;
 }
 
 int ExtendedKalmanFilterTracker::predictionUpdate(VecX g, MatX G) {

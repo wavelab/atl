@@ -118,7 +118,7 @@ class QuadrotorModel {
           d(1.0),      // drag
           m(1.0),      // mass of quad
           g(10.0),     // gravitational constant
-          attitude_setpoints(0, 0, 0, 0),
+          attitude_setpoints(0, 0, 0, 0.5),
           position_setpoints(0, 0, 0),
           attitude_controller(),
           position_controller() {}

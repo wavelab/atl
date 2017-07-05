@@ -334,7 +334,7 @@ int8_t MPU6050::getSampleRateDiv(void) {
 }
 
 int16_t MPU6050::getSampleRate(void) {
-  uint8_t smplrt_div;
+  int8_t smplrt_div;
   uint8_t dlpf_cfg;
   uint16_t sample_divider;
   uint16_t gyro_rate;

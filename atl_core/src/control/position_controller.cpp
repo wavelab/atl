@@ -62,11 +62,6 @@ Vec4 PositionController::calculate(Vec3 setpoints,
                                    Pose robot_pose,
                                    double yaw,
                                    double dt) {
-  double r, p, y, t;
-  Vec3 errors;
-  Vec4 outputs;
-  Mat3 R;
-
   // check rate
   this->dt += dt;
   if (this->dt < 0.01) {
@@ -74,6 +69,7 @@ Vec4 PositionController::calculate(Vec3 setpoints,
   }
 
   // calculate setpoint relative to quadrotor
+  Vec3 errors;
   target2bodyplanar(setpoints,
                     robot_pose.position,
                     robot_pose.orientation,
@@ -81,10 +77,10 @@ Vec4 PositionController::calculate(Vec3 setpoints,
 
   // roll, pitch, yaw and throttle (assuming NWU frame)
   // clang-format off
-  r = -this->y_controller.calculate(errors(1), 0.0, this->dt);
-  p = this->x_controller.calculate(errors(0), 0.0, this->dt);
-  y = yaw;
-  t = this->hover_throttle;
+  double r = -this->y_controller.calculate(errors(1), 0.0, this->dt);
+  double p = this->x_controller.calculate(errors(0), 0.0, this->dt);
+  double y = yaw;
+  double t = this->hover_throttle;
   t += this->z_controller.calculate(errors(2), 0.0, this->dt);
   t /= fabs(cos(r) * cos(p));  // adjust throttle for roll and pitch
   // clang-format o
@@ -100,7 +96,7 @@ Vec4 PositionController::calculate(Vec3 setpoints,
   t = (t > 1.0) ? 1.0 : t;
 
   // set outputs
-  outputs << r, p, y, t;
+  Vec4 outputs{r, p, y, t};
 
   // keep track of setpoints and outputs
   this->setpoints = setpoints;
@@ -117,11 +113,9 @@ void PositionController::reset(void) {
 }
 
 void PositionController::printOutputs(void) {
-  double r, p, t;
-
-  r = rad2deg(this->outputs(0));
-  p = rad2deg(this->outputs(1));
-  t = this->outputs(3);
+  double r = rad2deg(this->outputs(0));
+  double p = rad2deg(this->outputs(1));
+  double t = this->outputs(3);
 
   std::cout << "roll: " << std::setprecision(2) << r << "\t";
   std::cout << "pitch: " << std::setprecision(2) << p << "\t";
@@ -129,16 +123,14 @@ void PositionController::printOutputs(void) {
 }
 
 void PositionController::printErrors(void) {
-  double p, i, d;
-
-  p = this->x_controller.error_p;
-  i = this->x_controller.error_i;
-  d = this->x_controller.error_d;
+  double p = this->x_controller.error_p;
+  double i = this->x_controller.error_i;
+  double d = this->x_controller.error_d;
 
   std::cout << "x_controller: " << std::endl;
   std::cout << "\terror_p: " << std::setprecision(2) << p << "\t";
   std::cout << "\terror_i: " << std::setprecision(2) << i << "\t";
-  std::cout << "\terror_d: " << std::setprecision(2) << i << std::endl;
+  std::cout << "\terror_d: " << std::setprecision(2) << d << std::endl;
 
   p = this->y_controller.error_p;
   i = this->y_controller.error_i;
@@ -147,7 +139,7 @@ void PositionController::printErrors(void) {
   std::cout << "y_controller: " << std::endl;
   std::cout << "\terror_p: " << std::setprecision(2) << p << "\t";
   std::cout << "\terror_i: " << std::setprecision(2) << i << "\t";
-  std::cout << "\terror_d: " << std::setprecision(2) << i << std::endl;
+  std::cout << "\terror_d: " << std::setprecision(2) << d << std::endl;
 
   p = this->z_controller.error_p;
   i = this->z_controller.error_i;
@@ -156,7 +148,7 @@ void PositionController::printErrors(void) {
   std::cout << "z_controller: " << std::endl;
   std::cout << "\terror_p: " << std::setprecision(2) << p << "\t";
   std::cout << "\terror_i: " << std::setprecision(2) << i << "\t";
-  std::cout << "\terror_d: " << std::setprecision(2) << i << std::endl;
+  std::cout << "\terror_d: " << std::setprecision(2) << d << std::endl;
 }
 
 }  // namespace atl

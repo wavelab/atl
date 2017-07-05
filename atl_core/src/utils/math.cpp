@@ -201,32 +201,28 @@ int quat2euler(Quaternion q, int euler_seq, Vec3 &euler) {
 }
 
 int quat2rot(Quaternion q, Mat3 &R) {
-  double qw, qx, qy, qz;
-  double qw2, qx2, qy2, qz2;
-  double R11, R12, R13, R21, R22, R23, R31, R32, R33;
+  double qw = q.w();
+  double qx = q.x();
+  double qy = q.y();
+  double qz = q.z();
 
-  qw = q.w();
-  qx = q.x();
-  qy = q.y();
-  qz = q.z();
-
-  qw2 = pow(qw, 2);
-  qx2 = pow(qx, 2);
-  qy2 = pow(qy, 2);
-  qz2 = pow(qz, 2);
+  // double qw2 = pow(qw, 2);
+  double qx2 = pow(qx, 2);
+  double qy2 = pow(qy, 2);
+  double qz2 = pow(qz, 2);
 
   // inhomogeneous form
-  R11 = 1 - 2 * qy2 - 2 * qz2;
-  R12 = 2 * qx * qy + 2 * qz * qw;
-  R13 = 2 * qx * qz - 2 * qy * qw;
+  double R11 = 1 - 2 * qy2 - 2 * qz2;
+  double R12 = 2 * qx * qy + 2 * qz * qw;
+  double R13 = 2 * qx * qz - 2 * qy * qw;
 
-  R21 = 2 * qx * qy - 2 * qz * qw;
-  R22 = 1 - 2 * qx2 - 2 * qz2;
-  R23 = 2 * qy * qz + 2 * qx * qw;
+  double R21 = 2 * qx * qy - 2 * qz * qw;
+  double R22 = 1 - 2 * qx2 - 2 * qz2;
+  double R23 = 2 * qy * qz + 2 * qx * qw;
 
-  R31 = 2 * qx * qz + 2 * qy * qw;
-  R32 = 2 * qy * qz - 2 * qx * qw;
-  R33 = 1 - 2 * qx2 - 2 * qy2;
+  double R31 = 2 * qx * qz + 2 * qy * qw;
+  double R32 = 2 * qy * qz - 2 * qx * qw;
+  double R33 = 1 - 2 * qx2 - 2 * qy2;
 
   // // homogeneous form
   // R11 = qx2 + qx2 - qy2 - qz2;

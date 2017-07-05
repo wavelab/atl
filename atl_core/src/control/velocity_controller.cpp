@@ -62,11 +62,6 @@ int VelocityController::configure(std::string config_file) {
 }
 
 Vec4 VelocityController::calculate(Vec3 setpoints, Vec3 actual, double dt) {
-  double r, p, y, t;
-  Vec3 errors, euler;
-  Vec4 outputs;
-  Mat3 R;
-
   // check rate
   this->dt += dt;
   if (this->dt < 0.01) {
@@ -74,16 +69,17 @@ Vec4 VelocityController::calculate(Vec3 setpoints, Vec3 actual, double dt) {
   }
 
   // calculate errors
+  Vec3 errors;
   errors(0) = setpoints(0) - actual(0);
   errors(1) = setpoints(1) - actual(1);
   errors(2) = setpoints(2) - actual(2);
 
   // roll, pitch, yaw and throttle (assuming NWU frame)
   // clang-format off
-  r = -this->vy_controller.calculate(errors(1), 0.0, this->dt);
-  p = this->vx_controller.calculate(errors(0), 0.0, this->dt);
-  y = 0.0;
-  t = this->vz_controller.calculate(errors(2), 0.0, this->dt);
+  double r = -this->vy_controller.calculate(errors(1), 0.0, this->dt);
+  double p = this->vx_controller.calculate(errors(0), 0.0, this->dt);
+  double y = 0.0;
+  double t = this->vz_controller.calculate(errors(2), 0.0, this->dt);
   t /= fabs(cos(r) * cos(p));  // adjust throttle for roll and pitch
   // clang-format o
 
@@ -98,7 +94,7 @@ Vec4 VelocityController::calculate(Vec3 setpoints, Vec3 actual, double dt) {
   t = (t > 1.0) ? 1.0 : t;
 
   // set outputs
-  outputs << r, p, y, t;
+  Vec4 outputs{r, p, y, t};
 
   // keep track of setpoints and outputs
   this->setpoints = setpoints;
@@ -115,11 +111,9 @@ void VelocityController::reset(void) {
 }
 
 void VelocityController::printOutputs(void) {
-  double r, p, t;
-
-  r = rad2deg(this->outputs(0));
-  p = rad2deg(this->outputs(1));
-  t = this->outputs(3);
+  double r = rad2deg(this->outputs(0));
+  double p = rad2deg(this->outputs(1));
+  double t = this->outputs(3);
 
   std::cout << "roll: " << std::setprecision(2) << r << "\t";
   std::cout << "pitch: " << std::setprecision(2) << p << "\t";
@@ -127,16 +121,14 @@ void VelocityController::printOutputs(void) {
 }
 
 void VelocityController::printErrors(void) {
-  double p, i, d;
-
-  p = this->vx_controller.error_p;
-  i = this->vx_controller.error_i;
-  d = this->vx_controller.error_d;
+  double p = this->vx_controller.error_p;
+  double i = this->vx_controller.error_i;
+  double d = this->vx_controller.error_d;
 
   std::cout << "x_controller: " << std::endl;
   std::cout << "\terror_p: " << std::setprecision(2) << p << "\t";
   std::cout << "\terror_i: " << std::setprecision(2) << i << "\t";
-  std::cout << "\terror_d: " << std::setprecision(2) << i << std::endl;
+  std::cout << "\terror_d: " << std::setprecision(2) << d << std::endl;
 
   p = this->vy_controller.error_p;
   i = this->vy_controller.error_i;
@@ -145,7 +137,7 @@ void VelocityController::printErrors(void) {
   std::cout << "y_controller: " << std::endl;
   std::cout << "\terror_p: " << std::setprecision(2) << p << "\t";
   std::cout << "\terror_i: " << std::setprecision(2) << i << "\t";
-  std::cout << "\terror_d: " << std::setprecision(2) << i << std::endl;
+  std::cout << "\terror_d: " << std::setprecision(2) << d << std::endl;
 
   p = this->vz_controller.error_p;
   i = this->vz_controller.error_i;
@@ -154,7 +146,7 @@ void VelocityController::printErrors(void) {
   std::cout << "z_controller: " << std::endl;
   std::cout << "\terror_p: " << std::setprecision(2) << p << "\t";
   std::cout << "\terror_i: " << std::setprecision(2) << i << "\t";
-  std::cout << "\terror_d: " << std::setprecision(2) << i << std::endl;
+  std::cout << "\terror_d: " << std::setprecision(2) << d << std::endl;
 }
 
 }  // namespace atl

@@ -6,13 +6,11 @@
 
 #include <Eigen/Dense>
 
-#include "wave/utils/math.hpp"
+#include "atl/utils/math.hpp"
 #include "atl_gazebo/gazebo_node.hpp"
 
 namespace atl {
 namespace gaz {
-
-using namespace wave;
 
 // MESSAGE TYPES
 #define VEC3_MSG gazebo::msgs::Vector3d

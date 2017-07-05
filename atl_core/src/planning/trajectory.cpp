@@ -97,74 +97,74 @@ int trajectory_calculate_desired(struct problem_data *p) {
   return 0;
 }
 
-double trajectory_cost_func(const std::vector<double> &x,
-                            std::vector<double> &grad,
-                            void *data) {
-  double cost;
-  struct problem_data *p;
-  MatX X;
-  VecX g;
-  VecX x_opt, x_des;
-  VecX z_opt, z_des;
-  VecX u1_opt, u2_opt;
+// double trajectory_cost_func(const std::vector<double> &x,
+//                             std::vector<double> &grad,
+//                             void *data) {
+//   double cost;
+//   struct problem_data *p;
+//   MatX X;
+//   VecX g;
+//   VecX x_opt, x_des;
+//   VecX z_opt, z_des;
+//   VecX u1_opt, u2_opt;
+//
+//   // setup
+//   cost = 0.0;
+//   p = (struct problem_data *) data;
+//   load_matrix(x, p->nb_states + p->nb_inputs, p->nb_steps, X);
+//   g = 9.81 * MatX::Ones(p->nb_steps, 1);
+//
+//   // position error cost
+//   x_opt = X.row(0);
+//   x_des = p->desired.row(0);
+//   cost += p->cost_weights[0] * (x_opt - x_des).norm();
+//
+//   z_opt = X.row(2);
+//   z_des = p->desired.row(2);
+//   cost += p->cost_weights[1] * (z_opt - z_des).norm();
+//
+//   // control input cost
+//   u1_opt = X.row(4);
+//   u2_opt = X.row(5);
+//   cost += p->cost_weights[2] * (u1_opt - g).squaredNorm();
+//   cost += p->cost_weights[3] * u2_opt.squaredNorm();
+//
+//   return cost;
+// }
 
-  // setup
-  cost = 0.0;
-  p = (struct problem_data *) data;
-  load_matrix(x, p->nb_states + p->nb_inputs, p->nb_steps, X);
-  g = 9.81 * MatX::Ones(p->nb_steps, 1);
-
-  // position error cost
-  x_opt = X.row(0);
-  x_des = p->desired.row(0);
-  cost += p->cost_weights[0] * (x_opt - x_des).norm();
-
-  z_opt = X.row(2);
-  z_des = p->desired.row(2);
-  cost += p->cost_weights[1] * (z_opt - z_des).norm();
-
-  // control input cost
-  u1_opt = X.row(4);
-  u2_opt = X.row(5);
-  cost += p->cost_weights[2] * (u1_opt - g).squaredNorm();
-  cost += p->cost_weights[3] * u2_opt.squaredNorm();
-
-  return cost;
-}
-
-double trajectory_constraint_func(const std::vector<double> &x,
-                                  std::vector<double> &grad,
-                                  void *data) {
-  struct problem_data *p;
-  double error, dt;
-  MatX X;
-  Vec4 x_curr, x_prev, x_dot;
-  Vec2 u_prev;
-
-  // setup
-  error = 0.0;
-  dt = 0.1;
-  p = (struct problem_data *) data;
-  load_matrix(x, p->nb_states + p->nb_inputs, p->nb_steps, X);
-
-  for (int i = 0; i < (p->nb_steps - 1); i++) {
-    u_prev = X.block(4, i, 2, 1);
-    x_prev = X.block(0, i, 4, 1);
-    x_curr = X.block(0, i + 1, 4, 1);
-
-    // clang-format off
-    x_dot << x_prev(1),
-             u_prev(0) * sin(u_prev(1)),
-             x_prev(3),
-             u_prev(0) * cos(u_prev(1));
-    // clang-format on
-
-    // calculate feasible regions
-    error += ((x_curr - x_prev) - dt * x_dot).sum();
-  }
-
-  return error;
-}
+// double trajectory_constraint_func(const std::vector<double> &x,
+//                                   std::vector<double> &grad,
+//                                   void *data) {
+//   struct problem_data *p;
+//   double error, dt;
+//   MatX X;
+//   Vec4 x_curr, x_prev, x_dot;
+//   Vec2 u_prev;
+//
+//   // setup
+//   error = 0.0;
+//   dt = 0.1;
+//   p = (struct problem_data *) data;
+//   load_matrix(x, p->nb_states + p->nb_inputs, p->nb_steps, X);
+//
+//   for (int i = 0; i < (p->nb_steps - 1); i++) {
+//     u_prev = X.block(4, i, 2, 1);
+//     x_prev = X.block(0, i, 4, 1);
+//     x_curr = X.block(0, i + 1, 4, 1);
+//
+//     // clang-format off
+//     x_dot << x_prev(1),
+//              u_prev(0) * sin(u_prev(1)),
+//              x_prev(3),
+//              u_prev(0) * cos(u_prev(1));
+//     // clang-format on
+//
+//     // calculate feasible regions
+//     error += ((x_curr - x_prev) - dt * x_dot).sum();
+//   }
+//
+//   return error;
+// }
 
 int trajectory_record_optimization(std::string file_path,
                                    std::vector<double> x,

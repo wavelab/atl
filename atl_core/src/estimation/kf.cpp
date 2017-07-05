@@ -45,6 +45,7 @@ int KalmanFilter::init(VecX mu, MatX R, MatX C, MatX Q) {
 
 int KalmanFilter::reset(VecX mu, MatX R, MatX C, MatX Q) {
   this->init(mu, R, C, Q);
+  return 0;
 }
 
 int KalmanFilter::estimate(MatX A, VecX y) {

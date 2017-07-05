@@ -16,10 +16,10 @@ CameraConfig::CameraConfig(void) {
   this->lambda << 0.0, 0.0, 0.0;
   this->alpha = 0.0;
 
-  this->camera_matrix;
-  this->rectification_matrix;
-  this->distortion_coefficients;
-  this->projection_matrix;
+  // this->camera_matrix;
+  // this->rectification_matrix;
+  // this->distortion_coefficients;
+  // this->projection_matrix;
 
   this->imshow = false;
   this->snapshot = false;

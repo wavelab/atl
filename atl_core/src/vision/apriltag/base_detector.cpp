@@ -45,7 +45,7 @@ int BaseDetector::configure(std::string config_file) {
   // TO BE CONFIGURED BY DERIVATIVE DETECTORS
 
   // tag configs
-  for (int i = 0; i < tag_ids.size(); i++) {
+  for (size_t i = 0; i < tag_ids.size(); i++) {
     this->tag_configs[tag_ids[i]] = tag_sizes[i];
   }
 
@@ -123,7 +123,7 @@ int BaseDetector::changeMode(cv::Mat &image) {
   image_height = image.rows;
 
   // traverse all camera modes and change mode based on image size
-  for (int i = 0; i < this->camera_modes.size(); i++) {
+  for (size_t i = 0; i < this->camera_modes.size(); i++) {
     config = this->camera_configs[this->camera_modes[i]];
     widths_equal = (config.image_width == image_width);
     heights_equal = (config.image_height == image_height);

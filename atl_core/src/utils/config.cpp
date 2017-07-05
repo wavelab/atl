@@ -316,7 +316,7 @@ int ConfigParser::load(std::string config_file) {
   // load and parse file
   this->root = YAML::LoadFile(config_file);
 
-  for (int i = 0; i < this->params.size(); i++) {
+  for (size_t i = 0; i < this->params.size(); i++) {
     switch (this->params[i].type) {
       // PRIMITIVE
       case BOOL:

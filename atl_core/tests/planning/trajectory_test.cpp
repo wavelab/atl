@@ -139,65 +139,65 @@ TEST(Trajectory, trajectory_calculate_desired_states) {
   path_file.close();
 }
 
-TEST(Trajectory, trajectory_cost_func) {
-  struct problem_data p;
-  std::vector<double> x;
-  std::vector<double> grad;
-  std::vector<double> cost_weights;
-  double cost;
-
-  // setup
-  cost_weights.push_back(1.0);
-  cost_weights.push_back(1.0);
-  cost_weights.push_back(1.0);
-  trajectory_setup(&p, 4, 2, 10, cost_weights);
-  p.pos_init << -1, 3.5;
-  p.pos_final << 2.3, 0;
-  p.vel_init << 1.0, 1.0;
-  p.vel_final << 0.0, 0.0;
-  p.thrust_init = 9.81;
-  p.thrust_final = 9.81;
-  p.theta_init = 0.2;
-  p.theta_final = 0.0;
-
-  trajectory_calculate_desired(&p);
-  for (int i = 0; i < 10; i++) {
-    x.push_back(p.desired(0, i));  // state - x
-    x.push_back(p.desired(1, i));  // state - vx
-    x.push_back(p.desired(2, i));  // state - z
-    x.push_back(p.desired(3, i));  // state - vz
-    x.push_back(p.desired(4, i));  // input - az
-    x.push_back(p.desired(5, i));  // input - w
-  }
-
-  // test
-  cost = trajectory_cost_func(x, grad, &p);
-  ASSERT_FLOAT_EQ(0.0, cost);
-}
-
-TEST(Trajectory, trajectory_constraint_func) {
-  struct problem_data p;
-  nlopt::opt opt;
-  std::vector<double> x, grad, cost_weights;
-  double error;
-
-  // setup problem
-  trajectory_setup(&p, 4, 2, 10, cost_weights);
-  p.pos_init << -1, 3.5;
-  p.pos_final << 2.3, 0;
-  p.vel_init << 1.0, 1.0;
-  p.vel_final << 0.0, 0.0;
-  p.thrust_init = 9.81;
-  p.thrust_final = 9.81;
-  p.theta_init = 0.2;
-  p.theta_final = 0.0;
-  trajectory_calculate_desired(&p);
-  load_matrix(p.desired, x);
-
-  error = trajectory_constraint_func(x, grad, &p);
-  std::cout << error << std::endl;
-}
-
+// TEST(Trajectory, trajectory_cost_func) {
+//   struct problem_data p;
+//   std::vector<double> x;
+//   std::vector<double> grad;
+//   std::vector<double> cost_weights;
+//   double cost;
+//
+//   // setup
+//   cost_weights.push_back(1.0);
+//   cost_weights.push_back(1.0);
+//   cost_weights.push_back(1.0);
+//   trajectory_setup(&p, 4, 2, 10, cost_weights);
+//   p.pos_init << -1, 3.5;
+//   p.pos_final << 2.3, 0;
+//   p.vel_init << 1.0, 1.0;
+//   p.vel_final << 0.0, 0.0;
+//   p.thrust_init = 9.81;
+//   p.thrust_final = 9.81;
+//   p.theta_init = 0.2;
+//   p.theta_final = 0.0;
+//
+//   trajectory_calculate_desired(&p);
+//   for (int i = 0; i < 10; i++) {
+//     x.push_back(p.desired(0, i));  // state - x
+//     x.push_back(p.desired(1, i));  // state - vx
+//     x.push_back(p.desired(2, i));  // state - z
+//     x.push_back(p.desired(3, i));  // state - vz
+//     x.push_back(p.desired(4, i));  // input - az
+//     x.push_back(p.desired(5, i));  // input - w
+//   }
+//
+//   // test
+//   cost = trajectory_cost_func(x, grad, &p);
+//   ASSERT_FLOAT_EQ(0.0, cost);
+// }
+//
+// TEST(Trajectory, trajectory_constraint_func) {
+//   struct problem_data p;
+//   nlopt::opt opt;
+//   std::vector<double> x, grad, cost_weights;
+//   double error;
+//
+//   // setup problem
+//   trajectory_setup(&p, 4, 2, 10, cost_weights);
+//   p.pos_init << -1, 3.5;
+//   p.pos_final << 2.3, 0;
+//   p.vel_init << 1.0, 1.0;
+//   p.vel_final << 0.0, 0.0;
+//   p.thrust_init = 9.81;
+//   p.thrust_final = 9.81;
+//   p.theta_init = 0.2;
+//   p.theta_final = 0.0;
+//   trajectory_calculate_desired(&p);
+//   load_matrix(p.desired, x);
+//
+//   error = trajectory_constraint_func(x, grad, &p);
+//   std::cout << error << std::endl;
+// }
+//
 // TEST(Trajectory, optimize) {
 //   double minf;
 //   struct problem_data p;

@@ -71,9 +71,6 @@ void QuadrotorGPlugin::onUpdate(const gazebo::common::UpdateInfo &info) {
 }
 
 void QuadrotorGPlugin::simulate(double dt) {
-  VecX quad_pose;
-  ignition::math::Pose3d gazebo_pose;
-
   // pre-check
   if (dt < 0.0) {
     return;
@@ -83,8 +80,8 @@ void QuadrotorGPlugin::simulate(double dt) {
   // block above the `this->quadrotor.update()` had the 3D model been set using
   // the calculated position in the Quadrotor class it would go through objects
   // and cause collision detection to go wild
-  quad_pose = this->quadrotor.getPose();
-  gazebo_pose = this->model->WorldPose();
+  VecX quad_pose = this->quadrotor.getPose();
+  ignition::math::Pose3d gazebo_pose = this->model->WorldPose();
   gazebo_pose = ignition::math::Pose3d(gazebo_pose.Pos().X(),
                                        gazebo_pose.Pos().Y(),
                                        gazebo_pose.Pos().Z(),
@@ -98,6 +95,7 @@ void QuadrotorGPlugin::simulate(double dt) {
   Vec4 motor_inputs = this->quadrotor.attitudeControllerControl(dt);
   // motor_inputs = this->quadrotor.positionControllerControl(dt);
   // motor_inputs = this->quadrotor.velocityControllerControl(dt);
+  // motor_inputs << 2.5, 2.5, 2.5, 2.5;
   this->quadrotor.update(motor_inputs, dt);
 
   // set model pose

@@ -7,14 +7,12 @@
 
 #include <Eigen/Dense>
 
-#include "wave/utils/math.hpp"
+#include "atl/utils/math.hpp"
 #include "atl_gazebo/gazebo_node.hpp"
 
 
 namespace atl {
 namespace gaz {
-
-using namespace wave;
 
 // MESSAGES TYPES
 #define TIME_MSG gazebo::msgs::Time
