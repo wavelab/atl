@@ -15,7 +15,7 @@
 #include "atl_gazebo/clients/camera_gclient.hpp"
 
 namespace atl {
-namespace ros {
+namespace gazebo_bridge {
 
 // NODE SETTINGS
 #define NODE_NAME "atl_camera"
@@ -63,6 +63,6 @@ public:
   void imageCallback(ConstImagePtr &msg);
 };
 
-}  // namespace ros
+}  // namespace gazebo_bridge
 }  // namespace atl
 #endif

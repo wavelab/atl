@@ -31,12 +31,12 @@ INCLUDE_DIRECTORIES(/usr/local/include)
 INCLUDE_DIRECTORIES(/usr/include/eigen3)
 INCLUDE_DIRECTORIES(/usr/include/opencv2)
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
-INCLUDE_DIRECTORIES(${catkin_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(SYSTEM ${catkin_INCLUDE_DIRS})
 
 # LIBS
 LINK_DIRECTORIES(/usr/lib)
 LINK_DIRECTORIES(/usr/local/lib)
-LINK_DIRECTORIES(${catkin_LIBRARY_DIRS})
+LINK_DIRECTORIES(AFTER ${catkin_LIBRARY_DIRS})
 
 # BUILD AS CATKIN PACKAGE
 CATKIN_PACKAGE(
@@ -56,7 +56,7 @@ SET(
     ATL_ROS_DEPS
     atl_ros_utils
     atl_core
-    # m3api
+    m3api
     flycapture
     ${catkin_LIBRARIES}
     ${OpenCV_LIBS}
@@ -66,45 +66,45 @@ SET(
     CGAL
     yaml-cpp
 )
-ADD_EXECUTABLE(apriltag_node src/ros/nodes/apriltag_node.cpp)
-TARGET_LINK_LIBRARIES(apriltag_node ${ATL_ROS_DEPS})
-ADD_DEPENDENCIES(apriltag_node atl_ros_utils)
+ADD_EXECUTABLE(atl_apriltag_node src/ros/nodes/apriltag_node.cpp)
+TARGET_LINK_LIBRARIES(atl_apriltag_node ${ATL_ROS_DEPS})
+ADD_DEPENDENCIES(atl_apriltag_node atl_ros_utils)
 
-# ADD_EXECUTABLE(camera_node src/ros/nodes/camera_node.cpp)
-# TARGET_LINK_LIBRARIES(camera_node ${ATL_ROS_DEPS})
-# ADD_DEPENDENCIES(camera_node atl_ros_utils)
+ADD_EXECUTABLE(atl_camera_node src/ros/nodes/camera_node.cpp)
+TARGET_LINK_LIBRARIES(atl_camera_node ${ATL_ROS_DEPS})
+ADD_DEPENDENCIES(atl_camera_node atl_ros_utils)
 
-ADD_EXECUTABLE(control_node src/ros/nodes/control_node.cpp)
-TARGET_LINK_LIBRARIES(control_node ${ATL_ROS_DEPS})
-ADD_DEPENDENCIES(control_node atl_ros_utils)
+ADD_EXECUTABLE(atl_control_node src/ros/nodes/control_node.cpp)
+TARGET_LINK_LIBRARIES(atl_control_node ${ATL_ROS_DEPS})
+ADD_DEPENDENCIES(atl_control_node atl_ros_utils)
 
-ADD_EXECUTABLE(estimator_node src/ros/nodes/estimator_node.cpp)
-TARGET_LINK_LIBRARIES(estimator_node ${ATL_ROS_DEPS})
-ADD_DEPENDENCIES(estimator_node atl_ros_utils)
+ADD_EXECUTABLE(atl_estimator_node src/ros/nodes/estimator_node.cpp)
+TARGET_LINK_LIBRARIES(atl_estimator_node ${ATL_ROS_DEPS})
+ADD_DEPENDENCIES(atl_estimator_node atl_ros_utils)
 
-# ADD_EXECUTABLE(example_node src/ros/nodes/example_node.cpp)
-# TARGET_LINK_LIBRARIES(example_node ${ATL_ROS_DEPS})
-# ADD_DEPENDENCIES(example_node atl_ros_utils)
-#
-# ADD_EXECUTABLE(fake_mavros_node src/ros/nodes/fake_mavros_node.cpp)
-# TARGET_LINK_LIBRARIES(fake_mavros_node ${ATL_ROS_DEPS})
-# ADD_DEPENDENCIES(fake_mavros_node atl_ros_utils)
-#
-# ADD_EXECUTABLE(gimbal_node src/ros/nodes/gimbal_node.cpp)
-# TARGET_LINK_LIBRARIES(gimbal_node ${ATL_ROS_DEPS})
-# ADD_DEPENDENCIES(gimbal_node atl_ros_utils)
-#
-# ADD_EXECUTABLE(imu_node src/ros/nodes/imu_node.cpp)
-# TARGET_LINK_LIBRARIES(imu_node ${ATL_ROS_DEPS})
-# ADD_DEPENDENCIES(imu_node atl_ros_utils)
-#
-# ADD_EXECUTABLE(pg_camera_node src/ros/nodes/pg_camera_node.cpp)
-# TARGET_LINK_LIBRARIES(pg_camera_node ${ATL_ROS_DEPS})
-# ADD_DEPENDENCIES(pg_camera_node atl_ros_utils)
+ADD_EXECUTABLE(atl_example_node src/ros/nodes/example_node.cpp)
+TARGET_LINK_LIBRARIES(atl_example_node ${ATL_ROS_DEPS})
+ADD_DEPENDENCIES(atl_example_node atl_ros_utils)
 
-# ADD_EXECUTABLE(ximea_camera_node src/ros/nodes/ximea_camera_node.cpp)
-# TARGET_LINK_LIBRARIES(ximea_camera_node ${ATL_ROS_DEPS})
-# ADD_DEPENDENCIES(ximea_camera_node atl_ros_utils)
+ADD_EXECUTABLE(atl_fake_mavros_node src/ros/nodes/fake_mavros_node.cpp)
+TARGET_LINK_LIBRARIES(atl_fake_mavros_node ${ATL_ROS_DEPS})
+ADD_DEPENDENCIES(atl_fake_mavros_node atl_ros_utils)
+
+ADD_EXECUTABLE(atl_gimbal_node src/ros/nodes/gimbal_node.cpp)
+TARGET_LINK_LIBRARIES(atl_gimbal_node ${ATL_ROS_DEPS})
+ADD_DEPENDENCIES(atl_gimbal_node atl_ros_utils)
+
+ADD_EXECUTABLE(atl_imu_node src/ros/nodes/imu_node.cpp)
+TARGET_LINK_LIBRARIES(atl_imu_node ${ATL_ROS_DEPS})
+ADD_DEPENDENCIES(atl_imu_node atl_ros_utils)
+
+ADD_EXECUTABLE(atl_pg_camera_node src/ros/nodes/pg_camera_node.cpp)
+TARGET_LINK_LIBRARIES(atl_pg_camera_node ${ATL_ROS_DEPS})
+ADD_DEPENDENCIES(atl_pg_camera_node atl_ros_utils)
+
+ADD_EXECUTABLE(atl_ximea_camera_node src/ros/nodes/ximea_camera_node.cpp)
+TARGET_LINK_LIBRARIES(atl_ximea_camera_node ${ATL_ROS_DEPS})
+ADD_DEPENDENCIES(atl_ximea_camera_node atl_ros_utils)
 
 # ROS UTILS
 ADD_LIBRARY(

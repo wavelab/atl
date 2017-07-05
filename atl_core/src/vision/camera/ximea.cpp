@@ -38,32 +38,32 @@ int XimeaCamera::initialize(void) {
   // clang-format off
   // open camera device
   retval = xiOpenDevice(0, &this->ximea);
-  this->checkState(retval, "xiOpenDevice");
+  XIMEA_CHECK(retval, "xiOpenDevice");
 
   // downsampling type
   retval = xiSetParamInt(this->ximea, XI_PRM_DOWNSAMPLING_TYPE, ds_type);
-  this->checkState(retval, "xiSetParam (downsampling type)");
+  XIMEA_CHECK(retval, "xiSetParam (downsampling type)");
 
   // downsampling
   retval = xiSetParamInt(this->ximea, XI_PRM_DOWNSAMPLING, ds_rate);
-  this->checkState(retval, "xiSetParam (downsampling rate)");
+  XIMEA_CHECK(retval, "xiSetParam (downsampling rate)");
 
   // image format
   retval = xiSetParamInt(this->ximea, XI_PRM_IMAGE_DATA_FORMAT, img_format);
-  this->checkState(retval, "xiSetParam (image format)");
+  XIMEA_CHECK(retval, "xiSetParam (image format)");
 
   // windowing
   retval = xiSetParamInt(this->ximea, XI_PRM_WIDTH, image_width);
-  this->checkState(retval, "xiSetParam (image_width)");
+  XIMEA_CHECK(retval, "xiSetParam (image_width)");
 
   retval = xiSetParamInt(this->ximea, XI_PRM_HEIGHT, image_height);
-  this->checkState(retval, "xiSetParam (image_height)");
+  XIMEA_CHECK(retval, "xiSetParam (image_height)");
 
   retval = xiSetParamInt(this->ximea, XI_PRM_OFFSET_X, offset_x);
-  this->checkState(retval, "xiSetParam (offset_x)");
+  XIMEA_CHECK(retval, "xiSetParam (offset_x)");
 
   retval = xiSetParamInt(this->ximea, XI_PRM_OFFSET_Y, offset_y);
-  this->checkState(retval, "xiSetParam (offset_y)");
+  XIMEA_CHECK(retval, "xiSetParam (offset_y)");
 
   // Gain and Exposure
   this->setExposure(this->config.exposure_value);
@@ -75,45 +75,37 @@ int XimeaCamera::initialize(void) {
 
   // start acquisition
   retval = xiStartAcquisition(this->ximea);
-  this->checkState(retval, "xiStartAcquisition");
+  XIMEA_CHECK(retval, "xiStartAcquisition");
   // clang-format on
 
   // return
   log_info("Ximea Camera Started Successfully\n");
   return 0;
 
-// ximea_error:
-//   if (this->ximea) {
-//     xiCloseDevice(this->ximea);
-//   }
-//   return -1;
-// }
-}
-
-int XimeaCamera::checkState(XI_RETURN retval, std::string where) {
-  if (retval != XI_OK) {
-    std::cout << "Error after " << where << std::endl;
-    if (this->ximea) {
-      xiCloseDevice(this->ximea);
-      return -1;
-    } else {
-      return 0;
-    }
-  }
+ximea_error:
+  return -1;
 }
 
 int XimeaCamera::setGain(float gain_db) {
   XI_RETURN retval;
 
   retval = xiSetParamFloat(this->ximea, XI_PRM_GAIN, gain_db);
-  return this->checkState(retval, "xiSetParam (exposure time set)");
+  XIMEA_CHECK(retval, "xiSetParam (exposure time set)");
+  return 0;
+
+ximea_error:
+  return -1;
 }
 
 int XimeaCamera::setExposure(float exposure_time_us) {
   XI_RETURN retval;
 
   retval = xiSetParamInt(this->ximea, XI_PRM_EXPOSURE, exposure_time_us);
-  return this->checkState(retval, "xiSetParam (exposure time set)");
+  XIMEA_CHECK(retval, "xiSetParam (exposure time set)");
+  return 0;
+
+ximea_error:
+  return -1;
 }
 
 int XimeaCamera::changeMode(std::string mode) {
@@ -151,10 +143,7 @@ int XimeaCamera::getFrame(cv::Mat &image) {
       .copyTo(image);
 
     // resize the image to reflect camera mode
-    cv::resize(
-      image,
-      image,
-      cv::Size(640, 480));
+    cv::resize(image, image, cv::Size(640, 480));
     // cv::Size(this->config.image_width, this->config.image_height));
     return 0;
   }

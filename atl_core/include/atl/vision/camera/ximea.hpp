@@ -8,16 +8,14 @@
 
 namespace atl {
 
-// #define XIMEA_CHECK(STATE, WHERE)                \
-//   if (STATE != XI_OK) {                          \
-//     printf("Error after %s (%d)", WHERE, STATE); \
-//     goto ximea_error;                            \
-//   }
-
-#define XIMEA_CHECK(STATE, WHERE)                \
-  if (STATE != XI_OK) {                          \
-    printf("Error after %s (%d)", WHERE, STATE); \
-    ximea_error();                            \
+#define XIMEA_CHECK(RETVAL, WHERE)                      \
+  if (RETVAL != XI_OK) {                                \
+    std::cout << "Error after " << WHERE << std::endl; \
+    if (this->ximea) { \
+      xiCloseDevice(this->ximea); \
+      return -1; \
+    } \
+    goto ximea_error; \
   }
 
 class XimeaCamera : public Camera {
@@ -27,11 +25,10 @@ public:
   XimeaCamera(void);
 
   int initialize(void);
-  int setExposure(float exposure_time_us);
   int setGain(float gain_db);
+  int setExposure(float exposure_time_us);
   int getFrame(cv::Mat &image);
   int changeMode(std::string mode);
-  int checkState(XI_RETURN retval, std::string where);
 };
 
 }  // namespace atl

@@ -91,33 +91,33 @@ SET(ATL_GAZEBO_DEPS
     CGAL
     yaml-cpp)
 
-ADD_EXECUTABLE(camera_node src/bridge/camera_node.cpp)
-TARGET_LINK_LIBRARIES(camera_node ${ATL_GAZEBO_DEPS})
-ADD_DEPENDENCIES(camera_node atl_gazebo_clients)
+ADD_EXECUTABLE(atl_bridge_camera_node src/bridge/camera_node.cpp)
+TARGET_LINK_LIBRARIES(atl_bridge_camera_node ${ATL_GAZEBO_DEPS})
+ADD_DEPENDENCIES(atl_bridge_camera_node atl_gazebo_clients)
 
-ADD_EXECUTABLE(df_camera_node src/bridge/df_camera_node.cpp)
-TARGET_LINK_LIBRARIES(df_camera_node ${ATL_GAZEBO_DEPS})
-ADD_DEPENDENCIES(df_camera_node atl_gazebo_clients)
+ADD_EXECUTABLE(atl_bridge_df_camera_node src/bridge/df_camera_node.cpp)
+TARGET_LINK_LIBRARIES(atl_bridge_df_camera_node ${ATL_GAZEBO_DEPS})
+ADD_DEPENDENCIES(atl_bridge_df_camera_node atl_gazebo_clients)
 
-ADD_EXECUTABLE(dji_quadrotor_node src/bridge/dji_quadrotor_node.cpp)
-TARGET_LINK_LIBRARIES(dji_quadrotor_node ${ATL_GAZEBO_DEPS})
-ADD_DEPENDENCIES(dji_quadrotor_node atl_gazebo_clients)
+ADD_EXECUTABLE(atl_bridge_dji_quadrotor_node src/bridge/dji_quadrotor_node.cpp)
+TARGET_LINK_LIBRARIES(atl_bridge_dji_quadrotor_node ${ATL_GAZEBO_DEPS})
+ADD_DEPENDENCIES(atl_bridge_dji_quadrotor_node atl_gazebo_clients)
 
-ADD_EXECUTABLE(gimbal_node src/bridge/gimbal_node.cpp)
-TARGET_LINK_LIBRARIES(gimbal_node ${ATL_GAZEBO_DEPS})
-ADD_DEPENDENCIES(gimbal_node atl_gazebo_clients)
+ADD_EXECUTABLE(atl_bridge_gimbal_node src/bridge/gimbal_node.cpp)
+TARGET_LINK_LIBRARIES(atl_bridge_gimbal_node ${ATL_GAZEBO_DEPS})
+ADD_DEPENDENCIES(atl_bridge_gimbal_node atl_gazebo_clients)
 
-ADD_EXECUTABLE(lz_node src/bridge/lz_node.cpp)
-TARGET_LINK_LIBRARIES(lz_node ${ATL_GAZEBO_DEPS})
-ADD_DEPENDENCIES(lz_node atl_gazebo_clients)
+ADD_EXECUTABLE(atl_bridge_lz_node src/bridge/lz_node.cpp)
+TARGET_LINK_LIBRARIES(atl_bridge_lz_node ${ATL_GAZEBO_DEPS})
+ADD_DEPENDENCIES(atl_bridge_lz_node atl_gazebo_clients)
 
-ADD_EXECUTABLE(px4_quadrotor_node src/bridge/px4_quadrotor_node.cpp)
-TARGET_LINK_LIBRARIES(px4_quadrotor_node ${ATL_GAZEBO_DEPS})
-ADD_DEPENDENCIES(px4_quadrotor_node atl_gazebo_clients)
+# ADD_EXECUTABLE(atl_bridge_px4_quadrotor_node src/bridge/px4_quadrotor_node.cpp)
+# TARGET_LINK_LIBRARIES(atl_bridge_px4_quadrotor_node ${ATL_GAZEBO_DEPS})
+# ADD_DEPENDENCIES(atl_bridge_px4_quadrotor_node atl_gazebo_clients)
 
-ADD_EXECUTABLE(world_node src/bridge/world_node.cpp)
-TARGET_LINK_LIBRARIES(world_node ${ATL_GAZEBO_DEPS})
-ADD_DEPENDENCIES(world_node atl_gazebo_clients)
+ADD_EXECUTABLE(atl_bridge_world_node src/bridge/world_node.cpp)
+TARGET_LINK_LIBRARIES(atl_bridge_world_node ${ATL_GAZEBO_DEPS})
+ADD_DEPENDENCIES(atl_bridge_world_node atl_gazebo_clients)
 
 
 # CLIENTS

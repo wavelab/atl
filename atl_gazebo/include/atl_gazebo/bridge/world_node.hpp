@@ -16,7 +16,7 @@
 #include "atl_gazebo/clients/world_gclient.hpp"
 
 namespace atl {
-namespace ros {
+namespace gazebo_bridge {
 
 // NODE SETTINGS
 #define NODE_NAME "atl_world"
@@ -48,6 +48,6 @@ public:
   void clearWorldCallback(const std_msgs::Bool &msg);
 };
 
-}  // namespace ros
+}  // namespace gazebo_bridge
 }  // namespace atl
 #endif

@@ -26,7 +26,7 @@
 
 
 namespace atl {
-namespace ros {
+namespace gazebo_bridge {
 
 // NODE SETTINGS
 #define NODE_NAME "atl_dji_quadrotor"
@@ -50,6 +50,6 @@ public:
                                dji_sdk::AttitudeControl::Response &response);
 };
 
-}  // namespace ros
+}  // namespace gazebo_bridge
 }  // namespace atl
 #endif

@@ -1,7 +1,7 @@
 #include "atl_gazebo/bridge/lz_node.hpp"
 
 namespace atl {
-namespace ros {
+namespace gazebo_bridge {
 
 int LZNode::configure(const std::string &node_name, int hz) {
   // setup ros node
@@ -59,7 +59,7 @@ void LZNode::angularVelocityCallback(const std_msgs::Float64 &msg) {
   this->setAngularVelocity(msg.data);
 }
 
-}  // namespace ros
+}  // namespace gazebo_bridge
 }  // namespace atl
 
-RUN_ROS_NODE(atl::ros::LZNode, NODE_NAME, NODE_RATE);
+RUN_ROS_NODE(atl::gazebo_bridge::LZNode, NODE_NAME, NODE_RATE);

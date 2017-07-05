@@ -1,7 +1,7 @@
 #include "atl_gazebo/bridge/px4_quadrotor_node.hpp"
 
 namespace atl {
-namespace ros {
+namespace gazebo_bridge {
 
 int PX4QuadrotorNode::configure(const std::string &node_name, int hz) {
   this->quad_frame = "NWU";
@@ -154,7 +154,7 @@ void PX4QuadrotorNode::velocitySetpointCallback(
   this->setVelocity(gaz_vel(0), gaz_vel(1), gaz_vel(2));
 }
 
-}  // namespace ros
+}  // namespace gazebo_bridge
 }  // namespace atl
 
-RUN_ROS_NODE(atl::ros::PX4QuadrotorNode, NODE_NAME, NODE_RATE);
+RUN_ROS_NODE(atl::gazebo_bridge::PX4QuadrotorNode, NODE_NAME, NODE_RATE);

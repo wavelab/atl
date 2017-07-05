@@ -1,7 +1,7 @@
 #include "atl_gazebo/bridge/world_node.hpp"
 
 namespace atl {
-namespace ros {
+namespace gazebo_bridge {
 
 int WorldNode::configure(const std::string &node_name, int hz) {
   // setup ros node
@@ -90,7 +90,7 @@ void WorldNode::clearWorldCallback(const std_msgs::Bool &msg) {
   }
 }
 
-}  // namespace ros
+}  // namespace gazebo_bridge
 }  // namespace atl
 
-RUN_ROS_NODE(atl::ros::WorldNode, NODE_NAME, NODE_RATE);
+RUN_ROS_NODE(atl::gazebo_bridge::WorldNode, NODE_NAME, NODE_RATE);

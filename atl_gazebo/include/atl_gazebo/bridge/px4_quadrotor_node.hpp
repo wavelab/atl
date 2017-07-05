@@ -20,7 +20,7 @@
 
 
 namespace atl {
-namespace ros {
+namespace gazebo_bridge {
 
 // NODE SETTINGS
 #define NODE_NAME "atl_px4_quadrotor"
@@ -53,6 +53,6 @@ public:
   void velocitySetpointCallback(geometry_msgs::TwistStamped msg);
 };
 
-}  // namespace ros
+}  // namespace gazebo_bridge
 }  // namespace atl
 #endif

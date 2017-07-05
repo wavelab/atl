@@ -15,7 +15,7 @@
 
 
 namespace atl {
-namespace ros {
+namespace gazebo_bridge {
 
 #define ROLL_JOINT "quad_with_gimbal_cam::gimbal_camera::roll_motor_joint"
 #define PITCH_JOINT "quad_with_gimbal_cam::gimbal_camera::pitch_motor_joint"
@@ -49,6 +49,6 @@ public:
   void trackTargetCallback(const geometry_msgs::Vector3 msg);
 };
 
-}  // namespace ros
+}  // namespace gazebo_bridge
 }  // namespace atl
 #endif

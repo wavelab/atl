@@ -2,7 +2,7 @@
 
 
 namespace atl {
-namespace ros {
+namespace gazebo_bridge {
 
 int DJIQuadrotorNode::configure(const std::string &node_name, int hz) {
   // setup ros node
@@ -105,7 +105,7 @@ bool DJIQuadrotorNode::attitudeControlCallback(
   return true;
 }
 
-}  // namespace ros
+}  // namespace gazebo_bridge
 }  // namespace atl
 
-RUN_ROS_NODE(atl::ros::DJIQuadrotorNode, NODE_NAME, NODE_RATE);
+RUN_ROS_NODE(atl::gazebo_bridge::DJIQuadrotorNode, NODE_NAME, NODE_RATE);

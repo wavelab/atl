@@ -12,7 +12,7 @@
 
 
 namespace atl {
-namespace ros {
+namespace gazebo_bridge {
 
 // NODE SETTINGS
 #define NODE_NAME "atl_lz"
@@ -36,6 +36,6 @@ public:
   void angularVelocityCallback(const std_msgs::Float64 &msg);
 };
 
-}  // namespace ros
+}  // namespace gazebo_bridge
 }  // namespace atl
 #endif
