@@ -10,6 +10,8 @@ WorldGPlugin::WorldGPlugin(void) {
 
 void WorldGPlugin::Load(gazebo::physics::WorldPtr parent,
                         sdf::ElementPtr sdf) {
+  UNUSED(sdf);
+
   this->world_sdf = sdf;
   this->world = parent;
   this->update_conn = gazebo::event::Events::ConnectWorldUpdateBegin(
@@ -87,6 +89,7 @@ void WorldGPlugin::worldLoadCallback(ConstRequestPtr &msg) {
 }
 
 void WorldGPlugin::worldClearCallback(ConstRequestPtr &msg) {
+  UNUSED(msg);
   std::cout << "CLEARING WORLD ..." << std::endl;
   this->world->Clear();
 }

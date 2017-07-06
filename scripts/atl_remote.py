@@ -8,7 +8,7 @@ from atl import Camera
 from atl import LandingZone
 from atl import Gimbal
 from atl import Quadrotor
-from atl import World
+# from atl import World
 from atl import MAVROS
 
 
@@ -98,7 +98,8 @@ if __name__ == "__main__":
     rospy.sleep(1.0)
 
     quad.set_arm(True)
-    # lz.set_position([0, 0, 0])
+    # gimbal.set_attitude([0, 0.2, 0])
+    # lz.set_position([1, 0, 0])
     # quad.set_hover_point([0, 0.0, 5.0])
 
     # quad.set_hover_point([1.0, 0.0, 5.0])

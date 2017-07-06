@@ -3,34 +3,6 @@
 
 namespace atl {
 
-Quadrotor::Quadrotor(void) {
-  this->configured = false;
-
-  // this->position_controller;
-  // this->tracking_controller;
-  // this->landing_controller;
-  // this->att_cmd;
-
-  this->recover_height = 0.0;
-  this->auto_track = false;
-  this->auto_land = false;
-  this->auto_disarm = false;
-  this->target_lost_threshold = 0.0;
-  this->min_discover_time = FLT_MAX;
-  this->min_tracking_time = FLT_MAX;
-
-  this->discover_tic = (struct timespec){0, 0};
-  this->tracking_tic = (struct timespec){0, 0};
-  this->landing_tic = (struct timespec){0, 0};
-
-  this->current_mode = DISCOVER_MODE;
-  this->yaw = 0.0;
-  this->pose = Pose();
-  this->hover_position << 0.0, 0.0, 0.0;
-  this->landing_target = LandingTarget();
-  this->landing_target_prev = LandingTarget();
-}
-
 int Quadrotor::configure(std::string config_path) {
   std::string config_file;
   ConfigParser parser;

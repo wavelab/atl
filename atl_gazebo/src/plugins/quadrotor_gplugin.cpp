@@ -30,6 +30,7 @@ QuadrotorGPlugin::QuadrotorGPlugin(void) {
 
 void QuadrotorGPlugin::Load(gazebo::physics::ModelPtr model,
                             sdf::ElementPtr sdf) {
+  UNUSED(sdf);
 
   // set model and bind world update callback
   // clang-format off

@@ -7,6 +7,8 @@
 
 #include <nlopt.hpp>
 
+#include "atl/utils/utils.hpp"
+
 
 namespace atl {
 

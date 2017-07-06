@@ -10,6 +10,8 @@ CameraGPlugin::CameraGPlugin(void) {
 
 void CameraGPlugin::Load(gazebo::sensors::SensorPtr sptr,
                          sdf::ElementPtr sdf) {
+  UNUSED(sdf);
+
   // load sensor pointer
   // clang-format off
   this->sensor = std::dynamic_pointer_cast<gazebo::sensors::CameraSensor>(sptr);
@@ -58,10 +60,10 @@ void CameraGPlugin::onNewFrame(const unsigned char *image_raw,
                                const int image_height,
                                const int image_depth,
                                const std::string &format) {
-  gazebo::common::Image image;
-  gazebo::msgs::Image msg;
+  UNUSED(image_depth);
 
   // clang-format off
+  gazebo::common::Image image;
   image.SetFromData(
     image_raw,
     image_width,
@@ -70,6 +72,7 @@ void CameraGPlugin::onNewFrame(const unsigned char *image_raw,
   );
   // clang-format on
 
+  gazebo::msgs::Image msg;
   gazebo::msgs::Set(&msg, image);
   this->gaz_pubs[IMAGE_PUB_TOPIC]->Publish(msg);
 }

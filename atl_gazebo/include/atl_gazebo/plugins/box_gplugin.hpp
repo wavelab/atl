@@ -9,6 +9,8 @@
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
 
+#include "atl/utils/utils.hpp"
+
 
 namespace atl {
 namespace gaz {

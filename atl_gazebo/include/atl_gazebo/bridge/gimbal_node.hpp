@@ -10,15 +10,13 @@
 #include <geometry_msgs/PoseStamped.h>
 
 #include "atl/utils/utils.hpp"
+#include "atl/ros/utils/msgs.hpp"
 #include "atl/ros/utils/node.hpp"
 #include "atl_gazebo/clients/gimbal_gclient.hpp"
 
 
 namespace atl {
 namespace gazebo_bridge {
-
-#define ROLL_JOINT "quad_with_gimbal_cam::gimbal_camera::roll_motor_joint"
-#define PITCH_JOINT "quad_with_gimbal_cam::gimbal_camera::pitch_motor_joint"
 
 // NODE SETTINGS
 #define NODE_NAME "atl_gimbal"

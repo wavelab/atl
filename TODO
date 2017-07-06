@@ -1,3 +1,7 @@
+- Validate Quadrotor
+    - Position control
+    - Tracking control
+
 - Convert ROS Nodes to nodeletes
     - apriltag
     - camera

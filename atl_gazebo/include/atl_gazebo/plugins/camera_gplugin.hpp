@@ -15,6 +15,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/opencv.hpp>
 
+#include "atl/utils/utils.hpp"
 #include "atl_gazebo/gazebo_node.hpp"
 
 

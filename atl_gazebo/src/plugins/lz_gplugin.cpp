@@ -9,6 +9,8 @@ LZGPlugin::LZGPlugin(void) {
 }
 
 void LZGPlugin::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
+  UNUSED(sdf);
+
   // clang-format off
   this->model = model;
   this->update_conn = gazebo::event::Events::ConnectWorldUpdateBegin(

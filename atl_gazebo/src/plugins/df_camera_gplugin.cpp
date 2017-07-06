@@ -9,6 +9,8 @@ DFCameraGPlugin::DFCameraGPlugin(void) {
 
 void DFCameraGPlugin::Load(gazebo::sensors::SensorPtr sptr,
                            sdf::ElementPtr sdf) {
+  UNUSED(sdf);
+
   // load sensor pointer
   // clang-format off
   this->sensor = std::dynamic_pointer_cast<gazebo::sensors::CameraSensor>(sptr);

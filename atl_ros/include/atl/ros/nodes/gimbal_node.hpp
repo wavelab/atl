@@ -25,6 +25,7 @@ namespace atl {
 #define FRAME_ORIENTATION_TOPIC "/atl/gimbal/frame/orientation/inertial"
 #define JOINT_ORIENTATION_TOPIC "/atl/gimbal/joint/orientation/inertial"
 #define ENCODER_ORIENTATION_TOPIC "atl/gimbal/joint/orientation/body"
+
 // SUBSCRIBE TOPICS
 #define QUAD_POSE_TOPIC "/atl/quadrotor/pose/local"
 #define SETPOINT_TOPIC "/atl/gimbal/setpoint/attitude"

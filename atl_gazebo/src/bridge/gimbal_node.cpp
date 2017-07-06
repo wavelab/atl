@@ -32,26 +32,15 @@ void GimbalNode::frameOrientationCallback(ConstQuaternionPtr &msg) {
 
   // publish frame orientation in ROS
   geometry_msgs::Quaternion ros_msg;
-
-  ros_msg.w = this->frame_orientation.w();
-  ros_msg.x = this->frame_orientation.x();
-  ros_msg.y = this->frame_orientation.y();
-  ros_msg.z = this->frame_orientation.z();
-
+  buildMsg(this->frame_orientation, ros_msg);
   this->ros_pubs[FRAME_ORIENTATION_RTOPIC].publish(ros_msg);
 }
 
 void GimbalNode::jointOrientationCallback(ConstQuaternionPtr &msg) {
   GimbalGClient::jointOrientationCallback(msg);
 
-  // publish joint orientation in ROS
   geometry_msgs::Quaternion ros_msg;
-
-  ros_msg.w = this->joint_orientation.w();
-  ros_msg.x = this->joint_orientation.x();
-  ros_msg.y = this->joint_orientation.y();
-  ros_msg.z = this->joint_orientation.z();
-
+  buildMsg(this->joint_orientation, ros_msg);
   this->ros_pubs[JOINT_ORIENTATION_RTOPIC].publish(ros_msg);
 }
 

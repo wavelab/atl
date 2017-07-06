@@ -8,6 +8,8 @@ BoxGPlugin::BoxGPlugin(void) {
 }
 
 void BoxGPlugin::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
+  UNUSED(sdf);
+
   // store the pointer to the model
   this->model = model;
 
@@ -18,6 +20,8 @@ void BoxGPlugin::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
 }
 
 void BoxGPlugin::onUpdate(const gazebo::common::UpdateInfo &info) {
+  UNUSED(info);
+
   this->model->SetLinearVel(ignition::math::Vector3d(0.0, 0.0, 0.1));
   this->model->SetAngularVel(ignition::math::Vector3d(0.0, 0.0, 0.2));
 }
