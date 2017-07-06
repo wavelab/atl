@@ -1,16 +1,15 @@
 #ifndef ATL_ROS_NODES_APRILTAG_NODE_HPP
 #define ATL_ROS_NODES_APRILTAG_NODE_HPP
 
-#include <ros/ros.h>
 #include <cv_bridge/cv_bridge.h>
+#include <ros/ros.h>
 #include <sensor_msgs/CameraInfo.h>
 
-#include <atl/atl_core.hpp>
 #include <atl_msgs/AprilTagPose.h>
+#include <atl/atl_core.hpp>
 
-#include "atl/ros/utils/node.hpp"
 #include "atl/ros/utils/msgs.hpp"
-
+#include "atl/ros/utils/node.hpp"
 
 namespace atl {
 

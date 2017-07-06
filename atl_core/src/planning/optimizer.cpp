@@ -1,6 +1,5 @@
 #include "atl/planning/optimizer.hpp"
 
-
 namespace atl {
 
 double cost_func(const std::vector<double> &x,

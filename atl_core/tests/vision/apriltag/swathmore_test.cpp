@@ -1,6 +1,6 @@
+#include "atl/vision/apriltag/swathmore.hpp"
 #include "atl/atl_test.hpp"
 #include "atl/vision/camera/camera.hpp"
-#include "atl/vision/apriltag/swathmore.hpp"
 
 #define TEST_CONFIG "tests/configs/apriltag/config.yaml"
 #define TEST_IMAGE_CENTER "tests/data/apriltag/center.png"

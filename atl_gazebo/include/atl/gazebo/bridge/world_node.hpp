@@ -3,17 +3,17 @@
 
 #include <stdlib.h>
 
+#include <geometry_msgs/Vector3.h>
 #include <ros/ros.h>
 #include <ros/time.h>
+#include <rosgraph_msgs/Clock.h>
 #include <std_msgs/Bool.h>
 #include <std_msgs/String.h>
-#include <geometry_msgs/Vector3.h>
-#include <rosgraph_msgs/Clock.h>
 
-#include "atl/utils/utils.hpp"
-#include "atl/ros/utils/node.hpp"
-#include "atl/ros/utils/msgs.hpp"
 #include "atl/gazebo/clients/world_gclient.hpp"
+#include "atl/ros/utils/msgs.hpp"
+#include "atl/ros/utils/node.hpp"
+#include "atl/utils/utils.hpp"
 
 namespace atl {
 namespace gazebo_bridge {

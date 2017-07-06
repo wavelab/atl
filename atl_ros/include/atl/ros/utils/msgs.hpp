@@ -2,27 +2,26 @@
 #define ATL_ROS_UTILS_MSGS_HPP
 
 #include <std_msgs/Bool.h>
-#include <std_msgs/String.h>
 #include <std_msgs/Float64.h>
+#include <std_msgs/String.h>
 
-#include <geometry_msgs/Vector3.h>
-#include <geometry_msgs/Quaternion.h>
 #include <geometry_msgs/PoseStamped.h>
-#include <geometry_msgs/TwistStamped.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include <geometry_msgs/Quaternion.h>
+#include <geometry_msgs/TwistStamped.h>
+#include <geometry_msgs/Vector3.h>
 
 #include <atl/atl_core.hpp>
 
 #include <atl_msgs/AprilTagPose.h>
-#include <atl_msgs/ModelPose.h>
 #include <atl_msgs/LCtrlSettings.h>
-#include <atl_msgs/PCtrlStats.h>
+#include <atl_msgs/ModelPose.h>
 #include <atl_msgs/PCtrlSettings.h>
-#include <atl_msgs/TCtrlStats.h>
+#include <atl_msgs/PCtrlStats.h>
 #include <atl_msgs/TCtrlSettings.h>
-#include <atl_msgs/VCtrlStats.h>
+#include <atl_msgs/TCtrlStats.h>
 #include <atl_msgs/VCtrlSettings.h>
-
+#include <atl_msgs/VCtrlStats.h>
 
 namespace atl {
 

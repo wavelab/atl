@@ -1,6 +1,5 @@
 #include "atl/estimation/kf.hpp"
 
-
 namespace atl {
 
 KalmanFilter::KalmanFilter(void) {

@@ -1,13 +1,12 @@
-#include <random>
 #include <fstream>
 #include <iostream>
+#include <random>
 
 #include "atl/atl_test.hpp"
 #include "atl/estimation/kf_tracker.hpp"
 
 #define TEST_CONFIG "tests/configs/estimation/kf_tracker.yaml"
 #define TEST_OUTPUT_FILE "/tmp/estimation_kf_tracker_test.output"
-
 
 namespace atl {
 

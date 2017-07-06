@@ -4,13 +4,12 @@
 #include <string>
 #include <vector>
 
-#include <gazebo/gazebo_client.hh>
 #include <gazebo/gazebo_config.h>
+#include <gazebo/gazebo_client.hh>
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/transport/transport.hh>
 
 #include "atl/gazebo/msgs/atl_msgs.hpp"
-
 
 namespace atl {
 namespace gaz {

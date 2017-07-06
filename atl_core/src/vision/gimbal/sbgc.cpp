@@ -1,6 +1,5 @@
 #include "atl/vision/gimbal/sbgc.hpp"
 
-
 namespace atl {
 
 int set_interface_attribs(int fd, int speed, int parity) {
@@ -56,7 +55,6 @@ void set_blocking(int fd, int should_block) {
     printf("error %d setting term attributes", errno);
   }
 }
-
 
 void SBGCFrame::printFrame(void) {
   int i;
@@ -171,7 +169,6 @@ int SBGCFrame::parseFrame(uint8_t *data) {
   return 0;
 }
 
-
 void SBGCRealtimeData::printData(void) {
   // ACCELEROMOETER AND GYROSCOPE
   printf("accelerometer: %.2f\t%.2f\t%.2f\n",
@@ -204,7 +201,6 @@ void SBGCRealtimeData::printData(void) {
   printf("system_error: %d\n", this->system_error);
   printf("battery_level: %d\n\n", this->battery_level);
 }
-
 
 SBGC::SBGC(void) {
   this->configured = false;
@@ -432,7 +428,6 @@ int SBGC::getRealtimeData4(void) {
   this->data.encoder_angles(1) = S16BIT(frame.data, 66, 65);
   this->data.encoder_angles(2) = S16BIT(frame.data, 68, 67);
 
-
   this->data.camera_angles(0) = (DEG_PER_BIT) * this->data.camera_angles(0);
   this->data.camera_angles(1) = (DEG_PER_BIT) * this->data.camera_angles(1);
   this->data.camera_angles(2) = (DEG_PER_BIT) * this->data.camera_angles(2);
@@ -448,7 +443,6 @@ int SBGC::getRealtimeData4(void) {
   this->data.encoder_angles(0) = (DEG_PER_BIT) * this->data.encoder_angles(0);
   this->data.encoder_angles(1) = (DEG_PER_BIT) * this->data.encoder_angles(1);
   this->data.encoder_angles(2) = (DEG_PER_BIT) * this->data.encoder_angles(2);
-
 
   // misc
   this->data.cycle_time = U16BIT(frame.data, 51, 50);
@@ -581,7 +575,6 @@ int SBGC::getAnglesExt(void) {
 
   return 0;
 }
-
 
 int SBGC::setAngle(double roll, double pitch, double yaw) {
   SBGCFrame frame;

@@ -6,11 +6,11 @@
 #define ATL_GAZEBO_KINEMATICS_GIMBAL_HPP
 
 #include <float.h>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 
-#include "atl/utils/utils.hpp"
 #include "atl/gazebo/controls/pid.hpp"
+#include "atl/utils/utils.hpp"
 
 namespace atl {
 /** @addtogroup kinematics

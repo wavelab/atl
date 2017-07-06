@@ -1,8 +1,8 @@
 #ifndef ATL_UTILS_TIME_HPP
 #define ATL_UTILS_TIME_HPP
 
-#include <time.h>
 #include <sys/time.h>
+#include <time.h>
 
 namespace atl {
 

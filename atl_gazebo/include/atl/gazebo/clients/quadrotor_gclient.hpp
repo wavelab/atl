@@ -14,8 +14,8 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/opencv.hpp>
 
-#include "atl/utils/utils.hpp"
 #include "atl/gazebo/gazebo_node.hpp"
+#include "atl/utils/utils.hpp"
 
 namespace atl {
 namespace gaz {

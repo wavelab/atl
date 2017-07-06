@@ -1,6 +1,5 @@
 #include "atl/vision/camera/camera.hpp"
 
-
 namespace atl {
 
 Camera::Camera(void) {

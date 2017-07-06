@@ -3,14 +3,14 @@
 
 #include <unistd.h>
 
-#include <ros/ros.h>
 #include <geometry_msgs/Vector3.h>
+#include <ros/ros.h>
 #include <sensor_msgs/Imu.h>
 
 #include <atl/atl_core.hpp>
 
-#include "atl/ros/utils/node.hpp"
 #include "atl/ros/utils/msgs.hpp"
+#include "atl/ros/utils/node.hpp"
 
 namespace atl {
 
@@ -31,7 +31,6 @@ namespace atl {
 #define SETPOINT_TOPIC "/atl/gimbal/setpoint/attitude"
 #define TRACK_TOPIC "/atl/gimbal/target/track"
 #define SHUTDOWN_TOPIC "/atl/gimbal/shutdown"
-
 
 class GimbalNode : public ROSNode {
 public:

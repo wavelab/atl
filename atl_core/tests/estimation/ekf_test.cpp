@@ -1,8 +1,7 @@
-#include "atl/atl_test.hpp"
 #include "atl/estimation/ekf.hpp"
+#include "atl/atl_test.hpp"
 
 #define TEST_EKF_OUTPUT_FILE "/tmp/estimation_ekf_test.output"
-
 
 namespace atl {
 

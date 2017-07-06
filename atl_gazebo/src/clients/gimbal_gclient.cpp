@@ -1,6 +1,5 @@
 #include "atl/gazebo/clients/gimbal_gclient.hpp"
 
-
 namespace atl {
 namespace gaz {
 

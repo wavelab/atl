@@ -6,8 +6,8 @@
 
 #include <Eigen/Dense>
 
-#include "atl/utils/math.hpp"
 #include "atl/gazebo/gazebo_node.hpp"
+#include "atl/utils/math.hpp"
 
 namespace atl {
 namespace gaz {

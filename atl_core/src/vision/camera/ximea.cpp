@@ -1,6 +1,5 @@
 #include "atl/vision/camera/ximea.hpp"
 
-
 namespace atl {
 
 XimeaCamera::XimeaCamera(void) {

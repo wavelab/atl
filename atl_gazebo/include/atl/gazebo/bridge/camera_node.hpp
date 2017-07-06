@@ -1,18 +1,18 @@
 #ifndef ATL_GAZEBO_BRIDGE_CAMERA_NODE_HPP
 #define ATL_GAZEBO_BRIDGE_CAMERA_NODE_HPP
 
-#include <ros/ros.h>
 #include <cv_bridge/cv_bridge.h>
-#include <sensor_msgs/CameraInfo.h>
-#include <std_msgs/String.h>
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/Quaternion.h>
 #include <geometry_msgs/Vector3.h>
 #include <image_transport/image_transport.h>
+#include <ros/ros.h>
+#include <sensor_msgs/CameraInfo.h>
+#include <std_msgs/String.h>
 
-#include "atl/utils/math.hpp"
-#include "atl/ros/utils/node.hpp"
 #include "atl/gazebo/clients/camera_gclient.hpp"
+#include "atl/ros/utils/node.hpp"
+#include "atl/utils/math.hpp"
 
 namespace atl {
 namespace gazebo_bridge {

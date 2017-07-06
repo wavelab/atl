@@ -1,9 +1,8 @@
-#include "atl/atl_test.hpp"
 #include "atl/utils/data.hpp"
+#include "atl/atl_test.hpp"
 
 #define TEST_DATA "tests/data/utils/matrix.dat"
 #define TEST_OUTPUT "/tmp/matrix.dat"
-
 
 namespace atl {
 

@@ -1,5 +1,5 @@
-#include "atl/atl_test.hpp"
 #include "atl/quadrotor/quadrotor.hpp"
+#include "atl/atl_test.hpp"
 
 #define TEST_CONFIG_PATH "tests/configs/quadrotor"
 

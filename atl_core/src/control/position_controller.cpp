@@ -1,6 +1,5 @@
 #include "atl/control/position_controller.hpp"
 
-
 namespace atl {
 
 PositionController::PositionController(void) {

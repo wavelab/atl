@@ -5,22 +5,21 @@
 
 #define MAVLINK_DIALECT common
 #include <mavros/mavros.h>
-#include <mavros_msgs/State.h>
-#include <mavros_msgs/SetMode.h>
 #include <mavros_msgs/CommandBool.h>
 #include <mavros_msgs/RCIn.h>
+#include <mavros_msgs/SetMode.h>
+#include <mavros_msgs/State.h>
 
 #include <dji_sdk/dji_drone.h>
 
 #include <atl_msgs/AprilTagPose.h>
-#include <atl_msgs/PCtrlStats.h>
 #include <atl_msgs/PCtrlSettings.h>
+#include <atl_msgs/PCtrlStats.h>
 
 #include <atl/atl_core.hpp>
 
-#include "atl/ros/utils/node.hpp"
 #include "atl/ros/utils/msgs.hpp"
-
+#include "atl/ros/utils/node.hpp"
 
 namespace atl {
 
@@ -66,7 +65,6 @@ namespace atl {
 #define PCTRL_SET_TOPIC "/atl/control/position_controller/set"
 #define TCTRL_SET_TOPIC "/atl/control/tracking_controller/set"
 #define LCTRL_SET_TOPIC "/atl/control/landing_controller/set"
-
 
 class ControlNode : public ROSNode {
 public:

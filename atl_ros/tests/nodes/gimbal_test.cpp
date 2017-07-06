@@ -4,7 +4,6 @@
 
 #include "atl/ros/utils/node.hpp"
 
-
 namespace atl {
 
 // NODE SETTNGS
@@ -16,7 +15,6 @@ namespace atl {
 
 // PUBLISH TOPICS
 #define SET_ATTITUDE_TOPIC "/atl/gimbal/setpoint/attitude"
-
 
 class NodeTest : public ::testing::Test {
 protected:
@@ -80,7 +78,6 @@ TEST_F(NodeTest, frameOrientationMsg) {
   // ASSERT_NEAR(0.0, this->pos_if_msg.y, 0.1);
   // ASSERT_NEAR(0.0, this->pos_if_msg.z, 0.1);
 }
-
 
 }  // namespace atl
 

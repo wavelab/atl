@@ -1,5 +1,5 @@
-#include "atl/atl_test.hpp"
 #include "atl/sensor/MPU6050.hpp"
+#include "atl/atl_test.hpp"
 
 namespace atl {
 

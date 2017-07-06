@@ -1,17 +1,16 @@
 #ifndef ATL_ROS_NODES_PG_CAMERA_NODE_HPP
 #define ATL_ROS_NODES_PG_CAMERA_NODE_HPP
 
-#include <ros/ros.h>
 #include <cv_bridge/cv_bridge.h>
-#include <sensor_msgs/CameraInfo.h>
 #include <image_transport/image_transport.h>
+#include <ros/ros.h>
+#include <sensor_msgs/CameraInfo.h>
 
 #include <dji_sdk/dji_drone.h>
 #include <atl/atl_core.hpp>
 
-#include "atl/ros/utils/node.hpp"
 #include "atl/ros/utils/msgs.hpp"
-
+#include "atl/ros/utils/node.hpp"
 
 namespace atl {
 
@@ -37,7 +36,6 @@ namespace atl {
 
 #define LT_DETECTED_TOPIC "/atl/estimate/landing_target/detected"
 #define SHUTDOWN_TOPIC "/atl/camera/shutdown"
-
 
 class PGCameraNode : public ROSNode {
 public:

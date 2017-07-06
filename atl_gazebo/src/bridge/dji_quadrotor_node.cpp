@@ -1,6 +1,5 @@
 #include "atl/gazebo/bridge/dji_quadrotor_node.hpp"
 
-
 namespace atl {
 namespace gazebo_bridge {
 

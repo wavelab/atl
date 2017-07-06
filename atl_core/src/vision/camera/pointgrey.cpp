@@ -1,6 +1,5 @@
 #include "atl/vision/camera/pointgrey.hpp"
 
-
 namespace atl {
 
 PointGreyCamera::PointGreyCamera(void) {

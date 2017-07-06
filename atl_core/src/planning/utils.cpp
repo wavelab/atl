@@ -1,6 +1,5 @@
 #include "atl/planning/utils.hpp"
 
-
 namespace atl {
 
 std::vector<Eigen::Vector2d> bezier_cubic_curve(Eigen::Vector2d p0,

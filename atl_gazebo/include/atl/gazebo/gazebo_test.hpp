@@ -3,7 +3,6 @@
 
 #include "atl/gazebo/clients/world_gclient.hpp"
 
-
 namespace atl {
 namespace gaz {
 

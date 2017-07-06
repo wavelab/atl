@@ -1,16 +1,15 @@
 #ifndef ATL_CONTROL_LANDING_CONTROLLER_HPP
 #define ATL_CONTROL_LANDING_CONTROLLER_HPP
 
-#include <iomanip>
 #include <libgen.h>
-#include <string>
 #include <deque>
+#include <iomanip>
+#include <string>
 
 #include <yaml-cpp/yaml.h>
 
-#include "atl/utils/utils.hpp"
 #include "atl/control/pid_controller.hpp"
-
+#include "atl/utils/utils.hpp"
 
 namespace atl {
 

@@ -1,6 +1,5 @@
 #include "atl/control/velocity_controller.hpp"
 
-
 namespace atl {
 
 VelocityController::VelocityController(void) {

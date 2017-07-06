@@ -5,7 +5,6 @@
 
 #include "atl/vision/camera/camera.hpp"
 
-
 namespace atl {
 
 #define XIMEA_CHECK(RETVAL, WHERE)                     \

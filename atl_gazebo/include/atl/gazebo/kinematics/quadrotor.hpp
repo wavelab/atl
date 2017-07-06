@@ -7,8 +7,8 @@
 #include <float.h>
 #include <iostream>
 
-#include "atl/utils/utils.hpp"
 #include "atl/gazebo/controls/pid.hpp"
+#include "atl/utils/utils.hpp"
 
 namespace atl {
 /** @addtogroup kinematics

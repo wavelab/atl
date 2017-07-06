@@ -1,9 +1,9 @@
 #ifndef ATL_TEST_HPP
 #define ATL_TEST_HPP
 
-#include <random>
 #include <fstream>
 #include <iostream>
+#include <random>
 
 #include <gtest/gtest.h>
 

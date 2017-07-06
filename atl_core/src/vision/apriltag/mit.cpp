@@ -1,6 +1,5 @@
 #include "atl/vision/apriltag/mit.hpp"
 
-
 namespace atl {
 
 MITDetector::MITDetector(void) {
@@ -90,7 +89,6 @@ int MITDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
   //     break;
   //   }
   // }
-
 
   // imshow
   if (this->imshow) {

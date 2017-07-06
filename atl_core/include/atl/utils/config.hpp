@@ -8,20 +8,19 @@
 #define ATL_UTILS_CONFIG_HPP
 
 #include <iostream>
-#include <string>
 #include <sstream>
+#include <string>
 #include <type_traits>
 
 #include <yaml-cpp/yaml.h>
 
 #include <opencv2/core/core.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 
-#include "atl/utils/math.hpp"
-#include "atl/utils/log.hpp"
 #include "atl/utils/file.hpp"
-
+#include "atl/utils/log.hpp"
+#include "atl/utils/math.hpp"
 
 namespace atl {
 /** @addtogroup utils

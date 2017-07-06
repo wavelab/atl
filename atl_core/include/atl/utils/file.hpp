@@ -3,11 +3,10 @@
 
 #include <stdio.h>
 
+#include <iostream>
+#include <numeric>
 #include <string>
 #include <vector>
-#include <numeric>
-#include <iostream>
-
 
 namespace atl {
 

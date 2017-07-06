@@ -1,6 +1,5 @@
 #include "atl/vision/apriltag/swathmore.hpp"
 
-
 namespace atl {
 
 SwathmoreDetector::SwathmoreDetector(void) {

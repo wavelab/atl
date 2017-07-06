@@ -1,6 +1,5 @@
 #include "atl/estimation/ekf.hpp"
 
-
 namespace atl {
 
 ExtendedKalmanFilter::ExtendedKalmanFilter(void) {

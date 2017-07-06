@@ -6,9 +6,8 @@
 
 #include <atl/atl_core.hpp>
 
-#include "atl/ros/utils/node.hpp"
 #include "atl/ros/utils/msgs.hpp"
-
+#include "atl/ros/utils/node.hpp"
 
 namespace atl {
 

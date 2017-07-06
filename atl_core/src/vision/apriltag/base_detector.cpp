@@ -1,6 +1,5 @@
 #include "atl/vision/apriltag/base_detector.hpp"
 
-
 namespace atl {
 
 BaseDetector::BaseDetector(void) {

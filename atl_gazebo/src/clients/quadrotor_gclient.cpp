@@ -1,6 +1,5 @@
 #include "atl/gazebo/clients/quadrotor_gclient.hpp"
 
-
 namespace atl {
 namespace gaz {
 

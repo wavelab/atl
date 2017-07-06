@@ -1,21 +1,20 @@
 #ifndef ATL_VISION_APRILTAG_BASE_HPP
 #define ATL_VISION_APRILTAG_BASE_HPP
 
+#include <libgen.h>
+#include <math.h>
+#include <sys/time.h>
 #include <cmath>
 #include <fstream>
 #include <iostream>
-#include <math.h>
-#include <libgen.h>
-#include <sys/time.h>
 
 #include <opencv2/core/core.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 
 #include "atl/utils/utils.hpp"
-#include "atl/vision/camera/camera.hpp"
 #include "atl/vision/apriltag/data.hpp"
-
+#include "atl/vision/camera/camera.hpp"
 
 namespace atl {
 

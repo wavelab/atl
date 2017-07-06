@@ -117,7 +117,6 @@ void PGCameraNode::targetDetectedCallback(const std_msgs::Bool &msg) {
   convertMsg(msg, this->target_detected);
 }
 
-
 void PGCameraNode::quadPositionCallback(const dji_sdk::LocalPosition &msg) {
   Vec3 pos_ned, pos_enu;
 
@@ -162,7 +161,6 @@ int PGCameraNode::loopCallback(void) {
       this->camera.changeMode("160x120");
     }
   }
-
 
   this->camera.getFrame(this->image);
 

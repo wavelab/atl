@@ -19,6 +19,21 @@ and finally runs `catkin_make` to build the project, tests and installs configs
 and launch files.
 
 
+## Run Gazebo Simulations
+
+ATL uses Gazebo simulation to test the control and perception, to launch an
+instance of a Gazebo simulation along with ATL enter the following commands:
+
+    # Environment variables to tell Gazebo where to look for 3D models and plugins
+    export CATKIN_WS=<your catkin workspace>
+    export GAZEBO_RESOURCE_PATH=${GAZEBO_RESOURCE_PATH}:${CATKIN_WS}/install/share/atl_gazebo/
+    export GAZEBO_MODEL_PATH=${GAZEBO_MODEL_PATH}:${CATKIN_WS}/install/share/atl_gazebo/models
+    export GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}:${CATKIN_WS}/install/share/atl_gazebo/plugins
+
+    # Launch Gazebo simulation
+    roslaunch atl_ros atl_sim.launch
+
+
 ## ROS Node Tests
 
 Once you have performed the above instructions you can run ROS node tests via:

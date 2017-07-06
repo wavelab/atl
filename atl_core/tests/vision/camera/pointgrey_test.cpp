@@ -1,9 +1,8 @@
+#include "atl/vision/camera/pointgrey.hpp"
 #include "atl/atl_test.hpp"
 #include "atl/utils/opencv.hpp"
-#include "atl/vision/camera/pointgrey.hpp"
 
 #define TEST_CONFIG_PATH "tests/configs/camera/pointgrey_chameleon"
-
 
 namespace atl {
 

@@ -11,7 +11,6 @@
 
 #include "atl/utils/utils.hpp"
 
-
 namespace atl {
 namespace gaz {
 

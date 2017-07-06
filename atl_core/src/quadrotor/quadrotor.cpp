@@ -1,6 +1,5 @@
 #include "atl/quadrotor/quadrotor.hpp"
 
-
 namespace atl {
 
 int Quadrotor::configure(std::string config_path) {
@@ -146,7 +145,6 @@ int Quadrotor::setTargetDetected(bool detected) {
 
   return 0;
 }
-
 
 int Quadrotor::setHoverXYPosition(Vec3 position) {
   // pre-check

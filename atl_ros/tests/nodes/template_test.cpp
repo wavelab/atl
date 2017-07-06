@@ -2,7 +2,6 @@
 
 #include "atl/ros/utils/node.hpp"
 
-
 namespace atl {
 
 // NODE SETTNGS
@@ -11,7 +10,6 @@ namespace atl {
 // PUBLISH TOPICS
 
 // SUBSCRIBE TOPICS
-
 
 class NodeTest : public ::testing::Test {
 protected:

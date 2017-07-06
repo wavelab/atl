@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include "atl/ros/utils/node.hpp"
 #include "atl/ros/nodes/apriltag_node.hpp"
+#include "atl/ros/utils/node.hpp"
 
 namespace atl {
 

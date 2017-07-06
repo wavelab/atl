@@ -3,7 +3,6 @@
 
 #include "atl/utils/utils.hpp"
 
-
 #define TWO_WHEEL_MOTION_MODEL(EKF, G, g)         \
   G << 1, 0, (-u(0) * sin(EKF.mu(2)) * dt), 0, 1, \
     (u(0) * cos(EKF.mu(2)) * dt), 0, 0, 1;        \
@@ -43,7 +42,6 @@
   H(3, 3) = 1.0; /* theta */                                \
   h = H * EKF.mu;
 
-
 namespace atl {
 
 class ExtendedKalmanFilterTracker {
@@ -82,7 +80,6 @@ void two_wheel_process_model(ExtendedKalmanFilterTracker &ekf,
 void two_wheel_measurement_model(ExtendedKalmanFilterTracker &ekf,
                                  MatX &H,
                                  VecX &h);
-
 
 }  // namespace atl
 #endif

@@ -1,6 +1,5 @@
 #include "atl/sensor/i2c.hpp"
 
-
 namespace atl {
 
 I2C::I2C(void) {

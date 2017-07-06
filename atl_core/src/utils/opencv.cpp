@@ -1,6 +1,5 @@
 #include "atl/utils/opencv.hpp"
 
-
 namespace atl {
 
 bool cvMatIsEqual(const cv::Mat m1, const cv::Mat m2) {

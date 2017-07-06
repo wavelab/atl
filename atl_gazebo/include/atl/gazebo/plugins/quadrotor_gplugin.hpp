@@ -3,13 +3,13 @@
 
 #include <boost/bind.hpp>
 
-#include <gazebo/gazebo.hh>
 #include <gazebo/common/common.hh>
+#include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
 
-#include "atl/utils/utils.hpp"
-#include "atl/gazebo/kinematics/quadrotor.hpp"
 #include "atl/gazebo/gazebo_node.hpp"
+#include "atl/gazebo/kinematics/quadrotor.hpp"
+#include "atl/utils/utils.hpp"
 
 namespace atl {
 namespace gaz {

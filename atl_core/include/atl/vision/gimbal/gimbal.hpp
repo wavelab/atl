@@ -1,15 +1,14 @@
 #ifndef ATL_GIMBAL_HPP
 #define ATL_GIMBAL_HPP
 
-#include <unistd.h>
-#include <iostream>
 #include <math.h>
-#include <map>
+#include <unistd.h>
 #include <yaml-cpp/yaml.h>
+#include <iostream>
+#include <map>
 
 #include "atl/utils/utils.hpp"
 #include "atl/vision/gimbal/sbgc.hpp"
-
 
 namespace atl {
 

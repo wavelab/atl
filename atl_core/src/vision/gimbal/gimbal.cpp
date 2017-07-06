@@ -1,6 +1,5 @@
 #include "atl/vision/gimbal/gimbal.hpp"
 
-
 namespace atl {
 
 Gimbal::Gimbal(void) {

@@ -1,5 +1,5 @@
-#include "atl/atl_test.hpp"
 #include "atl/planning/model.hpp"
+#include "atl/atl_test.hpp"
 
 #define SIM_OUTPUT "/tmp/sim.output"
 

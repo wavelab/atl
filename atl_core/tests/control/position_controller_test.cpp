@@ -1,8 +1,7 @@
-#include "atl/atl_test.hpp"
 #include "atl/control/position_controller.hpp"
+#include "atl/atl_test.hpp"
 
 #define TEST_CONFIG "tests/configs/control/position_controller.yaml"
-
 
 namespace atl {
 

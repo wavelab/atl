@@ -1,6 +1,5 @@
 #include "atl/gazebo/clients/camera_gclient.hpp"
 
-
 namespace atl {
 namespace gaz {
 

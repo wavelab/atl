@@ -1,6 +1,5 @@
 #include "atl/utils/time.hpp"
 
-
 namespace atl {
 
 void tic(struct timespec *tic) {

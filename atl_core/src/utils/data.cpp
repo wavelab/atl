@@ -1,6 +1,5 @@
 #include "atl/utils/data.hpp"
 
-
 namespace atl {
 
 // ATTITUDE COMMAND
@@ -30,7 +29,6 @@ void AttitudeCommand::print(void) {
   printf("yaw: %.2f\t", euler(2));
   printf("throttle: %.2f\n", this->throttle);
 }
-
 
 // POSE
 Pose::Pose(
@@ -66,7 +64,6 @@ void Pose::print() {
   this->printPosition();
   this->printOrientation();
 }
-
 
 // CSV
 int csvrows(std::string file_path) {

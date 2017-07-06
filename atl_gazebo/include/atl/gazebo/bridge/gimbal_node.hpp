@@ -3,16 +3,16 @@
 
 #include <Eigen/Geometry>
 
+#include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/Quaternion.h>
+#include <geometry_msgs/Vector3.h>
 #include <ros/ros.h>
 #include <sensor_msgs/Imu.h>
-#include <geometry_msgs/Vector3.h>
-#include <geometry_msgs/Quaternion.h>
-#include <geometry_msgs/PoseStamped.h>
 
-#include "atl/utils/utils.hpp"
+#include "atl/gazebo/clients/gimbal_gclient.hpp"
 #include "atl/ros/utils/msgs.hpp"
 #include "atl/ros/utils/node.hpp"
-#include "atl/gazebo/clients/gimbal_gclient.hpp"
+#include "atl/utils/utils.hpp"
 
 namespace atl {
 namespace gazebo_bridge {

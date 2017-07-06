@@ -66,7 +66,6 @@ Vec4 AttitudeController::update(const Vec4 &psetpoints,
   return this->update(setpoints, actual, dt);
 }
 
-
 // POSITION CONTROLLER
 Vec4 PositionController::update(const Vec3 &setpoints,
                                 const Vec4 &actual,
@@ -133,7 +132,6 @@ Vec4 PositionController::update(const Vec3 &setpoints,
 
   return outputs;
 }
-
 
 // QUADROTOR MODEL
 int QuadrotorModel::update(const VecX &motor_inputs, double dt) {

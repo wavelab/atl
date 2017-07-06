@@ -1,6 +1,5 @@
 #include "atl/ros/nodes/control_node.hpp"
 
-
 namespace atl {
 
 int ControlNode::configure(const std::string node_name, int hz) {

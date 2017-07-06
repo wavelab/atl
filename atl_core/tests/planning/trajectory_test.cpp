@@ -1,11 +1,10 @@
-#include "atl/atl_test.hpp"
 #include "atl/planning/trajectory.hpp"
 #include <nlopt.hpp>
+#include "atl/atl_test.hpp"
 
 #define TEST_TRAJECTORY_OUTPUT_FILE "/tmp/trajectory.output"
 #define TEST_OPTIMIZED_OUTPUT_FILE "/tmp/trajectory_optimized.output"
 #define TEST_PATH_OUTPUT_FILE "/tmp/path.output"
-
 
 namespace atl {
 

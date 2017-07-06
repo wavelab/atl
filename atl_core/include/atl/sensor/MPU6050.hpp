@@ -5,9 +5,8 @@
 
 #include <iostream>
 
-#include "atl/utils/utils.hpp"
 #include "atl/sensor/i2c.hpp"
-
+#include "atl/utils/utils.hpp"
 
 namespace atl {
 
@@ -127,7 +126,6 @@ namespace atl {
 #define MPU6050_RA_FIFO_COUNTL 0x73
 #define MPU6050_RA_FIFO_R_W 0x74
 #define MPU6050_RA_WHO_AM_I 0x75
-
 
 class MPU6050Gyroscope {
 public:

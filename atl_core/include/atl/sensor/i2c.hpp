@@ -1,17 +1,16 @@
 #ifndef ATL_SENSOR_I2C_HPP
 #define ATL_SENSOR_I2C_HPP
 
+#include <errno.h>
+#include <fcntl.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <errno.h>
 #include <string.h>
 #include <sys/ioctl.h>
+#include <unistd.h>
 
 #include <linux/i2c-dev.h>
-
 
 namespace atl {
 

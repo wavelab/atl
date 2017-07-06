@@ -12,7 +12,6 @@
 #include "atl/gazebo/gazebo_node.hpp"
 #include "atl/gazebo/kinematics/two_wheel.hpp"
 
-
 namespace atl {
 namespace gaz {
 

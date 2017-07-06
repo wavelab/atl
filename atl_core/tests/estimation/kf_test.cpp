@@ -1,12 +1,11 @@
-#include <random>
 #include <fstream>
 #include <iostream>
+#include <random>
 
 #include "atl/atl_test.hpp"
 #include "atl/estimation/kf.hpp"
 
 #define TEST_KF_OUTPUT_FILE "/tmp/estimation_kf_test.output"
-
 
 static int prepareOutputFile(std::ofstream &output_file,
                              std::string output_path) {

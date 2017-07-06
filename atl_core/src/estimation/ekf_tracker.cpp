@@ -1,6 +1,5 @@
 #include "atl/estimation/ekf_tracker.hpp"
 
-
 namespace atl {
 
 ExtendedKalmanFilterTracker::ExtendedKalmanFilterTracker(void) {

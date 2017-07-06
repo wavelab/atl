@@ -5,18 +5,18 @@
 
 #include <Eigen/Geometry>
 
+#include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include <geometry_msgs/TwistStamped.h>
+#include <geometry_msgs/Vector3.h>
 #include <ros/ros.h>
 #include <std_msgs/Float64.h>
-#include <geometry_msgs/Vector3.h>
-#include <geometry_msgs/PoseStamped.h>
-#include <geometry_msgs/TwistStamped.h>
-#include <geometry_msgs/PoseWithCovarianceStamped.h>
 
-#include "atl/utils/utils.hpp"
-#include "atl/ros/utils/node.hpp"
-#include "atl/ros/utils/msgs.hpp"
-#include "atl/ros/utils/utils.hpp"
 #include "atl/gazebo/clients/quadrotor_gclient.hpp"
+#include "atl/ros/utils/msgs.hpp"
+#include "atl/ros/utils/node.hpp"
+#include "atl/ros/utils/utils.hpp"
+#include "atl/utils/utils.hpp"
 
 namespace atl {
 namespace gazebo_bridge {

@@ -1,6 +1,5 @@
 #include "atl/ros/utils/msgs.hpp"
 
-
 namespace atl {
 
 void buildMsg(bool b, std_msgs::Bool &msg) {

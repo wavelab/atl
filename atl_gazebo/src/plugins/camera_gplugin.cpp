@@ -1,6 +1,5 @@
 #include "atl/gazebo/plugins/camera_gplugin.hpp"
 
-
 namespace atl {
 namespace gaz {
 

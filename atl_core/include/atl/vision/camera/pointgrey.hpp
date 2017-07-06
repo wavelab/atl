@@ -4,7 +4,6 @@
 #include <flycapture/FlyCapture2.h>
 #include "atl/vision/camera/camera.hpp"
 
-
 namespace atl {
 
 class PointGreyCamera : public Camera {

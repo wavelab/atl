@@ -1,6 +1,5 @@
 #include "atl/utils/stats.hpp"
 
-
 namespace atl {
 
 inline static double sqr(double x) {

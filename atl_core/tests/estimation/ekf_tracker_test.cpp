@@ -1,6 +1,6 @@
-#include <random>
 #include <fstream>
 #include <iostream>
+#include <random>
 
 #include "atl/atl_test.hpp"
 #include "atl/estimation/ekf_tracker.hpp"
@@ -9,7 +9,6 @@
 #define TEST_CONFIG2 "tests/configs/estimation/ekf_tracker2.yaml"
 #define TEST_CONFIG3 "tests/configs/estimation/ekf_tracker3.yaml"
 #define TEST_OUTPUT_FILE "/tmp/estimation_ekf_tracker_test.output"
-
 
 namespace atl {
 

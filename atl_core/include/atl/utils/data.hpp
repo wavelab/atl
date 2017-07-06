@@ -1,20 +1,18 @@
 #ifndef ATL_UTILS_DATA_HPP
 #define ATL_UTILS_DATA_HPP
 
-#include <iostream>
 #include <fstream>
-#include <vector>
 #include <iomanip>
+#include <iostream>
+#include <vector>
 
 #include "atl/utils/math.hpp"
-
 
 namespace atl {
 
 // CSV ERROR MESSAGES
 #define E_CSV_DATA_LOAD "Error! failed to load test data [%s]!!\n"
 #define E_CSV_DATA_OPEN "Error! failed to open file for output [%s]!!\n"
-
 
 class AttitudeCommand {
 public:

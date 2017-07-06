@@ -1,6 +1,5 @@
 #include "atl/vision/apriltag/michigan.hpp"
 
-
 namespace atl {
 
 MichiganDetector::MichiganDetector(void) {
@@ -89,7 +88,6 @@ int MichiganDetector::obtainPose(apriltag_detection_t *det,
   std::vector<cv::Point3f> obj_pts;
   std::vector<cv::Point2f> img_pts;
 
-
   // setup
   CameraConfig camera_config = this->camera_configs[this->camera_mode];
   // fx = camera_config.camera_matrix.at<double>(0, 0);
@@ -118,10 +116,8 @@ int MichiganDetector::obtainPose(apriltag_detection_t *det,
   img_pts.push_back(cv::Point2f(det->p[2][0], det->p[2][1]));
   img_pts.push_back(cv::Point2f(det->p[3][0], det->p[3][1]));
 
-
   // distortion parameters
   cv::Vec4f distParam(0, 0, 0, 0);
-
 
   cv::Mat rvec, tvec;
   // recovering the relative transform of a tag:

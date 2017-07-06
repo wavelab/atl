@@ -1,12 +1,11 @@
 #include <gtest/gtest.h>
 
-#include <std_msgs/Bool.h>
-#include <geometry_msgs/Vector3.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/TwistStamped.h>
+#include <geometry_msgs/Vector3.h>
+#include <std_msgs/Bool.h>
 
 #include "atl/ros/utils/node.hpp"
-
 
 namespace atl {
 

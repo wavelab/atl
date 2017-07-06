@@ -6,7 +6,6 @@
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 
-
 namespace atl {
 
 #ifndef __EIGEN_TYPEDEF__

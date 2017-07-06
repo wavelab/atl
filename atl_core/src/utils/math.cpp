@@ -1,6 +1,5 @@
 #include "atl/utils/math.hpp"
 
-
 namespace atl {
 
 int randi(int ub, int lb) {

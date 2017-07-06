@@ -1,6 +1,5 @@
 #include "atl/control/landing_controller.hpp"
 
-
 namespace atl {
 
 // TRAJECTORY
@@ -141,7 +140,6 @@ void Trajectory::reset(void) {
   this->p0 << 0.0, 0.0, 0.0;
 }
 
-
 // TRAJECTORY INDEX
 TrajectoryIndex::TrajectoryIndex(void) {
   this->loaded = false;
@@ -221,7 +219,6 @@ int TrajectoryIndex::find(Vec3 pos, double v, Trajectory &traj) {
 
   return 0;
 }
-
 
 // LANDING CONTROLLER
 LandingController::LandingController(void) {

@@ -1,6 +1,5 @@
 #include "atl/vision/camera/config.hpp"
 
-
 namespace atl {
 
 CameraConfig::CameraConfig(void) {

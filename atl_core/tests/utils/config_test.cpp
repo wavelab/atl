@@ -1,9 +1,8 @@
+#include "atl/utils/config.hpp"
 #include "atl/atl_test.hpp"
 #include "atl/utils/data.hpp"
-#include "atl/utils/config.hpp"
 
 #define TEST_CONFIG "tests/data/utils/config.yaml"
-
 
 TEST(Utils_config_ConfigParam, constructor) {
   atl::ConfigParam param;

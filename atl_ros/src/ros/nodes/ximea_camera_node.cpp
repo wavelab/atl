@@ -44,7 +44,6 @@ int XimeaCameraNode::configure(std::string node_name, int hz) {
 int XimeaCameraNode::publishImage(void) {
   sensor_msgs::ImageConstPtr img_msg;
 
-
   // encode position and orientation into image (first 11 pixels in first row)
   // if (this->gimbal_mode) {
   // this->image.at<double>(0, 0) = this->gimbal_position(0);

@@ -1,6 +1,5 @@
 #include "atl/utils/file.hpp"
 
-
 namespace atl {
 
 bool file_exists(const std::string &fp) {

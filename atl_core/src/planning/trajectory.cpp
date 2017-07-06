@@ -1,6 +1,5 @@
 #include "atl/planning/trajectory.hpp"
 
-
 namespace atl {
 
 Vec2 quadrotor_calculate_inputs(double mass, double thrust, double omega) {

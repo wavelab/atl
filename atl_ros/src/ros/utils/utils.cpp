@@ -1,6 +1,5 @@
 #include "atl/ros/utils/utils.hpp"
 
-
 namespace atl {
 namespace ros {
 

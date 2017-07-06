@@ -21,7 +21,6 @@ namespace atl {
 #define ACC_UNIT (1.0 / 512.0)        // G
 #define GYRO_UNIT 0.06103701895       // deg per sec
 
-
 // CMD ID
 #define CMD_READ_PARAMS 82
 #define CMD_WRITE_PARAMS 87
@@ -73,12 +72,10 @@ namespace atl {
 #define CMD_CALIB_INFO 49
 #define CMD_BOOT_MODE_3 51
 
-
 // CMD FRAME SIZE
 #define MIN_FRAME_SIZE 5  // 4 bytes for header + 1 body checksum
 #define CMD_BOARD_INFO_FRAME_SIZE 5 + 18
 #define CMD_REALTIME_DATA_3_FRAME_SIZE 5 + 63
-
 
 // CMD CONTROL
 #define MODE_NO_CONTROL 0
@@ -109,7 +106,6 @@ namespace atl {
 
 #define U16BIT(DATA, HI_BYTE, LOW_BYTE) \
   (uint16_t)((DATA[HI_BYTE] << 8) | (DATA[LOW_BYTE] & 0xff))
-
 
 class SBGCFrame {
 public:

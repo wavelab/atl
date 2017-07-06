@@ -1,6 +1,5 @@
 #include "atl/control/tracking_controller.hpp"
 
-
 namespace atl {
 
 TrackingController::TrackingController(void) {

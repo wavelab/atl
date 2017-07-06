@@ -3,7 +3,6 @@
 
 #include "atl/utils/utils.hpp"
 
-
 namespace atl {
 
 #define ENBDIM "Invalid number of dimensions, have support for 1, 2, or 3!"
@@ -17,7 +16,6 @@ namespace atl {
 #define ECHECKCONFIG "Consider checking your dimensions in config: [%s]!"
 #define EASIZE "Transition matrix A should be a square matrix of size %d!"
 #define EYSIZE "Measurement vector y should be of size %d!"
-
 
 #define MATRIX_A_CONSTANT_ACCELERATION_X(A) \
   A << 1.0, dt, pow(dt, 2.0) / 2.0, 0.0, 1.0, dt, 0.0, 0.0, 1.0;
@@ -46,7 +44,6 @@ namespace atl {
   A << 1.0, 0.0, 0.0, dt, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, dt, 0.0, 0.0, 0.0, \
     1.0, 0.0, 0.0, dt, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,   \
     1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0;
-
 
 class KalmanFilterTracker {
 public:

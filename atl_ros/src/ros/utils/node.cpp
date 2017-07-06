@@ -1,6 +1,5 @@
 #include "atl/ros/utils/node.hpp"
 
-
 namespace atl {
 
 ROSNode::ROSNode(int argc, char **argv) {

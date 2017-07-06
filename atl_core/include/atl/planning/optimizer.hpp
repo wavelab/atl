@@ -9,7 +9,6 @@
 
 #include "atl/utils/utils.hpp"
 
-
 namespace atl {
 
 typedef struct {

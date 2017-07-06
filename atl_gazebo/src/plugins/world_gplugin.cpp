@@ -1,6 +1,5 @@
 #include "atl/gazebo/plugins/world_gplugin.hpp"
 
-
 namespace atl {
 namespace gaz {
 

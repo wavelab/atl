@@ -1,6 +1,5 @@
 #include "atl/quadrotor/landing_target.hpp"
 
-
 namespace atl {
 
 LandingTarget::LandingTarget(void) {

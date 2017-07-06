@@ -1,14 +1,14 @@
 #ifndef ATL_GAZEBO_BRIDGE_LZ_NODE_HPP
 #define ATL_GAZEBO_BRIDGE_LZ_NODE_HPP
 
-#include <ros/ros.h>
-#include <std_msgs/Float64.h>
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/Vector3.h>
+#include <ros/ros.h>
+#include <std_msgs/Float64.h>
 
-#include "atl/utils/utils.hpp"
-#include "atl/ros/utils/node.hpp"
 #include "atl/gazebo/clients/lz_gclient.hpp"
+#include "atl/ros/utils/node.hpp"
+#include "atl/utils/utils.hpp"
 
 namespace atl {
 namespace gazebo_bridge {

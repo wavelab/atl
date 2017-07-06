@@ -6,23 +6,23 @@
 
 #include <Eigen/Geometry>
 
+#include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include <geometry_msgs/TwistStamped.h>
+#include <geometry_msgs/Vector3.h>
 #include <ros/ros.h>
 #include <std_msgs/Float64.h>
-#include <geometry_msgs/Vector3.h>
-#include <geometry_msgs/PoseStamped.h>
-#include <geometry_msgs/TwistStamped.h>
-#include <geometry_msgs/PoseWithCovarianceStamped.h>
 
 #include <dji_sdk/AttitudeControl.h>
 #include <dji_sdk/AttitudeControlRequest.h>
 #include <dji_sdk/AttitudeControlResponse.h>
-#include <dji_sdk/LocalPosition.h>
 #include <dji_sdk/AttitudeQuaternion.h>
+#include <dji_sdk/LocalPosition.h>
 #include <dji_sdk/Velocity.h>
 
-#include "atl/utils/utils.hpp"
-#include "atl/ros/utils/node.hpp"
 #include "atl/gazebo/clients/quadrotor_gclient.hpp"
+#include "atl/ros/utils/node.hpp"
+#include "atl/utils/utils.hpp"
 
 namespace atl {
 namespace gazebo_bridge {

@@ -1,6 +1,5 @@
 #include "atl/sensor/MPU6050.hpp"
 
-
 namespace atl {
 
 MPU6050::MPU6050(void) {}

@@ -1,6 +1,5 @@
 #include "atl/ros/nodes/imu_node.hpp"
 
-
 namespace atl {
 
 int IMUNode::configure(std::string node_name, int hz) {
@@ -28,7 +27,6 @@ int IMUNode::configure(std::string node_name, int hz) {
   this->imu.roll_offset = -1 * this->imu.roll;
   this->imu.pitch_offset = -1 * this->imu.pitch;
   LOG_INFO("Zero-ing complete!");
-
 
   // register publisher and subscribers
   // clang-format off

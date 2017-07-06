@@ -1,6 +1,5 @@
 #include "atl/utils/config.hpp"
 
-
 namespace atl {
 
 ConfigParser::ConfigParser(void) {

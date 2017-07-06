@@ -1,9 +1,7 @@
-#include "atl/atl_test.hpp"
 #include "atl/vision/gimbal/sbgc.hpp"
-
+#include "atl/atl_test.hpp"
 
 namespace atl {
-
 
 TEST(SBGC, ConnectDisconnect) {
   SBGC sbgc("/dev/ttyUSB0");

@@ -1,9 +1,8 @@
+#include "atl/vision/camera/camera.hpp"
 #include "atl/atl_test.hpp"
 #include "atl/utils/opencv.hpp"
-#include "atl/vision/camera/camera.hpp"
 
 #define TEST_CONFIG_PATH "tests/configs/camera/webcam"
-
 
 namespace atl {
 

@@ -1,6 +1,5 @@
 #include "atl/planning/model.hpp"
 
-
 namespace atl {
 
 // QUAD2DMODEL
@@ -48,7 +47,6 @@ void Quad2DModel::printState(void) {
   std::cout << "z: " << this->x(2) << std::endl;
   std::cout << "vz: " << this->x(3) << std::endl;
 }
-
 
 // SIMULATOR
 Simulator::Simulator(void) {
@@ -123,6 +121,5 @@ int Simulator::simulate(double dt, double tend, MatX U, MatX &X) {
 
   return 0;
 }
-
 
 }  // namespace atl

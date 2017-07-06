@@ -3,7 +3,6 @@
 
 #include "atl/utils/utils.hpp"
 
-
 namespace atl {
 
 class Quad2DModel {

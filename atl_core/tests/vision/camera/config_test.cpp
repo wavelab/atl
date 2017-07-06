@@ -1,9 +1,8 @@
+#include "atl/vision/camera/config.hpp"
 #include "atl/atl_test.hpp"
 #include "atl/utils/opencv.hpp"
-#include "atl/vision/camera/config.hpp"
 
 #define TEST_CONFIG "tests/configs/camera/webcam/640x480.yaml"
-
 
 TEST(CameraConfig, constructor) {
   atl::CameraConfig config;

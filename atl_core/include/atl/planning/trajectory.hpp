@@ -1,8 +1,8 @@
 #ifndef ATL_PLANNING_TRAJECTORY_HPP
 #define ATL_PLANNING_TRAJECTORY_HPP
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 #include "atl/utils/utils.hpp"
 
@@ -61,7 +61,6 @@ double trajectory_constraint_func(const std::vector<double> &x,
 int trajectory_record_optimization(std::string file_path,
                                    std::vector<double> x,
                                    int nb_rows);
-
 
 }  // namespace atl
 #endif

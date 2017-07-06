@@ -1,10 +1,9 @@
-#include "atl/atl_test.hpp"
 #include "atl/control/landing_controller.hpp"
+#include "atl/atl_test.hpp"
 
 #define TEST_CONFIG "tests/configs/control/landing_controller.yaml"
 #define TEST_TRAJ_INDEX "tests/configs/trajectory/index.csv"
 #define TEST_TRAJ "tests/configs/trajectory/0.csv"
-
 
 namespace atl {
 
@@ -61,7 +60,6 @@ TEST(Trajectory, reset) {
   EXPECT_EQ(0, traj.inputs.size());
 }
 
-
 // TRAJECTORY INDEX
 TEST(TrajectoryIndex, constructor) {
   TrajectoryIndex index;
@@ -105,7 +103,6 @@ TEST(TrajectoryIndex, find) {
   EXPECT_EQ(50, traj.rel_pos.size());
   EXPECT_EQ(50, traj.rel_vel.size());
 }
-
 
 // LANDING CONTROLLER
 TEST(LandingController, constructor) {
