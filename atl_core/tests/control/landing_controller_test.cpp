@@ -12,7 +12,7 @@ namespace atl {
 TEST(Trajectory, constructor) {
   Trajectory trajectory;
 
-  ASSERT_FALSE(trajectory.loaded);
+  EXPECT_FALSE(trajectory.loaded);
 }
 
 TEST(Trajectory, load) {
@@ -22,16 +22,16 @@ TEST(Trajectory, load) {
 
   pos << 1.0, 2.0, 3.0;
   retval = traj.load(1, TEST_TRAJ, pos);
-  ASSERT_EQ(0, retval);
-  ASSERT_EQ(1, traj.index);
-  ASSERT_FLOAT_EQ(1.0, traj.p0(0));
-  ASSERT_FLOAT_EQ(2.0, traj.p0(1));
-  ASSERT_FLOAT_EQ(3.0, traj.p0(2));
-  ASSERT_EQ(50, traj.pos.size());
-  ASSERT_EQ(50, traj.vel.size());
-  ASSERT_EQ(50, traj.inputs.size());
-  ASSERT_EQ(50, traj.rel_pos.size());
-  ASSERT_EQ(50, traj.rel_vel.size());
+  EXPECT_EQ(0, retval);
+  EXPECT_EQ(1, traj.index);
+  EXPECT_FLOAT_EQ(1.0, traj.p0(0));
+  EXPECT_FLOAT_EQ(2.0, traj.p0(1));
+  EXPECT_FLOAT_EQ(3.0, traj.p0(2));
+  EXPECT_EQ(50, traj.pos.size());
+  EXPECT_EQ(50, traj.vel.size());
+  EXPECT_EQ(50, traj.inputs.size());
+  EXPECT_EQ(50, traj.rel_pos.size());
+  EXPECT_EQ(50, traj.rel_vel.size());
 }
 
 TEST(Trajectory, update) {
@@ -44,9 +44,9 @@ TEST(Trajectory, update) {
 
   // pos << 0.0, 0.0, 5.0;
   // traj.update(pos, wp_pos, wp_vel, wp_inputs);
-  // ASSERT_FLOAT_EQ(0.0, wp_pos(0));
-  // ASSERT_FLOAT_EQ(5.0, wp_pos(1));
-  // ASSERT_FLOAT_EQ(0.0, wp_vel(0));
+  // EXPECT_FLOAT_EQ(0.0, wp_pos(0));
+  // EXPECT_FLOAT_EQ(5.0, wp_pos(1));
+  // EXPECT_FLOAT_EQ(0.0, wp_vel(0));
 }
 
 TEST(Trajectory, reset) {
@@ -56,9 +56,9 @@ TEST(Trajectory, reset) {
   pos << 1.0, 2.0, 3.0;
   traj.load(1, TEST_TRAJ, pos);
   traj.reset();
-  ASSERT_EQ(0, traj.pos.size());
-  ASSERT_EQ(0, traj.vel.size());
-  ASSERT_EQ(0, traj.inputs.size());
+  EXPECT_EQ(0, traj.pos.size());
+  EXPECT_EQ(0, traj.vel.size());
+  EXPECT_EQ(0, traj.inputs.size());
 }
 
 
@@ -66,7 +66,7 @@ TEST(Trajectory, reset) {
 TEST(TrajectoryIndex, constructor) {
   TrajectoryIndex index;
 
-  ASSERT_FALSE(index.loaded);
+  EXPECT_FALSE(index.loaded);
 }
 
 TEST(TrajectoryIndex, load) {
@@ -74,13 +74,13 @@ TEST(TrajectoryIndex, load) {
   TrajectoryIndex index;
 
   retval = index.load(TEST_TRAJ_INDEX);
-  ASSERT_EQ(0, retval);
-  ASSERT_TRUE(index.loaded);
-  ASSERT_EQ(1, index.index_data.rows());
-  ASSERT_EQ(3, index.index_data.cols());
+  EXPECT_EQ(0, retval);
+  EXPECT_TRUE(index.loaded);
+  EXPECT_EQ(1, index.index_data.rows());
+  EXPECT_EQ(3, index.index_data.cols());
 
-  ASSERT_FLOAT_EQ(0.2, index.pos_thres);
-  ASSERT_FLOAT_EQ(0.2, index.vel_thres);
+  EXPECT_FLOAT_EQ(0.2, index.pos_thres);
+  EXPECT_FLOAT_EQ(0.2, index.vel_thres);
 }
 
 TEST(TrajectoryIndex, find) {
@@ -98,12 +98,12 @@ TEST(TrajectoryIndex, find) {
   v = 0.0;
   retval = index.find(pos, v, traj);
 
-  ASSERT_EQ(0, retval);
-  ASSERT_EQ(50, traj.pos.size());
-  ASSERT_EQ(50, traj.vel.size());
-  ASSERT_EQ(50, traj.inputs.size());
-  ASSERT_EQ(50, traj.rel_pos.size());
-  ASSERT_EQ(50, traj.rel_vel.size());
+  EXPECT_EQ(0, retval);
+  EXPECT_EQ(50, traj.pos.size());
+  EXPECT_EQ(50, traj.vel.size());
+  EXPECT_EQ(50, traj.inputs.size());
+  EXPECT_EQ(50, traj.rel_pos.size());
+  EXPECT_EQ(50, traj.rel_vel.size());
 }
 
 
@@ -111,44 +111,44 @@ TEST(TrajectoryIndex, find) {
 TEST(LandingController, constructor) {
   LandingController controller;
 
-  ASSERT_FALSE(controller.configured);
+  EXPECT_FALSE(controller.configured);
 
-  ASSERT_FLOAT_EQ(0.0, controller.dt);
-  ASSERT_FLOAT_EQ(0.0, controller.blackbox_dt);
+  EXPECT_FLOAT_EQ(0.0, controller.dt);
+  EXPECT_FLOAT_EQ(0.0, controller.blackbox_dt);
 
-  // ASSERT_FLOAT_EQ(0.0, controller.vx_controller.k_p);
-  // ASSERT_FLOAT_EQ(0.0, controller.vx_controller.k_i);
-  // ASSERT_FLOAT_EQ(0.0, controller.vx_controller.k_d);
+  // EXPECT_FLOAT_EQ(0.0, controller.vx_controller.k_p);
+  // EXPECT_FLOAT_EQ(0.0, controller.vx_controller.k_i);
+  // EXPECT_FLOAT_EQ(0.0, controller.vx_controller.k_d);
   //
-  // ASSERT_FLOAT_EQ(0.0, controller.vy_controller.k_p);
-  // ASSERT_FLOAT_EQ(0.0, controller.vy_controller.k_i);
-  // ASSERT_FLOAT_EQ(0.0, controller.vy_controller.k_d);
+  // EXPECT_FLOAT_EQ(0.0, controller.vy_controller.k_p);
+  // EXPECT_FLOAT_EQ(0.0, controller.vy_controller.k_i);
+  // EXPECT_FLOAT_EQ(0.0, controller.vy_controller.k_d);
   //
-  // ASSERT_FLOAT_EQ(0.0, controller.vz_controller.k_p);
-  // ASSERT_FLOAT_EQ(0.0, controller.vz_controller.k_i);
-  // ASSERT_FLOAT_EQ(0.0, controller.vz_controller.k_d);
+  // EXPECT_FLOAT_EQ(0.0, controller.vz_controller.k_p);
+  // EXPECT_FLOAT_EQ(0.0, controller.vz_controller.k_i);
+  // EXPECT_FLOAT_EQ(0.0, controller.vz_controller.k_d);
 
-  ASSERT_FLOAT_EQ(0.0, controller.roll_limit[0]);
-  ASSERT_FLOAT_EQ(0.0, controller.roll_limit[1]);
+  EXPECT_FLOAT_EQ(0.0, controller.roll_limit[0]);
+  EXPECT_FLOAT_EQ(0.0, controller.roll_limit[1]);
 
-  ASSERT_FLOAT_EQ(0.0, controller.pitch_limit[0]);
-  ASSERT_FLOAT_EQ(0.0, controller.pitch_limit[1]);
+  EXPECT_FLOAT_EQ(0.0, controller.pitch_limit[0]);
+  EXPECT_FLOAT_EQ(0.0, controller.pitch_limit[1]);
 
-  ASSERT_FLOAT_EQ(0.0, controller.setpoints(0));
-  ASSERT_FLOAT_EQ(0.0, controller.setpoints(0));
-  ASSERT_FLOAT_EQ(0.0, controller.setpoints(1));
+  EXPECT_FLOAT_EQ(0.0, controller.setpoints(0));
+  EXPECT_FLOAT_EQ(0.0, controller.setpoints(0));
+  EXPECT_FLOAT_EQ(0.0, controller.setpoints(1));
 
-  ASSERT_FLOAT_EQ(0.0, controller.outputs(0));
-  ASSERT_FLOAT_EQ(0.0, controller.outputs(1));
-  ASSERT_FLOAT_EQ(0.0, controller.outputs(2));
-  ASSERT_FLOAT_EQ(0.0, controller.outputs(3));
+  EXPECT_FLOAT_EQ(0.0, controller.outputs(0));
+  EXPECT_FLOAT_EQ(0.0, controller.outputs(1));
+  EXPECT_FLOAT_EQ(0.0, controller.outputs(2));
+  EXPECT_FLOAT_EQ(0.0, controller.outputs(3));
 
-  ASSERT_FLOAT_EQ(1.0, controller.trajectory_threshold(0));
-  ASSERT_FLOAT_EQ(1.0, controller.trajectory_threshold(1));
-  ASSERT_FLOAT_EQ(1.0, controller.trajectory_threshold(2));
+  EXPECT_FLOAT_EQ(1.0, controller.trajectory_threshold(0));
+  EXPECT_FLOAT_EQ(1.0, controller.trajectory_threshold(1));
+  EXPECT_FLOAT_EQ(1.0, controller.trajectory_threshold(2));
 
-  ASSERT_FALSE(controller.blackbox_enable);
-  ASSERT_FLOAT_EQ(FLT_MAX, controller.blackbox_rate);
+  EXPECT_FALSE(controller.blackbox_enable);
+  EXPECT_FLOAT_EQ(FLT_MAX, controller.blackbox_rate);
 }
 
 TEST(LandingController, configure) {
@@ -156,47 +156,47 @@ TEST(LandingController, configure) {
 
   controller.configure(TEST_CONFIG);
 
-  ASSERT_TRUE(controller.configured);
+  EXPECT_TRUE(controller.configured);
 
-  ASSERT_FLOAT_EQ(0.0, controller.dt);
-  ASSERT_FLOAT_EQ(0.0, controller.blackbox_dt);
+  EXPECT_FLOAT_EQ(0.0, controller.dt);
+  EXPECT_FLOAT_EQ(0.0, controller.blackbox_dt);
 
-  // ASSERT_FLOAT_EQ(1.0, controller.vx_controller.k_p);
-  // ASSERT_FLOAT_EQ(2.0, controller.vx_controller.k_i);
-  // ASSERT_FLOAT_EQ(3.0, controller.vx_controller.k_d);
+  // EXPECT_FLOAT_EQ(1.0, controller.vx_controller.k_p);
+  // EXPECT_FLOAT_EQ(2.0, controller.vx_controller.k_i);
+  // EXPECT_FLOAT_EQ(3.0, controller.vx_controller.k_d);
   //
-  // ASSERT_FLOAT_EQ(1.0, controller.vy_controller.k_p);
-  // ASSERT_FLOAT_EQ(2.0, controller.vy_controller.k_i);
-  // ASSERT_FLOAT_EQ(3.0, controller.vy_controller.k_d);
+  // EXPECT_FLOAT_EQ(1.0, controller.vy_controller.k_p);
+  // EXPECT_FLOAT_EQ(2.0, controller.vy_controller.k_i);
+  // EXPECT_FLOAT_EQ(3.0, controller.vy_controller.k_d);
   //
-  // ASSERT_FLOAT_EQ(1.0, controller.vz_controller.k_p);
-  // ASSERT_FLOAT_EQ(2.0, controller.vz_controller.k_i);
-  // ASSERT_FLOAT_EQ(3.0, controller.vz_controller.k_d);
+  // EXPECT_FLOAT_EQ(1.0, controller.vz_controller.k_p);
+  // EXPECT_FLOAT_EQ(2.0, controller.vz_controller.k_i);
+  // EXPECT_FLOAT_EQ(3.0, controller.vz_controller.k_d);
 
-  ASSERT_FLOAT_EQ(deg2rad(-20.0), controller.roll_limit[0]);
-  ASSERT_FLOAT_EQ(deg2rad(20.0), controller.roll_limit[1]);
+  EXPECT_FLOAT_EQ(deg2rad(-20.0), controller.roll_limit[0]);
+  EXPECT_FLOAT_EQ(deg2rad(20.0), controller.roll_limit[1]);
 
-  ASSERT_FLOAT_EQ(deg2rad(-20.0), controller.pitch_limit[0]);
-  ASSERT_FLOAT_EQ(deg2rad(20.0), controller.pitch_limit[1]);
+  EXPECT_FLOAT_EQ(deg2rad(-20.0), controller.pitch_limit[0]);
+  EXPECT_FLOAT_EQ(deg2rad(20.0), controller.pitch_limit[1]);
 
-  ASSERT_FLOAT_EQ(-1.0, controller.throttle_limit[0]);
-  ASSERT_FLOAT_EQ(1.0, controller.throttle_limit[1]);
+  EXPECT_FLOAT_EQ(-1.0, controller.throttle_limit[0]);
+  EXPECT_FLOAT_EQ(1.0, controller.throttle_limit[1]);
 
-  ASSERT_FLOAT_EQ(0.0, controller.setpoints(0));
-  ASSERT_FLOAT_EQ(0.0, controller.setpoints(1));
-  ASSERT_FLOAT_EQ(0.0, controller.setpoints(2));
+  EXPECT_FLOAT_EQ(0.0, controller.setpoints(0));
+  EXPECT_FLOAT_EQ(0.0, controller.setpoints(1));
+  EXPECT_FLOAT_EQ(0.0, controller.setpoints(2));
 
-  ASSERT_FLOAT_EQ(0.0, controller.outputs(0));
-  ASSERT_FLOAT_EQ(0.0, controller.outputs(1));
-  ASSERT_FLOAT_EQ(0.0, controller.outputs(2));
-  ASSERT_FLOAT_EQ(0.0, controller.outputs(3));
+  EXPECT_FLOAT_EQ(0.0, controller.outputs(0));
+  EXPECT_FLOAT_EQ(0.0, controller.outputs(1));
+  EXPECT_FLOAT_EQ(0.0, controller.outputs(2));
+  EXPECT_FLOAT_EQ(0.0, controller.outputs(3));
 
-  ASSERT_FLOAT_EQ(0.5, controller.trajectory_threshold(0));
-  ASSERT_FLOAT_EQ(0.5, controller.trajectory_threshold(1));
-  ASSERT_FLOAT_EQ(0.5, controller.trajectory_threshold(2));
+  EXPECT_FLOAT_EQ(0.5, controller.trajectory_threshold(0));
+  EXPECT_FLOAT_EQ(0.5, controller.trajectory_threshold(1));
+  EXPECT_FLOAT_EQ(0.5, controller.trajectory_threshold(2));
 
-  ASSERT_TRUE(controller.blackbox_enable);
-  ASSERT_FLOAT_EQ(0.2, controller.blackbox_rate);
+  EXPECT_TRUE(controller.blackbox_enable);
+  EXPECT_FLOAT_EQ(0.2, controller.blackbox_rate);
 }
 
 TEST(LandingController, loadTrajectory) {
@@ -212,11 +212,11 @@ TEST(LandingController, loadTrajectory) {
   controller.configure(TEST_CONFIG);
   retval = controller.loadTrajectory(p0, pf, v);
 
-  ASSERT_EQ(0, retval);
-  ASSERT_TRUE(controller.trajectory.loaded);
-  ASSERT_EQ(50, controller.trajectory.pos.size());
-  ASSERT_EQ(50, controller.trajectory.vel.size());
-  ASSERT_EQ(50, controller.trajectory.inputs.size());
+  EXPECT_EQ(0, retval);
+  EXPECT_TRUE(controller.trajectory.loaded);
+  EXPECT_EQ(50, controller.trajectory.pos.size());
+  EXPECT_EQ(50, controller.trajectory.vel.size());
+  EXPECT_EQ(50, controller.trajectory.inputs.size());
 }
 
 // TEST(LandingController, calculateVelocityErrors) {
@@ -234,9 +234,9 @@ TEST(LandingController, loadTrajectory) {
 //   controller.calculateVelocityErrors(v_errors, 0.0, dt);
 //   controller.printOutputs();
 //
-//   ASSERT_FLOAT_EQ(0.0, controller.outputs(0));
-//   ASSERT_FLOAT_EQ(0.0, controller.outputs(1));
-//   ASSERT_FLOAT_EQ(0.0, controller.outputs(3));
+//   EXPECT_FLOAT_EQ(0.0, controller.outputs(0));
+//   EXPECT_FLOAT_EQ(0.0, controller.outputs(1));
+//   EXPECT_FLOAT_EQ(0.0, controller.outputs(3));
 //
 //   // CHECK MOVING TOWARDS THE X LOCATION
 //   v_errors << 1, 0, 0;
@@ -246,8 +246,8 @@ TEST(LandingController, loadTrajectory) {
 //   controller.calculateVelocityErrors(v_errors, 0.0, dt);
 //   controller.printOutputs();
 //
-//   ASSERT_FLOAT_EQ(0.0, controller.outputs(0));
-//   ASSERT_TRUE(controller.outputs(1) > 0.0);
+//   EXPECT_FLOAT_EQ(0.0, controller.outputs(0));
+//   EXPECT_TRUE(controller.outputs(1) > 0.0);
 //
 //   // CHECK MOVING TOWARDS THE Y LOCATION
 //   v_errors << 0, 1, 0;
@@ -257,8 +257,8 @@ TEST(LandingController, loadTrajectory) {
 //   controller.calculateVelocityErrors(v_errors, 0.0, dt);
 //   controller.printOutputs();
 //
-//   ASSERT_TRUE(controller.outputs(0) < 0.0);
-//   ASSERT_FLOAT_EQ(0.0, controller.outputs(1));
+//   EXPECT_TRUE(controller.outputs(0) < 0.0);
+//   EXPECT_FLOAT_EQ(0.0, controller.outputs(1));
 //
 //   // CHECK MOVING TOWARDS THE X AND Y LOCATION
 //   v_errors << 1, 1, 0;
@@ -268,8 +268,8 @@ TEST(LandingController, loadTrajectory) {
 //   controller.calculateVelocityErrors(v_errors, 0.0, dt);
 //   controller.printOutputs();
 //
-//   ASSERT_TRUE(controller.outputs(0) < 0.0);
-//   ASSERT_TRUE(controller.outputs(1) > 0.0);
+//   EXPECT_TRUE(controller.outputs(0) < 0.0);
+//   EXPECT_TRUE(controller.outputs(1) > 0.0);
 // }
 
 }  // end of atl namepsace

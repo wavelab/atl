@@ -57,12 +57,12 @@ TEST(KalmanFilterTracker, sanityCheck) {
   prev_pos << 0, 0, 0;
   curr_pos << 0, 0, 5;
   retval = tracker.sanityCheck(prev_pos, curr_pos);
-  ASSERT_EQ(0, retval);
+  EXPECT_EQ(0, retval);
 
   prev_pos << 0, 0, 0;
   curr_pos << 10, 20, 30;
   retval = tracker.sanityCheck(prev_pos, curr_pos);
-  ASSERT_EQ(-2, retval);
+  EXPECT_EQ(-2, retval);
 }
 
 TEST(KalmanFilterTracker, estimate) {

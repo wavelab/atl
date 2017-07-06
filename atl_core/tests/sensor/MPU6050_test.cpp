@@ -8,7 +8,7 @@ TEST(MPU6050, configure) {
   MPU6050 imu;
 
   retval = imu.configure();
-  ASSERT_EQ(0.0, retval);
+  EXPECT_EQ(0.0, retval);
 }
 
 }  // namespace atl

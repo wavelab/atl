@@ -42,13 +42,13 @@
       </visual>
     </link>
 
-    <!-- <include> -->
-    <!--   <uri>model://gimbal</uri> -->
-    <!--   <pose>0.1 0.0 0.12 0 0 &#45;1.57059</pose> -->
-    <!-- </include> -->
+    <include>
+      <uri>model://gimbal</uri>
+      <pose>0.0 0.0 0.1 0 0 -1.57059</pose>
+    </include>
 
     <!-- <link name="df_camera"> -->
-    <!--   <pose>&#45;0.08 0.0 0.15 0 1.57059 0</pose> -->
+    <!--   <pose>0.40 0 0.2 0 0 0</pose> -->
     <!--   <visual name="visual"> -->
     <!--     <pose>0 0 0 0 &#45;1.57059 0</pose> -->
     <!--     <geometry> -->
@@ -69,14 +69,10 @@
     <!--         <near>0.01</near> -->
     <!--         <far>200</far> -->
     <!--       </clip> -->
-    <!--       <noise> -->
-    <!--         <type>gaussian</type> -->
-    <!--         <mean>0</mean> -->
-    <!--         <stddev>0.01</stddev> -->
-    <!--       </noise> -->
     <!--     </camera> -->
     <!--     <always_on>1</always_on> -->
     <!--     <update_rate>60</update_rate> -->
+    <!--     <visualize>true</visualize> -->
     <!--     <plugin name="df_camera_plugin" filename="libdf_camera_gplugin.so"/> -->
     <!--   </sensor> -->
     <!-- </link> -->

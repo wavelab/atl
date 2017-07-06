@@ -10,57 +10,59 @@
   <param name="fcu_type" value="DJI" />
   <param name="estimate_frame" value="BODY" />
 
-  <!-- prototype -->
   <param name="gimbal_mode" value="true" />
   <param name="gimbal_position_topic" value="/atl/gimbal/position/inertial" />
   <param name="gimbal_frame_orientation_topic" value="/atl/gimbal/frame/orientation/inertial" />
   <param name="gimbal_joint_orientation_topic" value="/atl/gimbal/joint/orientation/inertial" />
 
-  <node pkg="prototype_ros" name="prototype_gazebo" type="run_gazebo.sh" output="screen" required="true" />
-  <node pkg="prototype_ros" name="prototype_world" type="world_node" output="screen" required="true" />
-  <node pkg="prototype_ros" name="prototype_quadrotor" type="dji_quadrotor_node" output="screen" required="true" />
-  <node pkg="prototype_ros" name="prototype_lz" type="lz_node" output="screen" required="true">
-    <remap from="/prototype/lz/pose" to="/atl/lz/pose" />
-    <remap from="/prototype/lz/position/set" to="/atl/lz/position/set" />
-    <remap from="/prototype/lz/velocity/set" to="/atl/lz/velocity/set" />
-    <remap from="/prototype/lz/angular_velocity/set" to="/atl/lz/angular_velocity/set" />
+  <!-- gazebo -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="worlds/simulation.world"/>
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/>
+    <arg name="headless" value="false"/>
+    <arg name="debug" value="false"/>
+  </include>
+
+  <node pkg="atl_gazebo" name="atl_quadrotor" type="atl_bridge_dji_quadrotor_node" output="screen" required="true" />
+  <node pkg="atl_gazebo" name="atl_lz" type="atl_bridge_lz_node" output="screen" required="true">
+    <remap from="/atl/lz/pose" to="/atl/lz/pose" />
+    <remap from="/atl/lz/position/set" to="/atl/lz/position/set" />
+    <remap from="/atl/lz/velocity/set" to="/atl/lz/velocity/set" />
+    <remap from="/atl/lz/angular_velocity/set" to="/atl/lz/angular_velocity/set" />
   </node>
-  <node pkg="prototype_ros" name="prototype_camera" type="camera_node" output="screen" required="true">
-    <remap from="/prototype/camera/image" to="/atl/camera/image" />
+  <node pkg="atl_gazebo" name="atl_camera" type="atl_bridge_camera_node" output="screen" required="true">
+    <remap from="/atl/camera/image" to="/atl/camera/image" />
   </node>
-  <node pkg="prototype_ros" name="prototype_df_camera" type="df_camera_node" output="screen" required="true">
-    <remap from="/prototype/df_camera/image" to="/atl/df_camera/image" />
-  </node>
-  <node pkg="prototype_ros" name="prototype_gimbal" type="gimbal_node" output="screen" required="true" >
-    <remap from="/prototype/gimbal/position/inertial" to="/atl/gimbal/position/inertial" />
-    <remap from="/prototype/gimbal/frame/orientation/inertial" to="/atl/gimbal/frame/orientation/inertial" />
-    <remap from="/prototype/gimbal/joint/orientation/inertial" to="/atl/gimbal/joint/orientation/inertial" />
-    <remap from="/prototype/gimbal/setpoint/attitude" to="/atl/gimbal/setpoint/attitude" />
-    <remap from="/prototype/gimbal/target/track" to="/atl/gimbal/target/track" />
+  <node pkg="atl_gazebo" name="atl_gimbal" type="atl_bridge_gimbal_node" output="screen" required="true" >
+    <remap from="/atl/gimbal/position/inertial" to="/atl/gimbal/position/inertial" />
+    <remap from="/atl/gimbal/frame/orientation/inertial" to="/atl/gimbal/frame/orientation/inertial" />
+    <remap from="/atl/gimbal/joint/orientation/inertial" to="/atl/gimbal/joint/orientation/inertial" />
+    <remap from="/atl/gimbal/setpoint/attitude" to="/atl/gimbal/setpoint/attitude" />
+    <remap from="/atl/gimbal/target/track" to="/atl/gimbal/target/track" />
   </node>
 
   <!-- svo -->
   <node pkg="svo_ros" type="vo" name="svo" clear_params="true" output="screen" required="true">
     <param name="cam_topic" value="/atl/df_camera/image" />
-
     <!-- camera calibration file -->
     <rosparam file="$(find atl_configs)/configs/svo/camera_atan_prototype.yaml" />
-
     <!-- default parameter settings: choose between vo_fast and vo_accurate -->
     <rosparam file="$(find atl_configs)/configs/svo/vo_fast.yaml" />
   </node>
 
   <!-- control node -->
   <param name="/control/config_dir" value="$(find atl_configs)/configs/quadrotor_gazebosim" />
-  <node pkg="atl_ros" name="atl_control" type="control_node" output="screen" required="true"/>
+  <node pkg="atl_ros" name="atl_control" type="atl_control_node" output="screen" required="true"/>
 
   <!-- apriltag node -->
   <param name="apriltag_config" value="$(find atl_configs)/configs/apriltag/prototype.yaml" />
-  <node pkg="atl_ros" name="atl_apriltag" type="apriltag_node" output="screen" required="true"/>
+  <node pkg="atl_ros" name="atl_apriltag" type="atl_apriltag_node" output="screen" required="true"/>
 
   <!-- estimate node -->
   <param name="tracker_mode" value="1" />
   <param name="/estimator/kf/config" value="$(find atl_configs)/configs/estimator/kf_tracker_prototype.yaml" />
   <param name="/estimator/ekf/config" value="$(find atl_configs)/configs/estimator/ekf_tracker.yaml" />
-  <node pkg="atl_ros" name="atl_estimator" type="estimator_node" output="screen" required="true"/>
+  <node pkg="atl_ros" name="atl_estimator" type="atl_estimator_node" output="screen" required="true"/>
 </launch>

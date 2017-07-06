@@ -88,17 +88,17 @@ protected:
 };
 
 TEST_F(NodeTest, poseMsg) {
-  ASSERT_EQ(1, this->pose_sub.getNumPublishers());
+  EXPECT_EQ(1, this->pose_sub.getNumPublishers());
 
-  ASSERT_EQ(0, this->pose_msg.id);
-  ASSERT_TRUE(this->pose_msg.detected);
+  EXPECT_EQ(0, this->pose_msg.id);
+  EXPECT_TRUE(this->pose_msg.detected);
   ASSERT_NEAR(0.0, this->pose_msg.position.x, 0.2);
   ASSERT_NEAR(0.0, this->pose_msg.position.y, 0.2);
   ASSERT_NEAR(3.0, this->pose_msg.position.z, 0.2);
 }
 
 TEST_F(NodeTest, inertialMsg) {
-  ASSERT_EQ(1, this->if_sub.getNumPublishers());
+  EXPECT_EQ(1, this->if_sub.getNumPublishers());
 
   ASSERT_NEAR(0.0, this->inertial_msg.x, 0.2);
   ASSERT_NEAR(0.0, this->inertial_msg.y, 0.2);
@@ -106,7 +106,7 @@ TEST_F(NodeTest, inertialMsg) {
 }
 
 TEST_F(NodeTest, bodyMsg) {
-  ASSERT_EQ(1, this->bf_sub.getNumPublishers());
+  EXPECT_EQ(1, this->bf_sub.getNumPublishers());
 
   ASSERT_NEAR(0.0, this->body_msg.x, 0.2);
   ASSERT_NEAR(0.0, this->body_msg.y, 0.2);

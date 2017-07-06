@@ -24,7 +24,7 @@ protected:
 };
 
 TEST_F(NodeTest, test) {
-  ASSERT_TRUE(true);
+  EXPECT_TRUE(true);
 }
 
 }  // namespace atl

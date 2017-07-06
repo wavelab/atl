@@ -8,9 +8,9 @@ namespace atl {
 TEST(Quad2DModel, constructor) {
   Quad2DModel model;
 
-  ASSERT_FALSE(model.configured);
-  ASSERT_FLOAT_EQ(0.0, model.x(0, 0));
-  ASSERT_FLOAT_EQ(0.0, model.m);
+  EXPECT_FALSE(model.configured);
+  EXPECT_FLOAT_EQ(0.0, model.x(0, 0));
+  EXPECT_FLOAT_EQ(0.0, model.m);
 }
 
 TEST(Quad2DModel, configure) {
@@ -20,12 +20,12 @@ TEST(Quad2DModel, configure) {
   x_init << 1.0, 2.0, 3.0, 4.0;
   model.configure(x_init, 1.0);
 
-  ASSERT_TRUE(model.configured);
-  ASSERT_FLOAT_EQ(1.0, model.x(0));
-  ASSERT_FLOAT_EQ(2.0, model.x(1));
-  ASSERT_FLOAT_EQ(3.0, model.x(2));
-  ASSERT_FLOAT_EQ(4.0, model.x(3));
-  ASSERT_FLOAT_EQ(1.0, model.m);
+  EXPECT_TRUE(model.configured);
+  EXPECT_FLOAT_EQ(1.0, model.x(0));
+  EXPECT_FLOAT_EQ(2.0, model.x(1));
+  EXPECT_FLOAT_EQ(3.0, model.x(2));
+  EXPECT_FLOAT_EQ(4.0, model.x(3));
+  EXPECT_FLOAT_EQ(1.0, model.m);
 }
 
 TEST(Quad2DModel, update) {
@@ -52,18 +52,18 @@ TEST(Quad2DModel, update) {
 TEST(Simulator, constructor) {
   Simulator sim;
 
-  ASSERT_FALSE(sim.configured);
-  ASSERT_FALSE(sim.model.configured);
+  EXPECT_FALSE(sim.configured);
+  EXPECT_FALSE(sim.model.configured);
 
-  ASSERT_FLOAT_EQ(0.0, sim.x_init(0));
-  ASSERT_FLOAT_EQ(0.0, sim.x_init(1));
-  ASSERT_FLOAT_EQ(0.0, sim.x_init(2));
-  ASSERT_FLOAT_EQ(0.0, sim.x_init(3));
+  EXPECT_FLOAT_EQ(0.0, sim.x_init(0));
+  EXPECT_FLOAT_EQ(0.0, sim.x_init(1));
+  EXPECT_FLOAT_EQ(0.0, sim.x_init(2));
+  EXPECT_FLOAT_EQ(0.0, sim.x_init(3));
 
-  ASSERT_FLOAT_EQ(0.0, sim.x_final(0));
-  ASSERT_FLOAT_EQ(0.0, sim.x_final(1));
-  ASSERT_FLOAT_EQ(0.0, sim.x_final(2));
-  ASSERT_FLOAT_EQ(0.0, sim.x_final(3));
+  EXPECT_FLOAT_EQ(0.0, sim.x_final(0));
+  EXPECT_FLOAT_EQ(0.0, sim.x_final(1));
+  EXPECT_FLOAT_EQ(0.0, sim.x_final(2));
+  EXPECT_FLOAT_EQ(0.0, sim.x_final(3));
 }
 
 TEST(Simulator, configure) {
@@ -79,18 +79,18 @@ TEST(Simulator, configure) {
   sim.configure(x_init, x_final, m);
 
   // assert
-  ASSERT_TRUE(sim.configured);
-  ASSERT_TRUE(sim.model.configured);
+  EXPECT_TRUE(sim.configured);
+  EXPECT_TRUE(sim.model.configured);
 
-  ASSERT_FLOAT_EQ(1.0, sim.x_init(0));
-  ASSERT_FLOAT_EQ(2.0, sim.x_init(1));
-  ASSERT_FLOAT_EQ(3.0, sim.x_init(2));
-  ASSERT_FLOAT_EQ(4.0, sim.x_init(3));
+  EXPECT_FLOAT_EQ(1.0, sim.x_init(0));
+  EXPECT_FLOAT_EQ(2.0, sim.x_init(1));
+  EXPECT_FLOAT_EQ(3.0, sim.x_init(2));
+  EXPECT_FLOAT_EQ(4.0, sim.x_init(3));
 
-  ASSERT_FLOAT_EQ(11.0, sim.x_final(0));
-  ASSERT_FLOAT_EQ(12.0, sim.x_final(1));
-  ASSERT_FLOAT_EQ(13.0, sim.x_final(2));
-  ASSERT_FLOAT_EQ(14.0, sim.x_final(3));
+  EXPECT_FLOAT_EQ(11.0, sim.x_final(0));
+  EXPECT_FLOAT_EQ(12.0, sim.x_final(1));
+  EXPECT_FLOAT_EQ(13.0, sim.x_final(2));
+  EXPECT_FLOAT_EQ(14.0, sim.x_final(3));
 }
 
 TEST(Simulator, simulate) {
@@ -137,12 +137,12 @@ TEST(Simulator, simulate) {
   output_file.close();
 
   // asssert
-  // ASSERT_EQ(0, retval);
-  // ASSERT_FLOAT_EQ(0.0, sim.d_az);
-  // ASSERT_FLOAT_EQ(0.0, sim.d_theta);
-  // ASSERT_FLOAT_EQ(10.0, sim.az_sum);
-  // ASSERT_TRUE(sim.dist_error > 0);
-  // ASSERT_TRUE(sim.vel_error > 0);
+  // EXPECT_EQ(0, retval);
+  // EXPECT_FLOAT_EQ(0.0, sim.d_az);
+  // EXPECT_FLOAT_EQ(0.0, sim.d_theta);
+  // EXPECT_FLOAT_EQ(10.0, sim.az_sum);
+  // EXPECT_TRUE(sim.dist_error > 0);
+  // EXPECT_TRUE(sim.vel_error > 0);
 }
 
 }  // namespace atl

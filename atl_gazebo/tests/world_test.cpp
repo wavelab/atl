@@ -46,12 +46,12 @@ TEST_F(WorldTest, PauseAndUnPauseWorld) {
   // test pause
   this->client.pauseWorld();
   sleep(1);
-  ASSERT_TRUE(this->client.time.paused);
+  EXPECT_TRUE(this->client.time.paused);
 
   // test unpause
   this->client.unPauseWorld();
   sleep(1);
-  ASSERT_FALSE(this->client.time.paused);
+  EXPECT_FALSE(this->client.time.paused);
 }
 
 TEST_F(WorldTest, Reset) {
@@ -59,7 +59,7 @@ TEST_F(WorldTest, Reset) {
   sleep(3);
   this->client.resetWorld();
   sleep(1);
-  ASSERT_TRUE(this->client.time.sim_time.sec() < 2);
+  EXPECT_TRUE(this->client.time.sim_time.sec() < 2);
 }
 
 TEST_F(WorldTest, LoadAndRemoveModel) {

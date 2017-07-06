@@ -8,59 +8,59 @@ namespace atl {
 TEST(Quadrotor, constructor) {
   Quadrotor quadrotor;
 
-  ASSERT_FALSE(quadrotor.configured);
-  ASSERT_EQ(DISCOVER_MODE, quadrotor.current_mode);
+  EXPECT_FALSE(quadrotor.configured);
+  EXPECT_EQ(DISCOVER_MODE, quadrotor.current_mode);
 
-  ASSERT_FLOAT_EQ(0.0, quadrotor.recover_height);
-  ASSERT_FALSE(quadrotor.auto_track);
-  ASSERT_FALSE(quadrotor.auto_land);
-  ASSERT_FALSE(quadrotor.auto_disarm);
-  ASSERT_FLOAT_EQ(0.0, quadrotor.target_lost_threshold);
-  ASSERT_FLOAT_EQ(FLT_MAX, quadrotor.min_discover_time);
-  ASSERT_FLOAT_EQ(FLT_MAX, quadrotor.min_tracking_time);
+  EXPECT_FLOAT_EQ(0.0, quadrotor.recover_height);
+  EXPECT_FALSE(quadrotor.auto_track);
+  EXPECT_FALSE(quadrotor.auto_land);
+  EXPECT_FALSE(quadrotor.auto_disarm);
+  EXPECT_FLOAT_EQ(0.0, quadrotor.target_lost_threshold);
+  EXPECT_FLOAT_EQ(FLT_MAX, quadrotor.min_discover_time);
+  EXPECT_FLOAT_EQ(FLT_MAX, quadrotor.min_tracking_time);
 }
 
 TEST(Quadrotor, configure) {
   Quadrotor quadrotor;
 
   quadrotor.configure(TEST_CONFIG_PATH);
-  ASSERT_TRUE(quadrotor.configured);
-  ASSERT_EQ(DISCOVER_MODE, quadrotor.current_mode);
+  EXPECT_TRUE(quadrotor.configured);
+  EXPECT_EQ(DISCOVER_MODE, quadrotor.current_mode);
 }
 
 TEST(Quadrotor, setMode) {
   Quadrotor quadrotor;
 
   // check fail
-  ASSERT_EQ(-1, quadrotor.setMode(HOVER_MODE));
+  EXPECT_EQ(-1, quadrotor.setMode(HOVER_MODE));
 
   // make sure quadrotor is configured
   quadrotor.configure(TEST_CONFIG_PATH);
-  ASSERT_TRUE(quadrotor.configured);
+  EXPECT_TRUE(quadrotor.configured);
 
   // check NOT_SET
   quadrotor.setMode(NOT_SET);
-  ASSERT_EQ(NOT_SET, quadrotor.current_mode);
+  EXPECT_EQ(NOT_SET, quadrotor.current_mode);
 
   // check DISARM_MODE
   quadrotor.setMode(DISARM_MODE);
-  ASSERT_EQ(DISARM_MODE, quadrotor.current_mode);
+  EXPECT_EQ(DISARM_MODE, quadrotor.current_mode);
 
   // check HOVER_MODE
   quadrotor.setMode(HOVER_MODE);
-  ASSERT_EQ(HOVER_MODE, quadrotor.current_mode);
+  EXPECT_EQ(HOVER_MODE, quadrotor.current_mode);
 
   // check DISCOVER_MODE
   quadrotor.setMode(DISCOVER_MODE);
-  ASSERT_EQ(DISCOVER_MODE, quadrotor.current_mode);
+  EXPECT_EQ(DISCOVER_MODE, quadrotor.current_mode);
 
   // check TRACKING_MODE
   quadrotor.setMode(TRACKING_MODE);
-  ASSERT_EQ(TRACKING_MODE, quadrotor.current_mode);
+  EXPECT_EQ(TRACKING_MODE, quadrotor.current_mode);
 
   // check LANDING_MODE
   quadrotor.setMode(LANDING_MODE);
-  ASSERT_EQ(LANDING_MODE, quadrotor.current_mode);
+  EXPECT_EQ(LANDING_MODE, quadrotor.current_mode);
 }
 
 TEST(Quadrotor, setPose) {
@@ -72,14 +72,14 @@ TEST(Quadrotor, setPose) {
   pose.orientation = Quaternion();
 
   // check fail
-  ASSERT_EQ(-1, quadrotor.setPose(pose));
+  EXPECT_EQ(-1, quadrotor.setPose(pose));
 
   // check set pose
   quadrotor.configure(TEST_CONFIG_PATH);
-  ASSERT_EQ(0, quadrotor.setPose(pose));
-  ASSERT_FLOAT_EQ(1.0, quadrotor.pose.position(0));
-  ASSERT_FLOAT_EQ(2.0, quadrotor.pose.position(1));
-  ASSERT_FLOAT_EQ(3.0, quadrotor.pose.position(2));
+  EXPECT_EQ(0, quadrotor.setPose(pose));
+  EXPECT_FLOAT_EQ(1.0, quadrotor.pose.position(0));
+  EXPECT_FLOAT_EQ(2.0, quadrotor.pose.position(1));
+  EXPECT_FLOAT_EQ(3.0, quadrotor.pose.position(2));
 }
 
 TEST(Quadrotor, setVelocity) {
@@ -90,24 +90,24 @@ TEST(Quadrotor, setVelocity) {
   velocity << 1.0, 2.0, 3.0;
 
   // check fail
-  ASSERT_EQ(-1, quadrotor.setVelocity(velocity));
+  EXPECT_EQ(-1, quadrotor.setVelocity(velocity));
 
   // check set velocity
   quadrotor.configure(TEST_CONFIG_PATH);
-  ASSERT_EQ(0, quadrotor.setVelocity(velocity));
-  ASSERT_FLOAT_EQ(1.0, quadrotor.velocity(0));
-  ASSERT_FLOAT_EQ(2.0, quadrotor.velocity(1));
-  ASSERT_FLOAT_EQ(3.0, quadrotor.velocity(2));
+  EXPECT_EQ(0, quadrotor.setVelocity(velocity));
+  EXPECT_FLOAT_EQ(1.0, quadrotor.velocity(0));
+  EXPECT_FLOAT_EQ(2.0, quadrotor.velocity(1));
+  EXPECT_FLOAT_EQ(3.0, quadrotor.velocity(2));
 }
 
 TEST(Quadrotor, setYaw) {
   Quadrotor quadrotor;
 
   quadrotor.configure(TEST_CONFIG_PATH);
-  ASSERT_FLOAT_EQ(0, quadrotor.yaw);
+  EXPECT_FLOAT_EQ(0, quadrotor.yaw);
 
   quadrotor.setYaw(1);
-  ASSERT_FLOAT_EQ(1, quadrotor.yaw);
+  EXPECT_FLOAT_EQ(1, quadrotor.yaw);
 }
 
 TEST(Quadrotor, setTargetPosition) {
@@ -118,14 +118,14 @@ TEST(Quadrotor, setTargetPosition) {
   target_position << 1.0, 2.0, 3.0;
 
   // check fail
-  ASSERT_EQ(-1, quadrotor.setTargetPosition(target_position));
+  EXPECT_EQ(-1, quadrotor.setTargetPosition(target_position));
 
   // check set target_position
   quadrotor.configure(TEST_CONFIG_PATH);
-  ASSERT_EQ(0, quadrotor.setTargetPosition(target_position));
-  ASSERT_FLOAT_EQ(1.0, quadrotor.landing_target.position_bf(0));
-  ASSERT_FLOAT_EQ(2.0, quadrotor.landing_target.position_bf(1));
-  ASSERT_FLOAT_EQ(3.0, quadrotor.landing_target.position_bf(2));
+  EXPECT_EQ(0, quadrotor.setTargetPosition(target_position));
+  EXPECT_FLOAT_EQ(1.0, quadrotor.landing_target.position_bf(0));
+  EXPECT_FLOAT_EQ(2.0, quadrotor.landing_target.position_bf(1));
+  EXPECT_FLOAT_EQ(3.0, quadrotor.landing_target.position_bf(2));
 }
 
 TEST(Quadrotor, setTargetVelocity) {
@@ -136,14 +136,14 @@ TEST(Quadrotor, setTargetVelocity) {
   target_velocity << 1.0, 2.0, 3.0;
 
   // check fail
-  ASSERT_EQ(-1, quadrotor.setTargetVelocity(target_velocity));
+  EXPECT_EQ(-1, quadrotor.setTargetVelocity(target_velocity));
 
   // check set target_velocity
   quadrotor.configure(TEST_CONFIG_PATH);
-  ASSERT_EQ(0, quadrotor.setTargetVelocity(target_velocity));
-  ASSERT_FLOAT_EQ(1.0, quadrotor.landing_target.velocity_bf(0));
-  ASSERT_FLOAT_EQ(2.0, quadrotor.landing_target.velocity_bf(1));
-  ASSERT_FLOAT_EQ(3.0, quadrotor.landing_target.velocity_bf(2));
+  EXPECT_EQ(0, quadrotor.setTargetVelocity(target_velocity));
+  EXPECT_FLOAT_EQ(1.0, quadrotor.landing_target.velocity_bf(0));
+  EXPECT_FLOAT_EQ(2.0, quadrotor.landing_target.velocity_bf(1));
+  EXPECT_FLOAT_EQ(3.0, quadrotor.landing_target.velocity_bf(2));
 }
 
 TEST(Quadrotor, setHoverXYPosition) {
@@ -154,16 +154,16 @@ TEST(Quadrotor, setHoverXYPosition) {
   hover_position << 1.0, 2.0, 3.0;
 
   // check fail
-  ASSERT_EQ(-1, quadrotor.setHoverXYPosition(hover_position));
+  EXPECT_EQ(-1, quadrotor.setHoverXYPosition(hover_position));
 
   // check set hover_position
   quadrotor.configure(TEST_CONFIG_PATH);
   quadrotor.hover_position(2) = 10.0;
 
-  ASSERT_EQ(0, quadrotor.setHoverXYPosition(hover_position));
-  ASSERT_FLOAT_EQ(1.0, quadrotor.hover_position(0));
-  ASSERT_FLOAT_EQ(2.0, quadrotor.hover_position(1));
-  ASSERT_FLOAT_EQ(10.0, quadrotor.hover_position(2));
+  EXPECT_EQ(0, quadrotor.setHoverXYPosition(hover_position));
+  EXPECT_FLOAT_EQ(1.0, quadrotor.hover_position(0));
+  EXPECT_FLOAT_EQ(2.0, quadrotor.hover_position(1));
+  EXPECT_FLOAT_EQ(10.0, quadrotor.hover_position(2));
 }
 
 TEST(Quadrotor, setHoverPosition) {
@@ -174,14 +174,14 @@ TEST(Quadrotor, setHoverPosition) {
   hover_position << 11.0, 22.0, 33.0;
 
   // check fail
-  ASSERT_EQ(-1, quadrotor.setHoverPosition(hover_position));
+  EXPECT_EQ(-1, quadrotor.setHoverPosition(hover_position));
 
   // check set hover_position
   quadrotor.configure(TEST_CONFIG_PATH);
-  ASSERT_EQ(0, quadrotor.setHoverPosition(hover_position));
-  ASSERT_FLOAT_EQ(11.0, quadrotor.hover_position(0));
-  ASSERT_FLOAT_EQ(22.0, quadrotor.hover_position(1));
-  ASSERT_FLOAT_EQ(33.0, quadrotor.hover_position(2));
+  EXPECT_EQ(0, quadrotor.setHoverPosition(hover_position));
+  EXPECT_FLOAT_EQ(11.0, quadrotor.hover_position(0));
+  EXPECT_FLOAT_EQ(22.0, quadrotor.hover_position(1));
+  EXPECT_FLOAT_EQ(33.0, quadrotor.hover_position(2));
 }
 
 TEST(Quadrotor, conditionsMet) {
@@ -194,11 +194,11 @@ TEST(Quadrotor, conditionsMet) {
   conditions[2] = false;
 
   // check fail
-  ASSERT_FALSE(quadrotor.conditionsMet(conditions, 3));
+  EXPECT_FALSE(quadrotor.conditionsMet(conditions, 3));
 
   // check pass
   conditions[2] = true;
-  ASSERT_TRUE(quadrotor.conditionsMet(conditions, 3));
+  EXPECT_TRUE(quadrotor.conditionsMet(conditions, 3));
 }
 
 }  // namespace atl

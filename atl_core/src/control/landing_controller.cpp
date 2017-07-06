@@ -600,16 +600,14 @@ void LandingController::printOutputs(void) {
 }
 
 // void LandingController::printErrors(void) {
-//   double p, i, d;
-//
-//   p = this->vx_controller.error_p;
-//   i = this->vx_controller.error_i;
-//   d = this->vx_controller.error_d;
+//   double p = this->vx_controller.error_p;
+//   double i = this->vx_controller.error_i;
+//   double d = this->vx_controller.error_d;
 //
 //   std::cout << "vx_controller: " << std::endl;
 //   std::cout << "\terror_p: " << std::setprecision(2) << p << "\t";
 //   std::cout << "\terror_i: " << std::setprecision(2) << i << "\t";
-//   std::cout << "\terror_d: " << std::setprecision(2) << i << std::endl;
+//   std::cout << "\terror_d: " << std::setprecision(2) << d << std::endl;
 //
 //   p = this->vy_controller.error_p;
 //   i = this->vy_controller.error_i;
@@ -618,7 +616,7 @@ void LandingController::printOutputs(void) {
 //   std::cout << "vy_controller: " << std::endl;
 //   std::cout << "\terror_p: " << std::setprecision(2) << p << "\t";
 //   std::cout << "\terror_i: " << std::setprecision(2) << i << "\t";
-//   std::cout << "\terror_d: " << std::setprecision(2) << i << std::endl;
+//   std::cout << "\terror_d: " << std::setprecision(2) << d << std::endl;
 //
 //   p = this->vz_controller.error_p;
 //   i = this->vz_controller.error_i;
@@ -627,7 +625,7 @@ void LandingController::printOutputs(void) {
 //   std::cout << "vz_controller: " << std::endl;
 //   std::cout << "\terror_p: " << std::setprecision(2) << p << "\t";
 //   std::cout << "\terror_i: " << std::setprecision(2) << i << "\t";
-//   std::cout << "\terror_d: " << std::setprecision(2) << i << std::endl;
+//   std::cout << "\terror_d: " << std::setprecision(2) << d << std::endl;
 // }
 
 }  // namespace atl

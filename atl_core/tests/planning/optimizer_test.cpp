@@ -7,7 +7,7 @@ TEST(POpt, test) {
   POpt popt;
 
   popt.run();
-  ASSERT_TRUE(true);
+  EXPECT_TRUE(true);
 }
 
 

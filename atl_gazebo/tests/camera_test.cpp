@@ -60,7 +60,7 @@ TEST_F(CameraTest, test) {
   // cv::imshow("got image", image);
   // cv::waitKey(100000);
 
-  ASSERT_FALSE(image.empty());
+  EXPECT_FALSE(image.empty());
 }
 
 }  // namespace gaz

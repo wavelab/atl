@@ -8,38 +8,38 @@
 TEST(Utils_config_ConfigParam, constructor) {
   atl::ConfigParam param;
 
-  ASSERT_EQ(atl::TYPE_NOT_SET, param.type);
-  ASSERT_EQ("", param.key);
-  ASSERT_EQ(false, param.optional);
+  EXPECT_EQ(atl::TYPE_NOT_SET, param.type);
+  EXPECT_EQ("", param.key);
+  EXPECT_EQ(false, param.optional);
 
-  ASSERT_EQ(NULL, param.b);
-  ASSERT_EQ(NULL, param.i);
-  ASSERT_EQ(NULL, param.f);
-  ASSERT_EQ(NULL, param.d);
-  ASSERT_EQ(NULL, param.s);
+  EXPECT_EQ(NULL, param.b);
+  EXPECT_EQ(NULL, param.i);
+  EXPECT_EQ(NULL, param.f);
+  EXPECT_EQ(NULL, param.d);
+  EXPECT_EQ(NULL, param.s);
 
-  ASSERT_EQ(NULL, param.b_array);
-  ASSERT_EQ(NULL, param.i_array);
-  ASSERT_EQ(NULL, param.f_array);
-  ASSERT_EQ(NULL, param.d_array);
-  ASSERT_EQ(NULL, param.s_array);
+  EXPECT_EQ(NULL, param.b_array);
+  EXPECT_EQ(NULL, param.i_array);
+  EXPECT_EQ(NULL, param.f_array);
+  EXPECT_EQ(NULL, param.d_array);
+  EXPECT_EQ(NULL, param.s_array);
 
-  ASSERT_EQ(NULL, param.vec2);
-  ASSERT_EQ(NULL, param.vec3);
-  ASSERT_EQ(NULL, param.vec4);
-  ASSERT_EQ(NULL, param.vecx);
+  EXPECT_EQ(NULL, param.vec2);
+  EXPECT_EQ(NULL, param.vec3);
+  EXPECT_EQ(NULL, param.vec4);
+  EXPECT_EQ(NULL, param.vecx);
 
-  ASSERT_EQ(NULL, param.mat2);
-  ASSERT_EQ(NULL, param.mat3);
-  ASSERT_EQ(NULL, param.mat4);
-  ASSERT_EQ(NULL, param.matx);
+  EXPECT_EQ(NULL, param.mat2);
+  EXPECT_EQ(NULL, param.mat3);
+  EXPECT_EQ(NULL, param.mat4);
+  EXPECT_EQ(NULL, param.matx);
 }
 
 TEST(Utils_config_ConfigParser, constructor) {
   atl::ConfigParser parser;
 
-  ASSERT_FALSE(parser.configured);
-  ASSERT_FALSE(parser.loaded);
+  EXPECT_FALSE(parser.configured);
+  EXPECT_FALSE(parser.loaded);
 }
 
 TEST(Utils_config_ConfigParser, addParam) {
@@ -91,10 +91,10 @@ TEST(Utils_config_ConfigParser, addParam) {
   parser.addParam<atl::MatX>("matrix", &matx);
   parser.addParam<cv::Mat>("matrix", &cvmat);
 
-  ASSERT_EQ(19, parser.params.size());
-  ASSERT_EQ(atl::BOOL, parser.params[0].type);
-  ASSERT_EQ("bool", parser.params[0].key);
-  ASSERT_TRUE(parser.params[0].b != NULL);
+  EXPECT_EQ(19, parser.params.size());
+  EXPECT_EQ(atl::BOOL, parser.params[0].type);
+  EXPECT_EQ("bool", parser.params[0].key);
+  EXPECT_TRUE(parser.params[0].b != NULL);
 }
 
 TEST(Utils_config_ConfigParser, getYamlNode) {
@@ -104,10 +104,10 @@ TEST(Utils_config_ConfigParser, getYamlNode) {
   parser.load(TEST_CONFIG);
 
   parser.getYamlNode("level3.a.b.c", node1);
-  ASSERT_EQ(3, node1.as<int>());
+  EXPECT_EQ(3, node1.as<int>());
 
   parser.getYamlNode("float", node2);
-  ASSERT_FLOAT_EQ(2.0, node2.as<float>());
+  EXPECT_FLOAT_EQ(2.0, node2.as<float>());
 }
 
 TEST(Utils_config_ConfigParser, loadPrimitive) {
@@ -127,7 +127,7 @@ TEST(Utils_config_ConfigParser, loadPrimitive) {
   param.key = "int";
   param.i = &i;
   parser.loadPrimitive(param);
-  ASSERT_EQ(1, i);
+  EXPECT_EQ(1, i);
 
   // FLOAT
   param.optional = false;
@@ -135,7 +135,7 @@ TEST(Utils_config_ConfigParser, loadPrimitive) {
   param.key = "float";
   param.f = &f;
   parser.loadPrimitive(param);
-  ASSERT_FLOAT_EQ(2.0, f);
+  EXPECT_FLOAT_EQ(2.0, f);
 
   // DOUBLE
   param.optional = false;
@@ -143,7 +143,7 @@ TEST(Utils_config_ConfigParser, loadPrimitive) {
   param.key = "double";
   param.d = &d;
   parser.loadPrimitive(param);
-  ASSERT_FLOAT_EQ(3.0, d);
+  EXPECT_FLOAT_EQ(3.0, d);
 
   // STRING
   param.optional = false;
@@ -151,7 +151,7 @@ TEST(Utils_config_ConfigParser, loadPrimitive) {
   param.key = "string";
   param.s = &s;
   parser.loadPrimitive(param);
-  ASSERT_EQ("hello world!", s);
+  EXPECT_EQ("hello world!", s);
 }
 
 TEST(Utils_config_ConfigParser, loadArray) {
@@ -173,10 +173,10 @@ TEST(Utils_config_ConfigParser, loadArray) {
   param.b_array = &b_array;
   parser.loadArray(param);
 
-  ASSERT_TRUE(b_array[0]);
-  ASSERT_FALSE(b_array[1]);
-  ASSERT_TRUE(b_array[2]);
-  ASSERT_FALSE(b_array[3]);
+  EXPECT_TRUE(b_array[0]);
+  EXPECT_FALSE(b_array[1]);
+  EXPECT_TRUE(b_array[2]);
+  EXPECT_FALSE(b_array[3]);
 
   // INTEGER
   param.optional = false;
@@ -186,7 +186,7 @@ TEST(Utils_config_ConfigParser, loadArray) {
   parser.loadArray(param);
 
   for (int i = 0; i < 4; i++) {
-    ASSERT_EQ(i + 1, i_array[i]);
+    EXPECT_EQ(i + 1, i_array[i]);
   }
 
   // FLOAT
@@ -197,7 +197,7 @@ TEST(Utils_config_ConfigParser, loadArray) {
   parser.loadArray(param);
 
   for (int i = 0; i < 4; i++) {
-    ASSERT_FLOAT_EQ((float) i + 1.0, f_array[i]);
+    EXPECT_FLOAT_EQ((float) i + 1.0, f_array[i]);
   }
 
   // DOUBLE
@@ -208,7 +208,7 @@ TEST(Utils_config_ConfigParser, loadArray) {
   parser.loadArray(param);
 
   for (int i = 0; i < 4; i++) {
-    ASSERT_FLOAT_EQ((double) i + 1.0, d_array[i]);
+    EXPECT_FLOAT_EQ((double) i + 1.0, d_array[i]);
   }
 
   // STRING
@@ -218,10 +218,10 @@ TEST(Utils_config_ConfigParser, loadArray) {
   param.s_array = &s_array;
   parser.loadArray(param);
 
-  ASSERT_EQ("1.0", s_array[0]);
-  ASSERT_EQ("2.0", s_array[1]);
-  ASSERT_EQ("3.0", s_array[2]);
-  ASSERT_EQ("4.0", s_array[3]);
+  EXPECT_EQ("1.0", s_array[0]);
+  EXPECT_EQ("2.0", s_array[1]);
+  EXPECT_EQ("3.0", s_array[2]);
+  EXPECT_EQ("4.0", s_array[3]);
 }
 
 TEST(Utils_config_ConfigParser, loadVector) {
@@ -242,8 +242,8 @@ TEST(Utils_config_ConfigParser, loadVector) {
   param.vec2 = &vec2;
   parser.loadVector(param);
 
-  ASSERT_FLOAT_EQ(1.0, vec2(0));
-  ASSERT_FLOAT_EQ(2.0, vec2(1));
+  EXPECT_FLOAT_EQ(1.0, vec2(0));
+  EXPECT_FLOAT_EQ(2.0, vec2(1));
 
   // VECTOR 3
   param.optional = false;
@@ -252,9 +252,9 @@ TEST(Utils_config_ConfigParser, loadVector) {
   param.vec3 = &vec3;
   parser.loadVector(param);
 
-  ASSERT_FLOAT_EQ(1.0, vec3(0));
-  ASSERT_FLOAT_EQ(2.0, vec3(1));
-  ASSERT_FLOAT_EQ(3.0, vec3(2));
+  EXPECT_FLOAT_EQ(1.0, vec3(0));
+  EXPECT_FLOAT_EQ(2.0, vec3(1));
+  EXPECT_FLOAT_EQ(3.0, vec3(2));
 
   // VECTOR 4
   param.optional = false;
@@ -263,10 +263,10 @@ TEST(Utils_config_ConfigParser, loadVector) {
   param.vec4 = &vec4;
   parser.loadVector(param);
 
-  ASSERT_FLOAT_EQ(1.0, vec4(0));
-  ASSERT_FLOAT_EQ(2.0, vec4(1));
-  ASSERT_FLOAT_EQ(3.0, vec4(2));
-  ASSERT_FLOAT_EQ(4.0, vec4(3));
+  EXPECT_FLOAT_EQ(1.0, vec4(0));
+  EXPECT_FLOAT_EQ(2.0, vec4(1));
+  EXPECT_FLOAT_EQ(3.0, vec4(2));
+  EXPECT_FLOAT_EQ(4.0, vec4(3));
 
   // VECTOR X
   param.optional = false;
@@ -276,7 +276,7 @@ TEST(Utils_config_ConfigParser, loadVector) {
   parser.loadVector(param);
 
   for (int i = 0; i < 10; i++) {
-    ASSERT_FLOAT_EQ((double) i + 1.0, vecx(i));
+    EXPECT_FLOAT_EQ((double) i + 1.0, vecx(i));
   }
 }
 
@@ -300,10 +300,10 @@ TEST(Utils_config_ConfigParser, loadMatrix) {
   param.mat2 = &mat2;
   parser.loadMatrix(param);
 
-  ASSERT_FLOAT_EQ(1.0, mat2(0, 0));
-  ASSERT_FLOAT_EQ(2.0, mat2(0, 1));
-  ASSERT_FLOAT_EQ(3.0, mat2(1, 0));
-  ASSERT_FLOAT_EQ(4.0, mat2(1, 1));
+  EXPECT_FLOAT_EQ(1.0, mat2(0, 0));
+  EXPECT_FLOAT_EQ(2.0, mat2(0, 1));
+  EXPECT_FLOAT_EQ(3.0, mat2(1, 0));
+  EXPECT_FLOAT_EQ(4.0, mat2(1, 1));
 
   // MATRIX 3
   param.optional = false;
@@ -315,7 +315,7 @@ TEST(Utils_config_ConfigParser, loadMatrix) {
   index = 0;
   for (int i = 0; i < 3; i++) {
     for (int j = 0; j < 3; j++) {
-      ASSERT_FLOAT_EQ(index + 1.0, mat3(i, j));
+      EXPECT_FLOAT_EQ(index + 1.0, mat3(i, j));
       index++;
     }
   }
@@ -330,7 +330,7 @@ TEST(Utils_config_ConfigParser, loadMatrix) {
   index = 0;
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 4; j++) {
-      ASSERT_FLOAT_EQ(index + 1.0, mat4(i, j));
+      EXPECT_FLOAT_EQ(index + 1.0, mat4(i, j));
       index++;
     }
   }
@@ -345,7 +345,7 @@ TEST(Utils_config_ConfigParser, loadMatrix) {
   index = 0;
   for (int i = 0; i < 3; i++) {
     for (int j = 0; j < 4; j++) {
-      ASSERT_FLOAT_EQ(index + 1.0, matx(i, j));
+      EXPECT_FLOAT_EQ(index + 1.0, matx(i, j));
       index++;
     }
   }
@@ -360,7 +360,7 @@ TEST(Utils_config_ConfigParser, loadMatrix) {
   index = 0;
   for (int i = 0; i < 3; i++) {
     for (int j = 0; j < 4; j++) {
-      ASSERT_FLOAT_EQ(index + 1.0, cvmat.at<double>(i, j));
+      EXPECT_FLOAT_EQ(index + 1.0, cvmat.at<double>(i, j));
       index++;
     }
   }

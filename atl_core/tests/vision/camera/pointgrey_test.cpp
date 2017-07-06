@@ -10,17 +10,17 @@ namespace atl {
 TEST(PointGreyCamera, constructor) {
   PointGreyCamera camera;
 
-  ASSERT_FALSE(camera.configured);
-  ASSERT_FALSE(camera.initialized);
+  EXPECT_FALSE(camera.configured);
+  EXPECT_FALSE(camera.initialized);
 
-  ASSERT_FALSE(camera.config.loaded);
-  ASSERT_EQ(0, camera.modes.size());
-  ASSERT_EQ(0, camera.configs.size());
+  EXPECT_FALSE(camera.config.loaded);
+  EXPECT_EQ(0, camera.modes.size());
+  EXPECT_EQ(0, camera.configs.size());
 
-  ASSERT_EQ(NULL, camera.capture);
-  ASSERT_FLOAT_EQ(0.0, camera.last_tic);
+  EXPECT_EQ(NULL, camera.capture);
+  EXPECT_FLOAT_EQ(0.0, camera.last_tic);
 
-  ASSERT_EQ(NULL, camera.pointgrey);
+  EXPECT_EQ(NULL, camera.pointgrey);
 }
 
 TEST(PointGreyCamera, configure) {
@@ -28,7 +28,7 @@ TEST(PointGreyCamera, configure) {
   PointGreyCamera camera;
 
   retval = camera.configure(TEST_CONFIG_PATH);
-  ASSERT_EQ(0, retval);
+  EXPECT_EQ(0, retval);
 }
 
 TEST(PointGreyCamera, initialize) {
@@ -37,11 +37,10 @@ TEST(PointGreyCamera, initialize) {
 
   camera.configure(TEST_CONFIG_PATH);
   retval = camera.initialize();
-  ASSERT_EQ(0, retval);
+  EXPECT_EQ(0, retval);
 }
 
 TEST(PointGreyCamera, brightness) {
-  int retval;
   double brightness;
   PointGreyCamera camera;
 
@@ -54,7 +53,6 @@ TEST(PointGreyCamera, brightness) {
 }
 
 TEST(PointGreyCamera, frameRate) {
-  int retval;
   double fps;
   PointGreyCamera camera;
 
@@ -63,11 +61,10 @@ TEST(PointGreyCamera, frameRate) {
   camera.setFrameRate(10);
   camera.getFrameRate(fps);
 
-  ASSERT_FLOAT_EQ(10, fps);
+  EXPECT_FLOAT_EQ(10, fps);
 }
 
 TEST(PointGreyCamera, exposure) {
-  int retval;
   double exposure;
   PointGreyCamera camera;
 
@@ -76,11 +73,10 @@ TEST(PointGreyCamera, exposure) {
   camera.setExposure(1.0);
   camera.getExposure(exposure);
 
-  ASSERT_FLOAT_EQ(1.0, exposure);
+  EXPECT_FLOAT_EQ(1.0, exposure);
 }
 
 TEST(PointGreyCamera, shutter) {
-  int retval;
   double shutter;
   PointGreyCamera camera;
 
@@ -93,7 +89,6 @@ TEST(PointGreyCamera, shutter) {
 }
 
 TEST(PointGreyCamera, gain) {
-  int retval;
   double gain;
   PointGreyCamera camera;
 
@@ -121,13 +116,13 @@ TEST(PointGreyCamera, printFormat7Capabilities) {
 //   camera.initialize();
 //
 //   camera.getFrame(image);
-//   ASSERT_EQ(640, image.cols);
-//   ASSERT_EQ(480, image.rows);
+//   EXPECT_EQ(640, image.cols);
+//   EXPECT_EQ(480, image.rows);
 //
 //   camera.changeMode("320x240");
 //   camera.getFrame(image);
-//   ASSERT_EQ(320, image.cols);
-//   ASSERT_EQ(240, image.rows);
+//   EXPECT_EQ(320, image.cols);
+//   EXPECT_EQ(240, image.rows);
 // }
 
 TEST(PointGreyCamera, getFrame) {
@@ -141,7 +136,7 @@ TEST(PointGreyCamera, getFrame) {
   // cv::imshow("Image", image);
   // cv::waitKey(100000);
 
-  ASSERT_FALSE(image.empty());
+  EXPECT_FALSE(image.empty());
 }
 
 TEST(PointGreyCamera, run) {

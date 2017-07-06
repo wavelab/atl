@@ -68,14 +68,14 @@ protected:
 };
 
 TEST_F(NodeTest, jointImuMessage) {
-  ASSERT_EQ(1, this->joint_if_imu_sub.getNumPublishers());
+  EXPECT_EQ(1, this->joint_if_imu_sub.getNumPublishers());
   // ASSERT_NEAR(0.0, this->pos_if_msg.x, 0.1);
   // ASSERT_NEAR(0.0, this->pos_if_msg.y, 0.1);
   // ASSERT_NEAR(0.0, this->pos_if_msg.z, 0.1);
 }
 
 TEST_F(NodeTest, frameOrientationMsg) {
-  ASSERT_EQ(1, this->frame_if_orientation_sub.getNumPublishers());
+  EXPECT_EQ(1, this->frame_if_orientation_sub.getNumPublishers());
   // ASSERT_NEAR(0.0, this->pos_if_msg.x, 0.1);
   // ASSERT_NEAR(0.0, this->pos_if_msg.y, 0.1);
   // ASSERT_NEAR(0.0, this->pos_if_msg.z, 0.1);

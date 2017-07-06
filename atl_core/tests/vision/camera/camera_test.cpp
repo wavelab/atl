@@ -10,15 +10,15 @@ namespace atl {
 TEST(Camera, constructor) {
   Camera camera;
 
-  ASSERT_FALSE(camera.configured);
-  ASSERT_FALSE(camera.initialized);
+  EXPECT_FALSE(camera.configured);
+  EXPECT_FALSE(camera.initialized);
 
-  ASSERT_FALSE(camera.config.loaded);
-  ASSERT_EQ(0, camera.modes.size());
-  ASSERT_EQ(0, camera.configs.size());
+  EXPECT_FALSE(camera.config.loaded);
+  EXPECT_EQ(0, camera.modes.size());
+  EXPECT_EQ(0, camera.configs.size());
 
-  ASSERT_EQ(NULL, camera.capture);
-  ASSERT_FLOAT_EQ(0.0, camera.last_tic);
+  EXPECT_EQ(NULL, camera.capture);
+  EXPECT_FLOAT_EQ(0.0, camera.last_tic);
 }
 
 TEST(Camera, configure) {
@@ -26,7 +26,7 @@ TEST(Camera, configure) {
   Camera camera;
 
   retval = camera.configure(TEST_CONFIG_PATH);
-  ASSERT_EQ(0, retval);
+  EXPECT_EQ(0, retval);
 }
 
 TEST(Camera, changeMode) {
@@ -37,13 +37,13 @@ TEST(Camera, changeMode) {
   camera.initialize();
 
   camera.getFrame(image);
-  ASSERT_EQ(640, image.cols);
-  ASSERT_EQ(480, image.rows);
+  EXPECT_EQ(640, image.cols);
+  EXPECT_EQ(480, image.rows);
 
   camera.changeMode("320x240");
   camera.getFrame(image);
-  ASSERT_EQ(320, image.cols);
-  ASSERT_EQ(240, image.rows);
+  EXPECT_EQ(320, image.cols);
+  EXPECT_EQ(240, image.rows);
 }
 
 TEST(Camera, getFrame) {
@@ -54,15 +54,15 @@ TEST(Camera, getFrame) {
   camera.initialize();
   camera.getFrame(image);
 
-  ASSERT_FALSE(image.empty());
+  EXPECT_FALSE(image.empty());
 }
 
-// TEST(Camera, run) {
-//   Camera camera;
-//
-//   camera.configure(TEST_CONFIG_PATH);
-//   camera.initialize();
-//   camera.run();
-// }
+TEST(Camera, run) {
+  Camera camera;
+
+  camera.configure(TEST_CONFIG_PATH);
+  camera.initialize();
+  camera.run();
+}
 
 }  // namespace atl

@@ -87,8 +87,8 @@ TEST(Trajectory, load_matrix) {
 
   // test and assert
   load_matrix(x, 2, 5, y);
-  ASSERT_FLOAT_EQ(0.0, y(0, 0));
-  ASSERT_FLOAT_EQ(9.0, y(1, 4));
+  EXPECT_FLOAT_EQ(0.0, y(0, 0));
+  EXPECT_FLOAT_EQ(9.0, y(1, 4));
 }
 
 TEST(Trajectory, trajectory_calculate_desired_states) {
@@ -117,23 +117,23 @@ TEST(Trajectory, trajectory_calculate_desired_states) {
   }
 
   // assert
-  ASSERT_EQ(p.nb_steps, p.desired.cols());
+  EXPECT_EQ(p.nb_steps, p.desired.cols());
 
   state = p.desired.block(0, 0, 6, 1);
-  ASSERT_FLOAT_EQ(p.pos_init(0), state(0));
-  ASSERT_FLOAT_EQ(p.vel_init(0), state(1));
-  ASSERT_FLOAT_EQ(p.pos_init(1), state(2));
-  ASSERT_FLOAT_EQ(p.vel_init(1), state(3));
-  ASSERT_FLOAT_EQ(p.thrust_init, state(4));
-  ASSERT_FLOAT_EQ(p.theta_init, state(5));
+  EXPECT_FLOAT_EQ(p.pos_init(0), state(0));
+  EXPECT_FLOAT_EQ(p.vel_init(0), state(1));
+  EXPECT_FLOAT_EQ(p.pos_init(1), state(2));
+  EXPECT_FLOAT_EQ(p.vel_init(1), state(3));
+  EXPECT_FLOAT_EQ(p.thrust_init, state(4));
+  EXPECT_FLOAT_EQ(p.theta_init, state(5));
 
   state = p.desired.block(0, p.nb_steps - 1, 6, 1);
-  ASSERT_FLOAT_EQ(p.pos_final(0), state(0));
-  ASSERT_FLOAT_EQ(p.vel_final(0), state(1));
-  ASSERT_FLOAT_EQ(p.pos_final(1), state(2));
-  ASSERT_FLOAT_EQ(p.vel_final(1), state(3));
-  ASSERT_FLOAT_EQ(p.thrust_final, state(4));
-  ASSERT_FLOAT_EQ(p.theta_final, state(5));
+  EXPECT_FLOAT_EQ(p.pos_final(0), state(0));
+  EXPECT_FLOAT_EQ(p.vel_final(0), state(1));
+  EXPECT_FLOAT_EQ(p.pos_final(1), state(2));
+  EXPECT_FLOAT_EQ(p.vel_final(1), state(3));
+  EXPECT_FLOAT_EQ(p.thrust_final, state(4));
+  EXPECT_FLOAT_EQ(p.theta_final, state(5));
 
   // clean up
   path_file.close();
@@ -172,7 +172,7 @@ TEST(Trajectory, trajectory_calculate_desired_states) {
 //
 //   // test
 //   cost = trajectory_cost_func(x, grad, &p);
-//   ASSERT_FLOAT_EQ(0.0, cost);
+//   EXPECT_FLOAT_EQ(0.0, cost);
 // }
 //
 // TEST(Trajectory, trajectory_constraint_func) {

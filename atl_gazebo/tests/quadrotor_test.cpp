@@ -45,29 +45,29 @@ TEST_F(QuadrotorTest, setPosition) {
   // setpoint 1
   this->client->setPosition(0.0, 0.0, 3.0);
   sleep(1);
-  ASSERT_FLOAT_EQ(0.0, this->client->ground_truth(0));
-  ASSERT_FLOAT_EQ(0.0, this->client->ground_truth(1));
-  ASSERT_FLOAT_EQ(3.0, this->client->ground_truth(2));
+  EXPECT_FLOAT_EQ(0.0, this->client->ground_truth(0));
+  EXPECT_FLOAT_EQ(0.0, this->client->ground_truth(1));
+  EXPECT_FLOAT_EQ(3.0, this->client->ground_truth(2));
 
   // setpoint 2
   this->client->setPosition(5.0, 5.0, 3.0);
   sleep(7);
-  ASSERT_TRUE(5.8 > this->client->ground_truth(0));
-  ASSERT_TRUE(4.8 < this->client->ground_truth(0));
-  ASSERT_TRUE(5.8 > this->client->ground_truth(1));
-  ASSERT_TRUE(4.8 < this->client->ground_truth(1));
-  ASSERT_TRUE(3.8 > this->client->ground_truth(2));
-  ASSERT_TRUE(2.8 < this->client->ground_truth(2));
+  EXPECT_TRUE(5.8 > this->client->ground_truth(0));
+  EXPECT_TRUE(4.8 < this->client->ground_truth(0));
+  EXPECT_TRUE(5.8 > this->client->ground_truth(1));
+  EXPECT_TRUE(4.8 < this->client->ground_truth(1));
+  EXPECT_TRUE(3.8 > this->client->ground_truth(2));
+  EXPECT_TRUE(2.8 < this->client->ground_truth(2));
 
   // setpoint 3
   this->client->setPosition(0.0, 0.0, 3.0);
   sleep(5);
-  ASSERT_TRUE(0.8 > this->client->ground_truth(0));
-  ASSERT_TRUE(-0.8 < this->client->ground_truth(0));
-  ASSERT_TRUE(0.8 > this->client->ground_truth(1));
-  ASSERT_TRUE(-0.8 < this->client->ground_truth(1));
-  ASSERT_TRUE(3.8 > this->client->ground_truth(2));
-  ASSERT_TRUE(2.8 < this->client->ground_truth(2));
+  EXPECT_TRUE(0.8 > this->client->ground_truth(0));
+  EXPECT_TRUE(-0.8 < this->client->ground_truth(0));
+  EXPECT_TRUE(0.8 > this->client->ground_truth(1));
+  EXPECT_TRUE(-0.8 < this->client->ground_truth(1));
+  EXPECT_TRUE(3.8 > this->client->ground_truth(2));
+  EXPECT_TRUE(2.8 < this->client->ground_truth(2));
 }
 
 // TEST_F(QuadrotorTest, setVelocity) {

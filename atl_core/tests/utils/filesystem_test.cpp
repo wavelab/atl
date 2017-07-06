@@ -5,18 +5,18 @@
 namespace atl {
 
 TEST(Utils_filesystem, file_exists) {
-  ASSERT_TRUE(file_exists("tests/configs/control/position_controller.yaml"));
-  ASSERT_FALSE(file_exists("tests/configs/control/bogus.yaml"));
+  EXPECT_TRUE(file_exists("tests/configs/control/position_controller.yaml"));
+  EXPECT_FALSE(file_exists("tests/configs/control/bogus.yaml"));
 }
 
 TEST(Utils_filesystem, path_split) {
   std::vector<std::string> splits;
 
   splits = path_split("/a/b/c.yaml");
-  ASSERT_EQ(3, splits.size());
-  ASSERT_EQ("a", splits[0]);
-  ASSERT_EQ("b", splits[1]);
-  ASSERT_EQ("c.yaml", splits[2]);
+  EXPECT_EQ(3, splits.size());
+  EXPECT_EQ("a", splits[0]);
+  EXPECT_EQ("b", splits[1]);
+  EXPECT_EQ("c.yaml", splits[2]);
 }
 
 TEST(Utils_filesystem, paths_combine) {
@@ -24,19 +24,19 @@ TEST(Utils_filesystem, paths_combine) {
 
   paths_combine("/a/b/c", "../", out);
   std::cout << out << std::endl;
-  ASSERT_EQ("/a/b", out);
+  EXPECT_EQ("/a/b", out);
 
   paths_combine("/a/b/c", "../..", out);
   std::cout << out << std::endl;
-  ASSERT_EQ("/a", out);
+  EXPECT_EQ("/a", out);
 
   paths_combine("/a/b/c", "d/e", out);
   std::cout << out << std::endl;
-  ASSERT_EQ("/a/b/c/d/e", out);
+  EXPECT_EQ("/a/b/c/d/e", out);
 
   paths_combine("./a/b/c", "../d/e", out);
   std::cout << out << std::endl;
-  ASSERT_EQ("./a/b/d/e", out);
+  EXPECT_EQ("./a/b/d/e", out);
 }
 
 }  // end of namespace

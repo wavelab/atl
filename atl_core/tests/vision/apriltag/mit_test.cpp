@@ -19,30 +19,30 @@ namespace atl {
 TEST(MITDetector, constructor) {
   MITDetector detector;
 
-  ASSERT_FALSE(detector.configured);
+  EXPECT_FALSE(detector.configured);
 
-  ASSERT_EQ(NULL, detector.detector);
+  EXPECT_EQ(NULL, detector.detector);
 
-  ASSERT_EQ(0, detector.tag_configs.size());
-  ASSERT_EQ("", detector.camera_mode);
-  ASSERT_EQ(0, detector.camera_modes.size());
-  ASSERT_EQ(0, detector.camera_configs.size());
-  ASSERT_FALSE(detector.imshow);
+  EXPECT_EQ(0, detector.tag_configs.size());
+  EXPECT_EQ("", detector.camera_mode);
+  EXPECT_EQ(0, detector.camera_modes.size());
+  EXPECT_EQ(0, detector.camera_configs.size());
+  EXPECT_FALSE(detector.imshow);
 }
 
 TEST(MITDetector, configure) {
   MITDetector detector;
 
   detector.configure(TEST_CONFIG);
-  ASSERT_TRUE(detector.configured);
+  EXPECT_TRUE(detector.configured);
 
-  ASSERT_FALSE(detector.detector == NULL);
+  EXPECT_FALSE(detector.detector == NULL);
 
-  ASSERT_EQ(2, detector.tag_configs.size());
-  ASSERT_EQ(detector.camera_modes[0], detector.camera_mode);
-  ASSERT_EQ(3, detector.camera_modes.size());
-  ASSERT_EQ(3, detector.camera_configs.size());
-  ASSERT_FALSE(detector.imshow);
+  EXPECT_EQ(2, detector.tag_configs.size());
+  EXPECT_EQ(detector.camera_modes[0], detector.camera_mode);
+  EXPECT_EQ(3, detector.camera_modes.size());
+  EXPECT_EQ(3, detector.camera_configs.size());
+  EXPECT_FALSE(detector.imshow);
 }
 
 TEST(MITDetector, illuminationInvarientTransform) {
@@ -57,11 +57,11 @@ TEST(MITDetector, illuminationInvarientTransform) {
 
   // test and assert
   detector.illuminationInvariantTransform(image);
-  cv::imshow("image", image);
-  cv::waitKey(1000000);
+  // cv::imshow("image", image);
+  // cv::waitKey(1000000);
 
   tags = detector.detector->extractTags(image);
-  ASSERT_EQ(2, tags.size());
+  EXPECT_EQ(2, tags.size());
 }
 
 TEST(MITDetector, extractTags) {
@@ -79,8 +79,8 @@ TEST(MITDetector, extractTags) {
   detector.prev_tag.detected = false;
   // tags[0].print();
 
-  ASSERT_EQ(0, retval);
-  ASSERT_EQ(1, tags.size());
+  EXPECT_EQ(0, retval);
+  EXPECT_EQ(1, tags.size());
   ASSERT_NEAR(0.0, tags[0].position(0), 0.15);
   ASSERT_NEAR(0.0, tags[0].position(1), 0.15);
   ASSERT_NEAR(2.2, tags[0].position(2), 0.15);
@@ -92,8 +92,8 @@ TEST(MITDetector, extractTags) {
   detector.prev_tag.detected = false;
   // tags[0].print();
 
-  ASSERT_EQ(0, retval);
-  ASSERT_EQ(1, tags.size());
+  EXPECT_EQ(0, retval);
+  EXPECT_EQ(1, tags.size());
   ASSERT_NEAR(0.0, tags[0].position(0), 0.15);
   ASSERT_NEAR(-0.5, tags[0].position(1), 0.15);
   ASSERT_NEAR(2.4, tags[0].position(2), 0.15);
@@ -105,8 +105,8 @@ TEST(MITDetector, extractTags) {
   detector.prev_tag.detected = false;
   // tags[0].print();
 
-  ASSERT_EQ(0, retval);
-  ASSERT_EQ(1, tags.size());
+  EXPECT_EQ(0, retval);
+  EXPECT_EQ(1, tags.size());
   ASSERT_NEAR(0.5, tags[0].position(0), 0.15);
   ASSERT_NEAR(0.0, tags[0].position(1), 0.15);
   ASSERT_NEAR(2.30, tags[0].position(2), 0.15);
@@ -122,15 +122,15 @@ TEST(MITDetector, changeMode) {
 
   image1 = cv::Mat(480, 640, CV_64F, double(0));
   detector.changeMode(image1);
-  ASSERT_EQ("640x480", detector.camera_mode);
+  EXPECT_EQ("640x480", detector.camera_mode);
 
   image2 = cv::Mat(240, 320, CV_64F, double(0));
   detector.changeMode(image2);
-  ASSERT_EQ("320x240", detector.camera_mode);
+  EXPECT_EQ("320x240", detector.camera_mode);
 
   image3 = cv::Mat(120, 160, CV_64F, double(0));
   detector.changeMode(image3);
-  ASSERT_EQ("160x120", detector.camera_mode);
+  EXPECT_EQ("160x120", detector.camera_mode);
 }
 
 TEST(MITDetector, maskImage) {

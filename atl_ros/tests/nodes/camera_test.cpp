@@ -42,8 +42,8 @@ TEST_F(NodeTest, poseMsg) {
   ros::Duration(1.0).sleep();
   ros::spinOnce();
 
-  ASSERT_EQ(640, this->image.cols);
-  ASSERT_EQ(480, this->image.rows);
+  EXPECT_EQ(640, this->image.cols);
+  EXPECT_EQ(480, this->image.rows);
 }
 
 }  // namespace atl

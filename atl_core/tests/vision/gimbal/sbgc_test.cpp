@@ -9,8 +9,8 @@ namespace atl {
 TEST(SBGC, ConnectDisconnect)
 {
     SBGC sbgc("/dev/ttyUSB0");
-    ASSERT_EQ(0, sbgc.connect());
-    ASSERT_EQ(0, sbgc.disconnect());
+    EXPECT_EQ(0, sbgc.connect());
+    EXPECT_EQ(0, sbgc.disconnect());
 
 }
 
@@ -26,13 +26,13 @@ TEST(SBGC,  SendFrame)
     // turn motors on
     frame.buildFrame(CMD_MOTORS_ON);
     retval = sbgc.sendFrame(frame);
-    ASSERT_EQ(retval, 0);
+    EXPECT_EQ(retval, 0);
     sleep(1);
 
     // turn motors off
     frame.buildFrame(CMD_MOTORS_OFF);
     retval = sbgc.sendFrame(frame);
-    ASSERT_EQ(retval, 0);
+    EXPECT_EQ(retval, 0);
     sleep(1);
 }
 
@@ -51,8 +51,8 @@ TEST(SBGC, ReadFrame)
     retval = sbgc.readFrame(CMD_BOARD_INFO_FRAME_SIZE, frame);
 
     // assert
-    ASSERT_EQ(18, frame.data_size);
-    ASSERT_EQ(0, 0);
+    EXPECT_EQ(18, frame.data_size);
+    EXPECT_EQ(0, 0);
 }
 
 TEST( SBGC, getBoardInfo)
@@ -70,8 +70,8 @@ TEST( SBGC, getBoardInfo)
     printf("board features: %d\n", sbgc.board_features);
     printf("connection flags: %d\n", sbgc.connection_flags);
 
-    ASSERT_EQ(30, sbgc.board_version);
-    ASSERT_EQ(2604, sbgc.firmware_version);
+    EXPECT_EQ(30, sbgc.board_version);
+    EXPECT_EQ(2604, sbgc.firmware_version);
 }
 
 TEST(SBGC, getRealTimeData)
@@ -95,7 +95,7 @@ TEST(SBGC, setAngle)
 {
     SBGC sbgc("/dev/ttyUSB0");
 
-    ASSERT_EQ(0, sbgc.connect());
+    EXPECT_EQ(0, sbgc.connect());
     sbgc.on();
 
     sbgc.setAngle(0, -90, 0);
@@ -110,7 +110,7 @@ TEST(SBGC, setSpeedAngle)
 {
     SBGC sbgc("/dev/ttyUSB0");
 
-    ASSERT_EQ(0, sbgc.connect());
+    EXPECT_EQ(0, sbgc.connect());
     sbgc.on();
 
     sbgc.setSpeedAngle(0, 10, 0, 0, -2, 0);

@@ -133,40 +133,40 @@ protected:
 };
 
 TEST_F(NodeTest, inertialPosition) {
-  ASSERT_EQ(1, this->pos_if_sub.getNumPublishers());
+  EXPECT_EQ(1, this->pos_if_sub.getNumPublishers());
   ASSERT_NEAR(0.0, this->pos_if_msg.x, 0.1);
   ASSERT_NEAR(0.0, this->pos_if_msg.y, 0.1);
   ASSERT_NEAR(0.0, this->pos_if_msg.z, 0.1);
 }
 
 TEST_F(NodeTest, inertialVelocity) {
-  ASSERT_EQ(1, this->vel_if_sub.getNumPublishers());
+  EXPECT_EQ(1, this->vel_if_sub.getNumPublishers());
   ASSERT_NEAR(0.0, this->vel_if_msg.x, 0.1);
   ASSERT_NEAR(0.0, this->vel_if_msg.y, 0.1);
   ASSERT_NEAR(0.0, this->vel_if_msg.z, 0.1);
 }
 
 TEST_F(NodeTest, bodyPosition) {
-  ASSERT_EQ(1, this->pos_bf_sub.getNumPublishers());
+  EXPECT_EQ(1, this->pos_bf_sub.getNumPublishers());
   ASSERT_NEAR(0.0, this->pos_bf_msg.x, 0.1);
   ASSERT_NEAR(0.0, this->pos_bf_msg.y, 0.1);
   ASSERT_NEAR(-3.0, this->pos_bf_msg.z, 0.1);
 }
 
 TEST_F(NodeTest, bodyVelocity) {
-  ASSERT_EQ(1, this->vel_bf_sub.getNumPublishers());
+  EXPECT_EQ(1, this->vel_bf_sub.getNumPublishers());
   ASSERT_NEAR(0.0, this->vel_bf_msg.x, 0.1);
   ASSERT_NEAR(0.0, this->vel_bf_msg.y, 0.1);
   ASSERT_NEAR(0.0, this->vel_bf_msg.z, 0.1);
 }
 
 TEST_F(NodeTest, detected) {
-  ASSERT_EQ(1, this->detected_sub.getNumPublishers());
-  ASSERT_TRUE(this->tag_detected);
+  EXPECT_EQ(1, this->detected_sub.getNumPublishers());
+  EXPECT_TRUE(this->tag_detected);
 }
 
 TEST_F(NodeTest, gimbal) {
-  ASSERT_EQ(1, this->gimbal_sub.getNumPublishers());
+  EXPECT_EQ(1, this->gimbal_sub.getNumPublishers());
   ASSERT_NEAR(0.0, this->gimbal_msg.x, 0.1);
   ASSERT_NEAR(0.0, this->gimbal_msg.y, 0.1);
   ASSERT_NEAR(0.0, this->gimbal_msg.z, 0.1);

@@ -19,7 +19,7 @@ TEST(BezierCubicCurve, test) {
   // create bezier curve
   bezier_points = bezier_cubic_curve(p0, p1, p2, p3);
   for (int i = 1; i < bezier_points.size(); i++) {
-    ASSERT_TRUE(bezier_points[i](1) < bezier_points[i - 1](1));
+    EXPECT_TRUE(bezier_points[i](1) < bezier_points[i - 1](1));
   }
 }
 
