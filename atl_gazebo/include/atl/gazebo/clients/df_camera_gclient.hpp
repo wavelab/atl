@@ -1,5 +1,5 @@
-#ifndef ATL_GAZEBO_CAMERA_CLIENT_HPP
-#define ATL_GAZEBO_CAMERA_CLIENT_HPP
+#ifndef atl_GAZEBO_DF_CAMERA_CLIENT_HPP
+#define atl_GAZEBO_DF_CAMERA_CLIENT_HPP
 
 #include <string>
 #include <vector>
@@ -10,21 +10,21 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/opencv.hpp>
 
-#include "atl_gazebo/gazebo_node.hpp"
+#include "atl/gazebo/gazebo_node.hpp"
 
 namespace atl {
 namespace gaz {
 
 // PUBLISH TOPICS
-#define IMAGE_TOPIC "~/camera/image"
+#define IMAGE_TOPIC "~/df_camera/image"
 
-class CameraGClient : public GazeboNode {
+class DFCameraGClient : public GazeboNode {
 public:
   bool connected;
   cv::Mat image;
 
-  CameraGClient(void);
-  ~CameraGClient(void);
+  DFCameraGClient(void);
+  ~DFCameraGClient(void);
   int configure(void);
   virtual void imageCallback(ConstImagePtr &msg);
 };

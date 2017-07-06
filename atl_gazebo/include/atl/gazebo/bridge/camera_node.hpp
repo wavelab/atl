@@ -12,7 +12,7 @@
 
 #include "atl/utils/math.hpp"
 #include "atl/ros/utils/node.hpp"
-#include "atl_gazebo/clients/camera_gclient.hpp"
+#include "atl/gazebo/clients/camera_gclient.hpp"
 
 namespace atl {
 namespace gazebo_bridge {

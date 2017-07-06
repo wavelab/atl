@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "atl_gazebo/gazebo_node.hpp"
+#include "atl/gazebo/gazebo_node.hpp"
 
 namespace atl {
 namespace gaz {

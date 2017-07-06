@@ -15,9 +15,9 @@
 #include "atl/utils/math.hpp"
 
 #include "atl/utils/utils.hpp"
-#include "atl_gazebo/kinematics/gimbal.hpp"
-#include "atl_gazebo/gazebo_node.hpp"
-#include "atl_gazebo/msgs/atl_msgs.hpp"
+#include "atl/gazebo/kinematics/gimbal.hpp"
+#include "atl/gazebo/gazebo_node.hpp"
+#include "atl/gazebo/msgs/atl_msgs.hpp"
 
 namespace atl {
 namespace gaz {

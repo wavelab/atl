@@ -9,7 +9,7 @@
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/transport/transport.hh>
 
-#include "atl_gazebo/msgs/atl_msgs.hpp"
+#include "atl/gazebo/msgs/atl_msgs.hpp"
 
 
 namespace atl {

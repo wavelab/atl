@@ -1,4 +1,4 @@
-#include "atl_gazebo/plugins/gimbal_gplugin.hpp"
+#include "atl/gazebo/plugins/gimbal_gplugin.hpp"
 
 namespace atl {
 namespace gaz {

@@ -16,8 +16,7 @@
 #include "atl/ros/utils/node.hpp"
 #include "atl/ros/utils/msgs.hpp"
 #include "atl/ros/utils/utils.hpp"
-#include "atl_gazebo/clients/quadrotor_gclient.hpp"
-
+#include "atl/gazebo/clients/quadrotor_gclient.hpp"
 
 namespace atl {
 namespace gazebo_bridge {

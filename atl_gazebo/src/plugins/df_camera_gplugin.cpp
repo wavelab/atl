@@ -1,4 +1,4 @@
-#include "atl_gazebo/plugins/df_camera_gplugin.hpp"
+#include "atl/gazebo/plugins/df_camera_gplugin.hpp"
 
 namespace atl {
 namespace gaz {

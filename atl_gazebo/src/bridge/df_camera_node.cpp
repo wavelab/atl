@@ -1,4 +1,4 @@
-#include "atl_gazebo/bridge/df_camera_node.hpp"
+#include "atl/gazebo/bridge/df_camera_node.hpp"
 
 namespace atl {
 namespace gazebo_bridge {

@@ -13,7 +13,7 @@
 #include "atl/utils/utils.hpp"
 #include "atl/ros/utils/node.hpp"
 #include "atl/ros/utils/msgs.hpp"
-#include "atl_gazebo/clients/world_gclient.hpp"
+#include "atl/gazebo/clients/world_gclient.hpp"
 
 namespace atl {
 namespace gazebo_bridge {

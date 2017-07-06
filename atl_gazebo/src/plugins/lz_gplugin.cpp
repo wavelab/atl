@@ -1,4 +1,4 @@
-#include "atl_gazebo/plugins/lz_gplugin.hpp"
+#include "atl/gazebo/plugins/lz_gplugin.hpp"
 
 
 namespace atl {

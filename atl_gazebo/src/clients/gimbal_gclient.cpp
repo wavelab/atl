@@ -1,4 +1,4 @@
-#include "atl_gazebo/clients/gimbal_gclient.hpp"
+#include "atl/gazebo/clients/gimbal_gclient.hpp"
 
 
 namespace atl {

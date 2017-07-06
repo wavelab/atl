@@ -1,4 +1,4 @@
-#include "atl_gazebo/plugins/camera_gplugin.hpp"
+#include "atl/gazebo/plugins/camera_gplugin.hpp"
 
 
 namespace atl {

@@ -10,7 +10,7 @@
 #include <iomanip>
 
 #include "atl/utils/utils.hpp"
-#include "atl_gazebo/controls/pid.hpp"
+#include "atl/gazebo/controls/pid.hpp"
 
 namespace atl {
 /** @addtogroup kinematics

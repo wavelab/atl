@@ -1,4 +1,4 @@
-#include "atl_gazebo/plugins/quadrotor_gplugin.hpp"
+#include "atl/gazebo/plugins/quadrotor_gplugin.hpp"
 
 
 namespace atl {

@@ -1,7 +1,7 @@
 #ifndef atl_GAZEBO_TEST_HPP
 #define atl_GAZEBO_TEST_HPP
 
-#include "atl_gazebo/clients/world_gclient.hpp"
+#include "atl/gazebo/clients/world_gclient.hpp"
 
 
 namespace atl {

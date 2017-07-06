@@ -4,11 +4,11 @@
 #include <boost/shared_ptr.hpp>
 #include <gazebo/msgs/msgs.hh>
 
-#include "atl_gazebo/msgs/attitude_setpoint.pb.h"
-#include "atl_gazebo/msgs/model_pose.pb.h"
-#include "atl_gazebo/msgs/position_setpoint.pb.h"
-#include "atl_gazebo/msgs/rpy_pose.pb.h"
-#include "atl_gazebo/msgs/velocity_setpoint.pb.h"
+#include "atl/gazebo/msgs/attitude_setpoint.pb.h"
+#include "atl/gazebo/msgs/model_pose.pb.h"
+#include "atl/gazebo/msgs/position_setpoint.pb.h"
+#include "atl/gazebo/msgs/rpy_pose.pb.h"
+#include "atl/gazebo/msgs/velocity_setpoint.pb.h"
 
 #define MSG_SHARED_PTR(X, Y) typedef const boost::shared_ptr<const X> Y
 

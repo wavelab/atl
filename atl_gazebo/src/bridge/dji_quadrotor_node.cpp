@@ -1,4 +1,4 @@
-#include "atl_gazebo/bridge/dji_quadrotor_node.hpp"
+#include "atl/gazebo/bridge/dji_quadrotor_node.hpp"
 
 
 namespace atl {

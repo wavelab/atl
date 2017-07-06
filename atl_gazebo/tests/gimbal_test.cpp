@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 #include "test_settings.hpp"
 
-#include "atl_gazebo/gazebo_test.hpp"
-#include "atl_gazebo/clients/gimbal_gclient.hpp"
+#include "atl/gazebo/gazebo_test.hpp"
+#include "atl/gazebo/clients/gimbal_gclient.hpp"
 
 #define TEST_WORLD "/gimbal_test.world"
 

@@ -6,7 +6,7 @@
 #include <gazebo/physics/physics.hh>
 
 #include "atl/utils/utils.hpp"
-#include "atl_gazebo/gazebo_node.hpp"
+#include "atl/gazebo/gazebo_node.hpp"
 
 
 namespace atl {

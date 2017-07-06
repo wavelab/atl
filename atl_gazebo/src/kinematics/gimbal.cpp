@@ -1,4 +1,4 @@
-#include "atl_gazebo/kinematics/gimbal.hpp"
+#include "atl/gazebo/kinematics/gimbal.hpp"
 
 namespace atl {
 

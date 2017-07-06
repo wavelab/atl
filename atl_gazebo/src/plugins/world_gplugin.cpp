@@ -1,4 +1,4 @@
-#include "atl_gazebo/plugins/world_gplugin.hpp"
+#include "atl/gazebo/plugins/world_gplugin.hpp"
 
 
 namespace atl {

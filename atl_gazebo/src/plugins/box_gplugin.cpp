@@ -1,4 +1,4 @@
-#include "atl_gazebo/plugins/box_gplugin.hpp"
+#include "atl/gazebo/plugins/box_gplugin.hpp"
 
 namespace atl {
 namespace gaz {

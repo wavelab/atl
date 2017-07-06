@@ -1,4 +1,4 @@
-#include "atl_gazebo/kinematics/quadrotor.hpp"
+#include "atl/gazebo/kinematics/quadrotor.hpp"
 
 namespace atl {
 

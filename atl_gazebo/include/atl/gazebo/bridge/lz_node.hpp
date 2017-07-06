@@ -8,8 +8,7 @@
 
 #include "atl/utils/utils.hpp"
 #include "atl/ros/utils/node.hpp"
-#include "atl_gazebo/clients/lz_gclient.hpp"
-
+#include "atl/gazebo/clients/lz_gclient.hpp"
 
 namespace atl {
 namespace gazebo_bridge {

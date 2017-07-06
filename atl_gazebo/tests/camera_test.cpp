@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
 #include "test_settings.hpp"
-#include "atl_gazebo/gazebo_test.hpp"
-#include "atl_gazebo/clients/camera_gclient.hpp"
+#include "atl/gazebo/gazebo_test.hpp"
+#include "atl/gazebo/clients/camera_gclient.hpp"
 
 #define TEST_IMAGE "tests/data/camera_test.png"
 #define TEST_WORLD "tests/worlds/camera_test.world"

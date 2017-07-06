@@ -1,4 +1,4 @@
-#include "atl_gazebo/clients/camera_gclient.hpp"
+#include "atl/gazebo/clients/camera_gclient.hpp"
 
 
 namespace atl {

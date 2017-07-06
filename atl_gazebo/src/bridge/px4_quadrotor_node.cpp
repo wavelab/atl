@@ -1,4 +1,4 @@
-#include "atl_gazebo/bridge/px4_quadrotor_node.hpp"
+#include "atl/gazebo/bridge/px4_quadrotor_node.hpp"
 
 namespace atl {
 namespace gazebo_bridge {

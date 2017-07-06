@@ -1,4 +1,4 @@
-#include "atl_gazebo/bridge/lz_node.hpp"
+#include "atl/gazebo/bridge/lz_node.hpp"
 
 namespace atl {
 namespace gazebo_bridge {

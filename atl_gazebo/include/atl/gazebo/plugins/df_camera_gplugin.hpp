@@ -1,5 +1,5 @@
-#ifndef atl_GAZEBO_CAMERA_PLUGIN_HPP
-#define atl_GAZEBO_CAMERA_PLUGIN_HPP
+#ifndef atl_GAZEBO_DF_CAMERA_PLUGIN_HPP
+#define atl_GAZEBO_DF_CAMERA_PLUGIN_HPP
 
 #include <boost/bind.hpp>
 
@@ -16,15 +16,15 @@
 #include <opencv2/opencv.hpp>
 
 #include "atl/utils/utils.hpp"
-#include "atl_gazebo/gazebo_node.hpp"
+#include "atl/gazebo/gazebo_node.hpp"
 
 
 namespace atl {
 namespace gaz {
 
-#define IMAGE_PUB_TOPIC "~/camera/image"
+#define IMAGE_PUB_TOPIC "~/df_camera/image"
 
-class CameraGPlugin : public gazebo::SensorPlugin, public GazeboNode {
+class DFCameraGPlugin : public gazebo::SensorPlugin, public GazeboNode {
 public:
   gazebo::rendering::ScenePtr scene;
   gazebo::sensors::CameraSensorPtr sensor;
@@ -36,11 +36,12 @@ public:
   int image_height;
   int image_depth;
   std::string image_format;
+  cv::Mat image;
 
-  CameraGPlugin(void);
+  DFCameraGPlugin(void);
   void Load(gazebo::sensors::SensorPtr sptr, sdf::ElementPtr sdf);
   int configure(void);
-  void onNewFrame(const unsigned char *image_raw,
+  void onNewFrame(const unsigned char *image,
                   const int image_width,
                   const int image_height,
                   const int image_depth,

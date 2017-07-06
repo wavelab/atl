@@ -15,7 +15,7 @@
 #include <opencv2/opencv.hpp>
 
 #include "atl/utils/utils.hpp"
-#include "atl_gazebo/gazebo_node.hpp"
+#include "atl/gazebo/gazebo_node.hpp"
 
 namespace atl {
 namespace gaz {
