@@ -25,8 +25,10 @@ namespace atl {
 // SUBSCRIBE TOPICS
 #define APRILTAG_TOPIC "/atl/apriltag/target"
 #define GIMBAL_POSITION_TOPIC "/atl/gimbal/position/inertial"
-#define GIMBAL_FRAME_ORIENTATION_TOPIC "/atl/gimbal/frame/orientation/inertial"
-#define GIMBAL_JOINT_ORIENTATION_TOPIC "/atl/gimbal/joint/orientation/inertial"
+#define GIMBAL_FRAME_ORIENTATION_TOPIC \
+  "/atl/gimbal/frame/orientation/inertial"
+#define GIMBAL_JOINT_ORIENTATION_TOPIC \
+  "/atl/gimbal/joint/orientation/inertial"
 #define ENCODER_ORIENTATION_TOPIC "atl/gimbal/joint/orientation/body"
 #define LT_BODY_POSITION_TOPIC "/atl/estimate/landing_target/position/body"
 

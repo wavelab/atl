@@ -12,25 +12,25 @@
 namespace atl {
 
 #define INFO_CONFIG "Configuring ROS Node [%s]!"
-#define ROS_GET_PARAM(X, Y)                                       \
-  if (this->ros_nh == NULL) {                                     \
-    ROS_ERROR("You did not do ROSNode::configure() first!");      \
-    ROS_ERROR("Can only call ROS_GET_PARAM() after configure!");  \
-    return -1;                                                    \
-  }                                                               \
-  if (this->ros_nh->getParam(X, Y) == false) {                    \
-    ROS_ERROR("Failed to get ROS param [%s]", #X);                \
-    return -1;                                                    \
+#define ROS_GET_PARAM(X, Y)                                      \
+  if (this->ros_nh == NULL) {                                    \
+    ROS_ERROR("You did not do ROSNode::configure() first!");     \
+    ROS_ERROR("Can only call ROS_GET_PARAM() after configure!"); \
+    return -1;                                                   \
+  }                                                              \
+  if (this->ros_nh->getParam(X, Y) == false) {                   \
+    ROS_ERROR("Failed to get ROS param [%s]", #X);               \
+    return -1;                                                   \
   }
-#define RUN_ROS_NODE(NODE_CLASS, NODE_NAME, NODE_RATE) \
-  int main(int argc, char **argv) { \
-    NODE_CLASS node(argc, argv); \
-    if (node.configure(NODE_NAME, NODE_RATE) != 0) { \
+#define RUN_ROS_NODE(NODE_CLASS, NODE_NAME, NODE_RATE)  \
+  int main(int argc, char **argv) {                     \
+    NODE_CLASS node(argc, argv);                        \
+    if (node.configure(NODE_NAME, NODE_RATE) != 0) {    \
       ROS_ERROR("Failed to configure %s", #NODE_CLASS); \
-      return -1; \
-    } \
-    node.loop(); \
-    return 0; \
+      return -1;                                        \
+    }                                                   \
+    node.loop();                                        \
+    return 0;                                           \
   }
 
 class ROSNode {
@@ -138,7 +138,7 @@ public:
 
   template <typename M>
   int registerClient(const std::string &service_topic,
-                     bool persistent=false) {
+                     bool persistent = false) {
     ::ros::ServiceClient client;
 
     // pre-check

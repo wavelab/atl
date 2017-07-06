@@ -51,8 +51,8 @@ public:
 
   TrajectoryIndex(void);
   int load(std::string index_file,
-           double pos_thres=0.2,
-           double vel_thres=0.2);
+           double pos_thres = 0.2,
+           double vel_thres = 0.2);
   int find(Vec3 pos, double v, Trajectory &traj);
 };
 

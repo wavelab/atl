@@ -618,7 +618,6 @@ TEST(Utils_math, linear_interpolation) {
   result = linear_interpolation(a, b, 0.8);
 
   std::cout << result << std::endl;
-
 }
 
 }  // namespace atl

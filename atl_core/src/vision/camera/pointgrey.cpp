@@ -14,13 +14,13 @@ PointGreyCamera::~PointGreyCamera(void) {
     // stop capture
     error = this->pointgrey->StopCapture();
     if (error != FlyCapture2::PGRERROR_OK) {
-      log_err("Failed to stop PointGreyCamera capture!");
+      LOG_ERROR("Failed to stop PointGreyCamera capture!");
     }
 
     // disconnect
     error = this->pointgrey->Disconnect();
     if (error != FlyCapture2::PGRERROR_OK) {
-      log_err("Failed to disconnect PointGreyCamera!");
+      LOG_ERROR("Failed to disconnect PointGreyCamera!");
     }
 
     // delete pointgrey
@@ -42,17 +42,17 @@ int PointGreyCamera::initialize(void) {
   // look for camera
   error = bus_manager.GetCameraFromIndex(0, &guid);
   if (error != FlyCapture2::PGRERROR_OK) {
-    log_err("ERROR! Could not find a camera!");
+    LOG_ERROR("ERROR! Could not find a camera!");
     return -1;
   }
 
   // connect
   error = this->pointgrey->Connect(&guid);
   if (error != FlyCapture2::PGRERROR_OK) {
-    log_err("ERROR! Failed to connect to camera!");
+    LOG_ERROR("ERROR! Failed to connect to camera!");
     return -1;
   } else {
-    log_info("PointGrey connected!");
+    LOG_INFO("PointGrey connected!");
   }
 
   this->setFrameRate(200);
@@ -64,10 +64,10 @@ int PointGreyCamera::initialize(void) {
   // start camera
   error = this->pointgrey->StartCapture();
   if (error != FlyCapture2::PGRERROR_OK) {
-    log_err("ERROR! Failed start camera!");
+    LOG_ERROR("ERROR! Failed start camera!");
     return -1;
   } else {
-    log_info("PointGrey initialized!");
+    LOG_INFO("PointGrey initialized!");
   }
 
   this->initialized = true;
@@ -86,7 +86,7 @@ int PointGreyCamera::setBrightness(double brightness) {
   // set frame rate
   error = this->pointgrey->SetProperty(&property);
   if (error != FlyCapture2::PGRERROR_OK) {
-    log_err("ERROR! failed to set BRIGHTNESS property!");
+    LOG_ERROR("ERROR! failed to set BRIGHTNESS property!");
     return -1;
   }
 
@@ -107,7 +107,7 @@ int PointGreyCamera::setFrameRate(double fps) {
   // set frame rate
   error = this->pointgrey->SetProperty(&property);
   if (error != FlyCapture2::PGRERROR_OK) {
-    log_err("ERROR! failed to set FRAME_RATE property!");
+    LOG_ERROR("ERROR! failed to set FRAME_RATE property!");
     return -1;
   }
 
@@ -128,7 +128,7 @@ int PointGreyCamera::setExposure(double exposure_val) {
   // set exposure
   error = this->pointgrey->SetProperty(&property);
   if (error != FlyCapture2::PGRERROR_OK) {
-    log_err("ERROR! failed to set EXPOSURE property!");
+    LOG_ERROR("ERROR! failed to set EXPOSURE property!");
     return -1;
   }
 
@@ -149,7 +149,7 @@ int PointGreyCamera::setShutter(double shutter_ms) {
   // set shutter
   error = this->pointgrey->SetProperty(&property);
   if (error != FlyCapture2::PGRERROR_OK) {
-    log_err("ERROR! failed to set SHUTTER property!");
+    LOG_ERROR("ERROR! failed to set SHUTTER property!");
     return -1;
   }
 
@@ -169,7 +169,7 @@ int PointGreyCamera::setGain(double gain_db) {
   // set shutter
   error = this->pointgrey->SetProperty(&property);
   if (error != FlyCapture2::PGRERROR_OK) {
-    log_err("ERROR! failed to set GAIN property!");
+    LOG_ERROR("ERROR! failed to set GAIN property!");
     return -1;
   }
 
@@ -186,7 +186,7 @@ int PointGreyCamera::getBrightness(double &brightness) {
   // get frame rate
   error = this->pointgrey->GetProperty(&property);
   if (error != FlyCapture2::PGRERROR_OK) {
-    log_err("ERROR! failed to set BRIGHTNESS property!");
+    LOG_ERROR("ERROR! failed to set BRIGHTNESS property!");
     return -1;
   }
   brightness = property.absValue;
@@ -204,7 +204,7 @@ int PointGreyCamera::getFrameRate(double &fps) {
   // get frame rate
   error = this->pointgrey->GetProperty(&property);
   if (error != FlyCapture2::PGRERROR_OK) {
-    log_err("ERROR! failed to set FRAME_RATE property!");
+    LOG_ERROR("ERROR! failed to set FRAME_RATE property!");
     return -1;
   }
   fps = property.absValue;
@@ -222,7 +222,7 @@ int PointGreyCamera::getExposure(double &exposure_val) {
   // set exposure
   error = this->pointgrey->GetProperty(&property);
   if (error != FlyCapture2::PGRERROR_OK) {
-    log_err("ERROR! failed to get EXPOSURE property!");
+    LOG_ERROR("ERROR! failed to get EXPOSURE property!");
     return -1;
   }
   exposure_val = property.absValue;
@@ -240,7 +240,7 @@ int PointGreyCamera::getShutter(double &shutter_ms) {
   // get shutter
   error = this->pointgrey->GetProperty(&property);
   if (error != FlyCapture2::PGRERROR_OK) {
-    log_err("ERROR! failed to get SHUTTER property!");
+    LOG_ERROR("ERROR! failed to get SHUTTER property!");
     return -1;
   }
   shutter_ms = property.absValue;
@@ -258,7 +258,7 @@ int PointGreyCamera::getGain(double &gain_db) {
   // get shutter
   error = this->pointgrey->GetProperty(&property);
   if (error != FlyCapture2::PGRERROR_OK) {
-    log_err("ERROR! failed to get GAIN property!");
+    LOG_ERROR("ERROR! failed to get GAIN property!");
     return -1;
   }
   gain_db = property.absValue;
@@ -277,16 +277,18 @@ int PointGreyCamera::printFormat7Capabilities(void) {
 
   // get format7 info
   this->pointgrey->GetFormat7Info(&info, &supported);
-  log_info(
+  LOG_INFO(
     "Max image pixels: (%u, %u)\n"
     "Image Unit size: (%u, %u)\n"
     "Offset Unit size: (%u, %u)\n"
     "Pixel format bitfield: 0x%08x\n",
-    info.maxWidth, info.maxHeight,
-    info.imageHStepSize, info.imageVStepSize,
-    info.offsetHStepSize, info.offsetVStepSize,
-    info.pixelFormatBitField
-  );
+    info.maxWidth,
+    info.maxHeight,
+    info.imageHStepSize,
+    info.imageVStepSize,
+    info.offsetHStepSize,
+    info.offsetVStepSize,
+    info.pixelFormatBitField);
 
   return 0;
 }
@@ -304,21 +306,26 @@ int PointGreyCamera::setFormat7(int mode,
   FlyCapture2::Format7ImageSettings settings;
 
   // get format7 settings
-  this->pointgrey->GetFormat7Configuration(&settings,
-                                           &packet_size,
-                                           &psize_percentage);
+  this->pointgrey->GetFormat7Configuration(
+    &settings, &packet_size, &psize_percentage);
 
   // set mode
   switch (mode) {
-    case 0: settings.mode = FlyCapture2::MODE_1; break;
-    case 1: settings.mode = FlyCapture2::MODE_1; break;
-    case 2: settings.mode = FlyCapture2::MODE_2; break;
+    case 0:
+      settings.mode = FlyCapture2::MODE_1;
+      break;
+    case 1:
+      settings.mode = FlyCapture2::MODE_1;
+      break;
+    case 2:
+      settings.mode = FlyCapture2::MODE_2;
+      break;
     default:
-        log_err("Format7 mode [%d] not implemented yet!", mode);
-        return -2;
+      LOG_ERROR("Format7 mode [%d] not implemented yet!", mode);
+      return -2;
   }
   settings.width = width;
-  settings.height =  height;
+  settings.height = height;
   settings.offsetX = 0;
   settings.offsetY = 0;
   if (pixel_format == "MONO8") {
@@ -330,36 +337,34 @@ int PointGreyCamera::setFormat7(int mode,
   } else if (pixel_format == "RAW16") {
     settings.pixelFormat = FlyCapture2::PIXEL_FORMAT_RAW16;
   } else {
-    log_err("PixelFormat [%s] not implemented yet!", pixel_format.c_str());
+    LOG_ERROR("PixelFormat [%s] not implemented yet!", pixel_format.c_str());
     return -2;
   }
 
   // validate settings
-  error = this->pointgrey->ValidateFormat7Settings(
-    &settings,
-    &valid,
-    &packet_info
-  );
+  error =
+    this->pointgrey->ValidateFormat7Settings(&settings, &valid, &packet_info);
   if (error != FlyCapture2::PGRERROR_OK) {
-    log_err("Format7 settings are invalid!, could not configure the camera");
+    LOG_ERROR(
+      "Format7 settings are invalid!, could not configure the camera");
     return -1;
   }
 
   // send settings
   error = this->pointgrey->SetFormat7Configuration(
-    &settings,
-    packet_info.maxBytesPerPacket
-  );
+    &settings, packet_info.maxBytesPerPacket);
   if (error != FlyCapture2::PGRERROR_OK) {
-    log_err("Could not configure the camera with Format7!");
+    LOG_ERROR("Could not configure the camera with Format7!");
     return -1;
   }
-  log_info("Format7 Settings applied successfully!");
+  LOG_INFO("Format7 Settings applied successfully!");
 
   return 0;
 }
 
-std::pair<int, int> PointGreyCamera::centerROI(int size, int max_size, int step) {
+std::pair<int, int> PointGreyCamera::centerROI(int size,
+                                               int max_size,
+                                               int step) {
   if (size == 0 || size > max_size) {
     size = max_size;
   }
@@ -395,7 +400,7 @@ int PointGreyCamera::getFrame(cv::Mat &image) {
   // obtain raw image
   error = this->pointgrey->RetrieveBuffer(&raw_img);
   if (error != FlyCapture2::PGRERROR_OK) {
-    log_err("Failed to obtain raw image from camera!");
+    LOG_ERROR("Failed to obtain raw image from camera!");
     return -1;
   }
 

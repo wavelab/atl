@@ -3,9 +3,7 @@
 
 namespace atl {
 
-MPU6050::MPU6050(void) {
-
-}
+MPU6050::MPU6050(void) {}
 
 int8_t MPU6050::configure(void) {
   int8_t retval;
@@ -13,7 +11,7 @@ int8_t MPU6050::configure(void) {
   /* setup */
   this->i2c = I2C();
   if (this->i2c.setup() != 0) {
-    log_err("Failed to initilize I2C!");
+    LOG_ERROR("Failed to initilize I2C!");
   }
   this->i2c.setSlave(MPU6050_ADDRESS);
 
@@ -48,7 +46,7 @@ int8_t MPU6050::configure(void) {
     return -1;
   } else {
     this->dplf_config = retval;
-    log_info("dplf config: %d", this->dplf_config);
+    LOG_INFO("dplf config: %d", this->dplf_config);
   }
 
   /* set power management register */
@@ -193,7 +191,7 @@ int8_t MPU6050::calibrate(void) {
   int16_t i;
 
   /* let it stablize for a while first */
-  log_info("calibrating mpu6050");
+  LOG_INFO("calibrating mpu6050");
   for (i = 0; i < 50; i++) {
     this->getData();
   }
@@ -300,7 +298,7 @@ int8_t MPU6050::getDPLFConfig(void) {
     return -1;
   }
 
-  log_info("GOT DPLF: %d", data[0]);
+  LOG_INFO("GOT DPLF: %d", data[0]);
   data[0] = data[0] & 0b00000111;
 
   return data[0];
@@ -469,8 +467,7 @@ void MPU6050::recordHeader(FILE *output_file) {
   fprintf(output_file, "roll\n");
 }
 
-void MPU6050::recordData(FILE *output_file)
-{
+void MPU6050::recordData(FILE *output_file) {
   fprintf(output_file, "%f,", this->gyro.x);
   fprintf(output_file, "%f,", this->gyro.y);
   fprintf(output_file, "%f,", this->gyro.z);
@@ -501,14 +498,14 @@ int8_t MPU6050::record(std::string output_path, int nb_samples) {
     /* get data */
     retval = this->getData();
     if (retval == -1) {
-      log_err("failed to obtain data from MPU6050!");
+      LOG_ERROR("failed to obtain data from MPU6050!");
       return -1;
     }
 
     /* record data */
     this->recordData(output_file);
     if (retval == -1) {
-      log_err("failed to record MPU6050 data!");
+      LOG_ERROR("failed to record MPU6050 data!");
       return -1;
     }
   }

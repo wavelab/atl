@@ -279,15 +279,14 @@ TEST(ExtendedKalmanFilterTracker, estimate3) {
     // propagate measurement
     H = MatX::Zero(4, 9);
     if (i % 3 == 0) {
-      H(0, 0) = 1.0;  /* x */
-      H(1, 1) = 1.0;  /* y */
-      H(2, 2) = 1.0;  /* z */
-      H(3, 3) = 1.0;  /* theta */
+      H(0, 0) = 1.0; /* x */
+      H(1, 1) = 1.0; /* y */
+      H(2, 2) = 1.0; /* z */
+      H(3, 3) = 1.0; /* theta */
       h = H * tracker.mu_p;
       tracker.measurementUpdate(h, H, y);
     } else {
       tracker.mu = tracker.mu_p;
-
     }
 
     // record true state x, y, z

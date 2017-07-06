@@ -23,8 +23,8 @@ void LZGPlugin::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
   this->robot_states(0) = pose.Pos().X();  // position x
   this->robot_states(1) = pose.Pos().Y();  // position y
   this->robot_states(2) = pose.Rot().Z();  // heading
-  this->robot_inputs(0) = 0.0;         // velocity
-  this->robot_inputs(1) = 0.0;         // angular velocity
+  this->robot_inputs(0) = 0.0;             // velocity
+  this->robot_inputs(1) = 0.0;             // angular velocity
 
   // gazebo node
   // clang-format off

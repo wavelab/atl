@@ -114,10 +114,10 @@ int ControlNode::px4Connect(void) {
 
   // wait fo FCU
   attempts = 0;
-  log_info("Waiting for PX4 FCU ...");
+  LOG_INFO("Waiting for PX4 FCU ...");
   while (this->px4_state.connected != true) {
     if (attempts == 10) {
-      log_info("Failed to connect to PX4 FCU for 10 seconds ...");
+      LOG_INFO("Failed to connect to PX4 FCU for 10 seconds ...");
       return -1;
     }
 
@@ -126,7 +126,7 @@ int ControlNode::px4Connect(void) {
     attempts++;
   }
 
-  log_info("Connected to PX4 FCU!");
+  LOG_INFO("Connected to PX4 FCU!");
   return 0;
 }
 
@@ -134,15 +134,15 @@ int ControlNode::px4Disarm(void) {
   mavros_msgs::CommandBool msg;
 
   // setup
-  log_info("Disarming atl ...");
+  LOG_INFO("Disarming atl ...");
   msg.request.value = false;
 
   // disarm
   if (this->px4_arming_client.call(msg)) {
-    log_info("PX4 FCU disarmed!");
+    LOG_INFO("PX4 FCU disarmed!");
     return 0;
   } else {
-    log_err("Failed to disarm PX4 FCU!");
+    LOG_ERROR("Failed to disarm PX4 FCU!");
     return -1;
   }
 }
@@ -152,10 +152,10 @@ int ControlNode::px4OffboardModeOn(void) {
   msg.request.custom_mode = "OFFBOARD";
 
   if (this->px4_mode_client.call(msg) && msg.response.success) {
-    log_info("PX4 FCU OFFBOARD MODE ON!");
+    LOG_INFO("PX4 FCU OFFBOARD MODE ON!");
     return 0;
   } else {
-    log_err("Failed to enable PX4 FCU offboard mode!");
+    LOG_ERROR("Failed to enable PX4 FCU offboard mode!");
     return -1;
   }
 }
@@ -170,20 +170,20 @@ int ControlNode::djiDisarm(void) {
 
 int ControlNode::djiOffboardModeOn(void) {
   if (this->dji->request_sdk_permission_control() != true) {
-    log_err("Failed to release DJI SDK control!");
+    LOG_ERROR("Failed to release DJI SDK control!");
     return -1;
   }
-  log_info("Obtained DJI SDK control!");
+  LOG_INFO("Obtained DJI SDK control!");
 
   return 0;
 }
 
 int ControlNode::djiOffboardModeOff(void) {
   if (this->dji->release_sdk_permission_control() != true) {
-    log_err("Failed to release DJI SDK control!");
+    LOG_ERROR("Failed to release DJI SDK control!");
     return -1;
   }
-  log_info("Released DJI SDK control!");
+  LOG_INFO("Released DJI SDK control!");
 
   return 0;
 }
@@ -192,12 +192,12 @@ int ControlNode::waitForEstimator(void) {
   int attempts;
 
   // wait for estimator
-  log_info("Waiting for Estimator ...");
+  LOG_INFO("Waiting for Estimator ...");
   attempts = 0;
 
   while (this->ros_pubs[ESTIMATOR_ON_TOPIC].getNumSubscribers() == 0) {
     if (attempts == 10) {
-      log_info("Failed to connect to EstimatorNode for 10 seconds ...");
+      LOG_INFO("Failed to connect to EstimatorNode for 10 seconds ...");
       return -1;
     }
 
@@ -246,14 +246,15 @@ void ControlNode::px4PoseCallback(const geometry_msgs::PoseStamped &msg) {
     pose.orientation = orientation;
 
   } else {
-    log_err("Invalid ROS [/quad_frame] param value: %s", this->quad_frame.c_str());
-
+    LOG_ERROR("Invalid ROS [/quad_frame] param value: %s",
+              this->quad_frame.c_str());
   }
 
   this->quadrotor.setPose(pose);
 }
 
-void ControlNode::px4VelocityCallback(const geometry_msgs::TwistStamped &msg) {
+void ControlNode::px4VelocityCallback(
+  const geometry_msgs::TwistStamped &msg) {
   Vec3 vel_nwu, vel_ned, vel_enu;
 
   if (this->quad_frame == "NWU") {
@@ -267,8 +268,8 @@ void ControlNode::px4VelocityCallback(const geometry_msgs::TwistStamped &msg) {
     this->quadrotor.setVelocity(vel_enu);
 
   } else {
-    log_err("Invalid ROS [/quad_frame] param value: %s", this->quad_frame.c_str());
-
+    LOG_ERROR("Invalid ROS [/quad_frame] param value: %s",
+              this->quad_frame.c_str());
   }
 }
 
@@ -301,7 +302,8 @@ void ControlNode::djiPositionCallback(const dji_sdk::LocalPosition &msg) {
   this->quadrotor.pose.position = pos_enu;
 }
 
-void ControlNode::djiAttitudeCallback(const dji_sdk::AttitudeQuaternion &msg) {
+void ControlNode::djiAttitudeCallback(
+  const dji_sdk::AttitudeQuaternion &msg) {
   Quaternion orientation_ned, orientation_nwu;
 
   orientation_ned.w() = msg.q0;
@@ -365,7 +367,6 @@ void ControlNode::armCallback(const std_msgs::Bool &msg) {
     if (this->fcu_type == "DJI" && this->sim_mode == false) {
       this->djiOffboardModeOff();
     }
-
   }
 }
 
@@ -503,7 +504,6 @@ void ControlNode::publishAttitudeSetpoint(void) {
   } else {
     ROS_ERROR("Invalid [fcu_type]: %s", this->fcu_type.c_str());
   }
-
 }
 
 void ControlNode::publishQuadrotorPose(void) {

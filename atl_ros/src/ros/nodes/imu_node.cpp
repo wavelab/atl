@@ -15,19 +15,19 @@ int IMUNode::configure(std::string node_name, int hz) {
 
   // imu
   if (this->imu.configure() != 0) {
-    log_err("Failed to configure IMU!");
+    LOG_ERROR("Failed to configure IMU!");
     return -1;
   }
 
   // zero imu - assuming it is zero-ed
-  log_info("Zero-ing IMU! DO NOT MOVE THE QUADROTOR!");
+  LOG_INFO("Zero-ing IMU! DO NOT MOVE THE QUADROTOR!");
   sleep(5);
   for (int i = 0; i < 1000; i++) {
     this->imu.getData();
   }
   this->imu.roll_offset = -1 * this->imu.roll;
   this->imu.pitch_offset = -1 * this->imu.pitch;
-  log_info("Zero-ing complete!");
+  LOG_INFO("Zero-ing complete!");
 
 
   // register publisher and subscribers
@@ -36,7 +36,7 @@ int IMUNode::configure(std::string node_name, int hz) {
   if (this->gimbal_imu == "HACK") {
     this->registerPublisher<geometry_msgs::Quaternion>(JOINT_ORIENTATION_TOPIC);
   } else if (this->gimbal_imu != "SBGC") {
-    log_err("Invalid gimbal imu mode [%s]", this->gimbal_imu.c_str());
+    LOG_ERROR("Invalid gimbal imu mode [%s]", this->gimbal_imu.c_str());
     return -3;
   }
   // clang-format on
@@ -74,12 +74,12 @@ int IMUNode::loopCallback(void) {
       this->publishJointOrientation(q);
     }
   } else {
-    log_info("Failed to poll IMU for data!");
+    LOG_INFO("Failed to poll IMU for data!");
   }
 
   return 0;
 }
 
-} // eof atl namespace
+}  // eof atl namespace
 
 RUN_ROS_NODE(atl::IMUNode, NODE_NAME, NODE_RATE);

@@ -67,17 +67,14 @@ void target2inertial(Vec3 target_pos_bf,
                      Vec3 body_pos_if,
                      Quaternion body_orientation_if,
                      Vec3 &target_pos_if);
-void inertial2body(Vec3 enu_if,
-                   Quaternion orientation_if,
-                   Vec3 &nwu_bf);
-void inertial2body(Vec3 enu_if,
-                   Vec3 orientation_if,
-                   Vec3 &nwu_bf);
+void inertial2body(Vec3 enu_if, Quaternion orientation_if, Vec3 &nwu_bf);
+void inertial2body(Vec3 enu_if, Vec3 orientation_if, Vec3 &nwu_bf);
 double wrapTo180(double euler_angle);
 double wrapTo360(double euler_angle);
 double cross_track_error(Vec2 p1, Vec2 p2, Vec2 pos);
 int point_left_right(Vec2 p1, Vec2 p2, Vec2 pos);
-// int closest_point(Vec2 p1, Vec2 p2, Vec2 p3, Vec2 &closest, bool limit=false);
+// int closest_point(Vec2 p1, Vec2 p2, Vec2 p3, Vec2 &closest, bool
+// limit=false);
 double closest_point(Vec2 p1, Vec2 p2, Vec2 p3, Vec2 &closest);
 Vec2 linear_interpolation(Vec2 a, Vec2 b, double mu);
 

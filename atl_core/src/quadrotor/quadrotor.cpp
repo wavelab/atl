@@ -21,14 +21,14 @@ int Quadrotor::configure(std::string config_path) {
 
   // load config
   // clang-format off
-  parser.addParam<Vec3>("hover_position", &this->hover_position);
-  parser.addParam<double>("recover_height", &this->recover_height);
-  parser.addParam<bool>("auto_track", &this->auto_track);
-  parser.addParam<bool>("auto_land", &this->auto_land);
-  parser.addParam<bool>("auto_disarm", &this->auto_disarm);
-  parser.addParam<double>("target_lost_threshold", &this->target_lost_threshold);
-  parser.addParam<double>("min_discover_time", &this->min_discover_time);
-  parser.addParam<double>("min_tracking_time", &this->min_tracking_time);
+  parser.addParam("hover_position", &this->hover_position);
+  parser.addParam("recover_height", &this->recover_height);
+  parser.addParam("auto_track", &this->auto_track);
+  parser.addParam("auto_land", &this->auto_land);
+  parser.addParam("auto_disarm", &this->auto_disarm);
+  parser.addParam("target_lost_threshold", &this->target_lost_threshold);
+  parser.addParam("min_discover_time", &this->min_discover_time);
+  parser.addParam("min_tracking_time", &this->min_tracking_time);
   // clang-format on
   if (parser.load(config_path + "/config.yaml") != 0) {
     return -1;
@@ -52,22 +52,22 @@ int Quadrotor::setMode(enum Mode mode) {
   this->current_mode = mode;
   switch (mode) {
     case DISARM_MODE:
-      log_info(INFO_KMODE);
+      LOG_INFO(INFO_KMODE);
       break;
     case HOVER_MODE:
-      log_info(INFO_HMODE);
+      LOG_INFO(INFO_HMODE);
       break;
     case DISCOVER_MODE:
-      log_info(INFO_DMODE);
+      LOG_INFO(INFO_DMODE);
       break;
     case TRACKING_MODE:
-      log_info(INFO_TMODE);
+      LOG_INFO(INFO_TMODE);
       break;
     case LANDING_MODE:
-      log_info(INFO_LMODE);
+      LOG_INFO(INFO_LMODE);
       break;
     default:
-      log_err(EINVMODE);
+      LOG_ERROR(EINVMODE);
       return -2;
   }
 
@@ -226,7 +226,7 @@ int Quadrotor::stepDiscoverMode(double dt) {
 
   if (this->conditionsMet(conditions, 3) && this->auto_track) {
     // transition to tracking mode
-    log_info("Transitioning to [TRACKING MODE]!");
+    LOG_INFO("Transitioning to [TRACKING MODE]!");
     this->setMode(TRACKING_MODE);
     this->discover_tic = (struct timespec){0, 0};
   }
@@ -251,13 +251,12 @@ int Quadrotor::stepTrackingMode(double dt) {
   inertial2body(this->velocity, q, vel_bf);
 
   // track target
-  this->att_cmd = this->tracking_controller.calculate(
-    this->landing_target.position_bf,
-    this->pose.position,
-    this->hover_position,
-    this->yaw,
-    dt
-  );
+  this->att_cmd =
+    this->tracking_controller.calculate(this->landing_target.position_bf,
+                                        this->pose.position,
+                                        this->hover_position,
+                                        this->yaw,
+                                        dt);
 
   // update hover position and tracking timer
   this->setHoverXYPosition(this->pose.position);
@@ -274,14 +273,11 @@ int Quadrotor::stepTrackingMode(double dt) {
   if (this->conditionsMet(conditions, 3) && this->auto_land) {
     // load trajectory
     retval = this->landing_controller.loadTrajectory(
-      this->pose.position,
-      this->landing_target.position_bf,
-      vel_bf(0)
-    );
+      this->pose.position, this->landing_target.position_bf, vel_bf(0));
 
     // transition to landing mode
     if (retval == 0) {
-      log_info("Transitioning to [LANDING MODE]!");
+      LOG_INFO("Transitioning to [LANDING MODE]!");
       // this->landing_controller.recordTrajectoryIndex();
       this->setMode(LANDING_MODE);
       this->tracking_tic = (struct timespec){0, 0};
@@ -289,12 +285,11 @@ int Quadrotor::stepTrackingMode(double dt) {
 
   } else if (this->landing_target.isTargetLosted()) {
     // transition back to discover mode
-    log_info("Landing Target is losted!");
-    log_info("Transitioning back to [DISCOVER_MODE]!");
+    LOG_INFO("Landing Target is losted!");
+    LOG_INFO("Transitioning back to [DISCOVER_MODE]!");
     this->setMode(DISCOVER_MODE);
     this->tracking_tic = (struct timespec){0, 0};
     this->hover_position(2) = this->recover_height;
-
   }
 
   return 0;
@@ -310,15 +305,14 @@ int Quadrotor::stepLandingMode(double dt) {
   }
 
   // land on target
-  retval = this->landing_controller.calculate(
-    this->landing_target.position_bf,
-    this->landing_target.velocity_bf,
-    this->pose.position,
-    this->velocity,
-    this->pose.orientation,
-    this->yaw,
-    dt
-  );
+  retval =
+    this->landing_controller.calculate(this->landing_target.position_bf,
+                                       this->landing_target.velocity_bf,
+                                       this->pose.position,
+                                       this->velocity,
+                                       this->pose.orientation,
+                                       this->yaw,
+                                       dt);
   this->att_cmd = this->landing_controller.att_cmd;
 
   // update hover position and tracking timer
@@ -340,20 +334,19 @@ int Quadrotor::stepLandingMode(double dt) {
 
   } else if (this->landing_target.isTargetLosted()) {
     // transition back to discovery mode
-    log_info("Landing Target is losted!");
-    log_info("Transitioning back to [DISCOVER_MODE]!");
+    LOG_INFO("Landing Target is losted!");
+    LOG_INFO("Transitioning back to [DISCOVER_MODE]!");
     this->setMode(DISCOVER_MODE);
     this->landing_tic = (struct timespec){0, 0};
     this->hover_position(2) = this->recover_height;
 
   } else if (retval != 0) {
     // transition back to discovery mode
-    log_info("Failed to follow landing trajectory!");
-    log_info("Transitioning back to [DISCOVER_MODE]!");
+    LOG_INFO("Failed to follow landing trajectory!");
+    LOG_INFO("Transitioning back to [DISCOVER_MODE]!");
     this->setMode(DISCOVER_MODE);
     this->landing_tic = (struct timespec){0, 0};
     this->hover_position(2) = this->recover_height;
-
   }
 
   return 0;
@@ -394,7 +387,7 @@ int Quadrotor::step(double dt) {
       retval = this->stepLandingMode(dt);
       break;
     default:
-      log_err(EINVMODE);
+      LOG_ERROR(EINVMODE);
       retval = this->stepHoverMode(dt);
       break;
   }

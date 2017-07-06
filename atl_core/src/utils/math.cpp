@@ -395,9 +395,7 @@ void target2inertial(Vec3 target_pos_bf,
   target_pos_if = (R * target_enu) + body_pos_if;
 }
 
-void inertial2body(Vec3 enu_if,
-                   Quaternion orientation_if,
-                   Vec3 &nwu_bf) {
+void inertial2body(Vec3 enu_if, Quaternion orientation_if, Vec3 &nwu_bf) {
   Mat3 R;
   Vec3 euler, nwu_if;
 
@@ -414,9 +412,7 @@ void inertial2body(Vec3 enu_if,
   nwu_bf = R * nwu_if;
 }
 
-void inertial2body(Vec3 enu_if,
-                   Vec3 orientation_if,
-                   Vec3 &nwu_bf) {
+void inertial2body(Vec3 enu_if, Vec3 orientation_if, Vec3 &nwu_bf) {
   Mat3 R;
   Vec3 nwu_if;
 
@@ -533,7 +529,7 @@ double closest_point(Vec2 a, Vec2 b, Vec2 p, Vec2 &closest) {
 }
 
 Vec2 linear_interpolation(Vec2 a, Vec2 b, double mu) {
-   return a * (1 - mu) + b * mu;
+  return a * (1 - mu) + b * mu;
 }
 
 }  // eof atl

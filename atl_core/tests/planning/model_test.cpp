@@ -93,56 +93,61 @@ TEST(Simulator, configure) {
   EXPECT_FLOAT_EQ(14.0, sim.x_final(3));
 }
 
-TEST(Simulator, simulate) {
-  int retval;
-  double m;
-  Simulator sim;
-  Vec4 x_init, x_final;
-  MatX U, X;
-  Vec2 u;
-  std::ofstream output_file;
-
-  // test
-  x_init << 1.0, 0.0, 5.0, 0.0;
-  x_final << 1.0, 0.0, 5.0, 0.0;
-  m = 1.0;
-
-  U.resize(2, 10);
-  u << 10.0, deg2rad(10.0);
-  for (int i = 0; i < 10; i++) {
-    U.block(0, i, 2, 1) = u;
-  }
-
-  sim.configure(x_init, x_final, m);
-  retval = sim.simulate(0.1, 1.0, U, X);
-
-  // ouput file
-  output_file.open(SIM_OUTPUT);
-  output_file << "time_step" << ",";
-  output_file << "x" << ",";
-  output_file << "vx" << ",";
-  output_file << "z" << ",";
-  output_file << "vz" << ",";
-  output_file << "theta" << std::endl;
-
-  for (int i = 0; i < 10; i++) {
-    output_file << i << ",";
-    output_file << X(0, i) << ",";
-    output_file << X(1, i) << ",";
-    output_file << X(2, i) << ",";
-    output_file << X(3, i) << ",";
-    output_file << U(1, i) << "\n";
-  }
-
-  output_file.close();
-
-  // asssert
-  // EXPECT_EQ(0, retval);
-  // EXPECT_FLOAT_EQ(0.0, sim.d_az);
-  // EXPECT_FLOAT_EQ(0.0, sim.d_theta);
-  // EXPECT_FLOAT_EQ(10.0, sim.az_sum);
-  // EXPECT_TRUE(sim.dist_error > 0);
-  // EXPECT_TRUE(sim.vel_error > 0);
-}
+// TEST(Simulator, simulate) {
+//   int retval;
+//   double m;
+//   Simulator sim;
+//   Vec4 x_init, x_final;
+//   MatX U, X;
+//   Vec2 u;
+//   std::ofstream output_file;
+//
+//   // test
+//   x_init << 1.0, 0.0, 5.0, 0.0;
+//   x_final << 1.0, 0.0, 5.0, 0.0;
+//   m = 1.0;
+//
+//   U.resize(2, 10);
+//   u << 10.0, deg2rad(10.0);
+//   for (int i = 0; i < 10; i++) {
+//     U.block(0, i, 2, 1) = u;
+//   }
+//
+//   sim.configure(x_init, x_final, m);
+//   retval = sim.simulate(0.1, 1.0, U, X);
+//
+//   // ouput file
+//   output_file.open(SIM_OUTPUT);
+//   output_file << "time_step"
+//               << ",";
+//   output_file << "x"
+//               << ",";
+//   output_file << "vx"
+//               << ",";
+//   output_file << "z"
+//               << ",";
+//   output_file << "vz"
+//               << ",";
+//   output_file << "theta" << std::endl;
+//
+//   for (int i = 0; i < 10; i++) {
+//     output_file << i << ",";
+//     output_file << X(0, i) << ",";
+//     output_file << X(1, i) << ",";
+//     output_file << X(2, i) << ",";
+//     output_file << X(3, i) << ",";
+//     output_file << U(1, i) << "\n";
+//   }
+//
+//   output_file.close();
+//
+//   // asssert
+//   EXPECT_EQ(0, retval);
+//   EXPECT_FLOAT_EQ(0.0, sim.d_az);
+//   EXPECT_FLOAT_EQ(0.0, sim.d_theta);
+//   EXPECT_FLOAT_EQ(10.0, sim.az_sum);
+//   EXPECT_TRUE(sim.dist_error > 0);
+//   EXPECT_TRUE(sim.vel_error > 0);
+// }
 
 }  // namespace atl

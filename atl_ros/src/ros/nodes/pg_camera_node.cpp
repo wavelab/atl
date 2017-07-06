@@ -104,7 +104,8 @@ void PGCameraNode::gimbalJointCallback(const geometry_msgs::Quaternion &msg) {
   convertMsg(msg, this->gimbal_joint_orientation);
 }
 
-void PGCameraNode::gimbalJointBodyCallback(const geometry_msgs::Quaternion &msg) {
+void PGCameraNode::gimbalJointBodyCallback(
+  const geometry_msgs::Quaternion &msg) {
   convertMsg(msg, this->gimbal_joint_body_orientation);
 }
 
@@ -128,7 +129,8 @@ void PGCameraNode::quadPositionCallback(const dji_sdk::LocalPosition &msg) {
   this->quadrotor_position = pos_enu;
 }
 
-void PGCameraNode::quadOrientationCallback(const dji_sdk::AttitudeQuaternion &msg){
+void PGCameraNode::quadOrientationCallback(
+  const dji_sdk::AttitudeQuaternion &msg) {
   Quaternion orientation_ned, orientation_nwu;
 
   orientation_ned.w() = msg.q0;
@@ -156,7 +158,7 @@ int PGCameraNode::loopCallback(void) {
       this->camera.changeMode("640x480");
     } else if (dist > 0.3) {
       this->camera.changeMode("320x240");
-    } else  {
+    } else {
       this->camera.changeMode("160x120");
     }
   }
@@ -169,9 +171,9 @@ int PGCameraNode::loopCallback(void) {
     int key = cv::waitKey(100);
     // std::cout << key << std::endl;
     if (key == 32) {
-      cv::imwrite("/tmp/calibration/image_"
-          + std::to_string(this->image_number)
-          + ".jpg", this->image);
+      cv::imwrite("/tmp/calibration/image_" +
+                    std::to_string(this->image_number) + ".jpg",
+                  this->image);
       this->image_number += 1;
     }
   }
@@ -180,6 +182,6 @@ int PGCameraNode::loopCallback(void) {
   return 0;
 }
 
-} // eof atl namespace
+}  // eof atl namespace
 
 RUN_ROS_NODE(atl::PGCameraNode, NODE_NAME, NODE_RATE);

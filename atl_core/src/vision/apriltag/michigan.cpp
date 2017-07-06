@@ -25,7 +25,8 @@ int MichiganDetector::configure(std::string config_file) {
   return 0;
 }
 
-int MichiganDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
+int MichiganDetector::extractTags(cv::Mat &image,
+                                  std::vector<TagPose> &tags) {
   int retval;
   TagPose pose;
   cv::Mat image_gray;
@@ -56,20 +57,18 @@ int MichiganDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
   }
 
   // extract tags
-  image_u8_t im = {
-    .width = image_gray.cols,
-    .height = image_gray.rows,
-    .stride = image_gray.cols,
-    .buf = image_gray.data
-  };
+  image_u8_t im = {.width = image_gray.cols,
+                   .height = image_gray.rows,
+                   .stride = image_gray.cols,
+                   .buf = image_gray.data};
   zarray_t *detections = apriltag_detector_detect(this->detector, &im);
 
   // calculate tag pose
   for (int i = 0; i < zarray_size(detections); i++) {
-      apriltag_detection_t *det;
-      zarray_get(detections, i, &det);
-      this->obtainPose(det, pose);
-      break;  // only need 1 tag
+    apriltag_detection_t *det;
+    zarray_get(detections, i, &det);
+    this->obtainPose(det, pose);
+    break;  // only need 1 tag
   }
   // imshow
   if (this->imshow) {
@@ -81,14 +80,14 @@ int MichiganDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
   return 0;
 }
 
-int MichiganDetector::obtainPose(apriltag_detection_t *det, TagPose &tag_pose) {
+int MichiganDetector::obtainPose(apriltag_detection_t *det,
+                                 TagPose &tag_pose) {
   Mat4 transform;
   Vec3 t;
   Mat3 R;
   // double fx, fy, cx, cy, s;
   std::vector<cv::Point3f> obj_pts;
   std::vector<cv::Point2f> img_pts;
-
 
 
   // setup
@@ -101,7 +100,7 @@ int MichiganDetector::obtainPose(apriltag_detection_t *det, TagPose &tag_pose) {
 
   // get tag size according to tag id
   // if (this->tag_configs.find(tag.id) == this->tag_configs.end()) {
-  //   // log_err("ERROR! Tag size for [%d] not configured!", (int) tag.id);
+  //   // LOG_ERROR("ERROR! Tag size for [%d] not configured!", (int) tag.id);
   //   return -2;
   // } else {
   //   tag_size = this->tag_configs[tag.id] / 2;
@@ -126,15 +125,21 @@ int MichiganDetector::obtainPose(apriltag_detection_t *det, TagPose &tag_pose) {
 
   cv::Mat rvec, tvec;
   // recovering the relative transform of a tag:
-  cv::solvePnP(obj_pts, img_pts, camera_config.camera_matrix, distParam, rvec, tvec, false, CV_ITERATIVE);
+  cv::solvePnP(obj_pts,
+               img_pts,
+               camera_config.camera_matrix,
+               distParam,
+               rvec,
+               tvec,
+               false,
+               CV_ITERATIVE);
 
   cv::Matx33d r;
   cv::Rodrigues(rvec, r);
 
   // Eigen::Matrix3d wRo;
-  R << r(0,0), r(0,1), r(0,2),
-         r(1,0), r(1,1), r(1,2),
-         r(2,0), r(2,1), r(2,2);
+  R << r(0, 0), r(0, 1), r(0, 2), r(1, 0), r(1, 1), r(1, 2), r(2, 0), r(2, 1),
+    r(2, 2);
 
   // translational component
   t << tvec.at<double>(0), tvec.at<double>(1), tvec.at<double>(2);

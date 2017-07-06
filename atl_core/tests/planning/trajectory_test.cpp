@@ -12,10 +12,14 @@ namespace atl {
 static int trajectory_file_init(std::ofstream &output_file,
                                 std::string output_path) {
   output_file.open(output_path);
-  output_file << "time_step" << ",";
-  output_file << "x" << ",";
-  output_file << "z" << ",";
-  output_file << "theta" << "\n";
+  output_file << "time_step"
+              << ",";
+  output_file << "x"
+              << ",";
+  output_file << "z"
+              << ",";
+  output_file << "theta"
+              << "\n";
   return 0;
 }
 
@@ -29,11 +33,16 @@ static void record_time_step(std::ofstream &output_file, int i, VecX x) {
 static int path_file_init(std::ofstream &output_file,
                           std::string output_path) {
   output_file.open(output_path);
-  output_file << "x" << ",";
-  output_file << "z" << ",";
-  output_file << "vx" << ",";
-  output_file << "vz" << ",";
-  output_file << "theta" << "\n";
+  output_file << "x"
+              << ",";
+  output_file << "z"
+              << ",";
+  output_file << "vx"
+              << ",";
+  output_file << "vz"
+              << ",";
+  output_file << "theta"
+              << "\n";
   return 0;
 }
 

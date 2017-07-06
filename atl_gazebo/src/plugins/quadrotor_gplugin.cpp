@@ -78,8 +78,10 @@ void QuadrotorGPlugin::simulate(double dt) {
   }
 
   // set quadrotor orientation using last calculated keep the following code
-  // block above the `this->quadrotor.update()` had the 3D model been set using
-  // the calculated position in the Quadrotor class it would go through objects
+  // block above the `this->quadrotor.update()` had the 3D model been set
+  // using
+  // the calculated position in the Quadrotor class it would go through
+  // objects
   // and cause collision detection to go wild
   VecX quad_pose = this->quadrotor.getPose();
   ignition::math::Pose3d gazebo_pose = this->model->WorldPose();

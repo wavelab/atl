@@ -17,7 +17,7 @@ int I2C::setup(void) {
   char filename[20];
 
   /* setup */
-  adapter_nr = 1;  /* probably dynamically determined */
+  adapter_nr = 1; /* probably dynamically determined */
   memset(filename, '\0', sizeof(char) * 20);
   snprintf(filename, 19, "/dev/i2c-%d", adapter_nr);
 
@@ -33,7 +33,7 @@ int I2C::setup(void) {
 }
 
 int I2C::setSlave(char slave_addr) {
-  return ioctl(this->fd, I2C_SLAVE , slave_addr);
+  return ioctl(this->fd, I2C_SLAVE, slave_addr);
 }
 
 int I2C::readByte(char reg_addr, char *data) {

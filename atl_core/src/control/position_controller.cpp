@@ -26,23 +26,23 @@ int PositionController::configure(std::string config_file) {
   ConfigParser parser;
 
   // load config
-  parser.addParam<double>("roll_controller.k_p", &this->y_controller.k_p);
-  parser.addParam<double>("roll_controller.k_i", &this->y_controller.k_i);
-  parser.addParam<double>("roll_controller.k_d", &this->y_controller.k_d);
-  parser.addParam<double>("roll_controller.min", &this->roll_limit[0]);
-  parser.addParam<double>("roll_controller.max", &this->roll_limit[1]);
+  parser.addParam("roll_controller.k_p", &this->y_controller.k_p);
+  parser.addParam("roll_controller.k_i", &this->y_controller.k_i);
+  parser.addParam("roll_controller.k_d", &this->y_controller.k_d);
+  parser.addParam("roll_controller.min", &this->roll_limit[0]);
+  parser.addParam("roll_controller.max", &this->roll_limit[1]);
 
-  parser.addParam<double>("pitch_controller.k_p", &this->x_controller.k_p);
-  parser.addParam<double>("pitch_controller.k_i", &this->x_controller.k_i);
-  parser.addParam<double>("pitch_controller.k_d", &this->x_controller.k_d);
-  parser.addParam<double>("pitch_controller.min", &this->pitch_limit[0]);
-  parser.addParam<double>("pitch_controller.max", &this->pitch_limit[1]);
+  parser.addParam("pitch_controller.k_p", &this->x_controller.k_p);
+  parser.addParam("pitch_controller.k_i", &this->x_controller.k_i);
+  parser.addParam("pitch_controller.k_d", &this->x_controller.k_d);
+  parser.addParam("pitch_controller.min", &this->pitch_limit[0]);
+  parser.addParam("pitch_controller.max", &this->pitch_limit[1]);
 
-  parser.addParam<double>("throttle_controller.k_p", &this->z_controller.k_p);
-  parser.addParam<double>("throttle_controller.k_i", &this->z_controller.k_i);
-  parser.addParam<double>("throttle_controller.k_d", &this->z_controller.k_d);
-  parser.addParam<double>("throttle_controller.hover_throttle",
-                          &this->hover_throttle);
+  parser.addParam("throttle_controller.k_p", &this->z_controller.k_p);
+  parser.addParam("throttle_controller.k_i", &this->z_controller.k_i);
+  parser.addParam("throttle_controller.k_d", &this->z_controller.k_d);
+  parser.addParam("throttle_controller.hover_throttle",
+                  &this->hover_throttle);
 
   if (parser.load(config_file) != 0) {
     return -1;
@@ -70,10 +70,8 @@ Vec4 PositionController::calculate(Vec3 setpoints,
 
   // calculate setpoint relative to quadrotor
   Vec3 errors;
-  target2bodyplanar(setpoints,
-                    robot_pose.position,
-                    robot_pose.orientation,
-                    errors);
+  target2bodyplanar(
+    setpoints, robot_pose.position, robot_pose.orientation, errors);
 
   // roll, pitch, yaw and throttle (assuming NWU frame)
   // clang-format off

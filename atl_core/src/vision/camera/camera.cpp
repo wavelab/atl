@@ -33,10 +33,10 @@ int Camera::configure(std::string config_path) {
 
   // load config
   config_file = config_path + "/" + "config.yaml";
-  parser.addParam<std::vector<std::string>>("modes", &camera_modes);
-  parser.addParam<std::vector<std::string>>("configs", &camera_configs);
+  parser.addParam("modes", &camera_modes);
+  parser.addParam("configs", &camera_configs);
   if (parser.load(config_file) != 0) {
-    log_err("Failed to load config file [%s]!", config_file.c_str());
+    LOG_ERROR("Failed to load config file [%s]!", config_file.c_str());
     return -1;
   }
 
@@ -45,7 +45,7 @@ int Camera::configure(std::string config_path) {
     config = CameraConfig();
     config_file = config_path + "/" + camera_configs[i];
     if (config.load(config_file) != 0) {
-      log_err("Failed to load config file [%s]!", config_file.c_str());
+      LOG_ERROR("Failed to load config file [%s]!", config_file.c_str());
       return -1;
     }
 
@@ -76,14 +76,14 @@ int Camera::initialize(void) {
   // open
   this->capture = new cv::VideoCapture(camera_index);
   if (this->capture->isOpened() == 0) {
-    log_err("Failed to open camera!\n");
+    LOG_ERROR("Failed to open camera!\n");
     return -1;
 
   } else {
     this->capture->set(CV_CAP_PROP_FRAME_WIDTH, image_width);
     this->capture->set(CV_CAP_PROP_FRAME_HEIGHT, image_height);
     this->initialized = true;
-    log_info("Camera initialized!\n");
+    LOG_INFO("Camera initialized!\n");
     return 0;
   }
 

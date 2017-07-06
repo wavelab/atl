@@ -4,7 +4,7 @@
 namespace atl {
 
 XimeaCamera::XimeaCamera(void) {
-  this->ximea= NULL;
+  this->ximea = NULL;
 }
 
 int XimeaCamera::initialize(void) {
@@ -33,7 +33,7 @@ int XimeaCamera::initialize(void) {
   this->ximea = NULL;
   retval = XI_OK;
 
-  log_info("Starting Ximea Camera\n");
+  LOG_INFO("Starting Ximea Camera\n");
 
   // clang-format off
   // open camera device
@@ -79,7 +79,7 @@ int XimeaCamera::initialize(void) {
   // clang-format on
 
   // return
-  log_info("Ximea Camera Started Successfully\n");
+  LOG_INFO("Ximea Camera Started Successfully\n");
   return 0;
 
 ximea_error:
@@ -129,7 +129,7 @@ int XimeaCamera::getFrame(cv::Mat &image) {
   // get the image
   retval = xiGetImage(this->ximea, 1000, &ximea_img);
   if (retval != XI_OK) {
-    log_err("Error after xiGetImage (%d)\n", retval);
+    LOG_ERROR("Error after xiGetImage (%d)\n", retval);
     return -1;
 
   } else {

@@ -21,8 +21,7 @@ namespace atl {
 // DEFINES
 #define I2C_BUF_MAX 1024
 
-class I2C
-{
+class I2C {
 public:
   int fd;
 

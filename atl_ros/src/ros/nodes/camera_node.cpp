@@ -20,10 +20,14 @@ int CameraNode::configure(const std::string &node_name, int hz) {
 
   // register publisher and subscribers
   this->registerImagePublisher(CAMERA_IMAGE_TOPIC);
-  this->registerSubscriber(GIMBAL_POSITION_TOPIC, &CameraNode::gimbalPositionCallback, this);
-  this->registerSubscriber(GIMBAL_FRAME_ORIENTATION_TOPIC, &CameraNode::gimbalFrameCallback, this);
-  this->registerSubscriber(GIMBAL_JOINT_ORIENTATION_TOPIC, &CameraNode::gimbalJointCallback, this);
-  this->registerSubscriber(APRILTAG_TOPIC , &CameraNode::aprilTagCallback, this);
+  this->registerSubscriber(
+    GIMBAL_POSITION_TOPIC, &CameraNode::gimbalPositionCallback, this);
+  this->registerSubscriber(
+    GIMBAL_FRAME_ORIENTATION_TOPIC, &CameraNode::gimbalFrameCallback, this);
+  this->registerSubscriber(
+    GIMBAL_JOINT_ORIENTATION_TOPIC, &CameraNode::gimbalJointCallback, this);
+  this->registerSubscriber(
+    APRILTAG_TOPIC, &CameraNode::aprilTagCallback, this);
   this->registerShutdown(SHUTDOWN_TOPIC);
 
   // register loop callback
@@ -92,12 +96,11 @@ int CameraNode::loopCallback(void) {
     dist = this->tag.position(2);
     if (dist > 8.0) {
       this->camera.changeMode("640x640");
-    } else if ( dist > 4.0 ) {
+    } else if (dist > 4.0) {
       this->camera.changeMode("320x320");
-    } else  {
+    } else {
       this->camera.changeMode("160x160");
     }
-
   }
 
   this->camera.showImage(this->image);

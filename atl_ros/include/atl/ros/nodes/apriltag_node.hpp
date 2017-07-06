@@ -23,7 +23,8 @@ namespace atl {
 #define TARGET_IF_POS_TOPIC "/atl/apriltag/target/position/inertial"
 #define TARGET_IF_YAW_TOPIC "/atl/apriltag/target/yaw/inertial"
 #define TARGET_BPF_POS_TOPIC "/atl/apriltag/target/position/body"
-#define TARGET_BPF_POS_ENCODER_TOPIC "/atl/apriltag/target/position/body_encoders"
+#define TARGET_BPF_POS_ENCODER_TOPIC \
+  "/atl/apriltag/target/position/body_encoders"
 #define TARGET_BPF_YAW_TOPIC "/atl/apriltag/target/yaw/body"
 
 // SUBSCRIBE TOPICS

@@ -29,7 +29,7 @@ int GimbalNode::configure(std::string node_name, int hz) {
   if (this->gimbal_imu == "SBGC") {
     this->registerPublisher<geometry_msgs::Quaternion>(JOINT_ORIENTATION_TOPIC);
   } else if (this->gimbal_imu != "HACK") {
-    log_err("Invalid gimbal imu mode [%s]", this->gimbal_imu.c_str());
+    LOG_ERROR("Invalid gimbal imu mode [%s]", this->gimbal_imu.c_str());
     return -3;
   }
 
@@ -59,7 +59,7 @@ int GimbalNode::publishIMU(Vec3 euler) {
   return 0;
 }
 
-int GimbalNode::publishRawEncoder(Vec3 encoder_euler){
+int GimbalNode::publishRawEncoder(Vec3 encoder_euler) {
   geometry_msgs::Vector3 msg;
   buildMsg(encoder_euler, msg);
   this->ros_pubs[SBGC_RAW_ENCODER_TOPIC].publish(msg);
@@ -98,9 +98,9 @@ void GimbalNode::quadPoseCallback(const geometry_msgs::PoseStamped &msg) {
   Vec3 pos;
   Quaternion q;
 
-  pos(0)  = msg.pose.position.x;
-  pos(1)  = msg.pose.position.y;
-  pos(2)  = msg.pose.position.z;
+  pos(0) = msg.pose.position.x;
+  pos(1) = msg.pose.position.y;
+  pos(2) = msg.pose.position.z;
 
   q.w() = msg.pose.orientation.w;
   q.x() = msg.pose.orientation.x;
@@ -143,7 +143,7 @@ int GimbalNode::loopCallback(void) {
     // encoder reading
     encoder_euler(0) = this->gimbal.encoder_angles(0);
     encoder_euler(1) = this->gimbal.encoder_angles(1);
-    encoder_euler(2) = 0.0; // There is no yaw encoder (yet)
+    encoder_euler(2) = 0.0;  // There is no yaw encoder (yet)
     euler2quat(encoder_euler, 321, encoder_q);
 
     // publish imu and encoder readings

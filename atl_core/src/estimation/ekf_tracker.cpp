@@ -28,9 +28,9 @@ int ExtendedKalmanFilterTracker::configure(std::string config_file) {
   std::string mode;
 
   // parse and load config file
-  parser.addParam<int>("nb_states", &this->nb_states);
-  parser.addParam<MatX>("motion_noise_matrix", &this->R);
-  parser.addParam<MatX>("measurement_noise_matrix", &this->Q);
+  parser.addParam("nb_states", &this->nb_states);
+  parser.addParam("motion_noise_matrix", &this->R);
+  parser.addParam("measurement_noise_matrix", &this->Q);
   this->config_file = config_file;
   if (parser.load(config_file) != 0) {
     return -1;
@@ -148,10 +148,10 @@ void two_wheel_process_model(ExtendedKalmanFilterTracker &ekf,
 void two_wheel_measurement_model(ExtendedKalmanFilterTracker &ekf,
                                  MatX &H,
                                  VecX &h) {
-  H(0, 0) = 1.0;  /* x */
-  H(1, 1) = 1.0;  /* y */
-  H(2, 2) = 1.0;  /* z */
-  H(3, 3) = 1.0;  /* theta */
+  H(0, 0) = 1.0; /* x */
+  H(1, 1) = 1.0; /* y */
+  H(2, 2) = 1.0; /* z */
+  H(3, 3) = 1.0; /* theta */
   h = H * ekf.mu_p;
 }
 

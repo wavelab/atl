@@ -48,7 +48,8 @@ void GimbalGPlugin::simulate(double dt) {
 
   // set gimbal frame orientation
   ignition::math::Pose3d pose = this->model->WorldPose();
-  Quaternion q{pose.Rot().W(), pose.Rot().X(), pose.Rot().Y(), pose.Rot().Z()};
+  Quaternion q{
+    pose.Rot().W(), pose.Rot().X(), pose.Rot().Y(), pose.Rot().Z()};
   this->gimbal.setFrameOrientation(q);
 
   // attitude control and update

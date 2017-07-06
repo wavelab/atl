@@ -33,22 +33,22 @@ int Gimbal::configure(std::string config_file) {
   double x, y, z;
 
   // parse config file
-  parser.addParam<std::string>("device_path", &device_path);
-  parser.addParam<bool>("enable_tracking", &this->enable_tracking);
-  parser.addParam<double>("camera_offset.roll", &roll);
-  parser.addParam<double>("camera_offset.pitch", &pitch);
-  parser.addParam<double>("camera_offset.yaw", &yaw);
-  parser.addParam<double>("camera_offset.x", &x);
-  parser.addParam<double>("camera_offset.y", &y);
-  parser.addParam<double>("camera_offset.z", &z);
-  parser.addParam<double>("gimbal_limits.roll_min", &this->limits[0]);
-  parser.addParam<double>("gimbal_limits.roll_max", &this->limits[1]);
-  parser.addParam<double>("gimbal_limits.pitch_min", &this->limits[2]);
-  parser.addParam<double>("gimbal_limits.pitch_max", &this->limits[3]);
-  parser.addParam<double>("gimbal_limits.yaw_min", &this->limits[4]);
-  parser.addParam<double>("gimbal_limits.yaw_max", &this->limits[5]);
+  parser.addParam("device_path", &device_path);
+  parser.addParam("enable_tracking", &this->enable_tracking);
+  parser.addParam("camera_offset.roll", &roll);
+  parser.addParam("camera_offset.pitch", &pitch);
+  parser.addParam("camera_offset.yaw", &yaw);
+  parser.addParam("camera_offset.x", &x);
+  parser.addParam("camera_offset.y", &y);
+  parser.addParam("camera_offset.z", &z);
+  parser.addParam("gimbal_limits.roll_min", &this->limits[0]);
+  parser.addParam("gimbal_limits.roll_max", &this->limits[1]);
+  parser.addParam("gimbal_limits.pitch_min", &this->limits[2]);
+  parser.addParam("gimbal_limits.pitch_max", &this->limits[3]);
+  parser.addParam("gimbal_limits.yaw_min", &this->limits[4]);
+  parser.addParam("gimbal_limits.yaw_max", &this->limits[5]);
   if (parser.load(config_file) != 0) {
-    log_err("Failed to load config file [%s]!", config_file.c_str());
+    LOG_ERROR("Failed to load config file [%s]!", config_file.c_str());
     return -1;
   }
 
@@ -238,10 +238,7 @@ int Gimbal::setAngle(double roll, double pitch) {
   this->setpoints(2) = 0.0 * 180 / M_PI;
 
   return this->sbgc.setAngle(
-    this->setpoints(0),
-    this->setpoints(1),
-    this->setpoints(2)
-  );
+    this->setpoints(0), this->setpoints(1), this->setpoints(2));
 }
 
 void Gimbal::printSetpoints(void) {

@@ -30,29 +30,29 @@ int CameraConfig::load(const std::string &config_file) {
 
   // config variables
   // clang-format off
-  parser.addParam<int>("index", &this->index);
-  parser.addParam<int>("image_width", &this->image_width);
-  parser.addParam<int>("image_height", &this->image_height);
+  parser.addParam("index", &this->index);
+  parser.addParam("image_width", &this->image_width);
+  parser.addParam("image_height", &this->image_height);
 
-  parser.addParam<float>("shutter_speed", &this->shutter_speed, true);
-  parser.addParam<float>("exposure_value", &this->exposure_value, true);
-  parser.addParam<float>("gain_value", &this->gain_value, true);
-  parser.addParam<Vec3>("lambda", &this->lambda);
-  parser.addParam<float>("alpha", &this->alpha);
+  parser.addParam("shutter_speed", &this->shutter_speed, true);
+  parser.addParam("exposure_value", &this->exposure_value, true);
+  parser.addParam("gain_value", &this->gain_value, true);
+  parser.addParam("lambda", &this->lambda);
+  parser.addParam("alpha", &this->alpha);
 
-  parser.addParam<cv::Mat>("camera_matrix", &this->camera_matrix);
-  parser.addParam<cv::Mat>("distortion_coefficients", &this->distortion_coefficients);
-  parser.addParam<cv::Mat>("rectification_matrix", &this->rectification_matrix);
-  parser.addParam<cv::Mat>("projection_matrix", &this->projection_matrix);
+  parser.addParam("camera_matrix", &this->camera_matrix);
+  parser.addParam("distortion_coefficients", &this->distortion_coefficients);
+  parser.addParam("rectification_matrix", &this->rectification_matrix);
+  parser.addParam("projection_matrix", &this->projection_matrix);
 
-  parser.addParam<bool>("imshow", &this->imshow);
-  parser.addParam<bool>("snapshot", &this->snapshot);
-  parser.addParam<bool>("showfps", &this->showfps);
+  parser.addParam("imshow", &this->imshow);
+  parser.addParam("snapshot", &this->snapshot);
+  parser.addParam("showfps", &this->showfps);
   // clang-format on
 
   // load config
   if (parser.load(config_file) != 0) {
-    log_err("Failed to load configure file [%s]!", config_file.c_str());
+    LOG_ERROR("Failed to load configure file [%s]!", config_file.c_str());
     return -1;
   }
 

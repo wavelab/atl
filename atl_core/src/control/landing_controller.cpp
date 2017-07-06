@@ -21,7 +21,7 @@ int Trajectory::load(int index, std::string filepath, Vec3 p0) {
 
   // pre-check
   if (file_exists(filepath) == false) {
-    log_err("File not found: %s", filepath.c_str());
+    LOG_ERROR("File not found: %s", filepath.c_str());
     return -1;
   }
 
@@ -41,10 +41,10 @@ int Trajectory::load(int index, std::string filepath, Vec3 p0) {
   this->index = index;
   csv2mat(filepath, true, traj_data);
   if (traj_data.rows() == 0) {
-    log_err(ETROWS, filepath.c_str());
+    LOG_ERROR(ETROWS, filepath.c_str());
     return -2;
   } else if (traj_data.cols() != 10) {
-    log_err(ETCOLS, filepath.c_str());
+    LOG_ERROR(ETCOLS, filepath.c_str());
     return -2;
   }
 
@@ -68,7 +68,10 @@ int Trajectory::load(int index, std::string filepath, Vec3 p0) {
   return 0;
 }
 
-int Trajectory::update(Vec3 pos, Vec2 &wp_pos, Vec2 &wp_vel, Vec2 &wp_inputs) {
+int Trajectory::update(Vec3 pos,
+                       Vec2 &wp_pos,
+                       Vec2 &wp_vel,
+                       Vec2 &wp_inputs) {
   double wp_percent;
   Vec2 q_pos;
   Vec2 wp_pos_start, wp_pos_end;
@@ -101,7 +104,8 @@ int Trajectory::update(Vec3 pos, Vec2 &wp_pos, Vec2 &wp_vel, Vec2 &wp_inputs) {
   // find next waypoint position, velocity and inputs
   wp_percent = closest_point(wp_pos_start, wp_pos_end, q_pos, wp_pos);
   wp_vel = linear_interpolation(wp_vel_start, wp_vel_end, wp_percent);
-  wp_inputs = linear_interpolation(wp_inputs_start, wp_inputs_end, wp_percent);
+  wp_inputs =
+    linear_interpolation(wp_inputs_start, wp_inputs_end, wp_percent);
 
   // update trajectory waypoints
   if (wp_percent > 1.0) {
@@ -153,7 +157,7 @@ int TrajectoryIndex::load(std::string index_file,
                           double vel_thres) {
   // pre-check
   if (file_exists(index_file) == false) {
-    log_err("File not found: %s", index_file.c_str());
+    LOG_ERROR("File not found: %s", index_file.c_str());
     return -1;
   }
 
@@ -165,10 +169,10 @@ int TrajectoryIndex::load(std::string index_file,
   this->vel_thres = vel_thres;
 
   if (this->index_data.rows() == 0) {
-    log_err(ETIROWS, index_file.c_str());
+    LOG_ERROR(ETIROWS, index_file.c_str());
     return -2;
   } else if (this->index_data.cols() != 3) {
-    log_err(ETICOLS, index_file.c_str());
+    LOG_ERROR(ETICOLS, index_file.c_str());
     return -2;
   }
 
@@ -186,7 +190,8 @@ int TrajectoryIndex::find(Vec3 pos, double v, Trajectory &traj) {
     return -1;
   }
 
-  // NOTE: the following is not the most efficient way of implementing a lookup
+  // NOTE: the following is not the most efficient way of implementing a
+  // lookup
   // table, a better way could involve a search tree and traverse it or even a
   // bucket based approach. The following implements a list traversal type
   // search which is approx O(n), ok for small lookups.
@@ -277,33 +282,33 @@ int LandingController::configure(std::string config_file) {
 
   // load config
   // clang-format off
-  parser.addParam<double>("vx_controller.k_p", &this->vx_k_p);
-  parser.addParam<double>("vx_controller.k_i", &this->vx_k_i);
-  parser.addParam<double>("vx_controller.k_d", &this->vx_k_d);
+  parser.addParam("vx_controller.k_p", &this->vx_k_p);
+  parser.addParam("vx_controller.k_i", &this->vx_k_i);
+  parser.addParam("vx_controller.k_d", &this->vx_k_d);
 
-  parser.addParam<double>("vy_controller.k_p", &this->vy_k_p);
-  parser.addParam<double>("vy_controller.k_i", &this->vy_k_i);
-  parser.addParam<double>("vy_controller.k_d", &this->vy_k_d);
+  parser.addParam("vy_controller.k_p", &this->vy_k_p);
+  parser.addParam("vy_controller.k_i", &this->vy_k_i);
+  parser.addParam("vy_controller.k_d", &this->vy_k_d);
 
-  parser.addParam<double>("vz_controller.k_p", &this->vz_k_p);
-  parser.addParam<double>("vz_controller.k_i", &this->vz_k_i);
-  parser.addParam<double>("vz_controller.k_d", &this->vz_k_d);
+  parser.addParam("vz_controller.k_p", &this->vz_k_p);
+  parser.addParam("vz_controller.k_i", &this->vz_k_i);
+  parser.addParam("vz_controller.k_d", &this->vz_k_d);
 
-  parser.addParam<double>("roll_limit.min", &this->roll_limit[0]);
-  parser.addParam<double>("roll_limit.max", &this->roll_limit[1]);
+  parser.addParam("roll_limit.min", &this->roll_limit[0]);
+  parser.addParam("roll_limit.max", &this->roll_limit[1]);
 
-  parser.addParam<double>("pitch_limit.min", &this->pitch_limit[0]);
-  parser.addParam<double>("pitch_limit.max", &this->pitch_limit[1]);
+  parser.addParam("pitch_limit.min", &this->pitch_limit[0]);
+  parser.addParam("pitch_limit.max", &this->pitch_limit[1]);
 
-  parser.addParam<double>("throttle_limit.min", &this->throttle_limit[0]);
-  parser.addParam<double>("throttle_limit.max", &this->throttle_limit[1]);
+  parser.addParam("throttle_limit.min", &this->throttle_limit[0]);
+  parser.addParam("throttle_limit.max", &this->throttle_limit[1]);
 
-  parser.addParam<std::string>("trajectory_index", &traj_index_file);
-  parser.addParam<Vec3>("trajectory_threshold", &this->trajectory_threshold);
+  parser.addParam("trajectory_index", &traj_index_file);
+  parser.addParam("trajectory_threshold", &this->trajectory_threshold);
 
-  parser.addParam<bool>("blackbox_enable", &this->blackbox_enable);
-  parser.addParam<double>("blackbox_rate", &this->blackbox_rate, true);
-  parser.addParam<std::string>("blackbox_file", &blackbox_file, true);
+  parser.addParam("blackbox_enable", &this->blackbox_enable);
+  parser.addParam("blackbox_rate", &this->blackbox_rate, true);
+  parser.addParam("blackbox_file", &blackbox_file, true);
   // clang-format on
   if (parser.load(config_file) != 0) {
     return -1;
@@ -319,15 +324,16 @@ int LandingController::configure(std::string config_file) {
   // prepare blackbox file
   if (this->blackbox_enable) {
     if (blackbox_file == "") {
-      log_err("blackbox file is not set!");
+      LOG_ERROR("blackbox file is not set!");
       return -3;
     } else if (this->prepBlackbox(blackbox_file) != 0) {
-      log_err("Failed to open blackbox file at [%s]", blackbox_file.c_str());
+      LOG_ERROR("Failed to open blackbox file at [%s]",
+                blackbox_file.c_str());
       return -3;
     }
 
     if (this->blackbox_rate == FLT_MAX) {
-      log_err("blackbox rate is not set!");
+      LOG_ERROR("blackbox rate is not set!");
       return -3;
     }
   }
@@ -357,13 +363,13 @@ int LandingController::loadTrajectory(Vec3 pos,
 
   // check retval
   if (retval == -2) {
-    log_err(ETIFAIL, pos(2), v);
+    LOG_ERROR(ETIFAIL, pos(2), v);
     return -1;
   } else if (retval == -3) {
-    log_err(ETLOAD);
+    LOG_ERROR(ETLOAD);
     return -1;
   } else {
-    log_info(TLOAD, pos(2), v);
+    LOG_INFO(TLOAD, pos(2), v);
   }
 
   return 0;
@@ -377,23 +383,40 @@ int LandingController::prepBlackbox(std::string blackbox_file) {
   }
 
   // write header
-  this->blackbox << "dt" << ",";
-  this->blackbox << "x" << ",";
-  this->blackbox << "y" << ",";
-  this->blackbox << "z" << ",";
-  this->blackbox << "vx" << ",";
-  this->blackbox << "vy" << ",";
-  this->blackbox << "vz" << ",";
-  this->blackbox << "wp_pos_x" << ",";
-  this->blackbox << "wp_pos_z" << ",";
-  this->blackbox << "wp_vel_x" << ",";
-  this->blackbox << "wp_vel_z" << ",";
-  this->blackbox << "target_x_bf" << ",";
-  this->blackbox << "target_y_bf" << ",";
-  this->blackbox << "target_z_bf" << ",";
-  this->blackbox << "target_vx_bf" << ",";
-  this->blackbox << "target_vy_bf" << ",";
-  this->blackbox << "target_vz_bf" << ",";
+  this->blackbox << "dt"
+                 << ",";
+  this->blackbox << "x"
+                 << ",";
+  this->blackbox << "y"
+                 << ",";
+  this->blackbox << "z"
+                 << ",";
+  this->blackbox << "vx"
+                 << ",";
+  this->blackbox << "vy"
+                 << ",";
+  this->blackbox << "vz"
+                 << ",";
+  this->blackbox << "wp_pos_x"
+                 << ",";
+  this->blackbox << "wp_pos_z"
+                 << ",";
+  this->blackbox << "wp_vel_x"
+                 << ",";
+  this->blackbox << "wp_vel_z"
+                 << ",";
+  this->blackbox << "target_x_bf"
+                 << ",";
+  this->blackbox << "target_y_bf"
+                 << ",";
+  this->blackbox << "target_z_bf"
+                 << ",";
+  this->blackbox << "target_vx_bf"
+                 << ",";
+  this->blackbox << "target_vy_bf"
+                 << ",";
+  this->blackbox << "target_vz_bf"
+                 << ",";
   this->blackbox << "roll";
   this->blackbox << "pitch";
   this->blackbox << "yaw";
@@ -403,7 +426,8 @@ int LandingController::prepBlackbox(std::string blackbox_file) {
 }
 
 int LandingController::recordTrajectoryIndex(void) {
-  this->blackbox << "trajectory index: " << this->trajectory.index << std::endl;
+  this->blackbox << "trajectory index: " << this->trajectory.index
+                 << std::endl;
   return 0;
 }
 
@@ -550,31 +574,29 @@ int LandingController::calculate(Vec3 target_pos_bf,
 
   // record
   quat2euler(orientation, 321, euler);
-  this->record(
-    pos,
-    vel,
-    wp_pos,
-    wp_vel,
-    wp_inputs,
-    target_pos_bf,
-    target_vel_bf,
-    euler,
-    this->outputs(3),
-    dt
-  );
+  this->record(pos,
+               vel,
+               wp_pos,
+               wp_vel,
+               wp_inputs,
+               target_pos_bf,
+               target_vel_bf,
+               euler,
+               this->outputs(3),
+               dt);
 
   // check if we are too far off track with trajectory
   if (p_errors(0) > this->trajectory_threshold(0)) {
-    log_err("Trajectory error in the x-axis is too large!");
-    log_err("error: %f > %f", p_errors(0), this->trajectory_threshold(0));
+    LOG_ERROR("Trajectory error in the x-axis is too large!");
+    LOG_ERROR("error: %f > %f", p_errors(0), this->trajectory_threshold(0));
     return -1;
   } else if (p_errors(1) > this->trajectory_threshold(1)) {
-    log_err("Trajectory error in the y-axis is too large!");
-    log_err("error: %f > %f", p_errors(1), this->trajectory_threshold(1));
+    LOG_ERROR("Trajectory error in the y-axis is too large!");
+    LOG_ERROR("error: %f > %f", p_errors(1), this->trajectory_threshold(1));
     return -1;
   } else if (p_errors(2) > this->trajectory_threshold(2)) {
-    log_err("Trajectory error in the z-axis is too large!");
-    log_err("error: %f > %f", p_errors(2), this->trajectory_threshold(2));
+    LOG_ERROR("Trajectory error in the z-axis is too large!");
+    LOG_ERROR("error: %f > %f", p_errors(2), this->trajectory_threshold(2));
     return -1;
   }
 

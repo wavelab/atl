@@ -41,7 +41,7 @@ public:
   int configure(std::string config_file);
   int illuminationInvariantTransform(cv::Mat &image);
   int changeMode(cv::Mat &image);
-  int maskImage(TagPose tag_pose, cv::Mat &image, double padding=0.5);
+  int maskImage(TagPose tag_pose, cv::Mat &image, double padding = 0.5);
   void printTag(TagPose tag);
 };
 

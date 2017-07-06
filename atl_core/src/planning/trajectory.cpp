@@ -86,12 +86,12 @@ int trajectory_calculate_desired(struct problem_data *p) {
   }
 
   // push final x
-  x(0) = p->pos_final(0);   // state - x
-  x(1) = p->vel_final(0);   // state - vx
-  x(2) = p->pos_final(1);   // state - z
-  x(3) = p->vel_final(1);   // state - vz
-  x(4) = p->thrust_final;   // input - az
-  x(5) = p->theta_final;    // input - w
+  x(0) = p->pos_final(0);  // state - x
+  x(1) = p->vel_final(0);  // state - vx
+  x(2) = p->pos_final(1);  // state - z
+  x(3) = p->vel_final(1);  // state - vz
+  x(4) = p->thrust_final;  // input - az
+  x(5) = p->theta_final;   // input - w
   p->desired.block(0, p->nb_steps - 1, 6, 1) = x;
 
   return 0;
@@ -174,13 +174,20 @@ int trajectory_record_optimization(std::string file_path,
 
   // setup
   output_file.open(file_path);
-  output_file << "time_step" << ",";
-  output_file << "x" << ",";
-  output_file << "vx" << ",";
-  output_file << "z" << ",";
-  output_file << "vz" << ",";
-  output_file << "az" << ",";
-  output_file << "theta" << "\n";
+  output_file << "time_step"
+              << ",";
+  output_file << "x"
+              << ",";
+  output_file << "vx"
+              << ",";
+  output_file << "z"
+              << ",";
+  output_file << "vz"
+              << ",";
+  output_file << "az"
+              << ",";
+  output_file << "theta"
+              << "\n";
 
   // record
   nb_states = 6;

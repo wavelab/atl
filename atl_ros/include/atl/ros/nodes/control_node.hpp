@@ -56,8 +56,10 @@ namespace atl {
 #define ARM_TOPIC "/atl/control/arm"
 #define MODE_TOPIC "/atl/control/mode"
 #define YAW_TOPIC "/atl/control/yaw/set"
-#define TARGET_BODY_POSITION_TOPIC "/atl/estimate/landing_target/position/body"
-#define TARGET_BODY_VELOCITY_TOPIC "/atl/estimate/landing_target/velocity/body"
+#define TARGET_BODY_POSITION_TOPIC \
+  "/atl/estimate/landing_target/position/body"
+#define TARGET_BODY_VELOCITY_TOPIC \
+  "/atl/estimate/landing_target/velocity/body"
 #define TARGET_DETECTED_TOPIC "/atl/estimate/landing_target/detected"
 #define HOVER_SET_TOPIC "/atl/control/hover/set"
 #define HOVER_HEIGHT_SET_TOPIC "/atl/control/hover/height/set"

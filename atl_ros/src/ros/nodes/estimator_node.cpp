@@ -21,25 +21,25 @@ int EstimatorNode::configure(std::string node_name, int hz) {
 
   switch (this->mode) {
     case KF_MODE:
-      log_info("Estimator running in KF_MODE!");
+      LOG_INFO("Estimator running in KF_MODE!");
       ROS_GET_PARAM("/estimator/kf/config", config_file);
       if (this->kf_tracker.configure(config_file) != 0) {
-        log_err("Failed to configure KalmanFilterTracker!");
+        LOG_ERROR("Failed to configure KalmanFilterTracker!");
         return -2;
       }
       break;
 
     case EKF_MODE:
-      log_info("Estimator running in EKF_MODE!");
+      LOG_INFO("Estimator running in EKF_MODE!");
       ROS_GET_PARAM("/estimator/ekf/config", config_file);
       if (this->ekf_tracker.configure(config_file) != 0) {
-        log_err("Failed to configure ExtendedKalmanFilterTracker!");
+        LOG_ERROR("Failed to configure ExtendedKalmanFilterTracker!");
         return -2;
       }
       break;
 
     default:
-      log_err("Invalid Tracker Mode!");
+      LOG_ERROR("Invalid Tracker Mode!");
       return -2;
   }
 
@@ -81,9 +81,9 @@ void EstimatorNode::initLTKF(Vec3 x0) {
             0.0, 0.0, 0.0;
       // clang-format on
 
-      log_info("Intializing KF!");
+      LOG_INFO("Intializing KF!");
       if (this->kf_tracker.initialize(mu) != 0) {
-        log_err("Failed to intialize KalmanFilterTracker!");
+        LOG_ERROR("Failed to intialize KalmanFilterTracker!");
         exit(-1);  // dangerous but necessary
       }
       break;
@@ -96,15 +96,15 @@ void EstimatorNode::initLTKF(Vec3 x0) {
             0, 0, 0;
       // clang-format on
 
-      log_info("Intializing EKF!");
+      LOG_INFO("Intializing EKF!");
       if (this->ekf_tracker.initialize(mu) != 0) {
-        log_err("Failed to intialize ExtendedKalmanFilterTracker!");
+        LOG_ERROR("Failed to intialize ExtendedKalmanFilterTracker!");
         exit(-1);  // dangerous but necessary
       }
       break;
   }
 
-  log_info("Estimator intialized!");
+  LOG_INFO("Estimator intialized!");
   this->initialized = true;
 }
 
@@ -116,7 +116,8 @@ void EstimatorNode::quadPoseCallback(const geometry_msgs::PoseStamped &msg) {
   convertMsg(msg, this->quad_pose);
 }
 
-void EstimatorNode::quadVelocityCallback(const geometry_msgs::TwistStamped &msg) {
+void EstimatorNode::quadVelocityCallback(
+  const geometry_msgs::TwistStamped &msg) {
   convertMsg(msg.twist.linear, this->quad_velocity);
 }
 
@@ -167,7 +168,8 @@ void EstimatorNode::targetBodyPosCallback(const geometry_msgs::Vector3 &msg) {
   }
 }
 
-void EstimatorNode::targetInertialPosCallback(const geometry_msgs::Vector3 &msg) {
+void EstimatorNode::targetInertialPosCallback(
+  const geometry_msgs::Vector3 &msg) {
   // pre-check
   if (this->state == ESTIMATOR_OFF) {
     return;
@@ -235,7 +237,7 @@ void EstimatorNode::publishLTKFBodyVelocityEstimate(void) {
       est_vel(1) = this->ekf_tracker.mu(4) * sin(this->ekf_tracker.mu(3));
       est_vel(2) = this->ekf_tracker.mu(5);
       break;
-    std::cout << "Estimator ON" << std::endl;
+      std::cout << "Estimator ON" << std::endl;
   }
 
   // estimate in body planar frame
@@ -332,7 +334,6 @@ int EstimatorNode::estimateKF(double dt) {
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
     // clang-format on
     y << 0.0, 0.0, 0.0;  // to prevent uninitialized values from entering kf
-
   }
 
   // estimate
@@ -350,7 +351,7 @@ int EstimatorNode::estimateKF(double dt) {
 
 int EstimatorNode::estimateEKF(double dt) {
   VecX y(4), g(9), h(4);
-    MatX G(9, 9), H(4, 9);
+  MatX G(9, 9), H(4, 9);
 
   // setup
   H = MatX::Zero(4, 9);
@@ -365,16 +366,15 @@ int EstimatorNode::estimateEKF(double dt) {
 
   // measurement update
   if (this->target_detected) {
-    H(0, 0) = 1.0;  /* x */
-    H(1, 1) = 1.0;  /* y */
-    H(2, 2) = 1.0;  /* z */
-    H(3, 3) = 1.0;  /* theta */
+    H(0, 0) = 1.0; /* x */
+    H(1, 1) = 1.0; /* y */
+    H(2, 2) = 1.0; /* z */
+    H(3, 3) = 1.0; /* theta */
     h = H * this->ekf_tracker.mu_p;
     this->ekf_tracker.measurementUpdate(h, H, y);
 
   } else {
     this->ekf_tracker.mu = this->ekf_tracker.mu_p;
-
   }
 
   return 0;
@@ -391,7 +391,7 @@ int EstimatorNode::estimate(void) {
 
   // check if target is losted
   if (mtoc(&this->target_last_updated) > this->target_lost_threshold) {
-    log_info("Target lost, resetting estimator!");
+    LOG_INFO("Target lost, resetting estimator!");
     this->reset();
     return -1;
   }
@@ -401,13 +401,17 @@ int EstimatorNode::estimate(void) {
 
   // estimate
   switch (this->mode) {
-    case KF_MODE: retval = this->estimateKF(dt); break;
-    case EKF_MODE: retval = this->estimateEKF(dt); break;
+    case KF_MODE:
+      retval = this->estimateKF(dt);
+      break;
+    case EKF_MODE:
+      retval = this->estimateEKF(dt);
+      break;
   }
 
   // sanity check target estimates
   if (retval != 0) {
-    log_info("Bad estimates, resetting estimator!");
+    LOG_INFO("Bad estimates, resetting estimator!");
     this->reset();
     return -2;
   }

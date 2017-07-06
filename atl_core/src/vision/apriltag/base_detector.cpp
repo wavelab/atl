@@ -29,14 +29,14 @@ int BaseDetector::configure(std::string config_file) {
   std::string config_dir, camera_config;
 
   // load config
-  parser.addParam<std::vector<int>>("tag_ids", &tag_ids);
-  parser.addParam<std::vector<float>>("tag_sizes", &tag_sizes);
-  parser.addParam<double>("tag_sanity_check", &this->tag_sanity_check);
-  parser.addParam<std::string>("camera_config", &camera_config);
-  parser.addParam<bool>("illum_invar", &this->illum_invar);
-  parser.addParam<bool>("windowing", &this->windowing);
-  parser.addParam<double>("window_padding", &this->window_padding);
-  parser.addParam<bool>("imshow", &this->imshow);
+  parser.addParam("tag_ids", &tag_ids);
+  parser.addParam("tag_sizes", &tag_sizes);
+  parser.addParam("tag_sanity_check", &this->tag_sanity_check);
+  parser.addParam("camera_config", &camera_config);
+  parser.addParam("illum_invar", &this->illum_invar);
+  parser.addParam("windowing", &this->windowing);
+  parser.addParam("window_padding", &this->window_padding);
+  parser.addParam("imshow", &this->imshow);
   if (parser.load(config_file) != 0) {
     return -1;
   }
@@ -137,7 +137,9 @@ int BaseDetector::changeMode(cv::Mat &image) {
   return 0;
 }
 
-int BaseDetector::maskImage(TagPose tag_pose, cv::Mat &image, double padding) {
+int BaseDetector::maskImage(TagPose tag_pose,
+                            cv::Mat &image,
+                            double padding) {
   std::string camera_mode;
   int image_width, image_height;
   double x, y, z;
@@ -180,10 +182,10 @@ int BaseDetector::maskImage(TagPose tag_pose, cv::Mat &image, double padding) {
 
   // check input image dimensions against configuration file's
   if (image_width != image.cols) {
-    log_err("config image width does not match input image's!");
+    LOG_ERROR("config image width does not match input image's!");
     return -4;
   } else if (image_height != image.rows) {
-    log_err("config image height does not match input image's!");
+    LOG_ERROR("config image height does not match input image's!");
     return -4;
   }
 
@@ -196,16 +198,16 @@ int BaseDetector::maskImage(TagPose tag_pose, cv::Mat &image, double padding) {
   // project back to image frame (what it would look like in image)
   top_left(0) = (fx * top_left(0) / z) + px;
   top_left(1) = (fy * top_left(1) / z) + py;
-  bottom_right(0) = (fx * bottom_right(0)/ z) + px;
+  bottom_right(0) = (fx * bottom_right(0) / z) + px;
   bottom_right(1) = (fy * bottom_right(1) / z) + py;
 
   // create and check mask coordinates
   p1 = cv::Point(top_left(0), top_left(1));
   p2 = cv::Point(bottom_right(0), bottom_right(1));
   p1.x = (p1.x > image.cols) ? image.cols : p1.x;
-  p1.y = (p1.y > image.rows) ? image.rows: p1.y;
+  p1.y = (p1.y > image.rows) ? image.rows : p1.y;
   p2.x = (p2.x > image.cols) ? image.cols : p2.x;
-  p2.y = (p2.y > image.rows) ? image.rows: p2.y;
+  p2.y = (p2.y > image.rows) ? image.rows : p2.y;
 
   // create mask
   mask = cv::Mat::zeros(image_height, image_width, CV_8U);

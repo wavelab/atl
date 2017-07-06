@@ -22,7 +22,6 @@ struct problem_constraints {
 
   double feasible_angular_rate_min;
   double feasible_angular_rate_max;
-
 };
 
 struct problem_data {

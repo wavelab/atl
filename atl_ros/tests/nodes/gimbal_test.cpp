@@ -38,7 +38,8 @@ protected:
     // clang-format on
 
     // Publishers
-    this->setpoint_pub = this->ros_nh.advertise<geometry_msgs::Vector3>(SET_ATTITUDE_TOPIC, 1);
+    this->setpoint_pub =
+      this->ros_nh.advertise<geometry_msgs::Vector3>(SET_ATTITUDE_TOPIC, 1);
     ros::spinOnce();
     ros::Duration(1.0).sleep();
   }
@@ -47,7 +48,7 @@ protected:
     geometry_msgs::Vector3 setpoint_msg;
     setpoint_msg.x = 10;
     setpoint_msg.y = 10;
-    setpoint_msg.z = 0; // Yaw is not supported in this gimbal
+    setpoint_msg.z = 0;  // Yaw is not supported in this gimbal
 
     this->setpoint_pub.publish(setpoint_msg);
 
@@ -64,7 +65,6 @@ protected:
   void frameOrientationCallback(const geometry_msgs::Quaternion &msg) {
     this->frame_if_orien_msg = msg;
   }
-
 };
 
 TEST_F(NodeTest, jointImuMessage) {

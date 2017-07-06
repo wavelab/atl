@@ -25,13 +25,13 @@ namespace atl {
 
 #define CONFIGURE_CONTROLLER(X, CONF_FILE, ERR_MSG) \
   if (X.configure(CONF_FILE) != 0) {                \
-    log_err(ERR_MSG);                               \
+    LOG_ERROR(ERR_MSG);                             \
     goto error;                                     \
   }
 
 #define CONFIGURE_MODE(X, CONF_FILE, ERR_MSG) \
   if (X.configure(CONF_FILE) != 0) {          \
-    log_err(ERR_MSG);                         \
+    LOG_ERROR(ERR_MSG);                       \
     goto error;                               \
   }
 
@@ -73,28 +73,28 @@ public:
   LandingTarget landing_target;
   LandingTarget landing_target_prev;
 
-  Quadrotor() :
-    configured{false},
-    position_controller{},
-    tracking_controller{},
-    landing_controller{},
-    att_cmd{},
-    recover_height{0.0},
-    auto_track{false},
-    auto_land{false},
-    auto_disarm{false},
-    target_lost_threshold{0.0},
-    min_discover_time{FLT_MAX},
-    min_tracking_time{FLT_MAX},
-    discover_tic{0, 0},
-    tracking_tic{0, 0},
-    landing_tic{0, 0},
-    current_mode{DISCOVER_MODE},
-    yaw{0.0},
-    pose{},
-    hover_position{0.0, 0.0, 0.0},
-    landing_target{},
-    landing_target_prev{} {}
+  Quadrotor()
+      : configured{false},
+        position_controller{},
+        tracking_controller{},
+        landing_controller{},
+        att_cmd{},
+        recover_height{0.0},
+        auto_track{false},
+        auto_land{false},
+        auto_disarm{false},
+        target_lost_threshold{0.0},
+        min_discover_time{FLT_MAX},
+        min_tracking_time{FLT_MAX},
+        discover_tic{0, 0},
+        tracking_tic{0, 0},
+        landing_tic{0, 0},
+        current_mode{DISCOVER_MODE},
+        yaw{0.0},
+        pose{},
+        hover_position{0.0, 0.0, 0.0},
+        landing_target{},
+        landing_target_prev{} {}
 
   int configure(std::string config_path);
   int setMode(enum Mode mode);

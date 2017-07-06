@@ -24,9 +24,14 @@ int XimeaCameraNode::configure(std::string node_name, int hz) {
 
   // register publisher and subscribers
   this->registerImagePublisher(CAMERA_IMAGE_TOPIC);
-  this->registerSubscriber(GIMBAL_FRAME_ORIENTATION_TOPIC, &XimeaCameraNode::gimbalFrameCallback, this);
-  this->registerSubscriber(GIMBAL_JOINT_ORIENTATION_TOPIC, &XimeaCameraNode::gimbalJointCallback, this);
-  this->registerSubscriber(APRILTAG_TOPIC , &XimeaCameraNode::aprilTagCallback, this);
+  this->registerSubscriber(GIMBAL_FRAME_ORIENTATION_TOPIC,
+                           &XimeaCameraNode::gimbalFrameCallback,
+                           this);
+  this->registerSubscriber(GIMBAL_JOINT_ORIENTATION_TOPIC,
+                           &XimeaCameraNode::gimbalJointCallback,
+                           this);
+  this->registerSubscriber(
+    APRILTAG_TOPIC, &XimeaCameraNode::aprilTagCallback, this);
   this->registerShutdown(SHUTDOWN_TOPIC);
 
   // register loop callback
@@ -38,7 +43,6 @@ int XimeaCameraNode::configure(std::string node_name, int hz) {
 
 int XimeaCameraNode::publishImage(void) {
   sensor_msgs::ImageConstPtr img_msg;
-
 
 
   // encode position and orientation into image (first 11 pixels in first row)
@@ -59,16 +63,13 @@ int XimeaCameraNode::publishImage(void) {
   // }
 
   // if (this->grey_scale) {
-    // cv::Mat grey_image;
-    // cv::cvtColor(this->image, grey_image, CV_BGR2GRAY);
-    // cv::Size s = this->image.size();
-    // std::cout << s.height << std::endl;
-    // std::cout << s.width << std::endl;
-    img_msg = cv_bridge::CvImage(
-        std_msgs::Header(),
-        "mono8",
-        this->image
-        ).toImageMsg();
+  // cv::Mat grey_image;
+  // cv::cvtColor(this->image, grey_image, CV_BGR2GRAY);
+  // cv::Size s = this->image.size();
+  // std::cout << s.height << std::endl;
+  // std::cout << s.width << std::endl;
+  img_msg =
+    cv_bridge::CvImage(std_msgs::Header(), "mono8", this->image).toImageMsg();
   // } else {
   //   // clang-format off
   //   img_msg = cv_bridge::CvImage(
@@ -82,14 +83,16 @@ int XimeaCameraNode::publishImage(void) {
   return 0;
 }
 
-void XimeaCameraNode::gimbalFrameCallback(const geometry_msgs::Quaternion &msg) {
+void XimeaCameraNode::gimbalFrameCallback(
+  const geometry_msgs::Quaternion &msg) {
   this->gimbal_frame_orientation.w() = msg.w;
   this->gimbal_frame_orientation.x() = msg.x;
   this->gimbal_frame_orientation.y() = msg.y;
   this->gimbal_frame_orientation.z() = msg.z;
 }
 
-void XimeaCameraNode::gimbalJointCallback(const geometry_msgs::Quaternion &msg) {
+void XimeaCameraNode::gimbalJointCallback(
+  const geometry_msgs::Quaternion &msg) {
   this->gimbal_joint_orientation.w() = msg.w;
   this->gimbal_joint_orientation.x() = msg.x;
   this->gimbal_joint_orientation.y() = msg.y;
@@ -111,12 +114,11 @@ int XimeaCameraNode::loopCallback(void) {
     dist = this->tag.position(2);
     if (dist > 8.0) {
       this->camera.changeMode("640x640");
-    } else if ( dist > 4.0 ) {
+    } else if (dist > 4.0) {
       this->camera.changeMode("320x320");
-    } else  {
+    } else {
       this->camera.changeMode("160x160");
     }
-
   }
 
   // this->camera.showImage(this->image);

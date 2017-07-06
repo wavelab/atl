@@ -8,14 +8,14 @@
 
 namespace atl {
 
-#define XIMEA_CHECK(RETVAL, WHERE)                      \
-  if (RETVAL != XI_OK) {                                \
+#define XIMEA_CHECK(RETVAL, WHERE)                     \
+  if (RETVAL != XI_OK) {                               \
     std::cout << "Error after " << WHERE << std::endl; \
-    if (this->ximea) { \
-      xiCloseDevice(this->ximea); \
-      return -1; \
-    } \
-    goto ximea_error; \
+    if (this->ximea) {                                 \
+      xiCloseDevice(this->ximea);                      \
+      return -1;                                       \
+    }                                                  \
+    goto ximea_error;                                  \
   }
 
 class XimeaCamera : public Camera {

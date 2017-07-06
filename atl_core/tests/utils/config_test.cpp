@@ -2,44 +2,22 @@
 #include "atl/utils/data.hpp"
 #include "atl/utils/config.hpp"
 
-#define TEST_CONFIG "tests/configs/config/config.yaml"
+#define TEST_CONFIG "tests/data/utils/config.yaml"
 
 
 TEST(Utils_config_ConfigParam, constructor) {
   atl::ConfigParam param;
 
-  EXPECT_EQ(atl::TYPE_NOT_SET, param.type);
-  EXPECT_EQ("", param.key);
-  EXPECT_EQ(false, param.optional);
-
-  EXPECT_EQ(NULL, param.b);
-  EXPECT_EQ(NULL, param.i);
-  EXPECT_EQ(NULL, param.f);
-  EXPECT_EQ(NULL, param.d);
-  EXPECT_EQ(NULL, param.s);
-
-  EXPECT_EQ(NULL, param.b_array);
-  EXPECT_EQ(NULL, param.i_array);
-  EXPECT_EQ(NULL, param.f_array);
-  EXPECT_EQ(NULL, param.d_array);
-  EXPECT_EQ(NULL, param.s_array);
-
-  EXPECT_EQ(NULL, param.vec2);
-  EXPECT_EQ(NULL, param.vec3);
-  EXPECT_EQ(NULL, param.vec4);
-  EXPECT_EQ(NULL, param.vecx);
-
-  EXPECT_EQ(NULL, param.mat2);
-  EXPECT_EQ(NULL, param.mat3);
-  EXPECT_EQ(NULL, param.mat4);
-  EXPECT_EQ(NULL, param.matx);
+  ASSERT_EQ(atl::TYPE_NOT_SET, param.type);
+  ASSERT_EQ("", param.key);
+  ASSERT_FALSE(param.optional);
+  ASSERT_EQ(NULL, param.data);
 }
 
 TEST(Utils_config_ConfigParser, constructor) {
   atl::ConfigParser parser;
 
-  EXPECT_FALSE(parser.configured);
-  EXPECT_FALSE(parser.loaded);
+  ASSERT_FALSE(parser.config_loaded);
 }
 
 TEST(Utils_config_ConfigParser, addParam) {
@@ -68,33 +46,33 @@ TEST(Utils_config_ConfigParser, addParam) {
 
   atl::ConfigParser parser;
 
-  parser.addParam<bool>("bool", &b);
-  parser.addParam<int>("int", &i);
-  parser.addParam<float>("float", &f);
-  parser.addParam<double>("double", &d);
-  parser.addParam<std::string>("string", &s);
+  parser.addParam("bool", &b);
+  parser.addParam("int", &i);
+  parser.addParam("float", &f);
+  parser.addParam("double", &d);
+  parser.addParam("string", &s);
 
-  parser.addParam<std::vector<bool>>("bool_array", &b_array);
-  parser.addParam<std::vector<int>>("int_array", &i_array);
-  parser.addParam<std::vector<float>>("float_array", &f_array);
-  parser.addParam<std::vector<double>>("double_array", &d_array);
-  parser.addParam<std::vector<std::string>>("string_array", &s_array);
+  parser.addParam("bool_array", &b_array);
+  parser.addParam("int_array", &i_array);
+  parser.addParam("float_array", &f_array);
+  parser.addParam("double_array", &d_array);
+  parser.addParam("string_array", &s_array);
 
-  parser.addParam<atl::Vec2>("vector2", &vec2);
-  parser.addParam<atl::Vec3>("vector3", &vec3);
-  parser.addParam<atl::Vec4>("vector4", &vec4);
-  parser.addParam<atl::VecX>("vector", &vecx);
+  parser.addParam("vector2", &vec2);
+  parser.addParam("vector3", &vec3);
+  parser.addParam("vector4", &vec4);
+  parser.addParam("vector", &vecx);
 
-  parser.addParam<atl::Mat2>("matrix2", &mat2);
-  parser.addParam<atl::Mat3>("matrix3", &mat3);
-  parser.addParam<atl::Mat4>("matrix4", &mat4);
-  parser.addParam<atl::MatX>("matrix", &matx);
-  parser.addParam<cv::Mat>("matrix", &cvmat);
+  parser.addParam("matrix2", &mat2);
+  parser.addParam("matrix3", &mat3);
+  parser.addParam("matrix4", &mat4);
+  parser.addParam("matrix", &matx);
+  parser.addParam("matrix", &cvmat);
 
-  EXPECT_EQ(19, parser.params.size());
-  EXPECT_EQ(atl::BOOL, parser.params[0].type);
-  EXPECT_EQ("bool", parser.params[0].key);
-  EXPECT_TRUE(parser.params[0].b != NULL);
+  ASSERT_EQ(19, (int) parser.params.size());
+  ASSERT_EQ(atl::BOOL, parser.params[0].type);
+  ASSERT_EQ("bool", parser.params[0].key);
+  ASSERT_TRUE(parser.params[0].data != NULL);
 }
 
 TEST(Utils_config_ConfigParser, getYamlNode) {
@@ -104,10 +82,10 @@ TEST(Utils_config_ConfigParser, getYamlNode) {
   parser.load(TEST_CONFIG);
 
   parser.getYamlNode("level3.a.b.c", node1);
-  EXPECT_EQ(3, node1.as<int>());
+  ASSERT_EQ(3, node1.as<int>());
 
   parser.getYamlNode("float", node2);
-  EXPECT_FLOAT_EQ(2.0, node2.as<float>());
+  ASSERT_FLOAT_EQ(2.2, node2.as<float>());
 }
 
 TEST(Utils_config_ConfigParser, loadPrimitive) {
@@ -120,38 +98,39 @@ TEST(Utils_config_ConfigParser, loadPrimitive) {
 
   // setup
   parser.root = YAML::LoadFile(TEST_CONFIG);
+  parser.config_loaded = true;
 
   // INTEGER
   param.optional = false;
   param.type = atl::INT;
   param.key = "int";
-  param.i = &i;
+  param.data = &i;
   parser.loadPrimitive(param);
-  EXPECT_EQ(1, i);
+  ASSERT_EQ(1, i);
 
   // FLOAT
   param.optional = false;
   param.type = atl::FLOAT;
   param.key = "float";
-  param.f = &f;
+  param.data = &f;
   parser.loadPrimitive(param);
-  EXPECT_FLOAT_EQ(2.0, f);
+  ASSERT_FLOAT_EQ(2.2, f);
 
   // DOUBLE
   param.optional = false;
   param.type = atl::DOUBLE;
   param.key = "double";
-  param.d = &d;
+  param.data = &d;
   parser.loadPrimitive(param);
-  EXPECT_FLOAT_EQ(3.0, d);
+  ASSERT_FLOAT_EQ(3.3, d);
 
   // STRING
   param.optional = false;
   param.type = atl::STRING;
   param.key = "string";
-  param.s = &s;
+  param.data = &s;
   parser.loadPrimitive(param);
-  EXPECT_EQ("hello world!", s);
+  ASSERT_EQ("hello world!", s);
 }
 
 TEST(Utils_config_ConfigParser, loadArray) {
@@ -165,63 +144,64 @@ TEST(Utils_config_ConfigParser, loadArray) {
 
   // setup
   parser.root = YAML::LoadFile(TEST_CONFIG);
+  parser.config_loaded = true;
 
   // BOOL ARRAY
   param.optional = false;
   param.type = atl::BOOL_ARRAY;
   param.key = "bool_array";
-  param.b_array = &b_array;
+  param.data = &b_array;
   parser.loadArray(param);
 
-  EXPECT_TRUE(b_array[0]);
-  EXPECT_FALSE(b_array[1]);
-  EXPECT_TRUE(b_array[2]);
-  EXPECT_FALSE(b_array[3]);
+  ASSERT_TRUE(b_array[0]);
+  ASSERT_FALSE(b_array[1]);
+  ASSERT_TRUE(b_array[2]);
+  ASSERT_FALSE(b_array[3]);
 
   // INTEGER
   param.optional = false;
   param.type = atl::INT_ARRAY;
   param.key = "int_array";
-  param.i_array = &i_array;
+  param.data = &i_array;
   parser.loadArray(param);
 
   for (int i = 0; i < 4; i++) {
-    EXPECT_EQ(i + 1, i_array[i]);
+    ASSERT_EQ(i + 1, i_array[i]);
   }
 
   // FLOAT
   param.optional = false;
   param.type = atl::FLOAT_ARRAY;
   param.key = "float_array";
-  param.f_array = &f_array;
+  param.data = &f_array;
   parser.loadArray(param);
 
   for (int i = 0; i < 4; i++) {
-    EXPECT_FLOAT_EQ((float) i + 1.0, f_array[i]);
+    ASSERT_FLOAT_EQ((i + 1) * 1.1, f_array[i]);
   }
 
   // DOUBLE
   param.optional = false;
   param.type = atl::DOUBLE_ARRAY;
   param.key = "double_array";
-  param.d_array = &d_array;
+  param.data = &d_array;
   parser.loadArray(param);
 
   for (int i = 0; i < 4; i++) {
-    EXPECT_FLOAT_EQ((double) i + 1.0, d_array[i]);
+    ASSERT_FLOAT_EQ((i + 1) * 1.1, d_array[i]);
   }
 
   // STRING
   param.optional = false;
   param.type = atl::STRING_ARRAY;
   param.key = "string_array";
-  param.s_array = &s_array;
+  param.data = &s_array;
   parser.loadArray(param);
 
-  EXPECT_EQ("1.0", s_array[0]);
-  EXPECT_EQ("2.0", s_array[1]);
-  EXPECT_EQ("3.0", s_array[2]);
-  EXPECT_EQ("4.0", s_array[3]);
+  ASSERT_EQ("1.1", s_array[0]);
+  ASSERT_EQ("2.2", s_array[1]);
+  ASSERT_EQ("3.3", s_array[2]);
+  ASSERT_EQ("4.4", s_array[3]);
 }
 
 TEST(Utils_config_ConfigParser, loadVector) {
@@ -234,49 +214,50 @@ TEST(Utils_config_ConfigParser, loadVector) {
 
   // setup
   parser.root = YAML::LoadFile(TEST_CONFIG);
+  parser.config_loaded = true;
 
   // VECTOR 2
   param.optional = false;
   param.type = atl::VEC2;
   param.key = "vector2";
-  param.vec2 = &vec2;
+  param.data = &vec2;
   parser.loadVector(param);
 
-  EXPECT_FLOAT_EQ(1.0, vec2(0));
-  EXPECT_FLOAT_EQ(2.0, vec2(1));
+  ASSERT_FLOAT_EQ(1.1, vec2(0));
+  ASSERT_FLOAT_EQ(2.2, vec2(1));
 
   // VECTOR 3
   param.optional = false;
   param.type = atl::VEC3;
   param.key = "vector3";
-  param.vec3 = &vec3;
+  param.data = &vec3;
   parser.loadVector(param);
 
-  EXPECT_FLOAT_EQ(1.0, vec3(0));
-  EXPECT_FLOAT_EQ(2.0, vec3(1));
-  EXPECT_FLOAT_EQ(3.0, vec3(2));
+  ASSERT_FLOAT_EQ(1.1, vec3(0));
+  ASSERT_FLOAT_EQ(2.2, vec3(1));
+  ASSERT_FLOAT_EQ(3.3, vec3(2));
 
   // VECTOR 4
   param.optional = false;
   param.type = atl::VEC4;
   param.key = "vector4";
-  param.vec4 = &vec4;
+  param.data = &vec4;
   parser.loadVector(param);
 
-  EXPECT_FLOAT_EQ(1.0, vec4(0));
-  EXPECT_FLOAT_EQ(2.0, vec4(1));
-  EXPECT_FLOAT_EQ(3.0, vec4(2));
-  EXPECT_FLOAT_EQ(4.0, vec4(3));
+  ASSERT_FLOAT_EQ(1.1, vec4(0));
+  ASSERT_FLOAT_EQ(2.2, vec4(1));
+  ASSERT_FLOAT_EQ(3.3, vec4(2));
+  ASSERT_FLOAT_EQ(4.4, vec4(3));
 
   // VECTOR X
   param.optional = false;
   param.type = atl::VECX;
   param.key = "vector";
-  param.vecx = &vecx;
+  param.data = &vecx;
   parser.loadVector(param);
 
-  for (int i = 0; i < 10; i++) {
-    EXPECT_FLOAT_EQ((double) i + 1.0, vecx(i));
+  for (int i = 0; i < 9; i++) {
+    ASSERT_FLOAT_EQ((i + 1) * 1.1, vecx(i));
   }
 }
 
@@ -292,30 +273,31 @@ TEST(Utils_config_ConfigParser, loadMatrix) {
 
   // setup
   parser.root = YAML::LoadFile(TEST_CONFIG);
+  parser.config_loaded = true;
 
   // MATRIX 2
   param.optional = false;
   param.type = atl::MAT2;
   param.key = "matrix2";
-  param.mat2 = &mat2;
+  param.data = &mat2;
   parser.loadMatrix(param);
 
-  EXPECT_FLOAT_EQ(1.0, mat2(0, 0));
-  EXPECT_FLOAT_EQ(2.0, mat2(0, 1));
-  EXPECT_FLOAT_EQ(3.0, mat2(1, 0));
-  EXPECT_FLOAT_EQ(4.0, mat2(1, 1));
+  ASSERT_FLOAT_EQ(1.1, mat2(0, 0));
+  ASSERT_FLOAT_EQ(2.2, mat2(0, 1));
+  ASSERT_FLOAT_EQ(3.3, mat2(1, 0));
+  ASSERT_FLOAT_EQ(4.4, mat2(1, 1));
 
   // MATRIX 3
   param.optional = false;
   param.type = atl::MAT3;
   param.key = "matrix3";
-  param.mat3 = &mat3;
+  param.data = &mat3;
   parser.loadMatrix(param);
 
   index = 0;
   for (int i = 0; i < 3; i++) {
     for (int j = 0; j < 3; j++) {
-      EXPECT_FLOAT_EQ(index + 1.0, mat3(i, j));
+      ASSERT_FLOAT_EQ((index + 1) * 1.1, mat3(i, j));
       index++;
     }
   }
@@ -324,13 +306,13 @@ TEST(Utils_config_ConfigParser, loadMatrix) {
   param.optional = false;
   param.type = atl::MAT4;
   param.key = "matrix4";
-  param.mat4 = &mat4;
+  param.data = &mat4;
   parser.loadMatrix(param);
 
   index = 0;
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 4; j++) {
-      EXPECT_FLOAT_EQ(index + 1.0, mat4(i, j));
+      ASSERT_FLOAT_EQ((index + 1) * 1.1, mat4(i, j));
       index++;
     }
   }
@@ -339,13 +321,13 @@ TEST(Utils_config_ConfigParser, loadMatrix) {
   param.optional = false;
   param.type = atl::MATX;
   param.key = "matrix";
-  param.matx = &matx;
+  param.data = &matx;
   parser.loadMatrix(param);
 
   index = 0;
   for (int i = 0; i < 3; i++) {
     for (int j = 0; j < 4; j++) {
-      EXPECT_FLOAT_EQ(index + 1.0, matx(i, j));
+      ASSERT_FLOAT_EQ((index + 1) * 1.1, matx(i, j));
       index++;
     }
   }
@@ -354,13 +336,13 @@ TEST(Utils_config_ConfigParser, loadMatrix) {
   param.optional = false;
   param.type = atl::CVMAT;
   param.key = "matrix";
-  param.cvmat = &cvmat;
+  param.data = &cvmat;
   parser.loadMatrix(param);
 
   index = 0;
   for (int i = 0; i < 3; i++) {
     for (int j = 0; j < 4; j++) {
-      EXPECT_FLOAT_EQ(index + 1.0, cvmat.at<double>(i, j));
+      ASSERT_FLOAT_EQ((index + 1) * 1.1, cvmat.at<double>(i, j));
       index++;
     }
   }
@@ -393,28 +375,28 @@ TEST(Utils_config_ConfigParser, load) {
 
   atl::ConfigParser parser;
 
-  parser.addParam<bool>("bool", &b);
-  parser.addParam<int>("int", &i);
-  parser.addParam<float>("float", &f);
-  parser.addParam<double>("double", &d);
-  parser.addParam<std::string>("string", &s);
+  parser.addParam("bool", &b);
+  parser.addParam("int", &i);
+  parser.addParam("float", &f);
+  parser.addParam("double", &d);
+  parser.addParam("string", &s);
 
-  parser.addParam<std::vector<bool>>("bool_array", &b_array);
-  parser.addParam<std::vector<int>>("int_array", &i_array);
-  parser.addParam<std::vector<float>>("float_array", &f_array);
-  parser.addParam<std::vector<double>>("double_array", &d_array);
-  parser.addParam<std::vector<std::string>>("string_array", &s_array);
+  parser.addParam("bool_array", &b_array);
+  parser.addParam("int_array", &i_array);
+  parser.addParam("float_array", &f_array);
+  parser.addParam("double_array", &d_array);
+  parser.addParam("string_array", &s_array);
 
-  parser.addParam<atl::Vec2>("vector2", &vec2);
-  parser.addParam<atl::Vec3>("vector3", &vec3);
-  parser.addParam<atl::Vec4>("vector4", &vec4);
-  parser.addParam<atl::VecX>("vector", &vecx);
+  parser.addParam("vector2", &vec2);
+  parser.addParam("vector3", &vec3);
+  parser.addParam("vector4", &vec4);
+  parser.addParam("vector", &vecx);
 
-  parser.addParam<atl::Mat2>("matrix2", &mat2);
-  parser.addParam<atl::Mat3>("matrix3", &mat3);
-  parser.addParam<atl::Mat4>("matrix4", &mat4);
-  parser.addParam<atl::MatX>("matrix", &matx);
-  parser.addParam<cv::Mat>("matrix", &cvmat);
+  parser.addParam("matrix2", &mat2);
+  parser.addParam("matrix3", &mat3);
+  parser.addParam("matrix4", &mat4);
+  parser.addParam("matrix", &matx);
+  parser.addParam("matrix", &cvmat);
 
   retval = parser.load(TEST_CONFIG);
   if (retval != 0) {

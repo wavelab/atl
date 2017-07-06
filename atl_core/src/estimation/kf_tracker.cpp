@@ -34,12 +34,12 @@ int KalmanFilterTracker::configure(std::string config_file) {
   std::string mode;
 
   // parse and load config file
-  parser.addParam<int>("nb_states", &this->nb_states);
-  parser.addParam<int>("nb_dimensions", &this->nb_dimensions);
-  parser.addParam<double>("sanity_dist", &this->sanity_dist);
-  parser.addParam<MatX>("motion_noise_matrix", &this->R);
-  parser.addParam<MatX>("measurement_matrix", &this->C);
-  parser.addParam<MatX>("measurement_noise_matrix", &this->Q);
+  parser.addParam("nb_states", &this->nb_states);
+  parser.addParam("nb_dimensions", &this->nb_dimensions);
+  parser.addParam("sanity_dist", &this->sanity_dist);
+  parser.addParam("motion_noise_matrix", &this->R);
+  parser.addParam("measurement_matrix", &this->C);
+  parser.addParam("measurement_noise_matrix", &this->Q);
   this->config_file = config_file;
   if (parser.load(config_file) != 0) {
     return -1;
@@ -51,7 +51,7 @@ int KalmanFilterTracker::configure(std::string config_file) {
 
 int KalmanFilterTracker::initialize(VecX mu) {
   // pre-check
-  if (this->configured== false) {
+  if (this->configured == false) {
     return -1;
   }
 
@@ -82,40 +82,39 @@ int KalmanFilterTracker::initialize(VecX mu) {
 
 int KalmanFilterTracker::checkDimensions(void) {
   if (this->mu.size() != this->nb_states) {
-    log_err(EMUSIZE, this->nb_states, (int) this->mu.size());
-    log_err(ECHECKCONFIG, this->config_file.c_str());
+    LOG_ERROR(EMUSIZE, this->nb_states, (int) this->mu.size());
+    LOG_ERROR(ECHECKCONFIG, this->config_file.c_str());
     return -1;
 
   } else if (this->R.rows() != this->nb_states) {
-    log_err(ERROWSIZE, this->nb_states, (int) this->R.rows());
-    log_err(ECHECKCONFIG, this->config_file.c_str());
+    LOG_ERROR(ERROWSIZE, this->nb_states, (int) this->R.rows());
+    LOG_ERROR(ECHECKCONFIG, this->config_file.c_str());
     return -1;
 
   } else if (this->R.cols() != this->nb_states) {
-    log_err(ERCOLSIZE, this->nb_states, (int) this->R.cols());
-    log_err(ECHECKCONFIG, this->config_file.c_str());
+    LOG_ERROR(ERCOLSIZE, this->nb_states, (int) this->R.cols());
+    LOG_ERROR(ECHECKCONFIG, this->config_file.c_str());
     return -1;
 
   } else if (this->C.rows() != this->nb_dimensions) {
-    log_err(ECROWSIZE, this->nb_dimensions, (int) this->C.rows());
-    log_err(ECHECKCONFIG, this->config_file.c_str());
+    LOG_ERROR(ECROWSIZE, this->nb_dimensions, (int) this->C.rows());
+    LOG_ERROR(ECHECKCONFIG, this->config_file.c_str());
     return -1;
 
   } else if (this->C.cols() != this->nb_states) {
-    log_err(ECCOLSIZE, this->nb_states, (int) this->C.cols());
-    log_err(ECHECKCONFIG, this->config_file.c_str());
+    LOG_ERROR(ECCOLSIZE, this->nb_states, (int) this->C.cols());
+    LOG_ERROR(ECHECKCONFIG, this->config_file.c_str());
     return -1;
 
   } else if (this->Q.rows() != this->nb_dimensions) {
-    log_err(EQROWSIZE, this->nb_dimensions, (int) this->Q.rows());
-    log_err(ECHECKCONFIG, this->config_file.c_str());
+    LOG_ERROR(EQROWSIZE, this->nb_dimensions, (int) this->Q.rows());
+    LOG_ERROR(ECHECKCONFIG, this->config_file.c_str());
     return -1;
 
   } else if (this->Q.cols() != this->nb_dimensions) {
-    log_err(EQCOLSIZE, this->nb_dimensions, (int) this->Q.cols());
-    log_err(ECHECKCONFIG, this->config_file.c_str());
+    LOG_ERROR(EQCOLSIZE, this->nb_dimensions, (int) this->Q.cols());
+    LOG_ERROR(ECHECKCONFIG, this->config_file.c_str());
     return -1;
-
   }
 
   return 0;
@@ -159,10 +158,10 @@ int KalmanFilterTracker::estimate(MatX A, VecX y) {
   if (this->initialized == false) {
     return -1;
   } else if (A.rows() != this->nb_states || A.cols() != this->nb_states) {
-    log_err(EASIZE, this->nb_states);
+    LOG_ERROR(EASIZE, this->nb_states);
     return -2;
   } else if (y.size() != this->C.rows()) {
-    log_err(EYSIZE, (int) this->C.rows());
+    LOG_ERROR(EYSIZE, (int) this->C.rows());
     return -2;
   }
 
