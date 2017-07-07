@@ -1,5 +1,8 @@
 # Odroid Flashing
 
+To obtain the latest Ubuntu images for Odroid XU4 go to:
+[https://odroid.in](odroid.in)
+
 The following will detail how to flash a linux distro onto the eMMC or MicroSD
 and boot.
 
