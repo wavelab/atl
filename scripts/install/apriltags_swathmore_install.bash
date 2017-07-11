@@ -1,37 +1,35 @@
 #!/bin/bash
 set -e  # halt on first error
-BUILD_PATH="$PWD/atl_deps"
+DOWNLOAD_PATH=/usr/local/src
 
 
 install_dependencies()
 {
-    # install dependencies
-    sudo apt-get install -y libcgal-dev
+    sudo apt-get install -y -qq libcgal-dev
 }
 
 install_apriltags()
 {
-    # create build directory for atl
-    mkdir -p $BUILD_PATH
-    cd $BUILD_PATH
+    # donwload swathmore apriltags
+    cd $DOWNLOAD_PATH
+    if [ ! -d apriltags_swathmore ]; then
+        sudo git clone https://github.com/swatbotics/apriltags-cpp.git
+        sudo mv apriltags-cpp apriltags_swathmore
+    fi
 
-    # donwload and install swathmore apriltags
-    rm -rf apriltags-cpp
-    git clone https://github.com/swatbotics/apriltags-cpp.git
-    cd apriltags-cpp
+    # build library
+    cd apriltags_swathmore
     mkdir build
     cd build
     cmake .. -DCMAKE_BUILD_TYPE=RELEASE
     make apriltags
 
-    # As of Aug 31st 2016 they don't have a install target
+    # install
+    # as of Aug 31st 2016 they don't have a install target
     # you have to install it manually
     sudo cp libapriltags.a /usr/local/lib/libapriltags_swathmore.a
     sudo mkdir -p /usr/local/include/apriltags_swathmore/
     sudo cp ../src/*.h /usr/local/include/apriltags_swathmore/
-
-    # remove apriltags repo
-    rm -rf $BUILD_PATH/apriltags-cpp
 }
 
 uninstall_apriltags()

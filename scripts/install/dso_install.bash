@@ -9,7 +9,7 @@ install_pangolin()
     # clone repo
     cd /usr/local/src
     if [ ! -d Pangolin ]; then
-        git clone https://github.com/stevenlovegrove/Pangolin
+        sudo git clone https://github.com/stevenlovegrove/Pangolin
     fi
 
     # install dependencies
