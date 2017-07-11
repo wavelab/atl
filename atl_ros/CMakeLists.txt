@@ -5,6 +5,8 @@ IF (CMAKE_COMPILER_IS_GNUCXX)
     ADD_DEFINITIONS(-std=gnu++0x)
 ENDIF()
 
+SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CATKIN_PACKAGE_LIB_DESTINATION})
+
 # DEPENDENCIES
 FIND_PACKAGE(
     catkin
@@ -40,15 +42,17 @@ LINK_DIRECTORIES(AFTER ${catkin_LIBRARY_DIRS})
 
 # BUILD AS CATKIN PACKAGE
 CATKIN_PACKAGE(
-    INCLUDE_DIRS include
-    CATKIN_DEPENDS
-        roscpp
-        rospy
-        std_msgs
-        geometry_msgs
-        message_runtime
-        atl_core
-        atl_msgs
+  INCLUDE_DIRS include
+  CATKIN_DEPENDS
+    roscpp
+    rospy
+    std_msgs
+    geometry_msgs
+    message_runtime
+    atl_core
+    atl_msgs
+  LIBRARIES
+    atl_ros_utils
 )
 
 # ROS NODES
@@ -70,37 +74,37 @@ ADD_EXECUTABLE(atl_apriltag_node src/ros/nodes/apriltag_node.cpp)
 TARGET_LINK_LIBRARIES(atl_apriltag_node ${ATL_ROS_DEPS})
 ADD_DEPENDENCIES(atl_apriltag_node atl_ros_utils)
 
-ADD_EXECUTABLE(atl_camera_node src/ros/nodes/camera_node.cpp)
-TARGET_LINK_LIBRARIES(atl_camera_node ${ATL_ROS_DEPS})
-ADD_DEPENDENCIES(atl_camera_node atl_ros_utils)
+# ADD_EXECUTABLE(atl_camera_node src/ros/nodes/camera_node.cpp)
+# TARGET_LINK_LIBRARIES(atl_camera_node ${ATL_ROS_DEPS})
+# ADD_DEPENDENCIES(atl_camera_node atl_ros_utils)
 
-ADD_EXECUTABLE(atl_control_node src/ros/nodes/control_node.cpp)
-TARGET_LINK_LIBRARIES(atl_control_node ${ATL_ROS_DEPS})
-ADD_DEPENDENCIES(atl_control_node atl_ros_utils)
+# ADD_EXECUTABLE(atl_control_node src/ros/nodes/control_node.cpp)
+# TARGET_LINK_LIBRARIES(atl_control_node ${ATL_ROS_DEPS})
+# ADD_DEPENDENCIES(atl_control_node atl_ros_utils)
 
-ADD_EXECUTABLE(atl_estimator_node src/ros/nodes/estimator_node.cpp)
-TARGET_LINK_LIBRARIES(atl_estimator_node ${ATL_ROS_DEPS})
-ADD_DEPENDENCIES(atl_estimator_node atl_ros_utils)
+# ADD_EXECUTABLE(atl_estimator_node src/ros/nodes/estimator_node.cpp)
+# TARGET_LINK_LIBRARIES(atl_estimator_node ${ATL_ROS_DEPS})
+# ADD_DEPENDENCIES(atl_estimator_node atl_ros_utils)
+#
+# ADD_EXECUTABLE(atl_example_node src/ros/nodes/example_node.cpp)
+# TARGET_LINK_LIBRARIES(atl_example_node ${ATL_ROS_DEPS})
+# ADD_DEPENDENCIES(atl_example_node atl_ros_utils)
+#
+# ADD_EXECUTABLE(atl_fake_mavros_node src/ros/nodes/fake_mavros_node.cpp)
+# TARGET_LINK_LIBRARIES(atl_fake_mavros_node ${ATL_ROS_DEPS})
+# ADD_DEPENDENCIES(atl_fake_mavros_node atl_ros_utils)
+#
+# ADD_EXECUTABLE(atl_gimbal_node src/ros/nodes/gimbal_node.cpp)
+# TARGET_LINK_LIBRARIES(atl_gimbal_node ${ATL_ROS_DEPS})
+# ADD_DEPENDENCIES(atl_gimbal_node atl_ros_utils)
+#
+# ADD_EXECUTABLE(atl_imu_node src/ros/nodes/imu_node.cpp)
+# TARGET_LINK_LIBRARIES(atl_imu_node ${ATL_ROS_DEPS})
+# ADD_DEPENDENCIES(atl_imu_node atl_ros_utils)
 
-ADD_EXECUTABLE(atl_example_node src/ros/nodes/example_node.cpp)
-TARGET_LINK_LIBRARIES(atl_example_node ${ATL_ROS_DEPS})
-ADD_DEPENDENCIES(atl_example_node atl_ros_utils)
-
-ADD_EXECUTABLE(atl_fake_mavros_node src/ros/nodes/fake_mavros_node.cpp)
-TARGET_LINK_LIBRARIES(atl_fake_mavros_node ${ATL_ROS_DEPS})
-ADD_DEPENDENCIES(atl_fake_mavros_node atl_ros_utils)
-
-ADD_EXECUTABLE(atl_gimbal_node src/ros/nodes/gimbal_node.cpp)
-TARGET_LINK_LIBRARIES(atl_gimbal_node ${ATL_ROS_DEPS})
-ADD_DEPENDENCIES(atl_gimbal_node atl_ros_utils)
-
-ADD_EXECUTABLE(atl_imu_node src/ros/nodes/imu_node.cpp)
-TARGET_LINK_LIBRARIES(atl_imu_node ${ATL_ROS_DEPS})
-ADD_DEPENDENCIES(atl_imu_node atl_ros_utils)
-
-ADD_EXECUTABLE(atl_pg_camera_node src/ros/nodes/pg_camera_node.cpp)
-TARGET_LINK_LIBRARIES(atl_pg_camera_node ${ATL_ROS_DEPS})
-ADD_DEPENDENCIES(atl_pg_camera_node atl_ros_utils)
+# ADD_EXECUTABLE(atl_pg_camera_node src/ros/nodes/pg_camera_node.cpp)
+# TARGET_LINK_LIBRARIES(atl_pg_camera_node ${ATL_ROS_DEPS})
+# ADD_DEPENDENCIES(atl_pg_camera_node atl_ros_utils)
 
 ADD_EXECUTABLE(atl_ximea_camera_node src/ros/nodes/ximea_camera_node.cpp)
 TARGET_LINK_LIBRARIES(atl_ximea_camera_node ${ATL_ROS_DEPS})
@@ -113,7 +117,7 @@ ADD_LIBRARY(
     src/ros/utils/node.cpp
     src/ros/utils/utils.cpp
 )
-ADD_DEPENDENCIES(atl_ros_utils atl_msgs_gencpp)
+# ADD_DEPENDENCIES(atl_ros_utils atl_msgs_gencpp)
 
 
 # TESTS

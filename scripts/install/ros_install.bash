@@ -25,7 +25,7 @@ install() {
     echo "source /opt/ros/$ROS_VERSION/setup.bash" >> $HOME/.bashrc
 
     # install ros
-    apt-get install -y python-rosinstall
+    apt-get install -y python-rosinstall python-catkin-tools
 
     # fix rosdep permissions
     rosdep fix-permissions

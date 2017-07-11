@@ -12,8 +12,8 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
-#include <apriltags_mit/Tag16h5.h>
 #include <apriltags_mit/TagDetector.h>
+#include <apriltags_mit/Tag16h5.h>
 
 #include "atl/utils/utils.hpp"
 #include "atl/vision/apriltag/base_detector.hpp"

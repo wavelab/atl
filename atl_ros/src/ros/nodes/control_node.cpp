@@ -502,6 +502,7 @@ void ControlNode::publishAttitudeSetpoint(void) {
 
   } else {
     ROS_ERROR("Invalid [fcu_type]: %s", this->fcu_type.c_str());
+    exit(-1);  // dangerous but necessary
   }
 }
 

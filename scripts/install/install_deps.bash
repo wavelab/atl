@@ -20,7 +20,7 @@ sudo apt-get install -qq -y \
 # dependencies from git
 if [ ! -d "$CATKIN_PATH/src/Onboard-SDK-ROS" ]; then
     cd $CATKIN_PATH/src
-    git clone https://github.com/wavelab/Onboard-SDK-ROS
+    git clone https://github.com/dji-sdk/Onboard-SDK-ROS
     cd -
 fi
 
@@ -46,4 +46,4 @@ fi
 # compile
 cd "$CATKIN_PATH"
 source /opt/ros/$ROS_VERSION/setup.bash
-catkin_make
+catkin build
