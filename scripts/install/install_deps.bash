@@ -30,6 +30,7 @@ sudo bash $SCRIPT_PATH/apriltags_swathmore_install.bash
 sudo bash $SCRIPT_PATH/apriltags_mit_install.bash
 sudo bash $SCRIPT_PATH/ximea_install.bash
 sudo bash $SCRIPT_PATH/pointgrey_install.bash
+sudo bash $SCRIPT_PATH/djiosdk_install.bash
 
 # create catkin workspace if it doesn't already exist
 if [ ! -d $CATKIN_PATH/src ]; then
