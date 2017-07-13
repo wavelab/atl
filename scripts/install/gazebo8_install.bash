@@ -20,4 +20,10 @@ install_gazebo8()
 
 
 # RUN
-install_gazebo8
+ARCH_TYPE=`uname -m`
+if [ ${ARCH_TYPE} == 'x86_64' ]; then
+    install_gazebo8
+else
+    echo "Unsupported ARCH_TYPE [$ARCH_TYPE], NOT INSTALLING GAZEBO8!";
+    exit -1;
+fi
