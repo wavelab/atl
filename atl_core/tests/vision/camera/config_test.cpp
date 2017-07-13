@@ -21,10 +21,10 @@ TEST(CameraConfig, constructor) {
   EXPECT_FLOAT_EQ(0.0, config.lambda(2));
   EXPECT_FLOAT_EQ(0.0, config.alpha);
 
-  config.camera_matrix;
-  config.rectification_matrix;
-  config.distortion_coefficients;
-  config.projection_matrix;
+  // config.camera_matrix;
+  // config.rectification_matrix;
+  // config.distortion_coefficients;
+  // config.projection_matrix;
 
   EXPECT_FALSE(config.imshow);
   EXPECT_FALSE(config.snapshot);

@@ -1,9 +1,3 @@
-/** @file
- * @ingroup utils
- *
- * Contains a useful `ConfigParser` class to simplify parsing yaml files.
- */
-
 #ifndef ATL_UTILS_CONFIG_HPP
 #define ATL_UTILS_CONFIG_HPP
 
@@ -23,8 +17,6 @@
 #include "atl/utils/math.hpp"
 
 namespace atl {
-/** @addtogroup utils
- *  @{ */
 
 /**
  * An enum used by `ConfigParam` to denote the yaml value type.
@@ -80,7 +72,8 @@ public:
       : type{type}, key{key}, data{out}, optional{optional} {};
 };
 
-/** Parses yaml files for parameters of different types.
+/**
+ * Parses yaml files for parameters of different types.
  *
  * Currently `ConfigParser` supports parsing the following data types:
  * - **Primitives**: `bool`, `int`, `float`, `double`, `std::string`
@@ -121,7 +114,8 @@ public:
   YAML::Node root;
   std::vector<ConfigParam> params;
 
-  /** Default constructor. By default it sets:
+  /**
+   * Default constructor. By default it sets:
    *
    * - `config_loaded` to `false`
    *
@@ -129,7 +123,8 @@ public:
    */
   ConfigParser();
 
-  /** Use the variations of `addParam` to add parameters you would like to
+  /**
+   * Use the variations of `addParam` to add parameters you would like to
    * parse from the yaml file, where `key` is the yaml key, `out` is
    * dependent on the type of parameter you want to parse to and an
    * `optional` parameter to define whether `ConfigParser` should fail if the
@@ -165,12 +160,15 @@ public:
   void addParam(std::string key, MatX *out, bool optional = false);
   void addParam(std::string key, cv::Mat *out, bool optional = false);
 
-  /** Get yaml node given yaml `key`. The result is assigned to `node` if
+  /**
+   * Get yaml node given yaml `key`. The result is assigned to `node` if
    * `key` matches anything in the config file, else `node` is set to `NULL`.
    */
   int getYamlNode(std::string key, YAML::Node &node);
 
-  /** @return a status code meaning
+  /**
+   * @return a status code meaning
+   *
     * - `0`: On success
     * - `-1`: Config file is not loaded
     * - `-2`: `key` not found in yaml file, parameter is not optional
@@ -182,7 +180,8 @@ public:
   /** @return see `getYamlNode` */
   int checkKey(std::string key, bool optional);
 
-  /** @return see `checkKey`
+  /**
+   * @return see `checkKey`
    *
    * @todo refactor return codes into an enum which can be documented
    */
@@ -191,7 +190,9 @@ public:
   /** @return see `checkKey` */
   int checkMatrix(std::string key, bool optional);
 
-  /** Load yaml param primitive, array, vector or matrix.
+  /**
+   * Load yaml param primitive, array, vector or matrix.
+   *
    * @return
    * - `0`: On success
    * - `-1`: Config file is not loaded
@@ -207,7 +208,9 @@ public:
   int loadVector(ConfigParam param);
   int loadMatrix(ConfigParam param);
 
-  /** Load yaml file at `config_file`.
+  /**
+   * Load yaml file at `config_file`.
+   *
    * @return
    * - `0`: On success
    * - `1`: File not found
@@ -221,7 +224,6 @@ public:
   int load(std::string config_file);
 };
 
-/** @} group utils */
 }  // namespace atl
 
 #endif  // ATL_UTILS_CONFIG_HPP

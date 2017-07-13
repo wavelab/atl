@@ -14,9 +14,7 @@ namespace atl {
 #define E_CSV_DATA_LOAD "Error! failed to load test data [%s]!!\n"
 #define E_CSV_DATA_OPEN "Error! failed to open file for output [%s]!!\n"
 
-/**
- * Attitude Command
- */
+/** Attitude Command */
 class AttitudeCommand {
 public:
   Quaternion orientation;
@@ -27,9 +25,7 @@ public:
   void print();
 };
 
-/**
- * Pose stores orientation and position information
- */
+/** Pose stores orientation and position information */
 class Pose {
 public:
   Vec3 position;
@@ -56,9 +52,7 @@ public:
   void print();
 };
 
-/**
- * Twist stores linear and angular velocity
- */
+/** Twist stores linear and angular velocity */
 class Twist {
 public:
   Vec3 linear;

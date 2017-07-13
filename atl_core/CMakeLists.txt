@@ -59,6 +59,7 @@ ADD_LIBRARY(
     src/utils/config.cpp
     src/utils/data.cpp
     src/utils/file.cpp
+    src/utils/gps.cpp
     src/utils/math.cpp
     src/utils/opencv.cpp
     src/utils/stats.cpp
@@ -75,7 +76,7 @@ ADD_LIBRARY(
     src/vision/gimbal/gimbal.cpp
     src/vision/gimbal/sbgc.cpp
 )
-SET(DEPS
+SET(${PROJECT_NAME}_DEPS
     ${catkin_LIBRARIES}
     ${OpenCV_LIBS}
     m3api
@@ -89,7 +90,7 @@ SET(DEPS
     gtest
     pthread
 )
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${DEPS})
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
 
 # UNIT TESTS
 ADD_EXECUTABLE(
@@ -125,7 +126,8 @@ ADD_EXECUTABLE(
     # UTIL
     tests/utils/config_test.cpp
     tests/utils/data_test.cpp
-    tests/utils/filesystem_test.cpp
+    tests/utils/file_test.cpp
+    tests/utils/gps_test.cpp
     tests/utils/math_test.cpp
     tests/utils/opencv_test.cpp
     tests/utils/stats_test.cpp
@@ -133,7 +135,7 @@ ADD_EXECUTABLE(
     # TEST RUNNER
     tests/test_runner.cpp
 )
-TARGET_LINK_LIBRARIES(atl_tests ${PROJECT_NAME} ${DEPS})
+TARGET_LINK_LIBRARIES(atl_tests ${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
 
 # INSTALL
 INSTALL(

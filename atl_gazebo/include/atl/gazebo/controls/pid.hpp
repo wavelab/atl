@@ -1,17 +1,9 @@
-/** @file
- * @ingroup controls
- */
-
 #ifndef ATL_GAZEBO_CONTROLS_PID_HPP
 #define ATL_GAZEBO_CONTROLS_PID_HPP
 
 namespace atl {
-/** @addtogroup controls
- *  @{ */
 
-/**
- * PID Controller
- */
+/** PID Controller */
 class PID {
 public:
   double error_prev;
@@ -48,7 +40,5 @@ public:
   double update(double setpoint, double actual, double dt);
 };
 
-/** @} group controls */
 }  // namespace atl
-
 #endif  // ATL_GAZEBO_CONTROLS_PID_HPP

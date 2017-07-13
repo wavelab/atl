@@ -6,17 +6,12 @@
 
 #include <Eigen/Geometry>
 
-#include <geometry_msgs/PoseStamped.h>
-#include <geometry_msgs/PoseWithCovarianceStamped.h>
-#include <geometry_msgs/TwistStamped.h>
-#include <geometry_msgs/QuaternionStamped.h>
-#include <geometry_msgs/Vector3Stamped.h>
 #include <ros/ros.h>
-#include <std_msgs/Float64.h>
 
-#include "atl/gazebo/clients/quadrotor_gclient.hpp"
-#include "atl/ros/utils/node.hpp"
 #include "atl/utils/utils.hpp"
+#include "atl/ros/utils/node.hpp"
+#include "atl/ros/utils/msgs.hpp"
+#include "atl/gazebo/clients/quadrotor_gclient.hpp"
 
 namespace atl {
 namespace gazebo_bridge {
@@ -31,17 +26,47 @@ namespace gazebo_bridge {
 #define DJI_VELOCITY_RTOPIC "/dji_sdk/velocity"
 
 // SUBSCRIBE TOPICS
-#define DJI_ATTITUDE_SETPOINT_RTOPIC "/dji_sdk/attitude_control"
+#define DJI_SETPOINT_RTOPIC "/dji_sdk/flight_control_setpoint_generic"
 
+/** DJI Quadrotor ROS Node */
 class DJIQuadrotorNode : public gaz::QuadrotorGClient, public ROSNode {
 public:
+  // gps coordinates of uwaterloo
+  double home_latitude = 43.472285;
+  double home_longitude = -80.544858;
+  double home_altitude = 333;
+
   DJIQuadrotorNode(int argc, char **argv) : ROSNode(argc, argv) {}
+
+  /**
+   * Configure
+   * @param node_name Name of ROS Node
+   * @param hz ROS node rate in hertz
+   */
   int configure(const std::string &node_name, int hz);
-  // void poseCallback(RPYPosePtr &msg);
-  // void velocityCallback(ConstVector3dPtr &msg);
-  // bool attitudeControlCallback(dji_sdk::AttitudeControl::Request &request,
-  //                              dji_sdk::AttitudeControl::Response
-  //                              &response);
+
+  /**
+   * Quadrotor pose Gazebo callback
+   * @param msg Roll, pitch and yaw message
+   */
+  void poseGazeboCallback(RPYPosePtr &msg);
+
+  /**
+   * Quadrotor velocity Gazebo callback
+   * @param msg Velocity message in x, y, z
+   */
+  void velocityGazeboCallback(ConstVector3dPtr &msg);
+
+  /**
+   * Quadrotor attitude setpoint ROS callback
+   *
+   * Currently this function only supports a DJI control flag mode of 0x20.
+   * This translates to being able to control the quadrotor's roll, pitch, yaw
+   * and throttle
+   *
+   * @param msg Attitude setpoint for quadrotor
+   */
+  void attitudeSetpointCallback(const sensor_msgs::Joy &msg);
 };
 
 }  // namespace gazebo_bridge

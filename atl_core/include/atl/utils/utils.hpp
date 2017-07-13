@@ -4,6 +4,7 @@
 #include "atl/utils/config.hpp"
 #include "atl/utils/data.hpp"
 #include "atl/utils/file.hpp"
+#include "atl/utils/gps.hpp"
 #include "atl/utils/log.hpp"
 #include "atl/utils/math.hpp"
 #include "atl/utils/opencv.hpp"

@@ -5,18 +5,13 @@
 
 #include <Eigen/Geometry>
 
-#include <geometry_msgs/PoseStamped.h>
-#include <geometry_msgs/PoseWithCovarianceStamped.h>
-#include <geometry_msgs/TwistStamped.h>
-#include <geometry_msgs/Vector3.h>
 #include <ros/ros.h>
-#include <std_msgs/Float64.h>
 
-#include "atl/gazebo/clients/quadrotor_gclient.hpp"
+#include "atl/utils/utils.hpp"
 #include "atl/ros/utils/msgs.hpp"
 #include "atl/ros/utils/node.hpp"
 #include "atl/ros/utils/utils.hpp"
-#include "atl/utils/utils.hpp"
+#include "atl/gazebo/clients/quadrotor_gclient.hpp"
 
 namespace atl {
 namespace gazebo_bridge {
@@ -38,18 +33,55 @@ namespace gazebo_bridge {
 #define PX4_POSITION_SETPOINT_RTOPIC "/mavros/setpoint_position/local"
 #define PX4_VELOCITY_SETPOINT_RTOPIC "/mavros/setpoint_velocity/cmd_vel"
 
+/** PX4 Quadrotor ROS Node */
 class PX4QuadrotorNode : public gaz::QuadrotorGClient, public ROSNode {
 public:
   std::string quad_frame;
 
   PX4QuadrotorNode(int argc, char **argv) : ROSNode(argc, argv) {}
+
+  /**
+   * Configure
+   * @param node_name Name of ROS node
+   * @param hz ROS node rate in hertz
+   */
   int configure(const std::string &node_name, int hz);
-  void poseCallback(RPYPosePtr &msg);
-  void velocityCallback(ConstVector3dPtr &msg);
-  void attitudeSetpointCallback(geometry_msgs::PoseStamped msg);
-  void throttleSetpointCallback(std_msgs::Float64 msg);
-  void positionSetpointCallback(geometry_msgs::PoseStamped msg);
-  void velocitySetpointCallback(geometry_msgs::TwistStamped msg);
+
+  /**
+   * Quadrotor pose Gazebo callback
+   * @param msg Roll, pitch and yaw message
+   */
+  void poseGazeboCallback(const RPYPosePtr &msg);
+
+  /**
+   * Quadrotor velocity Gazebo callback
+   * @param msg Velocity message in x, y, z
+   */
+  void velocityCallback(const ConstVector3dPtr &msg);
+
+  /**
+   * Quadrotor attitude setpoint ROS callback
+   * @param msg Pose message
+   */
+  void attitudeSetpointCallback(const geometry_msgs::PoseStamped &msg);
+
+  /**
+   * Quadrotor throttle setpoint ROS callback
+   * @param msg Throttle message
+   */
+  void throttleSetpointCallback(const std_msgs::Float64 &msg);
+
+  /**
+   * Quadrotor position setpoint ROS callback
+   * @param msg Pose message
+   */
+  void positionSetpointCallback(const geometry_msgs::PoseStamped &msg);
+
+  /**
+   * Quadrotor velocity setpoint ROS callback
+   * @param msg Twist message
+   */
+  void velocitySetpointCallback(const geometry_msgs::TwistStamped &msg);
 };
 
 }  // namespace gazebo_bridge

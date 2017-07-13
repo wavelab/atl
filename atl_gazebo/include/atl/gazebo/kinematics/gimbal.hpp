@@ -1,7 +1,3 @@
-/** @file
- * @ingroup kinematics
- */
-
 #ifndef ATL_GAZEBO_KINEMATICS_GIMBAL_HPP
 #define ATL_GAZEBO_KINEMATICS_GIMBAL_HPP
 
@@ -13,8 +9,6 @@
 #include "atl/utils/utils.hpp"
 
 namespace atl {
-/** @addtogroup kinematics
- *  @{ */
 
 /**
  * Attitude Controller for a 2-Axis gimbal, this controller implements 2 PID
@@ -169,13 +163,10 @@ public:
    */
   Vec4 getState();
 
-  /**
-   * Print gimbal state
-   */
+  /** Print gimbal state */
   void printState();
 };
 
-/** @} group kinematics */
 }  // namespace atl
 
 #endif  // ATL_GAZEBO_KINEMATICS_GIMBAL_HPP

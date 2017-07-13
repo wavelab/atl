@@ -3,12 +3,9 @@
 
 #include <stdlib.h>
 
-#include <geometry_msgs/Vector3.h>
 #include <ros/ros.h>
 #include <ros/time.h>
 #include <rosgraph_msgs/Clock.h>
-#include <std_msgs/Bool.h>
-#include <std_msgs/String.h>
 
 #include "atl/gazebo/clients/world_gclient.hpp"
 #include "atl/ros/utils/msgs.hpp"
@@ -34,17 +31,64 @@ namespace gazebo_bridge {
 #define LOAD_WORLD_RTOPIC "/atl/world/load_world"
 #define CLEAR_WORLD_RTOPIC "/atl/world/clear_world"
 
+/** Gazebo ROS Node */
 class WorldNode : public gaz::WorldGClient, public ROSNode {
 public:
   WorldNode(int argc, char **argv) : ROSNode(argc, argv) {}
+
+  /**
+   * Configure
+   * @param node_name Name of ROS Node
+   * @param hz ROS node rate in hertz
+   */
   int configure(const std::string &node_name, int hz);
+
+  /**
+   * Clock Gazebo callback
+   * @param msg Time message
+   */
   void clockCallback(ConstTimePtr &gaz_msg);
+
+  /**
+   * Shutdown ROS callback
+   * @param msg Bool message
+   */
   void shutdownCallback(const std_msgs::Bool &msg);
+
+  /**
+   * Pause ROS callback
+   * @param msg Bool message
+   */
   void pauseCallback(const std_msgs::Bool &msg);
+
+  /**
+   * UnPause ROS callback
+   * @param msg Bool message
+   */
   void unPauseCallback(const std_msgs::Bool &msg);
+
+  /**
+   * Reset ROS callback
+   * @param msg Bool message
+   */
   void resetCallback(const std_msgs::Bool &msg);
+
+  /**
+   * Model pose ROS callback
+   * @param msg Model pose message
+   */
   void modelPoseCallback(const atl_msgs::ModelPose &msg);
+
+  /**
+   * Load world ROS callback
+   * @param msg String message
+   */
   void loadWorldCallback(const std_msgs::String &msg);
+
+  /**
+   * Clear world ROS callback
+   * @param msg Bool message
+   */
   void clearWorldCallback(const std_msgs::Bool &msg);
 };
 

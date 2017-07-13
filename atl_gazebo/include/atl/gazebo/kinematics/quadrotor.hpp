@@ -1,6 +1,3 @@
-/** @file
- * @ingroup kinematics
- */
 #ifndef ATL_GAZEBO_QUADROTOR_QUADROTOR_HPP
 #define ATL_GAZEBO_QUADROTOR_QUADROTOR_HPP
 
@@ -11,8 +8,6 @@
 #include "atl/utils/utils.hpp"
 
 namespace atl {
-/** @addtogroup kinematics
- *  @{ */
 
 class AttitudeController {
 public:
@@ -134,7 +129,6 @@ public:
   void printState();
 };
 
-/** @} group kinematics */
 }  // namespace atl
 
 #endif  // ATL_GAZEBO_KINEMATICS_QUADROTOR_HPP
