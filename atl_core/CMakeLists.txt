@@ -19,7 +19,7 @@ INCLUDE_DIRECTORIES(
     include
     /usr/include/eigen3
     /usr/include/flycapture/
-    # /usr/include/m3api/
+    /usr/include/m3api/
 )
 
 # LIBS

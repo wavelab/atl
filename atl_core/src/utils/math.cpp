@@ -295,6 +295,13 @@ void ned2nwu(Quaternion ned, Quaternion &nwu) {
   nwu.z() = -ned.z();
 }
 
+void enu2nwu(Quaternion enu, Quaternion &nwu) {
+  nwu.w() = enu.w();
+  nwu.x() = enu.y();
+  nwu.y() = -enu.x();
+  nwu.z() = enu.z();
+}
+
 void target2body(Vec3 target_pos_if,
                  Vec3 body_pos_if,
                  Quaternion body_orientation_if,

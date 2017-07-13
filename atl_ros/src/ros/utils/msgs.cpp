@@ -207,46 +207,50 @@ void buildMsg(TrackingController tc, atl_msgs::TCtrlSettings &msg) {
 //   msg.throttle_controller.max = lc.throttle_limit[1];
 // }
 
-int convertMsg(std_msgs::Bool msg, bool &b) {
+void convertMsg(std_msgs::Bool msg, bool &b) {
   b = msg.data;
-  return 0;
 }
 
-int convertMsg(std_msgs::String msg, std::string &s) {
+void convertMsg(std_msgs::String msg, std::string &s) {
   s = msg.data;
-  return 0;
 }
 
-int convertMsg(std_msgs::Float64 msg, double &d) {
+void convertMsg(std_msgs::Float64 msg, double &d) {
   d = msg.data;
-  return 0;
 }
 
-int convertMsg(geometry_msgs::Vector3 msg, Vec3 &v) {
+void convertMsg(geometry_msgs::Vector3 msg, Vec3 &v) {
   v << msg.x, msg.y, msg.z;
-  return 0;
 }
 
-int convertMsg(geometry_msgs::Point msg, Vec3 &v) {
+void convertMsg(geometry_msgs::Vector3Stamped msg, Vec3 &v) {
+  v << msg.vector.x, msg.vector.y, msg.vector.z;
+}
+
+void convertMsg(geometry_msgs::Point msg, Vec3 &v) {
   v << msg.x, msg.y, msg.z;
-  return 0;
 }
 
-int convertMsg(geometry_msgs::Quaternion msg, Quaternion &q) {
+void convertMsg(geometry_msgs::Quaternion msg, Quaternion &q) {
   q.w() = msg.w;
   q.x() = msg.x;
   q.y() = msg.y;
   q.z() = msg.z;
-  return 0;
 }
 
-int convertMsg(geometry_msgs::PoseStamped msg, Pose &p) {
+void convertMsg(geometry_msgs::QuaternionStamped msg, Quaternion &q) {
+  q.w() = msg.quaternion.w;
+  q.x() = msg.quaternion.x;
+  q.y() = msg.quaternion.y;
+  q.z() = msg.quaternion.z;
+}
+
+void convertMsg(geometry_msgs::PoseStamped msg, Pose &p) {
   convertMsg(msg.pose.position, p.position);
   convertMsg(msg.pose.orientation, p.orientation);
-  return 0;
 }
 
-int convertMsg(geometry_msgs::TwistStamped msg, VecX &v) {
+void convertMsg(geometry_msgs::TwistStamped msg, VecX &v) {
   v(0) = msg.twist.linear.x;
   v(1) = msg.twist.linear.y;
   v(2) = msg.twist.linear.z;
@@ -254,20 +258,16 @@ int convertMsg(geometry_msgs::TwistStamped msg, VecX &v) {
   v(3) = msg.twist.angular.x;
   v(4) = msg.twist.angular.y;
   v(5) = msg.twist.angular.z;
-
-  return 0;
 }
 
-int convertMsg(atl_msgs::AprilTagPose msg, TagPose &tag) {
+void convertMsg(atl_msgs::AprilTagPose msg, TagPose &tag) {
   tag.id = msg.id;
   tag.detected = msg.detected;
   convertMsg(msg.position, tag.position);
   convertMsg(msg.orientation, tag.orientation);
-
-  return 0;
 }
 
-int convertMsg(atl_msgs::PCtrlSettings msg, PositionController &pc) {
+void convertMsg(atl_msgs::PCtrlSettings msg, PositionController &pc) {
   pc.pitch_limit[0] = deg2rad(msg.pitch_controller.min);
   pc.pitch_limit[1] = deg2rad(msg.pitch_controller.max);
   pc.x_controller.k_p = msg.pitch_controller.k_p;
@@ -284,11 +284,9 @@ int convertMsg(atl_msgs::PCtrlSettings msg, PositionController &pc) {
   pc.z_controller.k_i = msg.throttle_controller.k_i;
   pc.z_controller.k_d = msg.throttle_controller.k_d;
   pc.hover_throttle = msg.hover_throttle;
-
-  return 0;
 }
 
-int convertMsg(atl_msgs::TCtrlSettings msg, TrackingController &tc) {
+void convertMsg(atl_msgs::TCtrlSettings msg, TrackingController &tc) {
   tc.y_controller.k_p = msg.roll_controller.k_p;
   tc.y_controller.k_i = msg.roll_controller.k_i;
   tc.y_controller.k_d = msg.roll_controller.k_d;
@@ -313,11 +311,9 @@ int convertMsg(atl_msgs::TCtrlSettings msg, TrackingController &tc) {
                      msg.track_offset.y,
                      msg.track_offset.z;
   // clang-format on
-
-  return 0;
 }
 
-// int convertMsg(atl_msgs::LCtrlSettings msg, LandingController &lc) {
+// void convertMsg(atl_msgs::LCtrlSettings msg, LandingController &lc) {
 //   lc.vx_controller.k_p = msg.vx_controller.k_p;
 //   lc.vx_controller.k_i = msg.vx_controller.k_i;
 //   lc.vx_controller.k_d = msg.vx_controller.k_d;
@@ -338,8 +334,6 @@ int convertMsg(atl_msgs::TCtrlSettings msg, TrackingController &tc) {
 //
 //   lc.throttle_limit[0] = msg.throttle_controller.min;
 //   lc.throttle_limit[1] = msg.throttle_controller.max;
-//
-//   return 0;
 // }
 
 }  // namespace atl

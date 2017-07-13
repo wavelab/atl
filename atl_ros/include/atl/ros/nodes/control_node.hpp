@@ -10,7 +10,8 @@
 #include <mavros_msgs/SetMode.h>
 #include <mavros_msgs/State.h>
 
-#include <dji_sdk/dji_drone.h>
+#include <dji_sdk/DroneArmControl.h>
+#include <dji_sdk/SDKControlAuthority.h>
 
 #include <atl_msgs/AprilTagPose.h>
 #include <atl_msgs/PCtrlSettings.h>
@@ -47,10 +48,13 @@ namespace atl {
 #define PX4_VELOCITY_TOPIC "/mavros/local_position/velocity"
 #define PX4_RADIO_TOPIC "/mavros/rc/in"
 
-#define DJI_POSITION_TOPIC "/dji_sdk/local_position"
-#define DJI_ATTITUDE_TOPIC "/dji_sdk/attitude_quaternion"
+#define DJI_ARM_TOPIC "/dji_sdk/drone_arm_control"
+#define DJI_SDK_AUTH_TOPIC "/dji_sdk/sdk_control_authority"
+#define DJI_SETPOINT_TOPIC "/dji_sdk/flight_control_setpoint_generic"
+#define DJI_GPS_POSITION_TOPIC "/dji_sdk/gps_position"
+#define DJI_ATTITUDE_TOPIC "/dji_sdk/attitude"
 #define DJI_VELOCITY_TOPIC "/dji_sdk/velocity"
-#define DJI_RADIO_TOPIC "/dji_sdk/rc_channels"
+#define DJI_RADIO_TOPIC "/dji_sdk/rc"
 
 #define ARM_TOPIC "/atl/control/arm"
 #define MODE_TOPIC "/atl/control/mode"
@@ -74,24 +78,13 @@ public:
   std::string fcu_type;
 
   mavros_msgs::State px4_state;
-  ros::ServiceClient px4_mode_client;
-  ros::ServiceClient px4_arming_client;
-
-  DJIDrone *dji;
 
   Quadrotor quadrotor;
-  int rc_in[16];
   bool armed;
 
   ControlNode(int argc, char **argv) : ROSNode(argc, argv) {
     this->quad_frame = "";
     this->fcu_type = "";
-
-    this->dji = NULL;
-
-    for (int i = 0; i < 16; i++) {
-      this->rc_in[i] = 0.0f;
-    }
     this->armed = false;
   }
 
@@ -111,10 +104,10 @@ public:
   void px4PoseCallback(const geometry_msgs::PoseStamped &msg);
   void px4VelocityCallback(const geometry_msgs::TwistStamped &msg);
   void px4RadioCallback(const mavros_msgs::RCIn &msg);
-  void djiPositionCallback(const dji_sdk::LocalPosition &msg);
-  void djiAttitudeCallback(const dji_sdk::AttitudeQuaternion &msg);
-  void djiVelocityCallback(const dji_sdk::Velocity &msg);
-  void djiRadioCallback(const dji_sdk::RCChannels &msg);
+  void djiGPSPositionCallback(const sensor_msgs::NavSatFix &msg);
+  void djiAttitudeCallback(const geometry_msgs::QuaternionStamped &msg);
+  void djiVelocityCallback(const geometry_msgs::Vector3Stamped &msg);
+  void djiRadioCallback(const sensor_msgs::Joy &msg);
   void armCallback(const std_msgs::Bool &msg);
   void modeCallback(const std_msgs::String &msg);
   void yawCallback(const std_msgs::Float64 &msg);
@@ -129,9 +122,7 @@ public:
   void publishAttitudeSetpoint(void);
   void publishQuadrotorPose(void);
   void publishQuadrotorVelocity(void);
-  void publishPX4DummyMsg(void);
   int loopCallback(void);
-  void publishStats(void);
 };
 
 }  // namespace atl

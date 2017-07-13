@@ -42,6 +42,7 @@ void nwu2enu(Vec3 nwu, Vec3 &enu);
 void ned2enu(Vec3 ned, Vec3 &enu);
 void nwu2ned(Quaternion nwu, Quaternion &ned);
 void ned2nwu(Quaternion ned, Quaternion &enu);
+void enu2nwu(Quaternion enu, Quaternion &nwu);
 void target2body(Vec3 target_pos_if,
                  Vec3 body_pos_if,
                  Quaternion body_orientation_if,

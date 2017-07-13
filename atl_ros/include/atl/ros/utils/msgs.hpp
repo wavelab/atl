@@ -8,8 +8,13 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <geometry_msgs/Quaternion.h>
+#include <geometry_msgs/QuaternionStamped.h>
 #include <geometry_msgs/TwistStamped.h>
 #include <geometry_msgs/Vector3.h>
+#include <geometry_msgs/Vector3Stamped.h>
+
+#include <sensor_msgs/Joy.h>
+#include <sensor_msgs/NavSatFix.h>
 
 #include <atl/atl_core.hpp>
 
@@ -48,18 +53,20 @@ void buildMsg(TrackingController tc, atl_msgs::TCtrlStats &msg);
 void buildMsg(TrackingController tc, atl_msgs::TCtrlSettings &msg);
 void buildMsg(LandingController tc, atl_msgs::LCtrlSettings &msg);
 
-int convertMsg(std_msgs::Bool msg, bool &b);
-int convertMsg(std_msgs::String msg, std::string &s);
-int convertMsg(std_msgs::Float64 msg, double &d);
-int convertMsg(geometry_msgs::Vector3 msg, Vec3 &v);
-int convertMsg(geometry_msgs::Point msg, Vec3 &v);
-int convertMsg(geometry_msgs::Quaternion msg, Quaternion &q);
-int convertMsg(geometry_msgs::PoseStamped msg, Pose &p);
-int convertMsg(geometry_msgs::TwistStamped msg, VecX &v);
-int convertMsg(atl_msgs::AprilTagPose msg, TagPose &p);
-int convertMsg(atl_msgs::PCtrlSettings msg, PositionController &pc);
-int convertMsg(atl_msgs::TCtrlSettings msg, TrackingController &tc);
-int convertMsg(atl_msgs::LCtrlSettings msg, LandingController &lc);
+void convertMsg(std_msgs::Bool msg, bool &b);
+void convertMsg(std_msgs::String msg, std::string &s);
+void convertMsg(std_msgs::Float64 msg, double &d);
+void convertMsg(geometry_msgs::Vector3 msg, Vec3 &v);
+void convertMsg(geometry_msgs::Vector3Stamped msg, Vec3 &v);
+void convertMsg(geometry_msgs::Point msg, Vec3 &v);
+void convertMsg(geometry_msgs::Quaternion msg, Quaternion &q);
+void convertMsg(geometry_msgs::QuaternionStamped msg, Quaternion &q);
+void convertMsg(geometry_msgs::PoseStamped msg, Pose &p);
+void convertMsg(geometry_msgs::TwistStamped msg, VecX &v);
+void convertMsg(atl_msgs::AprilTagPose msg, TagPose &p);
+void convertMsg(atl_msgs::PCtrlSettings msg, PositionController &pc);
+void convertMsg(atl_msgs::TCtrlSettings msg, TrackingController &tc);
+void convertMsg(atl_msgs::LCtrlSettings msg, LandingController &lc);
 
 }  // namespace atl
 #endif
