@@ -89,17 +89,17 @@ public:
   }
 
   int configure(std::string node_name, int hz);
-  int configurePX4Topics(void);
-  int configureDJITopics(void);
-  int px4Connect(void);
-  int px4Disarm(void);
-  int px4OffboardModeOn(void);
-  int djiDisarm(void);
-  int djiOffboardModeOn(void);
-  int djiOffboardModeOff(void);
-  int waitForEstimator(void);
-  void setEstimatorOn(void);
-  void setEstimatorOff(void);
+  int configurePX4Topics();
+  int configureDJITopics();
+  int px4Connect();
+  int px4Disarm();
+  int px4OffboardModeOn();
+  int djiDisarm();
+  int djiOffboardModeOn();
+  int djiOffboardModeOff();
+  int waitForEstimator();
+  void setEstimatorOn();
+  void setEstimatorOff();
   void px4StateCallback(const mavros_msgs::State::ConstPtr &msg);
   void px4PoseCallback(const geometry_msgs::PoseStamped &msg);
   void px4VelocityCallback(const geometry_msgs::TwistStamped &msg);
@@ -119,10 +119,10 @@ public:
   void positionControllerSetCallback(const atl_msgs::PCtrlSettings &msg);
   void trackingControllerSetCallback(const atl_msgs::TCtrlSettings &msg);
   void landingControllerSetCallback(const atl_msgs::LCtrlSettings &msg);
-  void publishAttitudeSetpoint(void);
-  void publishQuadrotorPose(void);
-  void publishQuadrotorVelocity(void);
-  int loopCallback(void);
+  void publishAttitudeSetpoint();
+  void publishQuadrotorPose();
+  void publishQuadrotorVelocity();
+  int loopCallback();
 };
 
 }  // namespace atl

@@ -26,7 +26,7 @@ class SwathmoreDetector : public BaseDetector {
 public:
   TagDetector *detector;
 
-  SwathmoreDetector(void);
+  SwathmoreDetector();
   int configure(std::string config_file);
   int extractTags(cv::Mat &image, std::vector<TagPose> &tags);
   int obtainPose(TagDetection tag, TagPose &tag_pose);

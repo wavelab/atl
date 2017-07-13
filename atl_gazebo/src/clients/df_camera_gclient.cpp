@@ -3,17 +3,17 @@
 namespace atl {
 namespace gaz {
 
-DFCameraGClient::DFCameraGClient(void) {
+DFCameraGClient::DFCameraGClient() {
   this->connected = false;
 }
 
-DFCameraGClient::~DFCameraGClient(void) {
+DFCameraGClient::~DFCameraGClient() {
   if (this->connected) {
     gazebo::client::shutdown();
   }
 }
 
-int DFCameraGClient::configure(void) {
+int DFCameraGClient::configure() {
   // pre-check
   this->connected = gazebo::client::setup(0, NULL);
   if (this->connected == false) {

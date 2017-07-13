@@ -2,11 +2,11 @@
 
 namespace atl {
 
-PointGreyCamera::PointGreyCamera(void) {
+PointGreyCamera::PointGreyCamera() {
   this->pointgrey = NULL;
 }
 
-PointGreyCamera::~PointGreyCamera(void) {
+PointGreyCamera::~PointGreyCamera() {
   FlyCapture2::Error error;
 
   if (this->initialized && this->pointgrey) {
@@ -27,7 +27,7 @@ PointGreyCamera::~PointGreyCamera(void) {
   }
 }
 
-int PointGreyCamera::initialize(void) {
+int PointGreyCamera::initialize() {
   FlyCapture2::Error error;
   FlyCapture2::Property property;
   FlyCapture2::Property gain_property;
@@ -265,7 +265,7 @@ int PointGreyCamera::getGain(double &gain_db) {
   return 0;
 }
 
-int PointGreyCamera::printFormat7Capabilities(void) {
+int PointGreyCamera::printFormat7Capabilities() {
   bool supported;
   FlyCapture2::Format7Info info;
 
@@ -425,7 +425,7 @@ int PointGreyCamera::getFrame(cv::Mat &image) {
   return 0;
 }
 
-int PointGreyCamera::run(void) {
+int PointGreyCamera::run() {
   int frame_count;
   double last_tic;
 

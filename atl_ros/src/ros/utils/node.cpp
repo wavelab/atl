@@ -15,7 +15,7 @@ ROSNode::ROSNode(int argc, char **argv) {
   this->ros_rate = NULL;
 }
 
-ROSNode::~ROSNode(void) {
+ROSNode::~ROSNode() {
   ::ros::shutdown();
 }
 
@@ -75,12 +75,12 @@ int ROSNode::registerImagePublisher(const std::string &topic) {
   return 0;
 }
 
-int ROSNode::registerLoopCallback(std::function<int(void)> cb) {
+int ROSNode::registerLoopCallback(std::function<int()> cb) {
   this->loop_cb = cb;
   return 0;
 }
 
-int ROSNode::loop(void) {
+int ROSNode::loop() {
   int retval;
 
   // pre-check

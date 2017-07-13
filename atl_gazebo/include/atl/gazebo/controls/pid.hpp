@@ -9,6 +9,9 @@ namespace atl {
 /** @addtogroup controls
  *  @{ */
 
+/**
+ * PID Controller
+ */
 class PID {
 public:
   double error_prev;

@@ -3,7 +3,7 @@
 namespace atl {
 namespace gaz {
 
-QuadrotorGClient::QuadrotorGClient(void) {
+QuadrotorGClient::QuadrotorGClient() {
   this->connected = false;
 
   this->pose = VecX(6);
@@ -13,13 +13,13 @@ QuadrotorGClient::QuadrotorGClient(void) {
   this->velocity_setpoints << 0.0, 0.0, 0.0;
 }
 
-QuadrotorGClient::~QuadrotorGClient(void) {
+QuadrotorGClient::~QuadrotorGClient() {
   if (this->connected) {
     gazebo::client::shutdown();
   }
 }
 
-int QuadrotorGClient::configure(void) {
+int QuadrotorGClient::configure() {
   // pre-check
   this->connected = gazebo::client::setup(0, NULL);
   if (this->connected == false) {

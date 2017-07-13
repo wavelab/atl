@@ -70,7 +70,7 @@ int ControlNode::configure(const std::string node_name, int hz) {
   return 0;
 }
 
-int ControlNode::configurePX4Topics(void) {
+int ControlNode::configurePX4Topics() {
   // clang-format off
   // services
   this->registerClient<mavros_msgs::SetMode>(PX4_MODE_TOPIC);
@@ -91,7 +91,7 @@ int ControlNode::configurePX4Topics(void) {
   return 0;
 }
 
-int ControlNode::configureDJITopics(void) {
+int ControlNode::configureDJITopics() {
   // clang-format off
   // services
   this->registerClient<dji_sdk::DroneArmControl>(DJI_ARM_TOPIC);
@@ -110,7 +110,7 @@ int ControlNode::configureDJITopics(void) {
   return 0;
 }
 
-int ControlNode::px4Connect(void) {
+int ControlNode::px4Connect() {
   int attempts;
 
   // pre-check
@@ -136,7 +136,7 @@ int ControlNode::px4Connect(void) {
   return 0;
 }
 
-int ControlNode::px4Disarm(void) {
+int ControlNode::px4Disarm() {
   mavros_msgs::CommandBool msg;
 
   // setup
@@ -153,7 +153,7 @@ int ControlNode::px4Disarm(void) {
   }
 }
 
-int ControlNode::px4OffboardModeOn(void) {
+int ControlNode::px4OffboardModeOn() {
   mavros_msgs::SetMode msg;
   msg.request.custom_mode = "OFFBOARD";
 
@@ -166,7 +166,7 @@ int ControlNode::px4OffboardModeOn(void) {
   }
 }
 
-int ControlNode::djiDisarm(void) {
+int ControlNode::djiDisarm() {
   dji_sdk::DroneArmControl msg;
 
   // send disarm msg
@@ -181,7 +181,7 @@ int ControlNode::djiDisarm(void) {
   return 0;
 }
 
-int ControlNode::djiOffboardModeOn(void) {
+int ControlNode::djiOffboardModeOn() {
   dji_sdk::SDKControlAuthority msg;
 
   msg.request.control_enable = 1;
@@ -195,7 +195,7 @@ int ControlNode::djiOffboardModeOn(void) {
   return 0;
 }
 
-int ControlNode::djiOffboardModeOff(void) {
+int ControlNode::djiOffboardModeOff() {
   dji_sdk::SDKControlAuthority msg;
 
   msg.request.control_enable = 0;
@@ -209,7 +209,7 @@ int ControlNode::djiOffboardModeOff(void) {
   return 0;
 }
 
-int ControlNode::waitForEstimator(void) {
+int ControlNode::waitForEstimator() {
   int attempts;
 
   // wait for estimator
@@ -233,13 +233,13 @@ int ControlNode::waitForEstimator(void) {
   return 0;
 }
 
-void ControlNode::setEstimatorOn(void) {
+void ControlNode::setEstimatorOn() {
   std_msgs::Bool msg;
   msg.data = true;
   this->ros_pubs[ESTIMATOR_ON_TOPIC].publish(msg);
 }
 
-void ControlNode::setEstimatorOff(void) {
+void ControlNode::setEstimatorOff() {
   std_msgs::Bool msg;
   msg.data = true;
   this->ros_pubs[ESTIMATOR_OFF_TOPIC].publish(msg);
@@ -449,7 +449,7 @@ void ControlNode::landingControllerSetCallback(
   // convertMsg(msg, this->quadrotor.landing_controller);
 }
 
-void ControlNode::publishAttitudeSetpoint(void) {
+void ControlNode::publishAttitudeSetpoint() {
   Vec3 euler;
   Quaternion q_ned;
   std_msgs::Float64 thr_msg;
@@ -512,13 +512,13 @@ void ControlNode::publishAttitudeSetpoint(void) {
   }
 }
 
-void ControlNode::publishQuadrotorPose(void) {
+void ControlNode::publishQuadrotorPose() {
   geometry_msgs::PoseStamped msg;
   buildMsg(this->ros_seq, ros::Time::now(), this->quadrotor.pose, msg);
   this->ros_pubs[QUADROTOR_POSE].publish(msg);
 }
 
-void ControlNode::publishQuadrotorVelocity(void) {
+void ControlNode::publishQuadrotorVelocity() {
   geometry_msgs::TwistStamped msg;
 
   msg.twist.linear.x = this->quadrotor.velocity(0);
@@ -528,7 +528,7 @@ void ControlNode::publishQuadrotorVelocity(void) {
   this->ros_pubs[QUADROTOR_VELOCITY].publish(msg);
 }
 
-int ControlNode::loopCallback(void) {
+int ControlNode::loopCallback() {
   double dt;
 
   // publish pose and velocity

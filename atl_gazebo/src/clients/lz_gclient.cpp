@@ -3,17 +3,17 @@
 namespace atl {
 namespace gaz {
 
-LZGClient::LZGClient(void) {
+LZGClient::LZGClient() {
   this->connected = false;
 }
 
-LZGClient::~LZGClient(void) {
+LZGClient::~LZGClient() {
   if (this->connected) {
     gazebo::client::shutdown();
   }
 }
 
-int LZGClient::configure(void) {
+int LZGClient::configure() {
   // pre-check
   this->connected = gazebo::client::setup(0, NULL);
   if (this->connected == false) {

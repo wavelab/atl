@@ -3,14 +3,6 @@
 namespace atl {
 
 // ATTITUDE COMMAND
-AttitudeCommand::AttitudeCommand(void) {
-  this->orientation.w() = 0.0;
-  this->orientation.x() = 0.0;
-  this->orientation.y() = 0.0;
-  this->orientation.z() = 0.0;
-  this->throttle = 0.0;
-}
-
 AttitudeCommand::AttitudeCommand(Vec4 command) {
   // quaternion
   Vec3 euler{command(0), command(1), command(2)};  // roll, pitch, yaw
@@ -20,7 +12,7 @@ AttitudeCommand::AttitudeCommand(Vec4 command) {
   this->throttle = command(3);
 }
 
-void AttitudeCommand::print(void) {
+void AttitudeCommand::print() {
   Vec3 euler;
   quat2euler(this->orientation, 321, euler);
 

@@ -56,7 +56,7 @@ void set_blocking(int fd, int should_block) {
   }
 }
 
-void SBGCFrame::printFrame(void) {
+void SBGCFrame::printFrame() {
   int i;
 
   // print header
@@ -78,7 +78,7 @@ void SBGCFrame::buildHeader(uint8_t cmd_id, uint8_t data_size) {
   this->header_checksum = (this->cmd_id + this->data_size) % 256;
 }
 
-void SBGCFrame::buildDataChecksum(void) {
+void SBGCFrame::buildDataChecksum() {
   this->data_checksum = 0x0;
   for (int i = 0; i < this->data_size; i++) {
     this->data_checksum += this->data[i];
@@ -169,7 +169,7 @@ int SBGCFrame::parseFrame(uint8_t *data) {
   return 0;
 }
 
-void SBGCRealtimeData::printData(void) {
+void SBGCRealtimeData::printData() {
   // ACCELEROMOETER AND GYROSCOPE
   printf("accelerometer: %.2f\t%.2f\t%.2f\n",
          this->accel(0),
@@ -202,7 +202,7 @@ void SBGCRealtimeData::printData(void) {
   printf("battery_level: %d\n\n", this->battery_level);
 }
 
-SBGC::SBGC(void) {
+SBGC::SBGC() {
   this->configured = false;
 
   this->port = "";
@@ -228,7 +228,7 @@ SBGC::SBGC(std::string port) {
   this->connection_flags = 0;
 }
 
-int SBGC::connect(void) {
+int SBGC::connect() {
   // open serial port
   this->serial = open(this->port.c_str(), O_RDWR | O_NOCTTY | O_SYNC);
   if (this->serial < 0) {
@@ -245,7 +245,7 @@ int SBGC::connect(void) {
   return 0;
 }
 
-int SBGC::disconnect(void) {
+int SBGC::disconnect() {
   if (close(this->serial) != 0) {
     std::cout << "failed to disconnect from SBGC!" << std::endl;
     return -1;
@@ -301,13 +301,13 @@ int SBGC::readFrame(uint8_t read_length, SBGCFrame &frame) {
   return 0;
 }
 
-int SBGC::on(void) {
+int SBGC::on() {
   SBGCFrame cmd;
   cmd.buildFrame(CMD_MOTORS_ON);
   return this->sendFrame(cmd);
 }
 
-int SBGC::off(void) {
+int SBGC::off() {
   int retval;
   SBGCFrame cmd;
   uint8_t data[13];
@@ -335,7 +335,7 @@ int SBGC::off(void) {
   return 0;
 }
 
-int SBGC::reset(void) {
+int SBGC::reset() {
   if (this->off() || this->on()) {
     std::cout << "failed to reset SBGC!" << std::endl;
     return -1;
@@ -344,7 +344,7 @@ int SBGC::reset(void) {
   return 0;
 }
 
-int SBGC::getBoardInfo(void) {
+int SBGC::getBoardInfo() {
   int retval;
   SBGCFrame frame;
 
@@ -376,7 +376,7 @@ int SBGC::getBoardInfo(void) {
   return 0;
 }
 
-int SBGC::getRealtimeData4(void) {
+int SBGC::getRealtimeData4() {
   int retval;
   SBGCFrame frame;
   // SBGCRealtimeData data;
@@ -454,7 +454,7 @@ int SBGC::getRealtimeData4(void) {
 
   return 0;
 }
-int SBGC::getRealtimeData(void) {
+int SBGC::getRealtimeData() {
   int retval;
   SBGCFrame frame;
   // SBGCRealtimeData data;
@@ -526,7 +526,7 @@ int SBGC::getRealtimeData(void) {
   return 0;
 }
 
-int SBGC::getAnglesExt(void) {
+int SBGC::getAnglesExt() {
   int retval;
   SBGCFrame frame;
   // SBGCRealtimeData data;

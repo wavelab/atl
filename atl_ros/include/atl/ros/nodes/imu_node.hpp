@@ -28,7 +28,7 @@ public:
   int configure(std::string node_name, int hz);
   int publishIMU(Vec3 euler);
   int publishJointOrientation(Quaternion q);
-  int loopCallback(void);
+  int loopCallback();
 };
 
 }  // namespace atl

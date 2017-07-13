@@ -12,10 +12,10 @@ public:
   Vec4 x;
   double m;
 
-  Quad2DModel(void);
+  Quad2DModel();
   int configure(Vec4 x_init, double m);
   int update(Vec2 u, double dt);
-  void printState(void);
+  void printState();
 };
 
 class Simulator {
@@ -32,7 +32,7 @@ public:
   double dist_error;
   double vel_error;
 
-  Simulator(void);
+  Simulator();
   int configure(Vec4 x_init, Vec4 x_final, double m);
   int simulate(double dt, double tend, MatX U, MatX &X);
 };

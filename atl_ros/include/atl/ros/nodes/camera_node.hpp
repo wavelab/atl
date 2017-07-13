@@ -42,13 +42,13 @@ public:
 
   CameraNode(int argc, char **argv) : ROSNode(argc, argv) {}
   int configure(const std::string &node_name, int hz);
-  int publishImage(void);
+  int publishImage();
   void imageCallback(const sensor_msgs::ImageConstPtr &msg);
   void gimbalPositionCallback(const geometry_msgs::Vector3 &msg);
   void gimbalFrameCallback(const geometry_msgs::Quaternion &msg);
   void gimbalJointCallback(const geometry_msgs::Quaternion &msg);
   void aprilTagCallback(const atl_msgs::AprilTagPose &msg);
-  int loopCallback(void);
+  int loopCallback();
 };
 
 }  // namespace atl

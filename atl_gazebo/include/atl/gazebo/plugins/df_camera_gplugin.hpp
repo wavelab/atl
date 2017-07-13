@@ -37,9 +37,9 @@ public:
   std::string image_format;
   cv::Mat image;
 
-  DFCameraGPlugin(void);
+  DFCameraGPlugin();
   void Load(gazebo::sensors::SensorPtr sptr, sdf::ElementPtr sdf);
-  int configure(void);
+  int configure();
   void onNewFrame(const unsigned char *image,
                   const int image_width,
                   const int image_height,

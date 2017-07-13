@@ -10,6 +10,9 @@
 
 namespace atl {
 
+/**
+ * Velocity Controller
+ */
 class VelocityController {
 public:
   bool configured;
@@ -27,12 +30,12 @@ public:
   Vec4 outputs;
   AttitudeCommand att_cmd;
 
-  VelocityController(void);
+  VelocityController();
   int configure(std::string config_file);
   Vec4 calculate(Vec3 setpoints, Vec3 actual, double dt);
-  void reset(void);
-  void printOutputs(void);
-  void printErrors(void);
+  void reset();
+  void printOutputs();
+  void printErrors();
 };
 
 }  // namespace atl

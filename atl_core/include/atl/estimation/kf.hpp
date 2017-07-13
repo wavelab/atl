@@ -24,7 +24,7 @@ public:
   VecX mu_p;
   MatX S_p;
 
-  KalmanFilter(void);
+  KalmanFilter();
   int init(VecX mu, MatX R, MatX C, MatX Q);
   int reset(VecX mu, MatX R, MatX C, MatX Q);
   int estimate(MatX A, VecX y);

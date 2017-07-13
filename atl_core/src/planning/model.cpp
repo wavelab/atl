@@ -3,7 +3,7 @@
 namespace atl {
 
 // QUAD2DMODEL
-Quad2DModel::Quad2DModel(void) {
+Quad2DModel::Quad2DModel() {
   this->configured = false;
 
   this->x << 0.0, 0.0, 0.0, 0.0;
@@ -41,7 +41,7 @@ int Quad2DModel::update(Vec2 u, double dt) {
   return 0;
 }
 
-void Quad2DModel::printState(void) {
+void Quad2DModel::printState() {
   std::cout << "x: " << this->x(0) << std::endl;
   std::cout << "vx: " << this->x(1) << std::endl;
   std::cout << "z: " << this->x(2) << std::endl;
@@ -49,7 +49,7 @@ void Quad2DModel::printState(void) {
 }
 
 // SIMULATOR
-Simulator::Simulator(void) {
+Simulator::Simulator() {
   this->configured = false;
   this->model = Quad2DModel();
   this->x_init << 0.0, 0.0, 0.0, 0.0;

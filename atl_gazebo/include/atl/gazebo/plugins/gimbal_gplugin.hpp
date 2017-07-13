@@ -45,12 +45,12 @@ public:
 
   Gimbal2AxisModel gimbal;
 
-  GimbalGPlugin(void);
+  GimbalGPlugin();
   void Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf);
   void simulate(double dt);
   void onUpdate(const gazebo::common::UpdateInfo &info);
-  void publishFrameOrientation(void);
-  void publishJointOrientation(void);
+  void publishFrameOrientation();
+  void publishJointOrientation();
   void setAttitudeCallback(ConstVector3dPtr &msg);
   void trackTargetCallback(ConstVector3dPtr &msg);
 };

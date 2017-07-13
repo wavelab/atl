@@ -19,7 +19,7 @@ public:
   gazebo::physics::ModelPtr model;
   gazebo::event::ConnectionPtr updateConnection;
 
-  BoxGPlugin(void);
+  BoxGPlugin();
   void Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf);
   void onUpdate(const gazebo::common::UpdateInfo &info);
 };

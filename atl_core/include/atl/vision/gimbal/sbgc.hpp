@@ -115,9 +115,9 @@ public:
   uint8_t *data;
   uint8_t data_checksum;
 
-  void printFrame(void);
+  void printFrame();
 
-  void buildDataChecksum(void);
+  void buildDataChecksum();
   void buildHeader(uint8_t cmd_id, uint8_t data_size);
   void buildBody(uint8_t *data);
   void buildFrame(int cmd_id, uint8_t *data, int data_size);
@@ -143,7 +143,7 @@ public:
   int system_error;
   int battery_level;
 
-  void printData(void);
+  void printData();
 };
 
 class SBGC {
@@ -160,19 +160,19 @@ public:
   uint16_t board_features;
   uint8_t connection_flags;
 
-  SBGC(void);
+  SBGC();
   SBGC(std::string port);
-  int connect(void);
-  int disconnect(void);
+  int connect();
+  int disconnect();
   int sendFrame(SBGCFrame &cmd);
   int readFrame(uint8_t read_length, SBGCFrame &frame);
-  int on(void);
-  int off(void);
-  int reset(void);
-  int getBoardInfo(void);
-  int getRealtimeData(void);
-  int getRealtimeData4(void);
-  int getAnglesExt(void);
+  int on();
+  int off();
+  int reset();
+  int getBoardInfo();
+  int getRealtimeData();
+  int getRealtimeData4();
+  int getAnglesExt();
   int setAngle(double roll, double pitch, double yaw);
   int setSpeedAngle(double roll,
                     double pitch,

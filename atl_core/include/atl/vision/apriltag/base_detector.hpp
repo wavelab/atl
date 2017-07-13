@@ -36,7 +36,7 @@ public:
   double window_padding;
   bool imshow;
 
-  BaseDetector(void);
+  BaseDetector();
   int configure(std::string config_file);
   int illuminationInvariantTransform(cv::Mat &image);
   int changeMode(cv::Mat &image);

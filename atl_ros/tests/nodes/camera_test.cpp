@@ -17,7 +17,7 @@ protected:
 
   cv::Mat image;
 
-  NodeTest(void) {
+  NodeTest() {
     image_transport::ImageTransport it(this->ros_nh);
 
     // clang-format off

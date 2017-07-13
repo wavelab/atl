@@ -10,6 +10,9 @@
 
 namespace atl {
 
+/**
+ * Tracking Controller
+ */
 class TrackingController {
 public:
   bool configured;
@@ -28,14 +31,14 @@ public:
   Vec4 outputs;
   AttitudeCommand att_cmd;
 
-  TrackingController(void);
+  TrackingController();
   int configure(std::string config_file);
   AttitudeCommand calculate(Vec3 errors, double yaw, double dt);
   AttitudeCommand calculate(
     Vec3 target_pos_bf, Vec3 pos, Vec3 pos_prev, double yaw, double dt);
-  void reset(void);
-  void printOutputs(void);
-  void printErrors(void);
+  void reset();
+  void printOutputs();
+  void printErrors();
 };
 
 }  // namespace atl

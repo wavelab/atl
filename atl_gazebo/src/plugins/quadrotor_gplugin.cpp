@@ -23,7 +23,7 @@ ignition::math::Pose3d vec2pose(VecX pose) {
   return ignition::math::Pose3d(x, y, z, phi, theta, psi);
 }
 
-QuadrotorGPlugin::QuadrotorGPlugin(void) {
+QuadrotorGPlugin::QuadrotorGPlugin() {
   printf("LOADING [libquadrotor_gplugin.so]!\n");
 }
 
@@ -130,7 +130,7 @@ void QuadrotorGPlugin::simulate(double dt) {
   this->publishVelocity();
 }
 
-void QuadrotorGPlugin::publishPose(void) {
+void QuadrotorGPlugin::publishPose() {
   atl_msgs::msgs::RPYPose msg;
 
   msg.set_x(this->quadrotor.position(0));
@@ -143,7 +143,7 @@ void QuadrotorGPlugin::publishPose(void) {
   this->gaz_pubs[POSE_GTOPIC]->Publish(msg);
 }
 
-void QuadrotorGPlugin::publishVelocity(void) {
+void QuadrotorGPlugin::publishVelocity() {
   gazebo::msgs::Vector3d msg;
 
   msg.set_x(this->quadrotor.linear_velocity(0));

@@ -2,11 +2,11 @@
 
 namespace atl {
 
-MichiganDetector::MichiganDetector(void) {
+MichiganDetector::MichiganDetector() {
   this->detector = NULL;
 }
 
-MichiganDetector::~MichiganDetector(void) {
+MichiganDetector::~MichiganDetector() {
   apriltag_detector_destroy(this->detector);
   tag16h5_destroy(this->family);
 }
@@ -119,8 +119,8 @@ int MichiganDetector::obtainPose(apriltag_detection_t *det,
   // distortion parameters
   cv::Vec4f distParam(0, 0, 0, 0);
 
-  cv::Mat rvec, tvec;
   // recovering the relative transform of a tag:
+  cv::Mat rvec, tvec;
   cv::solvePnP(obj_pts,
                img_pts,
                camera_config.camera_matrix,
@@ -129,7 +129,6 @@ int MichiganDetector::obtainPose(apriltag_detection_t *det,
                tvec,
                false,
                CV_ITERATIVE);
-
   cv::Matx33d r;
   cv::Rodrigues(rvec, r);
 

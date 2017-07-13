@@ -22,9 +22,9 @@ public:
   bool connected;
   ignition::math::Pose3d pose;
 
-  LZGClient(void);
-  ~LZGClient(void);
-  int configure(void);
+  LZGClient();
+  ~LZGClient();
+  int configure();
   virtual void poseCallback(ConstPosePtr &msg);
   void setXYPosition(double x, double y);
   void setVelocity(double vel);

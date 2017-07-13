@@ -15,7 +15,7 @@ class NodeTest : public ::testing::Test {
 protected:
   ros::NodeHandle ros_nh;
 
-  NodeTest(void) {
+  NodeTest() {
     ros::spinOnce();
     ros::Duration(1.0).sleep();
   }

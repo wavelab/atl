@@ -14,7 +14,7 @@ protected:
   WorldGClient client;
   std::string test_world;
 
-  WorldTest(void) {
+  WorldTest() {
     // setup gazebo world
     this->test_world = "atl_gazebo/" + std::string(TEST_WORLD);
 
@@ -25,17 +25,17 @@ protected:
     }
   }
 
-  virtual ~WorldTest(void) {
+  virtual ~WorldTest() {
     this->client.clearWorld();
   }
 
-  virtual void SetUp(void) {
+  virtual void SetUp() {
     this->client.clearWorld();
     this->client.resetWorld();
     this->client.loadWorld(this->test_world);
   }
 
-  virtual void TearDown(void) {
+  virtual void TearDown() {
     this->client.clearWorld();
     this->client.resetWorld();
   }

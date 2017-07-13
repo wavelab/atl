@@ -15,10 +15,10 @@ protected:
   GazeboTest *gazebo_test;
   std::string test_world;
 
-  QuadrotorTest(void) {}
-  virtual ~QuadrotorTest(void) {}
+  QuadrotorTest() {}
+  virtual ~QuadrotorTest() {}
 
-  virtual void SetUp(void) {
+  virtual void SetUp() {
     // setup gazebo world
     this->test_world = std::string(TEST_WORLD_DIR) + std::string(TEST_WORLD);
     this->gazebo_test = new GazeboTest();
@@ -32,7 +32,7 @@ protected:
     }
   }
 
-  virtual void TearDown(void) {
+  virtual void TearDown() {
     this->gazebo_test->teardown();
 
     delete this->client;

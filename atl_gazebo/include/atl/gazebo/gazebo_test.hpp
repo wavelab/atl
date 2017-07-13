@@ -10,7 +10,7 @@ class GazeboTest {
 public:
   WorldGClient world_client;
 
-  GazeboTest(void) {
+  GazeboTest() {
     if (this->world_client.configure() == -1) {
       std::cout << "Failed to connect to Gazebo Server!" << std::endl;
       exit(-1);
@@ -23,7 +23,7 @@ public:
     this->world_client.loadWorld(test_world);
   }
 
-  void teardown(void) {
+  void teardown() {
     this->world_client.clearWorld();
   }
 };

@@ -35,7 +35,7 @@ protected:
   geometry_msgs::Vector3 inertial_msg;
   geometry_msgs::Vector3 body_msg;
 
-  NodeTest(void) {
+  NodeTest() {
     image_transport::ImageTransport it(this->ros_nh);
 
     // clang-format off
@@ -49,7 +49,7 @@ protected:
     ros::Duration(1.0).sleep();
   }
 
-  virtual void SetUp(void) {
+  virtual void SetUp() {
     sensor_msgs::ImageConstPtr msg;
     cv::Mat image;
 

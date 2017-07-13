@@ -28,8 +28,8 @@ public:
   apriltag_detector_t *detector;
   apriltag_family_t *family;
 
-  MichiganDetector(void);
-  ~MichiganDetector(void);
+  MichiganDetector();
+  ~MichiganDetector();
   int configure(std::string config_file);
   int extractTags(cv::Mat &image, std::vector<TagPose> &tags);
   int obtainPose(apriltag_detection_t *det, TagPose &tag_pose);

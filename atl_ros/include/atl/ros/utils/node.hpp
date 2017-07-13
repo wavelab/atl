@@ -55,10 +55,10 @@ public:
 
   image_transport::Publisher img_pub;
   image_transport::Subscriber img_sub;
-  std::function<int(void)> loop_cb;
+  std::function<int()> loop_cb;
 
   ROSNode(int argc, char **argv);
-  ~ROSNode(void);
+  ~ROSNode();
   int configure(const std::string node_name, int hz);
   void shutdownCallback(const std_msgs::Bool &msg);
   int registerShutdown(std::string topic);
@@ -153,8 +153,8 @@ public:
     return 0;
   }
 
-  int registerLoopCallback(std::function<int(void)> cb);
-  int loop(void);
+  int registerLoopCallback(std::function<int()> cb);
+  int loop();
 };
 
 }  // namespace atl

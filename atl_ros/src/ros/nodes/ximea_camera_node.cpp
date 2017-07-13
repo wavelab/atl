@@ -41,7 +41,7 @@ int XimeaCameraNode::configure(std::string node_name, int hz) {
   return 0;
 }
 
-int XimeaCameraNode::publishImage(void) {
+int XimeaCameraNode::publishImage() {
   sensor_msgs::ImageConstPtr img_msg;
 
   // encode position and orientation into image (first 11 pixels in first row)
@@ -102,7 +102,7 @@ void XimeaCameraNode::aprilTagCallback(const atl_msgs::AprilTagPose &msg) {
   convertMsg(msg, this->tag);
 }
 
-int XimeaCameraNode::loopCallback(void) {
+int XimeaCameraNode::loopCallback() {
   double dist;
 
   // change mode depending on apriltag distance

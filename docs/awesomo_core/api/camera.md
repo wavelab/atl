@@ -83,7 +83,7 @@ Obtains a single image frame from the camera, the captured image will be set to
 
 ---
 
-    int run(void)
+    int run()
 
 Run Camera and attempt to detect any Apriltags. The AprilTags detected will be
 recorded in `Camera::apriltags`.

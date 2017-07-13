@@ -20,10 +20,10 @@ public:
   double k_i;
   double k_d;
 
-  PID(void);
+  PID();
   PID(double k_p, double k_i, double k_d);
   double calculate(double setpoint, double input, double dt);
-  void reset(void);
+  void reset();
 };
 
 }  // namespace atl

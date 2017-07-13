@@ -2,7 +2,7 @@
 
 namespace atl {
 
-ExtendedKalmanFilter::ExtendedKalmanFilter(void) {
+ExtendedKalmanFilter::ExtendedKalmanFilter() {
   this->initialized = false;
 }
 

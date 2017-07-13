@@ -47,7 +47,7 @@ protected:
   bool tag_detected;
   geometry_msgs::Vector3 gimbal_msg;
 
-  NodeTest(void) {
+  NodeTest() {
     // clang-format off
     this->pos_if_sub = this->ros_nh.subscribe(POS_IF_TOPIC, 200, &NodeTest::inertialPositionCallback, this);
     this->vel_if_sub = this->ros_nh.subscribe(VEL_IF_TOPIC, 200, &NodeTest::inertialVelocityCallback, this);
@@ -65,7 +65,7 @@ protected:
     ros::Duration(1.0).sleep();
   }
 
-  virtual void SetUp(void) {
+  virtual void SetUp() {
     geometry_msgs::PoseStamped pose_msg;
     geometry_msgs::TwistStamped vel_msg;
     geometry_msgs::Vector3 target_msg;

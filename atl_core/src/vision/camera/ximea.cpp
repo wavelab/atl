@@ -2,11 +2,11 @@
 
 namespace atl {
 
-XimeaCamera::XimeaCamera(void) {
+XimeaCamera::XimeaCamera() {
   this->ximea = NULL;
 }
 
-int XimeaCamera::initialize(void) {
+int XimeaCamera::initialize() {
   int ds_type;
   int ds_rate;
   int img_format;

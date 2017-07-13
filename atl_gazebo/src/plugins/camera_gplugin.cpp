@@ -3,7 +3,7 @@
 namespace atl {
 namespace gaz {
 
-CameraGPlugin::CameraGPlugin(void) {
+CameraGPlugin::CameraGPlugin() {
   printf("LOADING [libcamera_gplugin.so]!\n");
 }
 

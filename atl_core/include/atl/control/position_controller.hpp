@@ -10,6 +10,9 @@
 
 namespace atl {
 
+/**
+ * Position Controller
+ */
 class PositionController {
 public:
   bool configured;
@@ -27,12 +30,12 @@ public:
   Vec4 outputs;
   AttitudeCommand att_cmd;
 
-  PositionController(void);
+  PositionController();
   int configure(std::string config_file);
   Vec4 calculate(Vec3 setpoints, Pose robot_pose, double yaw, double dt);
-  void reset(void);
-  void printOutputs(void);
-  void printErrors(void);
+  void reset();
+  void printOutputs();
+  void printErrors();
 };
 
 }  // namespace atl

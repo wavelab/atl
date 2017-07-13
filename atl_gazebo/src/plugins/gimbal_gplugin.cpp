@@ -3,7 +3,7 @@
 namespace atl {
 namespace gaz {
 
-GimbalGPlugin::GimbalGPlugin(void) {
+GimbalGPlugin::GimbalGPlugin() {
   printf("LOADING [libgimbal_gplugin.so]!\n");
 }
 
@@ -77,7 +77,7 @@ void GimbalGPlugin::onUpdate(const gazebo::common::UpdateInfo &info) {
   this->publishJointOrientation();
 }
 
-void GimbalGPlugin::publishFrameOrientation(void) {
+void GimbalGPlugin::publishFrameOrientation() {
   ignition::math::Quaternion<double> q;
   QUATERNION_MSG msg;
 
@@ -92,7 +92,7 @@ void GimbalGPlugin::publishFrameOrientation(void) {
   this->gaz_pubs[FRAME_ORIENTATION_GTOPIC]->Publish(msg);
 }
 
-void GimbalGPlugin::publishJointOrientation(void) {
+void GimbalGPlugin::publishJointOrientation() {
   Vec3 frame_euler_if, joint_euler_bf, joint_euler_if;
   Quaternion q;
   QUATERNION_MSG msg;

@@ -2,7 +2,7 @@
 
 namespace atl {
 
-ConfigParser::ConfigParser(void) {
+ConfigParser::ConfigParser() {
   this->config_loaded = false;
 }
 

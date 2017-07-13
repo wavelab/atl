@@ -350,7 +350,7 @@ int Quadrotor::stepLandingMode(double dt) {
   return 0;
 }
 
-int Quadrotor::reset(void) {
+int Quadrotor::reset() {
   this->position_controller.reset();
   this->tracking_controller.reset();
   this->landing_controller.reset();

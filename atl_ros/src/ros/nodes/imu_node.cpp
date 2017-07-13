@@ -60,7 +60,7 @@ int IMUNode::publishJointOrientation(Quaternion q) {
   return 0;
 }
 
-int IMUNode::loopCallback(void) {
+int IMUNode::loopCallback() {
   Vec3 euler;
   Quaternion q;
 

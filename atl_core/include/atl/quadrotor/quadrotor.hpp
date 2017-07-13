@@ -111,7 +111,7 @@ public:
   int stepDiscoverMode(double dt);
   int stepTrackingMode(double dt);
   int stepLandingMode(double dt);
-  int reset(void);
+  int reset();
   int step(double dt);
 };
 

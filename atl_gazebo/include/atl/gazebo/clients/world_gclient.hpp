@@ -43,7 +43,7 @@ public:
   bool paused;
   long int iterations;
 
-  GTime(void){};
+  GTime(){};
 };
 
 class WorldGClient : public GazeboNode {
@@ -51,15 +51,15 @@ public:
   bool connected;
   GTime time;
 
-  WorldGClient(void);
-  ~WorldGClient(void);
-  int configure(void);
-  int shutdownServer(void);
-  int pauseWorld(void);
-  int unPauseWorld(void);
-  int resetWorld(void);
+  WorldGClient();
+  ~WorldGClient();
+  int configure();
+  int shutdownServer();
+  int pauseWorld();
+  int unPauseWorld();
+  int resetWorld();
   int loadWorld(std::string file_path);
-  int clearWorld(void);
+  int clearWorld();
   int loadModel(std::string model_name);
   int loadModel(std::string model_name,
                 Eigen::Vector3d pos,

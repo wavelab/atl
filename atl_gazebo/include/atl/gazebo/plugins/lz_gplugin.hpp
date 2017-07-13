@@ -32,10 +32,10 @@ public:
   Vec3 robot_states;
   Vec3 robot_inputs;
 
-  LZGPlugin(void);
+  LZGPlugin();
   void Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf);
   void onUpdate(const gazebo::common::UpdateInfo &info);
-  void publishPose(void);
+  void publishPose();
   void positionCallback(ConstVector3dPtr &msg);
   void velocityCallback(ConstAnyPtr &msg);
   void angularVelocityCallback(ConstAnyPtr &msg);

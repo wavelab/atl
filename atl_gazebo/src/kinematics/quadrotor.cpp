@@ -266,7 +266,7 @@ void QuadrotorModel::setPosition(double x, double y, double z) {
   this->position_setpoints(2) = z;
 }
 
-VecX QuadrotorModel::getPose(void) {
+VecX QuadrotorModel::getPose() {
   VecX pose(6);
 
   // x, y, z
@@ -282,7 +282,7 @@ VecX QuadrotorModel::getPose(void) {
   return pose;
 }
 
-VecX QuadrotorModel::getVelocity(void) {
+VecX QuadrotorModel::getVelocity() {
   VecX velocities(6);
 
   // vx, vy, vz
@@ -298,7 +298,7 @@ VecX QuadrotorModel::getVelocity(void) {
   return velocities;
 }
 
-void QuadrotorModel::printState(void) {
+void QuadrotorModel::printState() {
   printf("x: %f\t", this->position(0));
   printf("y: %f\t", this->position(1));
   printf("z: %f\t\t", this->position(2));

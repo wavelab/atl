@@ -3,19 +3,19 @@
 namespace atl {
 namespace gaz {
 
-GimbalGClient::GimbalGClient(void) {
+GimbalGClient::GimbalGClient() {
   this->connected = false;
   this->frame_orientation = Quaternion();
   this->joint_orientation = Quaternion();
 }
 
-GimbalGClient::~GimbalGClient(void) {
+GimbalGClient::~GimbalGClient() {
   if (this->connected) {
     gazebo::client::shutdown();
   }
 }
 
-int GimbalGClient::configure(void) {
+int GimbalGClient::configure() {
   // pre-check
   this->connected = gazebo::client::setup(0, NULL);
   if (this->connected == false) {

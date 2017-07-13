@@ -33,10 +33,10 @@ public:
   std::deque<Vec2> rel_vel;
   Vec3 p0;
 
-  Trajectory(void);
+  Trajectory();
   int load(int index, std::string filepath, Vec3 pos);
   int update(Vec3 pos, Vec2 &wp_pos, Vec2 &wp_vel, Vec2 &wp_inputs);
-  void reset(void);
+  void reset();
 };
 
 class TrajectoryIndex {
@@ -48,7 +48,7 @@ public:
   double pos_thres;
   double vel_thres;
 
-  TrajectoryIndex(void);
+  TrajectoryIndex();
   int load(std::string index_file,
            double pos_thres = 0.2,
            double vel_thres = 0.2);
@@ -97,12 +97,12 @@ public:
   double blackbox_rate;
   std::ofstream blackbox;
 
-  LandingController(void);
-  ~LandingController(void);
-  int configure(std::string config_file);
+  LandingController();
+  ~LandingController();
+  int configure(const std::string &config_file);
   int loadTrajectory(Vec3 pos, Vec3 target_pos_bf, double v);
-  int prepBlackbox(std::string blackbox_file);
-  int recordTrajectoryIndex(void);
+  int prepBlackbox(const std::string &blackbox_file);
+  int recordTrajectoryIndex();
   int record(Vec3 pos,
              Vec3 vel,
              Vec2 wp_pos,
@@ -124,9 +124,8 @@ public:
                 Quaternion orientation,
                 double yaw,
                 double dt);
-  void reset(void);
-  void printOutputs(void);
-  void printErrors(void);
+  void reset();
+  void printOutputs();
 };
 
 }  // namespace atl

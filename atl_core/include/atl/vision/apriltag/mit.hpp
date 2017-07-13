@@ -26,7 +26,7 @@ class MITDetector : public BaseDetector {
 public:
   AprilTags::TagDetector *detector;
 
-  MITDetector(void);
+  MITDetector();
   int configure(std::string config_file);
   int extractTags(cv::Mat &image, std::vector<TagPose> &tags);
   int obtainPose(AprilTags::TagDetection tag, TagPose &tag_pose);

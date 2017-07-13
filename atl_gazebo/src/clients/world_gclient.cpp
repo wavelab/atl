@@ -3,17 +3,17 @@
 namespace atl {
 namespace gaz {
 
-WorldGClient::WorldGClient(void) {
+WorldGClient::WorldGClient() {
   this->connected = false;
 }
 
-WorldGClient::~WorldGClient(void) {
+WorldGClient::~WorldGClient() {
   if (this->connected) {
     gazebo::client::shutdown();
   }
 }
 
-int WorldGClient::configure(void) {
+int WorldGClient::configure() {
   // pre-check
   if (this->connected) {
     // already connected
@@ -51,7 +51,7 @@ int WorldGClient::configure(void) {
   return 0;
 }
 
-int WorldGClient::shutdownServer(void) {
+int WorldGClient::shutdownServer() {
   gazebo::msgs::ServerControl msg;
 
   // pre-check
@@ -66,7 +66,7 @@ int WorldGClient::shutdownServer(void) {
   return 0;
 }
 
-int WorldGClient::pauseWorld(void) {
+int WorldGClient::pauseWorld() {
   gazebo::msgs::WorldControl msg;
 
   // pre-check
@@ -81,7 +81,7 @@ int WorldGClient::pauseWorld(void) {
   return 0;
 }
 
-int WorldGClient::unPauseWorld(void) {
+int WorldGClient::unPauseWorld() {
   gazebo::msgs::WorldControl msg;
 
   // pre-check
@@ -96,7 +96,7 @@ int WorldGClient::unPauseWorld(void) {
   return 0;
 }
 
-int WorldGClient::resetWorld(void) {
+int WorldGClient::resetWorld() {
   gazebo::msgs::WorldControl msg;
 
   // pre-check
@@ -137,7 +137,7 @@ int WorldGClient::loadWorld(std::string file_path) {
   return 0;
 }
 
-int WorldGClient::clearWorld(void) {
+int WorldGClient::clearWorld() {
   gazebo::msgs::Request msg;
 
   // pre-check

@@ -28,7 +28,7 @@ protected:
   sensor_msgs::Imu joint_if_imu_msg;
   geometry_msgs::Quaternion frame_if_orien_msg;
 
-  NodeTest(void) {
+  NodeTest() {
     // Subscribers
     // clang-format off
     this->joint_if_imu_sub = this->ros_nh.subscribe(FRAME_JOINT_TOPIC, 1, &NodeTest::jointImuCallback, this);
@@ -42,7 +42,7 @@ protected:
     ros::Duration(1.0).sleep();
   }
 
-  virtual void SetUp(void) {
+  virtual void SetUp() {
     geometry_msgs::Vector3 setpoint_msg;
     setpoint_msg.x = 10;
     setpoint_msg.y = 10;

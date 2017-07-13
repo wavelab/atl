@@ -3,7 +3,7 @@
 namespace atl {
 namespace gaz {
 
-WorldGPlugin::WorldGPlugin(void) {
+WorldGPlugin::WorldGPlugin() {
   printf("LOADING [libworld_gplugin.so]!\n");
 }
 

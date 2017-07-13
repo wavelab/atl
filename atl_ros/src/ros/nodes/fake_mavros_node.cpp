@@ -16,7 +16,7 @@ int FakeMavrosNode::configure(std::string node_name, int hz) {
   return 0;
 }
 
-int FakeMavrosNode::publishPose(void) {
+int FakeMavrosNode::publishPose() {
   geometry_msgs::PoseStamped msg;
 
   msg.pose.position.x = 0.0;
@@ -31,7 +31,7 @@ int FakeMavrosNode::publishPose(void) {
   return 0;
 }
 
-int FakeMavrosNode::publishVelocity(void) {
+int FakeMavrosNode::publishVelocity() {
   geometry_msgs::TwistStamped msg;
 
   msg.twist.linear.x = 0.0;
@@ -45,7 +45,7 @@ int FakeMavrosNode::publishVelocity(void) {
   return 0;
 }
 
-int FakeMavrosNode::loopCallback(void) {
+int FakeMavrosNode::loopCallback() {
   this->publishPose();
   this->publishVelocity();
   return 0;

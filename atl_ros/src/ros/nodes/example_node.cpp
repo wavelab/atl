@@ -14,7 +14,7 @@ int ExampleNode::configure(const std::string &node_name, int hz) {
   return 0;
 }
 
-int ExampleNode::loopCallback(void) {
+int ExampleNode::loopCallback() {
   std_msgs::String msg;
   msg.data = "Hello";
   this->ros_pubs[SAY_TOPIC].publish(msg);

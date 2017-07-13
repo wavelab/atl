@@ -14,19 +14,21 @@ namespace atl {
 #define E_CSV_DATA_LOAD "Error! failed to load test data [%s]!!\n"
 #define E_CSV_DATA_OPEN "Error! failed to open file for output [%s]!!\n"
 
+/**
+ * Attitude Command
+ */
 class AttitudeCommand {
 public:
   Quaternion orientation;
   double throttle;
 
-  AttitudeCommand(void);
+  AttitudeCommand() : orientation{1.0, 0.0, 0.0, 0.0}, throttle{0.0} {}
   AttitudeCommand(Vec4 command);
-  void print(void);
+  void print();
 };
 
 /**
- * A generic pose class that stores orientation and position information in a
- * quaternion and vector of size 3.
+ * Pose stores orientation and position information
  */
 class Pose {
 public:
@@ -54,46 +56,15 @@ public:
   void print();
 };
 
-class Velocity {
+/**
+ * Twist stores linear and angular velocity
+ */
+class Twist {
 public:
-  double linear_x;
-  double linear_y;
-  double linear_z;
+  Vec3 linear;
+  Vec3 angular;
 
-  double angular_x;
-  double angular_y;
-  double angular_z;
-
-  Velocity(void) {
-    this->linear_x = 0;
-    this->linear_y = 0;
-    this->linear_z = 0;
-    this->angular_x = 0;
-    this->angular_y = 0;
-    this->angular_z = 0;
-  }
-};
-
-class Attitude {
-public:
-  double x;
-  double y;
-  double z;
-  double w;
-
-  double roll;
-  double pitch;
-  double yaw;
-
-  Attitude(void) {
-    this->x = 0;
-    this->y = 0;
-    this->z = 0;
-    this->w = 0;
-    this->roll = 0;
-    this->pitch = 0;
-    this->yaw = 0;
-  }
+  Twist() : linear{VecX::Zero(3)}, angular{VecX::Zero(3)} {}
 };
 
 class LandingTargetPosition {
@@ -101,7 +72,7 @@ public:
   bool detected;
   Vec3 position;
 
-  LandingTargetPosition(void) {
+  LandingTargetPosition() {
     this->detected = false;
     this->position << 0, 0, 0;
   }

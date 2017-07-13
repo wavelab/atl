@@ -21,9 +21,9 @@ class XimeaCamera : public Camera {
 public:
   HANDLE ximea;
 
-  XimeaCamera(void);
+  XimeaCamera();
 
-  int initialize(void);
+  int initialize();
   int setGain(float gain_db);
   int setExposure(float exposure_time_us);
   int getFrame(cv::Mat &image);

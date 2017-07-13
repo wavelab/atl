@@ -16,12 +16,12 @@ public:
 
   double lost_threshold;
 
-  LandingTarget(void);
-  bool isTargetLosted(void);
+  LandingTarget();
+  bool isTargetLosted();
   void setTargetPosition(Vec3 position);
   void setTargetVelocity(Vec3 velocity);
-  double tracked(void);
-  void reset(void);
+  double tracked();
+  void reset();
   void update(bool detected);
 };
 

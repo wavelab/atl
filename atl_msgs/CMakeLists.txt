@@ -19,12 +19,9 @@ ADD_MESSAGE_FILES(
     AprilTagPose.msg
     LCtrlSettings.msg
     ModelPose.msg
-    PCtrlStats.msg
     PCtrlSettings.msg
     PIDSettings.msg
-    TCtrlStats.msg
     TCtrlSettings.msg
-    VCtrlStats.msg
     VCtrlSettings.msg
 )
 GENERATE_MESSAGES(DEPENDENCIES std_msgs geometry_msgs)

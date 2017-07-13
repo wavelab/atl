@@ -92,17 +92,17 @@ public:
   void targetBodyPosCallback(const geometry_msgs::Vector3 &msg);
   void targetInertialPosCallback(const geometry_msgs::Vector3 &msg);
   void targetInertialYawCallback(const std_msgs::Float64 &msg);
-  void publishLTKFBodyPositionEstimate(void);
-  void publishLTKFBodyVelocityEstimate(void);
-  void publishLTDetected(void);
+  void publishLTKFBodyPositionEstimate();
+  void publishLTKFBodyVelocityEstimate();
+  void publishLTDetected();
   void publishGimbalSetpointAttitudeMsg(Vec3 setpoints);
-  void publishQuadYawMsg(void);
-  void trackTarget(void);
-  void reset(void);
+  void publishQuadYawMsg();
+  void trackTarget();
+  void reset();
   int estimateKF(double dt);
   int estimateEKF(double dt);
-  int estimate(void);
-  int loopCallback(void);
+  int estimate();
+  int loopCallback();
 };
 
 }  // namespace atl

@@ -17,15 +17,15 @@ protected:
   GazeboTest gazebo_test;
   std::string test_world;
 
-  CameraTest(void) {
+  CameraTest() {
     this->test_world = "atl_gazebo/" + std::string(TEST_WORLD);
   }
 
-  virtual ~CameraTest(void) {
+  virtual ~CameraTest() {
     this->gazebo_test.teardown();
   }
 
-  virtual void SetUp(void) {
+  virtual void SetUp() {
     // world client
     if (this->world_client.configure() == -1) {
       std::cout << "Failed to connect to Gazebo Server!" << std::endl;
@@ -42,7 +42,7 @@ protected:
     }
   }
 
-  virtual void TearDown(void) {
+  virtual void TearDown() {
     this->world_client.clearWorld();
     this->world_client.resetWorld();
   }

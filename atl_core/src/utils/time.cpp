@@ -21,7 +21,7 @@ float mtoc(struct timespec *tic) {
   return toc(tic) * 1000.0;
 }
 
-double time_now(void) {
+double time_now() {
   struct timeval t;
   gettimeofday(&t, NULL);
   return ((double) t.tv_sec + ((double) t.tv_usec) / 1000000.0);

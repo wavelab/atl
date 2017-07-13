@@ -3,7 +3,7 @@
 namespace atl {
 namespace gaz {
 
-BoxGPlugin::BoxGPlugin(void) {
+BoxGPlugin::BoxGPlugin() {
   printf("LOADING [libbox_gplugin.so]!\n");
 }
 

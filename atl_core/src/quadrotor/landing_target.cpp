@@ -2,7 +2,7 @@
 
 namespace atl {
 
-LandingTarget::LandingTarget(void) {
+LandingTarget::LandingTarget() {
   this->position_bf << 0.0, 0.0, 0.0;
   this->velocity_bf << 0.0, 0.0, 0.0;
   this->detected = false;
@@ -13,7 +13,7 @@ LandingTarget::LandingTarget(void) {
   this->lost_threshold = 1000.0;
 }
 
-bool LandingTarget::isTargetLosted(void) {
+bool LandingTarget::isTargetLosted() {
   if (mtoc(&this->last_seen) > lost_threshold) {
     this->reset();
     return true;
@@ -30,11 +30,11 @@ void LandingTarget::setTargetVelocity(Vec3 velocity) {
   this->velocity_bf = velocity;
 }
 
-double LandingTarget::tracked(void) {
+double LandingTarget::tracked() {
   return mtoc(&this->first_seen);
 }
 
-void LandingTarget::reset(void) {
+void LandingTarget::reset() {
   this->position_bf << 0.0, 0.0, 0.0;
   this->velocity_bf << 0.0, 0.0, 0.0;
   this->detected = false;

@@ -122,7 +122,7 @@ void Gimbal2AxisModel::trackTarget(Vec3 target_cf) {
   this->target_attitude_if(1) = -asin(target(0) / dist);
 }
 
-Vec4 Gimbal2AxisModel::getState(void) {
+Vec4 Gimbal2AxisModel::getState() {
   Vec4 pose;
 
   pose(0) = this->states(0);
@@ -133,7 +133,7 @@ Vec4 Gimbal2AxisModel::getState(void) {
   return pose;
 }
 
-void Gimbal2AxisModel::printState(void) {
+void Gimbal2AxisModel::printState() {
   std::cout << "roll: ";
   std::cout << std::setprecision(2) << this->states(0) << "\t";
 

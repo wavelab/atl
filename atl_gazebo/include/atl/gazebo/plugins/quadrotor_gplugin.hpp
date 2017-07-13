@@ -36,12 +36,12 @@ public:
   gazebo::physics::LinkPtr body;
   QuadrotorModel quadrotor;
 
-  QuadrotorGPlugin(void);
+  QuadrotorGPlugin();
   void Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf);
   void onUpdate(const gazebo::common::UpdateInfo &info);
   void simulate(double dt);
-  void publishPose(void);
-  void publishVelocity(void);
+  void publishPose();
+  void publishVelocity();
   void setAttitudeCallback(AttitudeSetpointPtr &msg);
   void setPositionCallback(PositionSetpointPtr &msg);
   void setVelocityCallback(VelocitySetpointPtr &msg);

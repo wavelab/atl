@@ -3,7 +3,7 @@
 
 namespace atl {
 
-int PGCameraNode::configure(std::string node_name, int hz) {
+int PGCameraNode::configure(const std::string &node_name, int hz) {
   std::string config_path;
 
   // ros node
@@ -34,9 +34,11 @@ int PGCameraNode::configure(std::string node_name, int hz) {
   this->registerSubscriber(ENCODER_ORIENTATION_TOPIC, &PGCameraNode::gimbalJointBodyCallback, this);
   this->registerSubscriber(LT_BODY_POSITION_TOPIC , &PGCameraNode::targetPositionCallback, this);
   this->registerSubscriber(LT_DETECTED_TOPIC , &PGCameraNode::targetDetectedCallback, this);
+
   // DJI SUBSCRIBER
-  this->registerSubscriber(QUAD_POSITION_TOPIC, &PGCameraNode::quadPositionCallback, this);
-  this->registerSubscriber(QUAD_ORIENTATION_TOPIC, &PGCameraNode::quadOrientationCallback, this);
+  // this->registerSubscriber(QUAD_POSITION_TOPIC, &PGCameraNode::quadPositionCallback, this);
+  // this->registerSubscriber(QUAD_ORIENTATION_TOPIC, &PGCameraNode::quadOrientationCallback, this);
+  this->registerSubscriber(QUAD_POSE_TOPIC, &PGCameraNode::quadPoseCallback, this);
 
   this->registerShutdown(SHUTDOWN_TOPIC);
   // clang-format on
@@ -48,7 +50,7 @@ int PGCameraNode::configure(std::string node_name, int hz) {
   return 0;
 }
 
-int PGCameraNode::publishImage(void) {
+int PGCameraNode::publishImage() {
   sensor_msgs::ImageConstPtr img_msg;
 
   // encode position and orientation into image (first 11 pixels in first row)
@@ -117,34 +119,14 @@ void PGCameraNode::targetDetectedCallback(const std_msgs::Bool &msg) {
   convertMsg(msg, this->target_detected);
 }
 
-void PGCameraNode::quadPositionCallback(const dji_sdk::LocalPosition &msg) {
-  Vec3 pos_ned, pos_enu;
-
-  pos_ned(0) = msg.x;
-  pos_ned(1) = msg.y;
-  pos_ned(2) = msg.z;
-  ned2enu(pos_ned, pos_enu);
-
-  this->quadrotor_position = pos_enu;
+void PGCameraNode::quadPoseCallback(const geometry_msgs::PoseStamped &msg) {
+  Pose pose;
+  convertMsg(msg, pose);
+  this->quadrotor_position = pose.position;
+  this->quadrotor_orientation = pose.orientation;
 }
 
-void PGCameraNode::quadOrientationCallback(
-  const dji_sdk::AttitudeQuaternion &msg) {
-  Quaternion orientation_ned, orientation_nwu;
-
-  orientation_ned.w() = msg.q0;
-  orientation_ned.x() = msg.q1;
-  orientation_ned.y() = msg.q2;
-  orientation_ned.z() = msg.q3;
-
-  // transform pose position and orientation
-  // from NED to ENU and NWU
-  ned2nwu(orientation_ned, orientation_nwu);
-
-  this->quadrotor_orientation = orientation_nwu;
-}
-
-int PGCameraNode::loopCallback(void) {
+int PGCameraNode::loopCallback() {
   double dist;
 
   // change mode depending on apriltag distance

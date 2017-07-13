@@ -64,7 +64,7 @@ public:
   VecX mu_p;
   MatX S_p;
 
-  ExtendedKalmanFilterTracker(void);
+  ExtendedKalmanFilterTracker();
   int configure(std::string config_file);
   int initialize(VecX mu);
   int reset(VecX mu);

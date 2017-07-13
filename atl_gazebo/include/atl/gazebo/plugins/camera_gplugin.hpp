@@ -36,9 +36,9 @@ public:
   int image_depth;
   std::string image_format;
 
-  CameraGPlugin(void);
+  CameraGPlugin();
   void Load(gazebo::sensors::SensorPtr sptr, sdf::ElementPtr sdf);
-  int configure(void);
+  int configure();
   void onNewFrame(const unsigned char *image_raw,
                   const int image_width,
                   const int image_height,

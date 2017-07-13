@@ -46,9 +46,9 @@ public:
   Vec3 position_setpoints;
   Vec3 velocity_setpoints;
 
-  QuadrotorGClient(void);
-  ~QuadrotorGClient(void);
-  int configure(void);
+  QuadrotorGClient();
+  ~QuadrotorGClient();
+  int configure();
   virtual void poseCallback(RPYPosePtr &msg);
   virtual void velocityCallback(ConstVector3dPtr &msg);
   int setAttitude(double r, double p, double y, double t);

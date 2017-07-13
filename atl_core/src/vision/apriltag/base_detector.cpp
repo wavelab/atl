@@ -2,7 +2,7 @@
 
 namespace atl {
 
-BaseDetector::BaseDetector(void) {
+BaseDetector::BaseDetector() {
   this->configured = false;
 
   this->prev_tag = TagPose();

@@ -29,9 +29,9 @@ public:
   Quaternion frame_orientation;
   Quaternion joint_orientation;
 
-  GimbalGClient(void);
-  ~GimbalGClient(void);
-  int configure(void);
+  GimbalGClient();
+  ~GimbalGClient();
+  int configure();
   void setAttitude(Vec3 euler_if);
   void trackTarget(Vec3 target_cf);
   virtual void frameOrientationCallback(ConstQuaternionPtr &msg);

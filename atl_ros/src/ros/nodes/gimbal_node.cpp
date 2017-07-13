@@ -48,7 +48,7 @@ int GimbalNode::configure(std::string node_name, int hz) {
   return 0;
 }
 
-GimbalNode::~GimbalNode(void) {
+GimbalNode::~GimbalNode() {
   this->gimbal.off();
 }
 
@@ -121,7 +121,7 @@ void GimbalNode::trackTargetCallback(const geometry_msgs::Vector3 &msg) {
   this->gimbal.trackTarget(target_cf);
 }
 
-int GimbalNode::loopCallback(void) {
+int GimbalNode::loopCallback() {
   Vec3 euler;
   Quaternion q;
   Vec3 encoder_euler;

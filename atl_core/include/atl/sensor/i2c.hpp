@@ -24,9 +24,9 @@ class I2C {
 public:
   int fd;
 
-  I2C(void);
-  ~I2C(void);
-  int setup(void);
+  I2C();
+  ~I2C();
+  int setup();
   int setSlave(char slave_addr);
   int readBytes(char reg_addr, char *data, size_t length);
   int readByte(char reg_addr, char *data);

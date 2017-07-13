@@ -20,8 +20,8 @@ class POpt {
 public:
   nlopt::opt opt;
 
-  POpt(void);
-  int run(void);
+  POpt();
+  int run();
 };
 
 }  // namespace atl

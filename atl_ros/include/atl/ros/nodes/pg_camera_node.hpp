@@ -6,9 +6,7 @@
 #include <ros/ros.h>
 #include <sensor_msgs/CameraInfo.h>
 
-#include <dji_sdk/dji_drone.h>
-#include <atl/atl_core.hpp>
-
+#include "atl/atl_core.hpp"
 #include "atl/ros/utils/msgs.hpp"
 #include "atl/ros/utils/node.hpp"
 
@@ -31,6 +29,7 @@ namespace atl {
 #define ENCODER_ORIENTATION_TOPIC "atl/gimbal/joint/orientation/body"
 #define LT_BODY_POSITION_TOPIC "/atl/estimate/landing_target/position/body"
 
+#define QUAD_POSE_TOPIC "/atl/quadrotor/pose/local"
 #define QUAD_POSITION_TOPIC "/dji_sdk/local_position"
 #define QUAD_ORIENTATION_TOPIC "/dji_sdk/attitude_quaternion"
 
@@ -63,8 +62,8 @@ public:
     this->target_pos_bf = Vec3();
   }
 
-  int configure(std::string node_name, int hz);
-  int publishImage(void);
+  int configure(const std::string &node_name, int hz);
+  int publishImage();
   void imageCallback(const sensor_msgs::ImageConstPtr &msg);
   void gimbalPositionCallback(const geometry_msgs::Vector3 &msg);
   void gimbalFrameCallback(const geometry_msgs::Quaternion &msg);
@@ -72,11 +71,8 @@ public:
   void gimbalJointBodyCallback(const geometry_msgs::Quaternion &msg);
   void targetPositionCallback(const geometry_msgs::Vector3 &msg);
   void targetDetectedCallback(const std_msgs::Bool &msg);
-
-  void quadPositionCallback(const dji_sdk::LocalPosition &msg);
-  void quadOrientationCallback(const dji_sdk::AttitudeQuaternion &msg);
-
-  int loopCallback(void);
+  void quadPoseCallback(const geometry_msgs::PoseStamped &msg);
+  int loopCallback();
 };
 
 }  // namespace atl

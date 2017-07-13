@@ -71,10 +71,10 @@ public:
   VecX mu_p;
   MatX S_p;
 
-  KalmanFilterTracker(void);
+  KalmanFilterTracker();
   int configure(std::string config_file);
   int initialize(VecX mu);
-  int checkDimensions(void);
+  int checkDimensions();
   int reset(VecX mu);
   int sanityCheck(Vec3 prev_pos, Vec3 curr_pos);
   int estimate(MatX A, VecX y);

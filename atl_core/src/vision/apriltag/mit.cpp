@@ -2,7 +2,7 @@
 
 namespace atl {
 
-MITDetector::MITDetector(void) {
+MITDetector::MITDetector() {
   this->detector = NULL;
 }
 

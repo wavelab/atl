@@ -2,7 +2,7 @@
 
 namespace atl {
 
-SwathmoreDetector::SwathmoreDetector(void) {
+SwathmoreDetector::SwathmoreDetector() {
   this->detector = NULL;
 }
 

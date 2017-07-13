@@ -2,7 +2,7 @@
 
 namespace atl {
 
-Gimbal::Gimbal(void) {
+Gimbal::Gimbal() {
   this->configured = false;
 
   this->sbgc = SBGC();
@@ -21,7 +21,7 @@ Gimbal::Gimbal(void) {
   encoder_angles = Vec3();
 }
 
-Gimbal::~Gimbal(void) {
+Gimbal::~Gimbal() {
   this->off();
 }
 
@@ -69,11 +69,11 @@ int Gimbal::configure(std::string config_file) {
   return 0;
 }
 
-int Gimbal::on(void) {
+int Gimbal::on() {
   return this->sbgc.on();
 }
 
-int Gimbal::off(void) {
+int Gimbal::off() {
   return this->sbgc.off();
 }
 
@@ -184,7 +184,7 @@ int Gimbal::trackTarget(Vec3 target_bpf) {
   return 0;
 }
 
-int Gimbal::updateGimbalStates(void) {
+int Gimbal::updateGimbalStates() {
   int retval;
   const double k_gravity = 9.80665;
 
@@ -240,7 +240,7 @@ int Gimbal::setAngle(double roll, double pitch) {
     this->setpoints(0), this->setpoints(1), this->setpoints(2));
 }
 
-void Gimbal::printSetpoints(void) {
+void Gimbal::printSetpoints() {
   std::cout << "roll setpoint: " << this->setpoints(0) << "\t";
   std::cout << "pitch setpoint: " << this->setpoints(1) << "\t";
   std::cout << "target: [";

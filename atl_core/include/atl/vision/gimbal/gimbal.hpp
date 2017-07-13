@@ -31,11 +31,11 @@ public:
   Vec3 rc_angles;
   Vec3 encoder_angles;
 
-  Gimbal(void);
-  ~Gimbal(void);
+  Gimbal();
+  ~Gimbal();
   int configure(std::string config_path);
-  int on(void);
-  int off(void);
+  int on();
+  int off();
   static Vec3 getTargetInBF(Pose camera_offset, Vec3 target_cf);
   static Vec3 getTargetInBPF(Pose camera_offset,
                              Vec3 target_cf,
@@ -45,9 +45,9 @@ public:
                             Quaternion gimbal_frame_if);
   int getTargetInBPF(Vec3 target_cf, Vec3 &target_bpf);
   int trackTarget(Vec3 target_cf);
-  int updateGimbalStates(void);
+  int updateGimbalStates();
   int setAngle(double roll, double pitch);
-  void printSetpoints(void);
+  void printSetpoints();
 };
 
 }  // namespace atl

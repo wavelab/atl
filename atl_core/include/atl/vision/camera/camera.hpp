@@ -28,14 +28,14 @@ public:
 
   cv::VideoCapture *capture;
 
-  Camera(void);
-  ~Camera(void);
+  Camera();
+  ~Camera();
   virtual int configure(std::string config_path);
-  virtual int initialize(void);
-  virtual int shutdown(void);
+  virtual int initialize();
+  virtual int shutdown();
   virtual int changeMode(std::string mode);
   virtual int getFrame(cv::Mat &image);
-  int run(void);
+  int run();
   int showFPS(double &last_tic, int &frame);
   int showImage(cv::Mat &image);
 };

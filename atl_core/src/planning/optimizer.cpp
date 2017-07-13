@@ -36,9 +36,9 @@ double constraint_func(const std::vector<double> &x,
   return ((a * x[0] + b) * (a * x[0] + b) * (a * x[0] + b) - x[1]);
 }
 
-POpt::POpt(void) {}
+POpt::POpt() {}
 
-int POpt::run(void) {
+int POpt::run() {
   double minf;
   std::vector<double> lb(2);
   std::vector<double> x(2);

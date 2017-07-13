@@ -2,7 +2,7 @@
 
 namespace atl {
 
-VelocityController::VelocityController(void) {
+VelocityController::VelocityController() {
   this->configured = false;
 
   this->dt = 0.0;
@@ -103,13 +103,13 @@ Vec4 VelocityController::calculate(Vec3 setpoints, Vec3 actual, double dt) {
   return outputs;
 }
 
-void VelocityController::reset(void) {
+void VelocityController::reset() {
   this->vx_controller.reset();
   this->vy_controller.reset();
   this->vz_controller.reset();
 }
 
-void VelocityController::printOutputs(void) {
+void VelocityController::printOutputs() {
   double r = rad2deg(this->outputs(0));
   double p = rad2deg(this->outputs(1));
   double t = this->outputs(3);
@@ -119,7 +119,7 @@ void VelocityController::printOutputs(void) {
   std::cout << "throttle: " << std::setprecision(2) << t << std::endl;
 }
 
-void VelocityController::printErrors(void) {
+void VelocityController::printErrors() {
   double p = this->vx_controller.error_p;
   double i = this->vx_controller.error_i;
   double d = this->vx_controller.error_d;

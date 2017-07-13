@@ -3,7 +3,7 @@
 namespace atl {
 namespace gaz {
 
-DFCameraGPlugin::DFCameraGPlugin(void) {
+DFCameraGPlugin::DFCameraGPlugin() {
   printf("LOADING [libdf_camera_gplugin.so]!\n");
 }
 

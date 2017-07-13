@@ -2,7 +2,7 @@
 
 namespace atl {
 
-ExtendedKalmanFilterTracker::ExtendedKalmanFilterTracker(void) {
+ExtendedKalmanFilterTracker::ExtendedKalmanFilterTracker() {
   this->configured = false;
   this->initialized = false;
 

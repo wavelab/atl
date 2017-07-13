@@ -20,7 +20,7 @@ public:
   VecX mu_p;
   MatX S_p;
 
-  ExtendedKalmanFilter(void);
+  ExtendedKalmanFilter();
   int init(VecX mu, MatX R, MatX Q);
   int predictionUpdate(VecX g, MatX G);
   int measurementUpdate(VecX h, MatX H, VecX y);

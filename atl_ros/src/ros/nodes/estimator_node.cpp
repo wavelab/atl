@@ -190,7 +190,7 @@ void EstimatorNode::targetInertialYawCallback(const std_msgs::Float64 &msg) {
   convertMsg(msg, this->target_yaw_wf);
 }
 
-void EstimatorNode::publishLTKFBodyPositionEstimate(void) {
+void EstimatorNode::publishLTKFBodyPositionEstimate() {
   geometry_msgs::Vector3 msg;
   Vec3 est_pos;
 
@@ -219,7 +219,7 @@ void EstimatorNode::publishLTKFBodyPositionEstimate(void) {
   this->ros_pubs[LT_BODY_POSITION_TOPIC].publish(msg);
 }
 
-void EstimatorNode::publishLTKFBodyVelocityEstimate(void) {
+void EstimatorNode::publishLTKFBodyVelocityEstimate() {
   geometry_msgs::Vector3 msg;
   Vec3 est_vel;
 
@@ -249,7 +249,7 @@ void EstimatorNode::publishLTKFBodyVelocityEstimate(void) {
   this->ros_pubs[LT_BODY_VELOCITY_TOPIC].publish(msg);
 }
 
-void EstimatorNode::publishLTDetected(void) {
+void EstimatorNode::publishLTDetected() {
   std_msgs::Bool msg;
   if (this->target_losted) {
     msg.data = false;
@@ -265,7 +265,7 @@ void EstimatorNode::publishGimbalSetpointAttitudeMsg(Vec3 setpoints) {
   this->ros_pubs[GIMBAL_SETPOINT_ATTITUDE_TOPIC].publish(msg);
 }
 
-void EstimatorNode::publishQuadYawMsg(void) {
+void EstimatorNode::publishQuadYawMsg() {
   std_msgs::Float64 msg;
 
   // pre-check
@@ -278,7 +278,7 @@ void EstimatorNode::publishQuadYawMsg(void) {
   this->ros_pubs[QUAD_YAW_TOPIC].publish(msg);
 }
 
-void EstimatorNode::trackTarget(void) {
+void EstimatorNode::trackTarget() {
   double dist;
   Vec3 setpoints;
 
@@ -292,7 +292,7 @@ void EstimatorNode::trackTarget(void) {
   this->publishQuadYawMsg();
 }
 
-void EstimatorNode::reset(void) {
+void EstimatorNode::reset() {
   Vec3 setpoints;
 
   // reset estimator
@@ -379,7 +379,7 @@ int EstimatorNode::estimateEKF(double dt) {
   return 0;
 }
 
-int EstimatorNode::estimate(void) {
+int EstimatorNode::estimate() {
   double dt;
   int retval;
 
@@ -418,7 +418,7 @@ int EstimatorNode::estimate(void) {
   return 0;
 }
 
-int EstimatorNode::loopCallback(void) {
+int EstimatorNode::loopCallback() {
   // pre-check
   if (this->initialized == false) {
     return 0;

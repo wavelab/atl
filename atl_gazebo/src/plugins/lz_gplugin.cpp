@@ -3,7 +3,7 @@
 namespace atl {
 namespace gaz {
 
-LZGPlugin::LZGPlugin(void) {
+LZGPlugin::LZGPlugin() {
   printf("LOADING [liblz_gplugin.so]!\n");
 }
 
@@ -80,7 +80,7 @@ void LZGPlugin::onUpdate(const gazebo::common::UpdateInfo &info) {
   this->publishPose();
 }
 
-void LZGPlugin::publishPose(void) {
+void LZGPlugin::publishPose() {
   ignition::math::Pose3d pose = this->model->WorldPose();
 
   gazebo::msgs::Pose msg;

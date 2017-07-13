@@ -23,7 +23,7 @@ public:
   gazebo::physics::WorldPtr world;
   gazebo::event::ConnectionPtr update_conn;
 
-  WorldGPlugin(void);
+  WorldGPlugin();
   void Load(gazebo::physics::WorldPtr parent, sdf::ElementPtr sdf);
   void onUpdate(const gazebo::common::UpdateInfo &info);
   void modelRemoveCallback(ConstRequestPtr &msg);

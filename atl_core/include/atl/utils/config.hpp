@@ -127,7 +127,7 @@ public:
    *
    * This variable is set to `true` once the yaml file is loaded.
    */
-  ConfigParser(void);
+  ConfigParser();
 
   /** Use the variations of `addParam` to add parameters you would like to
    * parse from the yaml file, where `key` is the yaml key, `out` is

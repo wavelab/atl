@@ -2,7 +2,7 @@
 
 namespace atl {
 
-KalmanFilterTracker::KalmanFilterTracker(void) {
+KalmanFilterTracker::KalmanFilterTracker() {
   this->configured = false;
   this->initialized = false;
 
@@ -79,7 +79,7 @@ int KalmanFilterTracker::initialize(VecX mu) {
   return 0;
 }
 
-int KalmanFilterTracker::checkDimensions(void) {
+int KalmanFilterTracker::checkDimensions() {
   if (this->mu.size() != this->nb_states) {
     LOG_ERROR(EMUSIZE, this->nb_states, (int) this->mu.size());
     LOG_ERROR(ECHECKCONFIG, this->config_file.c_str());

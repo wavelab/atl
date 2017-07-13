@@ -46,7 +46,6 @@ TEST(MITDetector, configure) {
 }
 
 TEST(MITDetector, illuminationInvarientTransform) {
-  int retval;
   cv::Mat image;
   MITDetector detector;
   std::vector<AprilTags::TagDetection> tags;
@@ -65,17 +64,14 @@ TEST(MITDetector, illuminationInvarientTransform) {
 }
 
 TEST(MITDetector, extractTags) {
-  int retval;
-  cv::Mat image;
-  std::vector<TagPose> tags;
-  MITDetector detector;
-
   // setup
+  MITDetector detector;
   detector.configure(TEST_CONFIG);
 
   // CENTER
-  image = cv::imread(TEST_IMAGE_CENTER, CV_LOAD_IMAGE_COLOR);
-  retval = detector.extractTags(image, tags);
+  cv::Mat image = cv::imread(TEST_IMAGE_CENTER, CV_LOAD_IMAGE_COLOR);
+  std::vector<TagPose> tags;
+  int retval = detector.extractTags(image, tags);
   detector.prev_tag.detected = false;
   // tags[0].print();
 
@@ -134,17 +130,14 @@ TEST(MITDetector, changeMode) {
 }
 
 TEST(MITDetector, maskImage) {
-  int retval;
-  MITDetector detector;
-  cv::Mat image, masked;
-  std::vector<TagPose> tags;
-
   // setup
+  MITDetector detector;
   detector.configure(TEST_CONFIG);
 
   // CENTER
-  image = cv::imread(TEST_IMAGE_CENTER, CV_LOAD_IMAGE_COLOR);
-  retval = detector.extractTags(image, tags);
+  cv::Mat image = cv::imread(TEST_IMAGE_CENTER, CV_LOAD_IMAGE_COLOR);
+  std::vector<TagPose> tags;
+  detector.extractTags(image, tags);
   detector.maskImage(tags[0], image);
 
   // cv::imshow("test", image);

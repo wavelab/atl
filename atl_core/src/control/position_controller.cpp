@@ -2,7 +2,7 @@
 
 namespace atl {
 
-PositionController::PositionController(void) {
+PositionController::PositionController() {
   this->configured = false;
 
   this->dt = 0.0;
@@ -103,13 +103,13 @@ Vec4 PositionController::calculate(Vec3 setpoints,
   return outputs;
 }
 
-void PositionController::reset(void) {
+void PositionController::reset() {
   this->x_controller.reset();
   this->y_controller.reset();
   this->z_controller.reset();
 }
 
-void PositionController::printOutputs(void) {
+void PositionController::printOutputs() {
   double r = rad2deg(this->outputs(0));
   double p = rad2deg(this->outputs(1));
   double t = this->outputs(3);
@@ -119,7 +119,7 @@ void PositionController::printOutputs(void) {
   std::cout << "throttle: " << std::setprecision(2) << t << std::endl;
 }
 
-void PositionController::printErrors(void) {
+void PositionController::printErrors() {
   double p = this->x_controller.error_p;
   double i = this->x_controller.error_i;
   double d = this->x_controller.error_d;

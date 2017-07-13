@@ -2,7 +2,7 @@
 
 namespace atl {
 
-PID::PID(void) {
+PID::PID() {
   this->error_prev = 0.0;
   this->error_sum = 0.0;
 
@@ -48,7 +48,7 @@ double PID::calculate(double setpoint, double input, double dt) {
   return output;
 }
 
-void PID::reset(void) {
+void PID::reset() {
   this->error_prev = 0.0;
   this->error_sum = 0.0;
 

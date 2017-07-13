@@ -102,13 +102,13 @@ ADD_EXECUTABLE(atl_imu_node src/ros/nodes/imu_node.cpp)
 TARGET_LINK_LIBRARIES(atl_imu_node ${ATL_ROS_DEPS})
 ADD_DEPENDENCIES(atl_imu_node atl_ros_utils)
 
-# ADD_EXECUTABLE(atl_pg_camera_node src/ros/nodes/pg_camera_node.cpp)
-# TARGET_LINK_LIBRARIES(atl_pg_camera_node ${ATL_ROS_DEPS})
-# ADD_DEPENDENCIES(atl_pg_camera_node atl_ros_utils)
-#
-# ADD_EXECUTABLE(atl_ximea_camera_node src/ros/nodes/ximea_camera_node.cpp)
-# TARGET_LINK_LIBRARIES(atl_ximea_camera_node ${ATL_ROS_DEPS})
-# ADD_DEPENDENCIES(atl_ximea_camera_node atl_ros_utils)
+ADD_EXECUTABLE(atl_pg_camera_node src/ros/nodes/pg_camera_node.cpp)
+TARGET_LINK_LIBRARIES(atl_pg_camera_node ${ATL_ROS_DEPS})
+ADD_DEPENDENCIES(atl_pg_camera_node atl_ros_utils)
+
+ADD_EXECUTABLE(atl_ximea_camera_node src/ros/nodes/ximea_camera_node.cpp)
+TARGET_LINK_LIBRARIES(atl_ximea_camera_node ${ATL_ROS_DEPS})
+ADD_DEPENDENCIES(atl_ximea_camera_node atl_ros_utils)
 
 # ROS UTILS
 ADD_LIBRARY(
@@ -117,8 +117,6 @@ ADD_LIBRARY(
     src/ros/utils/node.cpp
     src/ros/utils/utils.cpp
 )
-# ADD_DEPENDENCIES(atl_ros_utils atl_msgs_gencpp)
-
 
 # TESTS
 # SET(ATL_ROS_TEST_DEPS ${catkin_LIBRARIES} ${GTEST_LIBRARIES})

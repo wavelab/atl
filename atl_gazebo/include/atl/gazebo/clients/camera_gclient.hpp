@@ -23,9 +23,9 @@ public:
   bool connected;
   cv::Mat image;
 
-  CameraGClient(void);
-  ~CameraGClient(void);
-  int configure(void);
+  CameraGClient();
+  ~CameraGClient();
+  int configure();
   virtual void imageCallback(ConstImagePtr &msg);
 };
 

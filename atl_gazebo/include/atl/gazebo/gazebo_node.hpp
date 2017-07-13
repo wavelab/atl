@@ -21,11 +21,11 @@ public:
   std::map<std::string, gazebo::transport::PublisherPtr> gaz_pubs;
   std::map<std::string, gazebo::transport::SubscriberPtr> gaz_subs;
 
-  GazeboNode(void) {
+  GazeboNode() {
     this->configured = false;
   }
 
-  int configure(void) {
+  int configure() {
     // setup gazebo node
     // clang-format off
     this->gaz_node = gazebo::transport::NodePtr(new gazebo::transport::Node());
@@ -66,7 +66,7 @@ public:
     return 0;
   }
 
-  int waitForConnection(void) {
+  int waitForConnection() {
     gazebo::transport::PublisherPtr pub;
     std::map<std::string, gazebo::transport::PublisherPtr>::iterator it;
 

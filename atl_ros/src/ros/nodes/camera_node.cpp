@@ -37,7 +37,7 @@ int CameraNode::configure(const std::string &node_name, int hz) {
   return 0;
 }
 
-int CameraNode::publishImage(void) {
+int CameraNode::publishImage() {
   sensor_msgs::ImageConstPtr img_msg;
 
   // encode position and orientation into image (first 11 pixels in first row)
@@ -85,7 +85,7 @@ void CameraNode::aprilTagCallback(const atl_msgs::AprilTagPose &msg) {
   convertMsg(msg, this->tag);
 }
 
-int CameraNode::loopCallback(void) {
+int CameraNode::loopCallback() {
   double dist;
 
   // change mode depending on apriltag distance

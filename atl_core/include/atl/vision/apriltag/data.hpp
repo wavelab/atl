@@ -12,7 +12,7 @@ public:
   Vec3 position;
   Quaternion orientation;
 
-  TagPose(void) {
+  TagPose() {
     this->id = -1;
     this->detected = false;
     this->position << 0.0, 0.0, 0.0;
@@ -33,7 +33,7 @@ public:
     this->orientation = Quaternion(rotmat);
   }
 
-  void print(void) {
+  void print() {
     std::cout << "tag ";
     std::cout << "id: " << this->id << "\t";
     std::cout << "detected: " << this->detected << "\t";

@@ -3,7 +3,7 @@
 namespace atl {
 
 // TRAJECTORY
-Trajectory::Trajectory(void) {
+Trajectory::Trajectory() {
   this->loaded = false;
   this->index = -1;
   this->pos.clear();
@@ -130,7 +130,7 @@ int Trajectory::update(Vec3 pos,
   return 0;
 }
 
-void Trajectory::reset(void) {
+void Trajectory::reset() {
   this->loaded = false;
   this->pos.clear();
   this->vel.clear();
@@ -141,7 +141,7 @@ void Trajectory::reset(void) {
 }
 
 // TRAJECTORY INDEX
-TrajectoryIndex::TrajectoryIndex(void) {
+TrajectoryIndex::TrajectoryIndex() {
   this->loaded = false;
 
   this->traj_dir = "";
@@ -221,7 +221,7 @@ int TrajectoryIndex::find(Vec3 pos, double v, Trajectory &traj) {
 }
 
 // LANDING CONTROLLER
-LandingController::LandingController(void) {
+LandingController::LandingController() {
   this->configured = false;
 
   this->dt = 0.0;
@@ -265,13 +265,13 @@ LandingController::LandingController(void) {
   // this->blackbox;
 }
 
-LandingController::~LandingController(void) {
+LandingController::~LandingController() {
   if (this->blackbox_enable && this->blackbox) {
     this->blackbox.close();
   }
 }
 
-int LandingController::configure(std::string config_file) {
+int LandingController::configure(const std::string &config_file) {
   ConfigParser parser;
   std::string config_dir;
   std::string traj_index_file;
@@ -372,7 +372,7 @@ int LandingController::loadTrajectory(Vec3 pos,
   return 0;
 }
 
-int LandingController::prepBlackbox(std::string blackbox_file) {
+int LandingController::prepBlackbox(const std::string &blackbox_file) {
   // setup
   this->blackbox.open(blackbox_file);
   if (!this->blackbox) {
@@ -380,51 +380,36 @@ int LandingController::prepBlackbox(std::string blackbox_file) {
   }
 
   // write header
-  this->blackbox << "dt"
-                 << ",";
-  this->blackbox << "x"
-                 << ",";
-  this->blackbox << "y"
-                 << ",";
-  this->blackbox << "z"
-                 << ",";
-  this->blackbox << "vx"
-                 << ",";
-  this->blackbox << "vy"
-                 << ",";
-  this->blackbox << "vz"
-                 << ",";
-  this->blackbox << "wp_pos_x"
-                 << ",";
-  this->blackbox << "wp_pos_z"
-                 << ",";
-  this->blackbox << "wp_vel_x"
-                 << ",";
-  this->blackbox << "wp_vel_z"
-                 << ",";
-  this->blackbox << "target_x_bf"
-                 << ",";
-  this->blackbox << "target_y_bf"
-                 << ",";
-  this->blackbox << "target_z_bf"
-                 << ",";
-  this->blackbox << "target_vx_bf"
-                 << ",";
-  this->blackbox << "target_vy_bf"
-                 << ",";
-  this->blackbox << "target_vz_bf"
-                 << ",";
+  // clang-format off
+  this->blackbox << "dt" << ",";
+  this->blackbox << "x" << ",";
+  this->blackbox << "y" << ",";
+  this->blackbox << "z" << ",";
+  this->blackbox << "vx" << ",";
+  this->blackbox << "vy" << ",";
+  this->blackbox << "vz" << ",";
+  this->blackbox << "wp_pos_x" << ",";
+  this->blackbox << "wp_pos_z" << ",";
+  this->blackbox << "wp_vel_x" << ",";
+  this->blackbox << "wp_vel_z" << ",";
+  this->blackbox << "target_x_bf" << ",";
+  this->blackbox << "target_y_bf" << ",";
+  this->blackbox << "target_z_bf" << ",";
+  this->blackbox << "target_vx_bf" << ",";
+  this->blackbox << "target_vy_bf" << ",";
+  this->blackbox << "target_vz_bf" << ",";
   this->blackbox << "roll";
   this->blackbox << "pitch";
   this->blackbox << "yaw";
   this->blackbox << std::endl;
+  // clang-format on
 
   return 0;
 }
 
-int LandingController::recordTrajectoryIndex(void) {
-  this->blackbox << "trajectory index: " << this->trajectory.index
-                 << std::endl;
+int LandingController::recordTrajectoryIndex() {
+  this->blackbox << "trajectory index: " << this->trajectory.index;
+  this->blackbox << std::endl;
   return 0;
 }
 
@@ -600,13 +585,13 @@ int LandingController::calculate(Vec3 target_pos_bf,
   return retval;
 }
 
-void LandingController::reset(void) {
+void LandingController::reset() {
   // this->vx_controller.reset();
   // this->vy_controller.reset();
   // this->vz_controller.reset();
 }
 
-void LandingController::printOutputs(void) {
+void LandingController::printOutputs() {
   double r, p, t;
 
   r = rad2deg(this->outputs(0));
@@ -617,34 +602,5 @@ void LandingController::printOutputs(void) {
   std::cout << "pitch: " << std::setprecision(2) << p << "\t";
   std::cout << "throttle: " << std::setprecision(2) << t << std::endl;
 }
-
-// void LandingController::printErrors(void) {
-//   double p = this->vx_controller.error_p;
-//   double i = this->vx_controller.error_i;
-//   double d = this->vx_controller.error_d;
-//
-//   std::cout << "vx_controller: " << std::endl;
-//   std::cout << "\terror_p: " << std::setprecision(2) << p << "\t";
-//   std::cout << "\terror_i: " << std::setprecision(2) << i << "\t";
-//   std::cout << "\terror_d: " << std::setprecision(2) << d << std::endl;
-//
-//   p = this->vy_controller.error_p;
-//   i = this->vy_controller.error_i;
-//   d = this->vy_controller.error_d;
-//
-//   std::cout << "vy_controller: " << std::endl;
-//   std::cout << "\terror_p: " << std::setprecision(2) << p << "\t";
-//   std::cout << "\terror_i: " << std::setprecision(2) << i << "\t";
-//   std::cout << "\terror_d: " << std::setprecision(2) << d << std::endl;
-//
-//   p = this->vz_controller.error_p;
-//   i = this->vz_controller.error_i;
-//   d = this->vz_controller.error_d;
-//
-//   std::cout << "vz_controller: " << std::endl;
-//   std::cout << "\terror_p: " << std::setprecision(2) << p << "\t";
-//   std::cout << "\terror_i: " << std::setprecision(2) << i << "\t";
-//   std::cout << "\terror_d: " << std::setprecision(2) << d << std::endl;
-// }
 
 }  // namespace atl

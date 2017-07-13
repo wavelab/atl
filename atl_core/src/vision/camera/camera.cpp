@@ -2,7 +2,7 @@
 
 namespace atl {
 
-Camera::Camera(void) {
+Camera::Camera() {
   this->configured = false;
   this->initialized = false;
 
@@ -16,7 +16,7 @@ Camera::Camera(void) {
   this->capture = NULL;
 }
 
-Camera::~Camera(void) {
+Camera::~Camera() {
   if (this->initialized && this->capture) {
     this->capture->release();
     this->capture = NULL;
@@ -57,7 +57,7 @@ int Camera::configure(std::string config_path) {
   return 0;
 }
 
-int Camera::initialize(void) {
+int Camera::initialize() {
   int camera_index;
   int image_width;
   int image_height;
@@ -89,7 +89,7 @@ int Camera::initialize(void) {
   return 0;
 }
 
-int Camera::shutdown(void) {
+int Camera::shutdown() {
   if (this->initialized && this->capture) {
     this->capture->release();
     this->capture = NULL;
@@ -127,7 +127,7 @@ int Camera::getFrame(cv::Mat &image) {
   return 0;
 }
 
-int Camera::run(void) {
+int Camera::run() {
   // pre-check
   if (this->configured == false) {
     return -1;

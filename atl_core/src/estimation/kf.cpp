@@ -2,7 +2,7 @@
 
 namespace atl {
 
-KalmanFilter::KalmanFilter(void) {
+KalmanFilter::KalmanFilter() {
   this->initialized = false;
 
   this->B = MatX::Zero(1, 1);

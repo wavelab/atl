@@ -34,9 +34,9 @@ public:
   bool snapshot;
   bool showfps;
 
-  CameraConfig(void);
+  CameraConfig();
   int load(const std::string &config_file);
-  void print(void);
+  void print();
 };
 
 }  // namespace atl

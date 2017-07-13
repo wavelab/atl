@@ -40,7 +40,7 @@ public:
   Vec3 set_points;
 
   GimbalNode(int argc, char **argv) : ROSNode(argc, argv) {}
-  ~GimbalNode(void);
+  ~GimbalNode();
   int configure(std::string node_name, int hz);
   int publishIMU(Vec3 euler);
   int publishRawEncoder(Vec3 encoder_euler);
@@ -51,7 +51,7 @@ public:
   void quadPoseCallback(const geometry_msgs::PoseStamped &msg);
   void setAttitudeCallback(const geometry_msgs::Vector3 &msg);
   void trackTargetCallback(const geometry_msgs::Vector3 &msg);
-  int loopCallback(void);
+  int loopCallback();
 };
 
 }  // namespace atl

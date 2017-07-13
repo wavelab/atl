@@ -2,7 +2,7 @@
 
 namespace atl {
 
-CameraConfig::CameraConfig(void) {
+CameraConfig::CameraConfig() {
   this->loaded = false;
 
   this->index = 0;
@@ -59,7 +59,7 @@ int CameraConfig::load(const std::string &config_file) {
   return 0;
 }
 
-void CameraConfig::print(void) {
+void CameraConfig::print() {
   // clang-format off
   std::cout << "index: " << this->index << std::endl;
   std::cout << "image_width: " << this->image_width << std::endl;

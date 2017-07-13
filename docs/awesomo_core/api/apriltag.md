@@ -24,7 +24,7 @@
 
 #### Constructors
 
-    TagDetector(void)
+    TagDetector()
     TagDetector(int apriltag_imshow)
 
 
