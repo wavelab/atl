@@ -13,7 +13,6 @@ install_dependencies()
     sudo apt-get install -q -y \
         subversion \
         cmake \
-        libopencv-dev \
         libeigen3-dev \
         libv4l-dev
 }

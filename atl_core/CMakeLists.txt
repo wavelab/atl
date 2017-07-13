@@ -8,9 +8,8 @@ ENDIF()
 
 # CATKIN
 FIND_PACKAGE(catkin)
-FIND_PACKAGE(OpenCV REQUIRED)
+FIND_PACKAGE(OpenCV 3.0 REQUIRED)
 FIND_PACKAGE(CGAL)
-CATKIN_PACKAGE(INCLUDE_DIRS include LIBRARIES ${PROJECT_NAME})
 
 # INCLUDES
 INCLUDE_DIRECTORIES(
@@ -18,12 +17,17 @@ INCLUDE_DIRECTORIES(
     ${OpenCV_INCLUDE_DIRS}
     ${Boost_INCLUDE_DIR}
     include
-    /usr/include
-    /usr/local/include
     /usr/include/eigen3
     /usr/include/flycapture/
     # /usr/include/m3api/
 )
+
+# LIBS
+LINK_DIRECTORIES(${OpenCV_LIBRARY_DIRS})
+LINK_DIRECTORIES(${catkin_LIBRARY_DIRS})
+
+
+CATKIN_PACKAGE(INCLUDE_DIRS include LIBRARIES ${PROJECT_NAME})
 
 # LIBRARY
 ADD_LIBRARY(
@@ -72,7 +76,6 @@ ADD_LIBRARY(
     src/vision/gimbal/sbgc.cpp
 )
 SET(DEPS
-    ${PROJECT_NAME}
     ${catkin_LIBRARIES}
     ${OpenCV_LIBS}
     m3api
@@ -86,6 +89,7 @@ SET(DEPS
     gtest
     pthread
 )
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${DEPS})
 
 # UNIT TESTS
 ADD_EXECUTABLE(
@@ -129,7 +133,7 @@ ADD_EXECUTABLE(
     # TEST RUNNER
     tests/test_runner.cpp
 )
-TARGET_LINK_LIBRARIES(atl_tests ${DEPS})
+TARGET_LINK_LIBRARIES(atl_tests ${PROJECT_NAME} ${DEPS})
 
 # INSTALL
 INSTALL(

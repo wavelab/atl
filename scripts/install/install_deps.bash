@@ -34,16 +34,16 @@ fi
 sudo bash $SCRIPT_PATH/apriltags_michigan_install.bash
 sudo bash $SCRIPT_PATH/apriltags_swathmore_install.bash
 sudo bash $SCRIPT_PATH/apriltags_mit_install.bash
-sudo bash $SCRIPT_PATH/ximea_install.bash
-sudo bash $SCRIPT_PATH/pointgrey_install.bash
-sudo bash $SCRIPT_PATH/dji_sdk_install.bash
-
-# link repo to catkin workspace
-if [ ! -d $CATKIN_PATH/src/atl ]; then
-     ln -sfn $REPO_PATH $CATKIN_PATH/src/atl
-fi
-
-# compile
-cd $CATKIN_PATH
-source /opt/ros/$ROS_VERSION/setup.bash
-catkin build
+# sudo bash $SCRIPT_PATH/ximea_install.bash
+# sudo bash $SCRIPT_PATH/pointgrey_install.bash
+# sudo bash $SCRIPT_PATH/dji_sdk_install.bash
+#
+# # link repo to catkin workspace
+# if [ ! -d $CATKIN_PATH/src/atl ]; then
+#      ln -sfn $REPO_PATH $CATKIN_PATH/src/atl
+# fi
+#
+# # compile
+# cd $CATKIN_PATH
+# source /opt/ros/$ROS_VERSION/setup.bash
+# catkin build

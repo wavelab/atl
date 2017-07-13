@@ -33,9 +33,6 @@ INCLUDE_DIRECTORIES(${GAZEBO_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}/msgs)
 
 # LIBS
-LINK_DIRECTORIES(/usr/lib)
-LINK_DIRECTORIES(/usr/local/lib)
-LINK_DIRECTORIES(${CATKIN_DEVEL_PREFIX}/lib})
 LINK_DIRECTORIES(${catkin_LIBRARY_DIRS})
 LINK_DIRECTORIES(${GAZEBO_LIBRARY_DIRS})
 LINK_DIRECTORIES(${OpenCV_LIBRARY_DIRS})
@@ -100,9 +97,9 @@ ADD_DEPENDENCIES(atl_bridge_camera_node atl_gazebo_clients)
 # TARGET_LINK_LIBRARIES(atl_bridge_df_camera_node ${ATL_GAZEBO_DEPS})
 # ADD_DEPENDENCIES(atl_bridge_df_camera_node atl_gazebo_clients)
 
-ADD_EXECUTABLE(atl_bridge_dji_quadrotor_node src/bridge/dji_quadrotor_node.cpp)
-TARGET_LINK_LIBRARIES(atl_bridge_dji_quadrotor_node ${ATL_GAZEBO_DEPS})
-ADD_DEPENDENCIES(atl_bridge_dji_quadrotor_node atl_gazebo_clients)
+# ADD_EXECUTABLE(atl_bridge_dji_quadrotor_node src/bridge/dji_quadrotor_node.cpp)
+# TARGET_LINK_LIBRARIES(atl_bridge_dji_quadrotor_node ${ATL_GAZEBO_DEPS})
+# ADD_DEPENDENCIES(atl_bridge_dji_quadrotor_node atl_gazebo_clients)
 
 # ADD_EXECUTABLE(atl_bridge_gimbal_node src/bridge/gimbal_node.cpp)
 # TARGET_LINK_LIBRARIES(atl_bridge_gimbal_node ${ATL_GAZEBO_DEPS})
