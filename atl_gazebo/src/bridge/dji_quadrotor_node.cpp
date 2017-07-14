@@ -34,12 +34,12 @@ void DJIQuadrotorNode::poseCallback(ConstPosePtr &msg) {
   // gazebo pose callback
   QuadrotorGClient::poseCallback(msg);
 
-  // convert quaternion from NWU to ENU
+  // convert quaternion from NWU to NED
   Quaternion ros_quat;
   ros_quat.w() = this->orientation.w();
-  ros_quat.x() = this->orientation.y();
-  ros_quat.y() = -this->orientation.x();
-  ros_quat.z() = this->orientation.z();
+  ros_quat.x() = this->orientation.x();
+  ros_quat.y() = -this->orientation.y();
+  ros_quat.z() = -this->orientation.z();
 
   // convert NWU position to GPS lat lon coordinates
   double lat = 0.0;

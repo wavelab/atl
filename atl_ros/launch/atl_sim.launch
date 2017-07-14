@@ -26,22 +26,22 @@
   </include>
 
   <node pkg="atl_gazebo" name="atl_quadrotor" type="atl_bridge_dji_quadrotor_node" output="screen" required="true" />
-  <!-- <node pkg="atl_gazebo" name="atl_lz" type="atl_bridge_lz_node" output="screen" required="true"> -->
-  <!--   <remap from="/atl/lz/pose" to="/atl/lz/pose" /> -->
-  <!--   <remap from="/atl/lz/position/set" to="/atl/lz/position/set" /> -->
-  <!--   <remap from="/atl/lz/velocity/set" to="/atl/lz/velocity/set" /> -->
-  <!--   <remap from="/atl/lz/angular_velocity/set" to="/atl/lz/angular_velocity/set" /> -->
-  <!-- </node> -->
-  <!-- <node pkg="atl_gazebo" name="atl_camera" type="atl_bridge_camera_node" output="screen" required="true"> -->
-  <!--   <remap from="/atl/camera/image" to="/atl/camera/image" /> -->
-  <!-- </node> -->
-  <!-- <node pkg="atl_gazebo" name="atl_gimbal" type="atl_bridge_gimbal_node" output="screen" required="true" > -->
-  <!--   <remap from="/atl/gimbal/position/inertial" to="/atl/gimbal/position/inertial" /> -->
-  <!--   <remap from="/atl/gimbal/frame/orientation/inertial" to="/atl/gimbal/frame/orientation/inertial" /> -->
-  <!--   <remap from="/atl/gimbal/joint/orientation/inertial" to="/atl/gimbal/joint/orientation/inertial" /> -->
-  <!--   <remap from="/atl/gimbal/setpoint/attitude" to="/atl/gimbal/setpoint/attitude" /> -->
-  <!--   <remap from="/atl/gimbal/target/track" to="/atl/gimbal/target/track" /> -->
-  <!-- </node> -->
+  <node pkg="atl_gazebo" name="atl_lz" type="atl_bridge_lz_node" output="screen" required="true">
+    <remap from="/atl/lz/pose" to="/atl/lz/pose" />
+    <remap from="/atl/lz/position/set" to="/atl/lz/position/set" />
+    <remap from="/atl/lz/velocity/set" to="/atl/lz/velocity/set" />
+    <remap from="/atl/lz/angular_velocity/set" to="/atl/lz/angular_velocity/set" />
+  </node>
+  <node pkg="atl_gazebo" name="atl_camera" type="atl_bridge_camera_node" output="screen" required="true">
+    <remap from="/atl/camera/image" to="/atl/camera/image" />
+  </node>
+  <node pkg="atl_gazebo" name="atl_gimbal" type="atl_bridge_gimbal_node" output="screen" required="true" >
+    <remap from="/atl/gimbal/position/inertial" to="/atl/gimbal/position/inertial" />
+    <remap from="/atl/gimbal/frame/orientation/inertial" to="/atl/gimbal/frame/orientation/inertial" />
+    <remap from="/atl/gimbal/joint/orientation/inertial" to="/atl/gimbal/joint/orientation/inertial" />
+    <remap from="/atl/gimbal/setpoint/attitude" to="/atl/gimbal/setpoint/attitude" />
+    <remap from="/atl/gimbal/target/track" to="/atl/gimbal/target/track" />
+  </node>
 
   <!-- control node -->
   <param name="/control/config_dir" value="$(find atl_configs)/configs/quadrotor_gazebosim" />

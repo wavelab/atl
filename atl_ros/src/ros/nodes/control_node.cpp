@@ -319,7 +319,7 @@ void ControlNode::djiGPSPositionCallback(const sensor_msgs::NavSatFix &msg) {
   if (this->home_set == false) {
     this->home_lat = msg.latitude;
     this->home_lon = msg.longitude;
-    this->home_alt = msg.altitude;
+    this->home_alt = msg.altitude - 4.0;
     this->home_set = true;
   }
 
@@ -476,10 +476,10 @@ void ControlNode::publishAttitudeSetpoint() {
 
   } else if (this->fcu_type == "DJI") {
     // transform orientation from NWU to NED
-    // nwu2ned(att_cmd.orientation, q_ned);
-    // quat2euler(q_ned, 321, euler);
     Vec3 euler;
-    quat2euler(att_cmd.orientation, 321, euler);
+    Quaternion q_ned;
+    nwu2ned(att_cmd.orientation, q_ned);
+    quat2euler(q_ned, 321, euler);
 
     //  DJI Control Flag Byte
     //
@@ -512,9 +512,9 @@ void ControlNode::publishAttitudeSetpoint() {
     sensor_msgs::Joy msg;
     msg.axes.push_back(rad2deg(euler(0)));       // roll (deg)
     msg.axes.push_back(rad2deg(euler(1)));       // pitch (deg)
-    msg.axes.push_back(att_cmd.throttle * 100);  // t)hrottle (0 - 100)
+    msg.axes.push_back(att_cmd.throttle * 100);  // throttle (0 - 100)
     msg.axes.push_back(rad2deg(euler(2)));       // yaw (deg)
-    msg.axes.push_back(0x20);                    // control flag (see above comment)
+    msg.axes.push_back(0x20);  // control flag (see above comment)
     this->ros_pubs[DJI_SETPOINT_TOPIC].publish(msg);
 
   } else {
