@@ -36,19 +36,14 @@ void LZGPlugin::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
 }
 
 void LZGPlugin::onUpdate(const gazebo::common::UpdateInfo &info) {
-  gazebo::common::Time diff;
-  double dt;
-  Vec3 x, u, euler;
-  Quaternion q;
-
   // calculate time step size
-  diff = info.simTime - this->prev_sim_time;
-  dt = diff.nsec / 1000000000.0;       // convert nsec to sec
-  this->prev_sim_time = info.simTime;  // keep track of sim time
+  gazebo::common::Time diff = info.simTime - this->prev_sim_time;
+  double dt = diff.nsec / 1000000000.0;  // convert nsec to sec
+  this->prev_sim_time = info.simTime;    // keep track of sim time
 
   // update robot
-  x = this->robot_states;
-  u = this->robot_inputs;
+  Vec3 x = this->robot_states;
+  Vec3 u = this->robot_inputs;
   x(0) = x(0) + u(0) * cos(x(2)) * dt;
   x(1) = x(1) + u(0) * sin(x(2)) * dt;
   x(2) = x(2) + u(1) * dt;
@@ -69,10 +64,11 @@ void LZGPlugin::onUpdate(const gazebo::common::UpdateInfo &info) {
   pose.Pos().Y() = this->robot_states(1);
 
   // make yaw be between +/- 180.0
-  euler << 0.0, 0.0, this->robot_states(2);
+  Vec3 euler{0.0, 0.0, this->robot_states(2)};
   euler(2) = fmod(euler(2) + deg2rad(180.0), deg2rad(360.0)) - deg2rad(180.0);
 
   // convert to quaternion
+  Quaternion q;
   euler2quat(euler, 321, q);
   pose.Rot().Z() = q.z();
 

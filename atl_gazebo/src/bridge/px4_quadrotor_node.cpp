@@ -26,7 +26,7 @@ int PX4QuadrotorNode::configure(const std::string &node_name, int hz) {
   return 0;
 }
 
-void PX4QuadrotorNode::poseGazeboCallback(const RPYPosePtr &msg) {
+void PX4QuadrotorNode::poseCallback(const RPYPosePtr &msg) {
   geometry_msgs::PoseStamped pose_msg;
   Vec3 euler;
   Vec3 gaz_pos, ros_pos, pos;

@@ -105,7 +105,7 @@ if __name__ == "__main__":
     # quad.set_hover_point([1.0, 0.0, 5.0])
 
     # quad.set_mode("HOVER")
-    # quad.set_hover_point([0.0, 0.0, 5.0])
+    quad.set_hover_point([1.0, 1.0, 5.0])
     # quad.set_yaw(-20)
 
     # square(quad, 3, 1)

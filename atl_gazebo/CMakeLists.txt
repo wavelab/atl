@@ -17,6 +17,7 @@ FIND_PACKAGE(catkin
                rospy
                std_msgs
                geometry_msgs
+               sensor_msgs
                message_runtime
                image_transport
                cv_bridge
@@ -47,12 +48,19 @@ CATKIN_PACKAGE(INCLUDE_DIRS include
                  rospy
                  std_msgs
                  geometry_msgs
+                 sensor_msgs
                  message_runtime
                  image_transport
                  cv_bridge
                  atl_core
                  atl_ros
                  atl_msgs)
+
+
+# MODELS AND WORLDS
+FILE(COPY models DESTINATION $ENV{HOME}/.gazebo)
+FILE(COPY worlds DESTINATION $ENV{HOME}/.gazebo)
+
 
 # MSGS
 SET(PROTOBUF_IMPORT_DIRS)
@@ -68,7 +76,7 @@ SET(GAZEBO_MSGS
 		msgs/rpy_pose.proto
 		msgs/velocity_setpoint.proto)
 PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${GAZEBO_MSGS})
-ADD_LIBRARY(atl_gazebo_msgs STATIC ${PROTO_SRCS})
+ADD_LIBRARY(atl_gazebo_msgs SHARED ${PROTO_SRCS})
 TARGET_LINK_LIBRARIES(atl_gazebo_msgs ${PROTOBUF_LIBRARY})
 
 
@@ -93,17 +101,17 @@ ADD_EXECUTABLE(atl_bridge_camera_node src/bridge/camera_node.cpp)
 TARGET_LINK_LIBRARIES(atl_bridge_camera_node ${ATL_GAZEBO_DEPS})
 ADD_DEPENDENCIES(atl_bridge_camera_node atl_gazebo_clients)
 
-# ADD_EXECUTABLE(atl_bridge_df_camera_node src/bridge/df_camera_node.cpp)
-# TARGET_LINK_LIBRARIES(atl_bridge_df_camera_node ${ATL_GAZEBO_DEPS})
-# ADD_DEPENDENCIES(atl_bridge_df_camera_node atl_gazebo_clients)
+ADD_EXECUTABLE(atl_bridge_df_camera_node src/bridge/df_camera_node.cpp)
+TARGET_LINK_LIBRARIES(atl_bridge_df_camera_node ${ATL_GAZEBO_DEPS})
+ADD_DEPENDENCIES(atl_bridge_df_camera_node atl_gazebo_clients)
 
-# ADD_EXECUTABLE(atl_bridge_dji_quadrotor_node src/bridge/dji_quadrotor_node.cpp)
-# TARGET_LINK_LIBRARIES(atl_bridge_dji_quadrotor_node ${ATL_GAZEBO_DEPS})
-# ADD_DEPENDENCIES(atl_bridge_dji_quadrotor_node atl_gazebo_clients)
+ADD_EXECUTABLE(atl_bridge_dji_quadrotor_node src/bridge/dji_quadrotor_node.cpp)
+TARGET_LINK_LIBRARIES(atl_bridge_dji_quadrotor_node ${ATL_GAZEBO_DEPS})
+ADD_DEPENDENCIES(atl_bridge_dji_quadrotor_node atl_gazebo_clients)
 
-# ADD_EXECUTABLE(atl_bridge_gimbal_node src/bridge/gimbal_node.cpp)
-# TARGET_LINK_LIBRARIES(atl_bridge_gimbal_node ${ATL_GAZEBO_DEPS})
-# ADD_DEPENDENCIES(atl_bridge_gimbal_node atl_gazebo_clients)
+ADD_EXECUTABLE(atl_bridge_gimbal_node src/bridge/gimbal_node.cpp)
+TARGET_LINK_LIBRARIES(atl_bridge_gimbal_node ${ATL_GAZEBO_DEPS})
+ADD_DEPENDENCIES(atl_bridge_gimbal_node atl_gazebo_clients)
 
 ADD_EXECUTABLE(atl_bridge_lz_node src/bridge/lz_node.cpp)
 TARGET_LINK_LIBRARIES(atl_bridge_lz_node ${ATL_GAZEBO_DEPS})
@@ -155,6 +163,7 @@ SET(ATL_GAZEBO_PLUGINS_DEPS
     ${OpenCV_LIBS}
     yaml-cpp
     pthread)
+SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY $ENV{HOME}/.gazebo/plugins)
 
 ADD_LIBRARY(box_gplugin SHARED src/plugins/box_gplugin.cpp)
 TARGET_LINK_LIBRARIES(box_gplugin ${ATL_GAZEBO_PLUGINS_DEPS})
@@ -194,24 +203,3 @@ ADD_LIBRARY(atl_gazebo
             ${PROTO_SRCS})
 ADD_DEPENDENCIES(atl_gazebo atl_gazebo_clients atl_gazebo_msgs)
 TARGET_LINK_LIBRARIES(atl_gazebo ${PROTOBUF_LIBRARY})
-
-# INSTALL
-INSTALL(DIRECTORY models
-        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
-INSTALL(DIRECTORY worlds
-        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
-INSTALL(TARGETS
-        box_gplugin
-        camera_gplugin
-        df_camera_gplugin
-        gimbal_gplugin
-        lz_gplugin
-        quadrotor_gplugin
-        world_gplugin
-        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/plugins)
-INSTALL(DIRECTORY include/${PROJECT_NAME}/
-        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
-INSTALL(TARGETS atl_gazebo
-        ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-        RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION})

@@ -23,7 +23,7 @@ Camera::~Camera() {
   }
 }
 
-int Camera::configure(std::string config_path) {
+int Camera::configure(const std::string &config_path) {
   ConfigParser parser;
   CameraConfig config;
   std::string config_file;
@@ -99,7 +99,7 @@ int Camera::shutdown() {
   return 0;
 }
 
-int Camera::changeMode(std::string mode) {
+int Camera::changeMode(const std::string &mode) {
   // pre-check
   if (this->configs.find(mode) == this->configs.end()) {
     return -1;

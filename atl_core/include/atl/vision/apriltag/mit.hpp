@@ -22,14 +22,35 @@
 
 namespace atl {
 
+/** MIT Apriltag Detector **/
 class MITDetector : public BaseDetector {
 public:
   AprilTags::TagDetector *detector;
 
   MITDetector();
-  int configure(std::string config_file);
+
+  /**
+   * Configure
+   * @param config_file Path to configuration file (YAML)
+   * @returns 0 for success, -1 for failure
+   */
+  int configure(const std::string &config_file);
+
+  /**
+   * Extract AprilTags
+   * @param image
+   * @param tags
+   * @returns 0 for success else failure
+   */
   int extractTags(cv::Mat &image, std::vector<TagPose> &tags);
-  int obtainPose(AprilTags::TagDetection tag, TagPose &tag_pose);
+
+  /**
+   * Obtain pose
+   * @param tag Tag detected
+   * @param tag_pose Tag Pose
+   * @returns 0 for success and -1 for failure
+   */
+  int obtainPose(const AprilTags::TagDetection &tag, TagPose &tag_pose);
 };
 
 }  // namespace atl

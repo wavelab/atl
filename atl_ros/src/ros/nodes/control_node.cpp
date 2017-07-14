@@ -24,8 +24,7 @@ int ControlNode::configure(const std::string node_name, int hz) {
     this->configurePX4Topics();
 
   } else if (this->fcu_type == "DJI") {
-    // this->dji = new DJIDrone(*this->ros_nh);
-    // this->configureDJITopics();
+    this->configureDJITopics();
 
   } else {
     ROS_ERROR("Invalid [fcu_type]: %s", this->fcu_type.c_str());
@@ -317,14 +316,28 @@ void ControlNode::px4RadioCallback(const mavros_msgs::RCIn &msg) {
 }
 
 void ControlNode::djiGPSPositionCallback(const sensor_msgs::NavSatFix &msg) {
-  //   Vec3 pos_ned, pos_enu;
-  //
-  //   pos_ned(0) = msg.x;
-  //   pos_ned(1) = msg.y;
-  //   pos_ned(2) = msg.z;
-  //   ned2enu(pos_ned, pos_enu);
-  //
-  //   this->quadrotor.pose.position = pos_enu;
+  // set home point
+  if (this->home_set == false) {
+    this->home_lat = msg.latitude;
+    this->home_lon = msg.longitude;
+    this->home_alt = msg.altitude;
+    this->home_set = true;
+  }
+
+  // calculate local position
+  double diff_N = 0.0;
+  double diff_E = 0.0;
+  double diff_alt = 0.0;
+  latlon_diff(this->home_lat,
+              this->home_lon,
+              msg.latitude,
+              msg.longitude,
+              &diff_N,
+              &diff_E);
+  diff_alt = msg.altitude - this->home_alt;
+
+  // set quadrotor position (ENU)
+  this->quadrotor.pose.position << diff_E, diff_N, diff_alt;
 }
 
 void ControlNode::djiAttitudeCallback(
@@ -466,8 +479,9 @@ void ControlNode::publishAttitudeSetpoint() {
 
   } else if (this->fcu_type == "DJI") {
     // transform orientation from NWU to NED
-    nwu2ned(att_cmd.orientation, q_ned);
-    quat2euler(q_ned, 321, euler);
+    // nwu2ned(att_cmd.orientation, q_ned);
+    // quat2euler(q_ned, 321, euler);
+    quat2euler(att_cmd.orientation, 321, euler);
 
     //  DJI Control Flag Byte
     //

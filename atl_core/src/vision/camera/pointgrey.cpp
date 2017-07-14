@@ -2,10 +2,6 @@
 
 namespace atl {
 
-PointGreyCamera::PointGreyCamera() {
-  this->pointgrey = NULL;
-}
-
 PointGreyCamera::~PointGreyCamera() {
   FlyCapture2::Error error;
 
@@ -85,7 +81,7 @@ int PointGreyCamera::setBrightness(double brightness) {
   // set frame rate
   error = this->pointgrey->SetProperty(&property);
   if (error != FlyCapture2::PGRERROR_OK) {
-    LOG_ERROR("ERROR! failed to set BRIGHTNESS property!");
+    LOG_ERROR("ERROR! Failed to set BRIGHTNESS property!");
     return -1;
   }
 

@@ -14,6 +14,7 @@
 
 namespace atl {
 
+/** Generic Camera **/
 class Camera {
 public:
   bool configured;
@@ -30,13 +31,58 @@ public:
 
   Camera();
   ~Camera();
-  virtual int configure(std::string config_path);
+
+  /**
+   * Configure camera
+   * @param config_path Path to config file (YAML)
+   * @returns 0 for success, -1 for failure
+   */
+  virtual int configure(const std::string &config_path);
+
+  /**
+   * Initialize camera
+   * @returns 0 for success, -1 for failure
+   */
   virtual int initialize();
+
+  /**
+   * Shutdown camera
+   * @returns 0 for success, -1 for failure
+   */
   virtual int shutdown();
-  virtual int changeMode(std::string mode);
+
+  /**
+   * Change camera mode
+   * @returns 0 for success, -1 for failure
+   */
+  virtual int changeMode(const std::string &mode);
+
+  /**
+   * Get camera frame
+   * @params image Camera frame image
+   * @returns 0 for success, -1 for failure
+   */
   virtual int getFrame(cv::Mat &image);
+
+  /**
+   * Run camera
+   * @returns 0 for success, -1 for failure
+   */
   int run();
+
+  /**
+   * Show FPS
+   * @params last_tic Last tic in seconds
+   * @params frame Frame number
+   * @returns 0 for success, -1 for failure
+   */
   int showFPS(double &last_tic, int &frame);
+
+  /**
+   * Show image
+   * @params image Image
+   * @returns 0 for success, -1 for failure
+   */
   int showImage(cv::Mat &image);
 };
 

@@ -21,30 +21,23 @@ public:
   std::map<std::string, gazebo::transport::PublisherPtr> gaz_pubs;
   std::map<std::string, gazebo::transport::SubscriberPtr> gaz_subs;
 
-  GazeboNode() {
-    this->configured = false;
-  }
+  GazeboNode() : configured{false} {}
 
   int configure() {
-    // setup gazebo node
-    // clang-format off
-    this->gaz_node = gazebo::transport::NodePtr(new gazebo::transport::Node());
+    this->gaz_node =
+      gazebo::transport::NodePtr(new gazebo::transport::Node());
     this->gaz_node->Init();
-    // clang-format on
-
     this->configured = true;
 
     return 0;
   }
 
   int configure(std::string world_name) {
-    // setup gazebo node
-    // clang-format off
-    this->gaz_node = gazebo::transport::NodePtr(new gazebo::transport::Node());
+    this->gaz_node =
+      gazebo::transport::NodePtr(new gazebo::transport::Node());
     this->gaz_node->Init(world_name);
-    // clang-format on
-
     this->configured = true;
+
     return 0;
   }
 

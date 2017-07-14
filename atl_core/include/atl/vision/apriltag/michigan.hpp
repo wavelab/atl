@@ -23,6 +23,7 @@
 
 namespace atl {
 
+/** Michigan Apriltag Detector **/
 class MichiganDetector : public BaseDetector {
 public:
   apriltag_detector_t *detector;
@@ -30,9 +31,29 @@ public:
 
   MichiganDetector();
   ~MichiganDetector();
-  int configure(std::string config_file);
+
+  /**
+   * Configure
+   * @param config_file Path to configuration file (YAML)
+   * @returns 0 for success, -1 for failure
+   */
+  int configure(const std::string &config_file);
+
+  /**
+   * Extract AprilTags
+   * @param image
+   * @param tags
+   * @returns 0 for success else failure
+   */
   int extractTags(cv::Mat &image, std::vector<TagPose> &tags);
-  int obtainPose(apriltag_detection_t *det, TagPose &tag_pose);
+
+  /**
+   * Obtain pose
+   * @param tag Tag detected
+   * @param tag_pose Tag Pose
+   * @returns 0 for success and -1 for failure
+   */
+  int obtainPose(apriltag_detection_t *tag, TagPose &tag_pose);
 };
 
 }  // namespace atl

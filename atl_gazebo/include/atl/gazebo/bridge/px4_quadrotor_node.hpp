@@ -51,7 +51,7 @@ public:
    * Quadrotor pose Gazebo callback
    * @param msg Roll, pitch and yaw message
    */
-  void poseGazeboCallback(const RPYPosePtr &msg);
+  void poseCallback(const RPYPosePtr &msg);
 
   /**
    * Quadrotor velocity Gazebo callback

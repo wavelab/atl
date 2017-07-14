@@ -14,7 +14,7 @@
 namespace atl {
 namespace gaz {
 
-#define POSE_MSG atl_msgs::msgs::RPYPose
+#define POSE_MSG gazebo::msgs::Pose
 #define VELOCITY_MSG gazebo::msgs::Vector3d
 #define ATT_SETPOINT_MSG atl_msgs::msgs::AttitudeSetpoint
 #define POS_SETPOINT_MSG atl_msgs::msgs::PositionSetpoint
@@ -32,8 +32,8 @@ public:
   gazebo::event::ConnectionPtr update_conn;
   gazebo::common::Time prev_sim_time;
 
-  ignition::math::Pose3d pose;
   gazebo::physics::LinkPtr body;
+  ignition::math::Pose3d pose;
   QuadrotorModel quadrotor;
 
   QuadrotorGPlugin();

@@ -21,7 +21,7 @@ namespace atl {
 namespace gaz {
 
 // MESSAGES TYPES
-#define POSE_MSG atl_msgs::msgs::Pose
+#define POSE_MSG gazebo::msgs::Pose
 #define ATT_SETPOINT_MSG atl_msgs::msgs::AttitudeSetpoint
 #define POS_SETPOINT_MSG atl_msgs::msgs::PositionSetpoint
 #define VEL_SETPOINT_MSG atl_msgs::msgs::VelocitySetpoint
@@ -40,16 +40,28 @@ class QuadrotorGClient : public GazeboNode {
 public:
   bool connected;
 
-  VecX pose;
+  Vec3 position;
+  Quaternion orientation;
   Vec3 velocity;
   Vec4 attitude_setpoints;
   Vec3 position_setpoints;
   Vec3 velocity_setpoints;
 
-  QuadrotorGClient();
-  ~QuadrotorGClient();
+  QuadrotorGClient()
+      : position{Vec3::Zero()},
+        orientation{1.0, 0.0, 0.0, 0.0},
+        attitude_setpoints{0.0, 0.0, 0.0, 0.0},
+        position_setpoints{0.0, 0.0, 0.0},
+        velocity_setpoints{0.0, 0.0, 0.0} {}
+
+  ~QuadrotorGClient() {
+    if (this->connected) {
+      gazebo::client::shutdown();
+    }
+  }
+
   int configure();
-  virtual void poseCallback(RPYPosePtr &msg);
+  virtual void poseCallback(ConstPosePtr &msg);
   virtual void velocityCallback(ConstVector3dPtr &msg);
   int setAttitude(double r, double p, double y, double t);
   int setPosition(double x, double y, double z);

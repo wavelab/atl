@@ -11,7 +11,7 @@ MichiganDetector::~MichiganDetector() {
   tag16h5_destroy(this->family);
 }
 
-int MichiganDetector::configure(std::string config_file) {
+int MichiganDetector::configure(const std::string &config_file) {
   if (BaseDetector::configure(config_file) != 0) {
     return -1;
   }
@@ -69,6 +69,7 @@ int MichiganDetector::extractTags(cv::Mat &image,
     this->obtainPose(det, pose);
     break;  // only need 1 tag
   }
+
   // imshow
   if (this->imshow) {
     cv::imshow("MichiganDetector", image_gray);
@@ -79,7 +80,7 @@ int MichiganDetector::extractTags(cv::Mat &image,
   return 0;
 }
 
-int MichiganDetector::obtainPose(apriltag_detection_t *det,
+int MichiganDetector::obtainPose(apriltag_detection_t *tag,
                                  TagPose &tag_pose) {
   Mat4 transform;
   Vec3 t;
@@ -111,10 +112,10 @@ int MichiganDetector::obtainPose(apriltag_detection_t *det,
   obj_pts.push_back(cv::Point3f(tag_size, tag_size, 0));
   obj_pts.push_back(cv::Point3f(-tag_size, tag_size, 0));
 
-  img_pts.push_back(cv::Point2f(det->p[0][0], det->p[0][1]));
-  img_pts.push_back(cv::Point2f(det->p[1][0], det->p[1][1]));
-  img_pts.push_back(cv::Point2f(det->p[2][0], det->p[2][1]));
-  img_pts.push_back(cv::Point2f(det->p[3][0], det->p[3][1]));
+  img_pts.push_back(cv::Point2f(tag->p[0][0], tag->p[0][1]));
+  img_pts.push_back(cv::Point2f(tag->p[1][0], tag->p[1][1]));
+  img_pts.push_back(cv::Point2f(tag->p[2][0], tag->p[2][1]));
+  img_pts.push_back(cv::Point2f(tag->p[3][0], tag->p[3][1]));
 
   // distortion parameters
   cv::Vec4f distParam(0, 0, 0, 0);

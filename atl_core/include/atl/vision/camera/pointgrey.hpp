@@ -10,8 +10,9 @@ class PointGreyCamera : public Camera {
 public:
   FlyCapture2::Camera *pointgrey;
 
-  PointGreyCamera();
+  PointGreyCamera() : pointgrey{nullptr} {}
   ~PointGreyCamera();
+
   int initialize();
   int setBrightness(double brightness);
   int setFrameRate(double fps);

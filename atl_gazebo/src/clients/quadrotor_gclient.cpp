@@ -3,22 +3,6 @@
 namespace atl {
 namespace gaz {
 
-QuadrotorGClient::QuadrotorGClient() {
-  this->connected = false;
-
-  this->pose = VecX(6);
-  this->velocity << 0.0, 0.0, 0.0;
-  this->attitude_setpoints << 0.0, 0.0, 0.0, 0.0;
-  this->position_setpoints << 0.0, 0.0, 0.0;
-  this->velocity_setpoints << 0.0, 0.0, 0.0;
-}
-
-QuadrotorGClient::~QuadrotorGClient() {
-  if (this->connected) {
-    gazebo::client::shutdown();
-  }
-}
-
 int QuadrotorGClient::configure() {
   // pre-check
   this->connected = gazebo::client::setup(0, NULL);
@@ -27,7 +11,8 @@ int QuadrotorGClient::configure() {
   }
 
   // initialize data
-  this->pose = VecX(6);
+  this->position = VecX::Zero(3);
+  this->orientation = Quaternion{1.0, 0.0, 0.0, 0.0};
 
   // setup gazebo node
   GazeboNode::configure();
@@ -39,29 +24,25 @@ int QuadrotorGClient::configure() {
   // clang-format on
 
   // publishers
-  // clang-format off
   this->registerPublisher<ATT_SETPOINT_MSG>(ATT_SETPOINT_GTOPIC);
   this->registerPublisher<POS_SETPOINT_MSG>(POS_SETPOINT_GTOPIC);
   this->registerPublisher<VEL_SETPOINT_MSG>(VEL_SETPOINT_GTOPIC);
   this->waitForConnection();
-  // clang-format on
-
-  // follow
-  gazebo::gui::Events::follow("quadrotor");
 
   return 0;
 }
 
-void QuadrotorGClient::poseCallback(RPYPosePtr &msg) {
+void QuadrotorGClient::poseCallback(ConstPosePtr &msg) {
   // position
-  this->pose(0) = msg->x();
-  this->pose(1) = msg->y();
-  this->pose(2) = msg->z();
+  this->position(0) = msg->position().x();
+  this->position(1) = msg->position().y();
+  this->position(2) = msg->position().z();
 
   // orientation
-  this->pose(3) = msg->roll();
-  this->pose(4) = msg->pitch();
-  this->pose(5) = msg->yaw();
+  this->orientation.w() = msg->orientation().w();
+  this->orientation.x() = msg->orientation().x();
+  this->orientation.y() = msg->orientation().y();
+  this->orientation.z() = msg->orientation().z();
 }
 
 void QuadrotorGClient::velocityCallback(ConstVector3dPtr &msg) {
@@ -71,18 +52,19 @@ void QuadrotorGClient::velocityCallback(ConstVector3dPtr &msg) {
 }
 
 int QuadrotorGClient::setAttitude(double r, double p, double y, double t) {
-  ATT_SETPOINT_MSG msg;
-
   // pre-check
   if (this->connected == false) {
     return -1;
   }
 
   // publish msg
+  ATT_SETPOINT_MSG msg;
+
   msg.set_roll(r);
   msg.set_pitch(p);
   msg.set_yaw(y);
   msg.set_throttle(t);
+
   this->attitude_setpoints << r, p, y, t;
   this->gaz_pubs[ATT_SETPOINT_GTOPIC]->Publish(msg);
 
@@ -90,17 +72,18 @@ int QuadrotorGClient::setAttitude(double r, double p, double y, double t) {
 }
 
 int QuadrotorGClient::setPosition(double x, double y, double z) {
-  POS_SETPOINT_MSG msg;
-
   // pre-check
   if (this->connected == false) {
     return -1;
   }
 
   // publish msg
+  POS_SETPOINT_MSG msg;
+
   msg.set_x(x);
   msg.set_y(y);
   msg.set_z(z);
+
   this->position_setpoints << x, y, z;
   this->gaz_pubs[POS_SETPOINT_GTOPIC]->Publish(msg);
 
@@ -108,17 +91,18 @@ int QuadrotorGClient::setPosition(double x, double y, double z) {
 }
 
 int QuadrotorGClient::setVelocity(double vx, double vy, double vz) {
-  VEL_SETPOINT_MSG msg;
-
   // pre-check
   if (this->connected == false) {
     return -1;
   }
 
   // publish msg
+  VEL_SETPOINT_MSG msg;
+
   msg.set_vx(vx);
   msg.set_vy(vy);
   msg.set_vz(vz);
+
   this->velocity_setpoints << vx, vy, vz;
   this->gaz_pubs[VEL_SETPOINT_GTOPIC]->Publish(msg);
 

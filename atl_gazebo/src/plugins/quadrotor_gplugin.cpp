@@ -61,11 +61,8 @@ void QuadrotorGPlugin::Load(gazebo::physics::ModelPtr model,
 }
 
 void QuadrotorGPlugin::onUpdate(const gazebo::common::UpdateInfo &info) {
-  double dt;
-  gazebo::common::Time diff;
-
-  diff = info.simTime - this->prev_sim_time;
-  dt = diff.nsec / 1000000000.0;  // convert nsec to sec
+  gazebo::common::Time diff = info.simTime - this->prev_sim_time;
+  double dt = diff.nsec / 1000000000.0;  // convert nsec to sec
   this->simulate(dt);
   this->prev_sim_time = info.simTime;
 }
@@ -91,13 +88,13 @@ void QuadrotorGPlugin::simulate(double dt) {
                                        quad_pose(4),
                                        quad_pose(5));
   this->model->SetWorldPose(gazebo_pose);
+  this->pose = gazebo_pose;
 
   // simulate quadrotor
   // TODO: switch to attitude controller when in offboard mode
   Vec4 motor_inputs = this->quadrotor.attitudeControllerControl(dt);
   // motor_inputs = this->quadrotor.positionControllerControl(dt);
   // motor_inputs = this->quadrotor.velocityControllerControl(dt);
-  // motor_inputs << 2.5, 2.5, 2.5, 2.5;
   this->quadrotor.update(motor_inputs, dt);
 
   // set model pose
@@ -105,40 +102,21 @@ void QuadrotorGPlugin::simulate(double dt) {
   gazebo_pose = vec2pose(quad_pose);
   this->model->SetWorldPose(gazebo_pose);
 
-  // set model linear velocities
-  // gazebo::math::Vector3 vector;
-  // vector.x = this->quadrotor.states(9);
-  // vector.y = this->quadrotor.states(10);
-  // vector.z = this->quadrotor.states(11);
-  // this->body->SetLinearVel(vector);
-
-  // THIS IS A HACK TO PREVENT QUAD FROM VIBRATING AT REST
-  // if (motor_inputs.norm() > 0.5) {
-  //   this->body->SetLinearVel(vector);
-  //
-  // } else {
-  //   vector.x = 0;
-  //   vector.y = 0;
-  //   vector.z = 0;
-  //   this->body->SetForce(vector);
-  //   this->body->SetLinearVel(vector);
-  //   this->body->SetLinearAccel(vector);
-  // }
-
   // publish
   this->publishPose();
   this->publishVelocity();
 }
 
 void QuadrotorGPlugin::publishPose() {
-  atl_msgs::msgs::RPYPose msg;
+  gazebo::msgs::Pose msg;
 
-  msg.set_x(this->quadrotor.position(0));
-  msg.set_y(this->quadrotor.position(1));
-  msg.set_z(this->quadrotor.position(2));
-  msg.set_roll(this->quadrotor.attitude(0));
-  msg.set_pitch(this->quadrotor.attitude(1));
-  msg.set_yaw(this->quadrotor.attitude(2));
+  msg.mutable_position()->set_x(this->pose.Pos().X());
+  msg.mutable_position()->set_y(this->pose.Pos().Y());
+  msg.mutable_position()->set_z(this->pose.Pos().Z());
+  msg.mutable_orientation()->set_w(this->pose.Rot().W());
+  msg.mutable_orientation()->set_x(this->pose.Rot().X());
+  msg.mutable_orientation()->set_y(this->pose.Rot().Y());
+  msg.mutable_orientation()->set_z(this->pose.Rot().Z());
 
   this->gaz_pubs[POSE_GTOPIC]->Publish(msg);
 }

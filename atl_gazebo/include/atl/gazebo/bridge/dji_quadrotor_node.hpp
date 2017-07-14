@@ -8,9 +8,9 @@
 
 #include <ros/ros.h>
 
-#include "atl/utils/utils.hpp"
-#include "atl/ros/utils/node.hpp"
-#include "atl/ros/utils/msgs.hpp"
+#include <atl/utils/utils.hpp>
+#include <atl/ros/utils/node.hpp>
+#include <atl/ros/utils/msgs.hpp>
 #include "atl/gazebo/clients/quadrotor_gclient.hpp"
 
 namespace atl {
@@ -49,16 +49,16 @@ public:
    * Quadrotor pose Gazebo callback
    * @param msg Roll, pitch and yaw message
    */
-  void poseGazeboCallback(RPYPosePtr &msg);
+  void poseCallback(ConstPosePtr &msg);
 
   /**
    * Quadrotor velocity Gazebo callback
    * @param msg Velocity message in x, y, z
    */
-  void velocityGazeboCallback(ConstVector3dPtr &msg);
+  void velocityCallback(ConstVector3dPtr &msg);
 
   /**
-   * Quadrotor attitude setpoint ROS callback
+   * Quadrotor control ROS callback
    *
    * Currently this function only supports a DJI control flag mode of 0x20.
    * This translates to being able to control the quadrotor's roll, pitch, yaw
@@ -66,7 +66,7 @@ public:
    *
    * @param msg Attitude setpoint for quadrotor
    */
-  void attitudeSetpointCallback(const sensor_msgs::Joy &msg);
+  void controlCallback(const sensor_msgs::Joy &msg);
 };
 
 }  // namespace gazebo_bridge

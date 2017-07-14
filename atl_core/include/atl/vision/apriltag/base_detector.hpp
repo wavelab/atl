@@ -41,6 +41,8 @@ public:
   int illuminationInvariantTransform(cv::Mat &image);
   int changeMode(cv::Mat &image);
   int maskImage(TagPose tag_pose, cv::Mat &image, double padding = 0.5);
+
+  /** Print detected AprilTag */
   void printTag(TagPose tag);
 };
 

@@ -15,6 +15,8 @@ FIND_PACKAGE(
     rospy
     rostest
     std_msgs
+    geometry_msgs
+    sensor_msgs
     message_generation
     image_transport
     cv_bridge
@@ -48,6 +50,7 @@ CATKIN_PACKAGE(
     rospy
     std_msgs
     geometry_msgs
+    sensor_msgs
     message_runtime
     atl_core
     atl_msgs
@@ -152,7 +155,3 @@ ADD_LIBRARY(
 #     tests/nodes/gimbal_test.cpp
 # )
 # TARGET_LINK_LIBRARIES(gimbal_test ${ATL_ROS_TEST_DEPS})
-
-# INSTALL LAUNCH FILES
-SET(SHARE_DEST ${CATKIN_PACKAGE_SHARE_DESTINATION})
-INSTALL(DIRECTORY launch/ DESTINATION ${SHARE_DEST}/launch)

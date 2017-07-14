@@ -81,11 +81,22 @@ public:
 
   Quadrotor quadrotor;
   bool armed;
+  bool home_set;
+  double home_lat;
+  double home_lon;
+  double home_alt;
 
   ControlNode(int argc, char **argv) : ROSNode(argc, argv) {
+    this->configured = false;
+
     this->quad_frame = "";
     this->fcu_type = "";
+
     this->armed = false;
+    this->home_set = false;
+    this->home_lat = 0.0;
+    this->home_lon = 0.0;
+    this->home_alt = 0.0;
   }
 
   int configure(std::string node_name, int hz);

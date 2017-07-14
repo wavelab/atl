@@ -1,7 +1,7 @@
 hover_position: [0.0, 0.0, 5.0]
 recover_height: 5.0
 
-auto_track: true
+auto_track: false
 auto_land: false
 auto_disarm: false
 

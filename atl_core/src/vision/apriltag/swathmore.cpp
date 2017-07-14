@@ -2,11 +2,7 @@
 
 namespace atl {
 
-SwathmoreDetector::SwathmoreDetector() {
-  this->detector = NULL;
-}
-
-int SwathmoreDetector::configure(std::string config_file) {
+int SwathmoreDetector::configure(const std::string &config_file) {
   if (BaseDetector::configure(config_file) != 0) {
     return -1;
   }
@@ -90,7 +86,8 @@ int SwathmoreDetector::extractTags(cv::Mat &image,
   return 0;
 }
 
-int SwathmoreDetector::obtainPose(TagDetection tag, TagPose &tag_pose) {
+int SwathmoreDetector::obtainPose(const TagDetection &tag,
+                                  TagPose &tag_pose) {
   Vec3 t;
   Mat3 R;
   cv::Mat cv_R, cv_T;

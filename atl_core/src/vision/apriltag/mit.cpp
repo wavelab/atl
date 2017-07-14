@@ -6,7 +6,7 @@ MITDetector::MITDetector() {
   this->detector = NULL;
 }
 
-int MITDetector::configure(std::string config_file) {
+int MITDetector::configure(const std::string &config_file) {
   if (BaseDetector::configure(config_file) != 0) {
     return -1;
   }
@@ -100,7 +100,8 @@ int MITDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
   return 0;
 }
 
-int MITDetector::obtainPose(AprilTags::TagDetection tag, TagPose &tag_pose) {
+int MITDetector::obtainPose(const AprilTags::TagDetection &tag,
+                            TagPose &tag_pose) {
   Mat4 transform;
   Vec3 t;
   Mat3 R;
