@@ -22,11 +22,8 @@
 #include <atl_msgs/LCtrlSettings.h>
 #include <atl_msgs/ModelPose.h>
 #include <atl_msgs/PCtrlSettings.h>
-#include <atl_msgs/PCtrlStats.h>
 #include <atl_msgs/TCtrlSettings.h>
-#include <atl_msgs/TCtrlStats.h>
 #include <atl_msgs/VCtrlSettings.h>
-#include <atl_msgs/VCtrlStats.h>
 
 namespace atl {
 
@@ -47,9 +44,7 @@ void buildMsg(int seq,
               std_msgs::Float64 &thr_msg);
 void buildMsg(TagPose tag, atl_msgs::AprilTagPose &msg);
 void buildMsg(TagPose tag, geometry_msgs::Vector3 &msg);
-void buildMsg(PositionController pc, atl_msgs::PCtrlStats &msg);
 void buildMsg(PositionController pc, atl_msgs::PCtrlSettings &msg);
-void buildMsg(TrackingController tc, atl_msgs::TCtrlStats &msg);
 void buildMsg(TrackingController tc, atl_msgs::TCtrlSettings &msg);
 void buildMsg(LandingController tc, atl_msgs::LCtrlSettings &msg);
 

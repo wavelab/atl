@@ -32,7 +32,6 @@ int ControlNode::configure(const std::string node_name, int hz) {
   }
 
   // publishers
-  this->registerPublisher<atl_msgs::PCtrlStats>(PCTRL_STATS_TOPIC);
   this->registerPublisher<atl_msgs::PCtrlSettings>(PCTRL_GET_TOPIC);
   this->registerPublisher<geometry_msgs::PoseStamped>(QUADROTOR_POSE);
   this->registerPublisher<geometry_msgs::TwistStamped>(QUADROTOR_VELOCITY);
@@ -63,7 +62,7 @@ int ControlNode::configure(const std::string node_name, int hz) {
   }
 
   // connect to estimator
-  this->waitForEstimator();
+  // this->waitForEstimator();
 
   this->configured = true;
   return 0;
@@ -463,17 +462,15 @@ void ControlNode::landingControllerSetCallback(
 }
 
 void ControlNode::publishAttitudeSetpoint() {
-  Vec3 euler;
-  Quaternion q_ned;
-  std_msgs::Float64 thr_msg;
-  geometry_msgs::PoseStamped att_msg;
-
   // setup
   int seq = this->ros_seq;
   AttitudeCommand att_cmd = this->quadrotor.att_cmd;
 
   if (this->fcu_type == "PX4") {
+    std_msgs::Float64 thr_msg;
+    geometry_msgs::PoseStamped att_msg;
     buildMsg(seq, ros::Time::now(), att_cmd, att_msg, thr_msg);
+
     this->ros_pubs[PX4_SETPOINT_ATTITUDE_TOPIC].publish(att_msg);
     this->ros_pubs[PX4_SETPOINT_THROTTLE_TOPIC].publish(thr_msg);
 
@@ -481,6 +478,7 @@ void ControlNode::publishAttitudeSetpoint() {
     // transform orientation from NWU to NED
     // nwu2ned(att_cmd.orientation, q_ned);
     // quat2euler(q_ned, 321, euler);
+    Vec3 euler;
     quat2euler(att_cmd.orientation, 321, euler);
 
     //  DJI Control Flag Byte
@@ -511,13 +509,12 @@ void ControlNode::publishAttitudeSetpoint() {
     //    non-stable mode
     //
     //  ends up being: 0b00100000 -> 0x20
-
     sensor_msgs::Joy msg;
-    msg.axes[0] = rad2deg(euler(0));       // roll (deg)
-    msg.axes[1] = rad2deg(euler(1));       // pitch (deg)
-    msg.axes[2] = att_cmd.throttle * 100;  // throttle (0 - 100)
-    msg.axes[3] = rad2deg(euler(2));       // yaw (deg)
-    msg.axes[4] = 0x20;                    // control flag (see above comment)
+    msg.axes.push_back(rad2deg(euler(0)));       // roll (deg)
+    msg.axes.push_back(rad2deg(euler(1)));       // pitch (deg)
+    msg.axes.push_back(att_cmd.throttle * 100);  // t)hrottle (0 - 100)
+    msg.axes.push_back(rad2deg(euler(2)));       // yaw (deg)
+    msg.axes.push_back(0x20);                    // control flag (see above comment)
     this->ros_pubs[DJI_SETPOINT_TOPIC].publish(msg);
 
   } else {
@@ -565,6 +562,11 @@ int ControlNode::loopCallback() {
     return -1;
   } else if (this->quadrotor.current_mode == DISARM_MODE) {
     this->setEstimatorOff();
+  }
+
+  // publish msgs
+  if (this->armed || this->sim_mode) {
+    this->publishAttitudeSetpoint();
   }
 
   return 0;

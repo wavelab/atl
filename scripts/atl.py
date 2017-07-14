@@ -10,7 +10,7 @@ from geometry_msgs.msg import PoseStamped
 from atl_msgs.msg import PCtrlSettings
 from atl_msgs.msg import TCtrlSettings
 from atl_msgs.msg import LCtrlSettings
-from prototype_ros.msg import ModelPose
+from atl_msgs.msg import ModelPose
 
 
 class ROSNode(object):

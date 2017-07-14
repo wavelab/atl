@@ -94,29 +94,6 @@ void buildMsg(TagPose tag, geometry_msgs::Vector3 &msg) {
   msg.z = tag.position(2);
 }
 
-void buildMsg(PositionController pc, atl_msgs::PCtrlStats &msg) {
-  // roll
-  msg.roll_p_error = pc.y_controller.error_p;
-  msg.roll_i_error = pc.y_controller.error_i;
-  msg.roll_d_error = pc.y_controller.error_d;
-  msg.roll_output = rad2deg(pc.outputs(0));
-  msg.roll_setpoint = pc.setpoints(0);
-
-  // pitch
-  msg.pitch_p_error = pc.x_controller.error_p;
-  msg.pitch_i_error = pc.x_controller.error_i;
-  msg.pitch_d_error = pc.x_controller.error_d;
-  msg.pitch_output = rad2deg(pc.outputs(1));
-  msg.pitch_setpoint = pc.setpoints(1);
-
-  // thrust
-  msg.throttle_p_error = pc.z_controller.error_p;
-  msg.throttle_i_error = pc.z_controller.error_i;
-  msg.throttle_d_error = pc.z_controller.error_d;
-  msg.throttle_output = pc.outputs(3);
-  msg.throttle_setpoint = pc.setpoints(2);
-}
-
 void buildMsg(PositionController pc, atl_msgs::PCtrlSettings &msg) {
   msg.roll_controller.min = pc.roll_limit[0];
   msg.roll_controller.max = pc.roll_limit[1];
@@ -134,29 +111,6 @@ void buildMsg(PositionController pc, atl_msgs::PCtrlSettings &msg) {
   msg.throttle_controller.k_i = pc.z_controller.k_i;
   msg.throttle_controller.k_d = pc.z_controller.k_d;
   msg.hover_throttle = pc.hover_throttle;
-}
-
-void buildMsg(TrackingController tc, atl_msgs::TCtrlStats &msg) {
-  // roll
-  msg.roll_p_error = tc.y_controller.error_p;
-  msg.roll_i_error = tc.y_controller.error_i;
-  msg.roll_d_error = tc.y_controller.error_d;
-  msg.roll_output = rad2deg(tc.outputs(0));
-  msg.roll_setpoint = tc.setpoints(0);
-
-  // pitch
-  msg.pitch_p_error = tc.x_controller.error_p;
-  msg.pitch_i_error = tc.x_controller.error_i;
-  msg.pitch_d_error = tc.x_controller.error_d;
-  msg.pitch_output = rad2deg(tc.outputs(1));
-  msg.pitch_setpoint = tc.setpoints(1);
-
-  // thrust
-  msg.throttle_p_error = tc.z_controller.error_p;
-  msg.throttle_i_error = tc.z_controller.error_i;
-  msg.throttle_d_error = tc.z_controller.error_d;
-  msg.throttle_output = tc.outputs(3);
-  msg.throttle_setpoint = tc.setpoints(2);
 }
 
 void buildMsg(TrackingController tc, atl_msgs::TCtrlSettings &msg) {

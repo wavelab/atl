@@ -13,10 +13,6 @@
 #include <dji_sdk/DroneArmControl.h>
 #include <dji_sdk/SDKControlAuthority.h>
 
-#include <atl_msgs/AprilTagPose.h>
-#include <atl_msgs/PCtrlSettings.h>
-#include <atl_msgs/PCtrlStats.h>
-
 #include <atl/atl_core.hpp>
 
 #include "atl/ros/utils/msgs.hpp"
