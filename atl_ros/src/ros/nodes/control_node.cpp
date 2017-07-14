@@ -24,6 +24,7 @@ int ControlNode::configure(const std::string node_name, int hz) {
     this->configurePX4Topics();
 
   } else if (this->fcu_type == "DJI") {
+    this->dji = new DJIDrone(*this->ros_nh);
     this->configureDJITopics();
 
   } else {
@@ -165,45 +166,30 @@ int ControlNode::px4OffboardModeOn() {
 }
 
 int ControlNode::djiDisarm() {
-  dji_sdk::DroneArmControl msg;
-
-  // send disarm msg
-  msg.request.arm = false;
-  bool msg_sent = this->ros_clients[DJI_ARM_TOPIC].call(msg);
-  if (msg_sent == true && msg.response.result == true) {
-    LOG_ERROR("Failed to disarm DJI FCU!");
+  if (this->dji->drone_disarm() != true) {
     return -1;
   }
 
-  LOG_INFO("DJI FCU DISARMED!");
   return 0;
 }
 
 int ControlNode::djiOffboardModeOn() {
-  dji_sdk::SDKControlAuthority msg;
-
-  msg.request.control_enable = 1;
-  bool msg_sent = this->ros_clients[DJI_SDK_AUTH_TOPIC].call(msg);
-  if (msg_sent == true && msg.response.result == true) {
-    LOG_ERROR("Failed to gain DJI SDK control!");
+  if (this->dji->request_sdk_permission_control() != true) {
+    LOG_ERROR("Failed to release DJI SDK control!");
     return -1;
   }
+  LOG_INFO("Obtained DJI SDK control!");
 
-  LOG_INFO("DJI SDK control obtained!");
   return 0;
 }
 
 int ControlNode::djiOffboardModeOff() {
-  dji_sdk::SDKControlAuthority msg;
-
-  msg.request.control_enable = 0;
-  bool msg_sent = this->ros_clients[DJI_SDK_AUTH_TOPIC].call(msg);
-  if (msg_sent == true && msg.response.result == true) {
+  if (this->dji->release_sdk_permission_control() != true) {
     LOG_ERROR("Failed to release DJI SDK control!");
     return -1;
   }
+  LOG_INFO("Released DJI SDK control!");
 
-  LOG_INFO("DJI SDK control released!");
   return 0;
 }
 
@@ -315,54 +301,62 @@ void ControlNode::px4RadioCallback(const mavros_msgs::RCIn &msg) {
 }
 
 void ControlNode::djiGPSPositionCallback(const sensor_msgs::NavSatFix &msg) {
-  // set home point
-  if (this->home_set == false) {
-    this->home_lat = msg.latitude;
-    this->home_lon = msg.longitude;
-    this->home_alt = msg.altitude - 4.0;
-    this->home_set = true;
-  }
+  this->latitude = msg.latitude;
+  this->longitude = msg.longitude;
+}
 
-  // calculate local position
-  double diff_N = 0.0;
-  double diff_E = 0.0;
-  double diff_alt = 0.0;
-  latlon_diff(this->home_lat,
-              this->home_lon,
-              msg.latitude,
-              msg.longitude,
-              &diff_N,
-              &diff_E);
-  diff_alt = msg.altitude - this->home_alt;
+void ControlNode::djiLocalPositionCallback(
+  const dji_sdk::LocalPosition &msg) {
+  Vec3 pos_ned, pos_enu;
 
-  // set quadrotor position (ENU)
-  this->quadrotor.pose.position << diff_E, diff_N, diff_alt;
+  pos_ned(0) = msg.x;
+  pos_ned(1) = msg.y;
+  pos_ned(2) = msg.z;
+  ned2enu(pos_ned, pos_enu);
+
+  this->quadrotor.pose.position = pos_enu;
 }
 
 void ControlNode::djiAttitudeCallback(
-  const geometry_msgs::QuaternionStamped &msg) {
-  Quaternion orientation;
-  convertMsg(msg, orientation);
-  this->quadrotor.pose.orientation = orientation;
+  const dji_sdk::AttitudeQuaternion &msg) {
+  Quaternion orientation_ned, orientation_nwu;
+
+  orientation_ned.w() = msg.q0;
+  orientation_ned.x() = msg.q1;
+  orientation_ned.y() = msg.q2;
+  orientation_ned.z() = msg.q3;
+
+  // transform pose position and orientation
+  // from NED to NWU
+  ned2nwu(orientation_ned, orientation_nwu);
+
+  this->quadrotor.pose.orientation = orientation_nwu;
 }
 
-void ControlNode::djiVelocityCallback(
-  const geometry_msgs::Vector3Stamped &msg) {
-  Vec3 vel;
-  convertMsg(msg, vel);
-  this->quadrotor.setVelocity(vel);
+void ControlNode::djiVelocityCallback(const dji_sdk::Velocity &msg) {
+  Vec3 vel_ned, vel_enu;
+
+  // convert DJI msg to Eigen vector
+  vel_ned(0) = msg.vx;
+  vel_ned(1) = msg.vy;
+  vel_ned(2) = msg.vz;
+
+  // transform velocity in NED to ENU
+  ned2enu(vel_ned, vel_enu);
+
+  // update
+  this->quadrotor.setVelocity(vel_enu);
 }
 
-void ControlNode::djiRadioCallback(const sensor_msgs::Joy &msg) {
-  int mode_switch = msg.axes[4];
+void ControlNode::djiRadioCallback(const dji_sdk::RCChannels &msg) {
   if (this->armed) {
-    if (mode_switch < 0) {
+    if (msg.gear < 0) {
       this->armed = false;
       this->djiOffboardModeOff();
       this->setEstimatorOff();
     }
   } else {
-    if (mode_switch > 0) {
+    if (msg.gear > 0) {
       this->armed = true;
       this->quadrotor.setMode(DISCOVER_MODE);
       this->djiOffboardModeOn();
@@ -476,12 +470,14 @@ void ControlNode::publishAttitudeSetpoint() {
 
   } else if (this->fcu_type == "DJI") {
     // transform orientation from NWU to NED
-    Vec3 euler;
     Quaternion q_ned;
     nwu2ned(att_cmd.orientation, q_ned);
+
+    // convert to euler
+    Vec3 euler;
     quat2euler(q_ned, 321, euler);
 
-    //  DJI Control Flag Byte
+    //  DJI Control Mode Byte
     //
     //    bit 7:6  0b00: HORI_ATTI_TILT_ANG
     //             0b01: HORI_VEL
@@ -509,13 +505,16 @@ void ControlNode::publishAttitudeSetpoint() {
     //    non-stable mode
     //
     //  ends up being: 0b00100000 -> 0x20
-    sensor_msgs::Joy msg;
-    msg.axes.push_back(rad2deg(euler(0)));       // roll (deg)
-    msg.axes.push_back(rad2deg(euler(1)));       // pitch (deg)
-    msg.axes.push_back(att_cmd.throttle * 100);  // throttle (0 - 100)
-    msg.axes.push_back(rad2deg(euler(2)));       // yaw (deg)
-    msg.axes.push_back(0x20);  // control flag (see above comment)
-    this->ros_pubs[DJI_SETPOINT_TOPIC].publish(msg);
+
+    // clang-format off
+    this->dji->attitude_control(
+      0x20,                    // control mode byte (see above comment)
+      rad2deg(euler(0)),       // roll (deg)
+      rad2deg(euler(1)),       // pitch (deg)
+      att_cmd.throttle * 100,  // throttle (0 - 100)
+      rad2deg(euler(2))        // yaw (deg)
+    );
+    // clang-format on
 
   } else {
     ROS_ERROR("Invalid [fcu_type]: %s", this->fcu_type.c_str());

@@ -10,6 +10,7 @@
 #include <mavros_msgs/SetMode.h>
 #include <mavros_msgs/State.h>
 
+#include <dji_sdk/dji_drone.h>
 #include <dji_sdk/DroneArmControl.h>
 #include <dji_sdk/SDKControlAuthority.h>
 
@@ -47,8 +48,9 @@ namespace atl {
 #define DJI_ARM_TOPIC "/dji_sdk/drone_arm_control"
 #define DJI_SDK_AUTH_TOPIC "/dji_sdk/sdk_control_authority"
 #define DJI_SETPOINT_TOPIC "/dji_sdk/flight_control_setpoint_generic"
-#define DJI_GPS_POSITION_TOPIC "/dji_sdk/gps_position"
-#define DJI_ATTITUDE_TOPIC "/dji_sdk/attitude"
+#define DJI_GPS_POSITION_TOPIC "/dji_sdk/global_position"
+#define DJI_LOCAL_POSITION_TOPIC "/dji_sdk/local_position"
+#define DJI_ATTITUDE_TOPIC "/dji_sdk/attitude_quaternion"
 #define DJI_VELOCITY_TOPIC "/dji_sdk/velocity"
 #define DJI_RADIO_TOPIC "/dji_sdk/rc"
 
@@ -74,26 +76,24 @@ public:
   std::string fcu_type;
 
   mavros_msgs::State px4_state;
+  DJIDrone *dji;
 
   Quadrotor quadrotor;
   bool armed;
-  bool home_set;
-  double home_lat;
-  double home_lon;
-  double home_alt;
+  double latitude;
+  double longitude;
 
-  ControlNode(int argc, char **argv) : ROSNode(argc, argv) {
-    this->configured = false;
-
-    this->quad_frame = "";
-    this->fcu_type = "";
-
-    this->armed = false;
-    this->home_set = false;
-    this->home_lat = 0.0;
-    this->home_lon = 0.0;
-    this->home_alt = 0.0;
-  }
+  ControlNode(int argc, char **argv)
+      : ROSNode(argc, argv),
+        configured{false},
+        fcu_type{},
+        quad_frame{},
+        px4_state{},
+        dji{nullptr},
+        quadrotor{},
+        armed{false},
+        latitude{},
+        longitude{} {}
 
   int configure(std::string node_name, int hz);
   int configurePX4Topics();
@@ -112,9 +112,10 @@ public:
   void px4VelocityCallback(const geometry_msgs::TwistStamped &msg);
   void px4RadioCallback(const mavros_msgs::RCIn &msg);
   void djiGPSPositionCallback(const sensor_msgs::NavSatFix &msg);
-  void djiAttitudeCallback(const geometry_msgs::QuaternionStamped &msg);
-  void djiVelocityCallback(const geometry_msgs::Vector3Stamped &msg);
-  void djiRadioCallback(const sensor_msgs::Joy &msg);
+  void djiLocalPositionCallback(const dji_sdk::LocalPosition &msg);
+  void djiAttitudeCallback(const dji_sdk::AttitudeQuaternion &msg);
+  void djiVelocityCallback(const dji_sdk::Velocity &msg);
+  void djiRadioCallback(const dji_sdk::RCChannels &msg);
   void armCallback(const std_msgs::Bool &msg);
   void modeCallback(const std_msgs::String &msg);
   void yawCallback(const std_msgs::Float64 &msg);
