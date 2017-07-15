@@ -4,8 +4,8 @@
 #include <float.h>
 #include <iostream>
 
-#include "atl/gazebo/controls/pid.hpp"
 #include "atl/utils/utils.hpp"
+#include "atl/control/pid.hpp"
 
 namespace atl {
 

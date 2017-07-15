@@ -357,7 +357,6 @@ void ControlNode::djiRadioCallback(const dji_sdk::RCChannels &msg) {
     this->djiOffboardModeOn();
     this->setEstimatorOn();
   }
-
 }
 
 void ControlNode::armCallback(const std_msgs::Bool &msg) {

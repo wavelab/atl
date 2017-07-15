@@ -35,7 +35,7 @@ ADD_LIBRARY(
     STATIC
     # control
     src/control/landing_controller.cpp
-    src/control/pid_controller.cpp
+    src/control/pid.cpp
     src/control/position_controller.cpp
     src/control/tracking_controller.cpp
     src/control/velocity_controller.cpp
@@ -44,6 +44,10 @@ ADD_LIBRARY(
     src/estimation/ekf_tracker.cpp
     src/estimation/kf.cpp
     src/estimation/kf_tracker.cpp
+    # models
+    src/models/gimbal.cpp
+    src/models/quadrotor.cpp
+    src/models/two_wheel.cpp
     # planning
     src/planning/model.cpp
     src/planning/optimizer.cpp
@@ -97,7 +101,7 @@ ADD_EXECUTABLE(
     atl_tests
     # CONTROL
     tests/control/landing_controller_test.cpp
-    tests/control/pid_controller_test.cpp
+    tests/control/pid_test.cpp
     tests/control/position_controller_test.cpp
     tests/control/tracking_controller_test.cpp
     tests/control/velocity_controller_test.cpp

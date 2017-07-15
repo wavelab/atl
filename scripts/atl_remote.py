@@ -87,6 +87,14 @@ def init_svo(lz):
         sleep(1)
 
 
+def hover_side_to_side():
+    for i in range(3):
+        quad.set_hover_point([1, 0, 5.0])
+        sleep(5)
+        quad.set_hover_point([-1, 0, 5.0])
+        sleep(5)
+
+
 if __name__ == "__main__":
     rospy.init_node("atl_remote")
     lz = LandingZone()
@@ -98,11 +106,13 @@ if __name__ == "__main__":
     rospy.sleep(1.0)
 
     quad.set_arm(True)
+    hover_side_to_side()
+
     # gimbal.set_attitude([0, 0.2, 0])
     # lz.set_position([1, 0, 0])
     # quad.set_hover_point([0, 0.0, 5.0])
 
-    # quad.set_hover_point([1.0, 0.0, 5.0])
+    # quad.set_hover_point([0.0, 0.0, 2.0])
 
     # quad.set_mode("HOVER")
     # quad.set_hover_point([1.0, 1.0, 5.0])

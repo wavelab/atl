@@ -1,13 +1,13 @@
-#include "atl/gazebo/controls/pid.hpp"
+#include "atl/control/pid.hpp"
 
 namespace atl {
 
-double PID::update(double setpoint, double actual, double dt) {
+double PID::update(double setpoint, double input, double dt) {
   double error;
   double output;
 
   // calculate errors
-  error = setpoint - actual;
+  error = setpoint - input;
   this->error_sum += error * dt;
 
   // calculate output
@@ -22,4 +22,13 @@ double PID::update(double setpoint, double actual, double dt) {
   return output;
 }
 
-}  // namespace atl
+void PID::reset() {
+  this->error_prev = 0.0;
+  this->error_sum = 0.0;
+
+  this->error_p = 0.0;
+  this->error_i = 0.0;
+  this->error_d = 0.0;
+}
+
+}  // end of atl_control namespace

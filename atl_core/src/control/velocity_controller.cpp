@@ -75,10 +75,10 @@ Vec4 VelocityController::calculate(Vec3 setpoints, Vec3 actual, double dt) {
 
   // roll, pitch, yaw and throttle (assuming NWU frame)
   // clang-format off
-  double r = -this->vy_controller.calculate(errors(1), 0.0, this->dt);
-  double p = this->vx_controller.calculate(errors(0), 0.0, this->dt);
+  double r = -this->vy_controller.update(errors(1), 0.0, this->dt);
+  double p = this->vx_controller.update(errors(0), 0.0, this->dt);
   double y = 0.0;
-  double t = this->vz_controller.calculate(errors(2), 0.0, this->dt);
+  double t = this->vz_controller.update(errors(2), 0.0, this->dt);
   t /= fabs(cos(r) * cos(p));  // adjust throttle for roll and pitch
   // clang-format o
 

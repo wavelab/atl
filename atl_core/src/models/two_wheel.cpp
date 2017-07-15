@@ -1,4 +1,4 @@
-#include "atl/gazebo/kinematics/two_wheel.hpp"
+#include "atl/models/two_wheel.hpp"
 
 namespace atl {
 

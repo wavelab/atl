@@ -8,6 +8,8 @@
 
 #include <ros/ros.h>
 
+#include <dji_sdk/dji_drone.h>
+
 #include <atl/utils/utils.hpp>
 #include <atl/ros/utils/node.hpp>
 #include <atl/ros/utils/msgs.hpp>
@@ -21,12 +23,13 @@ namespace gazebo_bridge {
 #define NODE_RATE 200
 
 // PUBLISH TOPICS
-#define DJI_GPS_POSITION_RTOPIC "/dji_sdk/gps_position"
-#define DJI_ATTITUDE_RTOPIC "/dji_sdk/attitude"
+#define DJI_GLOBAL_POSITION_RTOPIC "/dji_sdk/global_position"
+#define DJI_LOCAL_POSITION_RTOPIC "/dji_sdk/local_position"
+#define DJI_ATTITUDE_RTOPIC "/dji_sdk/attitude_quaternion"
 #define DJI_VELOCITY_RTOPIC "/dji_sdk/velocity"
 
 // SUBSCRIBE TOPICS
-#define DJI_SETPOINT_RTOPIC "/dji_sdk/flight_control_setpoint_generic"
+#define DJI_CONTROL_RTOPIC "/dji_sdk/attitude_control"
 
 /** DJI Quadrotor ROS Node */
 class DJIQuadrotorNode : public gaz::QuadrotorGClient, public ROSNode {
@@ -66,7 +69,8 @@ public:
    *
    * @param msg Attitude setpoint for quadrotor
    */
-  void controlCallback(const sensor_msgs::Joy &msg);
+  bool controlCallback(dji_sdk::AttitudeControl::Request &request,
+                       dji_sdk::AttitudeControl::Response &response);
 };
 
 }  // namespace gazebo_bridge

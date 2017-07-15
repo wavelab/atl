@@ -21,6 +21,7 @@ FIND_PACKAGE(catkin
                message_runtime
                image_transport
                cv_bridge
+							 dji_sdk
                atl_core
                atl_ros
                atl_msgs)
@@ -52,6 +53,7 @@ CATKIN_PACKAGE(INCLUDE_DIRS include
                  message_runtime
                  image_transport
                  cv_bridge
+								 dji_sdk
                  atl_core
                  atl_ros
                  atl_msgs)
@@ -138,27 +140,10 @@ ADD_LIBRARY(atl_gazebo_clients ${ATL_GAZEBO_CLIENTS_SRCS})
 ADD_DEPENDENCIES(atl_gazebo_clients atl_gazebo_msgs)
 
 
-# CONTROLS
-SET(ATL_GAZEBO_CONTROLS_SRCS src/controls/pid.cpp)
-ADD_LIBRARY(atl_gazebo_controls ${ATL_GAZEBO_CONTROLS_SRCS})
-ADD_DEPENDENCIES(atl_gazebo_controls atl_gazebo_msgs)
-
-
-# KINEMATICS
-SET(ATL_GAZEBO_KINEMATICS_SRCS
-    src/kinematics/gimbal.cpp
-    src/kinematics/quadrotor.cpp
-    src/kinematics/two_wheel.cpp)
-ADD_LIBRARY(atl_gazebo_kinematics ${ATL_GAZEBO_KINEMATICS_SRCS})
-ADD_DEPENDENCIES(atl_gazebo_kinematics atl_gazebo_msgs)
-
-
 # PLUGINS
 SET(ATL_GAZEBO_PLUGINS_DEPS
 		atl_core
     atl_gazebo_msgs
-    atl_gazebo_kinematics
-    atl_gazebo_controls
     ${GAZEBO_LIBRARIES}
     ${OpenCV_LIBS}
     yaml-cpp
@@ -198,8 +183,6 @@ ADD_DEPENDENCIES(world_gplugin atl_gazebo_msgs)
 ADD_LIBRARY(atl_gazebo
             STATIC
             ${ATL_GAZEBO_CLIENTS_SRCS}
-            ${ATL_GAZEBO_CONTROLS_SRCS}
-            ${ATL_GAZEBO_KINEMATICS_SRCS}
             ${PROTO_SRCS})
 ADD_DEPENDENCIES(atl_gazebo atl_gazebo_clients atl_gazebo_msgs)
 TARGET_LINK_LIBRARIES(atl_gazebo ${PROTOBUF_LIBRARY})

@@ -7,10 +7,11 @@ int DJIQuadrotorNode::configure(const std::string &node_name, int hz) {
   // setup ros node
   // clang-format off
   ROSNode::configure(node_name, hz);
-  ROSNode::registerPublisher<sensor_msgs::NavSatFix>(DJI_GPS_POSITION_RTOPIC);
-  ROSNode::registerPublisher<geometry_msgs::QuaternionStamped>(DJI_ATTITUDE_RTOPIC);
-  ROSNode::registerPublisher<geometry_msgs::Vector3Stamped>(DJI_VELOCITY_RTOPIC);
-  ROSNode::registerSubscriber(DJI_SETPOINT_RTOPIC, &DJIQuadrotorNode::controlCallback, this);
+  ROSNode::registerPublisher<dji_sdk::GlobalPosition>(DJI_GLOBAL_POSITION_RTOPIC);
+  ROSNode::registerPublisher<dji_sdk::LocalPosition>(DJI_LOCAL_POSITION_RTOPIC);
+  ROSNode::registerPublisher<dji_sdk::AttitudeQuaternion>(DJI_ATTITUDE_RTOPIC);
+  ROSNode::registerPublisher<dji_sdk::Velocity>(DJI_VELOCITY_RTOPIC);
+  ROSNode::registerServer(DJI_CONTROL_RTOPIC, &DJIQuadrotorNode::controlCallback, this);
   // clang-format on
 
   // setup gazebo client
@@ -34,6 +35,12 @@ void DJIQuadrotorNode::poseCallback(ConstPosePtr &msg) {
   // gazebo pose callback
   QuadrotorGClient::poseCallback(msg);
 
+  // transform position from NWU to NED
+  Vec3 ros_pos;
+  ros_pos(0) = this->position(0) + x_err(x_gen);
+  ros_pos(1) = -this->position(1) + y_err(y_gen);
+  ros_pos(2) = -this->position(2) + z_err(z_gen);
+
   // convert quaternion from NWU to NED
   Quaternion ros_quat;
   ros_quat.w() = this->orientation.w();
@@ -46,27 +53,34 @@ void DJIQuadrotorNode::poseCallback(ConstPosePtr &msg) {
   double lon = 0.0;
   latlon_offset(this->home_latitude,
                 this->home_longitude,
-                this->position(0) + x_err(x_gen),
-                this->position(1) + y_err(y_gen),
+                ros_pos(0),
+                ros_pos(1),
                 &lat,
                 &lon);
 
-  // build gps msg
-  sensor_msgs::NavSatFix gps_msg;
-  gps_msg.latitude = lat;
-  gps_msg.longitude = lon;
-  gps_msg.altitude = this->position(2) + z_err(z_gen);
+  // build global position msg
+  dji_sdk::GlobalPosition global_position_msg;
+  global_position_msg.latitude = lat;
+  global_position_msg.longitude = lon;
+  global_position_msg.altitude = ros_pos(2);
+
+  // build local position msg
+  dji_sdk::LocalPosition local_position_msg;
+  local_position_msg.x = ros_pos(0);
+  local_position_msg.y = ros_pos(1);
+  local_position_msg.z = ros_pos(2);
 
   // build attitude msg
-  geometry_msgs::QuaternionStamped att_msg;
-  att_msg.quaternion.w = ros_quat.w();
-  att_msg.quaternion.x = ros_quat.x();
-  att_msg.quaternion.y = ros_quat.y();
-  att_msg.quaternion.z = ros_quat.z();
+  dji_sdk::AttitudeQuaternion attitude_msg;
+  attitude_msg.q0 = ros_quat.w();
+  attitude_msg.q1 = ros_quat.x();
+  attitude_msg.q2 = ros_quat.y();
+  attitude_msg.q3 = ros_quat.z();
 
   // publish
-  this->ros_pubs[DJI_GPS_POSITION_RTOPIC].publish(gps_msg);
-  this->ros_pubs[DJI_ATTITUDE_RTOPIC].publish(att_msg);
+  this->ros_pubs[DJI_GLOBAL_POSITION_RTOPIC].publish(global_position_msg);
+  this->ros_pubs[DJI_LOCAL_POSITION_RTOPIC].publish(local_position_msg);
+  this->ros_pubs[DJI_ATTITUDE_RTOPIC].publish(attitude_msg);
 }
 
 void DJIQuadrotorNode::velocityCallback(ConstVector3dPtr &msg) {
@@ -77,34 +91,37 @@ void DJIQuadrotorNode::velocityCallback(ConstVector3dPtr &msg) {
   std::random_device rd;
   std::mt19937 gen(rd());
   std::normal_distribution<> err(0, 0.0);
+  dji_sdk::Velocity velocity_msg;
 
-  // transform velocity from NWU to ENU
-  geometry_msgs::Vector3Stamped velocity_msg;
-  velocity_msg.vector.x = -this->velocity(1) + err(gen);
-  velocity_msg.vector.y = this->velocity(0) + err(gen);
-  velocity_msg.vector.z = this->velocity(2) + err(gen);
+  // transform velocity from NWU to NED
+  velocity_msg.vx = this->velocity(0) + err(gen);
+  velocity_msg.vy = -this->velocity(1) + err(gen);
+  velocity_msg.vz = -this->velocity(2) + err(gen);
 
   this->ros_pubs[DJI_VELOCITY_RTOPIC].publish(velocity_msg);
 }
 
-void DJIQuadrotorNode::controlCallback(const sensor_msgs::Joy &msg) {
-  double roll = msg.axes[0];
-  double pitch = msg.axes[1];
-  double yaw = msg.axes[2];
-  double throttle = msg.axes[3];
-  int control_flag = msg.axes[4];
-
+bool DJIQuadrotorNode::controlCallback(
+  dji_sdk::AttitudeControl::Request &request,
+  dji_sdk::AttitudeControl::Response &response) {
   // pre-check
-  if (control_flag != 0x20) {
+  if (request.flag != 0x20) {
     LOG_ERROR("Attitude control byte other than [0x20] is not supported!");
-    return;
+    response.result = false;
+    return false;
   }
 
   // transform roll pitch yaw from NED to NWU
-  Vec3 euler{deg2rad(roll), -deg2rad(pitch), wrapTo180(-deg2rad(yaw))};
+  Vec3 euler{deg2rad(request.x),
+             -deg2rad(request.y),
+             wrapTo180(-deg2rad(request.yaw))};
 
   // set attitude
-  this->setAttitude(euler(0), euler(1), euler(2), throttle / 100.0);
+  this->setAttitude(euler(0), euler(1), euler(2), request.z / 100.0);
+
+  // return
+  response.result = true;
+  return true;
 }
 
 }  // namespace gazebo_bridge

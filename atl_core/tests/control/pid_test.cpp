@@ -1,5 +1,5 @@
-#include "atl/control/pid_controller.hpp"
 #include "atl/atl_test.hpp"
+#include "atl/control/pid.hpp"
 
 TEST(PID, constructor) {
   atl::PID controller;
@@ -29,15 +29,11 @@ TEST(PID, constructor) {
   EXPECT_FLOAT_EQ(3.0, controller.k_d);
 }
 
-TEST(PID, calculate) {
-  atl::PID controller;
-  double output;
-
-  // setup
-  controller = atl::PID(1.0, 1.0, 1.0);
+TEST(PID, update) {
+  atl::PID controller{1.0, 1.0, 1.0};
 
   // test and assert
-  output = controller.calculate(10.0, 0.0, 0.1);
+  double output = controller.update(10.0, 0.0, 0.1);
 
   EXPECT_FLOAT_EQ(1.0, controller.error_sum);
   EXPECT_FLOAT_EQ(10.0, controller.error_p);

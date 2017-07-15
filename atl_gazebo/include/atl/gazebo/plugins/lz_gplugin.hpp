@@ -9,8 +9,8 @@
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
 
+#include "atl/models/two_wheel.hpp"
 #include "atl/gazebo/gazebo_node.hpp"
-#include "atl/gazebo/kinematics/two_wheel.hpp"
 
 namespace atl {
 namespace gaz {

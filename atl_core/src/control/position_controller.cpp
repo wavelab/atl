@@ -74,11 +74,11 @@ Vec4 PositionController::calculate(Vec3 setpoints,
 
   // roll, pitch, yaw and throttle (assuming NWU frame)
   // clang-format off
-  double r = -this->y_controller.calculate(errors(1), 0.0, this->dt);
-  double p = this->x_controller.calculate(errors(0), 0.0, this->dt);
+  double r = -this->y_controller.update(errors(1), 0.0, this->dt);
+  double p = this->x_controller.update(errors(0), 0.0, this->dt);
   double y = yaw;
   double t = this->hover_throttle;
-  t += this->z_controller.calculate(errors(2), 0.0, this->dt);
+  t += this->z_controller.update(errors(2), 0.0, this->dt);
   t /= fabs(cos(r) * cos(p));  // adjust throttle for roll and pitch
   // clang-format o
 

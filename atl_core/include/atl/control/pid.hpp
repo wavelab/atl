@@ -1,5 +1,9 @@
-#ifndef ATL_GAZEBO_CONTROLS_PID_HPP
-#define ATL_GAZEBO_CONTROLS_PID_HPP
+#ifndef ATL_CONTROL_PID_CONTROLLER_HPP
+#define ATL_CONTROL_PID_CONTROLLER_HPP
+
+#include <float.h>
+#include <math.h>
+#include <iostream>
 
 namespace atl {
 
@@ -38,7 +42,8 @@ public:
         k_d(k_d) {}
 
   double update(double setpoint, double actual, double dt);
+  void reset();
 };
 
 }  // namespace atl
-#endif  // ATL_GAZEBO_CONTROLS_PID_HPP
+#endif

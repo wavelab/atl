@@ -132,12 +132,6 @@ void QuadrotorGPlugin::publishVelocity() {
 }
 
 void QuadrotorGPlugin::setAttitudeCallback(AttitudeSetpointPtr &msg) {
-  std::cout << "roll: " << msg->roll() << std::endl;
-  std::cout << "pitch: " << msg->pitch() << std::endl;
-  std::cout << "yaw: " << msg->yaw() << std::endl;
-  std::cout << "throttle: " << msg->throttle() << std::endl;
-  std::cout << std::endl;
-
   // clang-format off
   this->quadrotor.setAttitude(msg->roll(),
                               msg->pitch(),

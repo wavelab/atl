@@ -11,11 +11,8 @@
 #include <mavros_msgs/State.h>
 
 #include <dji_sdk/dji_drone.h>
-#include <dji_sdk/DroneArmControl.h>
-#include <dji_sdk/SDKControlAuthority.h>
 
 #include <atl/atl_core.hpp>
-
 #include "atl/ros/utils/msgs.hpp"
 #include "atl/ros/utils/node.hpp"
 
