@@ -92,15 +92,12 @@ int ControlNode::configurePX4Topics() {
 
 int ControlNode::configureDJITopics() {
   // clang-format off
-  // services
-  this->registerClient<dji_sdk::DroneArmControl>(DJI_ARM_TOPIC);
-  this->registerClient<dji_sdk::SDKControlAuthority>(DJI_SDK_AUTH_TOPIC);
-
   // publishers
   this->registerPublisher<sensor_msgs::Joy>(DJI_SETPOINT_TOPIC);
 
   // subscribers
   this->registerSubscriber(DJI_GPS_POSITION_TOPIC, &ControlNode::djiGPSPositionCallback, this);
+  this->registerSubscriber(DJI_LOCAL_POSITION_TOPIC, &ControlNode::djiLocalPositionCallback, this);
   this->registerSubscriber(DJI_ATTITUDE_TOPIC, &ControlNode::djiAttitudeCallback, this);
   this->registerSubscriber(DJI_VELOCITY_TOPIC, &ControlNode::djiVelocityCallback, this);
   this->registerSubscriber(DJI_RADIO_TOPIC, &ControlNode::djiRadioCallback, this);
@@ -300,7 +297,7 @@ void ControlNode::px4RadioCallback(const mavros_msgs::RCIn &msg) {
   }
 }
 
-void ControlNode::djiGPSPositionCallback(const sensor_msgs::NavSatFix &msg) {
+void ControlNode::djiGPSPositionCallback(const dji_sdk::GlobalPosition &msg) {
   this->latitude = msg.latitude;
   this->longitude = msg.longitude;
 }
@@ -349,20 +346,18 @@ void ControlNode::djiVelocityCallback(const dji_sdk::Velocity &msg) {
 }
 
 void ControlNode::djiRadioCallback(const dji_sdk::RCChannels &msg) {
-  if (this->armed) {
-    if (msg.gear < 0) {
-      this->armed = false;
-      this->djiOffboardModeOff();
-      this->setEstimatorOff();
-    }
-  } else {
-    if (msg.gear > 0) {
-      this->armed = true;
-      this->quadrotor.setMode(DISCOVER_MODE);
-      this->djiOffboardModeOn();
-      this->setEstimatorOn();
-    }
+  if (msg.mode > 0 && this->armed == true) {
+    this->armed = false;
+    this->djiOffboardModeOff();
+    this->setEstimatorOff();
+
+  } else if (msg.mode < 0 && this->armed == false) {
+    this->armed = true;
+    this->quadrotor.setMode(DISCOVER_MODE);
+    this->djiOffboardModeOn();
+    this->setEstimatorOn();
   }
+
 }
 
 void ControlNode::armCallback(const std_msgs::Bool &msg) {

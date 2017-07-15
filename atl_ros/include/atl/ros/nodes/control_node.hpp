@@ -45,14 +45,12 @@ namespace atl {
 #define PX4_VELOCITY_TOPIC "/mavros/local_position/velocity"
 #define PX4_RADIO_TOPIC "/mavros/rc/in"
 
-#define DJI_ARM_TOPIC "/dji_sdk/drone_arm_control"
-#define DJI_SDK_AUTH_TOPIC "/dji_sdk/sdk_control_authority"
 #define DJI_SETPOINT_TOPIC "/dji_sdk/flight_control_setpoint_generic"
 #define DJI_GPS_POSITION_TOPIC "/dji_sdk/global_position"
 #define DJI_LOCAL_POSITION_TOPIC "/dji_sdk/local_position"
 #define DJI_ATTITUDE_TOPIC "/dji_sdk/attitude_quaternion"
 #define DJI_VELOCITY_TOPIC "/dji_sdk/velocity"
-#define DJI_RADIO_TOPIC "/dji_sdk/rc"
+#define DJI_RADIO_TOPIC "/dji_sdk/rc_channels"
 
 #define ARM_TOPIC "/atl/control/arm"
 #define MODE_TOPIC "/atl/control/mode"
@@ -111,7 +109,7 @@ public:
   void px4PoseCallback(const geometry_msgs::PoseStamped &msg);
   void px4VelocityCallback(const geometry_msgs::TwistStamped &msg);
   void px4RadioCallback(const mavros_msgs::RCIn &msg);
-  void djiGPSPositionCallback(const sensor_msgs::NavSatFix &msg);
+  void djiGPSPositionCallback(const dji_sdk::GlobalPosition &msg);
   void djiLocalPositionCallback(const dji_sdk::LocalPosition &msg);
   void djiAttitudeCallback(const dji_sdk::AttitudeQuaternion &msg);
   void djiVelocityCallback(const dji_sdk::Velocity &msg);
