@@ -59,9 +59,9 @@ public:
 
   ROSNode(int argc, char **argv);
   ~ROSNode();
-  int configure(const std::string node_name, int hz);
+  int configure(const std::string &node_name, int hz);
   void shutdownCallback(const std_msgs::Bool &msg);
-  int registerShutdown(std::string topic);
+  int registerShutdown(const std::string &topic);
   int registerImagePublisher(const std::string &topic);
 
   template <typename M, typename T>

@@ -3,18 +3,7 @@
 namespace atl {
 
 // TRAJECTORY
-Trajectory::Trajectory() {
-  this->loaded = false;
-  this->index = -1;
-  this->pos.clear();
-  this->vel.clear();
-  this->inputs.clear();
-  this->rel_pos.clear();
-  this->rel_vel.clear();
-  this->p0 << 0.0, 0.0, 0.0;
-}
-
-int Trajectory::load(int index, std::string filepath, Vec3 p0) {
+int Trajectory::load(int index, const std::string &filepath, const Vec3 &p0) {
   MatX traj_data;
   Vec2 p, v, u, rel_p, rel_v;
 
@@ -141,16 +130,7 @@ void Trajectory::reset() {
 }
 
 // TRAJECTORY INDEX
-TrajectoryIndex::TrajectoryIndex() {
-  this->loaded = false;
-
-  this->traj_dir = "";
-  this->index_data = MatX();
-  this->pos_thres = 0.0;
-  this->vel_thres = 0.0;
-}
-
-int TrajectoryIndex::load(std::string index_file,
+int TrajectoryIndex::load(const std::string &index_file,
                           double pos_thres,
                           double vel_thres) {
   // pre-check
@@ -178,7 +158,7 @@ int TrajectoryIndex::load(std::string index_file,
   return 0;
 }
 
-int TrajectoryIndex::find(Vec3 pos, double v, Trajectory &traj) {
+int TrajectoryIndex::find(const Vec3 &pos, double v, Trajectory &traj) {
   bool p_ok, v_ok;
   std::vector<int> matches;
   std::string traj_file;
@@ -189,10 +169,9 @@ int TrajectoryIndex::find(Vec3 pos, double v, Trajectory &traj) {
   }
 
   // NOTE: the following is not the most efficient way of implementing a
-  // lookup
-  // table, a better way could involve a search tree and traverse it or even a
-  // bucket based approach. The following implements a list traversal type
-  // search which is approx O(n), ok for small lookups.
+  // lookup table, a better way could involve a search tree and traverse it
+  // or even a bucket based approach. The following implements a list
+  // traversal type search which is approx O(n), ok for small lookups.
 
   // find rows in the index that have same approx
   // start height (z) and velocity (v)
@@ -272,13 +251,11 @@ LandingController::~LandingController() {
 }
 
 int LandingController::configure(const std::string &config_file) {
-  ConfigParser parser;
-  std::string config_dir;
   std::string traj_index_file;
   std::string blackbox_file;
 
   // load config
-  // clang-format off
+  ConfigParser parser;
   parser.addParam("vx_controller.k_p", &this->vx_k_p);
   parser.addParam("vx_controller.k_i", &this->vx_k_i);
   parser.addParam("vx_controller.k_d", &this->vx_k_d);
@@ -306,13 +283,12 @@ int LandingController::configure(const std::string &config_file) {
   parser.addParam("blackbox_enable", &this->blackbox_enable);
   parser.addParam("blackbox_rate", &this->blackbox_rate, true);
   parser.addParam("blackbox_file", &blackbox_file, true);
-  // clang-format on
   if (parser.load(config_file) != 0) {
     return -1;
   }
 
   // load trajectory index
-  config_dir = std::string(dirname((char *) config_file.c_str()));
+  std::string config_dir = std::string(dirname((char *) config_file.c_str()));
   paths_combine(config_dir, traj_index_file, traj_index_file);
   if (this->traj_index.load(traj_index_file) != 0) {
     return -2;
@@ -583,12 +559,6 @@ int LandingController::calculate(Vec3 target_pos_bf,
   }
 
   return retval;
-}
-
-void LandingController::reset() {
-  // this->vx_controller.reset();
-  // this->vy_controller.reset();
-  // this->vz_controller.reset();
 }
 
 void LandingController::printOutputs() {

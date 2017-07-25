@@ -33,8 +33,8 @@ public:
   std::deque<Vec2> rel_vel;
   Vec3 p0;
 
-  Trajectory();
-  int load(int index, std::string filepath, Vec3 pos);
+  Trajectory() : loaded{false}, index{-1}, p0{Vec3::Zero()} {}
+  int load(int index, const std::string &filepath, const Vec3 &pos);
   int update(Vec3 pos, Vec2 &wp_pos, Vec2 &wp_vel, Vec2 &wp_inputs);
   void reset();
 };
@@ -48,11 +48,18 @@ public:
   double pos_thres;
   double vel_thres;
 
-  TrajectoryIndex();
-  int load(std::string index_file,
+  TrajectoryIndex()
+      : loaded{false},
+        traj_dir{""},
+        index_data{MatX::Zero(1, 1)},
+        pos_thres{0.0},
+        vel_thres{0.0} {}
+
+  int load(const std::string &index_file,
            double pos_thres = 0.2,
            double vel_thres = 0.2);
-  int find(Vec3 pos, double v, Trajectory &traj);
+
+  int find(const Vec3 &pos, double v, Trajectory &traj);
 };
 
 class LandingController {
@@ -99,6 +106,7 @@ public:
 
   LandingController();
   ~LandingController();
+
   int configure(const std::string &config_file);
   int loadTrajectory(Vec3 pos, Vec3 target_pos_bf, double v);
   int prepBlackbox(const std::string &blackbox_file);
@@ -124,7 +132,6 @@ public:
                 Quaternion orientation,
                 double yaw,
                 double dt);
-  void reset();
   void printOutputs();
 };
 

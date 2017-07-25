@@ -19,7 +19,7 @@ ROSNode::~ROSNode() {
   ::ros::shutdown();
 }
 
-int ROSNode::configure(const std::string node_name, int hz) {
+int ROSNode::configure(const std::string &node_name, int hz) {
   // clang-format off
   if (::ros::isInitialized() == false) {
     ::ros::init(
@@ -48,7 +48,7 @@ void ROSNode::shutdownCallback(const std_msgs::Bool &msg) {
   }
 }
 
-int ROSNode::registerShutdown(std::string topic) {
+int ROSNode::registerShutdown(const std::string &topic) {
   bool retval;
   ::ros::Subscriber sub;
 

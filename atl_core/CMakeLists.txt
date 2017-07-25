@@ -44,6 +44,8 @@ ADD_LIBRARY(
     src/estimation/ekf_tracker.cpp
     src/estimation/kf.cpp
     src/estimation/kf_tracker.cpp
+    # mission
+    src/mission/mission.cpp
     # models
     src/models/gimbal.cpp
     src/models/quadrotor.cpp
@@ -99,35 +101,37 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
 # UNIT TESTS
 ADD_EXECUTABLE(
     atl_tests
-    # CONTROL
+    # control
     tests/control/landing_controller_test.cpp
     tests/control/pid_test.cpp
     tests/control/position_controller_test.cpp
     tests/control/tracking_controller_test.cpp
     tests/control/velocity_controller_test.cpp
-    # ESTIMATION
+    # estimation
     tests/estimation/ekf_test.cpp
     tests/estimation/ekf_tracker_test.cpp
     tests/estimation/kf_test.cpp
     tests/estimation/kf_tracker_test.cpp
-    # PLANNING
+    # mission
+    tests/mission/mission_test.cpp
+    # planning
     tests/planning/model_test.cpp
     tests/planning/optimizer_test.cpp
     tests/planning/trajectory_test.cpp
     tests/planning/utils_test.cpp
-    # QUADROTOR
+    # quadrotor
     tests/quadrotor/landing_target_test.cpp
     tests/quadrotor/quadrotor_test.cpp
-    # SENSOR
+    # sensor
     tests/sensor/MPU6050_test.cpp
-    # VISION
+    # vision
     tests/vision/apriltag/mit_test.cpp
     tests/vision/camera/camera_test.cpp
     tests/vision/camera/pointgrey_test.cpp
     tests/vision/camera/config_test.cpp
     tests/vision/gimbal/gimbal_test.cpp
     tests/vision/gimbal/sbgc_test.cpp
-    # UTIL
+    # util
     tests/utils/config_test.cpp
     tests/utils/data_test.cpp
     tests/utils/file_test.cpp
@@ -136,7 +140,7 @@ ADD_EXECUTABLE(
     tests/utils/opencv_test.cpp
     tests/utils/stats_test.cpp
     tests/utils/time_test.cpp
-    # TEST RUNNER
+    # test runner
     tests/test_runner.cpp
 )
 TARGET_LINK_LIBRARIES(atl_tests ${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})

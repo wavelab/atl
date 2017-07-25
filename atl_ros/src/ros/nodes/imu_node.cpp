@@ -2,7 +2,7 @@
 
 namespace atl {
 
-int IMUNode::configure(std::string node_name, int hz) {
+int IMUNode::configure(const std::string &node_name, int hz) {
   std::string config_path;
 
   // ros node
@@ -46,14 +46,14 @@ int IMUNode::configure(std::string node_name, int hz) {
   return 0;
 }
 
-int IMUNode::publishIMU(Vec3 euler) {
+int IMUNode::publishIMU(const Vec3 &euler) {
   geometry_msgs::Vector3 msg;
   buildMsg(euler, msg);
   this->ros_pubs[IMU_TOPIC].publish(msg);
   return 0;
 }
 
-int IMUNode::publishJointOrientation(Quaternion q) {
+int IMUNode::publishJointOrientation(const Quaternion &q) {
   geometry_msgs::Quaternion msg;
   buildMsg(q, msg);
   this->ros_pubs[JOINT_ORIENTATION_TOPIC].publish(msg);
