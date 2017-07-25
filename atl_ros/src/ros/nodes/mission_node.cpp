@@ -3,16 +3,24 @@
 namespace atl {
 
 int MissionNode::configure(const std::string &node_name, int hz) {
-  std::string config_path;
+  std::string config_file;
 
   // ros node
   if (ROSNode::configure(node_name, hz) != 0) {
     return -1;
   }
 
+  // configure mission
+  ROS_GET_PARAM("/mission/config", config_file);
+  if (this->mission.configure(config_file) != 0) {
+    ROS_ERROR("Failed to configure mission!");
+    return -2;
+  }
+
   // configure dji topics
-  this->registerSubscriber(
-    DJI_RADIO_TOPIC, &MissionNode::djiRadioCallback, this);
+  // clang-format off
+  this->registerSubscriber(DJI_RADIO_TOPIC, &MissionNode::radioCallback, this);
+  // clang-format on
 
   // dji
   this->dji = new DJIDrone(*this->ros_nh);
@@ -21,18 +29,40 @@ int MissionNode::configure(const std::string &node_name, int hz) {
   return 0;
 }
 
-void MissionNode::djiRadioCallback(const dji_sdk::RCChannels &msg) {
+dji_sdk::WaypointList MissionNode::buildMission() {
+  dji_sdk::WaypointList waypoint_list;
+
+  // create waypoints list
+  for (auto wp : this->mission.waypoints) {
+    dji_sdk::Waypoint waypoint;
+    waypoint.latitude = wp.latitude;
+    waypoint.longitude = wp.longitude;
+    waypoint.altitude = wp.altitude;
+    waypoint.staytime = wp.staytime;
+    waypoint.heading = wp.heading;
+
+    waypoint_list.waypoint_list.push_back(waypoint);
+  }
+
+  // set mission velocity
+  this->dji->mission_waypoint_set_speed(this->mission.velocity);
+}
+
+void MissionNode::radioCallback(const dji_sdk::RCChannels &msg) {
   if (msg.mode > 0 && this->offboard == true) {
     this->offboard = false;
-    this->djiOffboardModeOff();
+    this->offboardModeOff();
+    this->dji->mission_cancel();
 
   } else if (msg.mode < 0 && this->offboard == false) {
     this->offboard = true;
-    this->djiOffboardModeOn();
+    if (this->offboardModeOn() == true) {
+      this->executeMission();
+    }
   }
 }
 
-int MissionNode::djiOffboardModeOn() {
+int MissionNode::offboardModeOn() {
   if (this->dji->request_sdk_permission_control() != true) {
     LOG_ERROR("Failed to release DJI SDK control!");
     return -1;
@@ -42,7 +72,7 @@ int MissionNode::djiOffboardModeOn() {
   return 0;
 }
 
-int MissionNode::djiOffboardModeOff() {
+int MissionNode::offboardModeOff() {
   if (this->dji->release_sdk_permission_control() != true) {
     LOG_ERROR("Failed to release DJI SDK control!");
     return -1;
@@ -52,20 +82,9 @@ int MissionNode::djiOffboardModeOff() {
   return 0;
 }
 
-int MissionNode::runMission() {
-  dji_sdk::WaypointList waypoint_list;
-
-  for (int i = 0; i < 10; i++) {
-    dji_sdk::Waypoint waypoint;
-    waypoint.latitude = 0.0;
-    waypoint.longitude = 0.0;
-    waypoint.altitude = 0.0;
-    waypoint.staytime = 0;
-    waypoint.heading = 0;
-
-    // waypoint_list.push_back(waypoint);
-  }
-  this->dji->mission_waypoint_set_speed(1.0);
+int MissionNode::executeMission() {
+  LOG_INFO("Executing Mission!");
+  dji_sdk::WaypointList waypoint_list = this->buildMission();
   this->dji->waypoint_navigation_send_request(waypoint_list);
 
   return 0;

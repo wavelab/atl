@@ -2,39 +2,17 @@
 #define ATL_MISSION_MISSION_HPP
 
 #include "atl/utils/utils.hpp"
+#include "atl/mission/waypoint.hpp"
 
 namespace atl {
 
 // ERROR MESSAGES
 #define EDISTLATLON "Waypoint %d: (%f, %f) has dist > %f from prev waypoint!"
-
-/**
- * Waypoint
- */
-class Waypoint {
-public:
-  double latitude;
-  double longitude;
-
-  Waypoint() : latitude{0.0}, longitude{0.0} {}
-  Waypoint(double latitude, double longitude)
-      : latitude{latitude}, longitude{longitude} {}
-
-  /**
-   * Calculate distance away from another waypoint
-   * @param wp 2nd Waypoint to calculate distance away from
-   * @return Distance between this waypoint and waypoint `wp`
-   */
-  double distance(const Waypoint &wp) {
-    return latlon_dist(latitude, longitude, wp.latitude, wp.longitude);
-  }
-
-  friend std::ostream &operator<<(std::ostream &out, const Waypoint &wp) {
-    out << "latitude:" << wp.latitude << ", ";
-    out << "longitude:" << wp.longitude;
-    return out;
-  }
-};
+#define EINVLATLON "Invalid latlon (%f, %f)!"
+#define EINVALT "Invalid altitude %f!"
+#define EINVSTAY "Invalid staytime %f!"
+#define EINVHEADING \
+  "Invalid heading %f! Should be between -180.0 to 180.0 degrees"
 
 /**
  * Mission
@@ -46,16 +24,14 @@ public:
   bool check_waypoints;
   double waypoint_threshold;
 
-  double altitude;
-  double max_velocity;
+  double velocity;
   std::vector<Waypoint> waypoints;
 
   Mission()
       : configured{false},
         check_waypoints{true},
         waypoint_threshold{20.0},
-        altitude{5.0},
-        max_velocity{0.5} {}
+        velocity{0.0} {}
 
   /**
    * Configure

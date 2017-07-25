@@ -57,6 +57,7 @@ public:
   image_transport::Subscriber img_sub;
   std::function<int()> loop_cb;
 
+  ROSNode() {}
   ROSNode(int argc, char **argv);
   ~ROSNode();
   int configure(const std::string &node_name, int hz);

@@ -21,9 +21,12 @@ namespace atl {
 
 class MissionNode : public ROSNode {
 public:
-  DJIDrone *dji = nullptr;
-  bool offboard = false;
+  bool offboard;
 
+  DJIDrone *dji;
+  Mission mission;
+
+  MissionNode() : offboard{false}, dji{nullptr}, mission{} {}
   MissionNode(int argc, char **argv) : ROSNode(argc, argv) {}
   ~MissionNode() {
     delete this->dji;
@@ -31,34 +34,40 @@ public:
 
   /**
    * Configure
-   * @params node_name ROS node name
-   * @params hz ROS node rate
-   * @returns 0 for success, -1 for failure
+   * @param node_name ROS node name
+   * @param hz ROS node rate
+   * @return 0 for success, -1 for failure
    */
   int configure(const std::string &node_name, int hz);
 
   /**
+   * Build DJI waypoint list
+   * @return Mission waypoint list
+   */
+  dji_sdk::WaypointList buildMission();
+
+  /**
    * ROS R/C radio callback
    */
-  void djiRadioCallback(const dji_sdk::RCChannels &msg);
+  void radioCallback(const dji_sdk::RCChannels &msg);
 
   /**
    * Configure mode on
-   * @returns 0 for success, -1 for failure
+   * @return 0 for success, -1 for failure
    */
-  int djiOffboardModeOn();
+  int offboardModeOn();
 
   /**
    * Offboard mode off
-   * @returns 0 for success, -1 for failure
+   * @return 0 for success, -1 for failure
    */
-  int djiOffboardModeOff();
+  int offboardModeOff();
 
   /**
-   * Run mission
-   * @returns 0 for success, -1 for failure
+   * Execute mission
+   * @return 0 for success, -1 for failure
    */
-  int runMission();
+  int executeMission();
 };
 
 }  // namespace atl
