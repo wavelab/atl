@@ -44,7 +44,7 @@ public:
    * Build DJI waypoint list
    * @return Mission waypoint list
    */
-  dji_sdk::WaypointList buildMission();
+  dji_sdk::MissionWaypointTask buildMission();
 
   /**
    * ROS R/C radio callback

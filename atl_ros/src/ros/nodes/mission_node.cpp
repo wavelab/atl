@@ -29,23 +29,36 @@ int MissionNode::configure(const std::string &node_name, int hz) {
   return 0;
 }
 
-dji_sdk::WaypointList MissionNode::buildMission() {
-  dji_sdk::WaypointList waypoint_list;
+dji_sdk::MissionWaypointTask MissionNode::buildMission() {
+  dji_sdk::MissionWaypointTask mission_task;
+
+  // mission general settings
+  mission_task.velocity_range = this->mission.velocity;
+  mission_task.idle_velocity = 0;
+  mission_task.action_on_finish = 0;
+  mission_task.mission_exec_times = 1;
+  mission_task.yaw_mode = 4;
+  mission_task.trace_mode = 0;
+  mission_task.action_on_rc_lost = 0;
+  mission_task.gimbal_pitch_mode = 0;
 
   // create waypoints list
   for (auto wp : this->mission.waypoints) {
-    dji_sdk::Waypoint waypoint;
+    dji_sdk::MissionWaypoint waypoint;
+
     waypoint.latitude = wp.latitude;
     waypoint.longitude = wp.longitude;
-    waypoint.altitude = wp.altitude;
-    waypoint.staytime = wp.staytime;
-    waypoint.heading = wp.heading;
+    waypoint.altitude = wp.altitude;  // relative to takeoff point, not sea level
+    waypoint.damping_distance = 0.1;
+    waypoint.target_yaw = wp.heading;
+    waypoint.target_gimbal_pitch = 0;
+    waypoint.turn_mode = 0;
+    waypoint.has_action = 0;
 
-    waypoint_list.waypoint_list.push_back(waypoint);
+    mission_task.mission_waypoint.push_back(waypoint);
   }
 
-  // set mission velocity
-  this->dji->mission_waypoint_set_speed(this->mission.velocity);
+  return mission_task;
 }
 
 void MissionNode::radioCallback(const dji_sdk::RCChannels &msg) {
@@ -84,8 +97,11 @@ int MissionNode::offboardModeOff() {
 
 int MissionNode::executeMission() {
   LOG_INFO("Executing Mission!");
-  dji_sdk::WaypointList waypoint_list = this->buildMission();
-  this->dji->waypoint_navigation_send_request(waypoint_list);
+
+  // execute mission
+  dji_sdk::MissionWaypointTask mission_task = this->buildMission();
+  this->dji->mission_waypoint_upload(mission_task);
+  this->dji->mission_start();
 
   return 0;
 }
