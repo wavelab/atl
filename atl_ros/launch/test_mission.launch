@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- dji sdk -->
+  <node pkg="dji_sdk" type="dji_sdk_node" name="dji_sdk" output="screen">
+    <param name="serial_name" type="string" value="/dev/ttyUSB0"/>
+    <param name="baud_rate" type="int" value="230400"/>
+    <param name="app_id" type="int" value="1043630"/>
+    <param name="app_version" type="int" value="1"/>
+    <param name="app_bundle_id" type="string" value="Not required in this SDK version"/>
+    <param name="enc_key" type="string" value="8bd7f50dc02c5e9343f1dc19afd22b44d7907dba3239ed88e77bf3c78356e8d0"/>
+    <param name="groundstation_enable" type="int" value="1"/>
+  </node>
+
+  <!-- mission node -->
+  <param name="/mission/config" value="$(find atl_configs)/configs/missions/carpark_1.yaml" />
+  <node pkg="atl_ros" name="atl_mission" type="atl_mission_node" output="screen" required="true" />
+</launch>
