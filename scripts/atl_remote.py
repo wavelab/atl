@@ -89,9 +89,9 @@ def init_svo(lz):
 
 def hover_side_to_side():
     for i in range(3):
-        quad.set_hover_point([1, 0, 5.0])
+        quad.set_hover_point([0, 2, 5.0])
         sleep(5)
-        quad.set_hover_point([-1, 0, 5.0])
+        quad.set_hover_point([0, -2, 5.0])
         sleep(5)
 
 
@@ -105,8 +105,31 @@ if __name__ == "__main__":
     # world = World()
     rospy.sleep(1.0)
 
-    quad.set_arm(True)
+    # quad.set_arm(True)
     hover_side_to_side()
+    # quad.set_pctrl_settings({
+    #     "roll": {
+    #         "min": -30,
+    #         "max": 30,
+    #         "k_p": 0.2,
+    #         "k_i": 0.0,
+    #         "k_d": 0.15
+    #     },
+    #     "pitch": {
+    #         "min": -30,
+    #         "max": 30,
+    #         "k_p": 0.2,
+    #         "k_i": 0.0,
+    #         "k_d": 0.15
+    #     },
+    #     "throttle": {
+    #         "hover": 0.5,
+    #         "k_p": 0.1,
+    #         "k_i": 0.0,
+    #         "k_d": 0.05
+    #     }
+    # })
+
 
     # gimbal.set_attitude([0, 0.2, 0])
     # lz.set_position([1, 0, 0])
@@ -187,29 +210,6 @@ if __name__ == "__main__":
 
     # side_to_side(quad, 4.0, 2.0)
     # square(quad, 4.0, 2.0)
-
-    # quad.set_pctrl_settings({
-    #     "roll": {
-    #         "min": -30,
-    #         "max": 30,
-    #         "k_p": 0.3,
-    #         "k_i": 0.0,
-    #         "k_d": 0.2
-    #     },
-    #     "pitch": {
-    #         "min": -30,
-    #         "max": 30,
-    #         "k_p": 0.3,
-    #         "k_i": 0.0,
-    #         "k_d": 0.2
-    #     },
-    #     "throttle": {
-    #         "hover": 0.5,
-    #         "k_p": 0.4,
-    #         "k_i": 0.0,
-    #         "k_d": 0.2
-    #     }
-    # })
 
     # quad.set_tctrl_settings({
     #     "roll": {
