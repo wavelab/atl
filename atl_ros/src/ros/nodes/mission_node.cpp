@@ -33,8 +33,8 @@ dji_sdk::MissionWaypointTask MissionNode::buildMission() {
   dji_sdk::MissionWaypointTask mission_task;
 
   // mission general settings
-  mission_task.velocity_range = this->mission.velocity;
-  mission_task.idle_velocity = 0;
+  mission_task.velocity_range = 10;
+  mission_task.idle_velocity = 3;
   mission_task.action_on_finish = 0;
   mission_task.mission_exec_times = 1;
   mission_task.yaw_mode = 4;
@@ -46,10 +46,12 @@ dji_sdk::MissionWaypointTask MissionNode::buildMission() {
   for (auto wp : this->mission.waypoints) {
     dji_sdk::MissionWaypoint waypoint;
 
+    std::cout << wp << std::endl;
+
     waypoint.latitude = wp.latitude;
     waypoint.longitude = wp.longitude;
     waypoint.altitude = wp.altitude;  // relative to takeoff point, not sea level
-    waypoint.damping_distance = 0.1;
+    waypoint.damping_distance = 0.0;
     waypoint.target_yaw = wp.heading;
     waypoint.target_gimbal_pitch = 0;
     waypoint.turn_mode = 0;
@@ -57,6 +59,7 @@ dji_sdk::MissionWaypointTask MissionNode::buildMission() {
 
     mission_task.mission_waypoint.push_back(waypoint);
   }
+  this->dji->mission_waypoint_upload(mission_task);
 
   return mission_task;
 }
@@ -69,7 +72,7 @@ void MissionNode::radioCallback(const dji_sdk::RCChannels &msg) {
 
   } else if (msg.mode < 0 && this->offboard == false) {
     this->offboard = true;
-    if (this->offboardModeOn() == true) {
+    if (this->offboardModeOn() == 0) {
       this->executeMission();
     }
   }
@@ -99,9 +102,8 @@ int MissionNode::executeMission() {
   LOG_INFO("Executing Mission!");
 
   // execute mission
-  dji_sdk::MissionWaypointTask mission_task = this->buildMission();
-  this->dji->mission_waypoint_upload(mission_task);
-  this->dji->mission_start();
+  this->buildMission();
+  // this->dji->mission_start();
 
   return 0;
 }

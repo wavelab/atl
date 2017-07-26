@@ -45,8 +45,11 @@ public:
   }
 
   friend std::ostream &operator<<(std::ostream &out, const Waypoint &wp) {
-    out << "latitude:" << wp.latitude << ", ";
-    out << "longitude:" << wp.longitude;
+    out << "latitude: " << wp.latitude << std::endl;
+    out << "longitude: " << wp.longitude << std::endl;
+    out << "altitude: " << wp.altitude << std::endl;
+    out << "staytime: " << wp.staytime << std::endl;
+    out << "heading: " << wp.heading;
     return out;
   }
 };
