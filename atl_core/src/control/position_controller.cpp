@@ -2,26 +2,7 @@
 
 namespace atl {
 
-PositionController::PositionController() {
-  this->configured = false;
-
-  this->dt = 0.0;
-  this->x_controller = PID(0.0, 0.0, 0.0);
-  this->y_controller = PID(0.0, 0.0, 0.0);
-  this->z_controller = PID(0.0, 0.0, 0.0);
-
-  this->roll_limit[0] = 0.0;
-  this->roll_limit[1] = 0.0;
-  this->pitch_limit[0] = 0.0;
-  this->pitch_limit[1] = 0.0;
-  this->hover_throttle = 0.0;
-
-  this->setpoints << 0.0, 0.0, 0.0;
-  this->outputs << 0.0, 0.0, 0.0, 0.0;
-  this->att_cmd = AttitudeCommand();
-}
-
-int PositionController::configure(std::string config_file) {
+int PositionController::configure(const std::string &config_file) {
   ConfigParser parser;
 
   // load config

@@ -39,6 +39,7 @@ ADD_LIBRARY(
     src/control/position_controller.cpp
     src/control/tracking_controller.cpp
     src/control/velocity_controller.cpp
+    src/control/waypoint_controller.cpp
     # estimation
     src/estimation/ekf.cpp
     src/estimation/ekf_tracker.cpp
@@ -107,6 +108,7 @@ ADD_EXECUTABLE(
     tests/control/position_controller_test.cpp
     tests/control/tracking_controller_test.cpp
     tests/control/velocity_controller_test.cpp
+    tests/control/waypoint_controller_test.cpp
     # estimation
     tests/estimation/ekf_test.cpp
     tests/estimation/ekf_tracker_test.cpp

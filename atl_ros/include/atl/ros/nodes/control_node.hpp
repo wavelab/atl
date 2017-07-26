@@ -42,7 +42,6 @@ namespace atl {
 #define PX4_VELOCITY_TOPIC "/mavros/local_position/velocity"
 #define PX4_RADIO_TOPIC "/mavros/rc/in"
 
-#define DJI_SETPOINT_TOPIC "/dji_sdk/flight_control_setpoint_generic"
 #define DJI_GPS_POSITION_TOPIC "/dji_sdk/global_position"
 #define DJI_LOCAL_POSITION_TOPIC "/dji_sdk/local_position"
 #define DJI_ATTITUDE_TOPIC "/dji_sdk/attitude_quaternion"
@@ -90,41 +89,225 @@ public:
         latitude{},
         longitude{} {}
 
-  int configure(std::string node_name, int hz);
+  /**
+   * Configure ROS node
+   * @param node_name ROS node name
+   * @param hz ROS node rate
+   * @return 0 for success, -1 for failure
+   */
+  int configure(const std::string &node_name, int hz);
+
+  /**
+   * Configure PX4 ROS topics
+   */
   int configurePX4Topics();
+
+  /**
+   * Configure DJI ROS topics
+   */
   int configureDJITopics();
+
+  /**
+   * PX4 connect
+   */
   int px4Connect();
+
+  /**
+   * PX4 disarm
+   */
   int px4Disarm();
+
+  /**
+   * PX4 offboard mode on
+   */
   int px4OffboardModeOn();
+
+  /**
+   * DJI disarm
+   */
   int djiDisarm();
+
+  /**
+   * DJI offboard mode on
+   */
   int djiOffboardModeOn();
+
+  /**
+   * DJI offboard mode off
+   */
   int djiOffboardModeOff();
+
+  /**
+   * Estimator wait
+   */
   int waitForEstimator();
+
+  /**
+   * Estimator on
+   */
   void setEstimatorOn();
+
+  /**
+   * Estimator off
+   */
   void setEstimatorOff();
+
+  /**
+   * PX4 state callback
+   * @param msg ROS message
+   */
   void px4StateCallback(const mavros_msgs::State::ConstPtr &msg);
+
+  /**
+   * PX4 pose callback
+   * @param msg ROS message
+   */
   void px4PoseCallback(const geometry_msgs::PoseStamped &msg);
+
+  /**
+   * PX4 velocity callback
+   * @param msg ROS message
+   */
   void px4VelocityCallback(const geometry_msgs::TwistStamped &msg);
+
+  /**
+   * PX4 radio callback
+   * @param msg ROS message
+   */
   void px4RadioCallback(const mavros_msgs::RCIn &msg);
+
+  /**
+   * DJI GPS position callback
+   * @param msg ROS message
+   */
   void djiGPSPositionCallback(const dji_sdk::GlobalPosition &msg);
+
+  /**
+   * DJI local position callback
+   * @param msg ROS message
+   */
   void djiLocalPositionCallback(const dji_sdk::LocalPosition &msg);
+
+  /**
+   * DJI attitude callback
+   * @param msg ROS message
+   */
   void djiAttitudeCallback(const dji_sdk::AttitudeQuaternion &msg);
+
+  /**
+   * DJI velocity callback
+   * @param msg ROS message
+   */
   void djiVelocityCallback(const dji_sdk::Velocity &msg);
+
+  /**
+   * DJI Radio callback
+   * @param msg ROS message
+   */
   void djiRadioCallback(const dji_sdk::RCChannels &msg);
+
+  /**
+   * Arm callback
+   * @param msg ROS message
+   */
   void armCallback(const std_msgs::Bool &msg);
+
+  /**
+   * Mode callback
+   * @param msg ROS message
+   */
   void modeCallback(const std_msgs::String &msg);
+
+  /**
+   * Yaw callback
+   * @param msg ROS message
+   */
   void yawCallback(const std_msgs::Float64 &msg);
+
+  /**
+   * Target position callback
+   * @param msg ROS message
+   */
   void targetPositionCallback(const geometry_msgs::Vector3 &msg);
+
+  /**
+   * Target velocity callback
+   * @param msg ROS message
+   */
   void targetVelocityCallback(const geometry_msgs::Vector3 &msg);
+
+  /**
+   * Target detected callback
+   * @param msg ROS message
+   */
   void targetDetectedCallback(const std_msgs::Bool &msg);
+
+  /**
+   * Hover setpoint callback
+   * @param msg ROS message
+   */
   void hoverSetCallback(const geometry_msgs::Vector3 &msg);
+
+  /**
+   * Hover height setpoint callback
+   * @param msg ROS message
+   */
   void hoverHeightSetCallback(const std_msgs::Float64 &msg);
+
+  /**
+   * Position controller callback
+   * @param msg ROS message
+   */
   void positionControllerSetCallback(const atl_msgs::PCtrlSettings &msg);
+
+  /**
+   * Tracking controller callback
+   * @param msg ROS message
+   */
   void trackingControllerSetCallback(const atl_msgs::TCtrlSettings &msg);
+
+  /**
+   * Landing controller callback
+   * @param msg ROS message
+   */
   void landingControllerSetCallback(const atl_msgs::LCtrlSettings &msg);
+
+  /**
+   * Publish attitude setpoints
+   */
   void publishAttitudeSetpoint();
+
+  /**
+   * Publish quadrotor pose
+   */
   void publishQuadrotorPose();
+
+  /**
+   * Publish quadrotor velocity
+   */
   void publishQuadrotorVelocity();
+
+  /**
+   * Takeoff
+   * @return
+   *    - 0: Success
+   *    - -1: ROS node not configured
+   *    - -2: Not in offboard mode
+   */
+  int takeoff();
+
+  /**
+   * Land
+   * @return
+   *    - 0: Success
+   *    - -1: ROS node not configured
+   *    - -2: Not in offboard mode
+   */
+  int land();
+
+  /**
+   * ROS node loop function
+   */
   int loopCallback();
 };
 

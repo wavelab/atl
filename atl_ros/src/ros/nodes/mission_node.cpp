@@ -19,6 +19,10 @@ int MissionNode::configure(const std::string &node_name, int hz) {
 
   // configure dji topics
   // clang-format off
+  this->registerSubscriber(DJI_GPS_POSITION_TOPIC, &MissionNode::gpsPositionCallback, this);
+  this->registerSubscriber(DJI_LOCAL_POSITION_TOPIC, &MissionNode::localPositionCallback, this);
+  this->registerSubscriber(DJI_ATTITUDE_TOPIC, &MissionNode::attitudeCallback, this);
+  this->registerSubscriber(DJI_VELOCITY_TOPIC, &MissionNode::velocityCallback, this);
   this->registerSubscriber(DJI_RADIO_TOPIC, &MissionNode::radioCallback, this);
   // clang-format on
 
@@ -29,39 +33,50 @@ int MissionNode::configure(const std::string &node_name, int hz) {
   return 0;
 }
 
-dji_sdk::MissionWaypointTask MissionNode::buildMission() {
-  dji_sdk::MissionWaypointTask mission_task;
+void MissionNode::gpsPositionCallback(const dji_sdk::GlobalPosition &msg) {
+  this->latitude = msg.latitude;
+  this->longitude = msg.longitude;
+}
 
-  // mission general settings
-  mission_task.velocity_range = 10;
-  mission_task.idle_velocity = 3;
-  mission_task.action_on_finish = 0;
-  mission_task.mission_exec_times = 1;
-  mission_task.yaw_mode = 4;
-  mission_task.trace_mode = 0;
-  mission_task.action_on_rc_lost = 0;
-  mission_task.gimbal_pitch_mode = 0;
+void MissionNode::localPositionCallback(const dji_sdk::LocalPosition &msg) {
+  Vec3 pos_ned, pos_enu;
 
-  // create waypoints list
-  for (auto wp : this->mission.waypoints) {
-    dji_sdk::MissionWaypoint waypoint;
+  pos_ned(0) = msg.x;
+  pos_ned(1) = msg.y;
+  pos_ned(2) = msg.z;
+  ned2enu(pos_ned, pos_enu);
 
-    std::cout << wp << std::endl;
+  this->quadrotor.pose.position = pos_enu;
+}
 
-    waypoint.latitude = wp.latitude;
-    waypoint.longitude = wp.longitude;
-    waypoint.altitude = wp.altitude;  // relative to takeoff point, not sea level
-    waypoint.damping_distance = 0.0;
-    waypoint.target_yaw = wp.heading;
-    waypoint.target_gimbal_pitch = 0;
-    waypoint.turn_mode = 0;
-    waypoint.has_action = 0;
+void MissionNode::attitudeCallback(const dji_sdk::AttitudeQuaternion &msg) {
+  Quaternion orientation_ned, orientation_nwu;
 
-    mission_task.mission_waypoint.push_back(waypoint);
-  }
-  this->dji->mission_waypoint_upload(mission_task);
+  orientation_ned.w() = msg.q0;
+  orientation_ned.x() = msg.q1;
+  orientation_ned.y() = msg.q2;
+  orientation_ned.z() = msg.q3;
 
-  return mission_task;
+  // transform pose position and orientation
+  // from NED to NWU
+  ned2nwu(orientation_ned, orientation_nwu);
+
+  this->quadrotor.pose.orientation = orientation_nwu;
+}
+
+void MissionNode::velocityCallback(const dji_sdk::Velocity &msg) {
+  Vec3 vel_ned, vel_enu;
+
+  // convert DJI msg to Eigen vector
+  vel_ned(0) = msg.vx;
+  vel_ned(1) = msg.vy;
+  vel_ned(2) = msg.vz;
+
+  // transform velocity in NED to ENU
+  ned2enu(vel_ned, vel_enu);
+
+  // update
+  this->quadrotor.setVelocity(vel_enu);
 }
 
 void MissionNode::radioCallback(const dji_sdk::RCChannels &msg) {
@@ -76,6 +91,36 @@ void MissionNode::radioCallback(const dji_sdk::RCChannels &msg) {
       this->executeMission();
     }
   }
+}
+
+int MissionNode::takeoff() {
+  // pre-check
+  if (this->configured == false) {
+    return -1;
+  } else
+    (this->offboard == false) {
+      return -2;
+    }
+
+  // takeoff
+
+
+  return 0;
+}
+
+int MissionNode::land() {
+  // pre-check
+  if (this->configured == false) {
+    return -1;
+  } else
+    (this->offboard == false) {
+      return -2;
+    }
+
+  // land
+
+
+  return 0;
 }
 
 int MissionNode::offboardModeOn() {

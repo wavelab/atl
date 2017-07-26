@@ -17,6 +17,10 @@ namespace atl {
 #define NODE_RATE 10
 
 // PUBLISH TOPICS
+#define DJI_GPS_POSITION_TOPIC "/dji_sdk/global_position"
+#define DJI_LOCAL_POSITION_TOPIC "/dji_sdk/local_position"
+#define DJI_ATTITUDE_TOPIC "/dji_sdk/attitude_quaternion"
+#define DJI_VELOCITY_TOPIC "/dji_sdk/velocity"
 #define DJI_RADIO_TOPIC "/dji_sdk/rc_channels"
 
 class MissionNode : public ROSNode {
@@ -41,15 +45,52 @@ public:
   int configure(const std::string &node_name, int hz);
 
   /**
-   * Build DJI waypoint list
-   * @return Mission waypoint list
+   * GPS position callback
+   * @param msg ROS message
    */
-  dji_sdk::MissionWaypointTask buildMission();
+  void gpsPositionCallback(const dji_sdk::GlobalPosition &msg);
 
   /**
-   * ROS R/C radio callback
+   * Local position callback
+   * @param msg ROS message
+   */
+  void localPositionCallback(const dji_sdk::LocalPosition &msg);
+
+  /**
+   * Attitude callback
+   * @param msg ROS message
+   */
+  void attitudeCallback(const dji_sdk::AttitudeQuaternion &msg);
+
+  /**
+   * Velocity callback
+   * @param msg ROS message
+   */
+  void velocityCallback(const dji_sdk::Velocity &msg);
+
+  /**
+   * Radio callback
+   * @param msg ROS message
    */
   void radioCallback(const dji_sdk::RCChannels &msg);
+
+  /**
+   * Takeoff
+   * @return
+   *    - 0: Success
+   *    - -1: ROS node not configured
+   *    - -2: Not in offboard mode
+   */
+  int takeoff();
+
+  /**
+   * Land
+   * @return
+   *    - 0: Success
+   *    - -1: ROS node not configured
+   *    - -2: Not in offboard mode
+   */
+  int land();
 
   /**
    * Configure mode on

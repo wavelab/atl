@@ -2,7 +2,7 @@
 
 namespace atl {
 
-int ControlNode::configure(const std::string node_name, int hz) {
+int ControlNode::configure(const std::string &node_name, int hz) {
   std::string config_path;
 
   // ros node
@@ -92,9 +92,6 @@ int ControlNode::configurePX4Topics() {
 
 int ControlNode::configureDJITopics() {
   // clang-format off
-  // publishers
-  this->registerPublisher<sensor_msgs::Joy>(DJI_SETPOINT_TOPIC);
-
   // subscribers
   this->registerSubscriber(DJI_GPS_POSITION_TOPIC, &ControlNode::djiGPSPositionCallback, this);
   this->registerSubscriber(DJI_LOCAL_POSITION_TOPIC, &ControlNode::djiLocalPositionCallback, this);
@@ -530,6 +527,38 @@ void ControlNode::publishQuadrotorVelocity() {
   msg.twist.linear.z = this->quadrotor.velocity(2);
 
   this->ros_pubs[QUADROTOR_VELOCITY].publish(msg);
+}
+
+int ControlNode::takeoff() {
+  // pre-check
+  if (this->configured == false) {
+    return -1;
+  } else if (this->armed == false) {
+    return -2;
+  }
+
+  // takeoff
+  double z = this->quadrotor.hover_position(2);
+  this->quadrotor.hover_position = Vec3{0.0, 0.0, z};
+  this->djiOffboardModeOn();
+
+  return 0;
+}
+
+int ControlNode::land() {
+  // pre-check
+  if (this->configured == false) {
+    return -1;
+  } else if (this->armed == false) {
+    return -2;
+  }
+
+  // land
+  double x = this->quadrotor.pose.position(0);
+  double y = this->quadrotor.pose.position(1);
+  this->quadrotor.hover_position = Vec3{x, y, 0.0};
+
+  return 0;
 }
 
 int ControlNode::loopCallback() {

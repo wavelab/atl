@@ -23,23 +23,130 @@ typedef Eigen::MatrixXd MatX;
 typedef Eigen::Quaterniond Quaternion;
 #endif
 
+/**
+ * Create random integer
+ * @param ub Upper bound
+ * @param lb Lower bound
+ * @return Random integer
+ */
 int randi(int ub, int lb);
+
+/**
+ * Create random double
+ * @param ub Upper bound
+ * @param lb Lower bound
+ * @return Random floating point
+ */
 double randf(double ub, double lb);
+
+/**
+ * Floating point comparator
+ * @param f1 First value
+ * @param f2 Second value
+ * @return
+ *    - 0: if equal
+ *    - 1: if f1 > f2
+ *    - -1: if f1 < f2
+ */
 int fltcmp(double f1, double f2);
+
+/**
+ * Calculate median given an array of numbers
+ * @param v Array of numbers
+ * @return Median of given array
+ */
 double median(std::vector<double> v);
+
+/**
+ * Degrees to radians
+ * @param d Degree to be converted
+ * @return Degree in radians
+ */
 double deg2rad(double d);
+
+/**
+ * Radians to degree
+ * @param r Radian to be converted
+ * @return Radian in degrees
+ */
 double rad2deg(double r);
+
+/**
+ * Load std::vector of doubles to an Eigen::Matrix
+ * @param x Matrix values
+ * @param rows Number of matrix rows
+ * @param cols Number of matrix colums
+ * @param y Output matrix
+ */
 void load_matrix(std::vector<double> x, int rows, int cols, MatX &y);
+
+/**
+ * Load an Eigen::Matrix into a std::vector of doubles
+ * @param A Matrix
+ * @param x Output vector of matrix values
+ */
 void load_matrix(MatX A, std::vector<double> &x);
+
+/**
+ * Convert Euler angles to rotation matrix
+ * @param euler Input Euler angles
+ * @param euler_seq Euler angle sequence
+ * @param R Output rotation matrix
+ */
 int euler2rot(Vec3 euler, int euler_seq, Mat3 &R);
+
+/**
+ * Convert Euler angles to quaternion
+ * @param euler Input Euler angles
+ * @param euler_seq Euler angle sequence
+ * @param q Output quaternion
+ */
 int euler2quat(Vec3 euler, int euler_seq, Quaternion &q);
+
+/**
+ * Convert quanternion to Euler angles
+ * @param q Input quaternion
+ * @param euler_seq Euler angle sequence
+ * @param euler Output Euler angles
+ */
 int quat2euler(Quaternion q, int euler_seq, Vec3 &euler);
+
+/**
+ * Convert Quaternion to rotation matrix
+ * @param q Input quaternion
+ * @param R Output rotation matrix
+ */
 int quat2rot(Quaternion q, Mat3 &R);
+
+/**
+ * Convert from ENU to NWU
+ * @param enu ENU vector
+ * @param nwu NWU vector
+ */
 void enu2nwu(Vec3 enu, Vec3 &nwu);
+
 void cf2nwu(Vec3 cf, Vec3 &nwu);
 void cf2enu(Vec3 cf, Vec3 &nwu);
+
+/**
+ * Convert from NWU to ENU
+ * @param nwu NWU vector
+ * @param enu ENU vector
+ */
 void nwu2enu(Vec3 nwu, Vec3 &enu);
+
+/**
+ * Convert from NED to ENU
+ * @param ned NED vector
+ * @param enu ENU vector
+ */
 void ned2enu(Vec3 ned, Vec3 &enu);
+
+/**
+ * Convert from NWU to NED
+ * @param nwu NWU vector
+ * @param ned NED vector
+ */
 void nwu2ned(Quaternion nwu, Quaternion &ned);
 void ned2nwu(Quaternion ned, Quaternion &enu);
 void enu2nwu(Quaternion enu, Quaternion &nwu);

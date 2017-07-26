@@ -8,5 +8,5 @@
   <param name="/camera/config_dir" value="$(find atl_configs)/configs/camera/webcam" />
 
   <!-- ros node -->
-  <node pkg="atl_ros" name="atl_camera" type="camera_node" output="screen" required="true" />
+  <node pkg="atl_ros" name="atl_camera" type="atl_camera_node" output="screen" required="true" />
 </launch>
