@@ -32,21 +32,17 @@ public:
   double error_z_sum = 0.0;
   double error_z_prev = 0.0;
 
-  double vx_error_prev = 0.0;
-  double vy_error_prev = 0.0;
-  double vz_error_prev = 0.0;
-
   double vx_k_p = 0.0;
   double vx_k_i = 0.0;
   double vx_k_d = 0.0;
 
-  double vy_k_p = 0.0;
-  double vy_k_i = 0.0;
-  double vy_k_d = 0.0;
+  double y_k_p = 0.0;
+  double y_k_i = 0.0;
+  double y_k_d = 0.0;
 
-  double vz_k_p = 0.0;
-  double vz_k_i = 0.0;
-  double vz_k_d = 0.0;
+  double z_k_p = 0.0;
+  double z_k_i = 0.0;
+  double z_k_d = 0.0;
 
   double yaw_k_p = 0.0;
 

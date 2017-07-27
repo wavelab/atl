@@ -16,13 +16,13 @@ TEST(WaypointController, constructor) {
   EXPECT_FLOAT_EQ(0.0, controller.vx_k_i);
   EXPECT_FLOAT_EQ(0.0, controller.vx_k_d);
 
-  EXPECT_FLOAT_EQ(0.0, controller.vy_k_p);
-  EXPECT_FLOAT_EQ(0.0, controller.vy_k_i);
-  EXPECT_FLOAT_EQ(0.0, controller.vy_k_d);
+  EXPECT_FLOAT_EQ(0.0, controller.y_k_p);
+  EXPECT_FLOAT_EQ(0.0, controller.y_k_i);
+  EXPECT_FLOAT_EQ(0.0, controller.y_k_d);
 
-  EXPECT_FLOAT_EQ(0.0, controller.vz_k_p);
-  EXPECT_FLOAT_EQ(0.0, controller.vz_k_i);
-  EXPECT_FLOAT_EQ(0.0, controller.vz_k_d);
+  EXPECT_FLOAT_EQ(0.0, controller.z_k_p);
+  EXPECT_FLOAT_EQ(0.0, controller.z_k_i);
+  EXPECT_FLOAT_EQ(0.0, controller.z_k_d);
 
   EXPECT_FLOAT_EQ(0.0, controller.roll_limit[0]);
   EXPECT_FLOAT_EQ(0.0, controller.roll_limit[1]);
@@ -246,15 +246,9 @@ TEST(WaypointController, update) {
   Vec3 vel_setpoints{0.0, 0.0, 0.0};
   Pose pose{0.0, 0.0, 0.0, 0.0, 1.0, 0.0};
   Vec3 vel{0.0, 0.0, 0.0};
-  double dt = 0.011;
-
 
   controller.wp_start = Vec3{0.0, 0.0, 0.0};
   controller.wp_end = Vec3{0.0, 5.0, 0.0};
-  Vec3 t = (controller.wp_end - controller.wp_start) /
-           (controller.wp_end - controller.wp_start).norm();
-
-  std::cout << t.transpose() << std::endl;
 
   // controller.configure(TEST_CONFIG);
   // controller.update(pose, vel, dt);

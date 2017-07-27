@@ -10,13 +10,13 @@ int WaypointController::configure(const std::string &config_file) {
   parser.addParam("vx_controller.k_i", &this->vx_k_i);
   parser.addParam("vx_controller.k_d", &this->vx_k_d);
 
-  parser.addParam("vy_controller.k_p", &this->vy_k_p);
-  parser.addParam("vy_controller.k_i", &this->vy_k_i);
-  parser.addParam("vy_controller.k_d", &this->vy_k_d);
+  parser.addParam("vy_controller.k_p", &this->y_k_p);
+  parser.addParam("vy_controller.k_i", &this->y_k_i);
+  parser.addParam("vy_controller.k_d", &this->y_k_d);
 
-  parser.addParam("vz_controller.k_p", &this->vz_k_p);
-  parser.addParam("vz_controller.k_i", &this->vz_k_i);
-  parser.addParam("vz_controller.k_d", &this->vz_k_d);
+  parser.addParam("vz_controller.k_p", &this->z_k_p);
+  parser.addParam("vz_controller.k_i", &this->z_k_i);
+  parser.addParam("vz_controller.k_d", &this->z_k_d);
 
   parser.addParam("roll_limit.min", &this->roll_limit[0]);
   parser.addParam("roll_limit.max", &this->roll_limit[1]);
@@ -201,9 +201,9 @@ int WaypointController::update(const Pose &pose,
   // roll
   double error_ct =
     this->crossTrackError(this->wp_start, this->wp_end, pose.position);
-  double r = this->vy_k_p * error_ct;
-  r += this->vy_k_i * this->error_ct_sum;
-  r += this->vy_k_d * (error_ct - this->error_ct_prev) / this->dt;
+  double r = this->y_k_p * error_ct;
+  r += this->y_k_i * this->error_ct_sum;
+  r += this->y_k_d * (error_ct - this->error_ct_prev) / this->dt;
   this->error_ct_sum += error_ct;
   this->error_ct_prev = error_ct;
 
@@ -224,9 +224,9 @@ int WaypointController::update(const Pose &pose,
 
   // throttle
   double error_z = waypoint(2) - pose.position(2);
-  double t = this->vz_k_p * error_z;
-  t += this->vz_k_i * error_z_sum;
-  t += this->vz_k_d * (error_z - this->vz_error_prev) / this->dt;
+  double t = this->z_k_p * error_z;
+  t += this->z_k_i * error_z_sum;
+  t += this->z_k_d * (error_z - this->error_z_prev) / this->dt;
   t /= fabs(cos(r) * cos(p));  // adjust throttle for roll and pitch
 
   // limit roll, pitch, throttle
