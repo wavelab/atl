@@ -40,6 +40,16 @@ int randi(int ub, int lb);
 double randf(double ub, double lb);
 
 /**
+ * Sign of number
+ * @param x Number to check sign
+ * @return
+ *    - 0: Number is zero
+ *    - 1: Positive number
+ *    - -1: Negative number
+ */
+int sign(double x);
+
+/**
  * Floating point comparator
  * @param f1 First value
  * @param f2 Second value

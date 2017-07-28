@@ -22,6 +22,10 @@ double PID::update(double setpoint, double input, double dt) {
   return output;
 }
 
+double PID::update(double error, double dt) {
+  return this->update(error, 0.0, dt);
+}
+
 void PID::reset() {
   this->error_prev = 0.0;
   this->error_sum = 0.0;

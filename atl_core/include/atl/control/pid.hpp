@@ -42,6 +42,7 @@ public:
         k_d(k_d) {}
 
   double update(double setpoint, double actual, double dt);
+  double update(double error, double dt);
   void reset();
 };
 

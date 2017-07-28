@@ -1,37 +1,24 @@
-roll_controller:
+at_controller:
     k_p: 0.1
     k_i: 0.2
     k_d: 0.3
-pitch_controller:
+ct_controller:
     k_p: 0.1
     k_i: 0.2
     k_d: 0.3
-throttle_controller:
+z_controller:
     k_p: 0.1
     k_i: 0.2
     k_d: 0.3
-
-vx_controller:
-    k_p: 1.0
-    k_i: 2.0
-    k_d: 3.0
-vy_controller:
-    k_p: 1.0
-    k_i: 2.0
-    k_d: 3.0
-vz_controller:
-    k_p: 1.0
-    k_i: 2.0
-    k_d: 3.0
+yaw_controller:
+    k_p: 0.1
+    k_i: 0.2
+    k_d: 0.3
 
 roll_limit:
     min: -20.0
     max: 20.0
-
 pitch_limit:
     min: -20.0
     max: 20.0
-
-throttle_limit:
-    min: -1.0
-    max: 1.0
+hover_throttle: 0.5

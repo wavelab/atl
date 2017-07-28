@@ -11,6 +11,15 @@ double randf(double ub, double lb) {
   return lb + f * (ub - lb);
 }
 
+int sign(double x) {
+  if (fltcmp(x, 0.0) == 0) {
+    return 0;
+  } else if (x < 0) {
+    return -1;
+  }
+  return 1;
+}
+
 int fltcmp(double f1, double f2) {
   if (fabs(f1 - f2) <= 0.0001) {
     return 0;

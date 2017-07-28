@@ -2,30 +2,35 @@
 
 namespace atl {
 
-int Mission::configure(const std::string &config_file) {
+int Mission::configure(const std::string &config_file,
+                       double home_lat,
+                       double home_lon) {
   ConfigParser parser;
   std::vector<double> waypoint_data;
 
   // load config
-  parser.addParam("velocity", &this->velocity);
+  // clang-format off
+  parser.addParam("desired_velocity", &this->desired_velocity);
+  parser.addParam("look_ahead_dist", &this->look_ahead_dist);
+  parser.addParam("threshold_waypoint_gap", &this->threshold_waypoint_gap);
+  parser.addParam("threshold_waypoint_reached", &this->threshold_waypoint_reached);
   parser.addParam("waypoints", &waypoint_data);
+  // clang-format on
   if (parser.load(config_file) != 0) {
     return -1;
   }
 
   // check number waypoint data
-  if (waypoint_data.size() % 5 != 0) {
+  if (waypoint_data.size() % 3 != 0) {
     LOG_ERROR("Invalid number of waypoint data!");
     return -1;
   }
 
-  // convert waypoint data into waypoints
-  for (size_t i = 0; i < waypoint_data.size(); i += 5) {
+  // convert waypoint data into waypoints in the local frame
+  for (size_t i = 0; i < waypoint_data.size(); i += 3) {
     double lat = waypoint_data[i];
     double lon = waypoint_data[i + 1];
     double alt = waypoint_data[i + 2];
-    double staytime = waypoint_data[i + 3];
-    double heading = waypoint_data[i + 4];
 
     // check lat, lon
     if (fltcmp(lat, 0.0) == 0.0 || fltcmp(lon, 0.0) == 0.0) {
@@ -39,19 +44,13 @@ int Mission::configure(const std::string &config_file) {
       return -1;
     }
 
-    // check staytime
-    if (staytime < 0.0) {
-      LOG_ERROR(EINVSTAY, staytime);
-      return -1;
-    }
+    // convert lat lon to local frame
+    double dist_N, dist_E;
+    latlon_diff(home_lat, home_lon, lat, lon, &dist_N, &dist_E);
 
-    // check heading
-    if (heading > deg2rad(180.0) || heading < deg2rad(-180.0)) {
-      LOG_ERROR(EINVHEADING, heading);
-      return -1;
-    }
-
-    this->waypoints.emplace_back(lat, lon, alt, staytime, heading);
+    // add to waypoints
+    Vec3 nwu{dist_N, -dist_E, alt};
+    this->waypoints.push_back(nwu);
   }
 
   // check waypoints
@@ -70,18 +69,14 @@ int Mission::checkWaypoints() {
   }
 
   // check waypoints
-  Waypoint last_wp = this->waypoints.front();
+  Vec3 last_wp = this->waypoints.front();
   for (size_t i = 1; i < this->waypoints.size(); i++) {
     // calculate distance between current and last waypoint
-    Waypoint wp = this->waypoints[i];
+    Vec3 wp = this->waypoints[i];
 
     // check distance
-    if (last_wp.distance(wp) > 20.0) {
-      LOG_ERROR(EDISTLATLON,
-                (int) i + 1,
-                wp.latitude,
-                wp.longitude,
-                this->waypoint_threshold);
+    if ((last_wp - wp).norm() > this->threshold_waypoint_gap) {
+      LOG_ERROR(EDISTLATLON, (int) i + 1, this->threshold_waypoint_gap);
       return -2;
     }
 
@@ -92,29 +87,25 @@ int Mission::checkWaypoints() {
   return 0;
 }
 
-Vec3 Mission::closestPoint(const Vec3 &position,
-                           const Vec3 &wp_start,
-                           const Vec3 &wp_end) {
+Vec3 Mission::closestPoint(const Vec3 &position) {
   // calculate closest point
-  Vec3 v1 = position - wp_start;
-  Vec3 v2 = wp_end - wp_start;
+  Vec3 v1 = position - this->wp_start;
+  Vec3 v2 = this->wp_end - this->wp_start;
   double t = v1.dot(v2) / v2.squaredNorm();
 
   // make sure the point is between wp_start and wp_end
   if (t < 0) {
-    return wp_start;
+    return this->wp_start;
   } else if (t > 1) {
-    return wp_end;
+    return this->wp_end;
   }
 
-  return wp_start + t * v2;
+  return this->wp_start + t * v2;
 }
 
-int Mission::pointLineSide(const Vec3 &wp_start,
-                           const Vec3 &wp_end,
-                           const Vec3 &position) {
-  Vec3 a = wp_start;
-  Vec3 b = wp_end;
+int Mission::pointLineSide(const Vec3 &position) {
+  Vec3 a = this->wp_start;
+  Vec3 b = this->wp_end;
   Vec3 c = position;
   double s = ((b(0) - a(0)) * (c(1) - a(1)) - (b(1) - a(1)) * (c(0) - a(0)));
 
@@ -132,12 +123,9 @@ int Mission::pointLineSide(const Vec3 &wp_start,
   return -1;
 }
 
-double Mission::crossTrackError(const Vec3 &wp_start,
-                                const Vec3 &wp_end,
-                                const Vec3 &position,
-                                int mode) {
-  Vec3 BA = wp_start - position;
-  Vec3 BC = wp_start - wp_end;
+double Mission::crossTrackError(const Vec3 &position, int mode) {
+  Vec3 BA = this->wp_start - position;
+  Vec3 BC = this->wp_start - this->wp_end;
 
   // only calculate horizontal crosstrack error by setting z to 0
   if (mode == CTRACK_HORIZ) {
@@ -149,61 +137,72 @@ double Mission::crossTrackError(const Vec3 &wp_start,
   double error = (BA.cross(BC)).norm() / BC.norm();
 
   // check which side the point is on
-  int side = this->pointLineSide(wp_start, wp_end, position);
+  int side = this->pointLineSide(position);
 
   return error * side;
 }
 
-Vec3 Mission::waypointTangentUnitVector(const Vec3 &wp_start,
-                                        const Vec3 &wp_end) {
-  return (wp_end - wp_start) / (wp_end - wp_start).norm();
+Vec3 Mission::waypointTangentUnitVector() {
+  Vec3 u = this->wp_start;
+  Vec3 v = this->wp_end;
+  return (v - u) / (v - u).norm();
 }
 
-double Mission::waypointHeading(const Vec3 &wp_start, const Vec3 &wp_end) {
-  Vec3 u = wp_end - wp_start;
-  Vec3 v = Vec3{1.0, 0.0, 0.0} - wp_start;
-
-  // make sure we're only calculating horizontal angle between two vectors
-  u(2) = 0.0;
-  v(2) = 0.0;
-
-  // double heading = acos(u.dot(v) / (u.norm().dot(v.norm())));
-  double heading = 0.0;
-
-  return heading;
+double Mission::waypointHeading() {
+  double dx = this->wp_end(0) - this->wp_start(0);
+  double dy = this->wp_end(1) - this->wp_start(1);
+  return atan2(dy, dx);
 }
 
-Vec3 Mission::calculateWaypoint(const Vec3 &position,
-                                const double r,
-                                const Vec3 &wp_start,
-                                const Vec3 &wp_end) {
+Vec3 Mission::waypointInterpolate(const Vec3 &position, const double r) {
   // get closest point
-  Vec3 pt_on_line = this->closestPoint(position, wp_start, wp_end);
+  Vec3 pt_on_line = this->closestPoint(position);
 
   // calculate waypoint between wp_start and wp_end
-  Vec3 v = wp_end - wp_start;
+  Vec3 v = this->wp_end - this->wp_start;
   Vec3 u = v / v.norm();
   return pt_on_line + r * u;
 }
 
-int Mission::waypointReached(const Vec3 &position,
-                             const Vec3 &waypoint,
-                             const double threshold) {
+int Mission::waypointReached(const Vec3 &position) {
   // pre-check
   if (this->configured == false) {
     return -1;
   }
 
   // calculate distance to waypoint
-  Vec3 x = waypoint - position;
+  Vec3 x = this->wp_end - position;
   double dist = x.norm();
 
   // waypoint reached?
-  if (dist > threshold) {
+  if (dist > this->threshold_waypoint_reached) {
     return 0;
   } else {
     return 1;
   }
+}
+
+int Mission::update(const Vec3 &position, Vec3 &waypoint) {
+  // pre-check
+  if (this->configured == false) {
+    return -1;
+  }
+
+  // waypoint reached? get new wp_start and wp_end
+  if (this->waypointReached(position)) {
+    if (this->waypoints.size() > 2) {
+      this->waypoints.pop_front();
+      this->wp_start = this->waypoints.at(0);
+      this->wp_end = this->waypoints.at(1);
+    } else {
+      return -2;
+    }
+  }
+
+  // interpolate new waypoint
+  waypoint = this->waypointInterpolate(position, this->look_ahead_dist);
+
+  return 0;
 }
 
 }  // namespace atl
