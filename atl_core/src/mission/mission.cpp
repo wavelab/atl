@@ -2,9 +2,7 @@
 
 namespace atl {
 
-int Mission::configure(const std::string &config_file,
-                       double home_lat,
-                       double home_lon) {
+int Mission::configure(const std::string &config_file) {
   ConfigParser parser;
   std::vector<double> waypoint_data;
 
@@ -44,13 +42,7 @@ int Mission::configure(const std::string &config_file,
       return -1;
     }
 
-    // convert lat lon to local frame
-    double dist_N, dist_E;
-    latlon_diff(home_lat, home_lon, lat, lon, &dist_N, &dist_E);
-
-    // add to waypoints
-    Vec3 nwu{dist_N, -dist_E, alt};
-    this->waypoints.push_back(nwu);
+    this->gps_waypoints.emplace_back(lat, lon, alt);
   }
 
   // check waypoints
@@ -58,31 +50,61 @@ int Mission::configure(const std::string &config_file,
     return -2;
   }
 
+  // update
   this->configured = true;
   return 0;
 }
 
 int Mission::checkWaypoints() {
   // pre-check
-  if (this->waypoints.size() == 0) {
+  if (this->gps_waypoints.size() <= 2) {
     return -1;
   }
 
-  // check waypoints
-  Vec3 last_wp = this->waypoints.front();
-  for (size_t i = 1; i < this->waypoints.size(); i++) {
+  // check waypoint gaps
+  Vec3 last_wp = this->gps_waypoints.front();
+  for (size_t i = 1; i < this->gps_waypoints.size(); i++) {
     // calculate distance between current and last waypoint
-    Vec3 wp = this->waypoints[i];
+    Vec3 wp = this->gps_waypoints[i];
 
     // check distance
-    if ((last_wp - wp).norm() > this->threshold_waypoint_gap) {
-      LOG_ERROR(EDISTLATLON, (int) i + 1, this->threshold_waypoint_gap);
+    double dist = latlon_dist(last_wp(0), last_wp(1), wp(0), wp(1));
+    if (dist > this->threshold_waypoint_gap) {
+      LOG_ERROR(
+        EDISTLATLON, (int) i + 1, wp(0), wp(1), this->threshold_waypoint_gap);
       return -2;
     }
 
     // update last waypoint
     last_wp = wp;
   }
+
+  return 0;
+}
+
+int Mission::setHomePoint(double home_lat, double home_lon) {
+  // pre-check
+  if (this->gps_waypoints.size() == 0) {
+    return -1;
+  }
+
+  // convert
+  for (auto gps : this->gps_waypoints) {
+    // convert lat lon to local frame
+    double lat = gps(0);
+    double lon = gps(1);
+    double alt = gps(2);
+    double dist_N, dist_E;
+    latlon_diff(home_lat, home_lon, lat, lon, &dist_N, &dist_E);
+
+    // add to waypoints
+    Vec3 enu{dist_E, dist_N, alt};
+    this->local_waypoints.push_back(enu);
+  }
+
+  // set first pair of waypoints
+  this->wp_start = this->local_waypoints[0];
+  this->wp_end = this->local_waypoints[1];
 
   return 0;
 }
@@ -186,21 +208,32 @@ int Mission::update(const Vec3 &position, Vec3 &waypoint) {
   // pre-check
   if (this->configured == false) {
     return -1;
+  } else if (this->local_waypoints.size() == 0) {
+    return -3;
   }
 
   // waypoint reached? get new wp_start and wp_end
   if (this->waypointReached(position)) {
-    if (this->waypoints.size() > 2) {
-      this->waypoints.pop_front();
-      this->wp_start = this->waypoints.at(0);
-      this->wp_end = this->waypoints.at(1);
+    if (this->waypoint_index < (int) (this->local_waypoints.size() - 3)) {
+      this->wp_start = this->local_waypoints[this->waypoint_index];
+      this->wp_end = this->local_waypoints[this->waypoint_index + 1];
+      this->waypoint_index++;
+
     } else {
+      this->completed = true;
+      this->waypoint_index = 0;
       return -2;
     }
   }
 
   // interpolate new waypoint
   waypoint = this->waypointInterpolate(position, this->look_ahead_dist);
+  // std::cout << "waypoint index: "  << this->waypoint_index << std::endl;
+  // std::cout << "waypoint start: " << this->wp_start.transpose() << std::endl;
+  // std::cout << "waypoint end: " << this->wp_end.transpose() << std::endl;
+  // std::cout << "look ahead: " << this->look_ahead_dist << std::endl;
+  // std::cout << "waypoint interpolated: " << waypoint.transpose() << std::endl;
+  // std::cout << std::endl;
 
   return 0;
 }

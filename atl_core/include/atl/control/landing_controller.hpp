@@ -132,6 +132,7 @@ public:
                 Quaternion orientation,
                 double yaw,
                 double dt);
+  void reset();
   void printOutputs();
 };
 

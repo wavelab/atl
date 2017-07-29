@@ -1,7 +1,7 @@
 #ifndef ATL_MISSION_MISSION_HPP
 #define ATL_MISSION_MISSION_HPP
 
-#include <deque>
+#include <vector>
 
 #include "atl/utils/utils.hpp"
 #include "atl/mission/waypoint.hpp"
@@ -9,7 +9,7 @@
 namespace atl {
 
 // ERROR MESSAGES
-#define EDISTLATLON "Waypoint %d has dist > %f from prev waypoint!"
+#define EDISTLATLON "Waypoint %d: (%f, %f) has dist > %f from prev waypoint!"
 #define EINVLATLON "Invalid latlon (%f, %f)!"
 #define EINVALT "Invalid altitude %f!"
 #define EINVSTAY "Invalid staytime %f!"
@@ -26,6 +26,7 @@ namespace atl {
 class Mission {
 public:
   bool configured = false;
+  bool completed = false;
 
   double home_lat;
   double home_lon;
@@ -37,7 +38,9 @@ public:
   double desired_velocity = 0.5;
   double look_ahead_dist = 0.5;
 
-  std::deque<Vec3> waypoints;
+  std::vector<Vec3> gps_waypoints;
+  std::vector<Vec3> local_waypoints;
+  int waypoint_index = 0;
   Vec3 wp_start = Vec3::Zero();
   Vec3 wp_end = Vec3::Zero();
 
@@ -46,16 +49,12 @@ public:
   /**
    * Configure
    * @param config_file Path to configuration fileN
-   * @param home_lat Home point latitude
-   * @param home_lon Home point longitude
    * @return
    *    - 0: success
    *    - -1: failure to load / parse configuration file
    *    - -2: invalid GPS waypoints
    */
-  int configure(const std::string &config_file,
-                double home_lat,
-                double home_lon);
+  int configure(const std::string &config_file);
 
   /**
    * Check waypoints
@@ -70,6 +69,18 @@ public:
    *    - -2: invalid GPS waypoints
    */
   int checkWaypoints();
+
+  /**
+   * Set home point and calculate local waypoints by converting GPS to local
+   * waypoints
+   *
+   * @param home_lat Home latitude point
+   * @param home_lon Home longitude point
+   * @return
+   *    - 0: Success
+   *    - -1: Failure
+   */
+  int setHomePoint(double home_lat, double home_lon);
 
   /**
    * Calculate closest point

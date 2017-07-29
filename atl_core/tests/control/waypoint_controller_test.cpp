@@ -55,21 +55,28 @@ TEST(WaypointController, configure) {
 }
 
 TEST(WaypointController, update) {
+  Mission mission;
   WaypointController controller;
 
-  Vec3 pos_setpoints{1.0, 0.0, 0.0};
-  Vec3 vel_setpoints{0.0, 0.0, 0.0};
-  Pose pose{0.0, 0.0, 0.0, 0.0, 1.0, 0.0};
+  // setup
+  controller.configure(TEST_CONFIG);
+
+  // push waypoints
+  Vec3 wp;
+  wp << 0.0, 0.0, 0.0;
+  mission.wp_start = wp;
+  mission.local_waypoints.push_back(wp);
+
+  wp << 5.0, 5.0, 0.0;
+  mission.wp_end = wp;
+  mission.local_waypoints.push_back(wp);
+  mission.configured = true;
+
+  // update controller
+  Pose pose{0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   Vec3 vel{0.0, 0.0, 0.0};
-
-  controller.wp_start = Vec3{0.0, 0.0, 0.0};
-  controller.wp_end = Vec3{0.0, 5.0, 0.0};
-
-  // controller.configure(TEST_CONFIG);
-  // controller.update(pose, vel, dt);
-  //   pos_setpoints, vel_setpoints, yaw_setpoint, pose, vel, dt);
-
-  // std::cout << controller.outputs.transpose() << std::endl;
+  double dt = 0.011;
+  controller.update(mission, pose, vel, dt);
 }
 
 

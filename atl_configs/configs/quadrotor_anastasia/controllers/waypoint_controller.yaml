@@ -1,19 +1,19 @@
 at_controller:
     k_p: 0.1
-    k_i: 0.2
-    k_d: 0.3
+    k_i: 0.0
+    k_d: 0.01
 ct_controller:
-    k_p: 0.1
-    k_i: 0.2
-    k_d: 0.3
+    k_p: 0.2
+    k_i: 0.0
+    k_d: 0.15
 z_controller:
     k_p: 0.1
-    k_i: 0.2
-    k_d: 0.3
+    k_i: 0.0
+    k_d: 0.05
 yaw_controller:
     k_p: 0.1
-    k_i: 0.2
-    k_d: 0.3
+    k_i: 0.0
+    k_d: 0.0
 
 roll_limit:
     min: -20.0
@@ -22,5 +22,3 @@ pitch_limit:
     min: -20.0
     max: 20.0
 hover_throttle: 0.5
-
-mission: "../../mission/mission.yaml"

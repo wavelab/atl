@@ -6,5 +6,6 @@
 #include "atl/control/position_controller.hpp"
 #include "atl/control/tracking_controller.hpp"
 #include "atl/control/velocity_controller.hpp"
+#include "atl/control/waypoint_controller.hpp"
 
 #endif

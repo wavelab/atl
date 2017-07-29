@@ -38,49 +38,55 @@ int WaypointController::configure(const std::string &config_file) {
   return 0;
 }
 
-int WaypointController::update(const Pose &pose,
+int WaypointController::update(Mission &mission,
+                               const Pose &pose,
                                const Vec3 &vel,
-                               const double dt,
-                               Vec4 &u) {
+                               const double dt) {
   // check rate
   this->dt += dt;
   if (this->dt < 0.01) {
-    u = this->outputs;
     return 0;
   }
 
   // current waypoint
-  Vec3 waypoint;
-  // int retval = this->waypointUpdate(pose.position, waypoint);
-  // if (retval != 0) {
-  //   u = this->outputs;
-  //   return retval;
-  // }
+  Vec3 waypoint = Vec3::Zero();
+  int retval = mission.update(pose.position, waypoint);
+  if (retval != 0) {
+    return retval;
+  }
   //
-  // // roll
-  // double error_ct =
-  //   this->crossTrackError(this->wp_start, this->wp_end, pose.position);
-  // double r = this->ct_controller.update(error_ct, this->dt);
-  //
-  // // pitch
-  // Vec3 tu = this->waypointTangentUnitVector(this->wp_end, this->wp_start);
-  // double error_at = vel_desired - vel.dot(tu);
-  // double p = this->at_controller.update(error_at, this->dt);
-  //
-  // // yaw
-  // Vec3 euler;
-  // quat2euler(pose.orientation, 321, euler);
-  // double yaw_setpoint = this->waypointHeading(this->wp_start,
-  // this->wp_end);
-  // double y = this->yaw_controller.update(yaw_setpoint, euler(2), this->dt);
-  //
-  // // throttle
-  // double error_z = waypoint(2) - pose.position(2);
-  // double t = this->hover_throttle;
-  // t += this->z_controller.update(error_z, this->dt);
-  // t /= fabs(cos(r) * cos(p));  // adjust throttle for roll and pitch
+  // std::cout << waypoint.transpose() << std::endl;
 
-  double r, p, y, t;
+  // roll
+  double error_ct = mission.crossTrackError(pose.position);
+  double r = this->ct_controller.update(error_ct, this->dt);
+  // std::cout << "position: " << pose.position.transpose() << std::endl;
+  // std::cout << "error_ct: " << error_ct << std::endl;
+  // std::cout << "r: " << r << std::endl;
+
+  // pitch
+  Vec3 tu = mission.waypointTangentUnitVector();
+  double error_at = mission.desired_velocity - vel.dot(tu);
+  double p = this->at_controller.update(error_at, this->dt);
+
+  // std::cout << "desired_velocity: " << mission.desired_velocity <<
+  // std::endl;
+  // std::cout << "velocity: " << vel.transpose() << std::endl;
+  // std::cout << "error_at: " << error_at << std::endl;
+  // std::cout << "p: " << p << std::endl;
+
+  // yaw
+  Vec3 euler;
+  quat2euler(pose.orientation, 321, euler);
+  double yaw_setpoint = mission.waypointHeading();
+  double y = yaw_setpoint;
+  // double y = this->yaw_controller.update(yaw_setpoint, euler(2), this->dt);
+
+  // throttle
+  double error_z = waypoint(2) - pose.position(2);
+  double t = this->hover_throttle;
+  t += this->z_controller.update(error_z, this->dt);
+  t /= fabs(cos(r) * cos(p));  // adjust throttle for roll and pitch
 
   // limit roll, pitch, throttle
   r = (r < this->roll_limit[0]) ? this->roll_limit[0] : r;
@@ -92,9 +98,17 @@ int WaypointController::update(const Pose &pose,
 
   // keep track of setpoints and outputs
   this->outputs << r, p, y, t;
+  this->att_cmd = AttitudeCommand{this->outputs};
   this->dt = 0.0;
 
   return 0;
+}
+
+void WaypointController::reset() {
+  this->at_controller.reset();
+  this->ct_controller.reset();
+  this->z_controller.reset();
+  this->yaw_controller.reset();
 }
 
 }  // namespace atl

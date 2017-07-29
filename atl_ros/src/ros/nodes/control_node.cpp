@@ -57,11 +57,6 @@ int ControlNode::configure(const std::string &node_name, int hz) {
   // loop callback
   this->registerLoopCallback(std::bind(&ControlNode::loopCallback, this));
 
-  // connect to FCU
-  if (this->fcu_type == "PX4" && this->px4Connect() != 0) {
-    return -2;
-  }
-
   // connect to estimator
   // this->waitForEstimator();
 
@@ -87,6 +82,11 @@ int ControlNode::configurePX4Topics() {
   this->registerSubscriber(PX4_RADIO_TOPIC, &ControlNode::px4RadioCallback, this);
   // clang-format on
 
+  // connect to FCU
+  if (this->px4Connect() != 0) {
+    return -1;
+  }
+
   return 0;
 }
 
@@ -99,6 +99,11 @@ int ControlNode::configureDJITopics() {
   this->registerSubscriber(DJI_VELOCITY_TOPIC, &ControlNode::djiVelocityCallback, this);
   this->registerSubscriber(DJI_RADIO_TOPIC, &ControlNode::djiRadioCallback, this);
   // clang-format on
+
+  // wait for GPS
+  // if (this->waitForGPS() != 0) {
+  //   return -1;
+  // }
 
   return 0;
 }
@@ -211,6 +216,27 @@ int ControlNode::waitForEstimator() {
   return 0;
 }
 
+int ControlNode::waitForGPS() {
+  int attempts;
+
+  // wait for estimator
+  LOG_INFO("Waiting for GPS ...");
+  attempts = 0;
+
+  while (this->home_set == false) {
+    if (attempts == 10) {
+      LOG_INFO("No GPS connection for 10 seconds ...");
+      return -1;
+    }
+
+    ros::spinOnce();
+    sleep(1);
+    attempts++;
+  }
+
+  return 0;
+}
+
 void ControlNode::setEstimatorOn() {
   std_msgs::Bool msg;
   msg.data = true;
@@ -297,6 +323,15 @@ void ControlNode::px4RadioCallback(const mavros_msgs::RCIn &msg) {
 void ControlNode::djiGPSPositionCallback(const dji_sdk::GlobalPosition &msg) {
   this->latitude = msg.latitude;
   this->longitude = msg.longitude;
+
+  if (this->home_set == false) {
+    this->home_latitude = msg.latitude;
+    this->home_longitude = msg.longitude;
+    this->home_altitude = msg.altitude;
+    this->home_set = true;
+
+    this->quadrotor.setHomePoint(this->home_latitude, this->home_longitude);
+  }
 }
 
 void ControlNode::djiLocalPositionCallback(
@@ -398,6 +433,8 @@ void ControlNode::modeCallback(const std_msgs::String &msg) {
   } else if (mode == "LANDING_MODE") {
     this->setEstimatorOn();
     this->quadrotor.setMode(LANDING_MODE);
+  } else if (mode == "WAYPOINT_MODE") {
+    this->quadrotor.setMode(WAYPOINT_MODE);
   }
 }
 
@@ -562,8 +599,6 @@ int ControlNode::land() {
 }
 
 int ControlNode::loopCallback() {
-  double dt;
-
   // publish pose and velocity
   this->publishQuadrotorPose();
   this->publishQuadrotorVelocity();
@@ -577,7 +612,7 @@ int ControlNode::loopCallback() {
   this->setEstimatorOn();
 
   // setup
-  dt = (ros::Time::now() - this->ros_last_updated).toSec();
+  double dt = (ros::Time::now() - this->ros_last_updated).toSec();
 
   // step
   if (this->quadrotor.step(dt) != 0) {

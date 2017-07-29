@@ -61,6 +61,10 @@ TEST(Quadrotor, setMode) {
   // check LANDING_MODE
   quadrotor.setMode(LANDING_MODE);
   EXPECT_EQ(LANDING_MODE, quadrotor.current_mode);
+
+  // check WAYPOINT_MODE
+  quadrotor.setMode(WAYPOINT_MODE);
+  EXPECT_EQ(WAYPOINT_MODE, quadrotor.current_mode);
 }
 
 TEST(Quadrotor, setPose) {

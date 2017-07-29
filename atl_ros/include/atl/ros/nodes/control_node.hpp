@@ -64,33 +64,28 @@ namespace atl {
 
 class ControlNode : public ROSNode {
 public:
-  bool configured;
+  bool configured = false;
 
-  std::string quad_frame;
-  std::string fcu_type;
+  std::string quad_frame = "";
+  std::string fcu_type = "";
 
   mavros_msgs::State px4_state;
-  DJIDrone *dji;
+  DJIDrone *dji = nullptr;
 
   Quadrotor quadrotor;
-  bool armed;
-  double latitude;
-  double longitude;
+  bool armed = false;
+  double latitude = 0.0;
+  double longitude = 0.0;
+  bool home_set = false;
+  double home_latitude = 0.0;
+  double home_longitude = 0.0;
+  double home_altitude = 0.0;
 
-  ControlNode(int argc, char **argv)
-      : ROSNode(argc, argv),
-        configured{false},
-        fcu_type{},
-        quad_frame{},
-        px4_state{},
-        dji{nullptr},
-        quadrotor{},
-        armed{false},
-        latitude{},
-        longitude{} {}
+  ControlNode(int argc, char **argv) : ROSNode(argc, argv) {}
 
   /**
    * Configure ROS node
+   *
    * @param node_name ROS node name
    * @param hz ROS node rate
    * @return 0 for success, -1 for failure
@@ -99,48 +94,93 @@ public:
 
   /**
    * Configure PX4 ROS topics
+   *
+   * @return
+   *    - 0: Success
+   *    - -1: Failure
    */
   int configurePX4Topics();
 
   /**
    * Configure DJI ROS topics
+   *
+   * @return
+   *    - 0: Success
+   *    - -1: Failure
    */
   int configureDJITopics();
 
   /**
    * PX4 connect
+   *
+   * @return
+   *    - 0: Success
+   *    - -1: Failure
    */
   int px4Connect();
 
   /**
    * PX4 disarm
+   *
+   * @return
+   *    - 0: Success
+   *    - -1: Failure
    */
   int px4Disarm();
 
   /**
    * PX4 offboard mode on
+   *
+   * @return
+   *    - 0: Success
+   *    - -1: Failure
    */
   int px4OffboardModeOn();
 
   /**
    * DJI disarm
+   *
+   * @return
+   *    - 0: Success
+   *    - -1: Failure
    */
   int djiDisarm();
 
   /**
    * DJI offboard mode on
+   *
+   * @return
+   *    - 0: Success
+   *    - -1: Failure
    */
   int djiOffboardModeOn();
 
   /**
    * DJI offboard mode off
+   *
+   * @return
+   *    - 0: Success
+   *    - -1: Failure
    */
   int djiOffboardModeOff();
 
   /**
-   * Estimator wait
+   * Wait for estimator connection
+   *
+   * @return
+   *    - 0: Success
+   *    - -1: No connection to estimator
    */
   int waitForEstimator();
+
+  /**
+   * Wait for GPS connection
+   *
+   * @return
+   *    - 0: Success
+   *    - -1: No connection to GPS
+   */
+  int waitForGPS();
 
   /**
    * Estimator on
@@ -289,6 +329,7 @@ public:
 
   /**
    * Takeoff
+   *
    * @return
    *    - 0: Success
    *    - -1: ROS node not configured
@@ -298,6 +339,7 @@ public:
 
   /**
    * Land
+   *
    * @return
    *    - 0: Success
    *    - -1: ROS node not configured
@@ -307,6 +349,10 @@ public:
 
   /**
    * ROS node loop function
+   *
+   * @return
+   *    - 0: Continue looping
+   *    - -1: Stop looping
    */
   int loopCallback();
 };

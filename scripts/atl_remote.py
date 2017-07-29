@@ -105,8 +105,10 @@ if __name__ == "__main__":
     # world = World()
     rospy.sleep(1.0)
 
-    # quad.set_arm(True)
-    hover_side_to_side()
+    quad.set_arm(True)
+    quad.set_mode("WAYPOINT_MODE")
+
+    # hover_side_to_side()
     # quad.set_pctrl_settings({
     #     "roll": {
     #         "min": -30,

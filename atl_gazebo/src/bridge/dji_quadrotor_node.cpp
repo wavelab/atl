@@ -62,7 +62,7 @@ void DJIQuadrotorNode::poseCallback(ConstPosePtr &msg) {
   dji_sdk::GlobalPosition global_position_msg;
   global_position_msg.latitude = lat;
   global_position_msg.longitude = lon;
-  global_position_msg.altitude = ros_pos(2);
+  global_position_msg.altitude = this->home_altitude + (ros_pos(2) * -1);
 
   // build local position msg
   dji_sdk::LocalPosition local_position_msg;

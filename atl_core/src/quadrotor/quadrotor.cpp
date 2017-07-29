@@ -2,8 +2,9 @@
 
 namespace atl {
 
-int Quadrotor::configure(std::string config_path) {
+int Quadrotor::configure(const std::string &config_path) {
   std::string config_file;
+  std::string mission_file;
   ConfigParser parser;
 
   // position controller
@@ -16,10 +17,13 @@ int Quadrotor::configure(std::string config_path) {
 
   // landing controller
   config_file = config_path + "/controllers/" + "landing_controller.yaml";
-  CONFIGURE_CONTROLLER(this->landing_controller, config_file, FCONFTCTRL);
+  CONFIGURE_CONTROLLER(this->landing_controller, config_file, FCONFLCTRL);
+
+  // waypoint controller
+  config_file = config_path + "/controllers/" + "waypoint_controller.yaml";
+  CONFIGURE_CONTROLLER(this->waypoint_controller, config_file, FCONFWCTRL);
 
   // load config
-  // clang-format off
   parser.addParam("hover_position", &this->hover_position);
   parser.addParam("recover_height", &this->recover_height);
   parser.addParam("auto_track", &this->auto_track);
@@ -28,10 +32,18 @@ int Quadrotor::configure(std::string config_path) {
   parser.addParam("target_lost_threshold", &this->target_lost_threshold);
   parser.addParam("min_discover_time", &this->min_discover_time);
   parser.addParam("min_tracking_time", &this->min_tracking_time);
-  // clang-format on
+  parser.addParam("mission", &mission_file);
   if (parser.load(config_path + "/config.yaml") != 0) {
     return -1;
   }
+
+  // mission
+  paths_combine(config_path, mission_file, mission_file);
+  if (this->mission.configure(mission_file) != 0) {
+    return -2;
+  }
+
+  // misc
   this->landing_target.lost_threshold = this->target_lost_threshold;
   this->current_mode = DISCOVER_MODE;
   this->configured = true;
@@ -41,7 +53,20 @@ error:
   return -1;
 }
 
-int Quadrotor::setMode(enum Mode mode) {
+int Quadrotor::setHomePoint(const double latitude, const double longitude) {
+  // pre-check
+  if (this->configured == false) {
+    return -1;
+  }
+
+  this->home_set = true;
+  this->home_lat = latitude;
+  this->home_lon = longitude;
+
+  return 0;
+}
+
+int Quadrotor::setMode(const enum Mode &mode) {
   // pre-check
   if (this->configured == false) {
     return -1;
@@ -65,6 +90,9 @@ int Quadrotor::setMode(enum Mode mode) {
     case LANDING_MODE:
       LOG_INFO(INFO_LMODE);
       break;
+    case WAYPOINT_MODE:
+      LOG_INFO(INFO_WMODE);
+      break;
     default:
       LOG_ERROR(EINVMODE);
       return -2;
@@ -73,7 +101,7 @@ int Quadrotor::setMode(enum Mode mode) {
   return 0;
 }
 
-int Quadrotor::setPose(Pose pose) {
+int Quadrotor::setPose(const Pose &pose) {
   // pre-check
   if (this->configured == false) {
     return -1;
@@ -84,7 +112,7 @@ int Quadrotor::setPose(Pose pose) {
   return 0;
 }
 
-int Quadrotor::setVelocity(Vec3 velocity) {
+int Quadrotor::setVelocity(const Vec3 &velocity) {
   // pre-check
   if (this->configured == false) {
     return -1;
@@ -96,7 +124,7 @@ int Quadrotor::setVelocity(Vec3 velocity) {
   return 0;
 }
 
-int Quadrotor::setYaw(double yaw) {
+int Quadrotor::setYaw(const double yaw) {
   // pre-check
   if (this->configured == false) {
     return -1;
@@ -108,7 +136,7 @@ int Quadrotor::setYaw(double yaw) {
   return 0;
 }
 
-int Quadrotor::setTargetPosition(Vec3 position) {
+int Quadrotor::setTargetPosition(const Vec3 &position) {
   // pre-check
   if (this->configured == false) {
     return -1;
@@ -121,7 +149,7 @@ int Quadrotor::setTargetPosition(Vec3 position) {
   return 0;
 }
 
-int Quadrotor::setTargetVelocity(Vec3 velocity) {
+int Quadrotor::setTargetVelocity(const Vec3 &velocity) {
   // pre-check
   if (this->configured == false) {
     return -1;
@@ -146,7 +174,7 @@ int Quadrotor::setTargetDetected(bool detected) {
   return 0;
 }
 
-int Quadrotor::setHoverXYPosition(Vec3 position) {
+int Quadrotor::setHoverXYPosition(const Vec3 &position) {
   // pre-check
   if (this->configured == false) {
     return -1;
@@ -159,7 +187,7 @@ int Quadrotor::setHoverXYPosition(Vec3 position) {
   return 0;
 }
 
-int Quadrotor::setHoverPosition(Vec3 position) {
+int Quadrotor::setHoverPosition(const Vec3 &position) {
   // pre-check
   if (this->configured == false) {
     return -1;
@@ -183,7 +211,7 @@ bool Quadrotor::conditionsMet(bool *conditions, int nb_conditions) {
   return true;
 }
 
-int Quadrotor::stepHoverMode(double dt) {
+int Quadrotor::stepHoverMode(const double dt) {
   // pre-check
   if (this->configured == false) {
     return -1;
@@ -203,7 +231,7 @@ int Quadrotor::stepHoverMode(double dt) {
   return 0;
 }
 
-int Quadrotor::stepDiscoverMode(double dt) {
+int Quadrotor::stepDiscoverMode(const double dt) {
   bool conditions[3];
 
   // pre-check
@@ -232,7 +260,7 @@ int Quadrotor::stepDiscoverMode(double dt) {
   return 0;
 }
 
-int Quadrotor::stepTrackingMode(double dt) {
+int Quadrotor::stepTrackingMode(const double dt) {
   int retval;
   bool conditions[3];
   Quaternion q;
@@ -243,7 +271,7 @@ int Quadrotor::stepTrackingMode(double dt) {
     return -1;
   }
 
-  // calculate velocity in body frame
+  // transform velocity from inertial to body frame
   euler << 0, 0, this->yaw;
   euler2quat(euler, 321, q);
   inertial2body(this->velocity, q, vel_bf);
@@ -293,7 +321,7 @@ int Quadrotor::stepTrackingMode(double dt) {
   return 0;
 }
 
-int Quadrotor::stepLandingMode(double dt) {
+int Quadrotor::stepLandingMode(const double dt) {
   int retval;
   bool conditions[3];
 
@@ -350,23 +378,64 @@ int Quadrotor::stepLandingMode(double dt) {
   return 0;
 }
 
-int Quadrotor::reset() {
-  this->position_controller.reset();
-  this->tracking_controller.reset();
-  // this->landing_controller.reset();
+int Quadrotor::stepWaypointMode(const double dt) {
+  // pre-check
+  if (this->configured == false) {
+    return -1;
+  } else if (this->home_set == false) {
+    return -2;
+  }
+
+  // convert mission waypoints to local frame
+  if (this->mission.local_waypoints.size() == 0) {
+    int retval = this->mission.setHomePoint(this->home_lat, this->home_lon);
+    if (retval != 0) {
+      return -3;
+    }
+  }
+
+  // travel through waypoints
+  int retval = this->waypoint_controller.update(
+    this->mission, this->pose, this->velocity, dt);
+  this->att_cmd = this->waypoint_controller.att_cmd;
+
+  // update hover position
+  this->setHoverPosition(this->pose.position);
+
+  // check conditions
+  if (retval == -1) {
+    // transition to hover mode
+    LOG_ERROR("Failed to load mission!");
+    LOG_INFO("Transitioning to [HOVER MODE]!");
+    this->setMode(HOVER_MODE);
+
+  } else if (retval == -2) {
+    // transition to hover mode
+    LOG_INFO("Mission complete!");
+    LOG_INFO("Transitioning to [HOVER MODE]!");
+    this->setMode(HOVER_MODE);
+  }
 
   return 0;
 }
 
-int Quadrotor::step(double dt) {
-  int retval;
+int Quadrotor::reset() {
+  this->position_controller.reset();
+  this->tracking_controller.reset();
+  this->landing_controller.reset();
+  this->waypoint_controller.reset();
 
+  return 0;
+}
+
+int Quadrotor::step(const double dt) {
   // pre-check
   if (this->configured == false) {
     return -1;
   }
 
   // step
+  int retval;
   switch (this->current_mode) {
     case DISARM_MODE:
       this->att_cmd = AttitudeCommand();
@@ -383,6 +452,9 @@ int Quadrotor::step(double dt) {
       break;
     case LANDING_MODE:
       retval = this->stepLandingMode(dt);
+      break;
+    case WAYPOINT_MODE:
+      retval = this->stepWaypointMode(dt);
       break;
     default:
       LOG_ERROR(EINVMODE);

@@ -561,6 +561,14 @@ int LandingController::calculate(Vec3 target_pos_bf,
   return retval;
 }
 
+void LandingController::reset() {
+  this->vx_error_prev = 0.0;
+  this->vy_error_prev = 0.0;
+  this->vz_error_prev = 0.0;
+
+  this->vx_error_sum = 0.0;
+}
+
 void LandingController::printOutputs() {
   double r, p, t;
 
