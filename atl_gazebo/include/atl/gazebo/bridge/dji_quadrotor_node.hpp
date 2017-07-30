@@ -35,8 +35,10 @@ namespace gazebo_bridge {
 class DJIQuadrotorNode : public gaz::QuadrotorGClient, public ROSNode {
 public:
   // gps coordinates of uwaterloo
-  double home_latitude = 43.472285;
-  double home_longitude = -80.544858;
+  // double home_latitude = 43.472285;
+  // double home_longitude = -80.544858;
+  double home_latitude = 43.474024;
+  double home_longitude = -80.540287;
   double home_altitude = 333;
 
   DJIQuadrotorNode(int argc, char **argv) : ROSNode(argc, argv) {}

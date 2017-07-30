@@ -30,21 +30,21 @@ TEST(Mission, configure) {
   EXPECT_FLOAT_EQ(0.5, mission.desired_velocity);
   EXPECT_EQ(4, (size_t) mission.local_waypoints.size());
 
-  // EXPECT_NEAR(0.0, mission.local_waypoints[0](0), 0.001);
-  // EXPECT_NEAR(0.0, mission.local_waypoints[0](1), 0.001);
-  // EXPECT_NEAR(10.0, mission.local_waypoints[0](2), 0.001);
-  //
-  // EXPECT_NEAR(6.01125, mission.local_waypoints[1](0), 0.001);
-  // EXPECT_NEAR(-10.1787, mission.local_waypoints[1](1), 0.001);
-  // EXPECT_NEAR(10.0, mission.local_waypoints[1](2), 0.001);
-  //
-  // EXPECT_NEAR(-7.45841, mission.local_waypoints[2](0), 0.001);
-  // EXPECT_NEAR(-17.2876, mission.local_waypoints[2](1), 0.001);
-  // EXPECT_NEAR(10.0, mission.local_waypoints[2](2), 0.001);
-  //
-  // EXPECT_NEAR(-10.5754, mission.local_waypoints[3](0), 0.001);
-  // EXPECT_NEAR(-9.20928, mission.local_waypoints[3](1), 0.001);
-  // EXPECT_NEAR(10.0, mission.local_waypoints[3](2), 0.001);
+  EXPECT_NEAR(0.0, mission.local_waypoints[0](0), 0.001);
+  EXPECT_NEAR(0.0, mission.local_waypoints[0](1), 0.001);
+  EXPECT_NEAR(10.0, mission.local_waypoints[0](2), 0.001);
+
+  EXPECT_NEAR(10.1787, mission.local_waypoints[1](0), 0.001);
+  EXPECT_NEAR(6.01125, mission.local_waypoints[1](1), 0.001);
+  EXPECT_NEAR(10.0, mission.local_waypoints[1](2), 0.001);
+
+  EXPECT_NEAR(17.2876, mission.local_waypoints[2](0), 0.001);
+  EXPECT_NEAR(-7.45841, mission.local_waypoints[2](1), 0.001);
+  EXPECT_NEAR(10.0, mission.local_waypoints[2](2), 0.001);
+
+  EXPECT_NEAR(9.20928, mission.local_waypoints[3](0), 0.001);
+  EXPECT_NEAR(-10.5754, mission.local_waypoints[3](1), 0.001);
+  EXPECT_NEAR(10.0, mission.local_waypoints[3](2), 0.001);
 }
 
 TEST(Mission, closestPoint) {
@@ -91,8 +91,8 @@ TEST(Mission, crossTrackError) {
   Mission mission;
 
   // setup
-  mission.wp_start = Vec3{0.0, 0.0, 0.0};
-  mission.wp_end = Vec3{5.0, 0.0, 0.0};
+  mission.wp_start = Vec3{0.0, 0.0, 10.0};
+  mission.wp_end = Vec3{10.0, 0.0, 10.0};
   Vec3 position = Vec3::Zero();
   double e = 0.0;
 

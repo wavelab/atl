@@ -135,7 +135,7 @@ if __name__ == "__main__":
 
     # gimbal.set_attitude([0, 0.2, 0])
     # lz.set_position([1, 0, 0])
-    # quad.set_hover_point([0, 0.0, 5.0])
+    # quad.set_hover_point([1, 0, 5.0])
 
     # quad.set_hover_point([0.0, 0.0, 2.0])
 

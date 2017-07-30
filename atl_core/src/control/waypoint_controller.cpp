@@ -34,7 +34,68 @@ int WaypointController::configure(const std::string &config_file) {
   this->pitch_limit[0] = deg2rad(this->pitch_limit[0]);
   this->pitch_limit[1] = deg2rad(this->pitch_limit[1]);
 
+
+  // prepare blackbox file
+  std::string blackbox_file = "/tmp/blackbox.dat";
+  if (this->blackbox_enable) {
+    if (blackbox_file == "") {
+      LOG_ERROR("blackbox file is not set!");
+      return -3;
+    } else if (this->prepBlackbox(blackbox_file) != 0) {
+      LOG_ERROR("Failed to open blackbox file at [%s]",
+                blackbox_file.c_str());
+      return -3;
+    }
+
+    if (this->blackbox_rate == FLT_MAX) {
+      LOG_ERROR("blackbox rate is not set!");
+      return -3;
+    }
+  }
+
   this->configured = true;
+  return 0;
+}
+
+int WaypointController::prepBlackbox(const std::string &blackbox_file) {
+  // setup
+  this->blackbox.open(blackbox_file);
+  if (!this->blackbox) {
+    return -1;
+  }
+
+  // write header
+  // clang-format off
+  this->blackbox << "dt" << ",";
+  this->blackbox << "x" << ",";
+  this->blackbox << "y" << ",";
+  this->blackbox << "z" << ",";
+  this->blackbox << "wp_x" << ",";
+  this->blackbox << "wp_y" << ",";
+  this->blackbox << "wp_z";
+  this->blackbox << std::endl;
+  // clang-format on
+
+  return 0;
+}
+
+int WaypointController::record(Vec3 pos, Vec3 waypoint) {
+  // pre-check
+  this->blackbox_dt += dt;
+  if (this->blackbox_enable && this->blackbox_dt > this->blackbox_rate) {
+    return 0;
+  }
+
+  // record
+  this->blackbox << pos(0) << ",";
+  this->blackbox << pos(1) << ",";
+  this->blackbox << pos(2) << ",";
+  this->blackbox << waypoint(0) << ",";
+  this->blackbox << waypoint(1) << ",";
+  this->blackbox << waypoint(2);
+  this->blackbox << std::endl;
+  this->blackbox_dt = 0.0;
+
   return 0;
 }
 
@@ -54,33 +115,23 @@ int WaypointController::update(Mission &mission,
   if (retval != 0) {
     return retval;
   }
-  //
-  // std::cout << waypoint.transpose() << std::endl;
+
+  // calculate setpoint relative to quadrotor
+  Vec3 errors;
+  Vec3 vel_bf;
+  target2bodyplanar(waypoint, pose.position, pose.orientation, errors);
+  target2bodyplanar(vel, pose.position, pose.orientation, vel_bf);
 
   // roll
-  double error_ct = mission.crossTrackError(pose.position);
-  double r = this->ct_controller.update(error_ct, this->dt);
-  // std::cout << "position: " << pose.position.transpose() << std::endl;
-  // std::cout << "error_ct: " << error_ct << std::endl;
-  // std::cout << "r: " << r << std::endl;
+  double r = -this->ct_controller.update(errors(1), this->dt);
 
   // pitch
-  Vec3 tu = mission.waypointTangentUnitVector();
-  double error_at = mission.desired_velocity - vel.dot(tu);
-  double p = this->at_controller.update(error_at, this->dt);
-
-  // std::cout << "desired_velocity: " << mission.desired_velocity <<
-  // std::endl;
-  // std::cout << "velocity: " << vel.transpose() << std::endl;
-  // std::cout << "error_at: " << error_at << std::endl;
-  // std::cout << "p: " << p << std::endl;
+  // double error_forward = mission.desired_velocity - vel_bf(0);
+  // double p = this->at_controller.update(error_forward, this->dt);
+  double p = this->at_controller.update(errors(0), this->dt);
 
   // yaw
-  Vec3 euler;
-  quat2euler(pose.orientation, 321, euler);
-  double yaw_setpoint = mission.waypointHeading();
-  double y = yaw_setpoint;
-  // double y = this->yaw_controller.update(yaw_setpoint, euler(2), this->dt);
+  double y = mission.waypointHeading();
 
   // throttle
   double error_z = waypoint(2) - pose.position(2);
@@ -88,7 +139,7 @@ int WaypointController::update(Mission &mission,
   t += this->z_controller.update(error_z, this->dt);
   t /= fabs(cos(r) * cos(p));  // adjust throttle for roll and pitch
 
-  // limit roll, pitch, throttle
+  // limit roll, pitch and throttle
   r = (r < this->roll_limit[0]) ? this->roll_limit[0] : r;
   r = (r > this->roll_limit[1]) ? this->roll_limit[1] : r;
   p = (p < this->pitch_limit[0]) ? this->pitch_limit[0] : p;
@@ -100,6 +151,7 @@ int WaypointController::update(Mission &mission,
   this->outputs << r, p, y, t;
   this->att_cmd = AttitudeCommand{this->outputs};
   this->dt = 0.0;
+  this->record(pose.position, waypoint);
 
   return 0;
 }

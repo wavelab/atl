@@ -1,7 +1,7 @@
 at_controller:
     k_p: 0.1
     k_i: 0.0
-    k_d: 0.01
+    k_d: 0.05
 ct_controller:
     k_p: 0.1
     k_i: 0.0

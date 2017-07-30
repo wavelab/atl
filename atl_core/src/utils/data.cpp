@@ -25,8 +25,7 @@ void AttitudeCommand::print() {
 // POSE
 Pose::Pose(
   double roll, double pitch, double yaw, double x, double y, double z) {
-  Vec3 euler;
-  euler << roll, pitch, yaw;
+  Vec3 euler{roll, pitch, yaw};
   euler2quat(euler, 321, this->orientation);
   this->position << x, y, z;
 }

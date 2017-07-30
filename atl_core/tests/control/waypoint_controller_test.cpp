@@ -61,22 +61,35 @@ TEST(WaypointController, update) {
   // setup
   controller.configure(TEST_CONFIG);
 
-  // push waypoints
+  // push waypoints in ENU coorindates
+  // note that the controller works in NWU coordinates
   Vec3 wp;
-  wp << 0.0, 0.0, 0.0;
+  wp << 0.0, 0.0, 10.0;
   mission.wp_start = wp;
   mission.local_waypoints.push_back(wp);
 
-  wp << 5.0, 5.0, 0.0;
+  wp << 10.0, 6.0, 10.0;
   mission.wp_end = wp;
+  mission.local_waypoints.push_back(wp);
+
+  wp << 17.0, -7.0, 10.0;
+  mission.local_waypoints.push_back(wp);
+
+  wp << 9.0, -10.0, 10.0;
   mission.local_waypoints.push_back(wp);
   mission.configured = true;
 
   // update controller
-  Pose pose{0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+  Pose pose{0.0, 0.0, deg2rad(0.0), 0.0, 0.0, 10.0};
   Vec3 vel{0.0, 0.0, 0.0};
   double dt = 0.011;
   controller.update(mission, pose, vel, dt);
+
+  Pose pose2{0.0, 0.0, deg2rad(0.0), 5.0, 6.0, 10.0};
+  controller.update(mission, pose2, vel, dt);
+
+  Pose pose3{0.0, 0.0, deg2rad(0.0), 5.0, 6.0, 10.0};
+  controller.update(mission, pose3, vel, dt);
 }
 
 

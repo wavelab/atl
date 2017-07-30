@@ -99,6 +99,7 @@ int Mission::setHomePoint(double home_lat, double home_lon) {
 
     // add to waypoints
     Vec3 enu{dist_E, dist_N, alt};
+    std::cout << "Adding local waypoint: " << enu.transpose() << std::endl;
     this->local_waypoints.push_back(enu);
   }
 
@@ -164,16 +165,15 @@ double Mission::crossTrackError(const Vec3 &position, int mode) {
   return error * side;
 }
 
-Vec3 Mission::waypointTangentUnitVector() {
-  Vec3 u = this->wp_start;
-  Vec3 v = this->wp_end;
-  return (v - u) / (v - u).norm();
-}
-
 double Mission::waypointHeading() {
+  // assume waypoints are in ENU inertial frame
   double dx = this->wp_end(0) - this->wp_start(0);
   double dy = this->wp_end(1) - this->wp_start(1);
-  return atan2(dy, dx);
+
+  // offset by -90 deg because ENU's 0 yaw is East rather than North
+  double heading = atan2(dy, dx) - deg2rad(90.0);
+
+  return heading;
 }
 
 Vec3 Mission::waypointInterpolate(const Vec3 &position, const double r) {
@@ -200,6 +200,10 @@ int Mission::waypointReached(const Vec3 &position) {
   if (dist > this->threshold_waypoint_reached) {
     return 0;
   } else {
+    LOG_INFO("Waypoint (%f, %f, %f) reached!",
+             this->wp_end(0),
+             this->wp_end(1),
+             this->wp_end(2));
     return 1;
   }
 }
@@ -214,26 +218,20 @@ int Mission::update(const Vec3 &position, Vec3 &waypoint) {
 
   // waypoint reached? get new wp_start and wp_end
   if (this->waypointReached(position)) {
-    if (this->waypoint_index < (int) (this->local_waypoints.size() - 3)) {
-      this->wp_start = this->local_waypoints[this->waypoint_index];
-      this->wp_end = this->local_waypoints[this->waypoint_index + 1];
-      this->waypoint_index++;
-
-    } else {
+    if ((this->waypoint_index + 1) == this->local_waypoints.size()) {
       this->completed = true;
       this->waypoint_index = 0;
       return -2;
+
+    } else {
+      this->wp_start = this->local_waypoints[this->waypoint_index];
+      this->wp_end = this->local_waypoints[this->waypoint_index + 1];
+      this->waypoint_index++;
     }
   }
 
   // interpolate new waypoint
   waypoint = this->waypointInterpolate(position, this->look_ahead_dist);
-  // std::cout << "waypoint index: "  << this->waypoint_index << std::endl;
-  // std::cout << "waypoint start: " << this->wp_start.transpose() << std::endl;
-  // std::cout << "waypoint end: " << this->wp_end.transpose() << std::endl;
-  // std::cout << "look ahead: " << this->look_ahead_dist << std::endl;
-  // std::cout << "waypoint interpolated: " << waypoint.transpose() << std::endl;
-  // std::cout << std::endl;
 
   return 0;
 }

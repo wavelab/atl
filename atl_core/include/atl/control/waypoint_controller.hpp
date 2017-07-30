@@ -37,6 +37,11 @@ public:
   Vec4 outputs = Vec4::Zero();
   AttitudeCommand att_cmd;
 
+  bool blackbox_enable = true;
+  double blackbox_rate = 1.0;
+  double blackbox_dt = 0.0;
+  std::ofstream blackbox;
+
   WaypointController() {}
 
   /**
@@ -49,6 +54,28 @@ public:
    *    - -2: Failed to load mission file
    */
   int configure(const std::string &config_file);
+
+  /**
+   * Prepare black box file
+   *
+   * @param blackbox_file Path to store black box file
+   * @return
+   *    - 0: Success
+   *    - -1: Failed to store black box file
+   */
+  int prepBlackbox(const std::string &blackbox_file);
+
+  /**
+   * Record position and waypoint
+   *
+   * @param pos Position
+   * @param waypoint Waypoint
+   * @param dt Difference in time (seconds)
+   * @return
+   *    - 0: Success
+   *    - -1: Failure
+   */
+  int record(Vec3 pos, Vec3 waypoint);
 
   /**
    * Update controller

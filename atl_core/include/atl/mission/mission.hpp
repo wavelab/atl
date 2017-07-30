@@ -121,13 +121,6 @@ public:
   double crossTrackError(const Vec3 &position, int mode = CTRACK_HORIZ);
 
   /**
-   * Calculate waypoint tangent unit vector
-   *
-   * @return Unit tagent vector
-   */
-  Vec3 waypointTangentUnitVector();
-
-  /**
    * Calculate waypoint yaw
    *
    * This function assumes we are operating in the NWU frame, where a 0
