@@ -116,19 +116,25 @@ int WaypointController::update(Mission &mission,
     return retval;
   }
 
-  // calculate setpoint relative to quadrotor
+  // calculate waypoint relative to quadrotor
   Vec3 errors;
-  Vec3 vel_bf;
   target2bodyplanar(waypoint, pose.position, pose.orientation, errors);
-  target2bodyplanar(vel, pose.position, pose.orientation, vel_bf);
+
+  // calculate velocity relative to quadrotor
+  Vec3 euler;
+  quat2euler(pose.orientation, 321, euler);
+
+  Mat3 R;
+  Vec3 yaw_only{0.0, 0.0, euler(2)};
+  euler2rot(yaw_only, 123, R);
+  Vec3 vel_bf = R * vel;
 
   // roll
   double r = -this->ct_controller.update(errors(1), this->dt);
 
   // pitch
-  // double error_forward = mission.desired_velocity - vel_bf(0);
-  // double p = this->at_controller.update(error_forward, this->dt);
-  double p = this->at_controller.update(errors(0), this->dt);
+  double error_forward = mission.desired_velocity - vel_bf(0);
+  double p = this->at_controller.update(error_forward, this->dt);
 
   // yaw
   double y = mission.waypointHeading();

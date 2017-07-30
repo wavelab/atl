@@ -216,22 +216,22 @@ int Mission::update(const Vec3 &position, Vec3 &waypoint) {
     return -3;
   }
 
+  // interpolate new waypoint
+  waypoint = this->waypointInterpolate(position, this->look_ahead_dist);
+
   // waypoint reached? get new wp_start and wp_end
-  if (this->waypointReached(position)) {
-    if ((this->waypoint_index + 1) == this->local_waypoints.size()) {
+  if (this->waypointReached(waypoint)) {
+    if ((this->waypoint_index + 2) == (int) this->local_waypoints.size()) {
       this->completed = true;
       this->waypoint_index = 0;
       return -2;
 
     } else {
+      this->waypoint_index++;
       this->wp_start = this->local_waypoints[this->waypoint_index];
       this->wp_end = this->local_waypoints[this->waypoint_index + 1];
-      this->waypoint_index++;
     }
   }
-
-  // interpolate new waypoint
-  waypoint = this->waypointInterpolate(position, this->look_ahead_dist);
 
   return 0;
 }
