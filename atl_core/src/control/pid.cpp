@@ -2,19 +2,18 @@
 
 namespace atl {
 
-double PID::update(double setpoint, double input, double dt) {
-  double error;
-  double output;
-
+double PID::update(const double setpoint,
+                   const double input,
+                   const double dt) {
   // calculate errors
-  error = setpoint - input;
+  double error = setpoint - input;
   this->error_sum += error * dt;
 
   // calculate output
   this->error_p = this->k_p * error;
   this->error_i = this->k_i * this->error_sum;
   this->error_d = this->k_d * (error - this->error_prev) / dt;
-  output = this->error_p + this->error_i + this->error_d;
+  double output = this->error_p + this->error_i + this->error_d;
 
   // update error
   this->error_prev = error;
@@ -22,7 +21,7 @@ double PID::update(double setpoint, double input, double dt) {
   return output;
 }
 
-double PID::update(double error, double dt) {
+double PID::update(const double error, const double dt) {
   return this->update(error, 0.0, dt);
 }
 

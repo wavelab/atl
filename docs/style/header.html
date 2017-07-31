@@ -1,0 +1,147 @@
+<!doctype html>
+<html>
+<head>
+  <title>$projectname: $title</title>
+
+  <!-- scripts -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      // hide doxygen elements
+      $("div#navrow2").remove();
+      $("div.levels").remove();
+
+      $("contents.textblock").remove();
+      $("contents.directory.levels").remove();
+      $("[class^=separator]").remove();
+
+      $("hr.footer").remove();
+      $("address.footer").remove();
+    });
+
+  </script>
+
+  <!-- styles -->
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+      font-size: 14px;
+      font-family: Verdana, Helvetica;
+    }
+
+    div#projectname {
+      margin-top: 20px;
+      margin-bottom: 30px;
+    }
+
+    div#navrow1 ul {
+      display: block;
+
+      margin-top: 0;
+      margin-left: 0;
+      margin-right: 0;
+
+      padding: 0;
+    }
+
+    div#navrow1 ul:after {
+      clear:both;
+      margin-bottom: 20px;
+    }
+
+    div#navrow1 li {
+      float: left;
+      display: block;
+      width: 100px;
+      height: 20;
+      margin-right: 10px;
+
+      text-align: center;
+      font-size: 16px;
+
+      border: 1px solid #333;
+      border-radius: 2px;
+    }
+
+    div#nav-path {
+      clear: left;
+    }
+
+    div#nav-path ul {
+      display: block;
+      margin: 0;
+      padding: 0;
+    }
+
+    div#nav-path li {
+      display: block;
+      float: left;
+    }
+
+    div#nav-path li:after {
+      content: "::";
+    }
+
+    div#nav-path li:last-child:after {
+      content: "";
+    }
+
+    div.header {
+      clear: both;
+    }
+
+    div.directory {
+      width: 600px;
+      margin: 0;
+    }
+
+    table.memberdecls {
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+
+    h2.groupheader {
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+
+    div.memitem {
+      width: 700px;
+
+      margin-bottom: 10px;
+      padding: 5px;
+
+      border: 1px solid #777;
+      border-radius: 5px;
+    }
+
+    table.memname {
+      border-spacing: 0px;
+    }
+
+    pre {
+      font-size: 1.1em;
+    }
+
+    a:link, a:visited {
+      text-decoration: none;
+      color: #4156F4;
+    }
+
+    hr {
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+
+  </style>
+
+</head>
+<body>
+   <div id="projectname">$projectname</div>
