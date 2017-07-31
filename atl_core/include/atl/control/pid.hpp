@@ -23,8 +23,7 @@ public:
   double k_i = 0.0;
   double k_d = 0.0;
 
-  PID() : {}
-
+  PID() {}
   PID(double k_p, double k_i, double k_d) : k_p(k_p), k_i(k_i), k_d(k_d) {}
 
   /**

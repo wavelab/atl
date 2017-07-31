@@ -236,8 +236,8 @@ void EstimatorNode::publishLTKFBodyVelocityEstimate() {
       est_vel(1) = this->ekf_tracker.mu(4) * sin(this->ekf_tracker.mu(3));
       est_vel(2) = this->ekf_tracker.mu(5);
       break;
-      std::cout << "Estimator ON" << std::endl;
   }
+  std::cout << "Estimator ON" << std::endl;
 
   // estimate in body planar frame
   this->target_vel_bpf(0) = est_vel(0);
@@ -365,10 +365,10 @@ int EstimatorNode::estimateEKF(double dt) {
 
   // measurement update
   if (this->target_detected) {
-    H(0, 0) = 1.0; /* x */
-    H(1, 1) = 1.0; /* y */
-    H(2, 2) = 1.0; /* z */
-    H(3, 3) = 1.0; /* theta */
+    H(0, 0) = 1.0;  // x
+    H(1, 1) = 1.0;  // y
+    H(2, 2) = 1.0;  // z
+    H(3, 3) = 1.0;  // theta
     h = H * this->ekf_tracker.mu_p;
     this->ekf_tracker.measurementUpdate(h, H, y);
 
@@ -380,7 +380,6 @@ int EstimatorNode::estimateEKF(double dt) {
 }
 
 int EstimatorNode::estimate() {
-  double dt;
   int retval;
 
   // pre-check
@@ -396,7 +395,7 @@ int EstimatorNode::estimate() {
   }
 
   // setup
-  dt = (ros::Time::now() - this->ros_last_updated).toSec();
+  double dt = (ros::Time::now() - this->ros_last_updated).toSec();
 
   // estimate
   switch (this->mode) {

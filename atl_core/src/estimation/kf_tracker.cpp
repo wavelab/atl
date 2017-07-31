@@ -2,7 +2,7 @@
 
 namespace atl {
 
-KalmanFilterTracker::KalmanFilterTracker() {
+KFTracker::KFTracker() {
   this->configured = false;
   this->initialized = false;
 
@@ -28,7 +28,7 @@ KalmanFilterTracker::KalmanFilterTracker() {
   this->S_p = MatX::Zero(1, 1);
 }
 
-int KalmanFilterTracker::configure(std::string config_file) {
+int KFTracker::configure(std::string config_file) {
   ConfigParser parser;
   std::string mode;
 
@@ -48,7 +48,7 @@ int KalmanFilterTracker::configure(std::string config_file) {
   return 0;
 }
 
-int KalmanFilterTracker::initialize(VecX mu) {
+int KFTracker::initialize(VecX mu) {
   // pre-check
   if (this->configured == false) {
     return -1;
@@ -79,7 +79,7 @@ int KalmanFilterTracker::initialize(VecX mu) {
   return 0;
 }
 
-int KalmanFilterTracker::checkDimensions() {
+int KFTracker::checkDimensions() {
   if (this->mu.size() != this->nb_states) {
     LOG_ERROR(EMUSIZE, this->nb_states, (int) this->mu.size());
     LOG_ERROR(ECHECKCONFIG, this->config_file.c_str());
@@ -119,7 +119,7 @@ int KalmanFilterTracker::checkDimensions() {
   return 0;
 }
 
-int KalmanFilterTracker::reset(VecX mu) {
+int KFTracker::reset(VecX mu) {
   // configure
   if (this->configure(this->config_file) != 0) {
     this->configured = false;
@@ -135,7 +135,7 @@ int KalmanFilterTracker::reset(VecX mu) {
   return 0;
 }
 
-int KalmanFilterTracker::sanityCheck(Vec3 prev_pos, Vec3 curr_pos) {
+int KFTracker::sanityCheck(Vec3 prev_pos, Vec3 curr_pos) {
   double dist;
 
   // pre-check
@@ -152,7 +152,7 @@ int KalmanFilterTracker::sanityCheck(Vec3 prev_pos, Vec3 curr_pos) {
   return 0;
 }
 
-int KalmanFilterTracker::estimate(MatX A, VecX y) {
+int KFTracker::estimate(MatX A, VecX y) {
   // pre-check
   if (this->initialized == false) {
     return -1;

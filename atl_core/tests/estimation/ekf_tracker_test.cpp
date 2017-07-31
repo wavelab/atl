@@ -47,12 +47,12 @@ static void recordTimeStep(std::ofstream &output_file,
   output_file << est(2) << std::endl;
 }
 
-TEST(ExtendedKalmanFilterTracker, estimate) {
+TEST(EKFTracker, estimate) {
   float dt;
   Vec2 u;
   Vec3 mu, x, y, g, h, gaussian_noise;
   Mat3 G, H;
-  ExtendedKalmanFilterTracker tracker;
+  EKFTracker tracker;
   std::ofstream output_file;
   std::default_random_engine rgen;
   std::normal_distribution<float> norm_x(0, pow(0.5, 2));
@@ -97,11 +97,11 @@ TEST(ExtendedKalmanFilterTracker, estimate) {
   output_file.close();
 }
 
-TEST(ExtendedKalmanFilterTracker, estimate2) {
+TEST(EKFTracker, estimate2) {
   float dt;
   VecX u(2), mu(5), x(5), y(5), g(5), h(5), gaussian_noise(5);
   MatX G(5, 5), H(5, 5);
-  ExtendedKalmanFilterTracker tracker;
+  EKFTracker tracker;
   std::ofstream output_file;
   std::default_random_engine rgen;
   std::normal_distribution<float> norm_x(0, pow(0.5, 2));
@@ -150,11 +150,11 @@ TEST(ExtendedKalmanFilterTracker, estimate2) {
   output_file.close();
 }
 
-// TEST(ExtendedKalmanFilterTracker, estimate3) {
+// TEST(EKFTracker, estimate3) {
 //   float dt;
 //   VecX u(3), mu(7), x(7), y(4), g(7), h(4), gaussian_noise(4);
 //   MatX G(7, 7), H(4, 7);
-//   ExtendedKalmanFilterTracker tracker;
+//   EKFTracker tracker;
 //   std::ofstream output_file;
 //   std::default_random_engine rgen;
 //   std::normal_distribution<float> norm_x(0, pow(0.2, 2));
@@ -209,11 +209,11 @@ TEST(ExtendedKalmanFilterTracker, estimate2) {
 //   output_file.close();
 // }
 
-TEST(ExtendedKalmanFilterTracker, estimate3) {
+TEST(EKFTracker, estimate3) {
   float dt;
   VecX u(3), mu(9), x(9), y(4), g(9), h(4), gaussian_noise(4);
   MatX G(9, 9), H(4, 9);
-  ExtendedKalmanFilterTracker tracker;
+  EKFTracker tracker;
   std::ofstream output_file;
   std::default_random_engine rgen;
   std::normal_distribution<float> norm_x(0, pow(0.5, 2));

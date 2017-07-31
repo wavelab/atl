@@ -44,7 +44,7 @@
 
 namespace atl {
 
-class ExtendedKalmanFilterTracker {
+class EKFTracker {
 public:
   bool configured;
   bool initialized;
@@ -64,7 +64,7 @@ public:
   VecX mu_p;
   MatX S_p;
 
-  ExtendedKalmanFilterTracker();
+  EKFTracker();
   int configure(std::string config_file);
   int initialize(VecX mu);
   int reset(VecX mu);
@@ -72,14 +72,9 @@ public:
   int measurementUpdate(VecX h, MatX H, VecX y);
 };
 
-void two_wheel_process_model(ExtendedKalmanFilterTracker &ekf,
-                             MatX &G,
-                             VecX &g,
-                             double dt);
+void two_wheel_process_model(EKFTracker &ekf, MatX &G, VecX &g, double dt);
 
-void two_wheel_measurement_model(ExtendedKalmanFilterTracker &ekf,
-                                 MatX &H,
-                                 VecX &h);
+void two_wheel_measurement_model(EKFTracker &ekf, MatX &H, VecX &h);
 
 }  // namespace atl
 #endif
