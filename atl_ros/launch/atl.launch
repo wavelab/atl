@@ -23,6 +23,10 @@
   <param name="/control/config_dir" value="$(find atl_configs)/configs/quadrotor_anastasia" />
   <node pkg="atl_ros" name="atl_control" type="atl_control_node" output="screen" required="true" />
 
+  <!-- camera node -->
+  <param name="/camera/config_dir" value="$(find atl_configs)/configs/camera/elp_camera" />
+  <node pkg="atl_ros" name="atl_camera" type="atl_camera_node" output="screen" required="true" />
+
   <!-- <!&#45;&#45; apriltag node &#45;&#45;> -->
   <!-- <param name="/apriltag/config" value="$(find atl_configs)/configs/apriltag/config.yaml" /> -->
   <!-- <node pkg="atl_ros" name="atl_apriltag" type="atl_apriltag_node" output="screen" required="true" /> -->

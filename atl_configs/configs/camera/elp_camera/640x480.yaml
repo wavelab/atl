@@ -1,4 +1,4 @@
-index: 0
+index: 6
 image_width: 640
 image_height: 480
 
@@ -33,6 +33,6 @@ projection_matrix:
          0.000000, 488.642670, 264.233566, 0.000000,
          0.000000, 0.000000, 1.000000, 0.000000]
 
-imshow: true
+imshow: false
 snapshot: false
-showfps: true
+showfps: false
