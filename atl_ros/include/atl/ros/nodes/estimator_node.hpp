@@ -43,8 +43,8 @@ public:
 
   std::string quad_frame;
 
-  KalmanFilterTracker kf_tracker;
-  ExtendedKalmanFilterTracker ekf_tracker;
+  KFTracker kf_tracker;
+  EKFTracker ekf_tracker;
 
   Pose quad_pose;
   Vec3 quad_velocity;
@@ -67,8 +67,8 @@ public:
   EstimatorNode(int argc, char **argv) : ROSNode(argc, argv) {
     this->quad_frame = "";
 
-    this->kf_tracker = KalmanFilterTracker();
-    this->ekf_tracker = ExtendedKalmanFilterTracker();
+    this->kf_tracker = KFTracker();
+    this->ekf_tracker = EKFTracker();
 
     this->quad_pose = Pose();
     this->target_detected = false;

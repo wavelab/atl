@@ -2,24 +2,7 @@
 
 namespace atl {
 
-KalmanFilter::KalmanFilter() {
-  this->initialized = false;
-
-  this->B = MatX::Zero(1, 1);
-  this->R = MatX::Zero(1, 1);
-
-  this->C = MatX::Zero(1, 1);
-  this->Q = MatX::Zero(1, 1);
-
-  this->S = MatX::Zero(1, 1);
-  this->I = MatX::Zero(1, 1);
-  this->K = MatX::Zero(1, 1);
-
-  this->mu_p = VecX::Zero(1);
-  this->S_p = MatX::Zero(1, 1);
-}
-
-int KalmanFilter::init(VecX mu, MatX R, MatX C, MatX Q) {
+int KF::init(VecX mu, MatX R, MatX C, MatX Q) {
   int nb_states;
 
   nb_states = mu.size();
@@ -42,12 +25,12 @@ int KalmanFilter::init(VecX mu, MatX R, MatX C, MatX Q) {
   return 0;
 }
 
-int KalmanFilter::reset(VecX mu, MatX R, MatX C, MatX Q) {
+int KF::reset(VecX mu, MatX R, MatX C, MatX Q) {
   this->init(mu, R, C, Q);
   return 0;
 }
 
-int KalmanFilter::estimate(MatX A, VecX y) {
+int KF::estimate(MatX A, VecX y) {
   // pre-check
   if (this->initialized == false) {
     return -1;

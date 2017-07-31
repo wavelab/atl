@@ -40,12 +40,12 @@ static void recordTimeStep(std::ofstream &output_file,
   output_file << est(2) << std::endl;
 }
 
-TEST(ExtendedKalmanFilter, estimate) {
+TEST(EKF, estimate) {
   float dt;
   Vec2 u;
   Vec3 mu, x, y, g, h, gaussian_noise;
   Mat3 R, Q, G, H;
-  ExtendedKalmanFilter ekf;
+  EKF ekf;
   std::ofstream output_file;
   std::default_random_engine rgen;
   std::normal_distribution<float> norm_x(0, pow(0.5, 2));

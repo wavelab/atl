@@ -2,11 +2,7 @@
 
 namespace atl {
 
-ExtendedKalmanFilter::ExtendedKalmanFilter() {
-  this->initialized = false;
-}
-
-int ExtendedKalmanFilter::init(VecX mu, MatX R, MatX Q) {
+int EKF::init(VecX mu, MatX R, MatX Q) {
   int nb_states;
 
   nb_states = mu.size();
@@ -26,7 +22,7 @@ int ExtendedKalmanFilter::init(VecX mu, MatX R, MatX Q) {
   return 0;
 }
 
-int ExtendedKalmanFilter::predictionUpdate(VecX g, MatX G) {
+int EKF::predictionUpdate(VecX g, MatX G) {
   // pre-check
   if (this->initialized == false) {
     return -1;
@@ -39,7 +35,7 @@ int ExtendedKalmanFilter::predictionUpdate(VecX g, MatX G) {
   return 0;
 }
 
-int ExtendedKalmanFilter::measurementUpdate(VecX h, MatX H, VecX y) {
+int EKF::measurementUpdate(VecX h, MatX H, VecX y) {
   // pre-check
   if (this->initialized == false) {
     return -1;

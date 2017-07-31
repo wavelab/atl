@@ -5,9 +5,9 @@
 
 namespace atl {
 
-class ExtendedKalmanFilter {
+class EKF {
 public:
-  bool initialized;
+  bool initialized = false;
   VecX mu;
 
   MatX R;
@@ -20,7 +20,7 @@ public:
   VecX mu_p;
   MatX S_p;
 
-  ExtendedKalmanFilter();
+  EKF() {}
   int init(VecX mu, MatX R, MatX Q);
   int predictionUpdate(VecX g, MatX G);
   int measurementUpdate(VecX h, MatX H, VecX y);

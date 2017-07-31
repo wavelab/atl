@@ -45,9 +45,9 @@ static void recordTimeStep(std::ofstream &output_file,
   output_file << est(2) << std::endl;
 }
 
-TEST(KalmanFilterTracker, sanityCheck) {
+TEST(KFTracker, sanityCheck) {
   int retval;
-  KalmanFilterTracker tracker;
+  KFTracker tracker;
   Vec3 prev_pos, curr_pos;
 
   tracker.configure(TEST_CONFIG);
@@ -64,9 +64,9 @@ TEST(KalmanFilterTracker, sanityCheck) {
   EXPECT_EQ(-2, retval);
 }
 
-TEST(KalmanFilterTracker, estimate) {
+TEST(KFTracker, estimate) {
   float dt;
-  KalmanFilterTracker tracker;
+  KFTracker tracker;
   MatX A(9, 9);
   Vec3 pos, vel, acc, mea, est;
   VecX state(9), mu(9), y(3), motion_noise(3);

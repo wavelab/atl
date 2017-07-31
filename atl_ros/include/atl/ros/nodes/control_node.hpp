@@ -35,6 +35,7 @@ namespace atl {
 #define ESTIMATOR_OFF_TOPIC "/atl/estimator/off"
 
 // SUBSCRIBE TOPICS
+// clang-format off
 #define PX4_MODE_TOPIC "/mavros/set_mode"
 #define PX4_ARM_TOPIC "/mavros/cmd/arming"
 #define PX4_STATE_TOPIC "/mavros/state"
@@ -51,16 +52,15 @@ namespace atl {
 #define ARM_TOPIC "/atl/control/arm"
 #define MODE_TOPIC "/atl/control/mode"
 #define YAW_TOPIC "/atl/control/yaw/set"
-#define TARGET_BODY_POSITION_TOPIC \
-  "/atl/estimate/landing_target/position/body"
-#define TARGET_BODY_VELOCITY_TOPIC \
-  "/atl/estimate/landing_target/velocity/body"
+#define TARGET_BODY_POSITION_TOPIC "/atl/estimate/landing_target/position/body"
+#define TARGET_BODY_VELOCITY_TOPIC "/atl/estimate/landing_target/velocity/body"
 #define TARGET_DETECTED_TOPIC "/atl/estimate/landing_target/detected"
 #define HOVER_SET_TOPIC "/atl/control/hover/set"
 #define HOVER_HEIGHT_SET_TOPIC "/atl/control/hover/height/set"
 #define PCTRL_SET_TOPIC "/atl/control/position_controller/set"
 #define TCTRL_SET_TOPIC "/atl/control/tracking_controller/set"
 #define LCTRL_SET_TOPIC "/atl/control/landing_controller/set"
+// clang-format on
 
 class ControlNode : public ROSNode {
 public:

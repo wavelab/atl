@@ -20,14 +20,14 @@ namespace atl {
 #define CAMERA_IMAGE_TOPIC "/atl/camera/image"
 
 // SUBSCRIBE TOPICS
+// clang-format off
 #define APRILTAG_TOPIC "/atl/apriltag/target"
 #define GIMBAL_POSITION_TOPIC "/atl/gimbal/position/inertial"
-#define GIMBAL_FRAME_ORIENTATION_TOPIC \
-  "/atl/gimbal/frame/orientation/inertial"
-#define GIMBAL_JOINT_ORIENTATION_TOPIC \
-  "/atl/gimbal/joint/orientation/inertial"
+#define GIMBAL_FRAME_ORIENTATION_TOPIC "/atl/gimbal/frame/orientation/inertial"
+#define GIMBAL_JOINT_ORIENTATION_TOPIC "/atl/gimbal/joint/orientation/inertial"
 #define ENCODER_ORIENTATION_TOPIC "atl/gimbal/joint/orientation/body"
 #define LT_BODY_POSITION_TOPIC "/atl/estimate/landing_target/position/body"
+// clang-format on
 
 #define QUAD_POSE_TOPIC "/atl/quadrotor/pose/local"
 #define QUAD_POSITION_TOPIC "/dji_sdk/local_position"

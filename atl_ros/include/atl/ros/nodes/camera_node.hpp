@@ -21,14 +21,14 @@ namespace atl {
 #define CAMERA_IMAGE_TOPIC "/atl/camera/image"
 
 // SUBSCRIBE TOPICS
+// clang-format off
 #define APRILTAG_TOPIC "/atl/apriltag/target"
 #define GIMBAL_POSITION_TOPIC "/atl/quadrotor/pose/local"
-#define GIMBAL_FRAME_ORIENTATION_TOPIC \
-  "/atl/gimbal/frame/orientation/inertial"
-#define GIMBAL_JOINT_ORIENTATION_TOPIC \
-  "/atl/gimbal/joint/orientation/inertial"
+#define GIMBAL_FRAME_ORIENTATION_TOPIC "/atl/gimbal/frame/orientation/inertial"
+#define GIMBAL_JOINT_ORIENTATION_TOPIC "/atl/gimbal/joint/orientation/inertial"
 #define APRILTAG_TOPIC "/atl/apriltag/target"
 #define SHUTDOWN_TOPIC "/atl/camera/shutdown"
+// clang-format on
 
 class CameraNode : public ROSNode {
 public:

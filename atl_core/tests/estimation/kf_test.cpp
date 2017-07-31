@@ -42,9 +42,9 @@ static void recordTimeStep(std::ofstream &output_file,
   output_file << est(2) << std::endl;
 }
 
-TEST(KalmanFilter, estimate) {
+TEST(KF, estimate) {
   float dt;
-  atl::KalmanFilter kf;
+  atl::KF kf;
   atl::Vec3 pos, vel, acc, mea, est;
   atl::VecX state(9), mu(9), y(3), motion_noise(3);
   atl::MatX A(9, 9), R(9, 9), C(3, 9), Q(3, 3);

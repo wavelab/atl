@@ -5,9 +5,9 @@
 
 namespace atl {
 
-class KalmanFilter {
+class KF {
 public:
-  bool initialized;
+  bool initialized = false;
 
   VecX mu;
 
@@ -24,7 +24,7 @@ public:
   VecX mu_p;
   MatX S_p;
 
-  KalmanFilter();
+  KF() {}
   int init(VecX mu, MatX R, MatX C, MatX Q);
   int reset(VecX mu, MatX R, MatX C, MatX Q);
   int estimate(MatX A, VecX y);
