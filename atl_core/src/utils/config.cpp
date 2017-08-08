@@ -159,17 +159,10 @@ int ConfigParser::checkVector(std::string key,
   }
 
   switch (type) {
-    case VEC2:
-      vector_size = 2;
-      break;
-    case VEC3:
-      vector_size = 3;
-      break;
-    case VEC4:
-      vector_size = 4;
-      break;
-    default:
-      return 0;
+    case VEC2: vector_size = 2; break;
+    case VEC3: vector_size = 3; break;
+    case VEC4: vector_size = 4; break;
+    default: return 0;
   }
 
   // check number of values
@@ -228,23 +221,16 @@ int ConfigParser::loadPrimitive(ConfigParam param) {
   // parse
   this->getYamlNode(param.key, node);
   switch (param.type) {
-    case BOOL:
-      *static_cast<bool *>(param.data) = node.as<bool>();
-      break;
-    case INT:
-      *static_cast<int *>(param.data) = node.as<int>();
-      break;
-    case FLOAT:
-      *static_cast<float *>(param.data) = node.as<float>();
-      break;
+    case BOOL: *static_cast<bool *>(param.data) = node.as<bool>(); break;
+    case INT: *static_cast<int *>(param.data) = node.as<int>(); break;
+    case FLOAT: *static_cast<float *>(param.data) = node.as<float>(); break;
     case DOUBLE:
       *static_cast<double *>(param.data) = node.as<double>();
       break;
     case STRING:
       *static_cast<std::string *>(param.data) = node.as<std::string>();
       break;
-    default:
-      return -6;
+    default: return -6;
   }
 
   return 0;
@@ -296,8 +282,7 @@ int ConfigParser::loadArray(ConfigParam param) {
           ->push_back(n.as<std::string>());
       }
       break;
-    default:
-      return -6;
+    default: return -6;
   }
 
   return 0;
@@ -436,8 +421,7 @@ int ConfigParser::loadMatrix(ConfigParam param) {
         }
       }
     } break;
-    default:
-      return -6;
+    default: return -6;
   }
 
   return 0;
@@ -486,11 +470,8 @@ int ConfigParser::load(std::string config_file) {
       case MAT3:
       case MAT4:
       case MATX:
-      case CVMAT:
-        retval = this->loadMatrix(this->params[i]);
-        break;
-      default:
-        return -6;
+      case CVMAT: retval = this->loadMatrix(this->params[i]); break;
+      default: return -6;
     }
 
     if (retval == -1) {

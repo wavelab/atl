@@ -277,7 +277,7 @@ int SBGC::sendFrame(SBGCFrame &cmd) {
   write(this->serial, cmd.data, cmd.data_size);
   write(this->serial, &cmd.data_checksum, 1);
   tcflush(this->serial, TCIOFLUSH);  // very critical
-  // usleep(20 * 1000);
+  usleep(10 * 1000);
 
   return 0;
 }

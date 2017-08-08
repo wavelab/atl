@@ -75,27 +75,13 @@ int Quadrotor::setMode(const enum Mode &mode) {
   // set mode
   this->current_mode = mode;
   switch (mode) {
-    case DISARM_MODE:
-      LOG_INFO(INFO_KMODE);
-      break;
-    case HOVER_MODE:
-      LOG_INFO(INFO_HMODE);
-      break;
-    case DISCOVER_MODE:
-      LOG_INFO(INFO_DMODE);
-      break;
-    case TRACKING_MODE:
-      LOG_INFO(INFO_TMODE);
-      break;
-    case LANDING_MODE:
-      LOG_INFO(INFO_LMODE);
-      break;
-    case WAYPOINT_MODE:
-      LOG_INFO(INFO_WMODE);
-      break;
-    default:
-      LOG_ERROR(EINVMODE);
-      return -2;
+    case DISARM_MODE: LOG_INFO(INFO_KMODE); break;
+    case HOVER_MODE: LOG_INFO(INFO_HMODE); break;
+    case DISCOVER_MODE: LOG_INFO(INFO_DMODE); break;
+    case TRACKING_MODE: LOG_INFO(INFO_TMODE); break;
+    case LANDING_MODE: LOG_INFO(INFO_LMODE); break;
+    case WAYPOINT_MODE: LOG_INFO(INFO_WMODE); break;
+    default: LOG_ERROR(EINVMODE); return -2;
   }
 
   return 0;
@@ -441,21 +427,11 @@ int Quadrotor::step(const double dt) {
       this->att_cmd = AttitudeCommand();
       retval = 0;
       break;
-    case HOVER_MODE:
-      retval = this->stepHoverMode(dt);
-      break;
-    case DISCOVER_MODE:
-      retval = this->stepDiscoverMode(dt);
-      break;
-    case TRACKING_MODE:
-      retval = this->stepTrackingMode(dt);
-      break;
-    case LANDING_MODE:
-      retval = this->stepLandingMode(dt);
-      break;
-    case WAYPOINT_MODE:
-      retval = this->stepWaypointMode(dt);
-      break;
+    case HOVER_MODE: retval = this->stepHoverMode(dt); break;
+    case DISCOVER_MODE: retval = this->stepDiscoverMode(dt); break;
+    case TRACKING_MODE: retval = this->stepTrackingMode(dt); break;
+    case LANDING_MODE: retval = this->stepLandingMode(dt); break;
+    case WAYPOINT_MODE: retval = this->stepWaypointMode(dt); break;
     default:
       LOG_ERROR(EINVMODE);
       retval = this->stepHoverMode(dt);

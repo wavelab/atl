@@ -78,8 +78,9 @@ ADD_LIBRARY(
     src/vision/apriltag/swathmore.cpp
     src/vision/camera/camera.cpp
     src/vision/camera/config.cpp
-    src/vision/camera/ximea.cpp
+    src/vision/camera/dc1394.cpp
     src/vision/camera/pointgrey.cpp
+    src/vision/camera/ximea.cpp
     src/vision/gimbal/gimbal.cpp
     src/vision/gimbal/sbgc.cpp
 )
@@ -88,6 +89,7 @@ SET(${PROJECT_NAME}_DEPS
     ${OpenCV_LIBS}
     m3api
     flycapture
+    dc1394
     apriltag
     apriltags_mit
     apriltags_swathmore
@@ -129,8 +131,9 @@ ADD_EXECUTABLE(
     # vision
     tests/vision/apriltag/mit_test.cpp
     tests/vision/camera/camera_test.cpp
-    tests/vision/camera/pointgrey_test.cpp
     tests/vision/camera/config_test.cpp
+    tests/vision/camera/dc1394_test.cpp
+    tests/vision/camera/pointgrey_test.cpp
     tests/vision/gimbal/gimbal_test.cpp
     tests/vision/gimbal/sbgc_test.cpp
     # util

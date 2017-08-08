@@ -16,7 +16,7 @@ namespace atl {
 
 // NODE SETTINGS
 #define NODE_NAME "atl_gimbal"
-#define NODE_RATE 40
+#define NODE_RATE 30
 
 // PUBLISH TOPICS
 #define SBGC_IMU_TOPIC "/atl/sbgc/imu"

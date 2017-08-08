@@ -28,17 +28,31 @@ int PointGreyCamera::initialize() {
   FlyCapture2::Property property;
   FlyCapture2::Property gain_property;
 
-  FlyCapture2::PGRGuid guid;
   FlyCapture2::BusManager bus_manager;
 
   // setup
   this->pointgrey = new FlyCapture2::Camera();
 
   // look for camera
+  FlyCapture2::PGRGuid guid;
   error = bus_manager.GetCameraFromIndex(0, &guid);
   if (error != FlyCapture2::PGRERROR_OK) {
+    error.PrintErrorTrace();
     LOG_ERROR("ERROR! Could not find a camera!");
     return -1;
+  }
+
+  // display camera info
+  FlyCapture2::CameraInfo cam_info;
+  error = this->pointgrey->GetCameraInfo(&cam_info);
+  if (error != FlyCapture2::PGRERROR_OK) {
+    error.PrintErrorTrace();
+    LOG_ERROR("ERROR! Failed to get camera info from camera!");
+    return -1;
+  } else {
+    LOG_INFO("PointGrey [%s] - serial no. [%d]",
+             cam_info.modelName,
+             cam_info.serialNumber);
   }
 
   // connect
@@ -50,11 +64,11 @@ int PointGreyCamera::initialize() {
     LOG_INFO("PointGrey connected!");
   }
 
-  this->setFrameRate(200);
-  this->setExposure(this->config.exposure_value);
-  this->setGain(this->config.gain_value);
-  this->setShutter(this->config.shutter_speed);
-  this->setFormat7(1, "RAW8", 1024, 768);
+  // this->setFrameRate(200);
+  // this->setExposure(this->config.exposure_value);
+  // this->setGain(this->config.gain_value);
+  // this->setShutter(this->config.shutter_speed);
+  // this->setFormat7(1, "RAW8", 1024, 768);
 
   // start camera
   error = this->pointgrey->StartCapture();
@@ -306,15 +320,9 @@ int PointGreyCamera::setFormat7(int mode,
 
   // set mode
   switch (mode) {
-    case 0:
-      settings.mode = FlyCapture2::MODE_1;
-      break;
-    case 1:
-      settings.mode = FlyCapture2::MODE_1;
-      break;
-    case 2:
-      settings.mode = FlyCapture2::MODE_2;
-      break;
+    case 0: settings.mode = FlyCapture2::MODE_1; break;
+    case 1: settings.mode = FlyCapture2::MODE_1; break;
+    case 2: settings.mode = FlyCapture2::MODE_2; break;
     default:
       LOG_ERROR("Format7 mode [%d] not implemented yet!", mode);
       return -2;

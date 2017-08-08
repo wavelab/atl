@@ -38,9 +38,7 @@ int EstimatorNode::configure(std::string node_name, int hz) {
       }
       break;
 
-    default:
-      LOG_ERROR("Invalid Tracker Mode!");
-      return -2;
+    default: LOG_ERROR("Invalid Tracker Mode!"); return -2;
   }
 
   // publishers and subscribers
@@ -399,12 +397,8 @@ int EstimatorNode::estimate() {
 
   // estimate
   switch (this->mode) {
-    case KF_MODE:
-      retval = this->estimateKF(dt);
-      break;
-    case EKF_MODE:
-      retval = this->estimateEKF(dt);
-      break;
+    case KF_MODE: retval = this->estimateKF(dt); break;
+    case EKF_MODE: retval = this->estimateEKF(dt); break;
   }
 
   // sanity check target estimates

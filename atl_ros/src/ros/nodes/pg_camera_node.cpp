@@ -12,21 +12,20 @@ int PGCameraNode::configure(const std::string &node_name, int hz) {
   }
 
   // camera
+  ROS_GET_PARAM("/camera/calibration_mode", this->calibration_mode);
   ROS_GET_PARAM("/camera_config_dir", config_path);
-  ROS_GET_PARAM("/photobooth", this->photobooth);
   if (this->camera.configure(config_path) != 0) {
     ROS_ERROR("Failed to configure Camera!");
     return -2;
   };
   this->camera.initialize();
 
-  if (this->photobooth) {
+  if (this->calibration_mode) {
     int retval = mkdir("/tmp/calibration", ACCESSPERMS);
   }
 
   // register publisher and subscribers
   // clang-format off
-
   this->registerImagePublisher(CAMERA_IMAGE_TOPIC);
   this->registerSubscriber(GIMBAL_POSITION_TOPIC, &PGCameraNode::gimbalPositionCallback, this);
   this->registerSubscriber(GIMBAL_FRAME_ORIENTATION_TOPIC, &PGCameraNode::gimbalFrameCallback, this);
@@ -146,7 +145,7 @@ int PGCameraNode::loopCallback() {
 
   this->camera.getFrame(this->image);
 
-  if (this->photobooth) {
+  if (this->calibration_mode) {
     this->camera.showImage(this->image);
     int key = cv::waitKey(100);
     // std::cout << key << std::endl;
