@@ -3,7 +3,7 @@ image_width: 640
 image_height: 480
 
 shutter_speed: 350.0
-exposure_value: 4.5 # in mili seconds
+exposure_value: 4.5
 gain_value: 3000.0
 lambda: [0.0, 0.0, 0.0]
 alpha: 4.0

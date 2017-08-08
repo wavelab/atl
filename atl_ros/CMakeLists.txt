@@ -65,6 +65,7 @@ SET(
     atl_core
     m3api
     flycapture
+    dc1394
     ${catkin_LIBRARIES}
     ${OpenCV_LIBS}
     apriltag
@@ -76,6 +77,10 @@ SET(
 ADD_EXECUTABLE(atl_apriltag_node src/ros/nodes/apriltag_node.cpp)
 TARGET_LINK_LIBRARIES(atl_apriltag_node ${ATL_ROS_DEPS})
 ADD_DEPENDENCIES(atl_apriltag_node atl_ros_utils)
+
+ADD_EXECUTABLE(atl_cam_calib_node src/ros/nodes/cam_calib_node.cpp)
+TARGET_LINK_LIBRARIES(atl_cam_calib_node ${ATL_ROS_DEPS})
+ADD_DEPENDENCIES(atl_cam_calib_node atl_ros_utils)
 
 ADD_EXECUTABLE(atl_camera_node src/ros/nodes/camera_node.cpp)
 TARGET_LINK_LIBRARIES(atl_camera_node ${ATL_ROS_DEPS})

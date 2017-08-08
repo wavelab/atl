@@ -1,10 +1,10 @@
 #ifndef ATL_ROS_NODES_PG_CAMERA_NODE_HPP
 #define ATL_ROS_NODES_PG_CAMERA_NODE_HPP
 
-#include <cv_bridge/cv_bridge.h>
-#include <image_transport/image_transport.h>
 #include <ros/ros.h>
+#include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/CameraInfo.h>
+#include <image_transport/image_transport.h>
 
 #include "atl/atl_core.hpp"
 #include "atl/ros/utils/msgs.hpp"
@@ -38,8 +38,6 @@ namespace atl {
 
 class PGCameraNode : public ROSNode {
 public:
-  bool calibration_mode = false;
-
   PointGreyCamera camera;
   cv::Mat image;
 
@@ -65,7 +63,6 @@ public:
 
   int configure(const std::string &node_name, int hz);
   int publishImage();
-  void imageCallback(const sensor_msgs::ImageConstPtr &msg);
   void gimbalPositionCallback(const geometry_msgs::Vector3 &msg);
   void gimbalFrameCallback(const geometry_msgs::Quaternion &msg);
   void gimbalJointCallback(const geometry_msgs::Quaternion &msg);

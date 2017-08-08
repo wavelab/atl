@@ -10,9 +10,6 @@
 
 namespace atl {
 
-#define CLAMP(x, low, high) \
-  (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
-
 class DC1394Camera : public Camera {
 public:
   dc1394camera_t *capture = nullptr;
