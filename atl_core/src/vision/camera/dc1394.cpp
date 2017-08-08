@@ -33,23 +33,22 @@ int DC1394Camera::initialize() {
   // connect to camera
   this->capture = dc1394_camera_new(dc1394, list->ids[0].guid);
   if (!this->capture) {
-    dc1394_log_error("Failed to initialize camera with guid %llx",
-                     list->ids[0].guid);
+    dc1394_log_error(
+      "Failed to initialize camera with guid %llx", list->ids[0].guid);
     return 1;
   }
   dc1394_camera_free_list(list);
-  LOG_INFO("Using camera with GUID %d", (int) this->capture->guid);
+  // LOG_INFO("Using camera with GUID %d", (int) this->capture->guid);
 
   // setup camera
-  error = dc1394_video_set_operation_mode(this->capture,
-                                          DC1394_OPERATION_MODE_LEGACY);
+  error = dc1394_video_set_operation_mode(
+    this->capture, DC1394_OPERATION_MODE_LEGACY);
   DC1394_ERR_RTN(error, "Failed to set 1394A mode");
 
-  error = dc1394_video_set_iso_speed(this->capture, DC1394_ISO_SPEED_400);
-  DC1394_ERR_RTN(error, "Failed to set iso speed");
-
-  error = dc1394_video_set_mode(this->capture, DC1394_VIDEO_MODE_FORMAT7_1);
-  DC1394_ERR_RTN(error, "Failed to set format7 video mode");
+  this->setFrameRate(60);
+  this->setExposure(this->config.exposure_value);
+  this->setShutter(this->config.shutter_speed);
+  this->setGain(this->config.gain_value);
 
   // initialize camera
   error =
@@ -89,6 +88,23 @@ void DC1394Camera::printFrameInfo(dc1394video_frame_t *frame) {
 }
 
 int DC1394Camera::setBrightness(double brightness) {
+  dc1394error_t err;
+
+  // turn on the feature - dont know what this means??
+  err = dc1394_feature_set_power(
+    this->capture, DC1394_FEATURE_BRIGHTNESS, DC1394_ON);
+  DC1394_ERR_RTN(err, "Could not turn on the brightness feature");
+
+  // turn off auto exposure
+  err = dc1394_feature_set_mode(
+    this->capture, DC1394_FEATURE_BRIGHTNESS, DC1394_FEATURE_MODE_MANUAL);
+  DC1394_ERR_RTN(err, "Could not turn off Auto-brightness");
+
+  // set brightness
+  err = dc1394_feature_set_value(
+    this->capture, DC1394_FEATURE_BRIGHTNESS, brightness);
+  DC1394_ERR_RTN(err, "Could not set value");
+
   return 0;
 }
 
@@ -127,45 +143,80 @@ int DC1394Camera::setFrameRate(double fps) {
 int DC1394Camera::setExposure(double exposure) {
   dc1394error_t err;
 
-  // turn on the feature - dont know what this means??
+  // turn on the exposure feature
   err = dc1394_feature_set_power(
     this->capture, DC1394_FEATURE_EXPOSURE, DC1394_ON);
   DC1394_ERR_RTN(err, "Could not turn on the exposure feature");
-
-  // if (manual) {
-  uint32_t min, max;
 
   // turn off auto exposure
   err = dc1394_feature_set_mode(
     this->capture, DC1394_FEATURE_EXPOSURE, DC1394_FEATURE_MODE_MANUAL);
   DC1394_ERR_RTN(err, "Could not turn off Auto-exposure");
 
-  // get bounds and set
-  err = dc1394_feature_get_boundaries(
-    this->capture, DC1394_FEATURE_EXPOSURE, &min, &max);
-  DC1394_ERR_RTN(err, "Could not get bounds");
-
+  // set exposure
   err = dc1394_feature_set_value(
-    this->capture, DC1394_FEATURE_EXPOSURE, CLAMP(exposure, min, max));
-  DC1394_ERR_RTN(err, "Could not set value");
-  // } else {
-  //	err = dc1394_feature_set_mode(camera, DC1394_FEATURE_EXPOSURE,
-  // DC1394_FEATURE_MODE_AUTO);
-  //	DC1394_ERR_RTN(err,"Could not turn off Auto-exposure");
-  // }
+    this->capture, DC1394_FEATURE_EXPOSURE, exposure);
+  DC1394_ERR_RTN(err, "Could not set exposure");
 
   return 0;
 }
 
 int DC1394Camera::setShutter(double shutter_ms) {
+  dc1394error_t err;
+
+  // turn on the shutter feature
+  err = dc1394_feature_set_power(
+    this->capture, DC1394_FEATURE_SHUTTER, DC1394_ON);
+  DC1394_ERR_RTN(err, "Could not turn on the shutter feature");
+
+  // turn off auto shutter
+  err = dc1394_feature_set_mode(
+    this->capture, DC1394_FEATURE_SHUTTER, DC1394_FEATURE_MODE_MANUAL);
+  DC1394_ERR_RTN(err, "Could not turn off Auto-shutter");
+
+  // set shutter
+  err = dc1394_feature_set_value(
+    this->capture, DC1394_FEATURE_SHUTTER, shutter_ms);
+  DC1394_ERR_RTN(err, "Could not set shutter");
+
   return 0;
 }
 
 int DC1394Camera::setGain(double gain_db) {
+  dc1394error_t err;
+
+  // turn on the gain feature
+  err =
+    dc1394_feature_set_power(this->capture, DC1394_FEATURE_GAIN, DC1394_ON);
+  DC1394_ERR_RTN(err, "Could not turn on the gain feature");
+
+  // turn off auto gain
+  err = dc1394_feature_set_mode(
+    this->capture, DC1394_FEATURE_GAIN, DC1394_FEATURE_MODE_MANUAL);
+  DC1394_ERR_RTN(err, "Could not turn off Auto-gain");
+
+  // set gain
+  err = dc1394_feature_set_value(this->capture, DC1394_FEATURE_GAIN, gain_db);
+  DC1394_ERR_RTN(err, "Could not set gain");
+
   return 0;
 }
 
 int DC1394Camera::getBrightness(double &brightness) {
+  dc1394error_t err;
+
+  // turn on the brightness feature
+  err = dc1394_feature_set_power(
+    this->capture, DC1394_FEATURE_BRIGHTNESS, DC1394_ON);
+  DC1394_ERR_RTN(err, "Could not turn on brightness feature");
+
+  // get brightness value
+  uint32_t value;
+  err = dc1394_feature_get_value(
+    this->capture, DC1394_FEATURE_BRIGHTNESS, &value);
+  DC1394_ERR_RTN(err, "Could not get brightness");
+  brightness = (double) value;
+
   return 0;
 }
 
@@ -202,14 +253,79 @@ int DC1394Camera::getFrameRate(double &fps) {
 }
 
 int DC1394Camera::getExposure(double &exposure) {
+  dc1394error_t err;
+
+  // turn on the exposure feature
+  err = dc1394_feature_set_power(
+    this->capture, DC1394_FEATURE_EXPOSURE, DC1394_ON);
+  DC1394_ERR_RTN(err, "Could not turn on exposure feature");
+
+  // get exposure value
+  uint32_t value;
+  err =
+    dc1394_feature_get_value(this->capture, DC1394_FEATURE_EXPOSURE, &value);
+  DC1394_ERR_RTN(err, "Could not get exposure");
+  exposure = (double) value;
+
   return 0;
 }
 
 int DC1394Camera::getShutter(double &shutter_ms) {
+  dc1394error_t err;
+
+  // turn on the exposure feature
+  err = dc1394_feature_set_power(
+    this->capture, DC1394_FEATURE_SHUTTER, DC1394_ON);
+  DC1394_ERR_RTN(err, "Could not turn on shutter feature");
+
+  // get shutter value
+  uint32_t value;
+  err =
+    dc1394_feature_get_value(this->capture, DC1394_FEATURE_SHUTTER, &value);
+  DC1394_ERR_RTN(err, "Could not get shutter");
+  shutter_ms = (double) value;
+
   return 0;
 }
 
 int DC1394Camera::getGain(double &gain_db) {
+  dc1394error_t err;
+
+  // turn on the gain feature
+  err =
+    dc1394_feature_set_power(this->capture, DC1394_FEATURE_GAIN, DC1394_ON);
+  DC1394_ERR_RTN(err, "Could not turn on gain feature");
+
+  // get shutter value
+  uint32_t value;
+  err = dc1394_feature_get_value(this->capture, DC1394_FEATURE_GAIN, &value);
+  DC1394_ERR_RTN(err, "Could not get gain");
+  gain_db = (double) value;
+
+  return 0;
+}
+
+std::pair<int, int> DC1394Camera::centerROI(
+  int size, int max_size, int step) {
+  if (size == 0 || size > max_size) {
+    size = max_size;
+  }
+
+  // size must be a multiple of the step
+  size = size / step * step;
+  const int offset = (max_size - size) / 2;
+  return std::make_pair(size, offset);
+}
+
+int DC1394Camera::changeMode(std::string mode) {
+  // pre-check
+  if (this->configs.find(mode) == this->configs.end()) {
+    return -1;
+  }
+
+  // update camera settings
+  this->config = this->configs[mode];
+
   return 0;
 }
 

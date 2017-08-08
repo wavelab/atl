@@ -87,9 +87,8 @@ Vec3 Gimbal2AxisModel::getTargetInBF(Vec3 target_cf) {
   return (R * target_nwu + t);
 }
 
-Vec3 Gimbal2AxisModel::getTargetInBPF(Vec3 target_cf,
-                                      Quaternion body_if,
-                                      Quaternion joint_bf) {
+Vec3 Gimbal2AxisModel::getTargetInBPF(
+  Vec3 target_cf, Quaternion body_if, Quaternion joint_bf) {
   Vec3 p, target_bpf;
   Mat3 R_body, R_joint;
 

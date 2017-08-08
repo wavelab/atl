@@ -104,7 +104,6 @@ int MissionNode::takeoff() {
 
   // takeoff
 
-
   return 0;
 }
 
@@ -118,7 +117,6 @@ int MissionNode::land() {
     }
 
   // land
-
 
   return 0;
 }

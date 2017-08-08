@@ -39,9 +39,8 @@ public:
   AprilTagNode(int argc, char **argv) : ROSNode(argc, argv) {}
   int configure(const std::string &node_name, int hz);
   void publishTagPoseMsg(TagPose tag);
-  void publishTargetInertialPositionMsg(Vec3 gimbal_position,
-                                        Quaternion gimbal_orientation,
-                                        Vec3 target_bf);
+  void publishTargetInertialPositionMsg(
+    Vec3 gimbal_position, Quaternion gimbal_orientation, Vec3 target_bf);
   void publishTargetInertialYawMsg(TagPose tag, Quaternion gimbal_frame);
   void publishTargetBodyPositionMsg(Vec3 target_bpf);
   void publishTargetBodyPositionEncoderMsg(Vec3 target_bpf_encoder);

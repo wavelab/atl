@@ -32,9 +32,8 @@ std::vector<std::string> path_split(const std::string path) {
   return splits;
 }
 
-void paths_combine(const std::string path1,
-                   const std::string path2,
-                   std::string &out) {
+void paths_combine(
+  const std::string path1, const std::string path2, std::string &out) {
   int dirs_up;
   std::vector<std::string> splits1;
   std::vector<std::string> splits2;

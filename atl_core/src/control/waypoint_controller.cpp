@@ -34,7 +34,6 @@ int WaypointController::configure(const std::string &config_file) {
   this->pitch_limit[0] = deg2rad(this->pitch_limit[0]);
   this->pitch_limit[1] = deg2rad(this->pitch_limit[1]);
 
-
   // prepare blackbox file
   std::string blackbox_file = "/tmp/blackbox.dat";
   if (this->blackbox_enable) {
@@ -42,8 +41,8 @@ int WaypointController::configure(const std::string &config_file) {
       LOG_ERROR("blackbox file is not set!");
       return -3;
     } else if (this->prepBlackbox(blackbox_file) != 0) {
-      LOG_ERROR("Failed to open blackbox file at [%s]",
-                blackbox_file.c_str());
+      LOG_ERROR(
+        "Failed to open blackbox file at [%s]", blackbox_file.c_str());
       return -3;
     }
 
@@ -99,10 +98,8 @@ int WaypointController::record(Vec3 pos, Vec3 waypoint) {
   return 0;
 }
 
-int WaypointController::update(Mission &mission,
-                               const Pose &pose,
-                               const Vec3 &vel,
-                               const double dt) {
+int WaypointController::update(
+  Mission &mission, const Pose &pose, const Vec3 &vel, const double dt) {
   // check rate
   this->dt += dt;
   if (this->dt < 0.01) {

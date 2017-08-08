@@ -263,12 +263,12 @@ int Quadrotor::stepTrackingMode(const double dt) {
   inertial2body(this->velocity, q, vel_bf);
 
   // track target
-  this->att_cmd =
-    this->tracking_controller.calculate(this->landing_target.position_bf,
-                                        this->pose.position,
-                                        this->hover_position,
-                                        this->yaw,
-                                        dt);
+  this->att_cmd = this->tracking_controller.calculate(
+    this->landing_target.position_bf,
+    this->pose.position,
+    this->hover_position,
+    this->yaw,
+    dt);
 
   // update hover position and tracking timer
   this->setHoverXYPosition(this->pose.position);
@@ -317,14 +317,14 @@ int Quadrotor::stepLandingMode(const double dt) {
   }
 
   // land on target
-  retval =
-    this->landing_controller.calculate(this->landing_target.position_bf,
-                                       this->landing_target.velocity_bf,
-                                       this->pose.position,
-                                       this->velocity,
-                                       this->pose.orientation,
-                                       this->yaw,
-                                       dt);
+  retval = this->landing_controller.calculate(
+    this->landing_target.position_bf,
+    this->landing_target.velocity_bf,
+    this->pose.position,
+    this->velocity,
+    this->pose.orientation,
+    this->yaw,
+    dt);
   this->att_cmd = this->landing_controller.att_cmd;
 
   // update hover position and tracking timer

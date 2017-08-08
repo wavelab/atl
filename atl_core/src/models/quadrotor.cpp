@@ -3,9 +3,8 @@
 namespace atl {
 
 // ATTITUDE CONTROLLER
-Vec4 AttitudeController::update(const Vec4 &setpoints,
-                                const Vec4 &actual,
-                                double dt) {
+Vec4 AttitudeController::update(
+  const Vec4 &setpoints, const Vec4 &actual, double dt) {
   // check rate
   this->dt += dt;
   if (this->dt < 0.001) {
@@ -57,20 +56,19 @@ Vec4 AttitudeController::update(const Vec4 &setpoints,
   return outputs;
 }
 
-Vec4 AttitudeController::update(const Vec4 &psetpoints,
-                                const Vec4 &vsetpoints,
-                                const Vec4 &actual,
-                                double dt) {
+Vec4 AttitudeController::update(
+  const Vec4 &psetpoints,
+  const Vec4 &vsetpoints,
+  const Vec4 &actual,
+  double dt) {
   Vec4 setpoints;
   setpoints = psetpoints + vsetpoints;
   return this->update(setpoints, actual, dt);
 }
 
 // POSITION CONTROLLER
-Vec4 PositionController::update(const Vec3 &setpoints,
-                                const Vec4 &actual,
-                                double yaw,
-                                double dt) {
+Vec4 PositionController::update(
+  const Vec3 &setpoints, const Vec4 &actual, double yaw, double dt) {
   // check rate
   this->dt += dt;
   if (this->dt < 0.01) {
@@ -250,10 +248,8 @@ Vec4 QuadrotorModel::positionControllerControl(double dt) {
   return motor_inputs;
 }
 
-void QuadrotorModel::setAttitude(double roll,
-                                 double pitch,
-                                 double yaw,
-                                 double z) {
+void QuadrotorModel::setAttitude(
+  double roll, double pitch, double yaw, double z) {
   this->attitude_setpoints(0) = roll;
   this->attitude_setpoints(1) = pitch;
   this->attitude_setpoints(2) = yaw;

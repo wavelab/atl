@@ -8,8 +8,8 @@
 
 #include <yaml-cpp/yaml.h>
 
-#include "atl/utils/utils.hpp"
 #include "atl/control/pid.hpp"
+#include "atl/utils/utils.hpp"
 
 namespace atl {
 
@@ -55,9 +55,10 @@ public:
         pos_thres{0.0},
         vel_thres{0.0} {}
 
-  int load(const std::string &index_file,
-           double pos_thres = 0.2,
-           double vel_thres = 0.2);
+  int load(
+    const std::string &index_file,
+    double pos_thres = 0.2,
+    double vel_thres = 0.2);
 
   int find(const Vec3 &pos, double v, Trajectory &traj);
 };
@@ -111,27 +112,27 @@ public:
   int loadTrajectory(Vec3 pos, Vec3 target_pos_bf, double v);
   int prepBlackbox(const std::string &blackbox_file);
   int recordTrajectoryIndex();
-  int record(Vec3 pos,
-             Vec3 vel,
-             Vec2 wp_pos,
-             Vec2 wp_vel,
-             Vec2 wp_inputs,
-             Vec3 target_pos_bf,
-             Vec3 target_vel_bf,
-             Vec3 rpy,
-             double thrust,
-             double dt);
-  Vec4 calculateVelocityErrors(Vec3 v_errors,
-                               Vec3 p_errors,
-                               double yaw,
-                               double dt);
-  int calculate(Vec3 target_pos_bf,
-                Vec3 target_vel_bf,
-                Vec3 pos,
-                Vec3 vel,
-                Quaternion orientation,
-                double yaw,
-                double dt);
+  int record(
+    Vec3 pos,
+    Vec3 vel,
+    Vec2 wp_pos,
+    Vec2 wp_vel,
+    Vec2 wp_inputs,
+    Vec3 target_pos_bf,
+    Vec3 target_vel_bf,
+    Vec3 rpy,
+    double thrust,
+    double dt);
+  Vec4 calculateVelocityErrors(
+    Vec3 v_errors, Vec3 p_errors, double yaw, double dt);
+  int calculate(
+    Vec3 target_pos_bf,
+    Vec3 target_vel_bf,
+    Vec3 pos,
+    Vec3 vel,
+    Quaternion orientation,
+    double yaw,
+    double dt);
   void reset();
   void printOutputs();
 };

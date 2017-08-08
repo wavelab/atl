@@ -37,8 +37,8 @@ int TrackingController::configure(std::string config_file) {
   parser.addParam("throttle_controller.k_p", &this->z_controller.k_p);
   parser.addParam("throttle_controller.k_i", &this->z_controller.k_i);
   parser.addParam("throttle_controller.k_d", &this->z_controller.k_d);
-  parser.addParam("throttle_controller.hover_throttle",
-                  &this->hover_throttle);
+  parser.addParam(
+    "throttle_controller.hover_throttle", &this->hover_throttle);
 
   parser.addParam("roll_limit.min", &this->roll_limit[0]);
   parser.addParam("roll_limit.max", &this->roll_limit[1]);
@@ -65,9 +65,8 @@ int TrackingController::configure(std::string config_file) {
   return 0;
 }
 
-AttitudeCommand TrackingController::calculate(Vec3 errors,
-                                              double yaw,
-                                              double dt) {
+AttitudeCommand TrackingController::calculate(
+  Vec3 errors, double yaw, double dt) {
   // check rate
   this->dt += dt;
   if (this->dt < 0.01) {

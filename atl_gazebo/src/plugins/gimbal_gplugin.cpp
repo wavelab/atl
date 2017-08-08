@@ -7,8 +7,8 @@ GimbalGPlugin::GimbalGPlugin() {
   printf("LOADING [libgimbal_gplugin.so]!\n");
 }
 
-void GimbalGPlugin::Load(gazebo::physics::ModelPtr model,
-                         sdf::ElementPtr sdf) {
+void GimbalGPlugin::Load(
+  gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
   UNUSED(sdf);
 
   // set model and bind world update callback

@@ -22,7 +22,9 @@
 
 namespace atl {
 
-/** MIT Apriltag Detector **/
+/**
+ * MIT Apriltag Detector
+ **/
 class MITDetector : public BaseDetector {
 public:
   AprilTags::TagDetector *detector;

@@ -136,9 +136,8 @@ int BaseDetector::changeMode(cv::Mat &image) {
   return 0;
 }
 
-int BaseDetector::maskImage(TagPose tag_pose,
-                            cv::Mat &image,
-                            double padding) {
+int BaseDetector::maskImage(
+  TagPose tag_pose, cv::Mat &image, double padding) {
   std::string camera_mode;
   int image_width, image_height;
   double x, y, z;

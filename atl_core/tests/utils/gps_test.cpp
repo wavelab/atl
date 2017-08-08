@@ -1,5 +1,5 @@
-#include "atl/atl_test.hpp"
 #include "atl/utils/gps.hpp"
+#include "atl/atl_test.hpp"
 
 namespace atl {
 

@@ -7,8 +7,8 @@ DFCameraGPlugin::DFCameraGPlugin() {
   printf("LOADING [libdf_camera_gplugin.so]!\n");
 }
 
-void DFCameraGPlugin::Load(gazebo::sensors::SensorPtr sptr,
-                           sdf::ElementPtr sdf) {
+void DFCameraGPlugin::Load(
+  gazebo::sensors::SensorPtr sptr, sdf::ElementPtr sdf) {
   UNUSED(sdf);
 
   // load sensor pointer
@@ -55,11 +55,12 @@ void DFCameraGPlugin::Load(gazebo::sensors::SensorPtr sptr,
   this->registerPublisher<gazebo::msgs::Image>(IMAGE_PUB_TOPIC);
 }
 
-void DFCameraGPlugin::onNewFrame(const unsigned char *image,
-                                 const int image_width,
-                                 const int image_height,
-                                 const int image_depth,
-                                 const std::string &format) {
+void DFCameraGPlugin::onNewFrame(
+  const unsigned char *image,
+  const int image_width,
+  const int image_height,
+  const int image_depth,
+  const std::string &format) {
   int buf_size;
   unsigned char *data;
   gazebo::common::Image input_image;

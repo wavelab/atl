@@ -21,8 +21,8 @@ int PositionController::configure(const std::string &config_file) {
   parser.addParam("throttle_controller.k_p", &this->z_controller.k_p);
   parser.addParam("throttle_controller.k_i", &this->z_controller.k_i);
   parser.addParam("throttle_controller.k_d", &this->z_controller.k_d);
-  parser.addParam("throttle_controller.hover_throttle",
-                  &this->hover_throttle);
+  parser.addParam(
+    "throttle_controller.hover_throttle", &this->hover_throttle);
 
   if (parser.load(config_file) != 0) {
     return -1;
@@ -38,10 +38,8 @@ int PositionController::configure(const std::string &config_file) {
   return 0;
 }
 
-Vec4 PositionController::calculate(Vec3 setpoints,
-                                   Pose robot_pose,
-                                   double yaw,
-                                   double dt) {
+Vec4 PositionController::calculate(
+  Vec3 setpoints, Pose robot_pose, double yaw, double dt) {
   // check rate
   this->dt += dt;
   if (this->dt < 0.01) {

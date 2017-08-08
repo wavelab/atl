@@ -2,14 +2,14 @@
 #define ATL_CONTROL_WAYPOINT_CONTROLLER_HPP
 
 #include <libgen.h>
-#include <iomanip>
 #include <deque>
+#include <iomanip>
 
 #include <yaml-cpp/yaml.h>
 
-#include "atl/utils/utils.hpp"
 #include "atl/control/pid.hpp"
 #include "atl/mission/mission.hpp"
+#include "atl/utils/utils.hpp"
 
 namespace atl {
 
@@ -89,10 +89,8 @@ public:
    *   - -1: Not configured
    *   - -2: No more waypoints
    */
-  int update(Mission &mission,
-             const Pose &pose,
-             const Vec3 &vel,
-             const double dt);
+  int update(
+    Mission &mission, const Pose &pose, const Vec3 &vel, const double dt);
 
   /**
    * Reset controller errors to 0

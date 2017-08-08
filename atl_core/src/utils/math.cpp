@@ -311,10 +311,11 @@ void enu2nwu(Quaternion enu, Quaternion &nwu) {
   nwu.z() = enu.z();
 }
 
-void target2body(Vec3 target_pos_if,
-                 Vec3 body_pos_if,
-                 Quaternion body_orientation_if,
-                 Vec3 &target_pos_bf) {
+void target2body(
+  Vec3 target_pos_if,
+  Vec3 body_pos_if,
+  Quaternion body_orientation_if,
+  Vec3 &target_pos_bf) {
   Mat3 R;
   Vec3 pos_enu, pos_nwu;
 
@@ -329,10 +330,11 @@ void target2body(Vec3 target_pos_if,
   target_pos_bf = R * pos_nwu;
 }
 
-void target2body(Vec3 target_pos_if,
-                 Vec3 body_pos_if,
-                 Vec3 body_orientation_if,
-                 Vec3 &target_pos_bf) {
+void target2body(
+  Vec3 target_pos_if,
+  Vec3 body_pos_if,
+  Vec3 body_orientation_if,
+  Vec3 &target_pos_bf) {
   Mat3 R;
   Vec3 pos_enu, pos_nwu;
 
@@ -347,10 +349,11 @@ void target2body(Vec3 target_pos_if,
   target_pos_bf = R * pos_nwu;
 }
 
-void target2bodyplanar(Vec3 target_pos_if,
-                       Vec3 body_pos_if,
-                       Quaternion body_orientation_if,
-                       Vec3 &target_pos_bf) {
+void target2bodyplanar(
+  Vec3 target_pos_if,
+  Vec3 body_pos_if,
+  Quaternion body_orientation_if,
+  Vec3 &target_pos_bf) {
   Vec3 euler;
 
   // convert quaternion to euler
@@ -363,10 +366,11 @@ void target2bodyplanar(Vec3 target_pos_if,
   target2body(target_pos_if, body_pos_if, euler, target_pos_bf);
 }
 
-void target2bodyplanar(Vec3 target_pos_if,
-                       Vec3 body_pos_if,
-                       Vec3 body_orientation_if,
-                       Vec3 &target_pos_bf) {
+void target2bodyplanar(
+  Vec3 target_pos_if,
+  Vec3 body_pos_if,
+  Vec3 body_orientation_if,
+  Vec3 &target_pos_bf) {
   Vec3 euler;
 
   // filtering out roll and pitch since we are in body planar frame
@@ -376,10 +380,11 @@ void target2bodyplanar(Vec3 target_pos_if,
   target2body(target_pos_if, body_pos_if, euler, target_pos_bf);
 }
 
-void target2inertial(Vec3 target_pos_bf,
-                     Vec3 body_pos_if,
-                     Vec3 body_orientation_if,
-                     Vec3 &target_pos_if) {
+void target2inertial(
+  Vec3 target_pos_bf,
+  Vec3 body_pos_if,
+  Vec3 body_orientation_if,
+  Vec3 &target_pos_if) {
   Mat3 R;
   Vec3 target_enu;
 
@@ -393,10 +398,11 @@ void target2inertial(Vec3 target_pos_bf,
   target_pos_if = (R * target_enu) + body_pos_if;
 }
 
-void target2inertial(Vec3 target_pos_bf,
-                     Vec3 body_pos_if,
-                     Quaternion body_orientation_if,
-                     Vec3 &target_pos_if) {
+void target2inertial(
+  Vec3 target_pos_bf,
+  Vec3 body_pos_if,
+  Quaternion body_orientation_if,
+  Vec3 &target_pos_if) {
   Mat3 R;
   Vec3 target_enu;
 

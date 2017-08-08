@@ -1,5 +1,5 @@
-#include "atl/atl_test.hpp"
 #include "atl/mission/mission.hpp"
+#include "atl/atl_test.hpp"
 
 namespace atl {
 

@@ -150,9 +150,10 @@ int PGCameraNode::loopCallback() {
     int key = cv::waitKey(100);
     // std::cout << key << std::endl;
     if (key == 32) {
-      cv::imwrite("/tmp/calibration/image_" +
-                    std::to_string(this->image_number) + ".jpg",
-                  this->image);
+      cv::imwrite(
+        "/tmp/calibration/image_" + std::to_string(this->image_number) +
+          ".jpg",
+        this->image);
       this->image_number += 1;
     }
   }

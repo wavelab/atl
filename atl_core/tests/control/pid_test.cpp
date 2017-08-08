@@ -1,5 +1,5 @@
-#include "atl/atl_test.hpp"
 #include "atl/control/pid.hpp"
+#include "atl/atl_test.hpp"
 
 TEST(PID, constructor) {
   atl::PID controller;

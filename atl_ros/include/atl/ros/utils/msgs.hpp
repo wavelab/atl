@@ -5,13 +5,13 @@
 #include <std_msgs/Float64.h>
 #include <std_msgs/String.h>
 
-#include <geometry_msgs/Vector3.h>
-#include <geometry_msgs/Vector3Stamped.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <geometry_msgs/Quaternion.h>
 #include <geometry_msgs/QuaternionStamped.h>
 #include <geometry_msgs/TwistStamped.h>
+#include <geometry_msgs/Vector3.h>
+#include <geometry_msgs/Vector3Stamped.h>
 
 #include <sensor_msgs/Joy.h>
 #include <sensor_msgs/NavSatFix.h>
@@ -33,15 +33,14 @@ void buildMsg(double d, std_msgs::Float64 &msg);
 void buildMsg(Vec3 vec, geometry_msgs::Vector3 &msg);
 void buildMsg(Vec3 vec, geometry_msgs::Point &msg);
 void buildMsg(Quaternion q, geometry_msgs::Quaternion &msg);
-void buildMsg(int seq,
-              ros::Time time,
-              Pose pose,
-              geometry_msgs::PoseStamped &msg);
-void buildMsg(int seq,
-              ros::Time time,
-              AttitudeCommand att_cmd,
-              geometry_msgs::PoseStamped &msg,
-              std_msgs::Float64 &thr_msg);
+void buildMsg(
+  int seq, ros::Time time, Pose pose, geometry_msgs::PoseStamped &msg);
+void buildMsg(
+  int seq,
+  ros::Time time,
+  AttitudeCommand att_cmd,
+  geometry_msgs::PoseStamped &msg,
+  std_msgs::Float64 &thr_msg);
 void buildMsg(TagPose tag, atl_msgs::AprilTagPose &msg);
 void buildMsg(TagPose tag, geometry_msgs::Vector3 &msg);
 void buildMsg(PositionController pc, atl_msgs::PCtrlSettings &msg);

@@ -2,9 +2,9 @@ index: 0
 image_width: 640
 image_height: 480
 
-shutter_speed: 0
+shutter_speed: 350.0
 exposure_value: 4.5 # in mili seconds
-gain_value: 6.0
+gain_value: 3000.0
 lambda: [0.0, 0.0, 0.0]
 alpha: 4.0
 
@@ -27,6 +27,6 @@ projection_matrix:
   data: [1141.614258, 0.000000, 322.208668, 0.000000, 0.000000, 1146.487793, 227.113253, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000]
 
 
-imshow: false
+imshow: true
 snapshot: false
 showfps: true

@@ -5,8 +5,8 @@
 #include <iomanip>
 #include <iostream>
 
-#include "atl/utils/utils.hpp"
 #include "atl/control/pid.hpp"
+#include "atl/utils/utils.hpp"
 
 namespace atl {
 
@@ -138,9 +138,8 @@ public:
    * @param body_if Gimbal body in inertial frame (NWU coordinate system)
    * @param joint_bf Gimbal body in body frame (NWU coordinate system)
    */
-  Vec3 getTargetInBPF(Vec3 target_cf,
-                      Quaternion body_if,
-                      Quaternion joint_bf);
+  Vec3 getTargetInBPF(
+    Vec3 target_cf, Quaternion body_if, Quaternion joint_bf);
 
   /**
    * Track target

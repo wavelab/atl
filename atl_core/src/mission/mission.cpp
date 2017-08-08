@@ -200,10 +200,11 @@ int Mission::waypointReached(const Vec3 &position) {
   if (dist > this->threshold_waypoint_reached) {
     return 0;
   } else {
-    LOG_INFO("Waypoint (%f, %f, %f) reached!",
-             this->wp_end(0),
-             this->wp_end(1),
-             this->wp_end(2));
+    LOG_INFO(
+      "Waypoint (%f, %f, %f) reached!",
+      this->wp_end(0),
+      this->wp_end(1),
+      this->wp_end(2));
     return 1;
   }
 }

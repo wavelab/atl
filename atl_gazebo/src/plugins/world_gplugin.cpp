@@ -7,8 +7,8 @@ WorldGPlugin::WorldGPlugin() {
   printf("LOADING [libworld_gplugin.so]!\n");
 }
 
-void WorldGPlugin::Load(gazebo::physics::WorldPtr parent,
-                        sdf::ElementPtr sdf) {
+void WorldGPlugin::Load(
+  gazebo::physics::WorldPtr parent, sdf::ElementPtr sdf) {
   UNUSED(sdf);
 
   this->world_sdf = sdf;

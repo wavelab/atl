@@ -22,8 +22,8 @@ int SwathmoreDetector::configure(const std::string &config_file) {
   return 0;
 }
 
-int SwathmoreDetector::extractTags(cv::Mat &image,
-                                   std::vector<TagPose> &tags) {
+int SwathmoreDetector::extractTags(
+  cv::Mat &image, std::vector<TagPose> &tags) {
   int retval;
   TagPose pose;
   cv::Mat image_gray;
@@ -86,8 +86,8 @@ int SwathmoreDetector::extractTags(cv::Mat &image,
   return 0;
 }
 
-int SwathmoreDetector::obtainPose(const TagDetection &tag,
-                                  TagPose &tag_pose) {
+int SwathmoreDetector::obtainPose(
+  const TagDetection &tag, TagPose &tag_pose) {
   Vec3 t;
   Mat3 R;
   cv::Mat cv_R, cv_T;

@@ -174,12 +174,13 @@ public:
   int getRealtimeData4();
   int getAnglesExt();
   int setAngle(double roll, double pitch, double yaw);
-  int setSpeedAngle(double roll,
-                    double pitch,
-                    double yaw,
-                    double roll_speed,
-                    double pitch_speed,
-                    double yaw_speed);
+  int setSpeedAngle(
+    double roll,
+    double pitch,
+    double yaw,
+    double roll_speed,
+    double pitch_speed,
+    double yaw_speed);
 };
 
 }  // end of namespace atl

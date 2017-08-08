@@ -51,12 +51,13 @@ void DJIQuadrotorNode::poseCallback(ConstPosePtr &msg) {
   // convert NWU position to GPS lat lon coordinates
   double lat = 0.0;
   double lon = 0.0;
-  latlon_offset(this->home_latitude,
-                this->home_longitude,
-                ros_pos(0),
-                ros_pos(1),
-                &lat,
-                &lon);
+  latlon_offset(
+    this->home_latitude,
+    this->home_longitude,
+    ros_pos(0),
+    ros_pos(1),
+    &lat,
+    &lon);
 
   // build global position msg
   dji_sdk::GlobalPosition global_position_msg;

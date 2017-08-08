@@ -10,9 +10,9 @@
 
 #include <dji_sdk/dji_drone.h>
 
-#include <atl/utils/utils.hpp>
-#include <atl/ros/utils/node.hpp>
 #include <atl/ros/utils/msgs.hpp>
+#include <atl/ros/utils/node.hpp>
+#include <atl/utils/utils.hpp>
 #include "atl/gazebo/clients/quadrotor_gclient.hpp"
 
 namespace atl {
@@ -71,8 +71,9 @@ public:
    *
    * @param msg Attitude setpoint for quadrotor
    */
-  bool controlCallback(dji_sdk::AttitudeControl::Request &request,
-                       dji_sdk::AttitudeControl::Response &response);
+  bool controlCallback(
+    dji_sdk::AttitudeControl::Request &request,
+    dji_sdk::AttitudeControl::Response &response);
 };
 
 }  // namespace gazebo_bridge

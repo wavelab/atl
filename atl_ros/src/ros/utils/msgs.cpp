@@ -33,10 +33,8 @@ void buildMsg(Quaternion q, geometry_msgs::Quaternion &msg) {
   msg.z = q.z();
 }
 
-void buildMsg(int seq,
-              ros::Time time,
-              Pose pose,
-              geometry_msgs::PoseStamped &msg) {
+void buildMsg(
+  int seq, ros::Time time, Pose pose, geometry_msgs::PoseStamped &msg) {
   msg.header.seq = seq;
   msg.header.stamp = time;
   msg.header.frame_id = "atl_quadrotor_pose";
@@ -51,11 +49,12 @@ void buildMsg(int seq,
   msg.pose.orientation.z = pose.orientation.z();
 }
 
-void buildMsg(int seq,
-              ros::Time time,
-              AttitudeCommand att_cmd,
-              geometry_msgs::PoseStamped &msg,
-              std_msgs::Float64 &thr_msg) {
+void buildMsg(
+  int seq,
+  ros::Time time,
+  AttitudeCommand att_cmd,
+  geometry_msgs::PoseStamped &msg,
+  std_msgs::Float64 &thr_msg) {
   // atitude command
   msg.header.seq = seq;
   msg.header.stamp = time;

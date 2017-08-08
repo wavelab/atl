@@ -50,9 +50,10 @@ int PointGreyCamera::initialize() {
     LOG_ERROR("ERROR! Failed to get camera info from camera!");
     return -1;
   } else {
-    LOG_INFO("PointGrey [%s] - serial no. [%d]",
-             cam_info.modelName,
-             cam_info.serialNumber);
+    LOG_INFO(
+      "PointGrey [%s] - serial no. [%d]",
+      cam_info.modelName,
+      cam_info.serialNumber);
   }
 
   // connect
@@ -302,10 +303,8 @@ int PointGreyCamera::printFormat7Capabilities() {
   return 0;
 }
 
-int PointGreyCamera::setFormat7(int mode,
-                                std::string pixel_format,
-                                int width,
-                                int height) {
+int PointGreyCamera::setFormat7(
+  int mode, std::string pixel_format, int width, int height) {
   bool valid;
   unsigned int packet_size;
   float psize_percentage;
@@ -365,9 +364,8 @@ int PointGreyCamera::setFormat7(int mode,
   return 0;
 }
 
-std::pair<int, int> PointGreyCamera::centerROI(int size,
-                                               int max_size,
-                                               int step) {
+std::pair<int, int> PointGreyCamera::centerROI(
+  int size, int max_size, int step) {
   if (size == 0 || size > max_size) {
     size = max_size;
   }

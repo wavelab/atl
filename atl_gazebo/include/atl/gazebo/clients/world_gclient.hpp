@@ -61,9 +61,8 @@ public:
   int loadWorld(std::string file_path);
   int clearWorld();
   int loadModel(std::string model_name);
-  int loadModel(std::string model_name,
-                Eigen::Vector3d pos,
-                Eigen::Quaterniond quat);
+  int loadModel(
+    std::string model_name, Eigen::Vector3d pos, Eigen::Quaterniond quat);
   int removeModel(std::string model_name);
   int setModelPose(std::string model_name, Vec3 pos, Vec3 rpy);
   virtual void clockCallback(ConstTimePtr &msg);

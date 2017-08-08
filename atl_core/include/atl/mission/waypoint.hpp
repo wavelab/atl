@@ -24,11 +24,12 @@ public:
         heading{0.0} {}
   Waypoint(double latitude, double longitude)
       : latitude{latitude}, longitude{longitude} {}
-  Waypoint(double latitude,
-           double longitude,
-           double altitude,
-           double staytime,
-           double heading)
+  Waypoint(
+    double latitude,
+    double longitude,
+    double altitude,
+    double staytime,
+    double heading)
       : latitude{latitude},
         longitude{longitude},
         altitude{altitude},

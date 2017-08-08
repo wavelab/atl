@@ -37,12 +37,10 @@ public:
   int on();
   int off();
   static Vec3 getTargetInBF(Pose camera_offset, Vec3 target_cf);
-  static Vec3 getTargetInBPF(Pose camera_offset,
-                             Vec3 target_cf,
-                             Quaternion joint_if);
-  static Vec3 getTargetInIF(Vec3 target_bpf,
-                            Vec3 gimbal_position,
-                            Quaternion gimbal_frame_if);
+  static Vec3 getTargetInBPF(
+    Pose camera_offset, Vec3 target_cf, Quaternion joint_if);
+  static Vec3 getTargetInIF(
+    Vec3 target_bpf, Vec3 gimbal_position, Quaternion gimbal_frame_if);
   int getTargetInBPF(Vec3 target_cf, Vec3 &target_bpf);
   int trackTarget(Vec3 target_cf);
   int updateGimbalStates();

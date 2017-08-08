@@ -56,10 +56,8 @@ int Trajectory::load(int index, const std::string &filepath, const Vec3 &p0) {
   return 0;
 }
 
-int Trajectory::update(Vec3 pos,
-                       Vec2 &wp_pos,
-                       Vec2 &wp_vel,
-                       Vec2 &wp_inputs) {
+int Trajectory::update(
+  Vec3 pos, Vec2 &wp_pos, Vec2 &wp_vel, Vec2 &wp_inputs) {
   double wp_percent;
   Vec2 q_pos;
   Vec2 wp_pos_start, wp_pos_end;
@@ -130,9 +128,8 @@ void Trajectory::reset() {
 }
 
 // TRAJECTORY INDEX
-int TrajectoryIndex::load(const std::string &index_file,
-                          double pos_thres,
-                          double vel_thres) {
+int TrajectoryIndex::load(
+  const std::string &index_file, double pos_thres, double vel_thres) {
   // pre-check
   if (file_exists(index_file) == false) {
     LOG_ERROR("File not found: %s", index_file.c_str());
@@ -300,8 +297,8 @@ int LandingController::configure(const std::string &config_file) {
       LOG_ERROR("blackbox file is not set!");
       return -3;
     } else if (this->prepBlackbox(blackbox_file) != 0) {
-      LOG_ERROR("Failed to open blackbox file at [%s]",
-                blackbox_file.c_str());
+      LOG_ERROR(
+        "Failed to open blackbox file at [%s]", blackbox_file.c_str());
       return -3;
     }
 
@@ -325,9 +322,8 @@ int LandingController::configure(const std::string &config_file) {
   return 0;
 }
 
-int LandingController::loadTrajectory(Vec3 pos,
-                                      Vec3 target_pos_bf,
-                                      double v) {
+int LandingController::loadTrajectory(
+  Vec3 pos, Vec3 target_pos_bf, double v) {
   int retval;
 
   // find trajectory
@@ -389,16 +385,17 @@ int LandingController::recordTrajectoryIndex() {
   return 0;
 }
 
-int LandingController::record(Vec3 pos,
-                              Vec3 vel,
-                              Vec2 wp_pos,
-                              Vec2 wp_vel,
-                              Vec2 wp_inputs,
-                              Vec3 target_pos_bf,
-                              Vec3 target_vel_bf,
-                              Vec3 rpy,
-                              double thrust,
-                              double dt) {
+int LandingController::record(
+  Vec3 pos,
+  Vec3 vel,
+  Vec2 wp_pos,
+  Vec2 wp_vel,
+  Vec2 wp_inputs,
+  Vec3 target_pos_bf,
+  Vec3 target_vel_bf,
+  Vec3 rpy,
+  double thrust,
+  double dt) {
   // pre-check
   this->blackbox_dt += dt;
   if (this->blackbox_enable && this->blackbox_dt > this->blackbox_rate) {
@@ -435,10 +432,8 @@ int LandingController::record(Vec3 pos,
   return 0;
 }
 
-Vec4 LandingController::calculateVelocityErrors(Vec3 v_errors,
-                                                Vec3 p_errors,
-                                                double yaw,
-                                                double dt) {
+Vec4 LandingController::calculateVelocityErrors(
+  Vec3 v_errors, Vec3 p_errors, double yaw, double dt) {
   UNUSED(yaw);
 
   // check rate
@@ -489,13 +484,14 @@ Vec4 LandingController::calculateVelocityErrors(Vec3 v_errors,
   return this->outputs;
 }
 
-int LandingController::calculate(Vec3 target_pos_bf,
-                                 Vec3 target_vel_bf,
-                                 Vec3 pos,
-                                 Vec3 vel,
-                                 Quaternion orientation,
-                                 double yaw,
-                                 double dt) {
+int LandingController::calculate(
+  Vec3 target_pos_bf,
+  Vec3 target_vel_bf,
+  Vec3 pos,
+  Vec3 vel,
+  Quaternion orientation,
+  double yaw,
+  double dt) {
   Quaternion q;
   Vec3 p_errors, v_errors, vel_bf, euler;
   Vec2 wp_pos, wp_vel, wp_inputs, wp_rel_pos, wp_rel_vel;
@@ -532,16 +528,17 @@ int LandingController::calculate(Vec3 target_pos_bf,
 
   // record
   quat2euler(orientation, 321, euler);
-  this->record(pos,
-               vel,
-               wp_pos,
-               wp_vel,
-               wp_inputs,
-               target_pos_bf,
-               target_vel_bf,
-               euler,
-               this->outputs(3),
-               dt);
+  this->record(
+    pos,
+    vel,
+    wp_pos,
+    wp_vel,
+    wp_inputs,
+    target_pos_bf,
+    target_vel_bf,
+    euler,
+    this->outputs(3),
+    dt);
 
   // check if we are too far off track with trajectory
   if (p_errors(0) > this->trajectory_threshold(0)) {

@@ -100,8 +100,8 @@ int MITDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
   return 0;
 }
 
-int MITDetector::obtainPose(const AprilTags::TagDetection &tag,
-                            TagPose &tag_pose) {
+int MITDetector::obtainPose(
+  const AprilTags::TagDetection &tag, TagPose &tag_pose) {
   Mat4 transform;
   Vec3 t;
   Mat3 R;

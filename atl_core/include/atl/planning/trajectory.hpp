@@ -46,21 +46,19 @@ struct problem_data {
 Vec2 quadrotor_calculate_inputs(double mass, double thrust, double omega);
 VecX quadrotor_2d_model(VecX x, Vec2 u);
 
-void trajectory_setup(struct problem_data *p,
-                      int nb_states,
-                      int nb_inputs,
-                      int nb_steps,
-                      std::vector<double> cost_weights);
+void trajectory_setup(
+  struct problem_data *p,
+  int nb_states,
+  int nb_inputs,
+  int nb_steps,
+  std::vector<double> cost_weights);
 int trajectory_calculate_desired(struct problem_data *p);
-double trajectory_cost_func(const std::vector<double> &x,
-                            std::vector<double> &grad,
-                            void *data);
-double trajectory_constraint_func(const std::vector<double> &x,
-                                  std::vector<double> &grad,
-                                  void *data);
-int trajectory_record_optimization(std::string file_path,
-                                   std::vector<double> x,
-                                   int nb_rows);
+double trajectory_cost_func(
+  const std::vector<double> &x, std::vector<double> &grad, void *data);
+double trajectory_constraint_func(
+  const std::vector<double> &x, std::vector<double> &grad, void *data);
+int trajectory_record_optimization(
+  std::string file_path, std::vector<double> x, int nb_rows);
 
 }  // namespace atl
 #endif

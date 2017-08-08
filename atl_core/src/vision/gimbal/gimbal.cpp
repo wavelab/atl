@@ -93,9 +93,8 @@ Vec3 Gimbal::getTargetInBF(Pose camera_offset, Vec3 target_cf) {
   return R * target_nwu + t;
 }
 
-Vec3 Gimbal::getTargetInBPF(Pose camera_offset,
-                            Vec3 target_cf,
-                            Quaternion joint_if) {
+Vec3 Gimbal::getTargetInBPF(
+  Pose camera_offset, Vec3 target_cf, Quaternion joint_if) {
   Vec3 p;
   Mat3 R;
 
@@ -109,9 +108,8 @@ Vec3 Gimbal::getTargetInBPF(Pose camera_offset,
   return R * p;
 }
 
-Vec3 Gimbal::getTargetInIF(Vec3 target_bpf,
-                           Vec3 gimbal_position,
-                           Quaternion gimbal_frame_if) {
+Vec3 Gimbal::getTargetInIF(
+  Vec3 target_bpf, Vec3 gimbal_position, Quaternion gimbal_frame_if) {
   Vec3 euler, target, target_enu, target_if;
   Mat3 R;
 

@@ -8,8 +8,8 @@
 
 namespace atl {
 
-static int trajectory_file_init(std::ofstream &output_file,
-                                std::string output_path) {
+static int trajectory_file_init(
+  std::ofstream &output_file, std::string output_path) {
   // clang-format off
   output_file.open(output_path);
   output_file << "time_step" << ",";
@@ -27,8 +27,8 @@ static void record_time_step(std::ofstream &output_file, int i, VecX x) {
   output_file << x(4) << "\n";
 }
 
-static int path_file_init(std::ofstream &output_file,
-                          std::string output_path) {
+static int path_file_init(
+  std::ofstream &output_file, std::string output_path) {
   // clang-format off
   output_file.open(output_path);
   output_file << "x" << ",";

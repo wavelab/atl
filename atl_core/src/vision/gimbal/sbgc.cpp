@@ -171,29 +171,34 @@ int SBGCFrame::parseFrame(uint8_t *data) {
 
 void SBGCRealtimeData::printData() {
   // ACCELEROMOETER AND GYROSCOPE
-  printf("accelerometer: %.2f\t%.2f\t%.2f\n",
-         this->accel(0),
-         this->accel(1),
-         this->accel(2));
-  printf("gyroscope: %.2f\t%.2f\t%.2f\n",
-         this->gyro(0),
-         this->gyro(1),
-         this->gyro(2));
+  printf(
+    "accelerometer: %.2f\t%.2f\t%.2f\n",
+    this->accel(0),
+    this->accel(1),
+    this->accel(2));
+  printf(
+    "gyroscope: %.2f\t%.2f\t%.2f\n",
+    this->gyro(0),
+    this->gyro(1),
+    this->gyro(2));
   printf("\n");
 
   // ANGLES
-  printf("camera_angles: %.2f\t%.2f\t%.2f\n",
-         this->camera_angles(0),
-         this->camera_angles(1),
-         this->camera_angles(2));
-  printf("frame_angles: %.2f\t%.2f\t%.2f\n",
-         this->frame_angles(0),
-         this->frame_angles(1),
-         this->frame_angles(2));
-  printf("rc_angles: %.2f\t%.2f\t%.2f\n",
-         this->rc_angles(0),
-         this->rc_angles(1),
-         this->rc_angles(2));
+  printf(
+    "camera_angles: %.2f\t%.2f\t%.2f\n",
+    this->camera_angles(0),
+    this->camera_angles(1),
+    this->camera_angles(2));
+  printf(
+    "frame_angles: %.2f\t%.2f\t%.2f\n",
+    this->frame_angles(0),
+    this->frame_angles(1),
+    this->frame_angles(2));
+  printf(
+    "rc_angles: %.2f\t%.2f\t%.2f\n",
+    this->rc_angles(0),
+    this->rc_angles(1),
+    this->rc_angles(2));
 
   // MISC
   printf("cycle_time: %d\n", this->cycle_time);
@@ -622,12 +627,13 @@ int SBGC::setAngle(double roll, double pitch, double yaw) {
   return 0;
 }
 
-int SBGC::setSpeedAngle(double roll,
-                        double pitch,
-                        double yaw,
-                        double roll_speed,
-                        double pitch_speed,
-                        double yaw_speed) {
+int SBGC::setSpeedAngle(
+  double roll,
+  double pitch,
+  double yaw,
+  double roll_speed,
+  double pitch_speed,
+  double yaw_speed) {
   SBGCFrame frame;
   int16_t roll_adjusted;
   int16_t pitch_adjusted;

@@ -169,9 +169,8 @@ int WorldGClient::loadModel(std::string model_name) {
   return 0;
 }
 
-int WorldGClient::loadModel(std::string model_name,
-                            Eigen::Vector3d pos,
-                            Eigen::Quaterniond quat) {
+int WorldGClient::loadModel(
+  std::string model_name, Eigen::Vector3d pos, Eigen::Quaterniond quat) {
   gazebo::msgs::Factory msg;
   ignition::math::Vector3d p;
   ignition::math::Quaterniond q;

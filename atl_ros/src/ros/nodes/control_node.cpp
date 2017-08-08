@@ -271,8 +271,8 @@ void ControlNode::px4PoseCallback(const geometry_msgs::PoseStamped &msg) {
     pose.orientation = orientation;
 
   } else {
-    LOG_ERROR("Invalid ROS [/quad_frame] param value: %s",
-              this->quad_frame.c_str());
+    LOG_ERROR(
+      "Invalid ROS [/quad_frame] param value: %s", this->quad_frame.c_str());
   }
 
   this->quadrotor.setPose(pose);
@@ -293,8 +293,8 @@ void ControlNode::px4VelocityCallback(
     this->quadrotor.setVelocity(vel_enu);
 
   } else {
-    LOG_ERROR("Invalid ROS [/quad_frame] param value: %s",
-              this->quad_frame.c_str());
+    LOG_ERROR(
+      "Invalid ROS [/quad_frame] param value: %s", this->quad_frame.c_str());
   }
 }
 

@@ -24,8 +24,8 @@ int MichiganDetector::configure(const std::string &config_file) {
   return 0;
 }
 
-int MichiganDetector::extractTags(cv::Mat &image,
-                                  std::vector<TagPose> &tags) {
+int MichiganDetector::extractTags(
+  cv::Mat &image, std::vector<TagPose> &tags) {
   int retval;
   TagPose pose;
   cv::Mat image_gray;
@@ -80,8 +80,8 @@ int MichiganDetector::extractTags(cv::Mat &image,
   return 0;
 }
 
-int MichiganDetector::obtainPose(apriltag_detection_t *tag,
-                                 TagPose &tag_pose) {
+int MichiganDetector::obtainPose(
+  apriltag_detection_t *tag, TagPose &tag_pose) {
   Mat4 transform;
   Vec3 t;
   Mat3 R;
@@ -122,14 +122,15 @@ int MichiganDetector::obtainPose(apriltag_detection_t *tag,
 
   // recovering the relative transform of a tag:
   cv::Mat rvec, tvec;
-  cv::solvePnP(obj_pts,
-               img_pts,
-               camera_config.camera_matrix,
-               distParam,
-               rvec,
-               tvec,
-               false,
-               CV_ITERATIVE);
+  cv::solvePnP(
+    obj_pts,
+    img_pts,
+    camera_config.camera_matrix,
+    distParam,
+    rvec,
+    tvec,
+    false,
+    CV_ITERATIVE);
   cv::Matx33d r;
   cv::Rodrigues(rvec, r);
 

@@ -4,8 +4,8 @@
 #include <float.h>
 #include <iostream>
 
-#include "atl/utils/utils.hpp"
 #include "atl/control/pid.hpp"
+#include "atl/utils/utils.hpp"
 
 namespace atl {
 
@@ -26,10 +26,11 @@ public:
         yaw_controller(200.0, 0.5, 10.0) {}
 
   Vec4 update(const Vec4 &setpoints, const Vec4 &actual, double dt);
-  Vec4 update(const Vec4 &psetpoints,
-              const Vec4 &vsetpoints,
-              const Vec4 &actual,
-              double dt);
+  Vec4 update(
+    const Vec4 &psetpoints,
+    const Vec4 &vsetpoints,
+    const Vec4 &actual,
+    double dt);
 };
 
 class PositionController {
@@ -48,10 +49,8 @@ public:
         y_controller(0.5, 0.0, 0.035),
         z_controller(0.5, 0.0, 0.018) {}
 
-  Vec4 update(const Vec3 &setpoints,
-              const Vec4 &actual,
-              double yaw,
-              double dt);
+  Vec4 update(
+    const Vec3 &setpoints, const Vec4 &actual, double yaw, double dt);
 };
 
 class QuadrotorModel {

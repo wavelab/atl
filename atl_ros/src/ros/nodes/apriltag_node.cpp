@@ -42,9 +42,8 @@ void AprilTagNode::publishTagPoseMsg(TagPose tag) {
   this->ros_pubs[TARGET_POSE_TOPIC].publish(msg);
 }
 
-void AprilTagNode::publishTargetInertialPositionMsg(Vec3 gimbal_position,
-                                                    Quaternion gimbal_frame,
-                                                    Vec3 target_bpf) {
+void AprilTagNode::publishTargetInertialPositionMsg(
+  Vec3 gimbal_position, Quaternion gimbal_frame, Vec3 target_bpf) {
   geometry_msgs::Vector3 msg;
   Vec3 target_if;
 
@@ -69,8 +68,8 @@ void AprilTagNode::publishTargetBodyPositionEncoderMsg(
   this->ros_pubs[TARGET_BPF_POS_ENCODER_TOPIC].publish(msg);
 }
 
-void AprilTagNode::publishTargetInertialYawMsg(TagPose tag,
-                                               Quaternion gimbal_frame) {
+void AprilTagNode::publishTargetInertialYawMsg(
+  TagPose tag, Quaternion gimbal_frame) {
   double yaw_if;
   Vec3 tag_euler, gimbal_frame_euler;
   std_msgs::Float64 msg;

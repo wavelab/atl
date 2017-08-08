@@ -27,8 +27,8 @@ QuadrotorGPlugin::QuadrotorGPlugin() {
   printf("LOADING [libquadrotor_gplugin.so]!\n");
 }
 
-void QuadrotorGPlugin::Load(gazebo::physics::ModelPtr model,
-                            sdf::ElementPtr sdf) {
+void QuadrotorGPlugin::Load(
+  gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
   UNUSED(sdf);
 
   // set model and bind world update callback
@@ -81,12 +81,13 @@ void QuadrotorGPlugin::simulate(double dt) {
   // and cause collision detection to go wild
   VecX quad_pose = this->quadrotor.getPose();
   ignition::math::Pose3d gazebo_pose = this->model->WorldPose();
-  gazebo_pose = ignition::math::Pose3d(gazebo_pose.Pos().X(),
-                                       gazebo_pose.Pos().Y(),
-                                       gazebo_pose.Pos().Z(),
-                                       quad_pose(3),
-                                       quad_pose(4),
-                                       quad_pose(5));
+  gazebo_pose = ignition::math::Pose3d(
+    gazebo_pose.Pos().X(),
+    gazebo_pose.Pos().Y(),
+    gazebo_pose.Pos().Z(),
+    quad_pose(3),
+    quad_pose(4),
+    quad_pose(5));
   this->model->SetWorldPose(gazebo_pose);
   this->pose = gazebo_pose;
 

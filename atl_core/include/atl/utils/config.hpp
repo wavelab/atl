@@ -135,21 +135,16 @@ public:
   void addParam(std::string key, float *out, bool optional = false);
   void addParam(std::string key, double *out, bool optional = false);
   void addParam(std::string key, std::string *out, bool optional = false);
-  void addParam(std::string key,
-                std::vector<bool> *out,
-                bool optional = false);
-  void addParam(std::string key,
-                std::vector<int> *out,
-                bool optional = false);
-  void addParam(std::string key,
-                std::vector<float> *out,
-                bool optional = false);
-  void addParam(std::string key,
-                std::vector<double> *out,
-                bool optional = false);
-  void addParam(std::string key,
-                std::vector<std::string> *out,
-                bool optional = false);
+  void addParam(
+    std::string key, std::vector<bool> *out, bool optional = false);
+  void addParam(
+    std::string key, std::vector<int> *out, bool optional = false);
+  void addParam(
+    std::string key, std::vector<float> *out, bool optional = false);
+  void addParam(
+    std::string key, std::vector<double> *out, bool optional = false);
+  void addParam(
+    std::string key, std::vector<std::string> *out, bool optional = false);
   void addParam(std::string key, Vec2 *out, bool optional = false);
   void addParam(std::string key, Vec3 *out, bool optional = false);
   void addParam(std::string key, Vec4 *out, bool optional = false);

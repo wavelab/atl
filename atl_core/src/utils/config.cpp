@@ -22,39 +22,33 @@ void ConfigParser::addParam(std::string key, double *out, bool optional) {
   this->params.emplace_back(DOUBLE, key, out, optional);
 }
 
-void ConfigParser::addParam(std::string key,
-                            std::string *out,
-                            bool optional) {
+void ConfigParser::addParam(
+  std::string key, std::string *out, bool optional) {
   this->params.emplace_back(STRING, key, out, optional);
 }
 
-void ConfigParser::addParam(std::string key,
-                            std::vector<bool> *out,
-                            bool optional) {
+void ConfigParser::addParam(
+  std::string key, std::vector<bool> *out, bool optional) {
   this->params.emplace_back(BOOL_ARRAY, key, out, optional);
 }
 
-void ConfigParser::addParam(std::string key,
-                            std::vector<int> *out,
-                            bool optional) {
+void ConfigParser::addParam(
+  std::string key, std::vector<int> *out, bool optional) {
   this->params.emplace_back(INT_ARRAY, key, out, optional);
 }
 
-void ConfigParser::addParam(std::string key,
-                            std::vector<float> *out,
-                            bool optional) {
+void ConfigParser::addParam(
+  std::string key, std::vector<float> *out, bool optional) {
   this->params.emplace_back(FLOAT_ARRAY, key, out, optional);
 }
 
-void ConfigParser::addParam(std::string key,
-                            std::vector<double> *out,
-                            bool optional) {
+void ConfigParser::addParam(
+  std::string key, std::vector<double> *out, bool optional) {
   this->params.emplace_back(DOUBLE_ARRAY, key, out, optional);
 }
 
-void ConfigParser::addParam(std::string key,
-                            std::vector<std::string> *out,
-                            bool optional) {
+void ConfigParser::addParam(
+  std::string key, std::vector<std::string> *out, bool optional) {
   this->params.emplace_back(STRING_ARRAY, key, out, optional);
 }
 
@@ -141,9 +135,8 @@ int ConfigParser::checkKey(std::string key, bool optional) {
   return 0;
 }
 
-int ConfigParser::checkVector(std::string key,
-                              enum ConfigDataType type,
-                              bool optional) {
+int ConfigParser::checkVector(
+  std::string key, enum ConfigDataType type, bool optional) {
   int retval;
   int vector_size;
 
@@ -198,9 +191,10 @@ int ConfigParser::checkMatrix(std::string key, bool optional) {
   // check fields
   for (int i = 0; i < 3; i++) {
     if (!this->root[key][targets[i]]) {
-      LOG_ERROR("Key [%s] is missing for matrix [%s]!",
-                targets[i].c_str(),
-                key.c_str());
+      LOG_ERROR(
+        "Key [%s] is missing for matrix [%s]!",
+        targets[i].c_str(),
+        key.c_str());
       return -5;
     }
   }

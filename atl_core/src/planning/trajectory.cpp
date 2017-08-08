@@ -29,11 +29,12 @@ VecX quadrotor_2d_model(VecX x, Vec2 u) {
   return x;
 }
 
-void trajectory_setup(struct problem_data *p,
-                      int nb_states,
-                      int nb_inputs,
-                      int nb_steps,
-                      std::vector<double> cost_weights) {
+void trajectory_setup(
+  struct problem_data *p,
+  int nb_states,
+  int nb_inputs,
+  int nb_steps,
+  std::vector<double> cost_weights) {
   p->nb_states = nb_states;
   p->nb_inputs = nb_inputs;
 
@@ -165,9 +166,8 @@ int trajectory_calculate_desired(struct problem_data *p) {
 //   return error;
 // }
 
-int trajectory_record_optimization(std::string file_path,
-                                   std::vector<double> x,
-                                   int nb_rows) {
+int trajectory_record_optimization(
+  std::string file_path, std::vector<double> x, int nb_rows) {
   std::ofstream output_file;
   int nb_states;
 

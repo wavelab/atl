@@ -24,12 +24,14 @@ int XimeaCameraNode::configure(std::string node_name, int hz) {
 
   // register publisher and subscribers
   this->registerImagePublisher(CAMERA_IMAGE_TOPIC);
-  this->registerSubscriber(GIMBAL_FRAME_ORIENTATION_TOPIC,
-                           &XimeaCameraNode::gimbalFrameCallback,
-                           this);
-  this->registerSubscriber(GIMBAL_JOINT_ORIENTATION_TOPIC,
-                           &XimeaCameraNode::gimbalJointCallback,
-                           this);
+  this->registerSubscriber(
+    GIMBAL_FRAME_ORIENTATION_TOPIC,
+    &XimeaCameraNode::gimbalFrameCallback,
+    this);
+  this->registerSubscriber(
+    GIMBAL_JOINT_ORIENTATION_TOPIC,
+    &XimeaCameraNode::gimbalJointCallback,
+    this);
   this->registerSubscriber(
     APRILTAG_TOPIC, &XimeaCameraNode::aprilTagCallback, this);
   this->registerShutdown(SHUTDOWN_TOPIC);
