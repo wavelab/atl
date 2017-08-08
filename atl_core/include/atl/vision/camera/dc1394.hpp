@@ -12,10 +12,24 @@ namespace atl {
 
 class DC1394Camera : public Camera {
 public:
+  dc1394_t *dc1394 = nullptr;
   dc1394camera_t *capture = nullptr;
 
-  DC1394Camera();
-  ~DC1394Camera();
+  DC1394Camera() {}
+  ~DC1394Camera() {
+    // close capture
+    if (this->capture != nullptr) {
+      dc1394_video_set_transmission(this->capture, DC1394_OFF);
+      dc1394_capture_stop(this->capture);
+      dc1394_camera_free(this->capture);
+    }
+
+    // close connection to libdc1394
+    if (this->dc1394 != nullptr) {
+      dc1394_free(this->dc1394);
+      this->dc1394 = nullptr;
+    }
+  }
 
   int initialize();
   void printFrameInfo(dc1394video_frame_t *frame);

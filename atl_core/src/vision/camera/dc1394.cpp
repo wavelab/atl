@@ -2,28 +2,18 @@
 
 namespace atl {
 
-DC1394Camera::DC1394Camera() {}
-
-DC1394Camera::~DC1394Camera() {
-  if (this->capture != nullptr) {
-    dc1394_video_set_transmission(this->capture, DC1394_OFF);
-    dc1394_capture_stop(this->capture);
-    dc1394_camera_free(this->capture);
-  }
-}
-
 int DC1394Camera::initialize() {
   dc1394error_t error;
 
   // connect to DC1394
-  dc1394_t *dc1394 = dc1394_new();
-  if (!dc1394) {
+  this->dc1394 = dc1394_new();
+  if (!this->dc1394) {
     LOG_ERROR("Failed to connect to DC1394");
   }
 
   // enumerate camera
   dc1394camera_list_t *list;
-  error = dc1394_camera_enumerate(dc1394, &list);
+  error = dc1394_camera_enumerate(this->dc1394, &list);
   DC1394_ERR_RTN(error, "Failed to enumerate cameras");
   if (list->num == 0) {
     dc1394_log_error("No cameras found");
@@ -31,7 +21,7 @@ int DC1394Camera::initialize() {
   }
 
   // connect to camera
-  this->capture = dc1394_camera_new(dc1394, list->ids[0].guid);
+  this->capture = dc1394_camera_new(this->dc1394, list->ids[0].guid);
   if (!this->capture) {
     dc1394_log_error(
       "Failed to initialize camera with guid %llx", list->ids[0].guid);
@@ -52,7 +42,7 @@ int DC1394Camera::initialize() {
 
   // initialize camera
   error =
-    dc1394_capture_setup(this->capture, 4, DC1394_CAPTURE_FLAGS_DEFAULT);
+    dc1394_capture_setup(this->capture, 10, DC1394_CAPTURE_FLAGS_DEFAULT);
   DC1394_ERR_RTN(error, "Failed to configure camera!");
 
   // start transmission

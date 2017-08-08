@@ -1,5 +1,3 @@
-#include <sys/stat.h>
-
 #include "atl/ros/nodes/pg_camera_node.hpp"
 
 
@@ -81,7 +79,8 @@ int PGCameraNode::publishImage() {
   // clang-format off
   img_msg = cv_bridge::CvImage(
     std_msgs::Header(),
-    "bgr8",
+    // "bgr8",
+    "mono8",
     this->image
   ).toImageMsg();
   this->img_pub.publish(img_msg);

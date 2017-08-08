@@ -122,16 +122,16 @@ TEST(DC1394Camera, gain) {
   EXPECT_EQ(0, retval);
 }
 
-// TEST(DC1394Camera, run) {
-//   DC1394Camera camera;
-//
-//   int retval = camera.configure(TEST_CONFIG_PATH);
-//   ASSERT_EQ(0, retval);
-//
-//   retval = camera.initialize();
-//   ASSERT_EQ(0, retval);
-//
-//   camera.run();
-// }
+TEST(DC1394Camera, run) {
+  DC1394Camera camera;
+
+  int retval = camera.configure(TEST_CONFIG_PATH);
+  ASSERT_EQ(0, retval);
+
+  retval = camera.initialize();
+  ASSERT_EQ(0, retval);
+
+  camera.run();
+}
 
 }  // namespace atl

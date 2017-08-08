@@ -1,6 +1,8 @@
 #ifndef ATL_ROS_NODES_PG_CAMERA_NODE_HPP
 #define ATL_ROS_NODES_PG_CAMERA_NODE_HPP
 
+#include <sys/stat.h>
+
 #include <ros/ros.h>
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/CameraInfo.h>
@@ -38,7 +40,8 @@ namespace atl {
 
 class PGCameraNode : public ROSNode {
 public:
-  PointGreyCamera camera;
+  // PointGreyCamera camera;
+  DC1394Camera camera;
   cv::Mat image;
 
   Vec3 gimbal_position;

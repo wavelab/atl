@@ -1,6 +1,10 @@
 <?xml version="1.0"?>
 <launch>
-  <!-- ros node -->
+  <!-- pg camera node -->
   <param name="/camera/config_dir" value="$(find atl_configs)/configs/camera/pointgrey_firefly" />
+  <node pkg="atl_ros" name="atl_camera" type="atl_pg_camera_node" output="screen" required="true" />
+
+  <!-- cam calib node -->
+  <param name="/camera/calib_dir" value="/tmp/calibration" />
   <node pkg="atl_ros" name="atl_cam_calib" type="atl_cam_calib_node" output="screen" required="true" />
 </launch>
