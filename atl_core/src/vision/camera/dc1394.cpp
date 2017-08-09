@@ -19,18 +19,18 @@ int DC1394Camera::initialize(uint64_t guid) {
     dc1394_log_error("No cameras found");
     return -1;
   } else {
+    std::cout << std::endl;
     std::cout << "Found " << list->num << " camera(s)" << std::endl;
     std::cout << "----------" << std::endl;
     for (size_t i = 0; i < list->num; i++) {
       std::cout << "camera[" << i << "] - guid: " << list->ids[i].guid
                 << std::endl;
     }
+    std::cout << std::endl;
   }
 
   // connect to camera
-  if (guid == 0) {
-    guid = list->ids[0].guid;
-  }
+  guid = (guid == 0) ? list->ids[0].guid : guid;
   this->capture = dc1394_camera_new(this->dc1394, guid);
   if (!this->capture) {
     dc1394_log_error("Failed to connect to camera with guid %" PRIu64, guid);
@@ -39,27 +39,36 @@ int DC1394Camera::initialize(uint64_t guid) {
   LOG_INFO("Connected to camera with guid %" PRIu64, guid);
   dc1394_camera_free_list(list);
 
-  // setup camera
+  // operation mode - FireWire IEEE 1394a or 1394b
   error = dc1394_video_set_operation_mode(
     this->capture, DC1394_OPERATION_MODE_LEGACY);
   DC1394_ERR_RTN(error, "Failed to set 1394A mode!");
 
+  // capture settings
+  error =
+    dc1394_capture_setup(this->capture, 4, DC1394_CAPTURE_FLAGS_DEFAULT);
+  DC1394_ERR_RTN(error, "Failed to configure camera!");
+
+  // video mode
   error =
     dc1394_video_set_mode(this->capture, DC1394_VIDEO_MODE_640x480_MONO8);
   DC1394_ERR_RTN(error, "Failed to set video mode!");
 
+  // iso speed
   error = dc1394_video_set_iso_speed(this->capture, DC1394_ISO_SPEED_400);
   DC1394_ERR_RTN(error, "Failed to set iso speed!");
 
+  // frame rate
   this->setFrameRate(60);
-  this->setExposure(this->config.exposure_value);
-  this->setShutter(this->config.shutter_speed);
-  this->setGain(this->config.gain_value);
 
-  // initialize camera
-  error =
-    dc1394_capture_setup(this->capture, 4, DC1394_CAPTURE_FLAGS_DEFAULT);
-  DC1394_ERR_RTN(error, "Failed to configure camera!");
+  // exposure
+  this->setExposure(this->config.exposure_value);
+
+  // shutter
+  this->setShutter(this->config.shutter_speed);
+
+  // gain
+  this->setGain(this->config.gain_value);
 
   // start transmission
   error = dc1394_video_set_transmission(this->capture, DC1394_ON);
@@ -345,12 +354,26 @@ int DC1394Camera::getFrame(cv::Mat &image) {
     dc1394_capture_dequeue(this->capture, DC1394_CAPTURE_POLICY_WAIT, &frame);
   DC1394_ERR_RTN(err, "Failed to obtain frame from camera!");
 
-  // convert to opencv mat
-  size_t img_size = frame->image_bytes;
+  // convert mono 8 to colour
+  size_t channels = 3;
+  size_t img_size = frame->image_bytes * channels;
   size_t img_rows = frame->size[1];
   size_t img_cols = frame->size[0];
   size_t row_bytes = img_size / img_rows;
-  cv::Mat(img_rows, img_cols, CV_8UC1, frame->image, row_bytes).copyTo(image);
+
+  if (this->buffer == nullptr) {
+    buffer = (uint8_t *) malloc(img_size);
+  }
+  dc1394_bayer_decoding_8bit(
+    frame->image,
+    this->buffer,
+    img_cols,
+    img_rows,
+    DC1394_COLOR_FILTER_BGGR,
+    DC1394_BAYER_METHOD_SIMPLE);
+
+  // convert to opencv mat
+  cv::Mat(img_rows, img_cols, CV_8UC3, this->buffer, row_bytes).copyTo(image);
 
   // release frame
   err = dc1394_capture_enqueue(this->capture, frame);

@@ -15,9 +15,15 @@ class DC1394Camera : public Camera {
 public:
   dc1394_t *dc1394 = nullptr;
   dc1394camera_t *capture = nullptr;
+  uint8_t *buffer = nullptr;
 
   DC1394Camera() {}
   ~DC1394Camera() {
+    // free buffer
+    if (this->buffer != nullptr) {
+      free(buffer);
+    }
+
     // close capture
     if (this->capture != nullptr) {
       dc1394_video_set_transmission(this->capture, DC1394_OFF);
