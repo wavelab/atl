@@ -25,17 +25,17 @@ ROSNode::ROSNode(int argc, char **argv) {
 }
 
 ROSNode::~ROSNode() {
-  ::ros::shutdown();
+  ros::shutdown();
 }
 
 int ROSNode::configure(const std::string &node_name, int hz) {
   // clang-format off
-  if (::ros::isInitialized() == false) {
-    ::ros::init(
+  if (ros::isInitialized() == false) {
+    ros::init(
       this->argc,
       this->argv,
       node_name,
-      ::ros::init_options::NoSigintHandler
+      ros::init_options::NoSigintHandler
     );
   }
   // clang-format on
@@ -44,10 +44,10 @@ int ROSNode::configure(const std::string &node_name, int hz) {
   if (this->ros_node_name == "") {
     this->ros_node_name = node_name;
   }
-  this->ros_nh = new ::ros::NodeHandle();
+  this->ros_nh = new ros::NodeHandle();
   this->ros_nh->getParam("/debug_mode", this->debug_mode);
   this->ros_nh->getParam("/sim_mode", this->sim_mode);
-  this->ros_rate = new ::ros::Rate(hz);
+  this->ros_rate = new ros::Rate(hz);
   this->configured = true;
 
   return 0;
@@ -55,13 +55,13 @@ int ROSNode::configure(const std::string &node_name, int hz) {
 
 void ROSNode::shutdownCallback(const std_msgs::Bool &msg) {
   if (msg.data) {
-    ::ros::shutdown();
+    ros::shutdown();
   }
 }
 
 int ROSNode::registerShutdown(const std::string &topic) {
   bool retval;
-  ::ros::Subscriber sub;
+  ros::Subscriber sub;
 
   // pre-check
   if (this->configured == false) {
@@ -101,7 +101,7 @@ int ROSNode::loop() {
 
   // loop
   ROS_INFO("ROS node [%s] is running!", this->ros_node_name.c_str());
-  while (::ros::ok()) {
+  while (ros::ok()) {
     // run loop callback
     if (this->loop_cb != nullptr) {
       retval = this->loop_cb();
@@ -111,9 +111,9 @@ int ROSNode::loop() {
     }
 
     // update
-    ::ros::spinOnce();
+    ros::spinOnce();
     this->ros_seq++;
-    this->ros_last_updated = ::ros::Time::now();
+    this->ros_last_updated = ros::Time::now();
     this->ros_rate->sleep();
   }
 

@@ -88,8 +88,7 @@ int PGCameraNode::publishImage() {
   // clang-format off
   img_msg = cv_bridge::CvImage(
     std_msgs::Header(),
-    // "bgr8",
-    "mono8",
+    "bgr8",
     this->image
   ).toImageMsg();
   this->img_pubs[this->image_topic].publish(img_msg);

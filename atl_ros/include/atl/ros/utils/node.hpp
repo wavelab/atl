@@ -44,14 +44,14 @@ public:
 
   std::string ros_node_name;
   long long int ros_seq;
-  ::ros::NodeHandle *ros_nh;
-  ::ros::Rate *ros_rate;
-  ::ros::Time ros_last_updated;
+  ros::NodeHandle *ros_nh;
+  ros::Rate *ros_rate;
+  ros::Time ros_last_updated;
 
-  std::map<std::string, ::ros::Publisher> ros_pubs;
-  std::map<std::string, ::ros::Subscriber> ros_subs;
-  std::map<std::string, ::ros::ServiceServer> ros_servers;
-  std::map<std::string, ::ros::ServiceClient> ros_clients;
+  std::map<std::string, ros::Publisher> ros_pubs;
+  std::map<std::string, ros::Subscriber> ros_subs;
+  std::map<std::string, ros::ServiceServer> ros_servers;
+  std::map<std::string, ros::ServiceClient> ros_clients;
 
   std::map<std::string, image_transport::Publisher> img_pubs;
   std::map<std::string, image_transport::Subscriber> img_subs;
@@ -86,7 +86,7 @@ public:
   template <typename M>
   int registerPublisher(
     const std::string &topic, uint32_t queue_size = 1, bool latch = false) {
-    ::ros::Publisher publisher;
+    ros::Publisher publisher;
 
     // pre-check
     if (this->configured == false) {
@@ -106,7 +106,7 @@ public:
     void (T::*fp)(M),
     T *obj,
     uint32_t queue_size = 1) {
-    ::ros::Subscriber subscriber;
+    ros::Subscriber subscriber;
 
     // pre-check
     if (this->configured == false) {
@@ -123,7 +123,7 @@ public:
   template <class T, class MReq, class MRes>
   int registerServer(
     const std::string &service_topic, bool (T::*fp)(MReq &, MRes &), T *obj) {
-    ::ros::ServiceServer server;
+    ros::ServiceServer server;
 
     // pre-check
     if (this->configured == false) {
@@ -140,7 +140,7 @@ public:
   template <typename M>
   int registerClient(
     const std::string &service_topic, bool persistent = false) {
-    ::ros::ServiceClient client;
+    ros::ServiceClient client;
 
     // pre-check
     if (this->configured == false) {

@@ -80,22 +80,16 @@ void CamCalibNode::imageMsgToCvMat(
   size_t img_rows = image_ptr->image.rows;
   size_t img_cols = image_ptr->image.cols;
   size_t row_bytes = img_size / img_rows;
-  cv::Mat(img_rows, img_cols, CV_8UC1, image_ptr->image.data, row_bytes)
+  cv::Mat(img_rows, img_cols, CV_8UC3, image_ptr->image.data, row_bytes)
     .copyTo(img);
 }
 
 void CamCalibNode::image1Callback(const sensor_msgs::ImageConstPtr &msg) {
   this->imageMsgToCvMat(msg, this->image_1);
-  if (this->image_1.empty() == false) {
-    cv::imshow("Camera 1", this->image_1);
-  }
 }
 
 void CamCalibNode::image2Callback(const sensor_msgs::ImageConstPtr &msg) {
   this->imageMsgToCvMat(msg, this->image_2);
-  if (this->image_2.empty() == false) {
-    cv::imshow("Camera 2", this->image_2);
-  }
 }
 
 void CamCalibNode::gimbalFrameCallback(const geometry_msgs::Quaternion &msg) {
@@ -163,12 +157,12 @@ void CamCalibNode::saveGimbalMeasurements() {
 
 int CamCalibNode::loopCallback() {
   // show image
-  // if (this->image_1.empty() == false) {
-  //   cv::imshow("Camera 1", this->image_1);
-  // }
-  // if (this->image_2.empty() == false) {
-  //   cv::imshow("Camera 2", this->image_2);
-  // }
+  if (this->image_1.empty() == false) {
+    cv::imshow("Camera 1", this->image_1);
+  }
+  if (this->image_2.empty() == false) {
+    cv::imshow("Camera 2", this->image_2);
+  }
 
   // parse keyboard input
   int key = cv::waitKey(1);
