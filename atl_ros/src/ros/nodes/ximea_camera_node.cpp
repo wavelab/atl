@@ -80,7 +80,7 @@ int XimeaCameraNode::publishImage() {
   //       ).toImageMsg();
   // }
   // clang-format on
-  this->img_pub.publish(img_msg);
+  this->img_pubs[CAMERA_IMAGE_TOPIC].publish(img_msg);
   return 0;
 }
 

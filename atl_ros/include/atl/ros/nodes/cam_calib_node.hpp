@@ -33,12 +33,19 @@ namespace atl {
 class CamCalibNode : public ROSNode {
 public:
   std::string calib_dir;
+  std::string camera_1_dir;
+  std::string camera_2_dir;
   std::ofstream gimbal_frame_file;
   std::ofstream gimbal_joint_file;
   std::ofstream gimbal_encoder_file;
-  int image_number = 0;
 
-  cv::Mat image;
+  int nb_cameras = 0;
+  std::string camera_1_topic;
+  std::string camera_2_topic;
+
+  int image_number = 0;
+  cv::Mat image_1;
+  cv::Mat image_2;
   Quaternion gimbal_frame_orientation;
   Quaternion gimbal_joint_orientation;
   Quaternion gimbal_joint_body_orientation;
@@ -51,11 +58,13 @@ public:
   }
 
   int configure(const std::string &node_name, int hz);
-  void imageCallback(const sensor_msgs::ImageConstPtr &msg);
+  void imageMsgToCvMat(const sensor_msgs::ImageConstPtr &msg, cv::Mat &img);
+  void image1Callback(const sensor_msgs::ImageConstPtr &msg);
+  void image2Callback(const sensor_msgs::ImageConstPtr &msg);
   void gimbalFrameCallback(const geometry_msgs::Quaternion &msg);
   void gimbalJointCallback(const geometry_msgs::Quaternion &msg);
   void gimbalJointBodyCallback(const geometry_msgs::Quaternion &msg);
-  void saveImage(cv::Mat &image, const int image_number);
+  void saveImages();
   void saveGimbalMeasurements();
   int loopCallback();
 };

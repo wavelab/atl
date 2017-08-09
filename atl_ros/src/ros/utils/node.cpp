@@ -10,7 +10,16 @@ ROSNode::ROSNode(int argc, char **argv) {
   this->argc = argc;
   this->argv = argv;
 
-  this->ros_node_name = "";
+  // parse args
+  for (int i = 1; i < argc; i++) {
+    std::string arg(argv[i]);
+
+    // ros node name
+    if (arg.find("__name:=") != std::string::npos) {
+      this->ros_node_name = arg.substr(8);
+    }
+  }
+
   this->ros_seq = 0;
   this->ros_rate = NULL;
 }
@@ -32,7 +41,9 @@ int ROSNode::configure(const std::string &node_name, int hz) {
   // clang-format on
 
   // initialize
-  this->ros_node_name = node_name;
+  if (this->ros_node_name == "") {
+    this->ros_node_name = node_name;
+  }
   this->ros_nh = new ::ros::NodeHandle();
   this->ros_nh->getParam("/debug_mode", this->debug_mode);
   this->ros_nh->getParam("/sim_mode", this->sim_mode);
@@ -70,7 +81,7 @@ int ROSNode::registerImagePublisher(const std::string &topic) {
 
   // image transport
   image_transport::ImageTransport it(*this->ros_nh);
-  this->img_pub = it.advertise(topic, 1);
+  this->img_pubs[topic] = it.advertise(topic, 1);
 
   return 0;
 }
@@ -89,6 +100,7 @@ int ROSNode::loop() {
   }
 
   // loop
+  ROS_INFO("ROS node [%s] is running!", this->ros_node_name.c_str());
   while (::ros::ok()) {
     // run loop callback
     if (this->loop_cb != nullptr) {

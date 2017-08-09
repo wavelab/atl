@@ -2,7 +2,7 @@
 
 namespace atl {
 
-int DC1394Camera::initialize() {
+int DC1394Camera::initialize(uint64_t guid) {
   dc1394error_t error;
 
   // connect to DC1394
@@ -17,23 +17,39 @@ int DC1394Camera::initialize() {
   DC1394_ERR_RTN(error, "Failed to enumerate cameras");
   if (list->num == 0) {
     dc1394_log_error("No cameras found");
-    return 1;
+    return -1;
+  } else {
+    std::cout << "Found " << list->num << " camera(s)" << std::endl;
+    std::cout << "----------" << std::endl;
+    for (size_t i = 0; i < list->num; i++) {
+      std::cout << "camera[" << i << "] - guid: " << list->ids[i].guid
+                << std::endl;
+    }
   }
 
   // connect to camera
-  this->capture = dc1394_camera_new(this->dc1394, list->ids[0].guid);
-  if (!this->capture) {
-    dc1394_log_error(
-      "Failed to initialize camera with guid %llx", list->ids[0].guid);
-    return 1;
+  if (guid == 0) {
+    guid = list->ids[0].guid;
   }
+  this->capture = dc1394_camera_new(this->dc1394, guid);
+  if (!this->capture) {
+    dc1394_log_error("Failed to connect to camera with guid %" PRIu64, guid);
+    return -1;
+  }
+  LOG_INFO("Connected to camera with guid %" PRIu64, guid);
   dc1394_camera_free_list(list);
-  // LOG_INFO("Using camera with GUID %d", (int) this->capture->guid);
 
   // setup camera
   error = dc1394_video_set_operation_mode(
     this->capture, DC1394_OPERATION_MODE_LEGACY);
-  DC1394_ERR_RTN(error, "Failed to set 1394A mode");
+  DC1394_ERR_RTN(error, "Failed to set 1394A mode!");
+
+  error =
+    dc1394_video_set_mode(this->capture, DC1394_VIDEO_MODE_640x480_MONO8);
+  DC1394_ERR_RTN(error, "Failed to set video mode!");
+
+  error = dc1394_video_set_iso_speed(this->capture, DC1394_ISO_SPEED_400);
+  DC1394_ERR_RTN(error, "Failed to set iso speed!");
 
   this->setFrameRate(60);
   this->setExposure(this->config.exposure_value);
@@ -42,7 +58,7 @@ int DC1394Camera::initialize() {
 
   // initialize camera
   error =
-    dc1394_capture_setup(this->capture, 10, DC1394_CAPTURE_FLAGS_DEFAULT);
+    dc1394_capture_setup(this->capture, 4, DC1394_CAPTURE_FLAGS_DEFAULT);
   DC1394_ERR_RTN(error, "Failed to configure camera!");
 
   // start transmission
@@ -50,6 +66,7 @@ int DC1394Camera::initialize() {
   DC1394_ERR_RTN(error, "Failed to start camera transmission!");
 
   // update
+  LOG_INFO("Camera initialized!");
   this->initialized = true;
 
   return 0;

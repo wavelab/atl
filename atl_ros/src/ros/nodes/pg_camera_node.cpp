@@ -5,6 +5,7 @@ namespace atl {
 
 int PGCameraNode::configure(const std::string &node_name, int hz) {
   std::string config_path;
+  std::string guid_str;
 
   // ros node
   if (ROSNode::configure(node_name, hz) != 0) {
@@ -12,27 +13,33 @@ int PGCameraNode::configure(const std::string &node_name, int hz) {
   }
 
   // camera
-  ROS_GET_PARAM("/camera/config_dir", config_path);
+  ROS_GET_PARAM(this->ros_node_name + "/guid", guid_str);
+  this->guid = std::stoull(guid_str);  // ros param cannot parse a uint64_t
+  ROS_GET_PARAM(this->ros_node_name + "/stamp_image", this->stamp_image);
+  ROS_GET_PARAM(this->ros_node_name + "/image_topic", this->image_topic);
+  ROS_GET_PARAM(this->ros_node_name + "/config_dir", config_path);
   if (this->camera.configure(config_path) != 0) {
     ROS_ERROR("Failed to configure Camera!");
     return -2;
   };
-  this->camera.initialize();
+  this->camera.initialize(this->guid);
 
   // register publisher and subscribers
   // clang-format off
-  this->registerImagePublisher(CAMERA_IMAGE_TOPIC);
-  this->registerSubscriber(GIMBAL_POSITION_TOPIC, &PGCameraNode::gimbalPositionCallback, this);
-  this->registerSubscriber(GIMBAL_FRAME_ORIENTATION_TOPIC, &PGCameraNode::gimbalFrameCallback, this);
-  this->registerSubscriber(GIMBAL_JOINT_ORIENTATION_TOPIC, &PGCameraNode::gimbalJointCallback, this);
-  this->registerSubscriber(ENCODER_ORIENTATION_TOPIC, &PGCameraNode::gimbalJointBodyCallback, this);
-  this->registerSubscriber(LT_BODY_POSITION_TOPIC , &PGCameraNode::targetPositionCallback, this);
-  this->registerSubscriber(LT_DETECTED_TOPIC , &PGCameraNode::targetDetectedCallback, this);
+  this->registerImagePublisher(this->image_topic);
+  if (this->stamp_image) {
+    this->registerSubscriber(GIMBAL_POSITION_TOPIC, &PGCameraNode::gimbalPositionCallback, this);
+    this->registerSubscriber(GIMBAL_FRAME_ORIENTATION_TOPIC, &PGCameraNode::gimbalFrameCallback, this);
+    this->registerSubscriber(GIMBAL_JOINT_ORIENTATION_TOPIC, &PGCameraNode::gimbalJointCallback, this);
+    this->registerSubscriber(ENCODER_ORIENTATION_TOPIC, &PGCameraNode::gimbalJointBodyCallback, this);
+    this->registerSubscriber(LT_BODY_POSITION_TOPIC , &PGCameraNode::targetPositionCallback, this);
+    this->registerSubscriber(LT_DETECTED_TOPIC , &PGCameraNode::targetDetectedCallback, this);
 
-  // DJI SUBSCRIBER
-  // this->registerSubscriber(QUAD_POSITION_TOPIC, &PGCameraNode::quadPositionCallback, this);
-  // this->registerSubscriber(QUAD_ORIENTATION_TOPIC, &PGCameraNode::quadOrientationCallback, this);
-  this->registerSubscriber(QUAD_POSE_TOPIC, &PGCameraNode::quadPoseCallback, this);
+    // DJI SUBSCRIBER
+    // this->registerSubscriber(QUAD_POSITION_TOPIC, &PGCameraNode::quadPositionCallback, this);
+    // this->registerSubscriber(QUAD_ORIENTATION_TOPIC, &PGCameraNode::quadOrientationCallback, this);
+    this->registerSubscriber(QUAD_POSE_TOPIC, &PGCameraNode::quadPoseCallback, this);
+  }
 
   this->registerShutdown(SHUTDOWN_TOPIC);
   // clang-format on
@@ -48,33 +55,35 @@ int PGCameraNode::publishImage() {
   sensor_msgs::ImageConstPtr img_msg;
 
   // encode position and orientation into image (first 11 pixels in first row)
-  this->image.at<double>(0, 0) = this->gimbal_position(0);
-  this->image.at<double>(0, 1) = this->gimbal_position(1);
-  this->image.at<double>(0, 2) = this->gimbal_position(2);
+  if (this->stamp_image) {
+    this->image.at<double>(0, 0) = this->gimbal_position(0);
+    this->image.at<double>(0, 1) = this->gimbal_position(1);
+    this->image.at<double>(0, 2) = this->gimbal_position(2);
 
-  this->image.at<double>(0, 3) = this->gimbal_frame_orientation.w();
-  this->image.at<double>(0, 4) = this->gimbal_frame_orientation.x();
-  this->image.at<double>(0, 5) = this->gimbal_frame_orientation.y();
-  this->image.at<double>(0, 6) = this->gimbal_frame_orientation.z();
+    this->image.at<double>(0, 3) = this->gimbal_frame_orientation.w();
+    this->image.at<double>(0, 4) = this->gimbal_frame_orientation.x();
+    this->image.at<double>(0, 5) = this->gimbal_frame_orientation.y();
+    this->image.at<double>(0, 6) = this->gimbal_frame_orientation.z();
 
-  this->image.at<double>(0, 7) = this->gimbal_joint_orientation.w();
-  this->image.at<double>(0, 8) = this->gimbal_joint_orientation.x();
-  this->image.at<double>(0, 9) = this->gimbal_joint_orientation.y();
-  this->image.at<double>(0, 10) = this->gimbal_joint_orientation.z();
+    this->image.at<double>(0, 7) = this->gimbal_joint_orientation.w();
+    this->image.at<double>(0, 8) = this->gimbal_joint_orientation.x();
+    this->image.at<double>(0, 9) = this->gimbal_joint_orientation.y();
+    this->image.at<double>(0, 10) = this->gimbal_joint_orientation.z();
 
-  this->image.at<double>(0, 11) = this->gimbal_joint_body_orientation.w();
-  this->image.at<double>(0, 12) = this->gimbal_joint_body_orientation.x();
-  this->image.at<double>(0, 13) = this->gimbal_joint_body_orientation.y();
-  this->image.at<double>(0, 14) = this->gimbal_joint_body_orientation.z();
+    this->image.at<double>(0, 11) = this->gimbal_joint_body_orientation.w();
+    this->image.at<double>(0, 12) = this->gimbal_joint_body_orientation.x();
+    this->image.at<double>(0, 13) = this->gimbal_joint_body_orientation.y();
+    this->image.at<double>(0, 14) = this->gimbal_joint_body_orientation.z();
 
-  this->image.at<double>(0, 15) = this->quadrotor_position(0);
-  this->image.at<double>(0, 16) = this->quadrotor_position(1);
-  this->image.at<double>(0, 17) = this->quadrotor_position(2);
+    this->image.at<double>(0, 15) = this->quadrotor_position(0);
+    this->image.at<double>(0, 16) = this->quadrotor_position(1);
+    this->image.at<double>(0, 17) = this->quadrotor_position(2);
 
-  this->image.at<double>(0, 18) = this->quadrotor_orientation.w();
-  this->image.at<double>(0, 19) = this->quadrotor_orientation.x();
-  this->image.at<double>(0, 20) = this->quadrotor_orientation.y();
-  this->image.at<double>(0, 21) = this->quadrotor_orientation.z();
+    this->image.at<double>(0, 18) = this->quadrotor_orientation.w();
+    this->image.at<double>(0, 19) = this->quadrotor_orientation.x();
+    this->image.at<double>(0, 20) = this->quadrotor_orientation.y();
+    this->image.at<double>(0, 21) = this->quadrotor_orientation.z();
+  }
 
   // clang-format off
   img_msg = cv_bridge::CvImage(
@@ -83,7 +92,7 @@ int PGCameraNode::publishImage() {
     "mono8",
     this->image
   ).toImageMsg();
-  this->img_pub.publish(img_msg);
+  this->img_pubs[this->image_topic].publish(img_msg);
   // clang-format on
 
   return 0;

@@ -53,8 +53,8 @@ public:
   std::map<std::string, ::ros::ServiceServer> ros_servers;
   std::map<std::string, ::ros::ServiceClient> ros_clients;
 
-  image_transport::Publisher img_pub;
-  image_transport::Subscriber img_sub;
+  std::map<std::string, image_transport::Publisher> img_pubs;
+  std::map<std::string, image_transport::Subscriber> img_subs;
   std::function<int()> loop_cb;
 
   ROSNode() {}
@@ -78,7 +78,7 @@ public:
 
     // image transport
     image_transport::ImageTransport it(*this->ros_nh);
-    this->img_sub = it.subscribe(topic, queue_size, fp, obj);
+    this->img_subs[topic] = it.subscribe(topic, queue_size, fp, obj);
 
     return 0;
   }

@@ -2,6 +2,7 @@
 #define ATL_CORE_VISION_CAMERA_DC1394_HPP
 
 #include <stdio.h>
+#include <inttypes.h>
 
 #include <dc1394/dc1394.h>
 
@@ -31,7 +32,7 @@ public:
     }
   }
 
-  int initialize();
+  int initialize(uint64_t guid = 0);
   void printFrameInfo(dc1394video_frame_t *frame);
   int setBrightness(double brightness);
   int setFrameRate(double fps);

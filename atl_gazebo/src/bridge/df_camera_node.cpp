@@ -40,7 +40,7 @@ void DFCameraNode::imageCallback(ConstImagePtr &msg) {
   // clang-format on
 
   // publish image
-  this->img_pub.publish(img_msg);
+  this->img_pubs[CAMERA_IMAGE_RTOPIC].publish(img_msg);
 
   // debug
   if (this->debug_mode) {

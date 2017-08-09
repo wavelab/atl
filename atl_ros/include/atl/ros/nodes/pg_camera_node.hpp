@@ -16,10 +16,7 @@ namespace atl {
 
 // NODE SETTINGS
 #define NODE_NAME "atl_camera"
-#define NODE_RATE 100
-
-// PUBLISH TOPICS
-#define CAMERA_IMAGE_TOPIC "/atl/camera/image"
+#define NODE_RATE 61
 
 // SUBSCRIBE TOPICS
 // clang-format off
@@ -42,8 +39,11 @@ class PGCameraNode : public ROSNode {
 public:
   // PointGreyCamera camera;
   DC1394Camera camera;
-  cv::Mat image;
+  bool stamp_image = false;
+  uint64_t guid = 0;
+  std::string image_topic;
 
+  cv::Mat image;
   Vec3 gimbal_position;
   Vec3 quadrotor_position;
   Quaternion gimbal_frame_orientation;
@@ -53,7 +53,6 @@ public:
 
   bool target_detected;
   Vec3 target_pos_bf;
-  int image_number = 0;
 
   PGCameraNode(int argc, char **argv) : ROSNode(argc, argv) {
     this->gimbal_position = Vec3();
