@@ -48,7 +48,7 @@ public:
    * @param node_name Name of ROS Node
    * @param hz ROS node rate in hertz
    */
-  int configure(const std::string &node_name, int hz);
+  int configure(int hz);
 
   /**
    * Quadrotor pose Gazebo callback

@@ -3,12 +3,12 @@
 
 namespace atl {
 
-int PGCameraNode::configure(const std::string &node_name, int hz) {
+int PGCameraNode::configure(int hz) {
   std::string config_path;
   std::string guid_str;
 
   // ros node
-  if (ROSNode::configure(node_name, hz) != 0) {
+  if (ROSNode::configure(hz) != 0) {
     return -1;
   }
 
@@ -155,4 +155,4 @@ int PGCameraNode::loopCallback() {
 
 }  // eof atl namespace
 
-RUN_ROS_NODE(atl::PGCameraNode, NODE_NAME, NODE_RATE);
+RUN_ROS_NODE(atl::PGCameraNode, NODE_RATE);

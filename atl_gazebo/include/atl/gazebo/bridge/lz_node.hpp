@@ -28,7 +28,7 @@ namespace gazebo_bridge {
 class LZNode : public gaz::LZGClient, public ROSNode {
 public:
   LZNode(int argc, char **argv) : ROSNode(argc, argv) {}
-  int configure(const std::string &node_name, int hz);
+  int configure(int hz);
   void poseCallback(ConstPosePtr &msg);
   void positionCallback(const geometry_msgs::Vector3 &msg);
   void velocityCallback(const std_msgs::Float64 &msg);

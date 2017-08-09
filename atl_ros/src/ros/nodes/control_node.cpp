@@ -2,11 +2,11 @@
 
 namespace atl {
 
-int ControlNode::configure(const std::string &node_name, int hz) {
+int ControlNode::configure(int hz) {
   std::string config_path;
 
   // ros node
-  if (ROSNode::configure(node_name, hz) != 0) {
+  if (ROSNode::configure(hz) != 0) {
     return -1;
   }
 
@@ -631,4 +631,4 @@ int ControlNode::loopCallback() {
 
 }  // namespace atl
 
-RUN_ROS_NODE(atl::ControlNode, NODE_NAME, NODE_RATE);
+RUN_ROS_NODE(atl::ControlNode, NODE_RATE);

@@ -20,7 +20,7 @@ namespace atl {
 class FakeMavrosNode : public ROSNode {
 public:
   FakeMavrosNode(int argc, char **argv) : ROSNode(argc, argv) {}
-  int configure(std::string node_name, int hz);
+  int configure(int hz);
   int publishPose();
   int publishVelocity();
   int loopCallback();

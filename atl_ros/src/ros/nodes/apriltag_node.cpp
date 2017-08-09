@@ -2,11 +2,11 @@
 
 namespace atl {
 
-int AprilTagNode::configure(const std::string &node_name, int hz) {
+int AprilTagNode::configure(int hz) {
   std::string apriltag_config;
 
   // ros node
-  if (ROSNode::configure(node_name, hz) != 0) {
+  if (ROSNode::configure(hz) != 0) {
     return -1;
   }
 
@@ -192,4 +192,4 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
 
 }  // namespace atl
 
-RUN_ROS_NODE(atl::AprilTagNode, NODE_NAME, NODE_RATE);
+RUN_ROS_NODE(atl::AprilTagNode, NODE_RATE);

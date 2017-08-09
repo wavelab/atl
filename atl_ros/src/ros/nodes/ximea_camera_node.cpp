@@ -2,12 +2,12 @@
 
 namespace atl {
 
-int XimeaCameraNode::configure(std::string node_name, int hz) {
+int XimeaCameraNode::configure(int hz) {
   std::string config_path;
   grey_scale = false;
 
   // ros node
-  if (ROSNode::configure(node_name, hz) != 0) {
+  if (ROSNode::configure(hz) != 0) {
     return -1;
   }
 
@@ -17,9 +17,7 @@ int XimeaCameraNode::configure(std::string node_name, int hz) {
     ROS_ERROR("Failed to configure Camera!");
     return -2;
   };
-
   this->ros_nh->getParam("/grey_scale", grey_scale);
-
   this->camera.initialize();
 
   // register publisher and subscribers
@@ -131,4 +129,4 @@ int XimeaCameraNode::loopCallback() {
 
 }  // namespace atl
 
-RUN_ROS_NODE(atl::XimeaCameraNode, NODE_NAME, NODE_RATE);
+RUN_ROS_NODE(atl::XimeaCameraNode, NODE_RATE);

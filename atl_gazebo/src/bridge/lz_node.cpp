@@ -3,10 +3,10 @@
 namespace atl {
 namespace gazebo_bridge {
 
-int LZNode::configure(const std::string &node_name, int hz) {
+int LZNode::configure(int hz) {
   // setup ros node
   // clang-format off
-  ROSNode::configure(node_name, hz);
+  ROSNode::configure(hz);
   ROSNode::registerPublisher<geometry_msgs::Pose>(POSE_RTOPIC);
   ROSNode::registerSubscriber(POSITION_SET_RTOPIC, &LZNode::positionCallback, this);
   ROSNode::registerSubscriber(VELOCITY_SET_RTOPIC, &LZNode::velocityCallback, this);
@@ -62,4 +62,4 @@ void LZNode::angularVelocityCallback(const std_msgs::Float64 &msg) {
 }  // namespace gazebo_bridge
 }  // namespace atl
 
-RUN_ROS_NODE(atl::gazebo_bridge::LZNode, NODE_NAME, NODE_RATE);
+RUN_ROS_NODE(atl::gazebo_bridge::LZNode, NODE_RATE);

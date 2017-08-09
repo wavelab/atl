@@ -37,7 +37,7 @@ public:
   Pose camera_offset;
 
   AprilTagNode(int argc, char **argv) : ROSNode(argc, argv) {}
-  int configure(const std::string &node_name, int hz);
+  int configure(int hz);
   void publishTagPoseMsg(TagPose tag);
   void publishTargetInertialPositionMsg(
     Vec3 gimbal_position, Quaternion gimbal_orientation, Vec3 target_bf);

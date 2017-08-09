@@ -90,7 +90,7 @@ public:
    * @param hz ROS node rate
    * @return 0 for success, -1 for failure
    */
-  int configure(const std::string &node_name, int hz);
+  int configure(int hz);
 
   /**
    * Configure PX4 ROS topics

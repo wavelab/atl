@@ -2,11 +2,11 @@
 
 namespace atl {
 
-int EstimatorNode::configure(std::string node_name, int hz) {
+int EstimatorNode::configure(int hz) {
   std::string config_file;
 
   // ros node
-  if (ROSNode::configure(node_name, hz) != 0) {
+  if (ROSNode::configure(hz) != 0) {
     return -1;
   }
 
@@ -434,4 +434,4 @@ int EstimatorNode::loopCallback() {
 
 }  // namespace atl
 
-RUN_ROS_NODE(atl::EstimatorNode, NODE_NAME, NODE_RATE);
+RUN_ROS_NODE(atl::EstimatorNode, NODE_RATE);

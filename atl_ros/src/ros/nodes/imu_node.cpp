@@ -2,11 +2,11 @@
 
 namespace atl {
 
-int IMUNode::configure(const std::string &node_name, int hz) {
+int IMUNode::configure(int hz) {
   std::string config_path;
 
   // ros node
-  if (ROSNode::configure(node_name, hz) != 0) {
+  if (ROSNode::configure(hz) != 0) {
     return -1;
   }
   ROS_GET_PARAM("/quad_frame", this->quad_frame);
@@ -80,4 +80,4 @@ int IMUNode::loopCallback() {
 
 }  // eof atl namespace
 
-RUN_ROS_NODE(atl::IMUNode, NODE_NAME, NODE_RATE);
+RUN_ROS_NODE(atl::IMUNode, NODE_RATE);

@@ -21,7 +21,7 @@ namespace atl {
 class ExampleNode : public ROSNode {
 public:
   ExampleNode(int argc, char **argv) : ROSNode(argc, argv) {}
-  int configure(const std::string &node_name, int hz);
+  int configure(int hz);
   int loopCallback();
   void sayCallback(const std_msgs::String &msg);
 };

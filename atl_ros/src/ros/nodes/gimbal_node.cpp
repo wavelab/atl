@@ -2,11 +2,11 @@
 
 namespace atl {
 
-int GimbalNode::configure(std::string node_name, int hz) {
+int GimbalNode::configure(int hz) {
   std::string config_file;
 
   // ros node
-  if (ROSNode::configure(node_name, hz) != 0) {
+  if (ROSNode::configure(hz) != 0) {
     return -1;
   }
 
@@ -156,4 +156,4 @@ int GimbalNode::loopCallback() {
 
 }  // namespace atl
 
-RUN_ROS_NODE(atl::GimbalNode, NODE_NAME, NODE_RATE);
+RUN_ROS_NODE(atl::GimbalNode, NODE_RATE);

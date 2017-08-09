@@ -3,12 +3,12 @@
 namespace atl {
 namespace gazebo_bridge {
 
-int PX4QuadrotorNode::configure(const std::string &node_name, int hz) {
+int PX4QuadrotorNode::configure(int hz) {
   this->quad_frame = "NWU";
 
   // setup ros node
   // clang-format off
-  ROSNode::configure(node_name, hz);
+  ROSNode::configure(hz);
   ROSNode::registerPublisher<geometry_msgs::PoseStamped>(PX4_POSE_RTOPIC);
   ROSNode::registerPublisher<geometry_msgs::TwistStamped>(PX4_VELOCITY_RTOPIC);
   ROSNode::registerSubscriber(PX4_ATTITUDE_SETPOINT_RTOPIC, &PX4QuadrotorNode::attitudeSetpointCallback, this, 1);
@@ -158,4 +158,4 @@ void PX4QuadrotorNode::velocitySetpointCallback(
 }  // namespace gazebo_bridge
 }  // namespace atl
 
-RUN_ROS_NODE(atl::gazebo_bridge::PX4QuadrotorNode, NODE_NAME, NODE_RATE);
+RUN_ROS_NODE(atl::gazebo_bridge::PX4QuadrotorNode, NODE_RATE);

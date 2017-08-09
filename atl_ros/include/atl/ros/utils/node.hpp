@@ -22,10 +22,10 @@ namespace atl {
     ROS_ERROR("Failed to get ROS param [%s]", #X);               \
     return -1;                                                   \
   }
-#define RUN_ROS_NODE(NODE_CLASS, NODE_NAME, NODE_RATE)  \
+#define RUN_ROS_NODE(NODE_CLASS, NODE_RATE)             \
   int main(int argc, char **argv) {                     \
     NODE_CLASS node(argc, argv);                        \
-    if (node.configure(NODE_NAME, NODE_RATE) != 0) {    \
+    if (node.configure(NODE_RATE) != 0) {               \
       ROS_ERROR("Failed to configure %s", #NODE_CLASS); \
       return -1;                                        \
     }                                                   \
@@ -60,7 +60,7 @@ public:
   ROSNode() {}
   ROSNode(int argc, char **argv);
   ~ROSNode();
-  int configure(const std::string &node_name, int hz);
+  int configure(int hz);
   void shutdownCallback(const std_msgs::Bool &msg);
   int registerShutdown(const std::string &topic);
   int registerImagePublisher(const std::string &topic);

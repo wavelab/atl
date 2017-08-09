@@ -28,22 +28,19 @@ ROSNode::~ROSNode() {
   ros::shutdown();
 }
 
-int ROSNode::configure(const std::string &node_name, int hz) {
+int ROSNode::configure(int hz) {
   // clang-format off
   if (ros::isInitialized() == false) {
     ros::init(
       this->argc,
       this->argv,
-      node_name,
+      this->ros_node_name,
       ros::init_options::NoSigintHandler
     );
   }
   // clang-format on
 
   // initialize
-  if (this->ros_node_name == "") {
-    this->ros_node_name = node_name;
-  }
   this->ros_nh = new ros::NodeHandle();
   this->ros_nh->getParam("/debug_mode", this->debug_mode);
   this->ros_nh->getParam("/sim_mode", this->sim_mode);

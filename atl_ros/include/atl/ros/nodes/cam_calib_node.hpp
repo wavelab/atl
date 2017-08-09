@@ -57,7 +57,7 @@ public:
     this->gimbal_encoder_file.close();
   }
 
-  int configure(const std::string &node_name, int hz);
+  int configure(int hz);
   void imageMsgToCvMat(const sensor_msgs::ImageConstPtr &msg, cv::Mat &img);
   void image1Callback(const sensor_msgs::ImageConstPtr &msg);
   void image2Callback(const sensor_msgs::ImageConstPtr &msg);

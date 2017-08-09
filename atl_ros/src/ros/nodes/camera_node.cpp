@@ -2,11 +2,11 @@
 
 namespace atl {
 
-int CameraNode::configure(const std::string &node_name, int hz) {
+int CameraNode::configure(int hz) {
   std::string config_path;
 
   // ros node
-  if (ROSNode::configure(node_name, hz) != 0) {
+  if (ROSNode::configure(hz) != 0) {
     return -1;
   }
 
@@ -110,4 +110,4 @@ int CameraNode::loopCallback() {
 
 }  // namespace atl
 
-RUN_ROS_NODE(atl::CameraNode, NODE_NAME, NODE_RATE);
+RUN_ROS_NODE(atl::CameraNode, NODE_RATE);

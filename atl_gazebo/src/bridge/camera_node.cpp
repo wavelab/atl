@@ -3,9 +3,9 @@
 namespace atl {
 namespace gazebo_bridge {
 
-int CameraNode::configure(const std::string &node_name, int hz) {
+int CameraNode::configure(int hz) {
   // ros node
-  if (ROSNode::configure(node_name, hz) != 0) {
+  if (ROSNode::configure(hz) != 0) {
     return -1;
   }
 
@@ -120,4 +120,4 @@ void CameraNode::imageCallback(ConstImagePtr &msg) {
 }  // namespace gazebo_bridge
 }  // namespace atl
 
-RUN_ROS_NODE(atl::gazebo_bridge::CameraNode, NODE_NAME, NODE_RATE);
+RUN_ROS_NODE(atl::gazebo_bridge::CameraNode, NODE_RATE);

@@ -41,7 +41,7 @@ public:
 
   GimbalNode(int argc, char **argv) : ROSNode(argc, argv) {}
   ~GimbalNode();
-  int configure(std::string node_name, int hz);
+  int configure(int hz);
   int publishIMU(Vec3 euler);
   int publishRawEncoder(Vec3 encoder_euler);
   int publishPosition(Vec3 pos);

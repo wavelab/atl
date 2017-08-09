@@ -82,7 +82,7 @@ public:
     this->target_lost_threshold = 1000.0;
   }
 
-  int configure(std::string node_name, int hz);
+  int configure(int hz);
   void initLTKF(Vec3 target_measured);
   void resetLTKF(Vec3 target_measured);
   void quadPoseCallback(const geometry_msgs::PoseStamped &msg);
