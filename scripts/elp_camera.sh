@@ -18,7 +18,7 @@
 #  - zoom_absolute    (int) : min=100 max=500 step=1 default=100 value=100
 
 v4l2-ctl \
-	--set-ctrl=exposure_auto=1 \
-	--set-ctrl=exposure_absolute=100 \
-	--set-ctrl=gain=20 \
+	--set-ctrl=exposure_auto=3\
 	--device=/dev/video6
+	# --set-ctrl=exposure_absolute=100 \
+	# --set-ctrl=gain=20 \
