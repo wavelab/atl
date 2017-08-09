@@ -16,7 +16,7 @@ namespace atl {
 
 // NODE SETTINGS
 #define NODE_NAME "atl_cam_calib"
-#define NODE_RATE 100
+#define NODE_RATE 60
 
 // PUBLISH TOPICS
 #define CAMERA_IMAGE_TOPIC "/atl/camera/image"
@@ -38,6 +38,11 @@ public:
   std::ofstream gimbal_frame_file;
   std::ofstream gimbal_joint_file;
   std::ofstream gimbal_encoder_file;
+
+  cv::Size chessboard_size;
+  bool chessboard_detected[2] = {false, false};
+  std::vector<cv::Point2f> corners_1;
+  std::vector<cv::Point2f> corners_2;
 
   int nb_cameras = 0;
   std::string camera_1_topic;
@@ -64,6 +69,8 @@ public:
   void gimbalFrameCallback(const geometry_msgs::Quaternion &msg);
   void gimbalJointCallback(const geometry_msgs::Quaternion &msg);
   void gimbalJointBodyCallback(const geometry_msgs::Quaternion &msg);
+  bool chessboardDetected();
+  void showImages();
   void saveImages();
   void saveGimbalMeasurements();
   int loopCallback();

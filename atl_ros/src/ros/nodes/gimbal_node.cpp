@@ -33,6 +33,7 @@ int GimbalNode::configure(int hz) {
     return -3;
   }
 
+  this->registerSubscriber(ACTIVATE_TOPIC, &GimbalNode::activateCallback, this);
   this->registerSubscriber(QUAD_POSE_TOPIC, &GimbalNode::quadPoseCallback, this);
   this->registerSubscriber(TRACK_TOPIC, &GimbalNode::trackTargetCallback, this);
   this->registerSubscriber(SETPOINT_TOPIC, &GimbalNode::setAttitudeCallback, this);
@@ -92,6 +93,17 @@ int GimbalNode::publishEncoderOrientation(Quaternion q) {
   buildMsg(q, msg);
   this->ros_pubs[ENCODER_ORIENTATION_TOPIC].publish(msg);
   return 0;
+}
+
+void GimbalNode::activateCallback(const std_msgs::Bool &msg) {
+  bool activate;
+  convertMsg(msg, activate);
+
+  if (activate) {
+    this->gimbal.on();
+  } else {
+    this->gimbal.off();
+  }
 }
 
 void GimbalNode::quadPoseCallback(const geometry_msgs::PoseStamped &msg) {

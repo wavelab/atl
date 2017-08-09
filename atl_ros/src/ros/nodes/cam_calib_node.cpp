@@ -12,6 +12,13 @@ int CamCalibNode::configure(int hz) {
 
   // get ros params
   ROS_GET_PARAM(this->ros_node_name + "/calib_dir", this->calib_dir);
+
+  int chessboard_rows = 0;
+  int chessboard_cols = 0;
+  ROS_GET_PARAM(this->ros_node_name + "/chessboard_rows", chessboard_rows);
+  ROS_GET_PARAM(this->ros_node_name + "/chessboard_cols", chessboard_cols);
+  this->chessboard_size = cv::Size(chessboard_cols, chessboard_rows);
+
   ROS_GET_PARAM(this->ros_node_name + "/nb_cameras", this->nb_cameras);
   ROS_GET_PARAM(
     this->ros_node_name + "/camera_1_topic", this->camera_1_topic);
@@ -24,10 +31,11 @@ int CamCalibNode::configure(int hz) {
   }
 
   // calibration dir
-  remove_dir(this->calib_dir.c_str());
   int retval = mkdir(this->calib_dir.c_str(), ACCESSPERMS);
   if (retval != 0) {
     ROS_ERROR("Failed to create calibration dir!");
+    ROS_ERROR("Destination already exists [%s]!", this->calib_dir.c_str());
+    ROS_ERROR("Delete dir and retry!");
     return -4;
   }
 
@@ -105,6 +113,75 @@ void CamCalibNode::gimbalJointBodyCallback(
   convertMsg(msg, this->gimbal_joint_body_orientation);
 }
 
+bool CamCalibNode::chessboardDetected() {
+  // reset detected flags
+  this->chessboard_detected[0] = false;
+  this->chessboard_detected[1] = false;
+
+  // pre-check
+  if (this->nb_cameras == 1 && this->image_1.empty()) {
+    return false;
+  } else if (
+    this->nb_cameras == 2 &&
+    (this->image_1.empty() || this->image_2.empty())) {
+    return false;
+  }
+
+  // chessboard detector flags
+  int flags = cv::CALIB_CB_ADAPTIVE_THRESH;
+  flags += cv::CALIB_CB_NORMALIZE_IMAGE;
+  flags += cv::CALIB_CB_FAST_CHECK;
+
+  // check first camera
+  this->corners_1.clear();
+  this->chessboard_detected[0] = cv::findChessboardCorners(
+    this->image_1, this->chessboard_size, this->corners_1, flags);
+  if (this->nb_cameras == 1) {
+    return this->chessboard_detected[0];
+  }
+
+  // check second camera
+  this->corners_2.clear();
+  this->chessboard_detected[1] = cv::findChessboardCorners(
+    this->image_2, this->chessboard_size, this->corners_2, flags);
+  if (this->chessboard_detected[0] && this->chessboard_detected[1]) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+void CamCalibNode::showImages() {
+  // pre-check
+  if (this->nb_cameras == 1 && this->image_1.empty()) {
+    return;
+  } else if (
+    this->nb_cameras == 2 &&
+    (this->image_1.empty() || this->image_2.empty())) {
+    return;
+  }
+
+  // show camera image 1
+  if (this->chessboard_detected[0]) {
+    cv::Mat img_1 = this->image_1.clone();
+    cv::drawChessboardCorners(
+      img_1, this->chessboard_size, this->corners_1, true);
+    cv::imshow("Camera 1", img_1);
+  } else {
+    cv::imshow("Camera 1", this->image_1);
+  }
+
+  // show camera image 2
+  if (this->chessboard_detected[1]) {
+    cv::Mat img_2 = this->image_2.clone();
+    cv::drawChessboardCorners(
+      img_2, this->chessboard_size, this->corners_2, true);
+    cv::imshow("Camera 2", img_2);
+  } else {
+    cv::imshow("Camera 2", this->image_2);
+  }
+}
+
 void CamCalibNode::saveImages() {
   std::string savepath;
   std::string filename = "img_" + std::to_string(this->image_number) + ".jpg";
@@ -156,13 +233,9 @@ void CamCalibNode::saveGimbalMeasurements() {
 }
 
 int CamCalibNode::loopCallback() {
-  // show image
-  if (this->image_1.empty() == false) {
-    cv::imshow("Camera 1", this->image_1);
-  }
-  if (this->image_2.empty() == false) {
-    cv::imshow("Camera 2", this->image_2);
-  }
+  // detect and show camera images
+  bool data_ok = this->chessboardDetected();
+  this->showImages();
 
   // parse keyboard input
   int key = cv::waitKey(1);
@@ -176,8 +249,12 @@ int CamCalibNode::loopCallback() {
     // "enter" key was pressed
     case 13:
       // save image
-      this->saveImages();
-      this->saveGimbalMeasurements();
+      if (data_ok) {
+        this->saveImages();
+        this->saveGimbalMeasurements();
+      } else {
+        ROS_WARN("Chessboard not inview of camera(s), NOT SAVING!");
+      }
       break;
   }
 

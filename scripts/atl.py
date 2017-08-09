@@ -73,11 +73,18 @@ class LandingZone(ROSNode):
 class Gimbal(ROSNode):
     def __init__(self):
         super(Gimbal, self).__init__()
+        self.activate_topic = "/atl/gimbal/activate"
         self.attitude_topic = "/atl/gimbal/setpoint/attitude"
         self.track_topic = "/atl/gimbal/track"
 
+        self.register_publisher(self.activate_topic, Bool)
         self.register_publisher(self.attitude_topic, Vector3)
         self.register_publisher(self.track_topic, Vector3)
+
+    def activate(self, value):
+        msg = Bool()
+        msg.data = value
+        self.pubs[self.activate_topic].publish(msg)
 
     def set_attitude(self, attitude):
         msg = Vector3()

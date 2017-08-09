@@ -27,6 +27,7 @@ namespace atl {
 #define ENCODER_ORIENTATION_TOPIC "atl/gimbal/joint/orientation/body"
 
 // SUBSCRIBE TOPICS
+#define ACTIVATE_TOPIC "/atl/gimbal/activate"
 #define QUAD_POSE_TOPIC "/atl/quadrotor/pose/local"
 #define SETPOINT_TOPIC "/atl/gimbal/setpoint/attitude"
 #define TRACK_TOPIC "/atl/gimbal/target/track"
@@ -48,6 +49,7 @@ public:
   int publishFrameOrientation(Quaternion q);
   int publishJointOrientation(Quaternion q);
   int publishEncoderOrientation(Quaternion q);
+  void activateCallback(const std_msgs::Bool &msg);
   void quadPoseCallback(const geometry_msgs::PoseStamped &msg);
   void setAttitudeCallback(const geometry_msgs::Vector3 &msg);
   void trackTargetCallback(const geometry_msgs::Vector3 &msg);
