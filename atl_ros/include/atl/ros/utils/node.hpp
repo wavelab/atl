@@ -42,7 +42,7 @@ public:
   int argc;
   char **argv;
 
-  std::string ros_node_name;
+  std::string node_name;
   long long int ros_seq;
   ros::NodeHandle *ros_nh;
   ros::Rate *ros_rate;

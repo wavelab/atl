@@ -11,20 +11,18 @@ int CamCalibNode::configure(int hz) {
   }
 
   // get ros params
-  ROS_GET_PARAM(this->ros_node_name + "/calib_dir", this->calib_dir);
+  ROS_GET_PARAM(this->node_name + "/calib_dir", this->calib_dir);
 
   int chessboard_rows = 0;
   int chessboard_cols = 0;
-  ROS_GET_PARAM(this->ros_node_name + "/chessboard_rows", chessboard_rows);
-  ROS_GET_PARAM(this->ros_node_name + "/chessboard_cols", chessboard_cols);
+  ROS_GET_PARAM(this->node_name + "/chessboard_rows", chessboard_rows);
+  ROS_GET_PARAM(this->node_name + "/chessboard_cols", chessboard_cols);
   this->chessboard_size = cv::Size(chessboard_cols, chessboard_rows);
 
-  ROS_GET_PARAM(this->ros_node_name + "/nb_cameras", this->nb_cameras);
-  ROS_GET_PARAM(
-    this->ros_node_name + "/camera_1_topic", this->camera_1_topic);
+  ROS_GET_PARAM(this->node_name + "/nb_cameras", this->nb_cameras);
+  ROS_GET_PARAM(this->node_name + "/camera_1_topic", this->camera_1_topic);
   if (this->nb_cameras == 2) {
-    ROS_GET_PARAM(
-      this->ros_node_name + "/camera_2_topic", this->camera_2_topic);
+    ROS_GET_PARAM(this->node_name + "/camera_2_topic", this->camera_2_topic);
   } else if (this->nb_cameras <= 0 || this->nb_cameras > 2) {
     ROS_ERROR("This node only supports maximum of 2 cameras!");
     return -2;
@@ -57,7 +55,6 @@ int CamCalibNode::configure(int hz) {
   }
 
   // measurements file
-  this->gimbal_frame_file.open(this->calib_dir + "/gimbal_frame.dat");
   this->gimbal_joint_file.open(this->calib_dir + "/gimbal_joint.dat");
   this->gimbal_encoder_file.open(this->calib_dir + "/gimbal_encoder.dat");
 
@@ -67,7 +64,6 @@ int CamCalibNode::configure(int hz) {
   if (this->nb_cameras == 2) {
     this->registerImageSubscriber(this->camera_2_topic, &CamCalibNode::image2Callback, this);
   }
-  this->registerSubscriber(GIMBAL_FRAME_ORIENTATION_TOPIC, &CamCalibNode::gimbalFrameCallback, this);
   this->registerSubscriber(GIMBAL_JOINT_ORIENTATION_TOPIC, &CamCalibNode::gimbalJointCallback, this);
   this->registerSubscriber(GIMBAL_ENCODER_ORIENTATION_TOPIC, &CamCalibNode::gimbalJointBodyCallback, this);
   this->registerShutdown(SHUTDOWN_TOPIC);
@@ -98,10 +94,6 @@ void CamCalibNode::image1Callback(const sensor_msgs::ImageConstPtr &msg) {
 
 void CamCalibNode::image2Callback(const sensor_msgs::ImageConstPtr &msg) {
   this->imageMsgToCvMat(msg, this->image_2);
-}
-
-void CamCalibNode::gimbalFrameCallback(const geometry_msgs::Quaternion &msg) {
-  convertMsg(msg, this->gimbal_frame_orientation);
 }
 
 void CamCalibNode::gimbalJointCallback(const geometry_msgs::Quaternion &msg) {
@@ -187,7 +179,7 @@ void CamCalibNode::saveImages() {
   std::string filename = "img_" + std::to_string(this->image_number) + ".jpg";
 
   // save image
-  ROS_INFO("Saving calibration image [%s]", savepath.c_str());
+  ROS_INFO("Saving calibration image [%d]", this->image_number);
   if (this->nb_cameras == 1) {
     paths_combine(this->camera_1_dir, filename, savepath);
     cv::imwrite(savepath, this->image_1);
@@ -210,19 +202,13 @@ void CamCalibNode::saveImages() {
 
 void CamCalibNode::saveGimbalMeasurements() {
   // convert measurements in quaternion to euler angles
-  Vec3 gimbal_frame_euler;
   Vec3 gimbal_joint_euler;
   Vec3 gimbal_encoder_euler;
 
-  quat2euler(this->gimbal_frame_orientation, 321, gimbal_frame_euler);
   quat2euler(this->gimbal_joint_orientation, 321, gimbal_joint_euler);
   quat2euler(this->gimbal_joint_body_orientation, 321, gimbal_encoder_euler);
 
   // write to file
-  this->gimbal_frame_file << gimbal_frame_euler(0) << ",";
-  this->gimbal_frame_file << gimbal_frame_euler(1) << ",";
-  this->gimbal_frame_file << gimbal_frame_euler(2) << std::endl;
-
   this->gimbal_joint_file << gimbal_joint_euler(0) << ",";
   this->gimbal_joint_file << gimbal_joint_euler(1) << ",";
   this->gimbal_joint_file << gimbal_joint_euler(2) << std::endl;

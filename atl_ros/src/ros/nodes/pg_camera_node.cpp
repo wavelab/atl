@@ -13,11 +13,11 @@ int PGCameraNode::configure(int hz) {
   }
 
   // camera
-  ROS_GET_PARAM(this->ros_node_name + "/guid", guid_str);
+  ROS_GET_PARAM(this->node_name + "/guid", guid_str);
   this->guid = std::stoull(guid_str);  // ros param cannot parse a uint64_t
-  ROS_GET_PARAM(this->ros_node_name + "/stamp_image", this->stamp_image);
-  ROS_GET_PARAM(this->ros_node_name + "/image_topic", this->image_topic);
-  ROS_GET_PARAM(this->ros_node_name + "/config_dir", config_path);
+  ROS_GET_PARAM(this->node_name + "/stamp_image", this->stamp_image);
+  ROS_GET_PARAM(this->node_name + "/image_topic", this->image_topic);
+  ROS_GET_PARAM(this->node_name + "/config_dir", config_path);
   if (this->camera.configure(config_path) != 0) {
     ROS_ERROR("Failed to configure Camera!");
     return -2;

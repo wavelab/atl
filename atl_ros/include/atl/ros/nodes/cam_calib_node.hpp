@@ -35,7 +35,6 @@ public:
   std::string calib_dir;
   std::string camera_1_dir;
   std::string camera_2_dir;
-  std::ofstream gimbal_frame_file;
   std::ofstream gimbal_joint_file;
   std::ofstream gimbal_encoder_file;
 
@@ -51,13 +50,11 @@ public:
   int image_number = 0;
   cv::Mat image_1;
   cv::Mat image_2;
-  Quaternion gimbal_frame_orientation;
   Quaternion gimbal_joint_orientation;
   Quaternion gimbal_joint_body_orientation;
 
   CamCalibNode(int argc, char **argv) : ROSNode(argc, argv) {}
   ~CamCalibNode() {
-    this->gimbal_frame_file.close();
     this->gimbal_joint_file.close();
     this->gimbal_encoder_file.close();
   }
@@ -66,7 +63,6 @@ public:
   void imageMsgToCvMat(const sensor_msgs::ImageConstPtr &msg, cv::Mat &img);
   void image1Callback(const sensor_msgs::ImageConstPtr &msg);
   void image2Callback(const sensor_msgs::ImageConstPtr &msg);
-  void gimbalFrameCallback(const geometry_msgs::Quaternion &msg);
   void gimbalJointCallback(const geometry_msgs::Quaternion &msg);
   void gimbalJointBodyCallback(const geometry_msgs::Quaternion &msg);
   bool chessboardDetected();

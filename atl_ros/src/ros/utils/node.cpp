@@ -16,7 +16,7 @@ ROSNode::ROSNode(int argc, char **argv) {
 
     // ros node name
     if (arg.find("__name:=") != std::string::npos) {
-      this->ros_node_name = arg.substr(8);
+      this->node_name = arg.substr(8);
     }
   }
 
@@ -34,7 +34,7 @@ int ROSNode::configure(int hz) {
     ros::init(
       this->argc,
       this->argv,
-      this->ros_node_name,
+      this->node_name,
       ros::init_options::NoSigintHandler
     );
   }
@@ -97,7 +97,7 @@ int ROSNode::loop() {
   }
 
   // loop
-  ROS_INFO("ROS node [%s] is running!", this->ros_node_name.c_str());
+  ROS_INFO("ROS node [%s] is running!", this->node_name.c_str());
   while (ros::ok()) {
     // run loop callback
     if (this->loop_cb != nullptr) {
