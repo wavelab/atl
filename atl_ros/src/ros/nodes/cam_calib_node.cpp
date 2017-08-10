@@ -19,14 +19,10 @@ int CamCalibNode::configure(int hz) {
   ROS_GET_PARAM(this->node_name + "/chessboard_cols", chessboard_cols);
   this->chessboard_size = cv::Size(chessboard_cols, chessboard_rows);
 
-  ROS_GET_PARAM(this->node_name + "/nb_cameras", this->nb_cameras);
-  ROS_GET_PARAM(this->node_name + "/camera_1_topic", this->camera_1_topic);
-  if (this->nb_cameras == 2) {
-    ROS_GET_PARAM(this->node_name + "/camera_2_topic", this->camera_2_topic);
-  } else if (this->nb_cameras <= 0 || this->nb_cameras > 2) {
-    ROS_ERROR("This node only supports maximum of 2 cameras!");
-    return -2;
-  }
+  ROS_GET_PARAM(
+    this->node_name + "/static_camera_topic", this->static_camera_topic);
+  ROS_GET_PARAM(
+    this->node_name + "/gimbal_camera_topic", this->gimbal_camera_topic);
 
   // calibration dir
   int retval = mkdir(this->calib_dir.c_str(), ACCESSPERMS);
@@ -37,21 +33,19 @@ int CamCalibNode::configure(int hz) {
     return -4;
   }
 
-  // camera dir
-  this->camera_1_dir = this->calib_dir + "/" + "camera_1";
-  retval = mkdir(this->camera_1_dir.c_str(), ACCESSPERMS);
+  // camera dirs
+  this->static_camera_dir = this->calib_dir + "/" + "static_camera";
+  retval = mkdir(this->static_camera_dir.c_str(), ACCESSPERMS);
   if (retval != 0) {
-    ROS_ERROR("Failed to create camera_1 dir!");
+    ROS_ERROR("Failed to create static_camera dir!");
     return -4;
   }
 
-  if (this->nb_cameras == 2) {
-    this->camera_2_dir = this->calib_dir + "/" + "camera_2";
-    retval = mkdir(this->camera_2_dir.c_str(), ACCESSPERMS);
-    if (retval != 0) {
-      ROS_ERROR("Failed to create camera_2 dir!");
-      return -4;
-    }
+  this->gimbal_camera_dir = this->calib_dir + "/" + "gimbal_camera";
+  retval = mkdir(this->gimbal_camera_dir.c_str(), ACCESSPERMS);
+  if (retval != 0) {
+    ROS_ERROR("Failed to create gimbal_camera dir!");
+    return -4;
   }
 
   // measurements file
@@ -60,10 +54,8 @@ int CamCalibNode::configure(int hz) {
 
   // register publisher and subscribers
   // clang-format off
-  this->registerImageSubscriber(this->camera_1_topic, &CamCalibNode::image1Callback, this);
-  if (this->nb_cameras == 2) {
-    this->registerImageSubscriber(this->camera_2_topic, &CamCalibNode::image2Callback, this);
-  }
+  this->registerImageSubscriber(this->static_camera_topic, &CamCalibNode::staticCameraCallback, this);
+  this->registerImageSubscriber(this->gimbal_camera_topic, &CamCalibNode::gimbalCameraCallback, this);
   this->registerSubscriber(GIMBAL_JOINT_ORIENTATION_TOPIC, &CamCalibNode::gimbalJointCallback, this);
   this->registerSubscriber(GIMBAL_ENCODER_ORIENTATION_TOPIC, &CamCalibNode::gimbalJointBodyCallback, this);
   this->registerShutdown(SHUTDOWN_TOPIC);
@@ -88,12 +80,14 @@ void CamCalibNode::imageMsgToCvMat(
     .copyTo(img);
 }
 
-void CamCalibNode::image1Callback(const sensor_msgs::ImageConstPtr &msg) {
-  this->imageMsgToCvMat(msg, this->image_1);
+void CamCalibNode::staticCameraCallback(
+  const sensor_msgs::ImageConstPtr &msg) {
+  this->imageMsgToCvMat(msg, this->static_camera_image);
 }
 
-void CamCalibNode::image2Callback(const sensor_msgs::ImageConstPtr &msg) {
-  this->imageMsgToCvMat(msg, this->image_2);
+void CamCalibNode::gimbalCameraCallback(
+  const sensor_msgs::ImageConstPtr &msg) {
+  this->imageMsgToCvMat(msg, this->gimbal_camera_image);
 }
 
 void CamCalibNode::gimbalJointCallback(const geometry_msgs::Quaternion &msg) {
@@ -111,11 +105,8 @@ bool CamCalibNode::chessboardDetected() {
   this->chessboard_detected[1] = false;
 
   // pre-check
-  if (this->nb_cameras == 1 && this->image_1.empty()) {
-    return false;
-  } else if (
-    this->nb_cameras == 2 &&
-    (this->image_1.empty() || this->image_2.empty())) {
+  if (
+    this->static_camera_image.empty() || this->gimbal_camera_image.empty()) {
     return false;
   }
 
@@ -127,15 +118,14 @@ bool CamCalibNode::chessboardDetected() {
   // check first camera
   this->corners_1.clear();
   this->chessboard_detected[0] = cv::findChessboardCorners(
-    this->image_1, this->chessboard_size, this->corners_1, flags);
-  if (this->nb_cameras == 1) {
-    return this->chessboard_detected[0];
-  }
+    this->static_camera_image, this->chessboard_size, this->corners_1, flags);
 
   // check second camera
   this->corners_2.clear();
   this->chessboard_detected[1] = cv::findChessboardCorners(
-    this->image_2, this->chessboard_size, this->corners_2, flags);
+    this->gimbal_camera_image, this->chessboard_size, this->corners_2, flags);
+
+  // check results
   if (this->chessboard_detected[0] && this->chessboard_detected[1]) {
     return true;
   } else {
@@ -145,32 +135,29 @@ bool CamCalibNode::chessboardDetected() {
 
 void CamCalibNode::showImages() {
   // pre-check
-  if (this->nb_cameras == 1 && this->image_1.empty()) {
-    return;
-  } else if (
-    this->nb_cameras == 2 &&
-    (this->image_1.empty() || this->image_2.empty())) {
+  if (
+    this->static_camera_image.empty() || this->gimbal_camera_image.empty()) {
     return;
   }
 
-  // show camera image 1
+  // show static camera image
   if (this->chessboard_detected[0]) {
-    cv::Mat img_1 = this->image_1.clone();
+    cv::Mat img_1 = this->static_camera_image.clone();
     cv::drawChessboardCorners(
       img_1, this->chessboard_size, this->corners_1, true);
     cv::imshow("Camera 1", img_1);
   } else {
-    cv::imshow("Camera 1", this->image_1);
+    cv::imshow("Camera 1", this->static_camera_image);
   }
 
-  // show camera image 2
+  // show gimbal camera image
   if (this->chessboard_detected[1]) {
-    cv::Mat img_2 = this->image_2.clone();
+    cv::Mat img_2 = this->gimbal_camera_image.clone();
     cv::drawChessboardCorners(
       img_2, this->chessboard_size, this->corners_2, true);
     cv::imshow("Camera 2", img_2);
   } else {
-    cv::imshow("Camera 2", this->image_2);
+    cv::imshow("Camera 2", this->gimbal_camera_image);
   }
 }
 
@@ -180,21 +167,11 @@ void CamCalibNode::saveImages() {
 
   // save image
   ROS_INFO("Saving calibration image [%d]", this->image_number);
-  if (this->nb_cameras == 1) {
-    paths_combine(this->camera_1_dir, filename, savepath);
-    cv::imwrite(savepath, this->image_1);
+  paths_combine(this->static_camera_dir, filename, savepath);
+  cv::imwrite(savepath, this->static_camera_image);
 
-  } else if (this->nb_cameras == 2) {
-    paths_combine(this->camera_1_dir, filename, savepath);
-    cv::imwrite(savepath, this->image_1);
-
-    paths_combine(this->camera_2_dir, filename, savepath);
-    cv::imwrite(savepath, this->image_2);
-
-  } else {
-    ROS_ERROR("This node only supports maximum of 2 cameras!");
-    exit(-1);
-  }
+  paths_combine(this->gimbal_camera_dir, filename, savepath);
+  cv::imwrite(savepath, this->gimbal_camera_image);
 
   // update image number
   this->image_number++;

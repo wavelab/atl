@@ -9,6 +9,14 @@ import numpy as np
 from atl import Gimbal
 
 
+class Chessboard(object):
+    def __init__(self, rows, cols, sq_size):
+        self.rows = rows
+        self.cols = cols
+        self.sq_size = sq_size
+        self.cb_size = (self.cols, self.rows)
+
+
 def move_gimbal():
     rospy.init_node("atl_gimbal_calib")
     gimbal = Gimbal()
@@ -117,22 +125,17 @@ def output_jason_format(output_path,
 
 
 def convert_measurements_to_jason_format(path,
-                                         camera_matrix1,
-                                         dist_coef1,
-                                         camera_matrix2,
-                                         dist_coef2):
-    # chessboard settings
-    cb_rows = 6
-    cb_cols = 9
-    cb_sq_size = 0.03
-    cb_size = (6, 9)
-
+                                         chessboard,
+                                         static_camera_K,
+                                         static_camera_d,
+                                         gimbal_camera_K,
+                                         gimbal_camera_d):
     # hard-coding the object points - assuming chessboard is origin by
     # setting chessboard in the x-y plane (where z = 0).
     object_points = []
-    for i in range(cb_rows):
-        for j in range(cb_cols):
-            pt = [j * cb_sq_size, i * cb_sq_size, 0.0]
+    for i in range(chessboard.rows):
+        for j in range(chessboard.cols):
+            pt = [j * chessboard.sq_size, i * chessboard.sq_size, 0.0]
             object_points.append(pt)
     object_points = np.array(object_points)
 
@@ -147,26 +150,26 @@ def convert_measurements_to_jason_format(path,
 
     # loop through camera images
     for i in range(nb_measurements):
-        img1 = cv2.imread(join(path, "camera_1", "img_%d.jpg" % i))
-        img2 = cv2.imread(join(path, "camera_2", "img_%d.jpg" % i))
+        img1 = cv2.imread(join(path, "static_camera", "img_%d.jpg" % i))
+        img2 = cv2.imread(join(path, "gimbal_camera", "img_%d.jpg" % i))
 
         # find and draw chessboard
-        img_points1 = find_chessboard(img1, cb_size, 1)
-        img_points2 = find_chessboard(img2, cb_size, 2)
+        img_points1 = find_chessboard(img1, chessboard.cb_size, 1)
+        img_points2 = find_chessboard(img2, chessboard.cb_size, 2)
 
         # output jason format
         output_jason_format(join(path, "static_%d.txt" % i),
                             object_points,
                             img_points1,
-                            camera_matrix1,
-                            dist_coef1,
+                            static_camera_K,
+                            static_camera_d,
                             [0.0, 0.0, 0.0])
 
         output_jason_format(join(path, "gimbal_%d.txt" % i),
                             object_points,
                             img_points2,
-                            camera_matrix2,
-                            dist_coef2,
+                            gimbal_camera_K,
+                            gimbal_camera_d,
                             encoder_data[i])
 
         # parse keyboard input
@@ -176,23 +179,33 @@ def convert_measurements_to_jason_format(path,
 
 
 if __name__ == "__main__":
-    pass
-    # # convert collected data
-    # fx = 320
-    # fy = 320
-    # cx = 320
-    # cy = 320
-    # camera_matrix1 = np.array([[fx, 0.0, cx],
-    #                            [0.0, fy, cy],
-    #                            [0.0, 0.0, 1.0]])
-    # camera_matrix2 = np.array([[fx, 0.0, cx],
-    #                            [0.0, fy, cy],
-    #                            [0.0, 0.0, 1.0]])
-    # dist_coef1 = np.zeros((4, 1))
-    # dist_coef2 = np.zeros((4, 1))
+    # rospy.init_node("atl_gimbal_calib")
+    # gimbal = Gimbal()
+    # rospy.sleep(1.0)
     #
-    # convert_measurements_to_jason_format("/tmp/calibration",
-    #                                      camera_matrix1,
-    #                                      dist_coef1,
-    #                                      camera_matrix2,
-    #                                      dist_coef2)
+    # gimbal.activate(False)
+
+    # chessboard settings
+    chessboard = Chessboard(6,  # rows
+                            9,  # cols
+                            0.022)  # square size
+
+    # static camera
+    static_camera_K = np.array([[384.925033, 0.000000, 315.661209],
+                               [0.000000, 385.784337, 261.723252],
+                               [0.000000, 0.000000, 1.000000]])
+    static_camera_d = np.array([-0.318282, 0.082325, -0.002069, 0.003112])
+
+    # gimbal camera
+    gimbal_camera_K = np.array([[397.421473, 0.000000, 315.368745],
+                               [0.000000, 397.690562, 236.920557],
+                               [0.000000, 0.000000, 1.000000]])
+    gimbal_camera_d = np.array([-0.313239, 0.080298, -0.000414, 0.002292])
+
+    # convert collected data
+    convert_measurements_to_jason_format("/tmp/calibration",
+                                         chessboard,
+                                         static_camera_K,
+                                         static_camera_d,
+                                         gimbal_camera_K,
+                                         gimbal_camera_d)

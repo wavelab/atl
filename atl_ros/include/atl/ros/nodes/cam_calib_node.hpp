@@ -15,11 +15,7 @@
 namespace atl {
 
 // NODE SETTINGS
-#define NODE_NAME "atl_cam_calib"
 #define NODE_RATE 60
-
-// PUBLISH TOPICS
-#define CAMERA_IMAGE_TOPIC "/atl/camera/image"
 
 // SUBSCRIBE TOPICS
 // clang-format off
@@ -33,8 +29,8 @@ namespace atl {
 class CamCalibNode : public ROSNode {
 public:
   std::string calib_dir;
-  std::string camera_1_dir;
-  std::string camera_2_dir;
+  std::string static_camera_dir;
+  std::string gimbal_camera_dir;
   std::ofstream gimbal_joint_file;
   std::ofstream gimbal_encoder_file;
 
@@ -43,13 +39,12 @@ public:
   std::vector<cv::Point2f> corners_1;
   std::vector<cv::Point2f> corners_2;
 
-  int nb_cameras = 0;
-  std::string camera_1_topic;
-  std::string camera_2_topic;
+  std::string static_camera_topic;
+  std::string gimbal_camera_topic;
 
   int image_number = 0;
-  cv::Mat image_1;
-  cv::Mat image_2;
+  cv::Mat static_camera_image;
+  cv::Mat gimbal_camera_image;
   Quaternion gimbal_joint_orientation;
   Quaternion gimbal_joint_body_orientation;
 
@@ -61,8 +56,8 @@ public:
 
   int configure(int hz);
   void imageMsgToCvMat(const sensor_msgs::ImageConstPtr &msg, cv::Mat &img);
-  void image1Callback(const sensor_msgs::ImageConstPtr &msg);
-  void image2Callback(const sensor_msgs::ImageConstPtr &msg);
+  void staticCameraCallback(const sensor_msgs::ImageConstPtr &msg);
+  void gimbalCameraCallback(const sensor_msgs::ImageConstPtr &msg);
   void gimbalJointCallback(const geometry_msgs::Quaternion &msg);
   void gimbalJointBodyCallback(const geometry_msgs::Quaternion &msg);
   bool chessboardDetected();

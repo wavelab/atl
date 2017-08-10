@@ -26,8 +26,7 @@
     <param name="calib_dir" value="/tmp/calibration" />
     <param name="chessboard_rows" value="6" />
     <param name="chessboard_cols" value="9" />
-    <param name="nb_cameras" value="2" />
-    <param name="camera_1_topic" value="/atl/static_camera/image" />
-    <param name="camera_2_topic" value="/atl/gimbal_camera/image" />
+    <param name="static_camera_topic" value="/atl/static_camera/image" />
+    <param name="gimbal_camera_topic" value="/atl/gimbal_camera/image" />
   </node>
 </launch>
