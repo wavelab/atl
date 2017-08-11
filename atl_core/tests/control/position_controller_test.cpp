@@ -169,7 +169,7 @@ TEST(PositionController, calculate2) {
   controller.configure(TEST_CONFIG);
 
   // CHECK HEADING AT 90 DEGREE
-  setpoint_nwu << 1, 0, 0;  // setpoint infront of quad
+  setpoint_nwu << 1, 0, 0; // setpoint infront of quad
   nwu2enu(setpoint_nwu, setpoint_enu);
 
   actual.position << 0, 0, 0;
@@ -187,4 +187,4 @@ TEST(PositionController, calculate2) {
   ASSERT_NEAR(controller.hover_throttle, controller.outputs(3), 0.01);
 }
 
-}  // end of atl namepsace
+} // end of atl namepsace

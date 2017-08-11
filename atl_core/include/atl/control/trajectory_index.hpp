@@ -1,9 +1,9 @@
 #ifndef ATL_CONTROL_TRAJECTORY_INDEX_HPP
 #define ATL_CONTROL_TRAJECTORY_INDEX_HPP
 
-#include <libgen.h>
 #include <deque>
 #include <iomanip>
+#include <libgen.h>
 #include <string>
 
 #include <yaml-cpp/yaml.h>
@@ -42,10 +42,9 @@ public:
    *    - -1: Failed to find index file
    *    - -2: Failed to load index file
    */
-  int load(
-    const std::string &index_file,
-    const double pos_thres = 0.2,
-    const double vel_thres = 0.2);
+  int load(const std::string &index_file,
+           const double pos_thres = 0.2,
+           const double vel_thres = 0.2);
 
   /**
    * Find trajectory based on relative position and velocity
@@ -64,5 +63,5 @@ public:
   int find(const Vec3 &pos, const double vel, Trajectory &traj);
 };
 
-}  // namespace atl
+} // namespace atl
 #endif

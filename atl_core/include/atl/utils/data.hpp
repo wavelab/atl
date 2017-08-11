@@ -77,5 +77,5 @@ int csvcols(std::string file_path);
 int csv2mat(std::string file_path, bool header, MatX &data);
 int mat2csv(std::string file_path, MatX data);
 
-}  // namespace atl
+} // namespace atl
 #endif

@@ -2,11 +2,10 @@
 
 namespace atl {
 
-std::vector<Eigen::Vector2d> bezier_cubic_curve(
-  Eigen::Vector2d p0,
-  Eigen::Vector2d p1,
-  Eigen::Vector2d p2,
-  Eigen::Vector2d p3) {
+std::vector<Eigen::Vector2d> bezier_cubic_curve(Eigen::Vector2d p0,
+                                                Eigen::Vector2d p1,
+                                                Eigen::Vector2d p2,
+                                                Eigen::Vector2d p3) {
   Eigen::Vector2d p;
   std::vector<Eigen::Vector2d> bezier_points;
   int segment_count;
@@ -23,7 +22,7 @@ std::vector<Eigen::Vector2d> bezier_cubic_curve(
     double uuu = uu * u;
     double ttt = tt * t;
 
-    t = i / (double) segment_count;
+    t = i / (double)segment_count;
     p << 0.0, 0.0;
 
     // first term
@@ -49,4 +48,4 @@ std::vector<Eigen::Vector2d> bezier_cubic_curve(
   return bezier_points;
 }
 
-}  // namespace atl
+} // namespace atl

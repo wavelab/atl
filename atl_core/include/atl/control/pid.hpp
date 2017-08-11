@@ -2,8 +2,8 @@
 #define ATL_CONTROL_PID_CONTROLLER_HPP
 
 #include <float.h>
-#include <math.h>
 #include <iostream>
+#include <math.h>
 
 namespace atl {
 
@@ -54,5 +54,5 @@ public:
   void reset();
 };
 
-}  // namespace atl
+} // namespace atl
 #endif

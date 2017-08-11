@@ -1,8 +1,8 @@
 #ifndef ATL_ROS_NODES_FAKE_MAVROS_NODE_HPP
 #define ATL_ROS_NODES_FAKE_MAVROS_NODE_HPP
 
-#include <ros/ros.h>
 #include <atl/atl_core.hpp>
+#include <ros/ros.h>
 
 #include "atl/ros/utils/msgs.hpp"
 #include "atl/ros/utils/node.hpp"
@@ -26,5 +26,5 @@ public:
   int loopCallback();
 };
 
-}  // namespace atl
+} // namespace atl
 #endif

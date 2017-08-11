@@ -50,8 +50,9 @@ public:
    *
    * @return controller output
    */
-  AttitudeCommand calculate(
-    const Vec3 &pos_errors, const double yaw, const double dt);
+  AttitudeCommand calculate(const Vec3 &pos_errors,
+                            const double yaw,
+                            const double dt);
 
   /**
    * Calculate controller outputs
@@ -64,12 +65,11 @@ public:
    *
    * @return controller output
    */
-  AttitudeCommand calculate(
-    const Vec3 &target_pos_bf,
-    const Vec3 &pos,
-    const Vec3 &pos_prev,
-    const double yaw,
-    const double dt);
+  AttitudeCommand calculate(const Vec3 &target_pos_bf,
+                            const Vec3 &pos,
+                            const Vec3 &pos_prev,
+                            const double yaw,
+                            const double dt);
 
   /**
    * Reset controller errors to 0
@@ -87,5 +87,5 @@ public:
   void printErrors();
 };
 
-}  // namespace atl
+} // namespace atl
 #endif

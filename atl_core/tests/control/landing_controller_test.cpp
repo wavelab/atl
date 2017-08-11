@@ -1,5 +1,5 @@
-#include "atl/atl_test.hpp"
 #include "atl/control/landing_controller.hpp"
+#include "atl/atl_test.hpp"
 
 #define TEST_CONFIG "tests/configs/control/landing_controller.yaml"
 
@@ -169,4 +169,4 @@ TEST(LandingController, loadTrajectory) {
 //   EXPECT_TRUE(controller.outputs(1) > 0.0);
 // }
 
-}  // end of atl namepsace
+} // end of atl namepsace

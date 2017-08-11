@@ -2,9 +2,7 @@
 
 namespace atl {
 
-MITDetector::MITDetector() {
-  this->detector = NULL;
-}
+MITDetector::MITDetector() { this->detector = NULL; }
 
 int MITDetector::configure(const std::string &config_file) {
   if (BaseDetector::configure(config_file) != 0) {
@@ -100,8 +98,8 @@ int MITDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
   return 0;
 }
 
-int MITDetector::obtainPose(
-  const AprilTags::TagDetection &tag, TagPose &tag_pose) {
+int MITDetector::obtainPose(const AprilTags::TagDetection &tag,
+                            TagPose &tag_pose) {
   Mat4 transform;
   Vec3 t;
   Mat3 R;
@@ -144,4 +142,4 @@ int MITDetector::obtainPose(
   return 0;
 }
 
-}  // namespace atl
+} // namespace atl

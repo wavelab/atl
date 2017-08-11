@@ -2,17 +2,11 @@
 
 namespace atl {
 
-void buildMsg(bool b, std_msgs::Bool &msg) {
-  msg.data = b;
-}
+void buildMsg(bool b, std_msgs::Bool &msg) { msg.data = b; }
 
-void buildMsg(std::string s, std_msgs::String &msg) {
-  msg.data = s;
-}
+void buildMsg(std::string s, std_msgs::String &msg) { msg.data = s; }
 
-void buildMsg(double d, std_msgs::Float64 &msg) {
-  msg.data = d;
-}
+void buildMsg(double d, std_msgs::Float64 &msg) { msg.data = d; }
 
 void buildMsg(Vec3 vec, geometry_msgs::Vector3 &msg) {
   msg.x = vec(0);
@@ -33,8 +27,10 @@ void buildMsg(Quaternion q, geometry_msgs::Quaternion &msg) {
   msg.z = q.z();
 }
 
-void buildMsg(
-  int seq, ros::Time time, Pose pose, geometry_msgs::PoseStamped &msg) {
+void buildMsg(int seq,
+              ros::Time time,
+              Pose pose,
+              geometry_msgs::PoseStamped &msg) {
   msg.header.seq = seq;
   msg.header.stamp = time;
   msg.header.frame_id = "atl_quadrotor_pose";
@@ -49,12 +45,11 @@ void buildMsg(
   msg.pose.orientation.z = pose.orientation.z();
 }
 
-void buildMsg(
-  int seq,
-  ros::Time time,
-  AttitudeCommand att_cmd,
-  geometry_msgs::PoseStamped &msg,
-  std_msgs::Float64 &thr_msg) {
+void buildMsg(int seq,
+              ros::Time time,
+              AttitudeCommand att_cmd,
+              geometry_msgs::PoseStamped &msg,
+              std_msgs::Float64 &thr_msg) {
   // atitude command
   msg.header.seq = seq;
   msg.header.stamp = time;
@@ -160,17 +155,11 @@ void buildMsg(TrackingController tc, atl_msgs::TCtrlSettings &msg) {
 //   msg.throttle_controller.max = lc.throttle_limit[1];
 // }
 
-void convertMsg(std_msgs::Bool msg, bool &b) {
-  b = msg.data;
-}
+void convertMsg(std_msgs::Bool msg, bool &b) { b = msg.data; }
 
-void convertMsg(std_msgs::String msg, std::string &s) {
-  s = msg.data;
-}
+void convertMsg(std_msgs::String msg, std::string &s) { s = msg.data; }
 
-void convertMsg(std_msgs::Float64 msg, double &d) {
-  d = msg.data;
-}
+void convertMsg(std_msgs::Float64 msg, double &d) { d = msg.data; }
 
 void convertMsg(geometry_msgs::Vector3 msg, Vec3 &v) {
   v << msg.x, msg.y, msg.z;
@@ -180,9 +169,7 @@ void convertMsg(geometry_msgs::Vector3Stamped msg, Vec3 &v) {
   v << msg.vector.x, msg.vector.y, msg.vector.z;
 }
 
-void convertMsg(geometry_msgs::Point msg, Vec3 &v) {
-  v << msg.x, msg.y, msg.z;
-}
+void convertMsg(geometry_msgs::Point msg, Vec3 &v) { v << msg.x, msg.y, msg.z; }
 
 void convertMsg(geometry_msgs::Quaternion msg, Quaternion &q) {
   q.w() = msg.w;
@@ -289,4 +276,4 @@ void convertMsg(atl_msgs::TCtrlSettings msg, TrackingController &tc) {
 //   lc.throttle_limit[1] = msg.throttle_controller.max;
 // }
 
-}  // namespace atl
+} // namespace atl

@@ -21,9 +21,7 @@ Gimbal::Gimbal() {
   encoder_angles = Vec3();
 }
 
-Gimbal::~Gimbal() {
-  this->off();
-}
+Gimbal::~Gimbal() { this->off(); }
 
 int Gimbal::configure(std::string config_file) {
   std::string device_path;
@@ -69,13 +67,9 @@ int Gimbal::configure(std::string config_file) {
   return 0;
 }
 
-int Gimbal::on() {
-  return this->sbgc.on();
-}
+int Gimbal::on() { return this->sbgc.on(); }
 
-int Gimbal::off() {
-  return this->sbgc.off();
-}
+int Gimbal::off() { return this->sbgc.off(); }
 
 Vec3 Gimbal::getTargetInBF(Pose camera_offset, Vec3 target_cf) {
   Vec3 target_nwu;
@@ -93,8 +87,9 @@ Vec3 Gimbal::getTargetInBF(Pose camera_offset, Vec3 target_cf) {
   return R * target_nwu + t;
 }
 
-Vec3 Gimbal::getTargetInBPF(
-  Pose camera_offset, Vec3 target_cf, Quaternion joint_if) {
+Vec3 Gimbal::getTargetInBPF(Pose camera_offset,
+                            Vec3 target_cf,
+                            Quaternion joint_if) {
   Vec3 p;
   Mat3 R;
 
@@ -108,8 +103,9 @@ Vec3 Gimbal::getTargetInBPF(
   return R * p;
 }
 
-Vec3 Gimbal::getTargetInIF(
-  Vec3 target_bpf, Vec3 gimbal_position, Quaternion gimbal_frame_if) {
+Vec3 Gimbal::getTargetInIF(Vec3 target_bpf,
+                           Vec3 gimbal_position,
+                           Quaternion gimbal_frame_if) {
   Vec3 euler, target, target_enu, target_if;
   Mat3 R;
 
@@ -175,9 +171,9 @@ int Gimbal::trackTarget(Vec3 target_bpf) {
   // Note: setpoints are assuming Gimbal are in NWU frame
   // NWU frame: (x - forward, y - left, z - up)
   dist = target_bpf.norm();
-  this->setpoints(0) = asin(target_bpf(1) / dist);  // roll setpoint
-  this->setpoints(1) = asin(target_bpf(0) / dist);  // pitch setpoint
-  this->setpoints(2) = 0.0;  // yaw setpoint - unsupported at the moment
+  this->setpoints(0) = asin(target_bpf(1) / dist); // roll setpoint
+  this->setpoints(1) = asin(target_bpf(0) / dist); // pitch setpoint
+  this->setpoints(2) = 0.0; // yaw setpoint - unsupported at the moment
 
   return 0;
 }
@@ -235,7 +231,7 @@ int Gimbal::setAngle(double roll, double pitch) {
   this->setpoints(2) = 0.0 * 180 / M_PI;
 
   return this->sbgc.setAngle(
-    this->setpoints(0), this->setpoints(1), this->setpoints(2));
+      this->setpoints(0), this->setpoints(1), this->setpoints(2));
 }
 
 void Gimbal::printSetpoints() {
@@ -248,4 +244,4 @@ void Gimbal::printSetpoints() {
   std::cout << "]" << std::endl;
 }
 
-}  // namespace atl
+} // namespace atl

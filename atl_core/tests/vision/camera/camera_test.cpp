@@ -64,4 +64,4 @@ TEST(Camera, run) {
   camera.run();
 }
 
-}  // namespace atl
+} // namespace atl

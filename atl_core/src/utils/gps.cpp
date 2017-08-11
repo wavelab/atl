@@ -2,24 +2,22 @@
 
 namespace atl {
 
-void latlon_offset(
-  double lat_ref,
-  double lon_ref,
-  double offset_N,
-  double offset_E,
-  double *lat_new,
-  double *lon_new) {
+void latlon_offset(double lat_ref,
+                   double lon_ref,
+                   double offset_N,
+                   double offset_E,
+                   double *lat_new,
+                   double *lon_new) {
   *lat_new = lat_ref + (offset_E / EARTH_RADIUS_M);
   *lon_new = lon_ref + (offset_N / EARTH_RADIUS_M) / cos(deg2rad(lat_ref));
 }
 
-void latlon_diff(
-  double lat_ref,
-  double lon_ref,
-  double lat,
-  double lon,
-  double *dist_N,
-  double *dist_E) {
+void latlon_diff(double lat_ref,
+                 double lon_ref,
+                 double lat,
+                 double lon,
+                 double *dist_N,
+                 double *dist_E) {
   double d_lon = lon - lon_ref;
   double d_lat = lat - lat_ref;
 
@@ -37,4 +35,4 @@ double latlon_dist(double lat_ref, double lon_ref, double lat, double lon) {
   return dist;
 }
 
-}  // namepsace atl
+} // namepsace atl

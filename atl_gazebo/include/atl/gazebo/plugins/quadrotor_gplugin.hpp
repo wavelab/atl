@@ -47,6 +47,6 @@ public:
   void setVelocityCallback(VelocitySetpointPtr &msg);
 };
 
-}  // namespace gaz
-}  // namespace atl
+} // namespace gaz
+} // namespace atl
 #endif

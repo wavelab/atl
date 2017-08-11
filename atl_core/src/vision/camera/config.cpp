@@ -81,4 +81,4 @@ void CameraConfig::print() {
   // clang-format on
 }
 
-}  // namespace atl
+} // namespace atl

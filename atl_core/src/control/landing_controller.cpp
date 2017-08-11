@@ -40,7 +40,7 @@ int LandingController::configure(const std::string &config_file) {
   }
 
   // load trajectory index
-  std::string config_dir = std::string(dirname((char *) config_file.c_str()));
+  std::string config_dir = std::string(dirname((char *)config_file.c_str()));
   paths_combine(config_dir, traj_index_file, traj_index_file);
   if (this->traj_index.load(traj_index_file) != 0) {
     return -2;
@@ -52,8 +52,7 @@ int LandingController::configure(const std::string &config_file) {
       LOG_ERROR("blackbox file is not set!");
       return -3;
     } else if (this->prepBlackbox(blackbox_file) != 0) {
-      LOG_ERROR(
-        "Failed to open blackbox file at [%s]", blackbox_file.c_str());
+      LOG_ERROR("Failed to open blackbox file at [%s]", blackbox_file.c_str());
       return -3;
     }
 
@@ -77,8 +76,9 @@ int LandingController::configure(const std::string &config_file) {
   return 0;
 }
 
-int LandingController::loadTrajectory(
-  const Vec3 &pos, const Vec3 &target_pos_bf, const double v) {
+int LandingController::loadTrajectory(const Vec3 &pos,
+                                      const Vec3 &target_pos_bf,
+                                      const double v) {
   int retval;
 
   // find trajectory
@@ -140,17 +140,16 @@ int LandingController::recordTrajectoryIndex() {
   return 0;
 }
 
-int LandingController::record(
-  const Vec3 &pos,
-  const Vec3 &vel,
-  const Vec2 &wp_pos,
-  const Vec2 &wp_vel,
-  const Vec2 &wp_inputs,
-  const Vec3 &target_pos_bf,
-  const Vec3 &target_vel_bf,
-  const Vec3 &rpy,
-  const double thrust,
-  const double dt) {
+int LandingController::record(const Vec3 &pos,
+                              const Vec3 &vel,
+                              const Vec2 &wp_pos,
+                              const Vec2 &wp_vel,
+                              const Vec2 &wp_inputs,
+                              const Vec3 &target_pos_bf,
+                              const Vec3 &target_vel_bf,
+                              const Vec3 &rpy,
+                              const double thrust,
+                              const double dt) {
   // pre-check
   this->blackbox_dt += dt;
   if (this->blackbox_enable && this->blackbox_dt > this->blackbox_rate) {
@@ -187,11 +186,10 @@ int LandingController::record(
   return 0;
 }
 
-Vec4 LandingController::calculateVelocityErrors(
-  const Vec3 &v_errors,
-  const Vec3 &p_errors,
-  const double yaw,
-  const double dt) {
+Vec4 LandingController::calculateVelocityErrors(const Vec3 &v_errors,
+                                                const Vec3 &p_errors,
+                                                const double yaw,
+                                                const double dt) {
   UNUSED(yaw);
 
   // check rate
@@ -219,7 +217,7 @@ Vec4 LandingController::calculateVelocityErrors(
   double t = this->vz_k_p * v_errors(2);
   t += this->vz_k_i * p_errors(2);
   t += this->vz_k_d * (v_errors(2) - this->vz_error_prev) / this->dt;
-  t /= fabs(cos(r) * cos(p));  // adjust throttle for roll and pitch
+  t /= fabs(cos(r) * cos(p)); // adjust throttle for roll and pitch
 
   // keep track of previous errors
   this->vx_error_prev = v_errors(0);
@@ -242,14 +240,13 @@ Vec4 LandingController::calculateVelocityErrors(
   return this->outputs;
 }
 
-int LandingController::calculate(
-  const Vec3 &target_pos_bf,
-  const Vec3 &target_vel_bf,
-  const Vec3 &pos,
-  const Vec3 &vel,
-  const Quaternion &orientation,
-  const double yaw,
-  const double dt) {
+int LandingController::calculate(const Vec3 &target_pos_bf,
+                                 const Vec3 &target_vel_bf,
+                                 const Vec3 &pos,
+                                 const Vec3 &vel,
+                                 const Quaternion &orientation,
+                                 const double yaw,
+                                 const double dt) {
   // obtain position and velocity waypoints
   Vec2 wp_pos, wp_vel, wp_inputs;
   int retval = this->trajectory.update(pos, wp_pos, wp_vel, wp_inputs);
@@ -282,25 +279,24 @@ int LandingController::calculate(
   this->outputs = this->calculateVelocityErrors(v_errors, p_errors, yaw, dt);
 
   // add in feed-forward controls
-  this->outputs(0) += 0.0;           // roll
-  this->outputs(1) += wp_inputs(1);  // pitch
-  this->outputs(2) += yaw;           // yaw
-  this->outputs(3) += wp_inputs(0);  // thrust
+  this->outputs(0) += 0.0;          // roll
+  this->outputs(1) += wp_inputs(1); // pitch
+  this->outputs(2) += yaw;          // yaw
+  this->outputs(3) += wp_inputs(0); // thrust
   this->att_cmd = AttitudeCommand(this->outputs);
 
   // record
   quat2euler(orientation, 321, euler);
-  this->record(
-    pos,
-    vel,
-    wp_pos,
-    wp_vel,
-    wp_inputs,
-    target_pos_bf,
-    target_vel_bf,
-    euler,
-    this->outputs(3),
-    dt);
+  this->record(pos,
+               vel,
+               wp_pos,
+               wp_vel,
+               wp_inputs,
+               target_pos_bf,
+               target_vel_bf,
+               euler,
+               this->outputs(3),
+               dt);
 
   // check if we are too far off track with trajectory
   if (p_errors(0) > this->trajectory_threshold(0)) {
@@ -340,4 +336,4 @@ void LandingController::printOutputs() {
   std::cout << "throttle: " << std::setprecision(2) << t << std::endl;
 }
 
-}  // namespace atl
+} // namespace atl

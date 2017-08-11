@@ -24,9 +24,7 @@ ROSNode::ROSNode(int argc, char **argv) {
   this->ros_rate = NULL;
 }
 
-ROSNode::~ROSNode() {
-  ros::shutdown();
-}
+ROSNode::~ROSNode() { ros::shutdown(); }
 
 int ROSNode::configure(int hz) {
   // clang-format off
@@ -117,4 +115,4 @@ int ROSNode::loop() {
   return 0;
 }
 
-}  // namespace atl
+} // namespace atl

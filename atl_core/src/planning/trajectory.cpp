@@ -29,12 +29,11 @@ VecX quadrotor_2d_model(VecX x, Vec2 u) {
   return x;
 }
 
-void trajectory_setup(
-  struct problem_data *p,
-  int nb_states,
-  int nb_inputs,
-  int nb_steps,
-  std::vector<double> cost_weights) {
+void trajectory_setup(struct problem_data *p,
+                      int nb_states,
+                      int nb_inputs,
+                      int nb_steps,
+                      std::vector<double> cost_weights) {
   p->nb_states = nb_states;
   p->nb_inputs = nb_inputs;
 
@@ -62,36 +61,36 @@ int trajectory_calculate_desired(struct problem_data *p) {
   c = p->pos_init(1) - m * p->pos_init(0);
 
   // push initial x
-  x(0) = p->pos_init(0);  // state - x
-  x(1) = p->vel_init(0);  // state - vx
-  x(2) = p->pos_init(1);  // state - z
-  x(3) = p->vel_init(1);  // state - vz
-  x(4) = p->thrust_init;  // input - az
-  x(5) = p->theta_init;   // input - w
+  x(0) = p->pos_init(0); // state - x
+  x(1) = p->vel_init(0); // state - vx
+  x(2) = p->pos_init(1); // state - z
+  x(3) = p->vel_init(1); // state - vz
+  x(4) = p->thrust_init; // input - az
+  x(5) = p->theta_init;  // input - w
   p->desired.block(0, 0, 6, 1) = x;
 
   // create points along the desired line path
-  dx = (p->pos_final(0) - p->pos_init(0)) / (double) (p->nb_steps - 1);
+  dx = (p->pos_final(0) - p->pos_init(0)) / (double)(p->nb_steps - 1);
   for (int i = 0; i < (p->nb_steps - 2); i++) {
     x = p->desired.block(0, i, 6, 1);
 
-    x(0) += dx;             // state - x
-    x(1) = p->vel_init(0);  // state - vx
-    x(2) = m * x(0) + c;    // state - z
-    x(3) = p->vel_init(1);  // state - vz
-    x(4) = p->thrust_init;  // input - az
-    x(5) = p->theta_init;   // input - w
+    x(0) += dx;            // state - x
+    x(1) = p->vel_init(0); // state - vx
+    x(2) = m * x(0) + c;   // state - z
+    x(3) = p->vel_init(1); // state - vz
+    x(4) = p->thrust_init; // input - az
+    x(5) = p->theta_init;  // input - w
 
     p->desired.block(0, i + 1, 6, 1) = x;
   }
 
   // push final x
-  x(0) = p->pos_final(0);  // state - x
-  x(1) = p->vel_final(0);  // state - vx
-  x(2) = p->pos_final(1);  // state - z
-  x(3) = p->vel_final(1);  // state - vz
-  x(4) = p->thrust_final;  // input - az
-  x(5) = p->theta_final;   // input - w
+  x(0) = p->pos_final(0); // state - x
+  x(1) = p->vel_final(0); // state - vx
+  x(2) = p->pos_final(1); // state - z
+  x(3) = p->vel_final(1); // state - vz
+  x(4) = p->thrust_final; // input - az
+  x(5) = p->theta_final;  // input - w
   p->desired.block(0, p->nb_steps - 1, 6, 1) = x;
 
   return 0;
@@ -166,8 +165,9 @@ int trajectory_calculate_desired(struct problem_data *p) {
 //   return error;
 // }
 
-int trajectory_record_optimization(
-  std::string file_path, std::vector<double> x, int nb_rows) {
+int trajectory_record_optimization(std::string file_path,
+                                   std::vector<double> x,
+                                   int nb_rows) {
   std::ofstream output_file;
   int nb_states;
 
@@ -206,4 +206,4 @@ int trajectory_record_optimization(
   return 0;
 }
 
-}  // namespace atl
+} // namespace atl

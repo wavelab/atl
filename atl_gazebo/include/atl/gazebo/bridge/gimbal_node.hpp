@@ -46,6 +46,6 @@ public:
   void trackTargetCallback(const geometry_msgs::Vector3 msg);
 };
 
-}  // namespace gazebo_bridge
-}  // namespace atl
+} // namespace gazebo_bridge
+} // namespace atl
 #endif

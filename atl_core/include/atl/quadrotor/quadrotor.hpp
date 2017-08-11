@@ -26,16 +26,16 @@ namespace atl {
 #define FCONFDMODE "Failed to configure discover mode!"
 #define FCONFTMODE "Failed to configure tracking mode!"
 
-#define CONFIGURE_CONTROLLER(X, CONF_FILE, ERR_MSG) \
-  if (X.configure(CONF_FILE) != 0) {                \
-    LOG_ERROR(ERR_MSG);                             \
-    goto error;                                     \
+#define CONFIGURE_CONTROLLER(X, CONF_FILE, ERR_MSG)                            \
+  if (X.configure(CONF_FILE) != 0) {                                           \
+    LOG_ERROR(ERR_MSG);                                                        \
+    goto error;                                                                \
   }
 
-#define CONFIGURE_MODE(X, CONF_FILE, ERR_MSG) \
-  if (X.configure(CONF_FILE) != 0) {          \
-    LOG_ERROR(ERR_MSG);                       \
-    goto error;                               \
+#define CONFIGURE_MODE(X, CONF_FILE, ERR_MSG)                                  \
+  if (X.configure(CONF_FILE) != 0) {                                           \
+    LOG_ERROR(ERR_MSG);                                                        \
+    goto error;                                                                \
   }
 
 enum Mode {
@@ -278,5 +278,5 @@ public:
   int step(const double dt);
 };
 
-}  // namespace atl
+} // namespace atl
 #endif

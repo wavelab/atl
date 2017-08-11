@@ -22,16 +22,14 @@ int XimeaCameraNode::configure(int hz) {
 
   // register publisher and subscribers
   this->registerImagePublisher(CAMERA_IMAGE_TOPIC);
+  this->registerSubscriber(GIMBAL_FRAME_ORIENTATION_TOPIC,
+                           &XimeaCameraNode::gimbalFrameCallback,
+                           this);
+  this->registerSubscriber(GIMBAL_JOINT_ORIENTATION_TOPIC,
+                           &XimeaCameraNode::gimbalJointCallback,
+                           this);
   this->registerSubscriber(
-    GIMBAL_FRAME_ORIENTATION_TOPIC,
-    &XimeaCameraNode::gimbalFrameCallback,
-    this);
-  this->registerSubscriber(
-    GIMBAL_JOINT_ORIENTATION_TOPIC,
-    &XimeaCameraNode::gimbalJointCallback,
-    this);
-  this->registerSubscriber(
-    APRILTAG_TOPIC, &XimeaCameraNode::aprilTagCallback, this);
+      APRILTAG_TOPIC, &XimeaCameraNode::aprilTagCallback, this);
   this->registerShutdown(SHUTDOWN_TOPIC);
 
   // register loop callback
@@ -68,7 +66,7 @@ int XimeaCameraNode::publishImage() {
   // std::cout << s.height << std::endl;
   // std::cout << s.width << std::endl;
   img_msg =
-    cv_bridge::CvImage(std_msgs::Header(), "mono8", this->image).toImageMsg();
+      cv_bridge::CvImage(std_msgs::Header(), "mono8", this->image).toImageMsg();
   // } else {
   //   // clang-format off
   //   img_msg = cv_bridge::CvImage(
@@ -83,7 +81,7 @@ int XimeaCameraNode::publishImage() {
 }
 
 void XimeaCameraNode::gimbalFrameCallback(
-  const geometry_msgs::Quaternion &msg) {
+    const geometry_msgs::Quaternion &msg) {
   this->gimbal_frame_orientation.w() = msg.w;
   this->gimbal_frame_orientation.x() = msg.x;
   this->gimbal_frame_orientation.y() = msg.y;
@@ -91,7 +89,7 @@ void XimeaCameraNode::gimbalFrameCallback(
 }
 
 void XimeaCameraNode::gimbalJointCallback(
-  const geometry_msgs::Quaternion &msg) {
+    const geometry_msgs::Quaternion &msg) {
   this->gimbal_joint_orientation.w() = msg.w;
   this->gimbal_joint_orientation.x() = msg.x;
   this->gimbal_joint_orientation.y() = msg.y;
@@ -127,6 +125,6 @@ int XimeaCameraNode::loopCallback() {
   return 0;
 }
 
-}  // namespace atl
+} // namespace atl
 
 RUN_ROS_NODE(atl::XimeaCameraNode, NODE_RATE);

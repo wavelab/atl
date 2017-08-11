@@ -28,6 +28,6 @@ public:
   Vec3 update(const Vec2 &inputs, double dt);
 };
 
-}  // namespace wave
+} // namespace wave
 
-#endif  // ATL_GAZEBO_KINEMATICS_TWOWHEEL_HPP
+#endif // ATL_GAZEBO_KINEMATICS_TWOWHEEL_HPP

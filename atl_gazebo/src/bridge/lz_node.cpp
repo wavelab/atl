@@ -59,7 +59,7 @@ void LZNode::angularVelocityCallback(const std_msgs::Float64 &msg) {
   this->setAngularVelocity(msg.data);
 }
 
-}  // namespace gazebo_bridge
-}  // namespace atl
+} // namespace gazebo_bridge
+} // namespace atl
 
 RUN_ROS_NODE(atl::gazebo_bridge::LZNode, NODE_RATE);

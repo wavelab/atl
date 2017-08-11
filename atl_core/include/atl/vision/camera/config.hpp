@@ -39,5 +39,5 @@ public:
   void print();
 };
 
-}  // namespace atl
+} // namespace atl
 #endif

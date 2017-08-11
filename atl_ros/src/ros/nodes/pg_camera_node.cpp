@@ -1,6 +1,5 @@
 #include "atl/ros/nodes/pg_camera_node.hpp"
 
-
 namespace atl {
 
 int PGCameraNode::configure(int hz) {
@@ -14,7 +13,7 @@ int PGCameraNode::configure(int hz) {
 
   // camera
   ROS_GET_PARAM(this->node_name + "/guid", guid_str);
-  this->guid = std::stoull(guid_str);  // ros param cannot parse a uint64_t
+  this->guid = std::stoull(guid_str); // ros param cannot parse a uint64_t
   ROS_GET_PARAM(this->node_name + "/stamp_image", this->stamp_image);
   ROS_GET_PARAM(this->node_name + "/image_topic", this->image_topic);
   ROS_GET_PARAM(this->node_name + "/config_dir", config_path);
@@ -110,7 +109,7 @@ void PGCameraNode::gimbalJointCallback(const geometry_msgs::Quaternion &msg) {
 }
 
 void PGCameraNode::gimbalJointBodyCallback(
-  const geometry_msgs::Quaternion &msg) {
+    const geometry_msgs::Quaternion &msg) {
   convertMsg(msg, this->gimbal_joint_body_orientation);
 }
 
@@ -153,6 +152,6 @@ int PGCameraNode::loopCallback() {
   return 0;
 }
 
-}  // eof atl namespace
+} // eof atl namespace
 
 RUN_ROS_NODE(atl::PGCameraNode, NODE_RATE);

@@ -21,11 +21,9 @@ protected:
   }
 };
 
-TEST_F(NodeTest, test) {
-  EXPECT_TRUE(true);
-}
+TEST_F(NodeTest, test) { EXPECT_TRUE(true); }
 
-}  // namespace atl
+} // namespace atl
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);

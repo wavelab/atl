@@ -51,6 +51,6 @@ int FakeMavrosNode::loopCallback() {
   return 0;
 }
 
-}  // namespace atl
+} // namespace atl
 
 RUN_ROS_NODE(atl::FakeMavrosNode, NODE_RATE);

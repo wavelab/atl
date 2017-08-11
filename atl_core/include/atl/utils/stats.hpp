@@ -7,5 +7,5 @@ namespace atl {
 
 int linreg(std::vector<Eigen::Vector2d> pts, double *m, double *b, double *r);
 
-}  // namespace atl
+} // namespace atl
 #endif

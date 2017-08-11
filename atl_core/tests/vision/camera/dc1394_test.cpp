@@ -134,4 +134,4 @@ TEST(DC1394Camera, gain) {
 //   camera.run();
 // }
 
-}  // namespace atl
+} // namespace atl

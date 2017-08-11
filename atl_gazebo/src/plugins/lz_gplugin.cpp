@@ -3,9 +3,7 @@
 namespace atl {
 namespace gaz {
 
-LZGPlugin::LZGPlugin() {
-  printf("LOADING [liblz_gplugin.so]!\n");
-}
+LZGPlugin::LZGPlugin() { printf("LOADING [liblz_gplugin.so]!\n"); }
 
 void LZGPlugin::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
   UNUSED(sdf);
@@ -19,11 +17,11 @@ void LZGPlugin::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
 
   // initialize robot
   ignition::math::Pose3d pose = this->model->WorldPose();
-  this->robot_states(0) = pose.Pos().X();  // position x
-  this->robot_states(1) = pose.Pos().Y();  // position y
-  this->robot_states(2) = pose.Rot().Z();  // heading
-  this->robot_inputs(0) = 0.0;             // velocity
-  this->robot_inputs(1) = 0.0;             // angular velocity
+  this->robot_states(0) = pose.Pos().X(); // position x
+  this->robot_states(1) = pose.Pos().Y(); // position y
+  this->robot_states(2) = pose.Rot().Z(); // heading
+  this->robot_inputs(0) = 0.0;            // velocity
+  this->robot_inputs(1) = 0.0;            // angular velocity
 
   // gazebo node
   // clang-format off
@@ -38,8 +36,8 @@ void LZGPlugin::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
 void LZGPlugin::onUpdate(const gazebo::common::UpdateInfo &info) {
   // calculate time step size
   gazebo::common::Time diff = info.simTime - this->prev_sim_time;
-  double dt = diff.nsec / 1000000000.0;  // convert nsec to sec
-  this->prev_sim_time = info.simTime;    // keep track of sim time
+  double dt = diff.nsec / 1000000000.0; // convert nsec to sec
+  this->prev_sim_time = info.simTime;   // keep track of sim time
 
   // update robot
   Vec3 x = this->robot_states;
@@ -116,5 +114,5 @@ void LZGPlugin::angularVelocityCallback(ConstAnyPtr &msg) {
 }
 
 GZ_REGISTER_MODEL_PLUGIN(LZGPlugin)
-}  // namespace gaz
-}  // namespace atl
+} // namespace gaz
+} // namespace atl

@@ -14,4 +14,4 @@ TEST(Utils_time, ticAndtoc) {
   EXPECT_TRUE(mtoc(&start) > 9.0);
 }
 
-}  // namespace atl
+} // namespace atl

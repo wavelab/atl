@@ -175,4 +175,4 @@ TEST(LandingTarget, update) {
   EXPECT_EQ(0, landing_target.last_seen.tv_nsec);
 }
 
-}  // namespace atl
+} // namespace atl

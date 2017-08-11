@@ -3,9 +3,7 @@
 namespace atl {
 namespace gaz {
 
-DFCameraGClient::DFCameraGClient() {
-  this->connected = false;
-}
+DFCameraGClient::DFCameraGClient() { this->connected = false; }
 
 DFCameraGClient::~DFCameraGClient() {
   if (this->connected) {
@@ -22,8 +20,7 @@ int DFCameraGClient::configure() {
 
   // setup gazebo node
   GazeboNode::configure();
-  this->registerSubscriber(
-    IMAGE_TOPIC, &DFCameraGClient::imageCallback, this);
+  this->registerSubscriber(IMAGE_TOPIC, &DFCameraGClient::imageCallback, this);
   this->waitForConnection();
   return 0;
 }
@@ -33,9 +30,9 @@ void DFCameraGClient::imageCallback(ConstImagePtr &msg) {
   unsigned char *img_data;
 
   // convert img message to cv::Mat
-  buf_size = (int) msg->width() * (int) msg->height() * 3;
+  buf_size = (int)msg->width() * (int)msg->height() * 3;
   img_data = new unsigned char[buf_size + 1];
-  memcpy((char *) img_data, msg->data().c_str(), buf_size);
+  memcpy((char *)img_data, msg->data().c_str(), buf_size);
 
   // clang-format off
   this->image = cv::Mat(
@@ -54,5 +51,5 @@ void DFCameraGClient::imageCallback(ConstImagePtr &msg) {
   delete img_data;
 }
 
-}  // namespace gaz
-}  // namespace atl
+} // namespace gaz
+} // namespace atl

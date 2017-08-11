@@ -3,9 +3,7 @@
 namespace atl {
 namespace gaz {
 
-LZGClient::LZGClient() {
-  this->connected = false;
-}
+LZGClient::LZGClient() { this->connected = false; }
 
 LZGClient::~LZGClient() {
   if (this->connected) {
@@ -67,5 +65,5 @@ void LZGClient::setAngularVelocity(double ang_vel) {
   this->gaz_pubs[ANGULAR_VEL_SET_GTOPIC]->Publish(msg);
 }
 
-}  // namespace gaz
-}  // namespace atl
+} // namespace gaz
+} // namespace atl

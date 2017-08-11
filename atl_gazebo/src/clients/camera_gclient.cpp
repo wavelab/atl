@@ -3,9 +3,7 @@
 namespace atl {
 namespace gaz {
 
-CameraGClient::CameraGClient() {
-  this->connected = false;
-}
+CameraGClient::CameraGClient() { this->connected = false; }
 
 CameraGClient::~CameraGClient() {
   if (this->connected) {
@@ -32,9 +30,9 @@ void CameraGClient::imageCallback(ConstImagePtr &msg) {
   unsigned char *img_data;
 
   // convert img message to cv::Mat
-  buf_size = (int) msg->width() * (int) msg->height() * 3;
+  buf_size = (int)msg->width() * (int)msg->height() * 3;
   img_data = new unsigned char[buf_size + 1];
-  memcpy((char *) img_data, msg->data().c_str(), buf_size);
+  memcpy((char *)img_data, msg->data().c_str(), buf_size);
 
   // clang-format off
   this->image = cv::Mat(
@@ -53,5 +51,5 @@ void CameraGClient::imageCallback(ConstImagePtr &msg) {
   delete img_data;
 }
 
-}  // namespace gaz
-}  // namespace atl
+} // namespace gaz
+} // namespace atl

@@ -12,25 +12,25 @@
 namespace atl {
 
 #define INFO_CONFIG "Configuring ROS Node [%s]!"
-#define ROS_GET_PARAM(X, Y)                                      \
-  if (this->ros_nh == NULL) {                                    \
-    ROS_ERROR("You did not do ROSNode::configure() first!");     \
-    ROS_ERROR("Can only call ROS_GET_PARAM() after configure!"); \
-    return -1;                                                   \
-  }                                                              \
-  if (this->ros_nh->getParam(X, Y) == false) {                   \
-    ROS_ERROR("Failed to get ROS param [%s]", #X);               \
-    return -1;                                                   \
+#define ROS_GET_PARAM(X, Y)                                                    \
+  if (this->ros_nh == NULL) {                                                  \
+    ROS_ERROR("You did not do ROSNode::configure() first!");                   \
+    ROS_ERROR("Can only call ROS_GET_PARAM() after configure!");               \
+    return -1;                                                                 \
+  }                                                                            \
+  if (this->ros_nh->getParam(X, Y) == false) {                                 \
+    ROS_ERROR("Failed to get ROS param [%s]", #X);                             \
+    return -1;                                                                 \
   }
-#define RUN_ROS_NODE(NODE_CLASS, NODE_RATE)             \
-  int main(int argc, char **argv) {                     \
-    NODE_CLASS node(argc, argv);                        \
-    if (node.configure(NODE_RATE) != 0) {               \
-      ROS_ERROR("Failed to configure %s", #NODE_CLASS); \
-      return -1;                                        \
-    }                                                   \
-    node.loop();                                        \
-    return 0;                                           \
+#define RUN_ROS_NODE(NODE_CLASS, NODE_RATE)                                    \
+  int main(int argc, char **argv) {                                            \
+    NODE_CLASS node(argc, argv);                                               \
+    if (node.configure(NODE_RATE) != 0) {                                      \
+      ROS_ERROR("Failed to configure %s", #NODE_CLASS);                        \
+      return -1;                                                               \
+    }                                                                          \
+    node.loop();                                                               \
+    return 0;                                                                  \
   }
 
 class ROSNode {
@@ -66,11 +66,10 @@ public:
   int registerImagePublisher(const std::string &topic);
 
   template <typename M, typename T>
-  int registerImageSubscriber(
-    const std::string &topic,
-    void (T::*fp)(M),
-    T *obj,
-    uint32_t queue_size = 1) {
+  int registerImageSubscriber(const std::string &topic,
+                              void (T::*fp)(M),
+                              T *obj,
+                              uint32_t queue_size = 1) {
     // pre-check
     if (this->configured == false) {
       return -1;
@@ -84,8 +83,9 @@ public:
   }
 
   template <typename M>
-  int registerPublisher(
-    const std::string &topic, uint32_t queue_size = 1, bool latch = false) {
+  int registerPublisher(const std::string &topic,
+                        uint32_t queue_size = 1,
+                        bool latch = false) {
     ros::Publisher publisher;
 
     // pre-check
@@ -101,11 +101,10 @@ public:
   }
 
   template <typename M, typename T>
-  int registerSubscriber(
-    const std::string &topic,
-    void (T::*fp)(M),
-    T *obj,
-    uint32_t queue_size = 1) {
+  int registerSubscriber(const std::string &topic,
+                         void (T::*fp)(M),
+                         T *obj,
+                         uint32_t queue_size = 1) {
     ros::Subscriber subscriber;
 
     // pre-check
@@ -121,8 +120,9 @@ public:
   }
 
   template <class T, class MReq, class MRes>
-  int registerServer(
-    const std::string &service_topic, bool (T::*fp)(MReq &, MRes &), T *obj) {
+  int registerServer(const std::string &service_topic,
+                     bool (T::*fp)(MReq &, MRes &),
+                     T *obj) {
     ros::ServiceServer server;
 
     // pre-check
@@ -138,8 +138,8 @@ public:
   }
 
   template <typename M>
-  int registerClient(
-    const std::string &service_topic, bool persistent = false) {
+  int registerClient(const std::string &service_topic,
+                     bool persistent = false) {
     ros::ServiceClient client;
 
     // pre-check
@@ -158,5 +158,5 @@ public:
   int loop();
 };
 
-}  // namespace atl
+} // namespace atl
 #endif

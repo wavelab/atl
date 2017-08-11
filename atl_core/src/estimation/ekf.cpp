@@ -49,4 +49,4 @@ int EKF::measurementUpdate(VecX h, MatX H, VecX y) {
   return 0;
 }
 
-}  // namespace atl
+} // namespace atl

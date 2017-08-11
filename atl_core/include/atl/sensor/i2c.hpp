@@ -35,5 +35,5 @@ public:
   int writeBytes(char reg_addr, char *data, size_t length);
 };
 
-}  // namespace atl
+} // namespace atl
 #endif

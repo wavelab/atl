@@ -1,5 +1,5 @@
-#include "atl/atl_test.hpp"
 #include "atl/control/trajectory_index.hpp"
+#include "atl/atl_test.hpp"
 
 #define TEST_CONFIG "tests/configs/control/landing_controller.yaml"
 #define TEST_TRAJ_INDEX "tests/configs/trajectory/index.csv"
@@ -49,4 +49,4 @@ TEST(TrajectoryIndex, find) {
   EXPECT_EQ(50, traj.rel_vel.size());
 }
 
-}  // end of atl namepsace
+} // end of atl namepsace

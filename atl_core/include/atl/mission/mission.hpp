@@ -13,7 +13,7 @@ namespace atl {
 #define EINVLATLON "Invalid latlon (%f, %f)!"
 #define EINVALT "Invalid altitude %f!"
 #define EINVSTAY "Invalid staytime %f!"
-#define EINVHEADING \
+#define EINVHEADING                                                            \
   "Invalid heading %f! Should be between -180.0 to 180.0 degrees"
 
 // CONSTANTS
@@ -155,6 +155,6 @@ public:
   int update(const Vec3 &position, Vec3 &waypoint);
 };
 
-}  // namespace atl
+} // namespace atl
 
 #endif

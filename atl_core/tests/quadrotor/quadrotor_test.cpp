@@ -205,4 +205,4 @@ TEST(Quadrotor, conditionsMet) {
   EXPECT_TRUE(quadrotor.conditionsMet(conditions, 3));
 }
 
-}  // namespace atl
+} // namespace atl

@@ -98,7 +98,7 @@ void PX4QuadrotorNode::velocityCallback(const ConstVector3dPtr &msg) {
 }
 
 void PX4QuadrotorNode::attitudeSetpointCallback(
-  const geometry_msgs::PoseStamped &msg) {
+    const geometry_msgs::PoseStamped &msg) {
   Vec3 euler;
   Quaternion q;
   double throttle;
@@ -117,8 +117,7 @@ void PX4QuadrotorNode::attitudeSetpointCallback(
   this->setAttitude(euler(0), euler(1), euler(2), throttle);
 }
 
-void PX4QuadrotorNode::throttleSetpointCallback(
-  const std_msgs::Float64 &msg) {
+void PX4QuadrotorNode::throttleSetpointCallback(const std_msgs::Float64 &msg) {
   double roll, pitch, yaw, throttle;
 
   roll = this->attitude_setpoints(0);
@@ -130,7 +129,7 @@ void PX4QuadrotorNode::throttleSetpointCallback(
 }
 
 void PX4QuadrotorNode::positionSetpointCallback(
-  const geometry_msgs::PoseStamped &msg) {
+    const geometry_msgs::PoseStamped &msg) {
   Vec3 ros_pos, gaz_pos;
 
   // transform ros position to gazebo position
@@ -143,7 +142,7 @@ void PX4QuadrotorNode::positionSetpointCallback(
 }
 
 void PX4QuadrotorNode::velocitySetpointCallback(
-  const geometry_msgs::TwistStamped &msg) {
+    const geometry_msgs::TwistStamped &msg) {
   Vec3 ros_vel, gaz_vel;
 
   // transform ros position to gazebo velocity
@@ -155,7 +154,7 @@ void PX4QuadrotorNode::velocitySetpointCallback(
   this->setVelocity(gaz_vel(0), gaz_vel(1), gaz_vel(2));
 }
 
-}  // namespace gazebo_bridge
-}  // namespace atl
+} // namespace gazebo_bridge
+} // namespace atl
 
 RUN_ROS_NODE(atl::gazebo_bridge::PX4QuadrotorNode, NODE_RATE);

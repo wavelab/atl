@@ -108,6 +108,6 @@ int CameraNode::loopCallback() {
   return 0;
 }
 
-}  // namespace atl
+} // namespace atl
 
 RUN_ROS_NODE(atl::CameraNode, NODE_RATE);

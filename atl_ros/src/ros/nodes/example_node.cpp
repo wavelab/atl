@@ -25,6 +25,6 @@ void ExampleNode::sayCallback(const std_msgs::String &msg) {
   std::cout << msg.data << std::endl;
 }
 
-}  // namespace atl
+} // namespace atl
 
 RUN_ROS_NODE(atl::ExampleNode, NODE_RATE);

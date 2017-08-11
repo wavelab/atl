@@ -29,4 +29,4 @@ TEST(Utils_stats, linreg) {
   std::cout << "r: " << r << std::endl;
 }
 
-}  // namespace atl
+} // namespace atl

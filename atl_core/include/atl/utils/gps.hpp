@@ -1,8 +1,8 @@
 #ifndef ATL_UTILS_GPS_HPP
 #define ATL_UTILS_GPS_HPP
 
-#include <cmath>
 #include "atl/utils/math.hpp"
+#include <cmath>
 
 namespace atl {
 
@@ -19,13 +19,12 @@ namespace atl {
  * @param lat_new New latitude (decimal format)
  * @param lon_new New longitude (decimal format)
  */
-void latlon_offset(
-  double lat_ref,
-  double lon_ref,
-  double offset_N,
-  double offset_E,
-  double *lat_new,
-  double *lon_new);
+void latlon_offset(double lat_ref,
+                   double lon_ref,
+                   double offset_N,
+                   double offset_E,
+                   double *lat_new,
+                   double *lon_new);
 
 /**
  * Calculate difference in distance in North and East from two GPS coordinates
@@ -37,13 +36,12 @@ void latlon_offset(
  * @param dist_N Distance of point of interest in North axis in meters
  * @param dist_E Distance of point of interest in East axis in meters
  */
-void latlon_diff(
-  double lat_ref,
-  double lon_ref,
-  double lat,
-  double lon,
-  double *dist_N,
-  double *dist_E);
+void latlon_diff(double lat_ref,
+                 double lon_ref,
+                 double lat,
+                 double lon,
+                 double *dist_N,
+                 double *dist_E);
 
 /**
  * Calculate Euclidean distance between two GPS coordintes
@@ -57,5 +55,5 @@ void latlon_diff(
  */
 double latlon_dist(double lat_ref, double lon_ref, double lat, double lon);
 
-}  // namepsace atl
+} // namepsace atl
 #endif

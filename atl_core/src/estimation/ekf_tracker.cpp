@@ -149,4 +149,4 @@ void two_wheel_measurement_model(EKFTracker &ekf, MatX &H, VecX &h) {
   h = H * ekf.mu_p;
 }
 
-}  // namespace atl
+} // namespace atl

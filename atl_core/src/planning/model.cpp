@@ -114,12 +114,12 @@ int Simulator::simulate(double dt, double tend, MatX U, MatX &X) {
   }
 
   // calculate error against final state
-  this->dist_error += pow((model.x(0) - this->x_final(0)), 2);  // x
-  this->dist_error += pow((model.x(2) - this->x_final(2)), 2);  // z
-  this->vel_error += pow((model.x(1) - this->x_final(1)), 2);   // vx
-  this->vel_error += pow((model.x(3) - this->x_final(3)), 2);   // vz
+  this->dist_error += pow((model.x(0) - this->x_final(0)), 2); // x
+  this->dist_error += pow((model.x(2) - this->x_final(2)), 2); // z
+  this->vel_error += pow((model.x(1) - this->x_final(1)), 2);  // vx
+  this->vel_error += pow((model.x(3) - this->x_final(3)), 2);  // vz
 
   return 0;
 }
 
-}  // namespace atl
+} // namespace atl

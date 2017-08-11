@@ -5,7 +5,7 @@ namespace atl {
 // ATTITUDE COMMAND
 AttitudeCommand::AttitudeCommand(Vec4 command) {
   // quaternion
-  Vec3 euler{command(0), command(1), command(2)};  // roll, pitch, yaw
+  Vec3 euler{command(0), command(1), command(2)}; // roll, pitch, yaw
   euler2quat(euler, 321, this->orientation);
 
   // throttle
@@ -24,15 +24,13 @@ void AttitudeCommand::print() {
 
 // POSE
 Pose::Pose(
-  double roll, double pitch, double yaw, double x, double y, double z) {
+    double roll, double pitch, double yaw, double x, double y, double z) {
   Vec3 euler{roll, pitch, yaw};
   euler2quat(euler, 321, this->orientation);
   this->position << x, y, z;
 }
 
-Mat3 Pose::rotationMatrix() {
-  return this->orientation.toRotationMatrix();
-}
+Mat3 Pose::rotationMatrix() { return this->orientation.toRotationMatrix(); }
 
 void Pose::printPosition() {
   std::cout << "position [";
@@ -176,4 +174,4 @@ int mat2csv(std::string file_path, MatX data) {
   return 0;
 }
 
-}  // namespace atl
+} // namespace atl

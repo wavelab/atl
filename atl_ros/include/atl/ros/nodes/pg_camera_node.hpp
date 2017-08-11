@@ -3,10 +3,10 @@
 
 #include <sys/stat.h>
 
-#include <ros/ros.h>
 #include <cv_bridge/cv_bridge.h>
-#include <sensor_msgs/CameraInfo.h>
 #include <image_transport/image_transport.h>
+#include <ros/ros.h>
+#include <sensor_msgs/CameraInfo.h>
 
 #include "atl/atl_core.hpp"
 #include "atl/ros/utils/msgs.hpp"
@@ -75,5 +75,5 @@ public:
   int loopCallback();
 };
 
-}  // namespace atl
+} // namespace atl
 #endif

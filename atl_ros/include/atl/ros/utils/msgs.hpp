@@ -33,14 +33,15 @@ void buildMsg(double d, std_msgs::Float64 &msg);
 void buildMsg(Vec3 vec, geometry_msgs::Vector3 &msg);
 void buildMsg(Vec3 vec, geometry_msgs::Point &msg);
 void buildMsg(Quaternion q, geometry_msgs::Quaternion &msg);
-void buildMsg(
-  int seq, ros::Time time, Pose pose, geometry_msgs::PoseStamped &msg);
-void buildMsg(
-  int seq,
-  ros::Time time,
-  AttitudeCommand att_cmd,
-  geometry_msgs::PoseStamped &msg,
-  std_msgs::Float64 &thr_msg);
+void buildMsg(int seq,
+              ros::Time time,
+              Pose pose,
+              geometry_msgs::PoseStamped &msg);
+void buildMsg(int seq,
+              ros::Time time,
+              AttitudeCommand att_cmd,
+              geometry_msgs::PoseStamped &msg,
+              std_msgs::Float64 &thr_msg);
 void buildMsg(TagPose tag, atl_msgs::AprilTagPose &msg);
 void buildMsg(TagPose tag, geometry_msgs::Vector3 &msg);
 void buildMsg(PositionController pc, atl_msgs::PCtrlSettings &msg);
@@ -62,5 +63,5 @@ void convertMsg(atl_msgs::PCtrlSettings msg, PositionController &pc);
 void convertMsg(atl_msgs::TCtrlSettings msg, TrackingController &tc);
 void convertMsg(atl_msgs::LCtrlSettings msg, LandingController &lc);
 
-}  // namespace atl
+} // namespace atl
 #endif

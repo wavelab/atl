@@ -2,13 +2,9 @@
 
 namespace atl {
 
-I2C::I2C() {
-  this->fd = -1;
-}
+I2C::I2C() { this->fd = -1; }
 
-I2C::~I2C() {
-  close(this->fd);
-}
+I2C::~I2C() { close(this->fd); }
 
 int I2C::setup() {
   int fd;
@@ -58,7 +54,7 @@ int I2C::readBytes(char reg_addr, char *data, size_t length) {
     return -1;
   }
 
-  if (read(this->fd, data, length) != (int) length) {
+  if (read(this->fd, data, length) != (int)length) {
     return -2;
   }
 
@@ -92,7 +88,7 @@ int I2C::writeBytes(char reg_addr, char *data, size_t length) {
   /* create buf */
   memset(buf, '\0', sizeof(char) * I2C_BUF_MAX);
   buf[0] = reg_addr;
-  for (i = 1; i < (int) length + 1; i++) {
+  for (i = 1; i < (int)length + 1; i++) {
     buf[i] = data[i];
   }
 
@@ -104,4 +100,4 @@ int I2C::writeBytes(char reg_addr, char *data, size_t length) {
   return 0;
 }
 
-}  // namespace atl
+} // namespace atl

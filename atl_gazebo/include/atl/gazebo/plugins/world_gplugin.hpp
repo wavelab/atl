@@ -32,6 +32,6 @@ public:
   void worldClearCallback(ConstRequestPtr &msg);
 };
 
-}  // namespace gaz
-}  // namespace atl
+} // namespace gaz
+} // namespace atl
 #endif

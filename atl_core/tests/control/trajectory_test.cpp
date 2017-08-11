@@ -1,5 +1,5 @@
-#include "atl/atl_test.hpp"
 #include "atl/control/trajectory.hpp"
+#include "atl/atl_test.hpp"
 
 #define TEST_TRAJ "tests/configs/trajectory/0.csv"
 
@@ -57,4 +57,4 @@ TEST(Trajectory, reset) {
   EXPECT_EQ(0, traj.inputs.size());
 }
 
-}  // end of atl namepsace
+} // end of atl namepsace

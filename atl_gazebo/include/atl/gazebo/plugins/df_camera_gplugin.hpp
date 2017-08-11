@@ -40,14 +40,13 @@ public:
   DFCameraGPlugin();
   void Load(gazebo::sensors::SensorPtr sptr, sdf::ElementPtr sdf);
   int configure();
-  void onNewFrame(
-    const unsigned char *image,
-    const int image_width,
-    const int image_height,
-    const int image_depth,
-    const std::string &format);
+  void onNewFrame(const unsigned char *image,
+                  const int image_width,
+                  const int image_height,
+                  const int image_depth,
+                  const std::string &format);
 };
 
-}  // namespace gaz
-}  // namespace atl
+} // namespace gaz
+} // namespace atl
 #endif

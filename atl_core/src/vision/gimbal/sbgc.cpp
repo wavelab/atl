@@ -13,20 +13,20 @@ int set_interface_attribs(int fd, int speed, int parity) {
   cfsetospeed(&tty, speed);
   cfsetispeed(&tty, speed);
 
-  tty.c_cflag = (tty.c_cflag & ~CSIZE) | CS8;  // 8-bit chars
+  tty.c_cflag = (tty.c_cflag & ~CSIZE) | CS8; // 8-bit chars
   // disable IGNBRK for mismatched speed tests; otherwise receive break
   // as \000 chars
-  tty.c_iflag &= ~IGNBRK;  // disable break processing
-  tty.c_lflag = 0;         // no signaling chars, no echo,
+  tty.c_iflag &= ~IGNBRK; // disable break processing
+  tty.c_lflag = 0;        // no signaling chars, no echo,
   // no canonical processing
-  tty.c_oflag = 0;      // no remapping, no delays
-  tty.c_cc[VMIN] = 0;   // read doesn't block
-  tty.c_cc[VTIME] = 5;  // 0.5 seconds read timeout
+  tty.c_oflag = 0;     // no remapping, no delays
+  tty.c_cc[VMIN] = 0;  // read doesn't block
+  tty.c_cc[VTIME] = 5; // 0.5 seconds read timeout
 
-  tty.c_iflag &= ~(IXON | IXOFF | IXANY);  // shut off xon/xoff ctrl
-  tty.c_cflag |= (CLOCAL | CREAD);         // ignore modem controls,
+  tty.c_iflag &= ~(IXON | IXOFF | IXANY); // shut off xon/xoff ctrl
+  tty.c_cflag |= (CLOCAL | CREAD);        // ignore modem controls,
   // enable reading
-  tty.c_cflag &= ~(PARENB | PARODD);  // shut off parity
+  tty.c_cflag &= ~(PARENB | PARODD); // shut off parity
   tty.c_cflag |= parity;
   tty.c_cflag &= ~CSTOPB;
   tty.c_cflag &= ~CRTSCTS;
@@ -49,7 +49,7 @@ void set_blocking(int fd, int should_block) {
   }
 
   tty.c_cc[VMIN] = should_block ? 1 : 0;
-  tty.c_cc[VTIME] = 5;  // 0.5 seconds read timeout
+  tty.c_cc[VTIME] = 5; // 0.5 seconds read timeout
 
   if (tcsetattr(fd, TCSANOW, &tty) != 0) {
     printf("error %d setting term attributes", errno);
@@ -92,12 +92,12 @@ void SBGCFrame::buildBody(uint8_t *data) {
 }
 
 void SBGCFrame::buildFrame(int cmd_id, uint8_t *data, int data_size) {
-  this->buildHeader((uint8_t) cmd_id, (uint8_t) data_size);
+  this->buildHeader((uint8_t)cmd_id, (uint8_t)data_size);
   this->buildBody(data);
 }
 
 void SBGCFrame::buildFrame(int cmd_id) {
-  this->buildHeader((uint8_t) cmd_id, (uint8_t) 0);
+  this->buildHeader((uint8_t)cmd_id, (uint8_t)0);
   this->buildBody(NULL);
 }
 
@@ -129,11 +129,11 @@ int SBGCFrame::parseBody(uint8_t *data) {
 
   // setup
   expected_checksum = 0x0;
-  this->data = (uint8_t *) malloc(sizeof(uint8_t) * this->data_size);
+  this->data = (uint8_t *)malloc(sizeof(uint8_t) * this->data_size);
 
   // parse body
   for (i = 0; i < this->data_size; i++) {
-    this->data[i] = data[4 + i];  // +4 because header is 4 bytes
+    this->data[i] = data[4 + i]; // +4 because header is 4 bytes
     expected_checksum += data[4 + i];
   }
   this->data_checksum = data[4 + i];
@@ -171,34 +171,29 @@ int SBGCFrame::parseFrame(uint8_t *data) {
 
 void SBGCRealtimeData::printData() {
   // ACCELEROMOETER AND GYROSCOPE
-  printf(
-    "accelerometer: %.2f\t%.2f\t%.2f\n",
-    this->accel(0),
-    this->accel(1),
-    this->accel(2));
-  printf(
-    "gyroscope: %.2f\t%.2f\t%.2f\n",
-    this->gyro(0),
-    this->gyro(1),
-    this->gyro(2));
+  printf("accelerometer: %.2f\t%.2f\t%.2f\n",
+         this->accel(0),
+         this->accel(1),
+         this->accel(2));
+  printf("gyroscope: %.2f\t%.2f\t%.2f\n",
+         this->gyro(0),
+         this->gyro(1),
+         this->gyro(2));
   printf("\n");
 
   // ANGLES
-  printf(
-    "camera_angles: %.2f\t%.2f\t%.2f\n",
-    this->camera_angles(0),
-    this->camera_angles(1),
-    this->camera_angles(2));
-  printf(
-    "frame_angles: %.2f\t%.2f\t%.2f\n",
-    this->frame_angles(0),
-    this->frame_angles(1),
-    this->frame_angles(2));
-  printf(
-    "rc_angles: %.2f\t%.2f\t%.2f\n",
-    this->rc_angles(0),
-    this->rc_angles(1),
-    this->rc_angles(2));
+  printf("camera_angles: %.2f\t%.2f\t%.2f\n",
+         this->camera_angles(0),
+         this->camera_angles(1),
+         this->camera_angles(2));
+  printf("frame_angles: %.2f\t%.2f\t%.2f\n",
+         this->frame_angles(0),
+         this->frame_angles(1),
+         this->frame_angles(2));
+  printf("rc_angles: %.2f\t%.2f\t%.2f\n",
+         this->rc_angles(0),
+         this->rc_angles(1),
+         this->rc_angles(2));
 
   // MISC
   printf("cycle_time: %d\n", this->cycle_time);
@@ -272,7 +267,7 @@ int SBGC::sendFrame(SBGCFrame &cmd) {
   }
 
   // header
-  start = 0x3E;  // ">" character
+  start = 0x3E; // ">" character
   write(this->serial, &start, 1);
   write(this->serial, &cmd.cmd_id, 1);
   write(this->serial, &cmd.data_size, 1);
@@ -281,7 +276,7 @@ int SBGC::sendFrame(SBGCFrame &cmd) {
   write(this->serial, &cmd.header_checksum, 1);
   write(this->serial, cmd.data, cmd.data_size);
   write(this->serial, &cmd.data_checksum, 1);
-  tcflush(this->serial, TCIOFLUSH);  // very critical
+  tcflush(this->serial, TCIOFLUSH); // very critical
   usleep(10 * 1000);
 
   return 0;
@@ -627,13 +622,12 @@ int SBGC::setAngle(double roll, double pitch, double yaw) {
   return 0;
 }
 
-int SBGC::setSpeedAngle(
-  double roll,
-  double pitch,
-  double yaw,
-  double roll_speed,
-  double pitch_speed,
-  double yaw_speed) {
+int SBGC::setSpeedAngle(double roll,
+                        double pitch,
+                        double yaw,
+                        double roll_speed,
+                        double pitch_speed,
+                        double yaw_speed) {
   SBGCFrame frame;
   int16_t roll_adjusted;
   int16_t pitch_adjusted;
@@ -685,4 +679,4 @@ int SBGC::setSpeedAngle(
   return 0;
 }
 
-}  // namespace atl
+} // namespace atl

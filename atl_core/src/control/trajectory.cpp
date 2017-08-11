@@ -2,8 +2,9 @@
 
 namespace atl {
 
-int Trajectory::load(
-  const int index, const std::string &filepath, const Vec3 &p0) {
+int Trajectory::load(const int index,
+                     const std::string &filepath,
+                     const Vec3 &p0) {
   MatX traj_data;
   Vec2 p, v, u, rel_p, rel_v;
 
@@ -38,11 +39,11 @@ int Trajectory::load(
 
   // set trajectory class
   for (int i = 0; i < traj_data.rows(); i++) {
-    p << traj_data(i, 0), traj_data(i, 2);      // x, z
-    v << traj_data(i, 1), traj_data(i, 3);      // vx, vz
-    u << traj_data(i, 4), traj_data(i, 5);      // az, theta
-    rel_p << traj_data(i, 6), traj_data(i, 7);  // rel_x, rel_z
-    rel_v << traj_data(i, 8), traj_data(i, 9);  // rel_vx, rel_vz
+    p << traj_data(i, 0), traj_data(i, 2);     // x, z
+    v << traj_data(i, 1), traj_data(i, 3);     // vx, vz
+    u << traj_data(i, 4), traj_data(i, 5);     // az, theta
+    rel_p << traj_data(i, 6), traj_data(i, 7); // rel_x, rel_z
+    rel_v << traj_data(i, 8), traj_data(i, 9); // rel_vx, rel_vz
 
     this->pos.push_back(p);
     this->vel.push_back(v);
@@ -56,8 +57,10 @@ int Trajectory::load(
   return 0;
 }
 
-int Trajectory::update(
-  const Vec3 &pos, Vec2 &wp_pos, Vec2 &wp_vel, Vec2 &wp_inputs) {
+int Trajectory::update(const Vec3 &pos,
+                       Vec2 &wp_pos,
+                       Vec2 &wp_vel,
+                       Vec2 &wp_inputs) {
   // pre-check
   if (this->loaded == false) {
     return -1;
@@ -85,8 +88,7 @@ int Trajectory::update(
   // find next waypoint position, velocity and inputs
   double wp_percent = closest_point(wp_pos_start, wp_pos_end, q_pos, wp_pos);
   wp_vel = linear_interpolation(wp_vel_start, wp_vel_end, wp_percent);
-  wp_inputs =
-    linear_interpolation(wp_inputs_start, wp_inputs_end, wp_percent);
+  wp_inputs = linear_interpolation(wp_inputs_start, wp_inputs_end, wp_percent);
 
   // update trajectory waypoints
   if (wp_percent > 1.0) {
@@ -122,4 +124,4 @@ void Trajectory::reset() {
   this->p0 << 0.0, 0.0, 0.0;
 }
 
-}  // namespace atl
+} // namespace atl

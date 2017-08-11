@@ -66,7 +66,7 @@ void GimbalNode::trackTargetCallback(const geometry_msgs::Vector3 msg) {
   GimbalGClient::trackTarget(target_cf);
 }
 
-}  // namespace gazebo_bridge
-}  // namespace atl
+} // namespace gazebo_bridge
+} // namespace atl
 
 RUN_ROS_NODE(atl::gazebo_bridge::GimbalNode, NODE_RATE);

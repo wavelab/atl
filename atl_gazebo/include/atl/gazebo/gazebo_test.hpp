@@ -23,11 +23,9 @@ public:
     this->world_client.loadWorld(test_world);
   }
 
-  void teardown() {
-    this->world_client.clearWorld();
-  }
+  void teardown() { this->world_client.clearWorld(); }
 };
 
-}  // namespace gaz
-}  // namespace atl
+} // namespace gaz
+} // namespace atl
 #endif

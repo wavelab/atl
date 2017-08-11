@@ -12,8 +12,8 @@
 
 namespace atl {
 
-static int prepareOutputFile(
-  std::ofstream &output_file, std::string output_path) {
+static int prepareOutputFile(std::ofstream &output_file,
+                             std::string output_path) {
   // clang-format off
   output_file.open(output_path);
 
@@ -31,8 +31,8 @@ static int prepareOutputFile(
   return 0;
 }
 
-static void recordTimeStep(
-  std::ofstream &output_file, int i, VecX mea, VecX est) {
+static void
+recordTimeStep(std::ofstream &output_file, int i, VecX mea, VecX est) {
   // record true state x, y, z
   output_file << i << ",";
   output_file << mea(0) << ",";
@@ -304,4 +304,4 @@ TEST(EKFTracker, estimate3) {
   output_file.close();
 }
 
-}  // namespace atl
+} // namespace atl

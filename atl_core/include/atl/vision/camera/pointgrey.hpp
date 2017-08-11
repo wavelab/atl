@@ -1,8 +1,8 @@
 #ifndef ATL_CORE_VISION_CAMERA_POINTGREY_HPP
 #define ATL_CORE_VISION_CAMERA_POINTGREY_HPP
 
-#include <flycapture/FlyCapture2.h>
 #include "atl/vision/camera/camera.hpp"
+#include <flycapture/FlyCapture2.h>
 
 namespace atl {
 
@@ -32,5 +32,5 @@ public:
   int run();
 };
 
-}  // namespace atl
+} // namespace atl
 #endif

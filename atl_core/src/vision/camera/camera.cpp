@@ -191,4 +191,4 @@ int Camera::showImage(cv::Mat &image) {
   return 0;
 }
 
-}  // namespace atl
+} // namespace atl

@@ -35,6 +35,6 @@ public:
   void imageCallback(ConstImagePtr &msg);
 };
 
-}  // namespace gazebo_bridge
-}  // namespace atl
+} // namespace gazebo_bridge
+} // namespace atl
 #endif

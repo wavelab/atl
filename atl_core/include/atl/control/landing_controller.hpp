@@ -1,9 +1,9 @@
 #ifndef ATL_CONTROL_LANDING_CONTROLLER_HPP
 #define ATL_CONTROL_LANDING_CONTROLLER_HPP
 
-#include <libgen.h>
 #include <deque>
 #include <iomanip>
+#include <libgen.h>
 #include <string>
 
 #include <yaml-cpp/yaml.h>
@@ -82,8 +82,9 @@ public:
    *
    * @return 0 for success, -1 for failure
    */
-  int loadTrajectory(
-    const Vec3 &pos, const Vec3 &target_pos_bf, const double v);
+  int loadTrajectory(const Vec3 &pos,
+                     const Vec3 &target_pos_bf,
+                     const double v);
 
   /**
    * Prepare blackbox
@@ -117,17 +118,16 @@ public:
    *
    * @return 0 for success, -1 for failure
    */
-  int record(
-    const Vec3 &pos,
-    const Vec3 &vel,
-    const Vec2 &wp_pos,
-    const Vec2 &wp_vel,
-    const Vec2 &wp_inputs,
-    const Vec3 &target_pos_bf,
-    const Vec3 &target_vel_bf,
-    const Vec3 &rpy,
-    const double thrust,
-    const double dt);
+  int record(const Vec3 &pos,
+             const Vec3 &vel,
+             const Vec2 &wp_pos,
+             const Vec2 &wp_vel,
+             const Vec2 &wp_inputs,
+             const Vec3 &target_pos_bf,
+             const Vec3 &target_vel_bf,
+             const Vec3 &rpy,
+             const double thrust,
+             const double dt);
 
   /**
    * Calculate elocity errors
@@ -141,11 +141,10 @@ public:
    *    Attitude command as a vector of size 4:
    *    (roll, pitch, yaw, throttle)
    */
-  Vec4 calculateVelocityErrors(
-    const Vec3 &v_errors,
-    const Vec3 &p_errors,
-    const double yaw,
-    const double dt);
+  Vec4 calculateVelocityErrors(const Vec3 &v_errors,
+                               const Vec3 &p_errors,
+                               const double yaw,
+                               const double dt);
 
   /**
    * Calculate controller outputs
@@ -159,14 +158,13 @@ public:
    *
    * @return 0 for success, -1 for failure
    */
-  int calculate(
-    const Vec3 &target_pos_bf,
-    const Vec3 &target_vel_bf,
-    const Vec3 &pos,
-    const Vec3 &vel,
-    const Quaternion &orientation,
-    const double yaw,
-    const double dt);
+  int calculate(const Vec3 &target_pos_bf,
+                const Vec3 &target_vel_bf,
+                const Vec3 &pos,
+                const Vec3 &vel,
+                const Quaternion &orientation,
+                const double yaw,
+                const double dt);
 
   /**
    * Reset controller errors to 0
@@ -179,5 +177,5 @@ public:
   void printOutputs();
 };
 
-}  // namespace atl
+} // namespace atl
 #endif

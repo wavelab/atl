@@ -30,9 +30,7 @@ void LandingTarget::setTargetVelocity(Vec3 velocity) {
   this->velocity_bf = velocity;
 }
 
-double LandingTarget::tracked() {
-  return mtoc(&this->first_seen);
-}
+double LandingTarget::tracked() { return mtoc(&this->first_seen); }
 
 void LandingTarget::reset() {
   this->position_bf << 0.0, 0.0, 0.0;
@@ -60,4 +58,4 @@ void LandingTarget::update(bool detected) {
   this->isTargetLosted();
 }
 
-}  // namespace atl
+} // namespace atl

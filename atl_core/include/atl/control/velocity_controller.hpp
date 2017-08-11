@@ -69,5 +69,5 @@ public:
   void printErrors();
 };
 
-}  // namespace atl
+} // namespace atl
 #endif

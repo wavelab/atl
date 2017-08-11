@@ -140,4 +140,4 @@ TEST(VelocityController, calculate) {
   EXPECT_TRUE(controller.outputs(1) > 0.0);
 }
 
-}  // end of atl namepsace
+} // end of atl namepsace

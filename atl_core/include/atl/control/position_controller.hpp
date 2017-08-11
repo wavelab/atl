@@ -52,11 +52,10 @@ public:
    *    Attitude command as a vector of size 4:
    *    (roll, pitch, yaw, throttle)
    */
-  Vec4 calculate(
-    const Vec3 &setpoints,
-    const Pose &pose,
-    const double yaw,
-    const double dt);
+  Vec4 calculate(const Vec3 &setpoints,
+                 const Pose &pose,
+                 const double yaw,
+                 const double dt);
 
   /**
    * Reset controller errors to 0
@@ -74,5 +73,5 @@ public:
   void printErrors();
 };
 
-}  // namespace atl
+} // namespace atl
 #endif

@@ -38,6 +38,6 @@ public:
   virtual void jointOrientationCallback(ConstQuaternionPtr &msg);
 };
 
-}  // namespace gaz
-}  // namespace atl
+} // namespace gaz
+} // namespace atl
 #endif

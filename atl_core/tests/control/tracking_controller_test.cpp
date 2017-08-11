@@ -155,4 +155,4 @@ TEST(TrackingController, calculate) {
   EXPECT_FLOAT_EQ(yaw, controller.outputs(2));
 }
 
-}  // end of atl namepsace
+} // end of atl namepsace

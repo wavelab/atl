@@ -17,24 +17,17 @@ public:
   double heading;
 
   Waypoint()
-      : latitude{0.0},
-        longitude{0.0},
-        altitude{0.0},
-        staytime{0.0},
+      : latitude{0.0}, longitude{0.0}, altitude{0.0}, staytime{0.0},
         heading{0.0} {}
   Waypoint(double latitude, double longitude)
       : latitude{latitude}, longitude{longitude} {}
-  Waypoint(
-    double latitude,
-    double longitude,
-    double altitude,
-    double staytime,
-    double heading)
-      : latitude{latitude},
-        longitude{longitude},
-        altitude{altitude},
-        staytime{staytime},
-        heading{heading} {}
+  Waypoint(double latitude,
+           double longitude,
+           double altitude,
+           double staytime,
+           double heading)
+      : latitude{latitude}, longitude{longitude}, altitude{altitude},
+        staytime{staytime}, heading{heading} {}
 
   /**
    * Calculate distance away from another waypoint
@@ -55,6 +48,6 @@ public:
   }
 };
 
-}  // namespace atl
+} // namespace atl
 
 #endif

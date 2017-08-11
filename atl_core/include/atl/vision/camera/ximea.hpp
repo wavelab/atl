@@ -7,14 +7,14 @@
 
 namespace atl {
 
-#define XIMEA_CHECK(RETVAL, WHERE)                     \
-  if (RETVAL != XI_OK) {                               \
-    std::cout << "Error after " << WHERE << std::endl; \
-    if (this->ximea) {                                 \
-      xiCloseDevice(this->ximea);                      \
-      return -1;                                       \
-    }                                                  \
-    goto ximea_error;                                  \
+#define XIMEA_CHECK(RETVAL, WHERE)                                             \
+  if (RETVAL != XI_OK) {                                                       \
+    std::cout << "Error after " << WHERE << std::endl;                         \
+    if (this->ximea) {                                                         \
+      xiCloseDevice(this->ximea);                                              \
+      return -1;                                                               \
+    }                                                                          \
+    goto ximea_error;                                                          \
   }
 
 class XimeaCamera : public Camera {
@@ -30,5 +30,5 @@ public:
   int changeMode(std::string mode);
 };
 
-}  // namespace atl
+} // namespace atl
 #endif

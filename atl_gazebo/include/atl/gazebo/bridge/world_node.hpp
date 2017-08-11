@@ -91,6 +91,6 @@ public:
   void clearWorldCallback(const std_msgs::Bool &msg);
 };
 
-}  // namespace gazebo_bridge
-}  // namespace atl
+} // namespace gazebo_bridge
+} // namespace atl
 #endif

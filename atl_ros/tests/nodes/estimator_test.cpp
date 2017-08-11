@@ -171,7 +171,7 @@ TEST_F(NodeTest, gimbal) {
   ASSERT_NEAR(0.0, this->gimbal_msg.z, 0.1);
 }
 
-}  // namespace atl
+} // namespace atl
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);

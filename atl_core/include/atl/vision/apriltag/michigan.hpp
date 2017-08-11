@@ -1,12 +1,12 @@
 #ifndef ATL_VISION_APRILTAG_MICHIGAN_HPP
 #define ATL_VISION_APRILTAG_MICHIGAN_HPP
 
-#include <libgen.h>
-#include <math.h>
-#include <sys/time.h>
 #include <cmath>
 #include <fstream>
 #include <iostream>
+#include <libgen.h>
+#include <math.h>
+#include <sys/time.h>
 
 #include <opencv2/calib3d/calib3d.hpp>
 #include <opencv2/core/core.hpp>
@@ -56,5 +56,5 @@ public:
   int obtainPose(apriltag_detection_t *tag, TagPose &tag_pose);
 };
 
-}  // namespace atl
+} // namespace atl
 #endif

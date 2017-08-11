@@ -24,5 +24,5 @@ public:
   int run();
 };
 
-}  // namespace atl
+} // namespace atl
 #endif

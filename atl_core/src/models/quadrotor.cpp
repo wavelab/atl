@@ -3,8 +3,9 @@
 namespace atl {
 
 // ATTITUDE CONTROLLER
-Vec4 AttitudeController::update(
-  const Vec4 &setpoints, const Vec4 &actual, double dt) {
+Vec4 AttitudeController::update(const Vec4 &setpoints,
+                                const Vec4 &actual,
+                                double dt) {
   // check rate
   this->dt += dt;
   if (this->dt < 0.001) {
@@ -29,9 +30,9 @@ Vec4 AttitudeController::update(
 
   // thrust
   double max_thrust = 5.0;
-  double t = max_thrust * setpoints(3);   // convert relative to true thrust
-  t = (t > max_thrust) ? max_thrust : t;  // limit thrust
-  t = (t < 0) ? 0.0 : t;                  // limit thrust
+  double t = max_thrust * setpoints(3);  // convert relative to true thrust
+  t = (t > max_thrust) ? max_thrust : t; // limit thrust
+  t = (t < 0) ? 0.0 : t;                 // limit thrust
 
   // map roll, pitch, yaw and thrust to motor outputs
   Vec4 outputs;
@@ -56,19 +57,20 @@ Vec4 AttitudeController::update(
   return outputs;
 }
 
-Vec4 AttitudeController::update(
-  const Vec4 &psetpoints,
-  const Vec4 &vsetpoints,
-  const Vec4 &actual,
-  double dt) {
+Vec4 AttitudeController::update(const Vec4 &psetpoints,
+                                const Vec4 &vsetpoints,
+                                const Vec4 &actual,
+                                double dt) {
   Vec4 setpoints;
   setpoints = psetpoints + vsetpoints;
   return this->update(setpoints, actual, dt);
 }
 
 // POSITION CONTROLLER
-Vec4 PositionController::update(
-  const Vec3 &setpoints, const Vec4 &actual, double yaw, double dt) {
+Vec4 PositionController::update(const Vec3 &setpoints,
+                                const Vec4 &actual,
+                                double yaw,
+                                double dt) {
   // check rate
   this->dt += dt;
   if (this->dt < 0.01) {
@@ -248,8 +250,10 @@ Vec4 QuadrotorModel::positionControllerControl(double dt) {
   return motor_inputs;
 }
 
-void QuadrotorModel::setAttitude(
-  double roll, double pitch, double yaw, double z) {
+void QuadrotorModel::setAttitude(double roll,
+                                 double pitch,
+                                 double yaw,
+                                 double z) {
   this->attitude_setpoints(0) = roll;
   this->attitude_setpoints(1) = pitch;
   this->attitude_setpoints(2) = yaw;
@@ -304,4 +308,4 @@ void QuadrotorModel::printState() {
   printf("psi: %f\n", this->attitude(2));
 }
 
-}  // namespace atl
+} // namespace atl

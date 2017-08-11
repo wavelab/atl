@@ -1,9 +1,9 @@
 #ifndef ATL_CONTROL_TRAJECTORY_HPP
 #define ATL_CONTROL_TRAJECTORY_HPP
 
-#include <libgen.h>
 #include <deque>
 #include <iomanip>
+#include <libgen.h>
 #include <string>
 
 #include <yaml-cpp/yaml.h>
@@ -59,5 +59,5 @@ public:
   void reset();
 };
 
-}  // namespace atl
+} // namespace atl
 #endif

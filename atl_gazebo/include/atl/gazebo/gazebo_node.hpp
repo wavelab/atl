@@ -4,8 +4,8 @@
 #include <string>
 #include <vector>
 
-#include <gazebo/gazebo_config.h>
 #include <gazebo/gazebo_client.hh>
+#include <gazebo/gazebo_config.h>
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/transport/transport.hh>
 
@@ -24,8 +24,7 @@ public:
   GazeboNode() : configured{false} {}
 
   int configure() {
-    this->gaz_node =
-      gazebo::transport::NodePtr(new gazebo::transport::Node());
+    this->gaz_node = gazebo::transport::NodePtr(new gazebo::transport::Node());
     this->gaz_node->Init();
     this->configured = true;
 
@@ -33,8 +32,7 @@ public:
   }
 
   int configure(std::string world_name) {
-    this->gaz_node =
-      gazebo::transport::NodePtr(new gazebo::transport::Node());
+    this->gaz_node = gazebo::transport::NodePtr(new gazebo::transport::Node());
     this->gaz_node->Init(world_name);
     this->configured = true;
 
@@ -42,10 +40,9 @@ public:
   }
 
   template <typename M>
-  int registerPublisher(
-    const std::string topic,
-    unsigned int queue_limit = 1000,
-    double rate = 0.0) {
+  int registerPublisher(const std::string topic,
+                        unsigned int queue_limit = 1000,
+                        double rate = 0.0) {
     gazebo::transport::PublisherPtr pub_ptr;
 
     // pre-check
@@ -75,10 +72,9 @@ public:
   }
 
   template <typename M, typename T>
-  int registerSubscriber(
-    std::string topic,
-    void (T::*fp)(const boost::shared_ptr<M const> &),
-    T *obj) {
+  int registerSubscriber(std::string topic,
+                         void (T::*fp)(const boost::shared_ptr<M const> &),
+                         T *obj) {
     gazebo::transport::SubscriberPtr sub_ptr;
 
     // pre-check
@@ -94,6 +90,6 @@ public:
   }
 };
 
-}  // namespace gaz
-}  // namespace atl
+} // namespace gaz
+} // namespace atl
 #endif

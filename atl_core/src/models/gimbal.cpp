@@ -48,7 +48,7 @@ void Gimbal2AxisModel::update(Vec2 motor_inputs, double dt) {
 Vec2 Gimbal2AxisModel::attitudeControllerControl(double dt) {
   Vec2 actual_attitude{this->states(0), this->states(2)};
   return this->joint_controller.update(
-    this->joint_setpoints, actual_attitude, dt);
+      this->joint_setpoints, actual_attitude, dt);
 }
 
 void Gimbal2AxisModel::setFrameOrientation(Quaternion frame_if) {
@@ -87,8 +87,9 @@ Vec3 Gimbal2AxisModel::getTargetInBF(Vec3 target_cf) {
   return (R * target_nwu + t);
 }
 
-Vec3 Gimbal2AxisModel::getTargetInBPF(
-  Vec3 target_cf, Quaternion body_if, Quaternion joint_bf) {
+Vec3 Gimbal2AxisModel::getTargetInBPF(Vec3 target_cf,
+                                      Quaternion body_if,
+                                      Quaternion joint_bf) {
   Vec3 p, target_bpf;
   Mat3 R_body, R_joint;
 
@@ -113,7 +114,7 @@ void Gimbal2AxisModel::trackTarget(Vec3 target_cf) {
 
   // obtain target in body planar frame
   target = this->getTargetInBPF(
-    target_cf, this->frame_orientation, this->joint_orientation);
+      target_cf, this->frame_orientation, this->joint_orientation);
 
   // update gimbal setpoints
   dist = target.norm();
@@ -146,4 +147,4 @@ void Gimbal2AxisModel::printState() {
   std::cout << std::setprecision(2) << this->states(3) << std::endl;
 }
 
-}  // namespace atl
+} // namespace atl

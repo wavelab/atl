@@ -109,5 +109,5 @@ int QuadrotorGClient::setVelocity(double vx, double vy, double vz) {
   return 0;
 }
 
-}  // namespace gaz
-}  // namespace atl
+} // namespace gaz
+} // namespace atl

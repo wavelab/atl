@@ -3,9 +3,7 @@
 namespace atl {
 namespace gaz {
 
-WorldGClient::WorldGClient() {
-  this->connected = false;
-}
+WorldGClient::WorldGClient() { this->connected = false; }
 
 WorldGClient::~WorldGClient() {
   if (this->connected) {
@@ -169,8 +167,9 @@ int WorldGClient::loadModel(std::string model_name) {
   return 0;
 }
 
-int WorldGClient::loadModel(
-  std::string model_name, Eigen::Vector3d pos, Eigen::Quaterniond quat) {
+int WorldGClient::loadModel(std::string model_name,
+                            Eigen::Vector3d pos,
+                            Eigen::Quaterniond quat) {
   gazebo::msgs::Factory msg;
   ignition::math::Vector3d p;
   ignition::math::Quaterniond q;
@@ -244,5 +243,5 @@ void WorldGClient::worldStatsCallback(ConstWorldStatisticsPtr &msg) {
   this->time.iterations = msg->iterations();
 }
 
-}  // namespace gaz
-}  // namespace atl
+} // namespace gaz
+} // namespace atl

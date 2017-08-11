@@ -46,7 +46,7 @@ void CameraNode::gimbalPositionCallback(const geometry_msgs::Vector3 &msg) {
 }
 
 void CameraNode::gimbalFrameOrientationCallback(
-  const geometry_msgs::Quaternion &msg) {
+    const geometry_msgs::Quaternion &msg) {
   this->gimbal_frame_orientation.w() = msg.w;
   this->gimbal_frame_orientation.x() = msg.x;
   this->gimbal_frame_orientation.y() = msg.y;
@@ -54,7 +54,7 @@ void CameraNode::gimbalFrameOrientationCallback(
 }
 
 void CameraNode::gimbalJointOrientationCallback(
-  const geometry_msgs::Quaternion &msg) {
+    const geometry_msgs::Quaternion &msg) {
   this->gimbal_joint_orientation.w() = msg.w;
   this->gimbal_joint_orientation.x() = msg.x;
   this->gimbal_joint_orientation.y() = msg.y;
@@ -117,7 +117,7 @@ void CameraNode::imageCallback(ConstImagePtr &msg) {
   }
 }
 
-}  // namespace gazebo_bridge
-}  // namespace atl
+} // namespace gazebo_bridge
+} // namespace atl
 
 RUN_ROS_NODE(atl::gazebo_bridge::CameraNode, NODE_RATE);

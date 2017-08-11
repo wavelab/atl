@@ -25,4 +25,4 @@ bool cvMatIsEqual(const cv::Mat m1, const cv::Mat m2) {
   return cv::countNonZero(diff) ? false : true;
 }
 
-}  // namespace atl
+} // namespace atl

@@ -1,19 +1,19 @@
 #ifndef ATL_VISION_APRILTAG_MIT_HPP
 #define ATL_VISION_APRILTAG_MIT_HPP
 
-#include <libgen.h>
-#include <math.h>
-#include <sys/time.h>
 #include <cmath>
 #include <fstream>
 #include <iostream>
+#include <libgen.h>
+#include <math.h>
+#include <sys/time.h>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
-#include <apriltags_mit/TagDetector.h>
 #include <apriltags_mit/Tag16h5.h>
+#include <apriltags_mit/TagDetector.h>
 
 #include "atl/utils/utils.hpp"
 #include "atl/vision/apriltag/base_detector.hpp"
@@ -55,5 +55,5 @@ public:
   int obtainPose(const AprilTags::TagDetection &tag, TagPose &tag_pose);
 };
 
-}  // namespace atl
+} // namespace atl
 #endif

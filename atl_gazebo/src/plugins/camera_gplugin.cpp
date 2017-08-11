@@ -3,12 +3,9 @@
 namespace atl {
 namespace gaz {
 
-CameraGPlugin::CameraGPlugin() {
-  printf("LOADING [libcamera_gplugin.so]!\n");
-}
+CameraGPlugin::CameraGPlugin() { printf("LOADING [libcamera_gplugin.so]!\n"); }
 
-void CameraGPlugin::Load(
-  gazebo::sensors::SensorPtr sptr, sdf::ElementPtr sdf) {
+void CameraGPlugin::Load(gazebo::sensors::SensorPtr sptr, sdf::ElementPtr sdf) {
   UNUSED(sdf);
 
   // load sensor pointer
@@ -54,12 +51,11 @@ void CameraGPlugin::Load(
   this->registerPublisher<gazebo::msgs::Image>(IMAGE_PUB_TOPIC);
 }
 
-void CameraGPlugin::onNewFrame(
-  const unsigned char *image_raw,
-  const int image_width,
-  const int image_height,
-  const int image_depth,
-  const std::string &format) {
+void CameraGPlugin::onNewFrame(const unsigned char *image_raw,
+                               const int image_width,
+                               const int image_height,
+                               const int image_depth,
+                               const std::string &format) {
   UNUSED(image_depth);
 
   // clang-format off
@@ -78,5 +74,5 @@ void CameraGPlugin::onNewFrame(
 }
 
 GZ_REGISTER_SENSOR_PLUGIN(CameraGPlugin)
-}  // namespace gaz
-}  // end of atl namepspace
+} // namespace gaz
+} // end of atl namepspace

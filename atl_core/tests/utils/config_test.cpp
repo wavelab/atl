@@ -68,7 +68,7 @@ TEST(Utils_config_ConfigParser, addParam) {
   parser.addParam("matrix", &matx);
   parser.addParam("matrix", &cvmat);
 
-  ASSERT_EQ(19, (int) parser.params.size());
+  ASSERT_EQ(19, (int)parser.params.size());
   ASSERT_EQ(atl::BOOL, parser.params[0].type);
   ASSERT_EQ("bool", parser.params[0].key);
   ASSERT_TRUE(parser.params[0].data != NULL);

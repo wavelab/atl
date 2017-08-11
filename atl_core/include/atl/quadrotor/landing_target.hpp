@@ -25,5 +25,5 @@ public:
   void update(bool detected);
 };
 
-}  // namespace atl
+} // namespace atl
 #endif

@@ -92,4 +92,4 @@ TEST(WaypointController, update) {
   // controller.update(mission, pose3, vel, dt);
 }
 
-}  // end of atl namepsace
+} // end of atl namepsace

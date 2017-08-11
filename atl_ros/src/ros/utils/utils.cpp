@@ -55,5 +55,5 @@ int gaz2ros(Quaternion gaz_quat, Quaternion &ros_quat) {
   return 0;
 }
 
-}  // namespace ros
-}  // namespace atl
+} // namespace ros
+} // namespace atl

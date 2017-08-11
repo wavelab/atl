@@ -3,10 +3,10 @@
 
 #include <boost/bind.hpp>
 
-#include <gazebo/msgs/server_control.pb.h>
-#include <gazebo/msgs/vector3d.pb.h>
 #include <gazebo/common/common.hh>
 #include <gazebo/gazebo.hh>
+#include <gazebo/msgs/server_control.pb.h>
+#include <gazebo/msgs/vector3d.pb.h>
 #include <gazebo/physics/physics.hh>
 
 #include <gazebo/sensors/ImuSensor.hh>
@@ -53,6 +53,6 @@ public:
   void trackTargetCallback(ConstVector3dPtr &msg);
 };
 
-}  // namespace gaz
-}  // namespace atl
+} // namespace gaz
+} // namespace atl
 #endif

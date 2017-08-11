@@ -50,5 +50,5 @@ public:
   int loopCallback();
 };
 
-}  // namespace atl
+} // namespace atl
 #endif

@@ -2,9 +2,7 @@
 
 namespace atl {
 
-inline static double sqr(double x) {
-  return x * x;
-}
+inline static double sqr(double x) { return x * x; }
 
 int linreg(std::vector<Vec2> pts, double *m, double *c, double *r) {
   // linear regression of form: y = mx + c
@@ -40,11 +38,11 @@ int linreg(std::vector<Vec2> pts, double *m, double *c, double *r) {
   /* compute correlation coeff */
   if (r != NULL) {
     *r = (sumxy - sumx * sumy / pts.size());
-    *r /= sqrt(
-      (sumx2 - sqr(sumx) / pts.size()) * (sumy2 - sqr(sumy) / pts.size()));
+    *r /= sqrt((sumx2 - sqr(sumx) / pts.size()) *
+               (sumy2 - sqr(sumy) / pts.size()));
   }
 
   return 0;
 }
 
-}  // namespace atl
+} // namespace atl

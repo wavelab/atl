@@ -160,36 +160,30 @@ void ned2enu(Vec3 ned, Vec3 &enu);
 void nwu2ned(Quaternion nwu, Quaternion &ned);
 void ned2nwu(Quaternion ned, Quaternion &enu);
 void enu2nwu(Quaternion enu, Quaternion &nwu);
-void target2body(
-  Vec3 target_pos_if,
-  Vec3 body_pos_if,
-  Quaternion body_orientation_if,
-  Vec3 &target_pos_bf);
-void target2body(
-  Vec3 target_pos_if,
-  Vec3 body_pos_if,
-  Vec3 body_euler_if,
-  Vec3 &target_pos_bf);
-void target2bodyplanar(
-  Vec3 target_pos_if,
-  Vec3 body_pos_if,
-  Quaternion body_orientation_if,
-  Vec3 &target_pos_bf);
-void target2bodyplanar(
-  Vec3 target_pos_if,
-  Vec3 body_pos_if,
-  Vec3 body_euler_if,
-  Vec3 &target_pos_bf);
-void target2inertial(
-  Vec3 target_pos_bf,
-  Vec3 body_pos_if,
-  Vec3 body_euler_if,
-  Vec3 &target_pos_if);
-void target2inertial(
-  Vec3 target_pos_bf,
-  Vec3 body_pos_if,
-  Quaternion body_orientation_if,
-  Vec3 &target_pos_if);
+void target2body(Vec3 target_pos_if,
+                 Vec3 body_pos_if,
+                 Quaternion body_orientation_if,
+                 Vec3 &target_pos_bf);
+void target2body(Vec3 target_pos_if,
+                 Vec3 body_pos_if,
+                 Vec3 body_euler_if,
+                 Vec3 &target_pos_bf);
+void target2bodyplanar(Vec3 target_pos_if,
+                       Vec3 body_pos_if,
+                       Quaternion body_orientation_if,
+                       Vec3 &target_pos_bf);
+void target2bodyplanar(Vec3 target_pos_if,
+                       Vec3 body_pos_if,
+                       Vec3 body_euler_if,
+                       Vec3 &target_pos_bf);
+void target2inertial(Vec3 target_pos_bf,
+                     Vec3 body_pos_if,
+                     Vec3 body_euler_if,
+                     Vec3 &target_pos_if);
+void target2inertial(Vec3 target_pos_bf,
+                     Vec3 body_pos_if,
+                     Quaternion body_orientation_if,
+                     Vec3 &target_pos_if);
 void inertial2body(Vec3 enu_if, Quaternion orientation_if, Vec3 &nwu_bf);
 void inertial2body(Vec3 enu_if, Vec3 orientation_if, Vec3 &nwu_bf);
 double wrapTo180(double euler_angle);
@@ -201,5 +195,5 @@ int point_left_right(Vec2 p1, Vec2 p2, Vec2 pos);
 double closest_point(Vec2 p1, Vec2 p2, Vec2 p3, Vec2 &closest);
 Vec2 linear_interpolation(Vec2 a, Vec2 b, double mu);
 
-}  // namespace atl
+} // namespace atl
 #endif

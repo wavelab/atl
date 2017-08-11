@@ -5,8 +5,8 @@
 #include <ros/ros.h>
 #include <sensor_msgs/CameraInfo.h>
 
-#include <atl_msgs/AprilTagPose.h>
 #include <atl/atl_core.hpp>
+#include <atl_msgs/AprilTagPose.h>
 
 #include "atl/ros/utils/msgs.hpp"
 #include "atl/ros/utils/node.hpp"
@@ -39,8 +39,9 @@ public:
   AprilTagNode(int argc, char **argv) : ROSNode(argc, argv) {}
   int configure(int hz);
   void publishTagPoseMsg(TagPose tag);
-  void publishTargetInertialPositionMsg(
-    Vec3 gimbal_position, Quaternion gimbal_orientation, Vec3 target_bf);
+  void publishTargetInertialPositionMsg(Vec3 gimbal_position,
+                                        Quaternion gimbal_orientation,
+                                        Vec3 target_bf);
   void publishTargetInertialYawMsg(TagPose tag, Quaternion gimbal_frame);
   void publishTargetBodyPositionMsg(Vec3 target_bpf);
   void publishTargetBodyPositionEncoderMsg(Vec3 target_bpf_encoder);
@@ -48,5 +49,5 @@ public:
   void imageCallback(const sensor_msgs::ImageConstPtr &msg);
 };
 
-}  // namespace atl
+} // namespace atl
 #endif

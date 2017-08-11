@@ -55,14 +55,14 @@ protected:
 
     // setup image
     image = cv::imread(TEST_IMAGE);
-    image.at<double>(0, 0) = 0.0;  // position x
-    image.at<double>(0, 1) = 0.0;  // position y
-    image.at<double>(0, 2) = 3.0;  // position z
+    image.at<double>(0, 0) = 0.0; // position x
+    image.at<double>(0, 1) = 0.0; // position y
+    image.at<double>(0, 2) = 3.0; // position z
 
-    image.at<double>(0, 3) = 1.0;  // quaternion w
-    image.at<double>(0, 4) = 0.0;  // quaternion x
-    image.at<double>(0, 5) = 0.0;  // quaternion y
-    image.at<double>(0, 6) = 0.0;  // quaternion z
+    image.at<double>(0, 3) = 1.0; // quaternion w
+    image.at<double>(0, 4) = 0.0; // quaternion x
+    image.at<double>(0, 5) = 0.0; // quaternion y
+    image.at<double>(0, 6) = 0.0; // quaternion z
 
     // publish image
     msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", image).toImageMsg();
@@ -74,9 +74,7 @@ protected:
     ros::spinOnce();
   }
 
-  void poseCallback(const atl_msgs::AprilTagPose &msg) {
-    this->pose_msg = msg;
-  }
+  void poseCallback(const atl_msgs::AprilTagPose &msg) { this->pose_msg = msg; }
 
   void inertialCallback(const geometry_msgs::Vector3 &msg) {
     this->inertial_msg = msg;
@@ -113,7 +111,7 @@ TEST_F(NodeTest, bodyMsg) {
   ASSERT_NEAR(-3.0, this->body_msg.z, 0.2);
 }
 
-}  // namespace atl
+} // namespace atl
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);

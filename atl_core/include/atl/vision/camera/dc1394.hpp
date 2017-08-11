@@ -1,8 +1,8 @@
 #ifndef ATL_CORE_VISION_CAMERA_DC1394_HPP
 #define ATL_CORE_VISION_CAMERA_DC1394_HPP
 
-#include <stdio.h>
 #include <inttypes.h>
+#include <stdio.h>
 
 #include <dc1394/dc1394.h>
 
@@ -56,5 +56,5 @@ public:
   int run();
 };
 
-}  // namespace atl
+} // namespace atl
 #endif

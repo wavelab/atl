@@ -75,13 +75,27 @@ int Quadrotor::setMode(const enum Mode &mode) {
   // set mode
   this->current_mode = mode;
   switch (mode) {
-    case DISARM_MODE: LOG_INFO(INFO_KMODE); break;
-    case HOVER_MODE: LOG_INFO(INFO_HMODE); break;
-    case DISCOVER_MODE: LOG_INFO(INFO_DMODE); break;
-    case TRACKING_MODE: LOG_INFO(INFO_TMODE); break;
-    case LANDING_MODE: LOG_INFO(INFO_LMODE); break;
-    case WAYPOINT_MODE: LOG_INFO(INFO_WMODE); break;
-    default: LOG_ERROR(EINVMODE); return -2;
+  case DISARM_MODE:
+    LOG_INFO(INFO_KMODE);
+    break;
+  case HOVER_MODE:
+    LOG_INFO(INFO_HMODE);
+    break;
+  case DISCOVER_MODE:
+    LOG_INFO(INFO_DMODE);
+    break;
+  case TRACKING_MODE:
+    LOG_INFO(INFO_TMODE);
+    break;
+  case LANDING_MODE:
+    LOG_INFO(INFO_LMODE);
+    break;
+  case WAYPOINT_MODE:
+    LOG_INFO(INFO_WMODE);
+    break;
+  default:
+    LOG_ERROR(EINVMODE);
+    return -2;
   }
 
   return 0;
@@ -263,12 +277,12 @@ int Quadrotor::stepTrackingMode(const double dt) {
   inertial2body(this->velocity, q, vel_bf);
 
   // track target
-  this->att_cmd = this->tracking_controller.calculate(
-    this->landing_target.position_bf,
-    this->pose.position,
-    this->hover_position,
-    this->yaw,
-    dt);
+  this->att_cmd =
+      this->tracking_controller.calculate(this->landing_target.position_bf,
+                                          this->pose.position,
+                                          this->hover_position,
+                                          this->yaw,
+                                          dt);
 
   // update hover position and tracking timer
   this->setHoverXYPosition(this->pose.position);
@@ -285,7 +299,7 @@ int Quadrotor::stepTrackingMode(const double dt) {
   if (this->conditionsMet(conditions, 3) && this->auto_land) {
     // load trajectory
     retval = this->landing_controller.loadTrajectory(
-      this->pose.position, this->landing_target.position_bf, vel_bf(0));
+        this->pose.position, this->landing_target.position_bf, vel_bf(0));
 
     // transition to landing mode
     if (retval == 0) {
@@ -317,14 +331,13 @@ int Quadrotor::stepLandingMode(const double dt) {
   }
 
   // land on target
-  retval = this->landing_controller.calculate(
-    this->landing_target.position_bf,
-    this->landing_target.velocity_bf,
-    this->pose.position,
-    this->velocity,
-    this->pose.orientation,
-    this->yaw,
-    dt);
+  retval = this->landing_controller.calculate(this->landing_target.position_bf,
+                                              this->landing_target.velocity_bf,
+                                              this->pose.position,
+                                              this->velocity,
+                                              this->pose.orientation,
+                                              this->yaw,
+                                              dt);
   this->att_cmd = this->landing_controller.att_cmd;
 
   // update hover position and tracking timer
@@ -382,7 +395,7 @@ int Quadrotor::stepWaypointMode(const double dt) {
 
   // travel through waypoints
   int retval = this->waypoint_controller.update(
-    this->mission, this->pose, this->velocity, dt);
+      this->mission, this->pose, this->velocity, dt);
   this->att_cmd = this->waypoint_controller.att_cmd;
 
   // update hover position
@@ -423,22 +436,32 @@ int Quadrotor::step(const double dt) {
   // step
   int retval;
   switch (this->current_mode) {
-    case DISARM_MODE:
-      this->att_cmd = AttitudeCommand();
-      retval = 0;
-      break;
-    case HOVER_MODE: retval = this->stepHoverMode(dt); break;
-    case DISCOVER_MODE: retval = this->stepDiscoverMode(dt); break;
-    case TRACKING_MODE: retval = this->stepTrackingMode(dt); break;
-    case LANDING_MODE: retval = this->stepLandingMode(dt); break;
-    case WAYPOINT_MODE: retval = this->stepWaypointMode(dt); break;
-    default:
-      LOG_ERROR(EINVMODE);
-      retval = this->stepHoverMode(dt);
-      break;
+  case DISARM_MODE:
+    this->att_cmd = AttitudeCommand();
+    retval = 0;
+    break;
+  case HOVER_MODE:
+    retval = this->stepHoverMode(dt);
+    break;
+  case DISCOVER_MODE:
+    retval = this->stepDiscoverMode(dt);
+    break;
+  case TRACKING_MODE:
+    retval = this->stepTrackingMode(dt);
+    break;
+  case LANDING_MODE:
+    retval = this->stepLandingMode(dt);
+    break;
+  case WAYPOINT_MODE:
+    retval = this->stepWaypointMode(dt);
+    break;
+  default:
+    LOG_ERROR(EINVMODE);
+    retval = this->stepHoverMode(dt);
+    break;
   }
 
   return retval;
 }
 
-}  // namespace atl
+} // namespace atl

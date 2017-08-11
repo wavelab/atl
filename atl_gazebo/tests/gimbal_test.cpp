@@ -1,5 +1,5 @@
-#include <gtest/gtest.h>
 #include "test_settings.hpp"
+#include <gtest/gtest.h>
 
 #include "atl/gazebo/clients/gimbal_gclient.hpp"
 #include "atl/gazebo/gazebo_test.hpp"
@@ -46,8 +46,8 @@ TEST_F(GimbalTest, setRollPitch) {
   this->client->setAttitude(euler_if);
 }
 
-}  // namespace gaz
-}  // namespace atl
+} // namespace gaz
+} // namespace atl
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);

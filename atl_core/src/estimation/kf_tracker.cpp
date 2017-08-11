@@ -81,37 +81,37 @@ int KFTracker::initialize(VecX mu) {
 
 int KFTracker::checkDimensions() {
   if (this->mu.size() != this->nb_states) {
-    LOG_ERROR(EMUSIZE, this->nb_states, (int) this->mu.size());
+    LOG_ERROR(EMUSIZE, this->nb_states, (int)this->mu.size());
     LOG_ERROR(ECHECKCONFIG, this->config_file.c_str());
     return -1;
 
   } else if (this->R.rows() != this->nb_states) {
-    LOG_ERROR(ERROWSIZE, this->nb_states, (int) this->R.rows());
+    LOG_ERROR(ERROWSIZE, this->nb_states, (int)this->R.rows());
     LOG_ERROR(ECHECKCONFIG, this->config_file.c_str());
     return -1;
 
   } else if (this->R.cols() != this->nb_states) {
-    LOG_ERROR(ERCOLSIZE, this->nb_states, (int) this->R.cols());
+    LOG_ERROR(ERCOLSIZE, this->nb_states, (int)this->R.cols());
     LOG_ERROR(ECHECKCONFIG, this->config_file.c_str());
     return -1;
 
   } else if (this->C.rows() != this->nb_dimensions) {
-    LOG_ERROR(ECROWSIZE, this->nb_dimensions, (int) this->C.rows());
+    LOG_ERROR(ECROWSIZE, this->nb_dimensions, (int)this->C.rows());
     LOG_ERROR(ECHECKCONFIG, this->config_file.c_str());
     return -1;
 
   } else if (this->C.cols() != this->nb_states) {
-    LOG_ERROR(ECCOLSIZE, this->nb_states, (int) this->C.cols());
+    LOG_ERROR(ECCOLSIZE, this->nb_states, (int)this->C.cols());
     LOG_ERROR(ECHECKCONFIG, this->config_file.c_str());
     return -1;
 
   } else if (this->Q.rows() != this->nb_dimensions) {
-    LOG_ERROR(EQROWSIZE, this->nb_dimensions, (int) this->Q.rows());
+    LOG_ERROR(EQROWSIZE, this->nb_dimensions, (int)this->Q.rows());
     LOG_ERROR(ECHECKCONFIG, this->config_file.c_str());
     return -1;
 
   } else if (this->Q.cols() != this->nb_dimensions) {
-    LOG_ERROR(EQCOLSIZE, this->nb_dimensions, (int) this->Q.cols());
+    LOG_ERROR(EQCOLSIZE, this->nb_dimensions, (int)this->Q.cols());
     LOG_ERROR(ECHECKCONFIG, this->config_file.c_str());
     return -1;
   }
@@ -160,7 +160,7 @@ int KFTracker::estimate(MatX A, VecX y) {
     LOG_ERROR(EASIZE, this->nb_states);
     return -2;
   } else if (y.size() != this->C.rows()) {
-    LOG_ERROR(EYSIZE, (int) this->C.rows());
+    LOG_ERROR(EYSIZE, (int)this->C.rows());
     return -2;
   }
 
@@ -176,4 +176,4 @@ int KFTracker::estimate(MatX A, VecX y) {
   return 0;
 }
 
-}  // namespace atl
+} // namespace atl

@@ -49,9 +49,7 @@ int GimbalNode::configure(int hz) {
   return 0;
 }
 
-GimbalNode::~GimbalNode() {
-  this->gimbal.off();
-}
+GimbalNode::~GimbalNode() { this->gimbal.off(); }
 
 int GimbalNode::publishIMU(Vec3 euler) {
   geometry_msgs::Vector3 msg;
@@ -155,7 +153,7 @@ int GimbalNode::loopCallback() {
     // encoder reading
     encoder_euler(0) = this->gimbal.encoder_angles(0);
     encoder_euler(1) = this->gimbal.encoder_angles(1);
-    encoder_euler(2) = 0.0;  // There is no yaw encoder (yet)
+    encoder_euler(2) = 0.0; // There is no yaw encoder (yet)
     euler2quat(encoder_euler, 321, encoder_q);
 
     // publish imu and encoder readings
@@ -166,6 +164,6 @@ int GimbalNode::loopCallback() {
   return 0;
 }
 
-}  // namespace atl
+} // namespace atl
 
 RUN_ROS_NODE(atl::GimbalNode, NODE_RATE);

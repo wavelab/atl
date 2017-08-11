@@ -61,9 +61,9 @@ enum ConfigDataType {
 /** Represents a parameter to be parsed in the yaml file */
 class ConfigParam {
 public:
-  enum ConfigDataType type = TYPE_NOT_SET;  //!< parameter type (e.g `INT`)
-  std::string key;                          //!< yaml key to parse from
-  void *data = nullptr;  //!< pointer to variable to store the parameter value
+  enum ConfigDataType type = TYPE_NOT_SET; //!< parameter type (e.g `INT`)
+  std::string key;                         //!< yaml key to parse from
+  void *data = nullptr; //!< pointer to variable to store the parameter value
   bool optional = false;
 
   ConfigParam() {}
@@ -178,8 +178,9 @@ public:
    *
    * @todo refactor return codes into an enum which can be documented
    */
-  int checkVector(
-    const std::string &key, enum ConfigDataType type, bool optional);
+  int checkVector(const std::string &key,
+                  enum ConfigDataType type,
+                  bool optional);
 
   /** @return see `checkKey` */
   int checkMatrix(const std::string &key, bool optional);
@@ -218,6 +219,6 @@ public:
   int load(const std::string &config_file);
 };
 
-}  // namespace atl
+} // namespace atl
 
-#endif  // ATL_UTILS_CONFIG_HPP
+#endif // ATL_UTILS_CONFIG_HPP

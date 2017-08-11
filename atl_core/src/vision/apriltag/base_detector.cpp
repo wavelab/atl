@@ -49,7 +49,7 @@ int BaseDetector::configure(std::string config_file) {
   }
 
   // parse camera configs
-  config_dir = std::string(dirname((char *) config_file.c_str()));
+  config_dir = std::string(dirname((char *)config_file.c_str()));
   paths_combine(config_dir, camera_config, camera_config);
   if (camera.configure(camera_config) != 0) {
     return -1;
@@ -136,8 +136,7 @@ int BaseDetector::changeMode(cv::Mat &image) {
   return 0;
 }
 
-int BaseDetector::maskImage(
-  TagPose tag_pose, cv::Mat &image, double padding) {
+int BaseDetector::maskImage(TagPose tag_pose, cv::Mat &image, double padding) {
   std::string camera_mode;
   int image_width, image_height;
   double x, y, z;
@@ -229,4 +228,4 @@ void BaseDetector::printTag(TagPose tag) {
   std::cout << std::endl;
 }
 
-}  // namespace atl
+} // namespace atl

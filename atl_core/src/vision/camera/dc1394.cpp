@@ -40,18 +40,16 @@ int DC1394Camera::initialize(uint64_t guid) {
   dc1394_camera_free_list(list);
 
   // operation mode - FireWire IEEE 1394a or 1394b
-  error = dc1394_video_set_operation_mode(
-    this->capture, DC1394_OPERATION_MODE_LEGACY);
+  error = dc1394_video_set_operation_mode(this->capture,
+                                          DC1394_OPERATION_MODE_LEGACY);
   DC1394_ERR_RTN(error, "Failed to set 1394A mode!");
 
   // capture settings
-  error =
-    dc1394_capture_setup(this->capture, 4, DC1394_CAPTURE_FLAGS_DEFAULT);
+  error = dc1394_capture_setup(this->capture, 4, DC1394_CAPTURE_FLAGS_DEFAULT);
   DC1394_ERR_RTN(error, "Failed to configure camera!");
 
   // video mode
-  error =
-    dc1394_video_set_mode(this->capture, DC1394_VIDEO_MODE_640x480_MONO8);
+  error = dc1394_video_set_mode(this->capture, DC1394_VIDEO_MODE_640x480_MONO8);
   DC1394_ERR_RTN(error, "Failed to set video mode!");
 
   // iso speed
@@ -108,17 +106,17 @@ int DC1394Camera::setBrightness(double brightness) {
 
   // turn on the feature - dont know what this means??
   err = dc1394_feature_set_power(
-    this->capture, DC1394_FEATURE_BRIGHTNESS, DC1394_ON);
+      this->capture, DC1394_FEATURE_BRIGHTNESS, DC1394_ON);
   DC1394_ERR_RTN(err, "Could not turn on the brightness feature");
 
   // turn off auto exposure
   err = dc1394_feature_set_mode(
-    this->capture, DC1394_FEATURE_BRIGHTNESS, DC1394_FEATURE_MODE_MANUAL);
+      this->capture, DC1394_FEATURE_BRIGHTNESS, DC1394_FEATURE_MODE_MANUAL);
   DC1394_ERR_RTN(err, "Could not turn off Auto-brightness");
 
   // set brightness
   err = dc1394_feature_set_value(
-    this->capture, DC1394_FEATURE_BRIGHTNESS, brightness);
+      this->capture, DC1394_FEATURE_BRIGHTNESS, brightness);
   DC1394_ERR_RTN(err, "Could not set value");
 
   return 0;
@@ -161,17 +159,17 @@ int DC1394Camera::setExposure(double exposure) {
 
   // turn on the exposure feature
   err = dc1394_feature_set_power(
-    this->capture, DC1394_FEATURE_EXPOSURE, DC1394_ON);
+      this->capture, DC1394_FEATURE_EXPOSURE, DC1394_ON);
   DC1394_ERR_RTN(err, "Could not turn on the exposure feature");
 
   // turn off auto exposure
   err = dc1394_feature_set_mode(
-    this->capture, DC1394_FEATURE_EXPOSURE, DC1394_FEATURE_MODE_MANUAL);
+      this->capture, DC1394_FEATURE_EXPOSURE, DC1394_FEATURE_MODE_MANUAL);
   DC1394_ERR_RTN(err, "Could not turn off Auto-exposure");
 
   // set exposure
   err = dc1394_feature_set_value(
-    this->capture, DC1394_FEATURE_EXPOSURE, exposure);
+      this->capture, DC1394_FEATURE_EXPOSURE, exposure);
   DC1394_ERR_RTN(err, "Could not set exposure");
 
   return 0;
@@ -182,17 +180,17 @@ int DC1394Camera::setShutter(double shutter_ms) {
 
   // turn on the shutter feature
   err = dc1394_feature_set_power(
-    this->capture, DC1394_FEATURE_SHUTTER, DC1394_ON);
+      this->capture, DC1394_FEATURE_SHUTTER, DC1394_ON);
   DC1394_ERR_RTN(err, "Could not turn on the shutter feature");
 
   // turn off auto shutter
   err = dc1394_feature_set_mode(
-    this->capture, DC1394_FEATURE_SHUTTER, DC1394_FEATURE_MODE_MANUAL);
+      this->capture, DC1394_FEATURE_SHUTTER, DC1394_FEATURE_MODE_MANUAL);
   DC1394_ERR_RTN(err, "Could not turn off Auto-shutter");
 
   // set shutter
   err = dc1394_feature_set_value(
-    this->capture, DC1394_FEATURE_SHUTTER, shutter_ms);
+      this->capture, DC1394_FEATURE_SHUTTER, shutter_ms);
   DC1394_ERR_RTN(err, "Could not set shutter");
 
   return 0;
@@ -202,13 +200,12 @@ int DC1394Camera::setGain(double gain_db) {
   dc1394error_t err;
 
   // turn on the gain feature
-  err =
-    dc1394_feature_set_power(this->capture, DC1394_FEATURE_GAIN, DC1394_ON);
+  err = dc1394_feature_set_power(this->capture, DC1394_FEATURE_GAIN, DC1394_ON);
   DC1394_ERR_RTN(err, "Could not turn on the gain feature");
 
   // turn off auto gain
   err = dc1394_feature_set_mode(
-    this->capture, DC1394_FEATURE_GAIN, DC1394_FEATURE_MODE_MANUAL);
+      this->capture, DC1394_FEATURE_GAIN, DC1394_FEATURE_MODE_MANUAL);
   DC1394_ERR_RTN(err, "Could not turn off Auto-gain");
 
   // set gain
@@ -223,15 +220,15 @@ int DC1394Camera::getBrightness(double &brightness) {
 
   // turn on the brightness feature
   err = dc1394_feature_set_power(
-    this->capture, DC1394_FEATURE_BRIGHTNESS, DC1394_ON);
+      this->capture, DC1394_FEATURE_BRIGHTNESS, DC1394_ON);
   DC1394_ERR_RTN(err, "Could not turn on brightness feature");
 
   // get brightness value
   uint32_t value;
   err = dc1394_feature_get_value(
-    this->capture, DC1394_FEATURE_BRIGHTNESS, &value);
+      this->capture, DC1394_FEATURE_BRIGHTNESS, &value);
   DC1394_ERR_RTN(err, "Could not get brightness");
-  brightness = (double) value;
+  brightness = (double)value;
 
   return 0;
 }
@@ -273,15 +270,15 @@ int DC1394Camera::getExposure(double &exposure) {
 
   // turn on the exposure feature
   err = dc1394_feature_set_power(
-    this->capture, DC1394_FEATURE_EXPOSURE, DC1394_ON);
+      this->capture, DC1394_FEATURE_EXPOSURE, DC1394_ON);
   DC1394_ERR_RTN(err, "Could not turn on exposure feature");
 
   // get exposure value
   uint32_t value;
   err =
-    dc1394_feature_get_value(this->capture, DC1394_FEATURE_EXPOSURE, &value);
+      dc1394_feature_get_value(this->capture, DC1394_FEATURE_EXPOSURE, &value);
   DC1394_ERR_RTN(err, "Could not get exposure");
-  exposure = (double) value;
+  exposure = (double)value;
 
   return 0;
 }
@@ -291,15 +288,14 @@ int DC1394Camera::getShutter(double &shutter_ms) {
 
   // turn on the exposure feature
   err = dc1394_feature_set_power(
-    this->capture, DC1394_FEATURE_SHUTTER, DC1394_ON);
+      this->capture, DC1394_FEATURE_SHUTTER, DC1394_ON);
   DC1394_ERR_RTN(err, "Could not turn on shutter feature");
 
   // get shutter value
   uint32_t value;
-  err =
-    dc1394_feature_get_value(this->capture, DC1394_FEATURE_SHUTTER, &value);
+  err = dc1394_feature_get_value(this->capture, DC1394_FEATURE_SHUTTER, &value);
   DC1394_ERR_RTN(err, "Could not get shutter");
-  shutter_ms = (double) value;
+  shutter_ms = (double)value;
 
   return 0;
 }
@@ -308,21 +304,19 @@ int DC1394Camera::getGain(double &gain_db) {
   dc1394error_t err;
 
   // turn on the gain feature
-  err =
-    dc1394_feature_set_power(this->capture, DC1394_FEATURE_GAIN, DC1394_ON);
+  err = dc1394_feature_set_power(this->capture, DC1394_FEATURE_GAIN, DC1394_ON);
   DC1394_ERR_RTN(err, "Could not turn on gain feature");
 
   // get shutter value
   uint32_t value;
   err = dc1394_feature_get_value(this->capture, DC1394_FEATURE_GAIN, &value);
   DC1394_ERR_RTN(err, "Could not get gain");
-  gain_db = (double) value;
+  gain_db = (double)value;
 
   return 0;
 }
 
-std::pair<int, int> DC1394Camera::centerROI(
-  int size, int max_size, int step) {
+std::pair<int, int> DC1394Camera::centerROI(int size, int max_size, int step) {
   if (size == 0 || size > max_size) {
     size = max_size;
   }
@@ -351,7 +345,7 @@ int DC1394Camera::getFrame(cv::Mat &image) {
   // capture frame
   dc1394video_frame_t *frame = nullptr;
   err =
-    dc1394_capture_dequeue(this->capture, DC1394_CAPTURE_POLICY_WAIT, &frame);
+      dc1394_capture_dequeue(this->capture, DC1394_CAPTURE_POLICY_WAIT, &frame);
   DC1394_ERR_RTN(err, "Failed to obtain frame from camera!");
 
   // convert mono 8 to colour
@@ -362,15 +356,14 @@ int DC1394Camera::getFrame(cv::Mat &image) {
   size_t row_bytes = img_size / img_rows;
 
   if (this->buffer == nullptr) {
-    buffer = (uint8_t *) malloc(img_size);
+    buffer = (uint8_t *)malloc(img_size);
   }
-  dc1394_bayer_decoding_8bit(
-    frame->image,
-    this->buffer,
-    img_cols,
-    img_rows,
-    DC1394_COLOR_FILTER_BGGR,
-    DC1394_BAYER_METHOD_SIMPLE);
+  dc1394_bayer_decoding_8bit(frame->image,
+                             this->buffer,
+                             img_cols,
+                             img_rows,
+                             DC1394_COLOR_FILTER_BGGR,
+                             DC1394_BAYER_METHOD_SIMPLE);
 
   // convert to opencv mat
   cv::Mat(img_rows, img_cols, CV_8UC3, this->buffer, row_bytes).copyTo(image);
@@ -409,4 +402,4 @@ int DC1394Camera::run() {
   return 0;
 }
 
-}  // namespace atr
+} // namespace atr

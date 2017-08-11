@@ -14,6 +14,6 @@ public:
   WaypointLine() {}
 };
 
-}  // namespace atl
+} // namespace atl
 
 #endif

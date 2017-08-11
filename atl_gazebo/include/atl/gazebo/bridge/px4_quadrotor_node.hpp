@@ -83,6 +83,6 @@ public:
   void velocitySetpointCallback(const geometry_msgs::TwistStamped &msg);
 };
 
-}  // namespace gazebo_bridge
-}  // namespace atl
+} // namespace gazebo_bridge
+} // namespace atl
 #endif

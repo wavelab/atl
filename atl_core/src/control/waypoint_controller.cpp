@@ -41,8 +41,7 @@ int WaypointController::configure(const std::string &config_file) {
       LOG_ERROR("blackbox file is not set!");
       return -3;
     } else if (this->prepBlackbox(blackbox_file) != 0) {
-      LOG_ERROR(
-        "Failed to open blackbox file at [%s]", blackbox_file.c_str());
+      LOG_ERROR("Failed to open blackbox file at [%s]", blackbox_file.c_str());
       return -3;
     }
 
@@ -98,8 +97,10 @@ int WaypointController::record(const Vec3 &pos, const Vec3 &waypoint) {
   return 0;
 }
 
-int WaypointController::update(
-  Mission &mission, const Pose &pose, const Vec3 &vel, const double dt) {
+int WaypointController::update(Mission &mission,
+                               const Pose &pose,
+                               const Vec3 &vel,
+                               const double dt) {
   // check rate
   this->dt += dt;
   if (this->dt < 0.01) {
@@ -140,7 +141,7 @@ int WaypointController::update(
   double error_z = waypoint(2) - pose.position(2);
   double t = this->hover_throttle;
   t += this->z_controller.update(error_z, this->dt);
-  t /= fabs(cos(r) * cos(p));  // adjust throttle for roll and pitch
+  t /= fabs(cos(r) * cos(p)); // adjust throttle for roll and pitch
 
   // limit roll, pitch and throttle
   r = (r < this->roll_limit[0]) ? this->roll_limit[0] : r;
@@ -166,4 +167,4 @@ void WaypointController::reset() {
   this->yaw_controller.reset();
 }
 
-}  // namespace atl
+} // namespace atl

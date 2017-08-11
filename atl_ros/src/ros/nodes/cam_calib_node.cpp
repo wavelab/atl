@@ -19,10 +19,10 @@ int CamCalibNode::configure(int hz) {
   ROS_GET_PARAM(this->node_name + "/chessboard_cols", chessboard_cols);
   this->chessboard_size = cv::Size(chessboard_cols, chessboard_rows);
 
-  ROS_GET_PARAM(
-    this->node_name + "/static_camera_topic", this->static_camera_topic);
-  ROS_GET_PARAM(
-    this->node_name + "/gimbal_camera_topic", this->gimbal_camera_topic);
+  ROS_GET_PARAM(this->node_name + "/static_camera_topic",
+                this->static_camera_topic);
+  ROS_GET_PARAM(this->node_name + "/gimbal_camera_topic",
+                this->gimbal_camera_topic);
 
   // calibration dir
   int retval = mkdir(this->calib_dir.c_str(), ACCESSPERMS);
@@ -68,8 +68,8 @@ int CamCalibNode::configure(int hz) {
   return 0;
 }
 
-void CamCalibNode::imageMsgToCvMat(
-  const sensor_msgs::ImageConstPtr &msg, cv::Mat &img) {
+void CamCalibNode::imageMsgToCvMat(const sensor_msgs::ImageConstPtr &msg,
+                                   cv::Mat &img) {
   cv_bridge::CvImagePtr image_ptr = cv_bridge::toCvCopy(msg);
 
   size_t img_size = image_ptr->image.total() * image_ptr->image.elemSize();
@@ -77,16 +77,14 @@ void CamCalibNode::imageMsgToCvMat(
   size_t img_cols = image_ptr->image.cols;
   size_t row_bytes = img_size / img_rows;
   cv::Mat(img_rows, img_cols, CV_8UC3, image_ptr->image.data, row_bytes)
-    .copyTo(img);
+      .copyTo(img);
 }
 
-void CamCalibNode::staticCameraCallback(
-  const sensor_msgs::ImageConstPtr &msg) {
+void CamCalibNode::staticCameraCallback(const sensor_msgs::ImageConstPtr &msg) {
   this->imageMsgToCvMat(msg, this->static_camera_image);
 }
 
-void CamCalibNode::gimbalCameraCallback(
-  const sensor_msgs::ImageConstPtr &msg) {
+void CamCalibNode::gimbalCameraCallback(const sensor_msgs::ImageConstPtr &msg) {
   this->imageMsgToCvMat(msg, this->gimbal_camera_image);
 }
 
@@ -95,7 +93,7 @@ void CamCalibNode::gimbalJointCallback(const geometry_msgs::Quaternion &msg) {
 }
 
 void CamCalibNode::gimbalJointBodyCallback(
-  const geometry_msgs::Quaternion &msg) {
+    const geometry_msgs::Quaternion &msg) {
   convertMsg(msg, this->gimbal_joint_body_orientation);
 }
 
@@ -105,8 +103,7 @@ bool CamCalibNode::chessboardDetected() {
   this->chessboard_detected[1] = false;
 
   // pre-check
-  if (
-    this->static_camera_image.empty() || this->gimbal_camera_image.empty()) {
+  if (this->static_camera_image.empty() || this->gimbal_camera_image.empty()) {
     return false;
   }
 
@@ -118,12 +115,12 @@ bool CamCalibNode::chessboardDetected() {
   // check first camera
   this->corners_1.clear();
   this->chessboard_detected[0] = cv::findChessboardCorners(
-    this->static_camera_image, this->chessboard_size, this->corners_1, flags);
+      this->static_camera_image, this->chessboard_size, this->corners_1, flags);
 
   // check second camera
   this->corners_2.clear();
   this->chessboard_detected[1] = cv::findChessboardCorners(
-    this->gimbal_camera_image, this->chessboard_size, this->corners_2, flags);
+      this->gimbal_camera_image, this->chessboard_size, this->corners_2, flags);
 
   // check results
   if (this->chessboard_detected[0] && this->chessboard_detected[1]) {
@@ -135,8 +132,7 @@ bool CamCalibNode::chessboardDetected() {
 
 void CamCalibNode::showImages() {
   // pre-check
-  if (
-    this->static_camera_image.empty() || this->gimbal_camera_image.empty()) {
+  if (this->static_camera_image.empty() || this->gimbal_camera_image.empty()) {
     return;
   }
 
@@ -144,7 +140,7 @@ void CamCalibNode::showImages() {
   if (this->chessboard_detected[0]) {
     cv::Mat img_1 = this->static_camera_image.clone();
     cv::drawChessboardCorners(
-      img_1, this->chessboard_size, this->corners_1, true);
+        img_1, this->chessboard_size, this->corners_1, true);
     cv::imshow("Camera 1", img_1);
   } else {
     cv::imshow("Camera 1", this->static_camera_image);
@@ -154,7 +150,7 @@ void CamCalibNode::showImages() {
   if (this->chessboard_detected[1]) {
     cv::Mat img_2 = this->gimbal_camera_image.clone();
     cv::drawChessboardCorners(
-      img_2, this->chessboard_size, this->corners_2, true);
+        img_2, this->chessboard_size, this->corners_2, true);
     cv::imshow("Camera 2", img_2);
   } else {
     cv::imshow("Camera 2", this->gimbal_camera_image);
@@ -203,27 +199,27 @@ int CamCalibNode::loopCallback() {
   // parse keyboard input
   int key = cv::waitKey(1);
   switch (key) {
-    // "esc" or "q" key was pressed
-    case 113:
-    case 27:
-      ROS_INFO("Shutting down CamCalibNode!");
-      return -1;
+  // "esc" or "q" key was pressed
+  case 113:
+  case 27:
+    ROS_INFO("Shutting down CamCalibNode!");
+    return -1;
 
-    // "enter" key was pressed
-    case 13:
-      // save image
-      if (data_ok) {
-        this->saveImages();
-        this->saveGimbalMeasurements();
-      } else {
-        ROS_WARN("Chessboard not inview of camera(s), NOT SAVING!");
-      }
-      break;
+  // "enter" key was pressed
+  case 13:
+    // save image
+    if (data_ok) {
+      this->saveImages();
+      this->saveGimbalMeasurements();
+    } else {
+      ROS_WARN("Chessboard not inview of camera(s), NOT SAVING!");
+    }
+    break;
   }
 
   return 0;
 }
 
-}  // namespace atl
+} // namespace atl
 
 RUN_ROS_NODE(atl::CamCalibNode, NODE_RATE);

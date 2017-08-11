@@ -12,9 +12,9 @@
 
 #include <dji_sdk/dji_drone.h>
 
-#include <atl/atl_core.hpp>
 #include "atl/ros/utils/msgs.hpp"
 #include "atl/ros/utils/node.hpp"
+#include <atl/atl_core.hpp>
 
 namespace atl {
 
@@ -357,5 +357,5 @@ public:
   int loopCallback();
 };
 
-}  // namespace atl
+} // namespace atl
 #endif

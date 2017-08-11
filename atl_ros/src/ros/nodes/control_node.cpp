@@ -271,15 +271,14 @@ void ControlNode::px4PoseCallback(const geometry_msgs::PoseStamped &msg) {
     pose.orientation = orientation;
 
   } else {
-    LOG_ERROR(
-      "Invalid ROS [/quad_frame] param value: %s", this->quad_frame.c_str());
+    LOG_ERROR("Invalid ROS [/quad_frame] param value: %s",
+              this->quad_frame.c_str());
   }
 
   this->quadrotor.setPose(pose);
 }
 
-void ControlNode::px4VelocityCallback(
-  const geometry_msgs::TwistStamped &msg) {
+void ControlNode::px4VelocityCallback(const geometry_msgs::TwistStamped &msg) {
   Vec3 vel_nwu, vel_ned, vel_enu;
 
   if (this->quad_frame == "NWU") {
@@ -293,8 +292,8 @@ void ControlNode::px4VelocityCallback(
     this->quadrotor.setVelocity(vel_enu);
 
   } else {
-    LOG_ERROR(
-      "Invalid ROS [/quad_frame] param value: %s", this->quad_frame.c_str());
+    LOG_ERROR("Invalid ROS [/quad_frame] param value: %s",
+              this->quad_frame.c_str());
   }
 }
 
@@ -334,8 +333,7 @@ void ControlNode::djiGPSPositionCallback(const dji_sdk::GlobalPosition &msg) {
   }
 }
 
-void ControlNode::djiLocalPositionCallback(
-  const dji_sdk::LocalPosition &msg) {
+void ControlNode::djiLocalPositionCallback(const dji_sdk::LocalPosition &msg) {
   Vec3 pos_ned, pos_enu;
 
   pos_ned(0) = msg.x;
@@ -346,8 +344,7 @@ void ControlNode::djiLocalPositionCallback(
   this->quadrotor.pose.position = pos_enu;
 }
 
-void ControlNode::djiAttitudeCallback(
-  const dji_sdk::AttitudeQuaternion &msg) {
+void ControlNode::djiAttitudeCallback(const dji_sdk::AttitudeQuaternion &msg) {
   Quaternion orientation_ned, orientation_nwu;
 
   orientation_ned.w() = msg.q0;
@@ -469,17 +466,17 @@ void ControlNode::hoverHeightSetCallback(const std_msgs::Float64 &msg) {
 }
 
 void ControlNode::positionControllerSetCallback(
-  const atl_msgs::PCtrlSettings &msg) {
+    const atl_msgs::PCtrlSettings &msg) {
   convertMsg(msg, this->quadrotor.position_controller);
 }
 
 void ControlNode::trackingControllerSetCallback(
-  const atl_msgs::TCtrlSettings &msg) {
+    const atl_msgs::TCtrlSettings &msg) {
   convertMsg(msg, this->quadrotor.tracking_controller);
 }
 
 void ControlNode::landingControllerSetCallback(
-  const atl_msgs::LCtrlSettings &msg) {
+    const atl_msgs::LCtrlSettings &msg) {
   // convertMsg(msg, this->quadrotor.landing_controller);
 }
 
@@ -546,7 +543,7 @@ void ControlNode::publishAttitudeSetpoint() {
 
   } else {
     ROS_ERROR("Invalid [fcu_type]: %s", this->fcu_type.c_str());
-    exit(-1);  // dangerous but necessary
+    exit(-1); // dangerous but necessary
   }
 }
 
@@ -629,6 +626,6 @@ int ControlNode::loopCallback() {
   return 0;
 }
 
-}  // namespace atl
+} // namespace atl
 
 RUN_ROS_NODE(atl::ControlNode, NODE_RATE);

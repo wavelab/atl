@@ -78,6 +78,6 @@ int IMUNode::loopCallback() {
   return 0;
 }
 
-}  // eof atl namespace
+} // eof atl namespace
 
 RUN_ROS_NODE(atl::IMUNode, NODE_RATE);

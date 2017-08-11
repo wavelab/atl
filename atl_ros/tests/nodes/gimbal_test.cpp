@@ -37,7 +37,7 @@ protected:
 
     // Publishers
     this->setpoint_pub =
-      this->ros_nh.advertise<geometry_msgs::Vector3>(SET_ATTITUDE_TOPIC, 1);
+        this->ros_nh.advertise<geometry_msgs::Vector3>(SET_ATTITUDE_TOPIC, 1);
     ros::spinOnce();
     ros::Duration(1.0).sleep();
   }
@@ -46,7 +46,7 @@ protected:
     geometry_msgs::Vector3 setpoint_msg;
     setpoint_msg.x = 10;
     setpoint_msg.y = 10;
-    setpoint_msg.z = 0;  // Yaw is not supported in this gimbal
+    setpoint_msg.z = 0; // Yaw is not supported in this gimbal
 
     this->setpoint_pub.publish(setpoint_msg);
 
@@ -79,7 +79,7 @@ TEST_F(NodeTest, frameOrientationMsg) {
   // ASSERT_NEAR(0.0, this->pos_if_msg.z, 0.1);
 }
 
-}  // namespace atl
+} // namespace atl
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);

@@ -49,7 +49,7 @@ void DFCameraNode::imageCallback(ConstImagePtr &msg) {
   }
 }
 
-}  // namespace gazebo_bridge
-}  // namespace atl
+} // namespace gazebo_bridge
+} // namespace atl
 
 RUN_ROS_NODE(atl::gazebo_bridge::DFCameraNode, NODE_RATE);

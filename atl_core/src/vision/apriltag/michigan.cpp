@@ -2,9 +2,7 @@
 
 namespace atl {
 
-MichiganDetector::MichiganDetector() {
-  this->detector = NULL;
-}
+MichiganDetector::MichiganDetector() { this->detector = NULL; }
 
 MichiganDetector::~MichiganDetector() {
   apriltag_detector_destroy(this->detector);
@@ -24,8 +22,7 @@ int MichiganDetector::configure(const std::string &config_file) {
   return 0;
 }
 
-int MichiganDetector::extractTags(
-  cv::Mat &image, std::vector<TagPose> &tags) {
+int MichiganDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
   int retval;
   TagPose pose;
   cv::Mat image_gray;
@@ -67,7 +64,7 @@ int MichiganDetector::extractTags(
     apriltag_detection_t *det;
     zarray_get(detections, i, &det);
     this->obtainPose(det, pose);
-    break;  // only need 1 tag
+    break; // only need 1 tag
   }
 
   // imshow
@@ -80,8 +77,7 @@ int MichiganDetector::extractTags(
   return 0;
 }
 
-int MichiganDetector::obtainPose(
-  apriltag_detection_t *tag, TagPose &tag_pose) {
+int MichiganDetector::obtainPose(apriltag_detection_t *tag, TagPose &tag_pose) {
   Mat4 transform;
   Vec3 t;
   Mat3 R;
@@ -122,21 +118,20 @@ int MichiganDetector::obtainPose(
 
   // recovering the relative transform of a tag:
   cv::Mat rvec, tvec;
-  cv::solvePnP(
-    obj_pts,
-    img_pts,
-    camera_config.camera_matrix,
-    distParam,
-    rvec,
-    tvec,
-    false,
-    CV_ITERATIVE);
+  cv::solvePnP(obj_pts,
+               img_pts,
+               camera_config.camera_matrix,
+               distParam,
+               rvec,
+               tvec,
+               false,
+               CV_ITERATIVE);
   cv::Matx33d r;
   cv::Rodrigues(rvec, r);
 
   // Eigen::Matrix3d wRo;
   R << r(0, 0), r(0, 1), r(0, 2), r(1, 0), r(1, 1), r(1, 2), r(2, 0), r(2, 1),
-    r(2, 2);
+      r(2, 2);
 
   // translational component
   t << tvec.at<double>(0), tvec.at<double>(1), tvec.at<double>(2);
@@ -156,4 +151,4 @@ int MichiganDetector::obtainPose(
   return 0;
 }
 
-}  // namespace atl
+} // namespace atl

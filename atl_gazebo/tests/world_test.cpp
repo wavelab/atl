@@ -25,9 +25,7 @@ protected:
     }
   }
 
-  virtual ~WorldTest() {
-    this->client.clearWorld();
-  }
+  virtual ~WorldTest() { this->client.clearWorld(); }
 
   virtual void SetUp() {
     this->client.clearWorld();
@@ -80,8 +78,8 @@ TEST_F(WorldTest, ClearAndLoadWorld) {
   this->client.loadWorld("worlds/quadrotor_test.world");
 }
 
-}  // namespace gaz
-}  // namespace atl
+} // namespace gaz
+} // namespace atl
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);

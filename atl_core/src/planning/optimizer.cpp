@@ -2,8 +2,9 @@
 
 namespace atl {
 
-double cost_func(
-  const std::vector<double> &x, std::vector<double> &grad, void *data) {
+double cost_func(const std::vector<double> &x,
+                 std::vector<double> &grad,
+                 void *data) {
   UNUSED(data);
 
   // calculate gradients
@@ -15,8 +16,9 @@ double cost_func(
   return sqrt(x[1]);
 }
 
-double constraint_func(
-  const std::vector<double> &x, std::vector<double> &grad, void *data) {
+double constraint_func(const std::vector<double> &x,
+                       std::vector<double> &grad,
+                       void *data) {
   constraint_data *d;
   double a, b;
 
@@ -70,4 +72,4 @@ int POpt::run() {
   return 0;
 }
 
-}  // namespace atl
+} // namespace atl

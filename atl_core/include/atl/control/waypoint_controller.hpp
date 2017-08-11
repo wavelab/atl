@@ -1,9 +1,9 @@
 #ifndef ATL_CONTROL_WAYPOINT_CONTROLLER_HPP
 #define ATL_CONTROL_WAYPOINT_CONTROLLER_HPP
 
-#include <libgen.h>
 #include <deque>
 #include <iomanip>
+#include <libgen.h>
 
 #include <yaml-cpp/yaml.h>
 
@@ -91,8 +91,10 @@ public:
    *   - -1: Not configured
    *   - -2: No more waypoints
    */
-  int update(
-    Mission &mission, const Pose &pose, const Vec3 &vel, const double dt);
+  int update(Mission &mission,
+             const Pose &pose,
+             const Vec3 &vel,
+             const double dt);
 
   /**
    * Reset controller errors to 0
@@ -100,5 +102,5 @@ public:
   void reset();
 };
 
-}  // namespace atl
+} // namespace atl
 #endif

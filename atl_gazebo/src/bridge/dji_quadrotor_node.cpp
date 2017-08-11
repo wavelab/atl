@@ -51,13 +51,12 @@ void DJIQuadrotorNode::poseCallback(ConstPosePtr &msg) {
   // convert NWU position to GPS lat lon coordinates
   double lat = 0.0;
   double lon = 0.0;
-  latlon_offset(
-    this->home_latitude,
-    this->home_longitude,
-    ros_pos(0),
-    ros_pos(1),
-    &lat,
-    &lon);
+  latlon_offset(this->home_latitude,
+                this->home_longitude,
+                ros_pos(0),
+                ros_pos(1),
+                &lat,
+                &lon);
 
   // build global position msg
   dji_sdk::GlobalPosition global_position_msg;
@@ -103,8 +102,8 @@ void DJIQuadrotorNode::velocityCallback(ConstVector3dPtr &msg) {
 }
 
 bool DJIQuadrotorNode::controlCallback(
-  dji_sdk::AttitudeControl::Request &request,
-  dji_sdk::AttitudeControl::Response &response) {
+    dji_sdk::AttitudeControl::Request &request,
+    dji_sdk::AttitudeControl::Response &response) {
   // pre-check
   if (request.flag != 0x20) {
     LOG_ERROR("Attitude control byte other than [0x20] is not supported!");
@@ -125,7 +124,7 @@ bool DJIQuadrotorNode::controlCallback(
   return true;
 }
 
-}  // namespace gazebo_bridge
-}  // namespace atl
+} // namespace gazebo_bridge
+} // namespace atl
 
 RUN_ROS_NODE(atl::gazebo_bridge::DJIQuadrotorNode, NODE_RATE);
