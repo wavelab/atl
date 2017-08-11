@@ -199,22 +199,22 @@ int CamCalibNode::loopCallback() {
   // parse keyboard input
   int key = cv::waitKey(1);
   switch (key) {
-  // "esc" or "q" key was pressed
-  case 113:
-  case 27:
-    ROS_INFO("Shutting down CamCalibNode!");
-    return -1;
+    // "esc" or "q" key was pressed
+    case 113:
+    case 27:
+      ROS_INFO("Shutting down CamCalibNode!");
+      return -1;
 
-  // "enter" key was pressed
-  case 13:
-    // save image
-    if (data_ok) {
-      this->saveImages();
-      this->saveGimbalMeasurements();
-    } else {
-      ROS_WARN("Chessboard not inview of camera(s), NOT SAVING!");
-    }
-    break;
+    // "enter" key was pressed
+    case 13:
+      // save image
+      if (data_ok) {
+        this->saveImages();
+        this->saveGimbalMeasurements();
+      } else {
+        ROS_WARN("Chessboard not inview of camera(s), NOT SAVING!");
+      }
+      break;
   }
 
   return 0;

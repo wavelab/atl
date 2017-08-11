@@ -2,25 +2,7 @@
 
 namespace atl {
 
-BaseDetector::BaseDetector() {
-  this->configured = false;
-
-  this->prev_tag = TagPose();
-  this->prev_tag_image_width = 0;
-  this->prev_tag_image_height = 0;
-
-  this->tag_configs.clear();
-  this->tag_sanity_check = FLT_MAX;
-  this->camera_mode = "";
-  this->camera_modes.clear();
-  this->camera_configs.clear();
-  this->windowing = false;
-  this->window_padding = FLT_MAX;
-  this->illum_invar = false;
-  this->imshow = false;
-}
-
-int BaseDetector::configure(std::string config_file) {
+int BaseDetector::configure(const std::string &config_file) {
   Camera camera;
   ConfigParser parser;
   std::vector<int> tag_ids;
@@ -49,7 +31,7 @@ int BaseDetector::configure(std::string config_file) {
   }
 
   // parse camera configs
-  config_dir = std::string(dirname((char *)config_file.c_str()));
+  config_dir = std::string(dirname((char *) config_file.c_str()));
   paths_combine(config_dir, camera_config, camera_config);
   if (camera.configure(camera_config) != 0) {
     return -1;
@@ -110,7 +92,7 @@ int BaseDetector::illuminationInvariantTransform(cv::Mat &image) {
   return 0;
 }
 
-int BaseDetector::changeMode(cv::Mat &image) {
+int BaseDetector::changeMode(const cv::Mat &image) {
   int image_width;
   int image_height;
   bool widths_equal;
@@ -136,7 +118,9 @@ int BaseDetector::changeMode(cv::Mat &image) {
   return 0;
 }
 
-int BaseDetector::maskImage(TagPose tag_pose, cv::Mat &image, double padding) {
+int BaseDetector::maskImage(const TagPose &tag_pose,
+                            const cv::Mat &image,
+                            const double padding) {
   std::string camera_mode;
   int image_width, image_height;
   double x, y, z;
@@ -180,10 +164,10 @@ int BaseDetector::maskImage(TagPose tag_pose, cv::Mat &image, double padding) {
   // check input image dimensions against configuration file's
   if (image_width != image.cols) {
     LOG_ERROR("config image width does not match input image's!");
-    return -4;
+    return -3;
   } else if (image_height != image.rows) {
     LOG_ERROR("config image height does not match input image's!");
-    return -4;
+    return -3;
   }
 
   // calculate 2 corners of tag in inertial frame to be used to create mask
@@ -218,7 +202,7 @@ int BaseDetector::maskImage(TagPose tag_pose, cv::Mat &image, double padding) {
   return 0;
 }
 
-void BaseDetector::printTag(TagPose tag) {
+void BaseDetector::printTag(const TagPose &tag) {
   std::cout << "id: " << tag.id << " ";
   std::cout << "[";
   std::cout << "x= " << tag.position(0) << " ";

@@ -14,7 +14,7 @@ int TrajectoryIndex::load(const std::string &index_file,
   // load trajectory index
   // assumes each column is: (index, p0_x, p0_z, pf_x, pf_z, z)
   csv2mat(index_file, true, this->index_data);
-  this->traj_dir = std::string(dirname((char *)index_file.c_str()));
+  this->traj_dir = std::string(dirname((char *) index_file.c_str()));
   this->pos_thres = pos_thres;
   this->vel_thres = vel_thres;
 
@@ -63,7 +63,7 @@ int TrajectoryIndex::find(const Vec3 &pos, const double v, Trajectory &traj) {
 
   // load trajectory
   traj_file = this->traj_dir + "/";
-  traj_file += std::to_string((int)matches[0]) + ".csv";
+  traj_file += std::to_string((int) matches[0]) + ".csv";
   if (traj.load(matches[0], traj_file, pos) != 0) {
     return -3;
   }

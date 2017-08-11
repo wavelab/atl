@@ -2,13 +2,6 @@
 
 namespace atl {
 
-MichiganDetector::MichiganDetector() { this->detector = NULL; }
-
-MichiganDetector::~MichiganDetector() {
-  apriltag_detector_destroy(this->detector);
-  tag16h5_destroy(this->family);
-}
-
 int MichiganDetector::configure(const std::string &config_file) {
   if (BaseDetector::configure(config_file) != 0) {
     return -1;

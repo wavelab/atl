@@ -30,9 +30,9 @@ void DFCameraGClient::imageCallback(ConstImagePtr &msg) {
   unsigned char *img_data;
 
   // convert img message to cv::Mat
-  buf_size = (int)msg->width() * (int)msg->height() * 3;
+  buf_size = (int) msg->width() * (int) msg->height() * 3;
   img_data = new unsigned char[buf_size + 1];
-  memcpy((char *)img_data, msg->data().c_str(), buf_size);
+  memcpy((char *) img_data, msg->data().c_str(), buf_size);
 
   // clang-format off
   this->image = cv::Mat(

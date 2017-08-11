@@ -168,7 +168,7 @@ int8_t MPU6050::getData() {
 
   /* calculate dt */
   time_now = clock();
-  dt = ((double)time_now - this->last_updated) / CLOCKS_PER_SEC;
+  dt = ((double) time_now - this->last_updated) / CLOCKS_PER_SEC;
 
   /* complimentary filter */
   this->accelerometerCalcAngle();
@@ -277,7 +277,7 @@ int8_t MPU6050::setDPLFConfig(int8_t setting) {
 
   /* set DPLF */
   this->i2c.setSlave(MPU6050_ADDRESS);
-  retval = this->i2c.writeByte(MPU6050_RA_CONFIG, (char)setting);
+  retval = this->i2c.writeByte(MPU6050_RA_CONFIG, (char) setting);
   if (retval != 0) {
     return -1;
   }
@@ -339,7 +339,7 @@ int16_t MPU6050::getSampleRate() {
   /* get sample rate divider */
   smplrt_div = this->getSampleRateDiv();
   if (smplrt_div != -1 || smplrt_div != -2) {
-    sample_divider = (float)smplrt_div;
+    sample_divider = (float) smplrt_div;
   } else {
     return -1;
   }

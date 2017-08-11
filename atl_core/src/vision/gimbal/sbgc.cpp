@@ -92,12 +92,12 @@ void SBGCFrame::buildBody(uint8_t *data) {
 }
 
 void SBGCFrame::buildFrame(int cmd_id, uint8_t *data, int data_size) {
-  this->buildHeader((uint8_t)cmd_id, (uint8_t)data_size);
+  this->buildHeader((uint8_t) cmd_id, (uint8_t) data_size);
   this->buildBody(data);
 }
 
 void SBGCFrame::buildFrame(int cmd_id) {
-  this->buildHeader((uint8_t)cmd_id, (uint8_t)0);
+  this->buildHeader((uint8_t) cmd_id, (uint8_t) 0);
   this->buildBody(NULL);
 }
 
@@ -129,7 +129,7 @@ int SBGCFrame::parseBody(uint8_t *data) {
 
   // setup
   expected_checksum = 0x0;
-  this->data = (uint8_t *)malloc(sizeof(uint8_t) * this->data_size);
+  this->data = (uint8_t *) malloc(sizeof(uint8_t) * this->data_size);
 
   // parse body
   for (i = 0; i < this->data_size; i++) {

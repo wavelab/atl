@@ -40,7 +40,7 @@ int LandingController::configure(const std::string &config_file) {
   }
 
   // load trajectory index
-  std::string config_dir = std::string(dirname((char *)config_file.c_str()));
+  std::string config_dir = std::string(dirname((char *) config_file.c_str()));
   paths_combine(config_dir, traj_index_file, traj_index_file);
   if (this->traj_index.load(traj_index_file) != 0) {
     return -2;

@@ -28,7 +28,7 @@ TEST(Mission, configure) {
   EXPECT_FLOAT_EQ(20.0, mission.threshold_waypoint_gap);
 
   EXPECT_FLOAT_EQ(0.5, mission.desired_velocity);
-  EXPECT_EQ(4, (size_t)mission.local_waypoints.size());
+  EXPECT_EQ(4, (size_t) mission.local_waypoints.size());
 
   EXPECT_NEAR(0.0, mission.local_waypoints[0](0), 0.001);
   EXPECT_NEAR(0.0, mission.local_waypoints[0](1), 0.001);

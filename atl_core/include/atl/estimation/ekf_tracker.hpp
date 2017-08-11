@@ -46,30 +46,74 @@ namespace atl {
 
 class EKFTracker {
 public:
-  bool configured;
-  bool initialized;
+  bool configured = false;
+  bool initialized = false;
 
-  int nb_states;
+  int nb_states = 0;
   std::string config_file;
 
-  VecX mu;
+  VecX mu = VecX::Zero(1);
 
-  MatX R;
-  MatX Q;
+  MatX R = MatX::Zero(1, 1);
+  MatX Q = MatX::Zero(1, 1);
 
-  MatX S;
-  MatX I;
-  MatX K;
+  MatX S = MatX::Zero(1, 1);
+  MatX I = MatX::Zero(1, 1);
+  MatX K = MatX::Zero(1, 1);
 
-  VecX mu_p;
-  MatX S_p;
+  VecX mu_p = MatX::Zero(1, 1);
+  MatX S_p = MatX::Zero(1, 1);
 
-  EKFTracker();
-  int configure(std::string config_file);
-  int initialize(VecX mu);
-  int reset(VecX mu);
-  int predictionUpdate(VecX g, MatX G);
-  int measurementUpdate(VecX h, MatX H, VecX y);
+  EKFTracker() {}
+
+  /**
+   * Configure
+   *
+   * @param config_file Path to config file
+   * @return 0 for success, -1 for failure
+   */
+  int configure(const std::string &config_file);
+
+  /**
+   * Initialize
+   *
+   * @param mu Initial estimate
+   * @return 0 for success, -1 for failure
+   */
+  int initialize(const VecX &mu);
+
+  /**
+   * Reset estimator with new estimates
+   *
+   * @param mu Estimate
+   * @return 0 for success, -1 for failure
+   */
+  int reset(const VecX &mu);
+
+  /**
+   * Prediction update
+   *
+   * @param g motion vector
+   * @param G Linearized motion vector
+   *
+   * @return
+   *    - 0: Success
+   *    - -1: Not initialized
+   */
+  int predictionUpdate(const VecX &g, const MatX &G);
+
+  /**
+   * Measurement update
+   *
+   * @param h Inverse measurement
+   * @param H Linearized inverse measurement
+   * @param y Measurement
+   *
+   * @return
+   *    - 0: Success
+   *    - -1: Not initialized
+   */
+  int measurementUpdate(const VecX &h, const MatX &H, const VecX &y);
 };
 
 void two_wheel_process_model(EKFTracker &ekf, MatX &G, VecX &g, double dt);

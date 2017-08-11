@@ -36,7 +36,7 @@ void WorldNode::clockCallback(ConstTimePtr &gaz_msg) {
   // publish simulation time
   sim_time = this->time.sim_time;
   ros_msg.clock =
-      ::ros::Time((uint32_t)sim_time.sec(), (uint32_t)sim_time.nsec());
+      ::ros::Time((uint32_t) sim_time.sec(), (uint32_t) sim_time.nsec());
   this->ros_pubs[CLOCK_RTOPIC].publish(ros_msg);
 }
 

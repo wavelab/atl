@@ -22,15 +22,19 @@
 
 namespace atl {
 
-/** Swathmore Apriltag Detector **/
+/**
+ * Swathmore Apriltag Detector
+ */
 class SwathmoreDetector : public BaseDetector {
 public:
-  TagDetector *detector;
+  TagDetector *detector = nullptr;
 
-  SwathmoreDetector() : detector{NULL} {}
+  SwathmoreDetector() {}
+  ~SwathmoreDetector() {}
 
   /**
    * Configure
+   *
    * @param config_file Path to configuration file (YAML)
    * @returns 0 for success, -1 for failure
    */
@@ -38,6 +42,7 @@ public:
 
   /**
    * Extract AprilTags
+   *
    * @param image
    * @param tags
    * @returns 0 for success else failure
@@ -46,6 +51,7 @@ public:
 
   /**
    * Obtain pose
+   *
    * @param tag Tag detected
    * @param tag_pose Tag Pose
    * @returns 0 for success and -1 for failure

@@ -22,7 +22,7 @@ std::vector<Eigen::Vector2d> bezier_cubic_curve(Eigen::Vector2d p0,
     double uuu = uu * u;
     double ttt = tt * t;
 
-    t = i / (double)segment_count;
+    t = i / (double) segment_count;
     p << 0.0, 0.0;
 
     // first term

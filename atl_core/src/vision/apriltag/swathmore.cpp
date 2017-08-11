@@ -100,7 +100,7 @@ int SwathmoreDetector::obtainPose(const TagDetection &tag, TagPose &tag_pose) {
 
   // get tag size according to tag id
   if (this->tag_configs.find(tag.id) == this->tag_configs.end()) {
-    LOG_ERROR("ERROR! Tag size for [%d] not configured!\n", (int)tag.id);
+    LOG_ERROR("ERROR! Tag size for [%d] not configured!\n", (int) tag.id);
     return -2;
   } else {
     tag_size = this->tag_configs[tag.id];

@@ -14,7 +14,7 @@
 // MACROS
 #define UNUSED(expr)                                                           \
   do {                                                                         \
-    (void)(expr);                                                              \
+    (void) (expr);                                                             \
   } while (0)
 
 #endif

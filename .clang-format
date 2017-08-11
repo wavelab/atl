@@ -1,3 +1,7 @@
+AllowShortCaseLabelsOnASingleLine: true
 BinPackArguments: false
 BinPackParameters: false
+IndentCaseLabels: true
 PenaltyReturnTypeOnItsOwnLine: 100
+SortIncludes: false
+SpaceAfterCStyleCast: true

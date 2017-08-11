@@ -2,8 +2,6 @@
 
 namespace atl {
 
-MITDetector::MITDetector() { this->detector = NULL; }
-
 int MITDetector::configure(const std::string &config_file) {
   if (BaseDetector::configure(config_file) != 0) {
     return -1;

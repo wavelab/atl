@@ -228,7 +228,7 @@ int DC1394Camera::getBrightness(double &brightness) {
   err = dc1394_feature_get_value(
       this->capture, DC1394_FEATURE_BRIGHTNESS, &value);
   DC1394_ERR_RTN(err, "Could not get brightness");
-  brightness = (double)value;
+  brightness = (double) value;
 
   return 0;
 }
@@ -266,19 +266,19 @@ int DC1394Camera::getFrameRate(double &fps) {
 }
 
 int DC1394Camera::getExposure(double &exposure) {
-  dc1394error_t err;
+  dc1394error_t error;
 
   // turn on the exposure feature
-  err = dc1394_feature_set_power(
+  error = dc1394_feature_set_power(
       this->capture, DC1394_FEATURE_EXPOSURE, DC1394_ON);
-  DC1394_ERR_RTN(err, "Could not turn on exposure feature");
+  DC1394_ERR_RTN(error, "Could not turn on exposure feature");
 
   // get exposure value
   uint32_t value;
-  err =
+  error =
       dc1394_feature_get_value(this->capture, DC1394_FEATURE_EXPOSURE, &value);
-  DC1394_ERR_RTN(err, "Could not get exposure");
-  exposure = (double)value;
+  DC1394_ERR_RTN(error, "Could not get exposure");
+  exposure = (double) value;
 
   return 0;
 }
@@ -295,7 +295,7 @@ int DC1394Camera::getShutter(double &shutter_ms) {
   uint32_t value;
   err = dc1394_feature_get_value(this->capture, DC1394_FEATURE_SHUTTER, &value);
   DC1394_ERR_RTN(err, "Could not get shutter");
-  shutter_ms = (double)value;
+  shutter_ms = (double) value;
 
   return 0;
 }
@@ -311,23 +311,26 @@ int DC1394Camera::getGain(double &gain_db) {
   uint32_t value;
   err = dc1394_feature_get_value(this->capture, DC1394_FEATURE_GAIN, &value);
   DC1394_ERR_RTN(err, "Could not get gain");
-  gain_db = (double)value;
+  gain_db = (double) value;
 
   return 0;
 }
 
-std::pair<int, int> DC1394Camera::centerROI(int size, int max_size, int step) {
+std::pair<int, int> DC1394Camera::centerROI(const int size,
+                                            const int max_size,
+                                            const int step) {
+  double roi_size;
   if (size == 0 || size > max_size) {
-    size = max_size;
+    roi_size = max_size;
   }
 
   // size must be a multiple of the step
-  size = size / step * step;
-  const int offset = (max_size - size) / 2;
-  return std::make_pair(size, offset);
+  roi_size = size / step * step;
+  int offset = (max_size - roi_size) / 2;
+  return std::make_pair(roi_size, offset);
 }
 
-int DC1394Camera::changeMode(std::string mode) {
+int DC1394Camera::changeMode(const std::string &mode) {
   // pre-check
   if (this->configs.find(mode) == this->configs.end()) {
     return -1;
@@ -356,7 +359,7 @@ int DC1394Camera::getFrame(cv::Mat &image) {
   size_t row_bytes = img_size / img_rows;
 
   if (this->buffer == nullptr) {
-    buffer = (uint8_t *)malloc(img_size);
+    buffer = (uint8_t *) malloc(img_size);
   }
   dc1394_bayer_decoding_8bit(frame->image,
                              this->buffer,

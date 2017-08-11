@@ -5,7 +5,7 @@ namespace atl {
 int randi(int ub, int lb) { return rand() % lb + ub; }
 
 double randf(double ub, double lb) {
-  double f = (double)rand() / RAND_MAX;
+  double f = (double) rand() / RAND_MAX;
   return lb + f * (ub - lb);
 }
 
@@ -92,26 +92,26 @@ int euler2quat(Vec3 euler, int euler_seq, Quaternion &q) {
   s3 = sin(gamma / 2.0);
 
   switch (euler_seq) {
-  case 123:
-    // euler 1-2-3 to quaternion
-    w = c1 * c2 * c3 - s1 * s2 * s3;
-    x = s1 * c2 * c3 + c1 * s2 * s3;
-    y = c1 * s2 * c3 - s1 * c2 * s3;
-    z = c1 * c2 * s3 + s1 * s2 * c3;
-    break;
+    case 123:
+      // euler 1-2-3 to quaternion
+      w = c1 * c2 * c3 - s1 * s2 * s3;
+      x = s1 * c2 * c3 + c1 * s2 * s3;
+      y = c1 * s2 * c3 - s1 * c2 * s3;
+      z = c1 * c2 * s3 + s1 * s2 * c3;
+      break;
 
-  case 321:
-    // euler 3-2-1 to quaternion
-    w = c1 * c2 * c3 + s1 * s2 * s3;
-    x = s1 * c2 * c3 - c1 * s2 * s3;
-    y = c1 * s2 * c3 + s1 * c2 * s3;
-    z = c1 * c2 * s3 - s1 * s2 * c3;
-    break;
+    case 321:
+      // euler 3-2-1 to quaternion
+      w = c1 * c2 * c3 + s1 * s2 * s3;
+      x = s1 * c2 * c3 - c1 * s2 * s3;
+      y = c1 * s2 * c3 + s1 * c2 * s3;
+      z = c1 * c2 * s3 - s1 * s2 * c3;
+      break;
 
-  default:
-    printf("Error! Invalid euler sequence [%d]\n", euler_seq);
-    return -1;
-    break;
+    default:
+      printf("Error! Invalid euler sequence [%d]\n", euler_seq);
+      return -1;
+      break;
   }
 
   q.w() = w;

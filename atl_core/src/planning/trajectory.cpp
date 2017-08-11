@@ -70,7 +70,7 @@ int trajectory_calculate_desired(struct problem_data *p) {
   p->desired.block(0, 0, 6, 1) = x;
 
   // create points along the desired line path
-  dx = (p->pos_final(0) - p->pos_init(0)) / (double)(p->nb_steps - 1);
+  dx = (p->pos_final(0) - p->pos_init(0)) / (double) (p->nb_steps - 1);
   for (int i = 0; i < (p->nb_steps - 2); i++) {
     x = p->desired.block(0, i, 6, 1);
 

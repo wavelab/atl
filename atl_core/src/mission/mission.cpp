@@ -71,7 +71,7 @@ int Mission::checkWaypoints() {
     double dist = latlon_dist(last_wp(0), last_wp(1), wp(0), wp(1));
     if (dist > this->threshold_waypoint_gap) {
       LOG_ERROR(
-          EDISTLATLON, (int)i + 1, wp(0), wp(1), this->threshold_waypoint_gap);
+          EDISTLATLON, (int) i + 1, wp(0), wp(1), this->threshold_waypoint_gap);
       return -2;
     }
 
@@ -221,7 +221,7 @@ int Mission::update(const Vec3 &position, Vec3 &waypoint) {
 
   // waypoint reached? get new wp_start and wp_end
   if (this->waypointReached(waypoint)) {
-    if ((this->waypoint_index + 2) == (int)this->local_waypoints.size()) {
+    if ((this->waypoint_index + 2) == (int) this->local_waypoints.size()) {
       this->completed = true;
       this->waypoint_index = 0;
       return -2;

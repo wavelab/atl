@@ -301,10 +301,10 @@ int PointGreyCamera::printFormat7Capabilities() {
   return 0;
 }
 
-int PointGreyCamera::setFormat7(int mode,
-                                std::string pixel_format,
-                                int width,
-                                int height) {
+int PointGreyCamera::setFormat7(const int mode,
+                                const std::string &pixel_format,
+                                const int width,
+                                const int height) {
   bool valid;
   unsigned int packet_size;
   float psize_percentage;
@@ -319,23 +319,19 @@ int PointGreyCamera::setFormat7(int mode,
 
   // set mode
   switch (mode) {
-  case 0:
-    settings.mode = FlyCapture2::MODE_1;
-    break;
-  case 1:
-    settings.mode = FlyCapture2::MODE_1;
-    break;
-  case 2:
-    settings.mode = FlyCapture2::MODE_2;
-    break;
-  default:
-    LOG_ERROR("Format7 mode [%d] not implemented yet!", mode);
-    return -2;
+    case 0: settings.mode = FlyCapture2::MODE_0; break;
+    case 1: settings.mode = FlyCapture2::MODE_1; break;
+    case 2: settings.mode = FlyCapture2::MODE_2; break;
+    default:
+      LOG_ERROR("Format7 mode [%d] not implemented yet!", mode);
+      return -2;
   }
+
   settings.width = width;
   settings.height = height;
   settings.offsetX = 0;
   settings.offsetY = 0;
+
   if (pixel_format == "MONO8") {
     settings.pixelFormat = FlyCapture2::PIXEL_FORMAT_MONO8;
   } else if (pixel_format == "MONO16") {
@@ -369,20 +365,21 @@ int PointGreyCamera::setFormat7(int mode,
   return 0;
 }
 
-std::pair<int, int> PointGreyCamera::centerROI(int size,
-                                               int max_size,
-                                               int step) {
+std::pair<int, int> PointGreyCamera::centerROI(const int size,
+                                               const int max_size,
+                                               const int step) {
+  double roi_size;
   if (size == 0 || size > max_size) {
-    size = max_size;
+    roi_size = max_size;
   }
 
   // size must be a multiple of the step
-  size = size / step * step;
-  const int offset = (max_size - size) / 2;
-  return std::make_pair(size, offset);
+  roi_size = size / step * step;
+  int offset = (max_size - roi_size) / 2;
+  return std::make_pair(roi_size, offset);
 }
 
-int PointGreyCamera::changeMode(std::string mode) {
+int PointGreyCamera::changeMode(const std::string &mode) {
   // pre-check
   if (this->configs.find(mode) == this->configs.end()) {
     return -1;

@@ -12,8 +12,10 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
-#include <apriltags_mit/Tag16h5.h>
+// clang-format off
 #include <apriltags_mit/TagDetector.h>
+#include <apriltags_mit/Tag16h5.h>
+// clang-format on
 
 #include "atl/utils/utils.hpp"
 #include "atl/vision/apriltag/base_detector.hpp"
@@ -27,12 +29,13 @@ namespace atl {
  **/
 class MITDetector : public BaseDetector {
 public:
-  AprilTags::TagDetector *detector;
+  AprilTags::TagDetector *detector = nullptr;
 
-  MITDetector();
+  MITDetector() {}
 
   /**
    * Configure
+   *
    * @param config_file Path to configuration file (YAML)
    * @returns 0 for success, -1 for failure
    */
@@ -40,6 +43,7 @@ public:
 
   /**
    * Extract AprilTags
+   *
    * @param image
    * @param tags
    * @returns 0 for success else failure
@@ -48,6 +52,7 @@ public:
 
   /**
    * Obtain pose
+   *
    * @param tag Tag detected
    * @param tag_pose Tag Pose
    * @returns 0 for success and -1 for failure
