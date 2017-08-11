@@ -9,59 +9,11 @@
 #include <yaml-cpp/yaml.h>
 
 #include "atl/control/pid.hpp"
+#include "atl/control/trajectory.hpp"
+#include "atl/control/trajectory_index.hpp"
 #include "atl/utils/utils.hpp"
 
 namespace atl {
-
-#define ETROWS "Trajectory [%s] has 0 rows!"
-#define ETCOLS "Trajectory [%s] invalid number of cols!"
-#define ETLOAD "Failed to load trajectory!"
-#define ETIROWS "Trajectory index [%s] has 0 rows!"
-#define ETICOLS "Trajectory index [%s] invalid number of cols!"
-#define ETIFAIL "Found no trajectory for z = %f, v = %f"
-#define TLOAD "Loaded trajectory @ z = %f, v = %f"
-
-class Trajectory {
-public:
-  bool loaded;
-  int index;
-
-  std::deque<Vec2> pos;
-  std::deque<Vec2> vel;
-  std::deque<Vec2> inputs;
-  std::deque<Vec2> rel_pos;
-  std::deque<Vec2> rel_vel;
-  Vec3 p0;
-
-  Trajectory() : loaded{false}, index{-1}, p0{Vec3::Zero()} {}
-  int load(int index, const std::string &filepath, const Vec3 &pos);
-  int update(Vec3 pos, Vec2 &wp_pos, Vec2 &wp_vel, Vec2 &wp_inputs);
-  void reset();
-};
-
-class TrajectoryIndex {
-public:
-  bool loaded;
-
-  std::string traj_dir;
-  MatX index_data;
-  double pos_thres;
-  double vel_thres;
-
-  TrajectoryIndex()
-      : loaded{false},
-        traj_dir{""},
-        index_data{MatX::Zero(1, 1)},
-        pos_thres{0.0},
-        vel_thres{0.0} {}
-
-  int load(
-    const std::string &index_file,
-    double pos_thres = 0.2,
-    double vel_thres = 0.2);
-
-  int find(const Vec3 &pos, double v, Trajectory &traj);
-};
 
 class LandingController {
 public:
@@ -105,13 +57,47 @@ public:
   double blackbox_rate;
   std::ofstream blackbox;
 
-  LandingController();
-  ~LandingController();
+  LandingController()
+      : configured{false},
+        dt{0.0},
+        blackbox_dt{0.0},
+        vx_error_prev{0.0},
+        vy_error_prev{0.0},
+        vz_error_prev{0.0},
+        vx_error_sum{0.0},
+        vx_k_p{0.0},
+        vx_k_i{0.0},
+        vx_k_d{0.0},
+        vy_k_p{0.0},
+        vy_k_i{0.0},
+        vy_k_d{0.0},
+        vz_k_p{0.0},
+        vz_k_i{0.0},
+        vz_k_d{0.0},
+        roll_limit{0.0, 0.0},
+        pitch_limit{0.0, 0.0},
+        throttle_limit{0.0, 0.0},
+        setpoints{0.0, 0.0, 0.0},
+        outputs{0.0, 0.0, 0.0, 0.0},
+        att_cmd{},
+        trajectory_threshold{1.0, 1.0, 1.0},
+        blackbox_enable{false},
+        blackbox_rate{FLT_MAX} {}
+
+  ~LandingController() {
+    if (this->blackbox_enable && this->blackbox) {
+      this->blackbox.close();
+    }
+  }
 
   int configure(const std::string &config_file);
+
   int loadTrajectory(Vec3 pos, Vec3 target_pos_bf, double v);
+
   int prepBlackbox(const std::string &blackbox_file);
+
   int recordTrajectoryIndex();
+
   int record(
     Vec3 pos,
     Vec3 vel,
@@ -123,8 +109,10 @@ public:
     Vec3 rpy,
     double thrust,
     double dt);
+
   Vec4 calculateVelocityErrors(
     Vec3 v_errors, Vec3 p_errors, double yaw, double dt);
+
   int calculate(
     Vec3 target_pos_bf,
     Vec3 target_vel_bf,
@@ -133,7 +121,9 @@ public:
     Quaternion orientation,
     double yaw,
     double dt);
+
   void reset();
+
   void printOutputs();
 };
 

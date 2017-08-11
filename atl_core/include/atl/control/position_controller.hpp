@@ -41,6 +41,7 @@ public:
 
   /**
    * Configure
+   *
    * @param config_file Path to config file
    * @return 0 for success, -1 for failure
    */
@@ -48,6 +49,7 @@ public:
 
   /**
    * Calculate controller outputs
+   *
    * @param setpoints Position setpoints
    * @param robot Actual robot pose
    * @param yaw Actual robot yaw
