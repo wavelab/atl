@@ -78,7 +78,7 @@ int WaypointController::prepBlackbox(const std::string &blackbox_file) {
   return 0;
 }
 
-int WaypointController::record(Vec3 pos, Vec3 waypoint) {
+int WaypointController::record(const Vec3 &pos, const Vec3 &waypoint) {
   // pre-check
   this->blackbox_dt += dt;
   if (this->blackbox_enable && this->blackbox_dt > this->blackbox_rate) {

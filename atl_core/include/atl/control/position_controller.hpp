@@ -15,29 +15,22 @@ namespace atl {
  */
 class PositionController {
 public:
-  bool configured;
+  bool configured = false;
 
-  double dt;
+  double dt = 0.0;
   PID x_controller;
   PID y_controller;
   PID z_controller;
 
-  double roll_limit[2];
-  double pitch_limit[2];
-  double hover_throttle;
+  double roll_limit[2] = {0.0, 0.0};
+  double pitch_limit[2] = {0.0, 0.0};
+  double hover_throttle = 0.0;
 
-  Vec3 setpoints;
-  Vec4 outputs;
+  Vec3 setpoints{0.0, 0.0, 0.0};
+  Vec4 outputs{0.0, 0.0, 0.0, 0.0};
   AttitudeCommand att_cmd;
 
-  PositionController()
-      : configured{false},
-        dt{0.0},
-        roll_limit{0.0, 0.0},
-        pitch_limit{0.0, 0.0},
-        hover_throttle{0.0},
-        setpoints{Vec3::Zero()},
-        outputs{Vec4::Zero()} {}
+  PositionController() {}
 
   /**
    * Configure
@@ -51,12 +44,19 @@ public:
    * Calculate controller outputs
    *
    * @param setpoints Position setpoints
-   * @param robot Actual robot pose
-   * @param yaw Actual robot yaw
+   * @param pose Actual pose
+   * @param yaw Actual yaw
    * @param dt Time difference in seconds
-   * @return controller output
+   *
+   * @return
+   *    Attitude command as a vector of size 4:
+   *    (roll, pitch, yaw, throttle)
    */
-  Vec4 calculate(Vec3 setpoints, Pose robot_pose, double yaw, double dt);
+  Vec4 calculate(
+    const Vec3 &setpoints,
+    const Pose &pose,
+    const double yaw,
+    const double dt);
 
   /**
    * Reset controller errors to 0

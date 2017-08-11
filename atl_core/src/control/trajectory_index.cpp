@@ -3,7 +3,9 @@
 namespace atl {
 
 int TrajectoryIndex::load(
-  const std::string &index_file, double pos_thres, double vel_thres) {
+  const std::string &index_file,
+  const double pos_thres,
+  const double vel_thres) {
   // pre-check
   if (file_exists(index_file) == false) {
     LOG_ERROR("File not found: %s", index_file.c_str());
@@ -29,7 +31,7 @@ int TrajectoryIndex::load(
   return 0;
 }
 
-int TrajectoryIndex::find(const Vec3 &pos, double v, Trajectory &traj) {
+int TrajectoryIndex::find(const Vec3 &pos, const double v, Trajectory &traj) {
   bool p_ok, v_ok;
   std::vector<int> matches;
   std::string traj_file;

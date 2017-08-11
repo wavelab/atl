@@ -40,7 +40,8 @@ int VelocityController::configure(const std::string &config_file) {
   return 0;
 }
 
-Vec4 VelocityController::calculate(Vec3 setpoints, Vec3 actual, double dt) {
+Vec4 VelocityController::calculate(
+  const Vec3 &setpoints, const Vec3 &actual, const double dt) {
   // check rate
   this->dt += dt;
   if (this->dt < 0.01) {

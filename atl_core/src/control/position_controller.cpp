@@ -39,7 +39,10 @@ int PositionController::configure(const std::string &config_file) {
 }
 
 Vec4 PositionController::calculate(
-  Vec3 setpoints, Pose robot_pose, double yaw, double dt) {
+  const Vec3 &setpoints,
+  const Pose &pose,
+  const double yaw,
+  const double dt) {
   // check rate
   this->dt += dt;
   if (this->dt < 0.01) {
@@ -48,8 +51,7 @@ Vec4 PositionController::calculate(
 
   // calculate setpoint relative to quadrotor
   Vec3 errors;
-  target2bodyplanar(
-    setpoints, robot_pose.position, robot_pose.orientation, errors);
+  target2bodyplanar(setpoints, pose.position, pose.orientation, errors);
 
   // roll, pitch, yaw and throttle (assuming NWU frame)
   // clang-format off

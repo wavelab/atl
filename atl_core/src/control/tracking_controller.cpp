@@ -46,7 +46,7 @@ int TrackingController::configure(const std::string &config_file) {
 }
 
 AttitudeCommand TrackingController::calculate(
-  Vec3 errors, double yaw, double dt) {
+  const Vec3 &pos_errors, const double yaw, const double dt) {
   // check rate
   this->dt += dt;
   if (this->dt < 0.01) {
@@ -54,7 +54,7 @@ AttitudeCommand TrackingController::calculate(
   }
 
   // add offsets
-  errors = errors + this->track_offset;
+  Vec3 errors = pos_errors + this->track_offset;
 
   // roll, pitch, yaw and throttle (assuming NWU frame)
   // clang-format off
@@ -83,11 +83,11 @@ AttitudeCommand TrackingController::calculate(
   return AttitudeCommand(this->outputs);
 }
 
-AttitudeCommand TrackingController::calculate(Vec3 target_pos_bf,
-                                              Vec3 pos,
-                                              Vec3 pos_prev,
-                                              double yaw,
-                                              double dt) {
+AttitudeCommand TrackingController::calculate(const Vec3 &target_pos_bf,
+                                              const Vec3 &pos,
+                                              const Vec3 &pos_prev,
+                                              const double yaw,
+                                              const double dt) {
   Vec3 errors;
 
   errors(0) = target_pos_bf(0);

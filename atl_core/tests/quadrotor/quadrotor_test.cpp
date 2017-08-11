@@ -9,7 +9,7 @@ TEST(Quadrotor, constructor) {
   Quadrotor quadrotor;
 
   EXPECT_FALSE(quadrotor.configured);
-  EXPECT_EQ(DISCOVER_MODE, quadrotor.current_mode);
+  EXPECT_EQ(NOT_SET, quadrotor.current_mode);
 
   EXPECT_FLOAT_EQ(0.0, quadrotor.recover_height);
   EXPECT_FALSE(quadrotor.auto_track);

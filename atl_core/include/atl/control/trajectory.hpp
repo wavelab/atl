@@ -18,19 +18,44 @@ namespace atl {
 
 class Trajectory {
 public:
-  bool loaded;
-  int index;
+  bool loaded = false;
+  int index = -1;
 
   std::deque<Vec2> pos;
   std::deque<Vec2> vel;
   std::deque<Vec2> inputs;
   std::deque<Vec2> rel_pos;
   std::deque<Vec2> rel_vel;
-  Vec3 p0;
+  Vec3 p0{0.0, 0.0, 0.0};
 
-  Trajectory() : loaded{false}, index{-1}, p0{Vec3::Zero()} {}
-  int load(int index, const std::string &filepath, const Vec3 &pos);
-  int update(Vec3 pos, Vec2 &wp_pos, Vec2 &wp_vel, Vec2 &wp_inputs);
+  Trajectory() {}
+
+  /**
+   * Load trajectory
+   *
+   * @param index Trajectory index
+   * @param filepath Trajectory filepath
+   * @param pos Robot position in inertial frame
+   *
+   * @return 0 for success, -1 for failure
+   */
+  int load(const int index, const std::string &filepath, const Vec3 &pos);
+
+  /**
+   * Update trajectory
+   *
+   * @param pos Robot position in inertial frame
+   * @param wp_pos Waypoint position in inertial frame
+   * @param wp_vel Waypoint velocity in inertial frame
+   * @param wp_input Waypoint inputs for robot
+   *
+   * @return 0 for success, -1 for failure
+   */
+  int update(const Vec3 &pos, Vec2 &wp_pos, Vec2 &wp_vel, Vec2 &wp_inputs);
+
+  /**
+   * Reset trajectory
+   */
   void reset();
 };
 

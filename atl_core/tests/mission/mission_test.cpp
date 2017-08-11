@@ -3,7 +3,7 @@
 
 namespace atl {
 
-#define TEST_CONFIG "tests/configs/mission/mission.yaml"
+#define TEST_CONFIG "tests/configs/missions/mission.yaml"
 #define WAYPOINTS_FILE "/tmp/waypoints.dat"
 #define STATE_FILE "/tmp/state.dat"
 

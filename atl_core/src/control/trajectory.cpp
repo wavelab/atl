@@ -2,7 +2,8 @@
 
 namespace atl {
 
-int Trajectory::load(int index, const std::string &filepath, const Vec3 &p0) {
+int Trajectory::load(
+  const int index, const std::string &filepath, const Vec3 &p0) {
   MatX traj_data;
   Vec2 p, v, u, rel_p, rel_v;
 
@@ -56,13 +57,7 @@ int Trajectory::load(int index, const std::string &filepath, const Vec3 &p0) {
 }
 
 int Trajectory::update(
-  Vec3 pos, Vec2 &wp_pos, Vec2 &wp_vel, Vec2 &wp_inputs) {
-  double wp_percent;
-  Vec2 q_pos;
-  Vec2 wp_pos_start, wp_pos_end;
-  Vec2 wp_vel_start, wp_vel_end;
-  Vec2 wp_inputs_start, wp_inputs_end;
-
+  const Vec3 &pos, Vec2 &wp_pos, Vec2 &wp_vel, Vec2 &wp_inputs) {
   // pre-check
   if (this->loaded == false) {
     return -1;
@@ -74,20 +69,21 @@ int Trajectory::update(
   }
 
   // setup
-  wp_pos_start = this->pos.at(0);
-  wp_pos_end = this->pos.at(1);
+  Vec2 wp_pos_start = this->pos.at(0);
+  Vec2 wp_pos_end = this->pos.at(1);
 
-  wp_vel_start = this->vel.at(0);
-  wp_vel_end = this->vel.at(1);
+  Vec2 wp_vel_start = this->vel.at(0);
+  Vec2 wp_vel_end = this->vel.at(1);
 
-  wp_inputs_start = this->inputs.at(0);
-  wp_inputs_end = this->inputs.at(1);
+  Vec2 wp_inputs_start = this->inputs.at(0);
+  Vec2 wp_inputs_end = this->inputs.at(1);
 
+  Vec2 q_pos;
   q_pos(0) = (this->p0.block(0, 0, 2, 1) - pos.block(0, 0, 2, 1)).norm();
   q_pos(1) = pos(2);
 
   // find next waypoint position, velocity and inputs
-  wp_percent = closest_point(wp_pos_start, wp_pos_end, q_pos, wp_pos);
+  double wp_percent = closest_point(wp_pos_start, wp_pos_end, q_pos, wp_pos);
   wp_vel = linear_interpolation(wp_vel_start, wp_vel_end, wp_percent);
   wp_inputs =
     linear_interpolation(wp_inputs_start, wp_inputs_end, wp_percent);

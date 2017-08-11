@@ -111,6 +111,7 @@ class ConfigParser {
 public:
   bool config_loaded;
 
+  std::string file_path;
   YAML::Node root;
   std::vector<ConfigParam> params;
 
@@ -130,36 +131,33 @@ public:
    * `optional` parameter to define whether `ConfigParser` should fail if the
    * parameter is not found.
    */
-  void addParam(std::string key, bool *out, bool optional = false);
-  void addParam(std::string key, int *out, bool optional = false);
-  void addParam(std::string key, float *out, bool optional = false);
-  void addParam(std::string key, double *out, bool optional = false);
-  void addParam(std::string key, std::string *out, bool optional = false);
-  void addParam(
-    std::string key, std::vector<bool> *out, bool optional = false);
-  void addParam(
-    std::string key, std::vector<int> *out, bool optional = false);
-  void addParam(
-    std::string key, std::vector<float> *out, bool optional = false);
-  void addParam(
-    std::string key, std::vector<double> *out, bool optional = false);
-  void addParam(
-    std::string key, std::vector<std::string> *out, bool optional = false);
-  void addParam(std::string key, Vec2 *out, bool optional = false);
-  void addParam(std::string key, Vec3 *out, bool optional = false);
-  void addParam(std::string key, Vec4 *out, bool optional = false);
-  void addParam(std::string key, VecX *out, bool optional = false);
-  void addParam(std::string key, Mat2 *out, bool optional = false);
-  void addParam(std::string key, Mat3 *out, bool optional = false);
-  void addParam(std::string key, Mat4 *out, bool optional = false);
-  void addParam(std::string key, MatX *out, bool optional = false);
-  void addParam(std::string key, cv::Mat *out, bool optional = false);
+  // clang-format off
+  void addParam(const std::string &key, bool *out, const bool optional = false);
+  void addParam(const std::string &key, int *out, const bool optional = false);
+  void addParam(const std::string &key, float *out, const bool optional = false);
+  void addParam(const std::string &key, double *out, const bool optional = false);
+  void addParam(const std::string &key, std::string *out, const bool optional = false);
+  void addParam(const std::string &key, std::vector<bool> *out, const bool optional = false);
+  void addParam(const std::string &key, std::vector<int> *out, const bool optional = false);
+  void addParam(const std::string &key, std::vector<float> *out, const bool optional = false);
+  void addParam(const std::string &key, std::vector<double> *out, const bool optional = false);
+  void addParam(const std::string &key, std::vector<std::string> *out, const bool optional = false);
+  void addParam(const std::string &key, Vec2 *out, const bool optional = false);
+  void addParam(const std::string &key, Vec3 *out, const bool optional = false);
+  void addParam(const std::string &key, Vec4 *out, const bool optional = false);
+  void addParam(const std::string &key, VecX *out, const bool optional = false);
+  void addParam(const std::string &key, Mat2 *out, const bool optional = false);
+  void addParam(const std::string &key, Mat3 *out, const bool optional = false);
+  void addParam(const std::string &key, Mat4 *out, const bool optional = false);
+  void addParam(const std::string &key, MatX *out, const bool optional = false);
+  void addParam(const std::string &key, cv::Mat *out, const bool optional = false);
+  // clang-format on
 
   /**
    * Get yaml node given yaml `key`. The result is assigned to `node` if
    * `key` matches anything in the config file, else `node` is set to `NULL`.
    */
-  int getYamlNode(std::string key, YAML::Node &node);
+  int getYamlNode(const std::string &key, YAML::Node &node);
 
   /**
    * @return a status code meaning
@@ -173,17 +171,18 @@ public:
     * matrix)
     */
   /** @return see `getYamlNode` */
-  int checkKey(std::string key, bool optional);
+  int checkKey(const std::string &key, bool optional);
 
   /**
    * @return see `checkKey`
    *
    * @todo refactor return codes into an enum which can be documented
    */
-  int checkVector(std::string key, enum ConfigDataType type, bool optional);
+  int checkVector(
+    const std::string &key, enum ConfigDataType type, bool optional);
 
   /** @return see `checkKey` */
-  int checkMatrix(std::string key, bool optional);
+  int checkMatrix(const std::string &key, bool optional);
 
   /**
    * Load yaml param primitive, array, vector or matrix.
@@ -198,10 +197,10 @@ public:
    * matrix)
    * - `-6`: Invalid param type
    */
-  int loadPrimitive(ConfigParam param);
-  int loadArray(ConfigParam param);
-  int loadVector(ConfigParam param);
-  int loadMatrix(ConfigParam param);
+  int loadPrimitive(ConfigParam &param);
+  int loadArray(ConfigParam &param);
+  int loadVector(ConfigParam &param);
+  int loadMatrix(ConfigParam &param);
 
   /**
    * Load yaml file at `config_file`.
@@ -216,7 +215,7 @@ public:
    * matrix)
    * - `-6`: Invalid param type
    */
-  int load(std::string config_file);
+  int load(const std::string &config_file);
 };
 
 }  // namespace atl

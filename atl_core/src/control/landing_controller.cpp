@@ -78,7 +78,7 @@ int LandingController::configure(const std::string &config_file) {
 }
 
 int LandingController::loadTrajectory(
-  Vec3 pos, Vec3 target_pos_bf, double v) {
+  const Vec3 &pos, const Vec3 &target_pos_bf, const double v) {
   int retval;
 
   // find trajectory
@@ -141,16 +141,16 @@ int LandingController::recordTrajectoryIndex() {
 }
 
 int LandingController::record(
-  Vec3 pos,
-  Vec3 vel,
-  Vec2 wp_pos,
-  Vec2 wp_vel,
-  Vec2 wp_inputs,
-  Vec3 target_pos_bf,
-  Vec3 target_vel_bf,
-  Vec3 rpy,
-  double thrust,
-  double dt) {
+  const Vec3 &pos,
+  const Vec3 &vel,
+  const Vec2 &wp_pos,
+  const Vec2 &wp_vel,
+  const Vec2 &wp_inputs,
+  const Vec3 &target_pos_bf,
+  const Vec3 &target_vel_bf,
+  const Vec3 &rpy,
+  const double thrust,
+  const double dt) {
   // pre-check
   this->blackbox_dt += dt;
   if (this->blackbox_enable && this->blackbox_dt > this->blackbox_rate) {
@@ -188,7 +188,10 @@ int LandingController::record(
 }
 
 Vec4 LandingController::calculateVelocityErrors(
-  Vec3 v_errors, Vec3 p_errors, double yaw, double dt) {
+  const Vec3 &v_errors,
+  const Vec3 &p_errors,
+  const double yaw,
+  const double dt) {
   UNUSED(yaw);
 
   // check rate
@@ -240,33 +243,37 @@ Vec4 LandingController::calculateVelocityErrors(
 }
 
 int LandingController::calculate(
-  Vec3 target_pos_bf,
-  Vec3 target_vel_bf,
-  Vec3 pos,
-  Vec3 vel,
-  Quaternion orientation,
-  double yaw,
-  double dt) {
-  Quaternion q;
-  Vec3 p_errors, v_errors, vel_bf, euler;
-  Vec2 wp_pos, wp_vel, wp_inputs, wp_rel_pos, wp_rel_vel;
-
+  const Vec3 &target_pos_bf,
+  const Vec3 &target_vel_bf,
+  const Vec3 &pos,
+  const Vec3 &vel,
+  const Quaternion &orientation,
+  const double yaw,
+  const double dt) {
   // obtain position and velocity waypoints
+  Vec2 wp_pos, wp_vel, wp_inputs;
   int retval = this->trajectory.update(pos, wp_pos, wp_vel, wp_inputs);
-  wp_rel_pos = this->trajectory.rel_pos.at(0);
-  wp_rel_vel = this->trajectory.rel_vel.at(0);
+  if (retval != 0) {
+    LOG_ERROR("Trajectory update failed!");
+    return -1;
+  }
+  Vec2 wp_rel_pos = this->trajectory.rel_pos.at(0);
+  // Vec2 wp_rel_vel = this->trajectory.rel_vel.at(0);
 
   // calculate velocity in body frame
-  euler << 0, 0, yaw;
+  Vec3 euler{0.0, 0.0, yaw}, vel_bf;
+  Quaternion q;
   euler2quat(euler, 321, q);
   inertial2body(vel, q, vel_bf);
 
   // calculate velocity errors (inertial version)
+  Vec3 v_errors;
   v_errors(0) = wp_vel(0) - vel_bf(0);
   v_errors(1) = target_vel_bf(1);
   v_errors(2) = wp_vel(1) - vel(2);
 
   // calculate position errors
+  Vec3 p_errors;
   p_errors(0) = wp_rel_pos(0) + target_pos_bf(0);
   p_errors(1) = target_pos_bf(1);
   p_errors(2) = wp_rel_pos(1) - pos(2);
@@ -310,7 +317,7 @@ int LandingController::calculate(
     return -1;
   }
 
-  return retval;
+  return 0;
 }
 
 void LandingController::reset() {

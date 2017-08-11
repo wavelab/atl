@@ -34,7 +34,7 @@ public:
   double pitch_limit[2] = {0.0, 0.0};
   double hover_throttle = 0.5;
 
-  Vec4 outputs = Vec4::Zero();
+  Vec4 outputs{0.0, 0.0, 0.0, 0.0};
   AttitudeCommand att_cmd;
 
   bool blackbox_enable = true;
@@ -71,11 +71,12 @@ public:
    * @param pos Position
    * @param waypoint Waypoint
    * @param dt Difference in time (seconds)
+   *
    * @return
    *    - 0: Success
    *    - -1: Failure
    */
-  int record(Vec3 pos, Vec3 waypoint);
+  int record(const Vec3 &pos, const Vec3 &waypoint);
 
   /**
    * Update controller
@@ -84,6 +85,7 @@ public:
    * @param vel Actual velocity
    * @param dt Time difference in seconds
    * @param dt Time difference in seconds
+   *
    * @return
    *   - 0: Success
    *   - -1: Not configured
