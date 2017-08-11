@@ -111,6 +111,8 @@ ADD_EXECUTABLE(
     tests/control/pid_test.cpp
     tests/control/position_controller_test.cpp
     tests/control/tracking_controller_test.cpp
+    tests/control/trajectory_index_test.cpp
+    tests/control/trajectory_test.cpp
     tests/control/velocity_controller_test.cpp
     tests/control/waypoint_controller_test.cpp
     # estimation
