@@ -1,17 +1,6 @@
-#include "atl/quadrotor/landing_target.hpp"
+#include "atl/data/landing_target.hpp"
 
 namespace atl {
-
-LandingTarget::LandingTarget() {
-  this->position_bf << 0.0, 0.0, 0.0;
-  this->velocity_bf << 0.0, 0.0, 0.0;
-  this->detected = false;
-  this->losted = true;
-  this->first_seen = (struct timespec){0, 0};
-  this->last_seen = (struct timespec){0, 0};
-
-  this->lost_threshold = 1000.0;
-}
 
 bool LandingTarget::isTargetLosted() {
   if (mtoc(&this->last_seen) > lost_threshold) {

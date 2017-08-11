@@ -481,26 +481,18 @@ void ControlNode::landingControllerSetCallback(
 }
 
 void ControlNode::publishAttitudeSetpoint() {
-  // setup
-  int seq = this->ros_seq;
   AttitudeCommand att_cmd = this->quadrotor.att_cmd;
 
   if (this->fcu_type == "PX4") {
     std_msgs::Float64 thr_msg;
     geometry_msgs::PoseStamped att_msg;
-    buildMsg(seq, ros::Time::now(), att_cmd, att_msg, thr_msg);
+    buildMsg(this->ros_seq, ros::Time::now(), att_cmd, att_msg, thr_msg);
 
     this->ros_pubs[PX4_SETPOINT_ATTITUDE_TOPIC].publish(att_msg);
     this->ros_pubs[PX4_SETPOINT_THROTTLE_TOPIC].publish(thr_msg);
 
   } else if (this->fcu_type == "DJI") {
-    // transform orientation from NWU to NED
-    Quaternion q_ned;
-    nwu2ned(att_cmd.orientation, q_ned);
-
-    // convert to euler
-    Vec3 euler;
-    quat2euler(q_ned, 321, euler);
+    Vec3 euler = att_cmd.toEuler("NED");
 
     //  DJI Control Mode Byte
     //
@@ -531,15 +523,11 @@ void ControlNode::publishAttitudeSetpoint() {
     //
     //  ends up being: 0b00100000 -> 0x20
 
-    // clang-format off
-    this->dji->attitude_control(
-      0x20,                    // control mode byte (see above comment)
-      rad2deg(euler(0)),       // roll (deg)
-      rad2deg(euler(1)),       // pitch (deg)
-      att_cmd.throttle * 100,  // throttle (0 - 100)
-      rad2deg(euler(2))        // yaw (deg)
-    );
-    // clang-format on
+    this->dji->attitude_control(0x20, // control mode byte (see above comment)
+                                rad2deg(euler(0)),      // roll (deg)
+                                rad2deg(euler(1)),      // pitch (deg)
+                                att_cmd.throttle * 100, // throttle (0 - 100)
+                                rad2deg(euler(2)));     // yaw (deg)
 
   } else {
     ROS_ERROR("Invalid [fcu_type]: %s", this->fcu_type.c_str());

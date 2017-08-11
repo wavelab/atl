@@ -1,5 +1,5 @@
-#include "atl/quadrotor/landing_target.hpp"
 #include "atl/atl_test.hpp"
+#include "atl/data/landing_target.hpp"
 
 namespace atl {
 

@@ -8,10 +8,11 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include "atl/utils/utils.hpp"
+#include "atl/data/data.hpp"
 #include "atl/control/pid.hpp"
 #include "atl/control/trajectory.hpp"
 #include "atl/control/trajectory_index.hpp"
-#include "atl/utils/utils.hpp"
 
 namespace atl {
 
@@ -158,13 +159,13 @@ public:
    *
    * @return 0 for success, -1 for failure
    */
-  int calculate(const Vec3 &target_pos_bf,
-                const Vec3 &target_vel_bf,
-                const Vec3 &pos,
-                const Vec3 &vel,
-                const Quaternion &orientation,
-                const double yaw,
-                const double dt);
+  int update(const Vec3 &target_pos_bf,
+             const Vec3 &target_vel_bf,
+             const Vec3 &pos,
+             const Vec3 &vel,
+             const Quaternion &orientation,
+             const double yaw,
+             const double dt);
 
   /**
    * Reset controller errors to 0

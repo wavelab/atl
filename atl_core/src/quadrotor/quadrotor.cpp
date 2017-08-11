@@ -204,7 +204,7 @@ int Quadrotor::stepHoverMode(const double dt) {
   }
 
   // hover
-  this->position_controller.calculate(
+  this->position_controller.update(
       this->hover_position, this->pose, this->yaw, dt);
   this->att_cmd = AttitudeCommand(this->position_controller.outputs);
 
@@ -258,11 +258,11 @@ int Quadrotor::stepTrackingMode(const double dt) {
 
   // track target
   this->att_cmd =
-      this->tracking_controller.calculate(this->landing_target.position_bf,
-                                          this->pose.position,
-                                          this->hover_position,
-                                          this->yaw,
-                                          dt);
+      this->tracking_controller.update(this->landing_target.position_bf,
+                                       this->pose.position,
+                                       this->hover_position,
+                                       this->yaw,
+                                       dt);
 
   // update hover position and tracking timer
   this->setHoverXYPosition(this->pose.position);
@@ -311,13 +311,13 @@ int Quadrotor::stepLandingMode(const double dt) {
   }
 
   // land on target
-  retval = this->landing_controller.calculate(this->landing_target.position_bf,
-                                              this->landing_target.velocity_bf,
-                                              this->pose.position,
-                                              this->velocity,
-                                              this->pose.orientation,
-                                              this->yaw,
-                                              dt);
+  retval = this->landing_controller.update(this->landing_target.position_bf,
+                                           this->landing_target.velocity_bf,
+                                           this->pose.position,
+                                           this->velocity,
+                                           this->pose.orientation,
+                                           this->yaw,
+                                           dt);
   this->att_cmd = this->landing_controller.att_cmd;
 
   // update hover position and tracking timer

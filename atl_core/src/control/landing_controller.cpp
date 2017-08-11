@@ -240,13 +240,13 @@ Vec4 LandingController::calculateVelocityErrors(const Vec3 &v_errors,
   return this->outputs;
 }
 
-int LandingController::calculate(const Vec3 &target_pos_bf,
-                                 const Vec3 &target_vel_bf,
-                                 const Vec3 &pos,
-                                 const Vec3 &vel,
-                                 const Quaternion &orientation,
-                                 const double yaw,
-                                 const double dt) {
+int LandingController::update(const Vec3 &target_pos_bf,
+                              const Vec3 &target_vel_bf,
+                              const Vec3 &pos,
+                              const Vec3 &vel,
+                              const Quaternion &orientation,
+                              const double yaw,
+                              const double dt) {
   // obtain position and velocity waypoints
   Vec2 wp_pos, wp_vel, wp_inputs;
   int retval = this->trajectory.update(pos, wp_pos, wp_vel, wp_inputs);

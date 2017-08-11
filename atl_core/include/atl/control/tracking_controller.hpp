@@ -5,8 +5,9 @@
 
 #include <yaml-cpp/yaml.h>
 
-#include "atl/control/pid.hpp"
 #include "atl/utils/utils.hpp"
+#include "atl/data/data.hpp"
+#include "atl/control/pid.hpp"
 
 namespace atl {
 
@@ -42,7 +43,7 @@ public:
   int configure(const std::string &config_file);
 
   /**
-   * Calculate controller outputs
+   * Update controller
    *
    * @param pos_errors Tracking errors in body frame
    * @param yaw Actual robot yaw
@@ -50,12 +51,12 @@ public:
    *
    * @return controller output
    */
-  AttitudeCommand calculate(const Vec3 &pos_errors,
-                            const double yaw,
-                            const double dt);
+  AttitudeCommand update(const Vec3 &pos_errors,
+                         const double yaw,
+                         const double dt);
 
   /**
-   * Calculate controller outputs
+   * Update controller
    *
    * @param target_pos_bf Target position in body frame
    * @param pos Robot position in inertial frame
@@ -65,11 +66,11 @@ public:
    *
    * @return controller output
    */
-  AttitudeCommand calculate(const Vec3 &target_pos_bf,
-                            const Vec3 &pos,
-                            const Vec3 &pos_prev,
-                            const double yaw,
-                            const double dt);
+  AttitudeCommand update(const Vec3 &target_pos_bf,
+                         const Vec3 &pos,
+                         const Vec3 &pos_prev,
+                         const double yaw,
+                         const double dt);
 
   /**
    * Reset controller errors to 0

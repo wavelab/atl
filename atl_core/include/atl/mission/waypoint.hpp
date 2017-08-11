@@ -10,15 +10,13 @@ namespace atl {
  */
 class Waypoint {
 public:
-  double latitude;
-  double longitude;
-  double altitude;
-  double staytime;
-  double heading;
+  double latitude = 0.0;
+  double longitude = 0.0;
+  double altitude = 0.0;
+  double staytime = 0.0;
+  double heading = 0.0;
 
-  Waypoint()
-      : latitude{0.0}, longitude{0.0}, altitude{0.0}, staytime{0.0},
-        heading{0.0} {}
+  Waypoint() {}
   Waypoint(double latitude, double longitude)
       : latitude{latitude}, longitude{longitude} {}
   Waypoint(double latitude,

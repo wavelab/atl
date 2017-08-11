@@ -87,7 +87,7 @@ TEST(TrackingController, configure) {
   EXPECT_FLOAT_EQ(0.0, controller.outputs(3));
 }
 
-TEST(TrackingController, calculate) {
+TEST(TrackingController, update) {
   Vec3 errors;
   double yaw, dt;
   TrackingController controller;
@@ -100,7 +100,7 @@ TEST(TrackingController, calculate) {
   errors << 0, 0, 0;
   yaw = 0.0;
   dt = 0.1;
-  controller.calculate(errors, yaw, dt);
+  controller.update(errors, yaw, dt);
   controller.printOutputs();
 
   EXPECT_FLOAT_EQ(0.0, controller.outputs(0));
@@ -113,7 +113,7 @@ TEST(TrackingController, calculate) {
   dt = 0.1;
 
   controller.reset();
-  controller.calculate(errors, yaw, dt);
+  controller.update(errors, yaw, dt);
   controller.printOutputs();
 
   EXPECT_FLOAT_EQ(0.0, controller.outputs(0));
@@ -125,7 +125,7 @@ TEST(TrackingController, calculate) {
   dt = 0.1;
 
   controller.reset();
-  controller.calculate(errors, yaw, dt);
+  controller.update(errors, yaw, dt);
   controller.printOutputs();
 
   EXPECT_TRUE(controller.outputs(0) < 0.0);
@@ -137,7 +137,7 @@ TEST(TrackingController, calculate) {
   dt = 0.1;
 
   controller.reset();
-  controller.calculate(errors, yaw, dt);
+  controller.update(errors, yaw, dt);
   controller.printOutputs();
 
   EXPECT_TRUE(controller.outputs(0) < 0.0);
@@ -149,7 +149,7 @@ TEST(TrackingController, calculate) {
   dt = 0.1;
 
   controller.reset();
-  controller.calculate(errors, yaw, dt);
+  controller.update(errors, yaw, dt);
   controller.printOutputs();
 
   EXPECT_FLOAT_EQ(yaw, controller.outputs(2));

@@ -5,8 +5,9 @@
 
 #include <yaml-cpp/yaml.h>
 
-#include "atl/control/pid.hpp"
 #include "atl/utils/utils.hpp"
+#include "atl/data/data.hpp"
+#include "atl/control/pid.hpp"
 
 namespace atl {
 
@@ -41,7 +42,7 @@ public:
   int configure(const std::string &config_file);
 
   /**
-   * Calculate controller outputs
+   * Update controller
    *
    * @param setpoints Position setpoints
    * @param pose Actual pose
@@ -52,10 +53,10 @@ public:
    *    Attitude command as a vector of size 4:
    *    (roll, pitch, yaw, throttle)
    */
-  Vec4 calculate(const Vec3 &setpoints,
-                 const Pose &pose,
-                 const double yaw,
-                 const double dt);
+  Vec4 update(const Vec3 &setpoints,
+              const Pose &pose,
+              const double yaw,
+              const double dt);
 
   /**
    * Reset controller errors to 0

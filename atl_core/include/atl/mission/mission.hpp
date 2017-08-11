@@ -3,8 +3,8 @@
 
 #include <vector>
 
-#include "atl/mission/waypoint.hpp"
 #include "atl/utils/utils.hpp"
+#include "atl/mission/waypoint.hpp"
 
 namespace atl {
 
@@ -28,9 +28,9 @@ public:
   bool configured = false;
   bool completed = false;
 
-  double home_lat;
-  double home_lon;
-  double home_alt;
+  double home_lat = 0.0;
+  double home_lon = 0.0;
+  double home_alt = 0.0;
 
   bool check_waypoints = true;
   double threshold_waypoint_gap = 20.0;

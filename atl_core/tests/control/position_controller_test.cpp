@@ -81,7 +81,7 @@ TEST(PositionController, configure) {
   EXPECT_FLOAT_EQ(0.0, controller.outputs(3));
 }
 
-TEST(PositionController, calculate) {
+TEST(PositionController, update) {
   Vec3 setpoint_nwu, setpoint_enu;
   Pose actual;
   float yaw_setpoint, dt;
@@ -96,7 +96,7 @@ TEST(PositionController, calculate) {
   actual.position << 0, 0, 0;
   yaw_setpoint = 0;
   dt = 0.1;
-  controller.calculate(setpoint_enu, actual, yaw_setpoint, dt);
+  controller.update(setpoint_enu, actual, yaw_setpoint, dt);
   controller.printOutputs();
 
   EXPECT_FLOAT_EQ(0.0, controller.outputs(0));
@@ -111,7 +111,7 @@ TEST(PositionController, calculate) {
   dt = 0.1;
 
   controller.reset();
-  controller.calculate(setpoint_enu, actual, yaw_setpoint, dt);
+  controller.update(setpoint_enu, actual, yaw_setpoint, dt);
   controller.printOutputs();
 
   EXPECT_TRUE(controller.outputs(0) < 0.0);
@@ -125,7 +125,7 @@ TEST(PositionController, calculate) {
   dt = 0.1;
 
   controller.reset();
-  controller.calculate(setpoint_enu, actual, yaw_setpoint, dt);
+  controller.update(setpoint_enu, actual, yaw_setpoint, dt);
   controller.printOutputs();
 
   EXPECT_FLOAT_EQ(0.0, controller.outputs(0));
@@ -139,7 +139,7 @@ TEST(PositionController, calculate) {
   dt = 0.1;
 
   controller.reset();
-  controller.calculate(setpoint_enu, actual, yaw_setpoint, dt);
+  controller.update(setpoint_enu, actual, yaw_setpoint, dt);
   controller.printOutputs();
 
   EXPECT_TRUE(controller.outputs(0) < 0.0);
@@ -153,13 +153,13 @@ TEST(PositionController, calculate) {
   dt = 0.1;
 
   controller.reset();
-  controller.calculate(setpoint_enu, actual, yaw_setpoint, dt);
+  controller.update(setpoint_enu, actual, yaw_setpoint, dt);
   controller.printOutputs();
 
   EXPECT_FLOAT_EQ(yaw_setpoint, controller.outputs(2));
 }
 
-TEST(PositionController, calculate2) {
+TEST(PositionController, update2) {
   Vec3 setpoint_nwu, setpoint_enu, euler;
   Pose actual;
   float yaw_setpoint, dt;
@@ -179,7 +179,7 @@ TEST(PositionController, calculate2) {
   yaw_setpoint = 0;
   dt = 0.1;
 
-  controller.calculate(setpoint_enu, actual, yaw_setpoint, dt);
+  controller.update(setpoint_enu, actual, yaw_setpoint, dt);
   controller.printOutputs();
 
   EXPECT_TRUE(controller.outputs(0) > 0);

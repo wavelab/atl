@@ -44,9 +44,9 @@ int TrackingController::configure(const std::string &config_file) {
   return 0;
 }
 
-AttitudeCommand TrackingController::calculate(const Vec3 &pos_errors,
-                                              const double yaw,
-                                              const double dt) {
+AttitudeCommand TrackingController::update(const Vec3 &pos_errors,
+                                           const double yaw,
+                                           const double dt) {
   // check rate
   this->dt += dt;
   if (this->dt < 0.01) {
@@ -83,18 +83,18 @@ AttitudeCommand TrackingController::calculate(const Vec3 &pos_errors,
   return AttitudeCommand(this->outputs);
 }
 
-AttitudeCommand TrackingController::calculate(const Vec3 &target_pos_bf,
-                                              const Vec3 &pos,
-                                              const Vec3 &pos_prev,
-                                              const double yaw,
-                                              const double dt) {
+AttitudeCommand TrackingController::update(const Vec3 &target_pos_bf,
+                                           const Vec3 &pos,
+                                           const Vec3 &pos_prev,
+                                           const double yaw,
+                                           const double dt) {
   Vec3 errors;
 
   errors(0) = target_pos_bf(0);
   errors(1) = target_pos_bf(1);
   errors(2) = pos_prev(2) - pos(2);
 
-  return this->calculate(errors, yaw, dt);
+  return this->update(errors, yaw, dt);
 }
 
 void TrackingController::reset() {

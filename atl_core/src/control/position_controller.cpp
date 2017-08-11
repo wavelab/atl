@@ -37,10 +37,10 @@ int PositionController::configure(const std::string &config_file) {
   return 0;
 }
 
-Vec4 PositionController::calculate(const Vec3 &setpoints,
-                                   const Pose &pose,
-                                   const double yaw,
-                                   const double dt) {
+Vec4 PositionController::update(const Vec3 &setpoints,
+                                const Pose &pose,
+                                const double yaw,
+                                const double dt) {
   // check rate
   this->dt += dt;
   if (this->dt < 0.01) {

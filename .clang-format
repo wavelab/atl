@@ -1,4 +1,5 @@
 AllowShortCaseLabelsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: true
 BinPackArguments: false
 BinPackParameters: false
 IndentCaseLabels: true

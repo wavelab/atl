@@ -42,6 +42,10 @@ ADD_LIBRARY(
     src/control/trajectory_index.cpp
     src/control/velocity_controller.cpp
     src/control/waypoint_controller.cpp
+    # data
+    src/data/attitude_command.cpp
+    src/data/landing_target.cpp
+    src/data/pose.cpp
     # estimation
     src/estimation/ekf.cpp
     src/estimation/ekf_tracker.cpp
@@ -59,7 +63,6 @@ ADD_LIBRARY(
     src/planning/trajectory.cpp
     src/planning/utils.cpp
     # quadrotor
-    src/quadrotor/landing_target.cpp
     src/quadrotor/quadrotor.cpp
     # sensor
     src/sensor/i2c.cpp
@@ -115,6 +118,9 @@ ADD_EXECUTABLE(
     tests/control/trajectory_test.cpp
     tests/control/velocity_controller_test.cpp
     tests/control/waypoint_controller_test.cpp
+    # control
+    tests/data/landing_target_test.cpp
+    tests/data/pose_test.cpp
     # estimation
     tests/estimation/ekf_test.cpp
     tests/estimation/ekf_tracker_test.cpp
@@ -128,7 +134,6 @@ ADD_EXECUTABLE(
     tests/planning/trajectory_test.cpp
     tests/planning/utils_test.cpp
     # quadrotor
-    tests/quadrotor/landing_target_test.cpp
     tests/quadrotor/quadrotor_test.cpp
     # sensor
     tests/sensor/MPU6050_test.cpp
