@@ -95,6 +95,14 @@ def hover_side_to_side():
         sleep(5)
 
 
+def up_and_down():
+    for i in range(3):
+        quad.set_hover_point([0, 0, 5.0])
+        sleep(5)
+        quad.set_hover_point([0, 0, 3.0])
+        sleep(5)
+
+
 if __name__ == "__main__":
     rospy.init_node("atl_remote")
     lz = LandingZone()
@@ -105,10 +113,12 @@ if __name__ == "__main__":
     # world = World()
     rospy.sleep(1.0)
 
-    quad.set_arm(True)
-    quad.set_mode("WAYPOINT_MODE")
+    # quad.set_arm(True)
+    # quad.set_mode("WAYPOINT_MODE")
 
+    # up_and_down()
     # hover_side_to_side()
+
     # quad.set_pctrl_settings({
     #     "roll": {
     #         "min": -30,
