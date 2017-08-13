@@ -31,10 +31,10 @@ public:
   DFCameraNode(int argc, char **argv) : ROSNode(argc, argv) {
     this->configured = false;
   }
-  int configure(const std::string &node_name, int hz);
+  int configure(int hz);
   void imageCallback(ConstImagePtr &msg);
 };
 
-}  // namespace gazebo_bridge
-}  // namespace atl
+} // namespace gazebo_bridge
+} // namespace atl
 #endif

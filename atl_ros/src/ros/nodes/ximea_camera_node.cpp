@@ -2,12 +2,12 @@
 
 namespace atl {
 
-int XimeaCameraNode::configure(std::string node_name, int hz) {
+int XimeaCameraNode::configure(int hz) {
   std::string config_path;
   grey_scale = false;
 
   // ros node
-  if (ROSNode::configure(node_name, hz) != 0) {
+  if (ROSNode::configure(hz) != 0) {
     return -1;
   }
 
@@ -17,9 +17,7 @@ int XimeaCameraNode::configure(std::string node_name, int hz) {
     ROS_ERROR("Failed to configure Camera!");
     return -2;
   };
-
   this->ros_nh->getParam("/grey_scale", grey_scale);
-
   this->camera.initialize();
 
   // register publisher and subscribers
@@ -30,8 +28,9 @@ int XimeaCameraNode::configure(std::string node_name, int hz) {
   this->registerSubscriber(GIMBAL_JOINT_ORIENTATION_TOPIC,
                            &XimeaCameraNode::gimbalJointCallback,
                            this);
-  this->registerSubscriber(
-    APRILTAG_TOPIC, &XimeaCameraNode::aprilTagCallback, this);
+  this->registerSubscriber(APRILTAG_TOPIC,
+                           &XimeaCameraNode::aprilTagCallback,
+                           this);
   this->registerShutdown(SHUTDOWN_TOPIC);
 
   // register loop callback
@@ -68,7 +67,7 @@ int XimeaCameraNode::publishImage() {
   // std::cout << s.height << std::endl;
   // std::cout << s.width << std::endl;
   img_msg =
-    cv_bridge::CvImage(std_msgs::Header(), "mono8", this->image).toImageMsg();
+      cv_bridge::CvImage(std_msgs::Header(), "mono8", this->image).toImageMsg();
   // } else {
   //   // clang-format off
   //   img_msg = cv_bridge::CvImage(
@@ -78,12 +77,12 @@ int XimeaCameraNode::publishImage() {
   //       ).toImageMsg();
   // }
   // clang-format on
-  this->img_pub.publish(img_msg);
+  this->img_pubs[CAMERA_IMAGE_TOPIC].publish(img_msg);
   return 0;
 }
 
 void XimeaCameraNode::gimbalFrameCallback(
-  const geometry_msgs::Quaternion &msg) {
+    const geometry_msgs::Quaternion &msg) {
   this->gimbal_frame_orientation.w() = msg.w;
   this->gimbal_frame_orientation.x() = msg.x;
   this->gimbal_frame_orientation.y() = msg.y;
@@ -91,7 +90,7 @@ void XimeaCameraNode::gimbalFrameCallback(
 }
 
 void XimeaCameraNode::gimbalJointCallback(
-  const geometry_msgs::Quaternion &msg) {
+    const geometry_msgs::Quaternion &msg) {
   this->gimbal_joint_orientation.w() = msg.w;
   this->gimbal_joint_orientation.x() = msg.x;
   this->gimbal_joint_orientation.y() = msg.y;
@@ -127,6 +126,6 @@ int XimeaCameraNode::loopCallback() {
   return 0;
 }
 
-}  // namespace atl
+} // namespace atl
 
-RUN_ROS_NODE(atl::XimeaCameraNode, NODE_NAME, NODE_RATE);
+RUN_ROS_NODE(atl::XimeaCameraNode, NODE_RATE);

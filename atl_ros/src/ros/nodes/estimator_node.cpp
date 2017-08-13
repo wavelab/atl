@@ -2,11 +2,11 @@
 
 namespace atl {
 
-int EstimatorNode::configure(std::string node_name, int hz) {
+int EstimatorNode::configure(int hz) {
   std::string config_file;
 
   // ros node
-  if (ROSNode::configure(node_name, hz) != 0) {
+  if (ROSNode::configure(hz) != 0) {
     return -1;
   }
 
@@ -38,9 +38,7 @@ int EstimatorNode::configure(std::string node_name, int hz) {
       }
       break;
 
-    default:
-      LOG_ERROR("Invalid Tracker Mode!");
-      return -2;
+    default: LOG_ERROR("Invalid Tracker Mode!"); return -2;
   }
 
   // publishers and subscribers
@@ -84,7 +82,7 @@ void EstimatorNode::initLTKF(Vec3 x0) {
       LOG_INFO("Intializing KF!");
       if (this->kf_tracker.initialize(mu) != 0) {
         LOG_ERROR("Failed to intialize KalmanFilterTracker!");
-        exit(-1);  // dangerous but necessary
+        exit(-1); // dangerous but necessary
       }
       break;
 
@@ -99,7 +97,7 @@ void EstimatorNode::initLTKF(Vec3 x0) {
       LOG_INFO("Intializing EKF!");
       if (this->ekf_tracker.initialize(mu) != 0) {
         LOG_ERROR("Failed to intialize ExtendedKalmanFilterTracker!");
-        exit(-1);  // dangerous but necessary
+        exit(-1); // dangerous but necessary
       }
       break;
   }
@@ -108,16 +106,14 @@ void EstimatorNode::initLTKF(Vec3 x0) {
   this->initialized = true;
 }
 
-void EstimatorNode::resetLTKF(Vec3 x0) {
-  this->initLTKF(x0);
-}
+void EstimatorNode::resetLTKF(Vec3 x0) { this->initLTKF(x0); }
 
 void EstimatorNode::quadPoseCallback(const geometry_msgs::PoseStamped &msg) {
   convertMsg(msg, this->quad_pose);
 }
 
 void EstimatorNode::quadVelocityCallback(
-  const geometry_msgs::TwistStamped &msg) {
+    const geometry_msgs::TwistStamped &msg) {
   convertMsg(msg.twist.linear, this->quad_velocity);
 }
 
@@ -168,7 +164,7 @@ void EstimatorNode::targetBodyPosCallback(const geometry_msgs::Vector3 &msg) {
 }
 
 void EstimatorNode::targetInertialPosCallback(
-  const geometry_msgs::Vector3 &msg) {
+    const geometry_msgs::Vector3 &msg) {
   // pre-check
   if (this->state == ESTIMATOR_OFF) {
     return;
@@ -284,9 +280,9 @@ void EstimatorNode::trackTarget() {
 
   // calculate roll pitch yaw setpoints
   dist = this->target_pos_bpf.norm();
-  setpoints(0) = asin(this->target_pos_bpf(1) / dist);   // roll
-  setpoints(1) = -asin(this->target_pos_bpf(0) / dist);  // pitch
-  setpoints(2) = 0.0;                                    // yaw
+  setpoints(0) = asin(this->target_pos_bpf(1) / dist);  // roll
+  setpoints(1) = -asin(this->target_pos_bpf(0) / dist); // pitch
+  setpoints(2) = 0.0;                                   // yaw
 
   this->publishGimbalSetpointAttitudeMsg(setpoints);
   this->publishQuadYawMsg();
@@ -332,7 +328,7 @@ int EstimatorNode::estimateKF(double dt) {
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
     // clang-format on
-    y << 0.0, 0.0, 0.0;  // to prevent uninitialized values from entering kf
+    y << 0.0, 0.0, 0.0; // to prevent uninitialized values from entering kf
   }
 
   // estimate
@@ -365,10 +361,10 @@ int EstimatorNode::estimateEKF(double dt) {
 
   // measurement update
   if (this->target_detected) {
-    H(0, 0) = 1.0;  // x
-    H(1, 1) = 1.0;  // y
-    H(2, 2) = 1.0;  // z
-    H(3, 3) = 1.0;  // theta
+    H(0, 0) = 1.0; // x
+    H(1, 1) = 1.0; // y
+    H(2, 2) = 1.0; // z
+    H(3, 3) = 1.0; // theta
     h = H * this->ekf_tracker.mu_p;
     this->ekf_tracker.measurementUpdate(h, H, y);
 
@@ -399,12 +395,8 @@ int EstimatorNode::estimate() {
 
   // estimate
   switch (this->mode) {
-    case KF_MODE:
-      retval = this->estimateKF(dt);
-      break;
-    case EKF_MODE:
-      retval = this->estimateEKF(dt);
-      break;
+    case KF_MODE: retval = this->estimateKF(dt); break;
+    case EKF_MODE: retval = this->estimateEKF(dt); break;
   }
 
   // sanity check target estimates
@@ -438,6 +430,6 @@ int EstimatorNode::loopCallback() {
   return 0;
 }
 
-}  // namespace atl
+} // namespace atl
 
-RUN_ROS_NODE(atl::EstimatorNode, NODE_NAME, NODE_RATE);
+RUN_ROS_NODE(atl::EstimatorNode, NODE_RATE);

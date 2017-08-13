@@ -11,4 +11,4 @@ TEST(MPU6050, configure) {
   EXPECT_EQ(0.0, retval);
 }
 
-}  // namespace atl
+} // namespace atl

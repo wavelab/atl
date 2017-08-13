@@ -7,9 +7,9 @@
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
 
-#include "atl/utils/utils.hpp"
-#include "atl/models/quadrotor.hpp"
 #include "atl/gazebo/gazebo_node.hpp"
+#include "atl/models/quadrotor.hpp"
+#include "atl/utils/utils.hpp"
 
 namespace atl {
 namespace gaz {
@@ -47,6 +47,6 @@ public:
   void setVelocityCallback(VelocitySetpointPtr &msg);
 };
 
-}  // namespace gaz
-}  // namespace atl
+} // namespace gaz
+} // namespace atl
 #endif

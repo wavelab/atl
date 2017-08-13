@@ -5,6 +5,8 @@
 #include "atl/vision/apriltag/mit.hpp"
 #include "atl/vision/apriltag/swathmore.hpp"
 #include "atl/vision/camera/camera.hpp"
+#include "atl/vision/camera/config.hpp"
+#include "atl/vision/camera/dc1394.hpp"
 #include "atl/vision/camera/pointgrey.hpp"
 #include "atl/vision/camera/ximea.hpp"
 #include "atl/vision/gimbal/gimbal.hpp"

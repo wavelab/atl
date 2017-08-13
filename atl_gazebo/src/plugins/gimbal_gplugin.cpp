@@ -3,12 +3,9 @@
 namespace atl {
 namespace gaz {
 
-GimbalGPlugin::GimbalGPlugin() {
-  printf("LOADING [libgimbal_gplugin.so]!\n");
-}
+GimbalGPlugin::GimbalGPlugin() { printf("LOADING [libgimbal_gplugin.so]!\n"); }
 
-void GimbalGPlugin::Load(gazebo::physics::ModelPtr model,
-                         sdf::ElementPtr sdf) {
+void GimbalGPlugin::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
   UNUSED(sdf);
 
   // set model and bind world update callback
@@ -48,8 +45,7 @@ void GimbalGPlugin::simulate(double dt) {
 
   // set gimbal frame orientation
   ignition::math::Pose3d pose = this->model->WorldPose();
-  Quaternion q{
-    pose.Rot().W(), pose.Rot().X(), pose.Rot().Y(), pose.Rot().Z()};
+  Quaternion q{pose.Rot().W(), pose.Rot().X(), pose.Rot().Y(), pose.Rot().Z()};
   this->gimbal.setFrameOrientation(q);
 
   // attitude control and update
@@ -68,7 +64,7 @@ void GimbalGPlugin::onUpdate(const gazebo::common::UpdateInfo &info) {
 
   // simulate
   diff = info.simTime - this->prev_sim_time;
-  dt = diff.nsec / 1000000000.0;  // convert nsec to sec
+  dt = diff.nsec / 1000000000.0; // convert nsec to sec
   this->simulate(dt);
   this->prev_sim_time = info.simTime;
 
@@ -134,5 +130,5 @@ void GimbalGPlugin::trackTargetCallback(ConstVector3dPtr &msg) {
 }
 
 GZ_REGISTER_MODEL_PLUGIN(GimbalGPlugin)
-}  // namespace gaz
-}  // namespace atl
+} // namespace gaz
+} // namespace atl

@@ -1,5 +1,5 @@
-#include "atl/atl_test.hpp"
 #include "atl/control/velocity_controller.hpp"
+#include "atl/atl_test.hpp"
 
 #define TEST_CONFIG "tests/configs/control/velocity_controller.yaml"
 
@@ -140,4 +140,4 @@ TEST(VelocityController, calculate) {
   EXPECT_TRUE(controller.outputs(1) > 0.0);
 }
 
-}  // end of atl namepsace
+} // end of atl namepsace

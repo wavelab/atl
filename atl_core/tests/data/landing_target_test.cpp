@@ -1,4 +1,4 @@
-#include "atl/quadrotor/landing_target.hpp"
+#include "atl/data/landing_target.hpp"
 #include "atl/atl_test.hpp"
 
 namespace atl {
@@ -175,4 +175,4 @@ TEST(LandingTarget, update) {
   EXPECT_EQ(0, landing_target.last_seen.tv_nsec);
 }
 
-}  // namespace atl
+} // namespace atl

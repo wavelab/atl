@@ -3,9 +3,7 @@
 namespace atl {
 namespace gaz {
 
-WorldGClient::WorldGClient() {
-  this->connected = false;
-}
+WorldGClient::WorldGClient() { this->connected = false; }
 
 WorldGClient::~WorldGClient() {
   if (this->connected) {
@@ -245,5 +243,5 @@ void WorldGClient::worldStatsCallback(ConstWorldStatisticsPtr &msg) {
   this->time.iterations = msg->iterations();
 }
 
-}  // namespace gaz
-}  // namespace atl
+} // namespace gaz
+} // namespace atl

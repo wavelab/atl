@@ -150,4 +150,4 @@ TEST(Simulator, configure) {
 //   EXPECT_TRUE(sim.vel_error > 0);
 // }
 
-}  // namespace atl
+} // namespace atl

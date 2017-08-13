@@ -16,10 +16,10 @@ namespace atl {
 // GENERAL
 #define SBGC_CMD_MAX_BYTES 255
 #define SBGC_CMD_PAYLOAD_BYTES 5
-#define DEG_PER_BIT 0.02197265625     // deg per bit
-#define DEG_SEC_PER_BIT 0.1220740379  // deg/sec per bit
-#define ACC_UNIT (1.0 / 512.0)        // G
-#define GYRO_UNIT 0.06103701895       // deg per sec
+#define DEG_PER_BIT 0.02197265625    // deg per bit
+#define DEG_SEC_PER_BIT 0.1220740379 // deg/sec per bit
+#define ACC_UNIT (1.0 / 512.0)       // G
+#define GYRO_UNIT 0.06103701895      // deg per sec
 
 // CMD ID
 #define CMD_READ_PARAMS 82
@@ -73,7 +73,7 @@ namespace atl {
 #define CMD_BOOT_MODE_3 51
 
 // CMD FRAME SIZE
-#define MIN_FRAME_SIZE 5  // 4 bytes for header + 1 body checksum
+#define MIN_FRAME_SIZE 5 // 4 bytes for header + 1 body checksum
 #define CMD_BOARD_INFO_FRAME_SIZE 5 + 18
 #define CMD_REALTIME_DATA_3_FRAME_SIZE 5 + 63
 
@@ -101,10 +101,10 @@ namespace atl {
 // ERR_EMERGENCY_STOP (1<<11)
 
 // MACROS
-#define S16BIT(DATA, HI_BYTE, LOW_BYTE) \
+#define S16BIT(DATA, HI_BYTE, LOW_BYTE)                                        \
   (int16_t)((DATA[HI_BYTE] << 8) | (DATA[LOW_BYTE] & 0xff))
 
-#define U16BIT(DATA, HI_BYTE, LOW_BYTE) \
+#define U16BIT(DATA, HI_BYTE, LOW_BYTE)                                        \
   (uint16_t)((DATA[HI_BYTE] << 8) | (DATA[LOW_BYTE] & 0xff))
 
 class SBGCFrame {
@@ -182,5 +182,5 @@ public:
                     double yaw_speed);
 };
 
-}  // end of namespace atl
+} // end of namespace atl
 #endif

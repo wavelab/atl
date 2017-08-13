@@ -48,4 +48,4 @@ std::vector<Eigen::Vector2d> bezier_cubic_curve(Eigen::Vector2d p0,
   return bezier_points;
 }
 
-}  // namespace atl
+} // namespace atl

@@ -28,17 +28,31 @@ int PointGreyCamera::initialize() {
   FlyCapture2::Property property;
   FlyCapture2::Property gain_property;
 
-  FlyCapture2::PGRGuid guid;
   FlyCapture2::BusManager bus_manager;
 
   // setup
   this->pointgrey = new FlyCapture2::Camera();
 
   // look for camera
+  FlyCapture2::PGRGuid guid;
   error = bus_manager.GetCameraFromIndex(0, &guid);
   if (error != FlyCapture2::PGRERROR_OK) {
+    error.PrintErrorTrace();
     LOG_ERROR("ERROR! Could not find a camera!");
     return -1;
+  }
+
+  // display camera info
+  FlyCapture2::CameraInfo cam_info;
+  error = this->pointgrey->GetCameraInfo(&cam_info);
+  if (error != FlyCapture2::PGRERROR_OK) {
+    error.PrintErrorTrace();
+    LOG_ERROR("ERROR! Failed to get camera info from camera!");
+    return -1;
+  } else {
+    LOG_INFO("PointGrey [%s] - serial no. [%d]",
+             cam_info.modelName,
+             cam_info.serialNumber);
   }
 
   // connect
@@ -50,11 +64,11 @@ int PointGreyCamera::initialize() {
     LOG_INFO("PointGrey connected!");
   }
 
-  this->setFrameRate(200);
-  this->setExposure(this->config.exposure_value);
-  this->setGain(this->config.gain_value);
-  this->setShutter(this->config.shutter_speed);
-  this->setFormat7(1, "RAW8", 1024, 768);
+  // this->setFrameRate(200);
+  // this->setExposure(this->config.exposure_value);
+  // this->setGain(this->config.gain_value);
+  // this->setShutter(this->config.shutter_speed);
+  // this->setFormat7(1, "RAW8", 1024, 768);
 
   // start camera
   error = this->pointgrey->StartCapture();
@@ -272,26 +286,25 @@ int PointGreyCamera::printFormat7Capabilities() {
 
   // get format7 info
   this->pointgrey->GetFormat7Info(&info, &supported);
-  LOG_INFO(
-    "Max image pixels: (%u, %u)\n"
-    "Image Unit size: (%u, %u)\n"
-    "Offset Unit size: (%u, %u)\n"
-    "Pixel format bitfield: 0x%08x\n",
-    info.maxWidth,
-    info.maxHeight,
-    info.imageHStepSize,
-    info.imageVStepSize,
-    info.offsetHStepSize,
-    info.offsetVStepSize,
-    info.pixelFormatBitField);
+  LOG_INFO("Max image pixels: (%u, %u)\n"
+           "Image Unit size: (%u, %u)\n"
+           "Offset Unit size: (%u, %u)\n"
+           "Pixel format bitfield: 0x%08x\n",
+           info.maxWidth,
+           info.maxHeight,
+           info.imageHStepSize,
+           info.imageVStepSize,
+           info.offsetHStepSize,
+           info.offsetVStepSize,
+           info.pixelFormatBitField);
 
   return 0;
 }
 
-int PointGreyCamera::setFormat7(int mode,
-                                std::string pixel_format,
-                                int width,
-                                int height) {
+int PointGreyCamera::setFormat7(const int mode,
+                                const std::string &pixel_format,
+                                const int width,
+                                const int height) {
   bool valid;
   unsigned int packet_size;
   float psize_percentage;
@@ -301,28 +314,25 @@ int PointGreyCamera::setFormat7(int mode,
   FlyCapture2::Format7ImageSettings settings;
 
   // get format7 settings
-  this->pointgrey->GetFormat7Configuration(
-    &settings, &packet_size, &psize_percentage);
+  this->pointgrey->GetFormat7Configuration(&settings,
+                                           &packet_size,
+                                           &psize_percentage);
 
   // set mode
   switch (mode) {
-    case 0:
-      settings.mode = FlyCapture2::MODE_1;
-      break;
-    case 1:
-      settings.mode = FlyCapture2::MODE_1;
-      break;
-    case 2:
-      settings.mode = FlyCapture2::MODE_2;
-      break;
+    case 0: settings.mode = FlyCapture2::MODE_0; break;
+    case 1: settings.mode = FlyCapture2::MODE_1; break;
+    case 2: settings.mode = FlyCapture2::MODE_2; break;
     default:
       LOG_ERROR("Format7 mode [%d] not implemented yet!", mode);
       return -2;
   }
+
   settings.width = width;
   settings.height = height;
   settings.offsetX = 0;
   settings.offsetY = 0;
+
   if (pixel_format == "MONO8") {
     settings.pixelFormat = FlyCapture2::PIXEL_FORMAT_MONO8;
   } else if (pixel_format == "MONO16") {
@@ -338,16 +348,16 @@ int PointGreyCamera::setFormat7(int mode,
 
   // validate settings
   error =
-    this->pointgrey->ValidateFormat7Settings(&settings, &valid, &packet_info);
+      this->pointgrey->ValidateFormat7Settings(&settings, &valid, &packet_info);
   if (error != FlyCapture2::PGRERROR_OK) {
-    LOG_ERROR(
-      "Format7 settings are invalid!, could not configure the camera");
+    LOG_ERROR("Format7 settings are invalid!, could not configure the camera");
     return -1;
   }
 
   // send settings
-  error = this->pointgrey->SetFormat7Configuration(
-    &settings, packet_info.maxBytesPerPacket);
+  error =
+      this->pointgrey->SetFormat7Configuration(&settings,
+                                               packet_info.maxBytesPerPacket);
   if (error != FlyCapture2::PGRERROR_OK) {
     LOG_ERROR("Could not configure the camera with Format7!");
     return -1;
@@ -357,20 +367,21 @@ int PointGreyCamera::setFormat7(int mode,
   return 0;
 }
 
-std::pair<int, int> PointGreyCamera::centerROI(int size,
-                                               int max_size,
-                                               int step) {
+std::pair<int, int> PointGreyCamera::centerROI(const int size,
+                                               const int max_size,
+                                               const int step) {
+  double roi_size;
   if (size == 0 || size > max_size) {
-    size = max_size;
+    roi_size = max_size;
   }
 
   // size must be a multiple of the step
-  size = size / step * step;
-  const int offset = (max_size - size) / 2;
-  return std::make_pair(size, offset);
+  roi_size = size / step * step;
+  int offset = (max_size - roi_size) / 2;
+  return std::make_pair(roi_size, offset);
 }
 
-int PointGreyCamera::changeMode(std::string mode) {
+int PointGreyCamera::changeMode(const std::string &mode) {
   // pre-check
   if (this->configs.find(mode) == this->configs.end()) {
     return -1;
@@ -448,4 +459,4 @@ int PointGreyCamera::run() {
   return 0;
 }
 
-}  // namespace atl
+} // namespace atl

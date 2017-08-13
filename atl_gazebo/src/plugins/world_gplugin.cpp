@@ -3,18 +3,15 @@
 namespace atl {
 namespace gaz {
 
-WorldGPlugin::WorldGPlugin() {
-  printf("LOADING [libworld_gplugin.so]!\n");
-}
+WorldGPlugin::WorldGPlugin() { printf("LOADING [libworld_gplugin.so]!\n"); }
 
-void WorldGPlugin::Load(gazebo::physics::WorldPtr parent,
-                        sdf::ElementPtr sdf) {
+void WorldGPlugin::Load(gazebo::physics::WorldPtr parent, sdf::ElementPtr sdf) {
   UNUSED(sdf);
 
   this->world_sdf = sdf;
   this->world = parent;
   this->update_conn = gazebo::event::Events::ConnectWorldUpdateBegin(
-    boost::bind(&WorldGPlugin::onUpdate, this, _1));
+      boost::bind(&WorldGPlugin::onUpdate, this, _1));
 
   // setup gazebo node
   // clang-format off
@@ -94,5 +91,5 @@ void WorldGPlugin::worldClearCallback(ConstRequestPtr &msg) {
 }
 
 GZ_REGISTER_WORLD_PLUGIN(WorldGPlugin)
-}  // namespace gaz
-}  // namespace atl
+} // namespace gaz
+} // namespace atl

@@ -12,25 +12,25 @@
 namespace atl {
 
 #define INFO_CONFIG "Configuring ROS Node [%s]!"
-#define ROS_GET_PARAM(X, Y)                                      \
-  if (this->ros_nh == NULL) {                                    \
-    ROS_ERROR("You did not do ROSNode::configure() first!");     \
-    ROS_ERROR("Can only call ROS_GET_PARAM() after configure!"); \
-    return -1;                                                   \
-  }                                                              \
-  if (this->ros_nh->getParam(X, Y) == false) {                   \
-    ROS_ERROR("Failed to get ROS param [%s]", #X);               \
-    return -1;                                                   \
+#define ROS_GET_PARAM(X, Y)                                                    \
+  if (this->ros_nh == NULL) {                                                  \
+    ROS_ERROR("You did not do ROSNode::configure() first!");                   \
+    ROS_ERROR("Can only call ROS_GET_PARAM() after configure!");               \
+    return -1;                                                                 \
+  }                                                                            \
+  if (this->ros_nh->getParam(X, Y) == false) {                                 \
+    ROS_ERROR("Failed to get ROS param [%s]", #X);                             \
+    return -1;                                                                 \
   }
-#define RUN_ROS_NODE(NODE_CLASS, NODE_NAME, NODE_RATE)  \
-  int main(int argc, char **argv) {                     \
-    NODE_CLASS node(argc, argv);                        \
-    if (node.configure(NODE_NAME, NODE_RATE) != 0) {    \
-      ROS_ERROR("Failed to configure %s", #NODE_CLASS); \
-      return -1;                                        \
-    }                                                   \
-    node.loop();                                        \
-    return 0;                                           \
+#define RUN_ROS_NODE(NODE_CLASS, NODE_RATE)                                    \
+  int main(int argc, char **argv) {                                            \
+    NODE_CLASS node(argc, argv);                                               \
+    if (node.configure(NODE_RATE) != 0) {                                      \
+      ROS_ERROR("Failed to configure %s", #NODE_CLASS);                        \
+      return -1;                                                               \
+    }                                                                          \
+    node.loop();                                                               \
+    return 0;                                                                  \
   }
 
 class ROSNode {
@@ -42,25 +42,25 @@ public:
   int argc;
   char **argv;
 
-  std::string ros_node_name;
+  std::string node_name;
   long long int ros_seq;
-  ::ros::NodeHandle *ros_nh;
-  ::ros::Rate *ros_rate;
-  ::ros::Time ros_last_updated;
+  ros::NodeHandle *ros_nh;
+  ros::Rate *ros_rate;
+  ros::Time ros_last_updated;
 
-  std::map<std::string, ::ros::Publisher> ros_pubs;
-  std::map<std::string, ::ros::Subscriber> ros_subs;
-  std::map<std::string, ::ros::ServiceServer> ros_servers;
-  std::map<std::string, ::ros::ServiceClient> ros_clients;
+  std::map<std::string, ros::Publisher> ros_pubs;
+  std::map<std::string, ros::Subscriber> ros_subs;
+  std::map<std::string, ros::ServiceServer> ros_servers;
+  std::map<std::string, ros::ServiceClient> ros_clients;
 
-  image_transport::Publisher img_pub;
-  image_transport::Subscriber img_sub;
+  std::map<std::string, image_transport::Publisher> img_pubs;
+  std::map<std::string, image_transport::Subscriber> img_subs;
   std::function<int()> loop_cb;
 
   ROSNode() {}
   ROSNode(int argc, char **argv);
   ~ROSNode();
-  int configure(const std::string &node_name, int hz);
+  int configure(int hz);
   void shutdownCallback(const std_msgs::Bool &msg);
   int registerShutdown(const std::string &topic);
   int registerImagePublisher(const std::string &topic);
@@ -77,7 +77,7 @@ public:
 
     // image transport
     image_transport::ImageTransport it(*this->ros_nh);
-    this->img_sub = it.subscribe(topic, queue_size, fp, obj);
+    this->img_subs[topic] = it.subscribe(topic, queue_size, fp, obj);
 
     return 0;
   }
@@ -86,7 +86,7 @@ public:
   int registerPublisher(const std::string &topic,
                         uint32_t queue_size = 1,
                         bool latch = false) {
-    ::ros::Publisher publisher;
+    ros::Publisher publisher;
 
     // pre-check
     if (this->configured == false) {
@@ -105,7 +105,7 @@ public:
                          void (T::*fp)(M),
                          T *obj,
                          uint32_t queue_size = 1) {
-    ::ros::Subscriber subscriber;
+    ros::Subscriber subscriber;
 
     // pre-check
     if (this->configured == false) {
@@ -123,7 +123,7 @@ public:
   int registerServer(const std::string &service_topic,
                      bool (T::*fp)(MReq &, MRes &),
                      T *obj) {
-    ::ros::ServiceServer server;
+    ros::ServiceServer server;
 
     // pre-check
     if (this->configured == false) {
@@ -140,7 +140,7 @@ public:
   template <typename M>
   int registerClient(const std::string &service_topic,
                      bool persistent = false) {
-    ::ros::ServiceClient client;
+    ros::ServiceClient client;
 
     // pre-check
     if (this->configured == false) {
@@ -158,5 +158,5 @@ public:
   int loop();
 };
 
-}  // namespace atl
+} // namespace atl
 #endif

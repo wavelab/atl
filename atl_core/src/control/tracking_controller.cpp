@@ -2,27 +2,7 @@
 
 namespace atl {
 
-TrackingController::TrackingController() {
-  this->configured = false;
-
-  this->dt = 0.0;
-  this->x_controller = PID(0.0, 0.0, 0.0);
-  this->y_controller = PID(0.0, 0.0, 0.0);
-  this->z_controller = PID(0.0, 0.0, 0.0);
-  this->hover_throttle = 0.0;
-
-  this->roll_limit[0] = 0.0;
-  this->roll_limit[1] = 0.0;
-  this->pitch_limit[0] = 0.0;
-  this->pitch_limit[1] = 0.0;
-  this->track_offset << 0.0, 0.0, 0.0;
-
-  this->setpoints << 0.0, 0.0, 0.0;
-  this->outputs << 0.0, 0.0, 0.0, 0.0;
-  this->att_cmd = AttitudeCommand();
-}
-
-int TrackingController::configure(std::string config_file) {
+int TrackingController::configure(const std::string &config_file) {
   ConfigParser parser;
 
   // load config
@@ -37,8 +17,7 @@ int TrackingController::configure(std::string config_file) {
   parser.addParam("throttle_controller.k_p", &this->z_controller.k_p);
   parser.addParam("throttle_controller.k_i", &this->z_controller.k_i);
   parser.addParam("throttle_controller.k_d", &this->z_controller.k_d);
-  parser.addParam("throttle_controller.hover_throttle",
-                  &this->hover_throttle);
+  parser.addParam("throttle_controller.hover_throttle", &this->hover_throttle);
 
   parser.addParam("roll_limit.min", &this->roll_limit[0]);
   parser.addParam("roll_limit.max", &this->roll_limit[1]);
@@ -65,9 +44,9 @@ int TrackingController::configure(std::string config_file) {
   return 0;
 }
 
-AttitudeCommand TrackingController::calculate(Vec3 errors,
-                                              double yaw,
-                                              double dt) {
+AttitudeCommand TrackingController::update(const Vec3 &pos_errors,
+                                           const double yaw,
+                                           const double dt) {
   // check rate
   this->dt += dt;
   if (this->dt < 0.01) {
@@ -75,7 +54,7 @@ AttitudeCommand TrackingController::calculate(Vec3 errors,
   }
 
   // add offsets
-  errors = errors + this->track_offset;
+  Vec3 errors = pos_errors + this->track_offset;
 
   // roll, pitch, yaw and throttle (assuming NWU frame)
   // clang-format off
@@ -104,18 +83,18 @@ AttitudeCommand TrackingController::calculate(Vec3 errors,
   return AttitudeCommand(this->outputs);
 }
 
-AttitudeCommand TrackingController::calculate(Vec3 target_pos_bf,
-                                              Vec3 pos,
-                                              Vec3 pos_prev,
-                                              double yaw,
-                                              double dt) {
+AttitudeCommand TrackingController::update(const Vec3 &target_pos_bf,
+                                           const Vec3 &pos,
+                                           const Vec3 &pos_prev,
+                                           const double yaw,
+                                           const double dt) {
   Vec3 errors;
 
   errors(0) = target_pos_bf(0);
   errors(1) = target_pos_bf(1);
   errors(2) = pos_prev(2) - pos(2);
 
-  return this->calculate(errors, yaw, dt);
+  return this->update(errors, yaw, dt);
 }
 
 void TrackingController::reset() {

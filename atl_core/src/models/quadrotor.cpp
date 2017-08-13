@@ -30,9 +30,9 @@ Vec4 AttitudeController::update(const Vec4 &setpoints,
 
   // thrust
   double max_thrust = 5.0;
-  double t = max_thrust * setpoints(3);   // convert relative to true thrust
-  t = (t > max_thrust) ? max_thrust : t;  // limit thrust
-  t = (t < 0) ? 0.0 : t;                  // limit thrust
+  double t = max_thrust * setpoints(3);  // convert relative to true thrust
+  t = (t > max_thrust) ? max_thrust : t; // limit thrust
+  t = (t < 0) ? 0.0 : t;                 // limit thrust
 
   // map roll, pitch, yaw and thrust to motor outputs
   Vec4 outputs;
@@ -308,4 +308,4 @@ void QuadrotorModel::printState() {
   printf("psi: %f\n", this->attitude(2));
 }
 
-}  // namespace atl
+} // namespace atl

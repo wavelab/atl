@@ -29,6 +29,6 @@ public:
   virtual void imageCallback(ConstImagePtr &msg);
 };
 
-}  // namespace gaz
-}  // namespace atl
+} // namespace gaz
+} // namespace atl
 #endif

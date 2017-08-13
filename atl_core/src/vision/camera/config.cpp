@@ -2,28 +2,6 @@
 
 namespace atl {
 
-CameraConfig::CameraConfig() {
-  this->loaded = false;
-
-  this->index = 0;
-  this->image_width = 0;
-  this->image_height = 0;
-
-  this->shutter_speed = 0.0;
-  this->exposure_value = 0.0;
-  this->gain_value = 0.0;
-  this->lambda << 0.0, 0.0, 0.0;
-  this->alpha = 0.0;
-
-  // this->camera_matrix;
-  // this->rectification_matrix;
-  // this->distortion_coefficients;
-  // this->projection_matrix;
-
-  this->imshow = false;
-  this->snapshot = false;
-}
-
 int CameraConfig::load(const std::string &config_file) {
   ConfigParser parser;
 
@@ -36,6 +14,7 @@ int CameraConfig::load(const std::string &config_file) {
   parser.addParam("shutter_speed", &this->shutter_speed, true);
   parser.addParam("exposure_value", &this->exposure_value, true);
   parser.addParam("gain_value", &this->gain_value, true);
+
   parser.addParam("lambda", &this->lambda);
   parser.addParam("alpha", &this->alpha);
 
@@ -81,4 +60,4 @@ void CameraConfig::print() {
   // clang-format on
 }
 
-}  // namespace atl
+} // namespace atl

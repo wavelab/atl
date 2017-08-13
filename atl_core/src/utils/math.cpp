@@ -2,9 +2,7 @@
 
 namespace atl {
 
-int randi(int ub, int lb) {
-  return rand() % lb + ub;
-}
+int randi(int ub, int lb) { return rand() % lb + ub; }
 
 double randf(double ub, double lb) {
   double f = (double) rand() / RAND_MAX;
@@ -49,13 +47,9 @@ double median(std::vector<double> v) {
   }
 }
 
-double deg2rad(double d) {
-  return d * (M_PI / 180);
-}
+double deg2rad(double d) { return d * (M_PI / 180); }
 
-double rad2deg(double r) {
-  return r * (180 / M_PI);
-}
+double rad2deg(double r) { return r * (180 / M_PI); }
 
 void load_matrix(std::vector<double> x, int rows, int cols, MatX &y) {
   int idx;
@@ -322,7 +316,7 @@ void target2body(Vec3 target_pos_if,
   R = body_orientation_if.toRotationMatrix().inverse();
 
   // calculate position difference and convert to body frame
-  pos_enu = target_pos_if - body_pos_if;  // assumes inertial frame is ENU
+  pos_enu = target_pos_if - body_pos_if; // assumes inertial frame is ENU
   enu2nwu(pos_enu, pos_nwu);
 
   // compensate for body orientation by rotating
@@ -340,7 +334,7 @@ void target2body(Vec3 target_pos_if,
   euler2rot(body_orientation_if, 123, R);
 
   // calculate position difference and convert to body frame
-  pos_enu = target_pos_if - body_pos_if;  // assumes inertial frame is ENU
+  pos_enu = target_pos_if - body_pos_if; // assumes inertial frame is ENU
   enu2nwu(pos_enu, pos_nwu);
 
   // compensate for body orientation by rotating
@@ -483,11 +477,11 @@ int point_left_right(Vec2 a, Vec2 b, Vec2 c) {
 
   x = (b(0) - a(0)) * (c(1) - a(1)) - (b(1) - a(1)) * (c(0) - a(0));
   if (x > 0) {
-    return 1;  // left
+    return 1; // left
   } else if (x < 0) {
-    return 2;  // right
+    return 2; // right
   } else if (x == 0) {
-    return 0;  // parallel
+    return 0; // parallel
   }
 
   return -1;
@@ -547,4 +541,4 @@ Vec2 linear_interpolation(Vec2 a, Vec2 b, double mu) {
   return a * (1 - mu) + b * mu;
 }
 
-}  // eof atl
+} // eof atl

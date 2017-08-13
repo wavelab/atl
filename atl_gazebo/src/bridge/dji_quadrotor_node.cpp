@@ -3,10 +3,10 @@
 namespace atl {
 namespace gazebo_bridge {
 
-int DJIQuadrotorNode::configure(const std::string &node_name, int hz) {
+int DJIQuadrotorNode::configure(int hz) {
   // setup ros node
   // clang-format off
-  ROSNode::configure(node_name, hz);
+  ROSNode::configure(hz);
   ROSNode::registerPublisher<dji_sdk::GlobalPosition>(DJI_GLOBAL_POSITION_RTOPIC);
   ROSNode::registerPublisher<dji_sdk::LocalPosition>(DJI_LOCAL_POSITION_RTOPIC);
   ROSNode::registerPublisher<dji_sdk::AttitudeQuaternion>(DJI_ATTITUDE_RTOPIC);
@@ -102,8 +102,8 @@ void DJIQuadrotorNode::velocityCallback(ConstVector3dPtr &msg) {
 }
 
 bool DJIQuadrotorNode::controlCallback(
-  dji_sdk::AttitudeControl::Request &request,
-  dji_sdk::AttitudeControl::Response &response) {
+    dji_sdk::AttitudeControl::Request &request,
+    dji_sdk::AttitudeControl::Response &response) {
   // pre-check
   if (request.flag != 0x20) {
     LOG_ERROR("Attitude control byte other than [0x20] is not supported!");
@@ -124,7 +124,7 @@ bool DJIQuadrotorNode::controlCallback(
   return true;
 }
 
-}  // namespace gazebo_bridge
-}  // namespace atl
+} // namespace gazebo_bridge
+} // namespace atl
 
-RUN_ROS_NODE(atl::gazebo_bridge::DJIQuadrotorNode, NODE_NAME, NODE_RATE);
+RUN_ROS_NODE(atl::gazebo_bridge::DJIQuadrotorNode, NODE_RATE);

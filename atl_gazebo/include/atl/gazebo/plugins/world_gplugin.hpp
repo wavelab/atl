@@ -5,8 +5,8 @@
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
 
-#include "atl/utils/utils.hpp"
 #include "atl/gazebo/gazebo_node.hpp"
+#include "atl/utils/utils.hpp"
 
 namespace atl {
 namespace gaz {
@@ -32,6 +32,6 @@ public:
   void worldClearCallback(ConstRequestPtr &msg);
 };
 
-}  // namespace gaz
-}  // namespace atl
+} // namespace gaz
+} // namespace atl
 #endif

@@ -2,62 +2,7 @@
 
 namespace atl {
 
-// ATTITUDE COMMAND
-AttitudeCommand::AttitudeCommand(Vec4 command) {
-  // quaternion
-  Vec3 euler{command(0), command(1), command(2)};  // roll, pitch, yaw
-  euler2quat(euler, 321, this->orientation);
-
-  // throttle
-  this->throttle = command(3);
-}
-
-void AttitudeCommand::print() {
-  Vec3 euler;
-  quat2euler(this->orientation, 321, euler);
-
-  printf("roll: %.2f\t", euler(0));
-  printf("pitch: %.2f\t", euler(1));
-  printf("yaw: %.2f\t", euler(2));
-  printf("throttle: %.2f\n", this->throttle);
-}
-
-// POSE
-Pose::Pose(
-  double roll, double pitch, double yaw, double x, double y, double z) {
-  Vec3 euler{roll, pitch, yaw};
-  euler2quat(euler, 321, this->orientation);
-  this->position << x, y, z;
-}
-
-Mat3 Pose::rotationMatrix() {
-  return this->orientation.toRotationMatrix();
-}
-
-void Pose::printPosition() {
-  std::cout << "position [";
-  std::cout << std::setprecision(2) << this->position(0);
-  std::cout << std::setprecision(2) << this->position(1);
-  std::cout << std::setprecision(2) << this->position(2);
-  std::cout << "]" << std::endl;
-}
-
-void Pose::printOrientation() {
-  std::cout << "quaternion[";
-  std::cout << std::setprecision(2) << this->orientation.w();
-  std::cout << std::setprecision(2) << this->orientation.x();
-  std::cout << std::setprecision(2) << this->orientation.y();
-  std::cout << std::setprecision(2) << this->orientation.z();
-  std::cout << "]" << std::endl;
-}
-
-void Pose::print() {
-  this->printPosition();
-  this->printOrientation();
-}
-
-// CSV
-int csvrows(std::string file_path) {
+int csvrows(const std::string &file_path) {
   int nb_rows;
   std::string line;
   std::ifstream infile(file_path);
@@ -77,7 +22,7 @@ int csvrows(std::string file_path) {
   return nb_rows;
 }
 
-int csvcols(std::string file_path) {
+int csvcols(const std::string &file_path) {
   int nb_elements;
   std::string line;
   bool found_separator;
@@ -105,7 +50,7 @@ int csvcols(std::string file_path) {
   return (found_separator) ? nb_elements : 0;
 }
 
-int csv2mat(std::string file_path, bool header, MatX &data) {
+int csv2mat(const std::string &file_path, const bool header, MatX &data) {
   int line_no;
   int nb_rows;
   int nb_cols;
@@ -150,7 +95,7 @@ int csv2mat(std::string file_path, bool header, MatX &data) {
   return 0;
 }
 
-int mat2csv(std::string file_path, MatX data) {
+int mat2csv(const std::string &file_path, MatX data) {
   std::ofstream outfile(file_path);
 
   // open file
@@ -176,4 +121,4 @@ int mat2csv(std::string file_path, MatX data) {
   return 0;
 }
 
-}  // namespace atl
+} // namespace atl

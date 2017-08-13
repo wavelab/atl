@@ -1,5 +1,5 @@
-#include "atl/atl_test.hpp"
 #include "atl/utils/gps.hpp"
+#include "atl/atl_test.hpp"
 
 namespace atl {
 
@@ -59,4 +59,4 @@ TEST(Utils, latlon_dist) {
   EXPECT_NEAR(100, dist, 1.0);
 }
 
-}  // end of namespace
+} // end of namespace

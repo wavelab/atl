@@ -38,10 +38,9 @@ public:
 
   /**
    * Configure
-   * @param node_name Name of ROS Node
    * @param hz ROS node rate in hertz
    */
-  int configure(const std::string &node_name, int hz);
+  int configure(int hz);
 
   /**
    * Clock Gazebo callback
@@ -92,6 +91,6 @@ public:
   void clearWorldCallback(const std_msgs::Bool &msg);
 };
 
-}  // namespace gazebo_bridge
-}  // namespace atl
+} // namespace gazebo_bridge
+} // namespace atl
 #endif

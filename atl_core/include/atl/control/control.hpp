@@ -5,6 +5,8 @@
 #include "atl/control/pid.hpp"
 #include "atl/control/position_controller.hpp"
 #include "atl/control/tracking_controller.hpp"
+#include "atl/control/trajectory.hpp"
+#include "atl/control/trajectory_index.hpp"
 #include "atl/control/velocity_controller.hpp"
 #include "atl/control/waypoint_controller.hpp"
 

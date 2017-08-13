@@ -3,13 +3,13 @@
 namespace atl {
 namespace gazebo_bridge {
 
-int GimbalNode::configure(const std::string &node_name, int hz) {
+int GimbalNode::configure(int hz) {
   this->quad_frame = "NWU";
   this->enable_tracking = true;
 
   // setup ros node
   // clang-format off
-  ROSNode::configure(node_name, hz);
+  ROSNode::configure(hz);
   ROSNode::registerPublisher<geometry_msgs::Quaternion>(FRAME_ORIENTATION_RTOPIC);
   ROSNode::registerPublisher<geometry_msgs::Quaternion>(JOINT_ORIENTATION_RTOPIC);
   ROSNode::registerPublisher<geometry_msgs::Vector3>(POSITION_RTOPIC);
@@ -66,7 +66,7 @@ void GimbalNode::trackTargetCallback(const geometry_msgs::Vector3 msg) {
   GimbalGClient::trackTarget(target_cf);
 }
 
-}  // namespace gazebo_bridge
-}  // namespace atl
+} // namespace gazebo_bridge
+} // namespace atl
 
-RUN_ROS_NODE(atl::gazebo_bridge::GimbalNode, NODE_NAME, NODE_RATE);
+RUN_ROS_NODE(atl::gazebo_bridge::GimbalNode, NODE_RATE);

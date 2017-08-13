@@ -38,8 +38,14 @@ ADD_LIBRARY(
     src/control/pid.cpp
     src/control/position_controller.cpp
     src/control/tracking_controller.cpp
+    src/control/trajectory.cpp
+    src/control/trajectory_index.cpp
     src/control/velocity_controller.cpp
     src/control/waypoint_controller.cpp
+    # data
+    src/data/attitude_command.cpp
+    src/data/landing_target.cpp
+    src/data/pose.cpp
     # estimation
     src/estimation/ekf.cpp
     src/estimation/ekf_tracker.cpp
@@ -57,7 +63,6 @@ ADD_LIBRARY(
     src/planning/trajectory.cpp
     src/planning/utils.cpp
     # quadrotor
-    src/quadrotor/landing_target.cpp
     src/quadrotor/quadrotor.cpp
     # sensor
     src/sensor/i2c.cpp
@@ -78,8 +83,9 @@ ADD_LIBRARY(
     src/vision/apriltag/swathmore.cpp
     src/vision/camera/camera.cpp
     src/vision/camera/config.cpp
-    src/vision/camera/ximea.cpp
+    src/vision/camera/dc1394.cpp
     src/vision/camera/pointgrey.cpp
+    src/vision/camera/ximea.cpp
     src/vision/gimbal/gimbal.cpp
     src/vision/gimbal/sbgc.cpp
 )
@@ -88,6 +94,7 @@ SET(${PROJECT_NAME}_DEPS
     ${OpenCV_LIBS}
     m3api
     flycapture
+    dc1394
     apriltag
     apriltags_mit
     apriltags_swathmore
@@ -107,8 +114,13 @@ ADD_EXECUTABLE(
     tests/control/pid_test.cpp
     tests/control/position_controller_test.cpp
     tests/control/tracking_controller_test.cpp
+    tests/control/trajectory_index_test.cpp
+    tests/control/trajectory_test.cpp
     tests/control/velocity_controller_test.cpp
     tests/control/waypoint_controller_test.cpp
+    # control
+    tests/data/landing_target_test.cpp
+    tests/data/pose_test.cpp
     # estimation
     tests/estimation/ekf_test.cpp
     tests/estimation/ekf_tracker_test.cpp
@@ -122,15 +134,15 @@ ADD_EXECUTABLE(
     tests/planning/trajectory_test.cpp
     tests/planning/utils_test.cpp
     # quadrotor
-    tests/quadrotor/landing_target_test.cpp
     tests/quadrotor/quadrotor_test.cpp
     # sensor
     tests/sensor/MPU6050_test.cpp
     # vision
     tests/vision/apriltag/mit_test.cpp
     tests/vision/camera/camera_test.cpp
-    tests/vision/camera/pointgrey_test.cpp
     tests/vision/camera/config_test.cpp
+    tests/vision/camera/dc1394_test.cpp
+    tests/vision/camera/pointgrey_test.cpp
     tests/vision/gimbal/gimbal_test.cpp
     tests/vision/gimbal/sbgc_test.cpp
     # util

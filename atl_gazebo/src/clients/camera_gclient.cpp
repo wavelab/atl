@@ -3,9 +3,7 @@
 namespace atl {
 namespace gaz {
 
-CameraGClient::CameraGClient() {
-  this->connected = false;
-}
+CameraGClient::CameraGClient() { this->connected = false; }
 
 CameraGClient::~CameraGClient() {
   if (this->connected) {
@@ -53,5 +51,5 @@ void CameraGClient::imageCallback(ConstImagePtr &msg) {
   delete img_data;
 }
 
-}  // namespace gaz
-}  // namespace atl
+} // namespace gaz
+} // namespace atl

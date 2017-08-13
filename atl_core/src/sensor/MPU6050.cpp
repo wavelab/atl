@@ -515,4 +515,4 @@ int8_t MPU6050::record(std::string output_path, int nb_samples) {
   return 0;
 }
 
-}  // namespace atl
+} // namespace atl

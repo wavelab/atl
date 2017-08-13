@@ -55,7 +55,7 @@ public:
     this->camera_mode = "640x640";
   }
 
-  int configure(const std::string &node_name, int hz);
+  int configure(int hz);
   void gimbalPositionCallback(const geometry_msgs::Vector3 &msg);
   void gimbalFrameOrientationCallback(const geometry_msgs::Quaternion &msg);
   void gimbalJointOrientationCallback(const geometry_msgs::Quaternion &msg);
@@ -63,6 +63,6 @@ public:
   void imageCallback(ConstImagePtr &msg);
 };
 
-}  // namespace gazebo_bridge
-}  // namespace atl
+} // namespace gazebo_bridge
+} // namespace atl
 #endif

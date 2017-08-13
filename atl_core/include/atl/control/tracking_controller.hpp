@@ -5,8 +5,9 @@
 
 #include <yaml-cpp/yaml.h>
 
-#include "atl/utils/utils.hpp"
 #include "atl/control/pid.hpp"
+#include "atl/data/data.hpp"
+#include "atl/utils/utils.hpp"
 
 namespace atl {
 
@@ -15,31 +16,77 @@ namespace atl {
  */
 class TrackingController {
 public:
-  bool configured;
+  bool configured = false;
 
-  double dt;
+  double dt = 0.0;
   PID x_controller;
   PID y_controller;
   PID z_controller;
 
-  double hover_throttle;
-  double roll_limit[2];
-  double pitch_limit[2];
-  Vec3 track_offset;
+  double roll_limit[2] = {0.0, 0.0};
+  double pitch_limit[2] = {0.0, 0.0};
+  double hover_throttle = 0.0;
+  Vec3 track_offset{0.0, 0.0, 0.0};
 
-  Vec3 setpoints;
-  Vec4 outputs;
+  Vec3 setpoints{0.0, 0.0, 0.0};
+  Vec4 outputs{0.0, 0.0, 0.0, 0.0};
   AttitudeCommand att_cmd;
 
-  TrackingController();
-  int configure(std::string config_file);
-  AttitudeCommand calculate(Vec3 errors, double yaw, double dt);
-  AttitudeCommand calculate(
-    Vec3 target_pos_bf, Vec3 pos, Vec3 pos_prev, double yaw, double dt);
+  TrackingController() {}
+
+  /**
+   * Configure
+   *
+   * @param config_file Path to config file
+   * @return 0 for success, -1 for failure
+   */
+  int configure(const std::string &config_file);
+
+  /**
+   * Update controller
+   *
+   * @param pos_errors Tracking errors in body frame
+   * @param yaw Actual robot yaw
+   * @param dt Time difference in seconds
+   *
+   * @return controller output
+   */
+  AttitudeCommand update(const Vec3 &pos_errors,
+                         const double yaw,
+                         const double dt);
+
+  /**
+   * Update controller
+   *
+   * @param target_pos_bf Target position in body frame
+   * @param pos Robot position in inertial frame
+   * @param pos_prev Previous robot position in inertial frame
+   * @param yaw Robot yaw
+   * @param dt Time difference in seconds
+   *
+   * @return controller output
+   */
+  AttitudeCommand update(const Vec3 &target_pos_bf,
+                         const Vec3 &pos,
+                         const Vec3 &pos_prev,
+                         const double yaw,
+                         const double dt);
+
+  /**
+   * Reset controller errors to 0
+   */
   void reset();
+
+  /**
+   * Print controller outputs
+   */
   void printOutputs();
+
+  /**
+   * Print controller errors
+   */
   void printErrors();
 };
 
-}  // namespace atl
+} // namespace atl
 #endif

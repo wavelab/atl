@@ -3,8 +3,8 @@
 
 #include <vector>
 
-#include "atl/utils/utils.hpp"
 #include "atl/mission/waypoint.hpp"
+#include "atl/utils/utils.hpp"
 
 namespace atl {
 
@@ -13,7 +13,7 @@ namespace atl {
 #define EINVLATLON "Invalid latlon (%f, %f)!"
 #define EINVALT "Invalid altitude %f!"
 #define EINVSTAY "Invalid staytime %f!"
-#define EINVHEADING \
+#define EINVHEADING                                                            \
   "Invalid heading %f! Should be between -180.0 to 180.0 degrees"
 
 // CONSTANTS
@@ -28,9 +28,9 @@ public:
   bool configured = false;
   bool completed = false;
 
-  double home_lat;
-  double home_lon;
-  double home_alt;
+  double home_lat = 0.0;
+  double home_lon = 0.0;
+  double home_alt = 0.0;
 
   bool check_waypoints = true;
   double threshold_waypoint_gap = 20.0;
@@ -155,6 +155,6 @@ public:
   int update(const Vec3 &position, Vec3 &waypoint);
 };
 
-}  // namespace atl
+} // namespace atl
 
 #endif

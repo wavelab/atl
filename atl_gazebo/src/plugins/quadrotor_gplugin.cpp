@@ -62,7 +62,7 @@ void QuadrotorGPlugin::Load(gazebo::physics::ModelPtr model,
 
 void QuadrotorGPlugin::onUpdate(const gazebo::common::UpdateInfo &info) {
   gazebo::common::Time diff = info.simTime - this->prev_sim_time;
-  double dt = diff.nsec / 1000000000.0;  // convert nsec to sec
+  double dt = diff.nsec / 1000000000.0; // convert nsec to sec
   this->simulate(dt);
   this->prev_sim_time = info.simTime;
 }
@@ -149,5 +149,5 @@ void QuadrotorGPlugin::setVelocityCallback(VelocitySetpointPtr &msg) {
 }
 
 GZ_REGISTER_MODEL_PLUGIN(QuadrotorGPlugin);
-}  // namespace gaz
-}  // namespace atl
+} // namespace gaz
+} // namespace atl

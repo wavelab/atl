@@ -75,8 +75,8 @@ TEST_F(QuadrotorTest, setPosition) {
 //   sleep(10);
 // }
 
-}  // namespace gaz
-}  // namespace atl
+} // namespace gaz
+} // namespace atl
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);

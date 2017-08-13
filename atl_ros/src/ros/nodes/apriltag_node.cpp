@@ -2,11 +2,11 @@
 
 namespace atl {
 
-int AprilTagNode::configure(const std::string &node_name, int hz) {
+int AprilTagNode::configure(int hz) {
   std::string apriltag_config;
 
   // ros node
-  if (ROSNode::configure(node_name, hz) != 0) {
+  if (ROSNode::configure(hz) != 0) {
     return -1;
   }
 
@@ -49,8 +49,7 @@ void AprilTagNode::publishTargetInertialPositionMsg(Vec3 gimbal_position,
   Vec3 target_if;
 
   // transform target from body planar to inertial frame
-  target_if =
-    Gimbal::getTargetInIF(target_bpf, gimbal_position, gimbal_frame);
+  target_if = Gimbal::getTargetInIF(target_bpf, gimbal_position, gimbal_frame);
 
   // build and publish msg
   buildMsg(target_if, msg);
@@ -63,7 +62,7 @@ void AprilTagNode::publishTargetBodyPositionMsg(Vec3 target_bpf) {
   this->ros_pubs[TARGET_BPF_POS_TOPIC].publish(msg);
 }
 void AprilTagNode::publishTargetBodyPositionEncoderMsg(
-  Vec3 target_bpf_encoder) {
+    Vec3 target_bpf_encoder) {
   geometry_msgs::Vector3 msg;
   buildMsg(target_bpf_encoder, msg);
   this->ros_pubs[TARGET_BPF_POS_ENCODER_TOPIC].publish(msg);
@@ -155,14 +154,14 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
   // detect tags
   retval = this->detector.extractTags(image_ptr->image, tags);
   if (retval == -1) {
-    exit(-1);  // dangerous but necessary
+    exit(-1); // dangerous but necessary
   } else if (tags.size() == 0) {
     return;
   }
   // transform tag in camera frame to body planar frame
   target_cf << tags[0].position(0), tags[0].position(1), tags[0].position(2);
   target_bpf =
-    Gimbal::getTargetInBPF(this->camera_offset, target_cf, gimbal_joint);
+      Gimbal::getTargetInBPF(this->camera_offset, target_cf, gimbal_joint);
 
   // Calculate target frame in bpf from encoders
   Vec3 encoder_rpy_bf;
@@ -178,19 +177,21 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
   joint_encoder_rpy_if(2) = 0.0;
 
   euler2quat(joint_encoder_rpy_if, 321, joint_encoder_quat_if);
-  target_bpf_encoder = Gimbal::getTargetInBPF(
-    this->camera_offset, target_cf, joint_encoder_quat_if);
+  target_bpf_encoder = Gimbal::getTargetInBPF(this->camera_offset,
+                                              target_cf,
+                                              joint_encoder_quat_if);
 
   // publish tag pose
   this->publishTagPoseMsg(tags[0]);
-  this->publishTargetInertialPositionMsg(
-    gimbal_position, gimbal_frame, target_bpf);
+  this->publishTargetInertialPositionMsg(gimbal_position,
+                                         gimbal_frame,
+                                         target_bpf);
   this->publishTargetInertialYawMsg(tags[0], gimbal_frame);
   this->publishTargetBodyPositionMsg(target_bpf);
   this->publishTargetBodyPositionEncoderMsg(target_bpf_encoder);
   this->publishTargetBodyYawMsg(tags[0]);
 }
 
-}  // namespace atl
+} // namespace atl
 
-RUN_ROS_NODE(atl::AprilTagNode, NODE_NAME, NODE_RATE);
+RUN_ROS_NODE(atl::AprilTagNode, NODE_RATE);

@@ -1,12 +1,13 @@
 #ifndef ATL_GIMBAL_HPP
 #define ATL_GIMBAL_HPP
 
+#include <iostream>
+#include <map>
 #include <math.h>
 #include <unistd.h>
 #include <yaml-cpp/yaml.h>
-#include <iostream>
-#include <map>
 
+#include "atl/data/data.hpp"
 #include "atl/utils/utils.hpp"
 #include "atl/vision/gimbal/sbgc.hpp"
 
@@ -50,5 +51,5 @@ public:
   void printSetpoints();
 };
 
-}  // namespace atl
+} // namespace atl
 #endif

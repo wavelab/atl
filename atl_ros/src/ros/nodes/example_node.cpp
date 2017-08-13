@@ -2,8 +2,8 @@
 
 namespace atl {
 
-int ExampleNode::configure(const std::string &node_name, int hz) {
-  ROSNode::configure(node_name, hz);
+int ExampleNode::configure(int hz) {
+  ROSNode::configure(hz);
 
   // clang-format off
   this->registerPublisher<std_msgs::String>(SAY_TOPIC);
@@ -25,11 +25,6 @@ void ExampleNode::sayCallback(const std_msgs::String &msg) {
   std::cout << msg.data << std::endl;
 }
 
-}  // namespace atl
+} // namespace atl
 
-int main(int argc, char **argv) {
-  atl::ExampleNode node(argc, argv);
-  node.configure(NODE_NAME, NODE_RATE);
-  node.loop();
-  return 0;
-}
+RUN_ROS_NODE(atl::ExampleNode, NODE_RATE);

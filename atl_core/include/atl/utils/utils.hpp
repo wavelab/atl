@@ -12,9 +12,9 @@
 #include "atl/utils/time.hpp"
 
 // MACROS
-#define UNUSED(expr) \
-  do {               \
-    (void) (expr);   \
+#define UNUSED(expr)                                                           \
+  do {                                                                         \
+    (void) (expr);                                                             \
   } while (0)
 
 #endif

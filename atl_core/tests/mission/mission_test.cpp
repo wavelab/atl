@@ -1,9 +1,9 @@
-#include "atl/atl_test.hpp"
 #include "atl/mission/mission.hpp"
+#include "atl/atl_test.hpp"
 
 namespace atl {
 
-#define TEST_CONFIG "tests/configs/mission/mission.yaml"
+#define TEST_CONFIG "tests/configs/missions/mission.yaml"
 #define WAYPOINTS_FILE "/tmp/waypoints.dat"
 #define STATE_FILE "/tmp/state.dat"
 
@@ -246,4 +246,4 @@ TEST(Mission, update) {
   EXPECT_EQ(3, mission.local_waypoints.size());
 }
 
-}  // namespace atl
+} // namespace atl

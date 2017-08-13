@@ -17,13 +17,9 @@ protected:
   GazeboTest gazebo_test;
   std::string test_world;
 
-  CameraTest() {
-    this->test_world = "atl_gazebo/" + std::string(TEST_WORLD);
-  }
+  CameraTest() { this->test_world = "atl_gazebo/" + std::string(TEST_WORLD); }
 
-  virtual ~CameraTest() {
-    this->gazebo_test.teardown();
-  }
+  virtual ~CameraTest() { this->gazebo_test.teardown(); }
 
   virtual void SetUp() {
     // world client
@@ -62,8 +58,8 @@ TEST_F(CameraTest, test) {
   EXPECT_FALSE(image.empty());
 }
 
-}  // namespace gaz
-}  // namespace atl
+} // namespace gaz
+} // namespace atl
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);

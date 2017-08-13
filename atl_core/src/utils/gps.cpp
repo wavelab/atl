@@ -35,4 +35,4 @@ double latlon_dist(double lat_ref, double lon_ref, double lat, double lon) {
   return dist;
 }
 
-}  // namepsace atl
+} // namepsace atl

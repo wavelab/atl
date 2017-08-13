@@ -3,9 +3,7 @@
 namespace atl {
 namespace gaz {
 
-BoxGPlugin::BoxGPlugin() {
-  printf("LOADING [libbox_gplugin.so]!\n");
-}
+BoxGPlugin::BoxGPlugin() { printf("LOADING [libbox_gplugin.so]!\n"); }
 
 void BoxGPlugin::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
   UNUSED(sdf);
@@ -16,7 +14,7 @@ void BoxGPlugin::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
   // listen to the update event. This event is broadcast every
   // simulation iteration.
   this->updateConnection = gazebo::event::Events::ConnectWorldUpdateBegin(
-    boost::bind(&BoxGPlugin::onUpdate, this, _1));
+      boost::bind(&BoxGPlugin::onUpdate, this, _1));
 }
 
 void BoxGPlugin::onUpdate(const gazebo::common::UpdateInfo &info) {
@@ -27,5 +25,5 @@ void BoxGPlugin::onUpdate(const gazebo::common::UpdateInfo &info) {
 }
 
 GZ_REGISTER_MODEL_PLUGIN(BoxGPlugin)
-}  // namespace gaz
-}  // namespace atl
+} // namespace gaz
+} // namespace atl

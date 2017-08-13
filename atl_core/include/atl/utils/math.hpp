@@ -158,8 +158,21 @@ void ned2enu(Vec3 ned, Vec3 &enu);
  * @param ned NED vector
  */
 void nwu2ned(Quaternion nwu, Quaternion &ned);
+
+/**
+ * Conver from NED to NWU
+ * @param ned NED vector
+ * @param nwu NWU vector
+ */
 void ned2nwu(Quaternion ned, Quaternion &enu);
+
+/**
+ * Conver from ENU to NWU
+ * @param ned ENU vector
+ * @param nwu NWU vector
+ */
 void enu2nwu(Quaternion enu, Quaternion &nwu);
+
 void target2body(Vec3 target_pos_if,
                  Vec3 body_pos_if,
                  Quaternion body_orientation_if,
@@ -186,8 +199,23 @@ void target2inertial(Vec3 target_pos_bf,
                      Vec3 &target_pos_if);
 void inertial2body(Vec3 enu_if, Quaternion orientation_if, Vec3 &nwu_bf);
 void inertial2body(Vec3 enu_if, Vec3 orientation_if, Vec3 &nwu_bf);
-double wrapTo180(double euler_angle);
-double wrapTo360(double euler_angle);
+
+/**
+ * Wrap angle in degrees to 180
+ *
+ * @param d Degrees
+ * @return Angle wraped to 180
+ */
+double wrapTo180(double d);
+
+/**
+ * Wrap angle in degrees to 360
+ *
+ * @param d Degrees
+ * @return Angle wraped to 360
+ */
+double wrapTo360(double d);
+
 double cross_track_error(Vec2 p1, Vec2 p2, Vec2 pos);
 int point_left_right(Vec2 p1, Vec2 p2, Vec2 pos);
 // int closest_point(Vec2 p1, Vec2 p2, Vec2 p3, Vec2 &closest, bool
@@ -195,5 +223,5 @@ int point_left_right(Vec2 p1, Vec2 p2, Vec2 pos);
 double closest_point(Vec2 p1, Vec2 p2, Vec2 p3, Vec2 &closest);
 Vec2 linear_interpolation(Vec2 a, Vec2 b, double mu);
 
-}  // namespace atl
+} // namespace atl
 #endif

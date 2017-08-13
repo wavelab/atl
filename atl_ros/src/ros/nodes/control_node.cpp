@@ -2,11 +2,11 @@
 
 namespace atl {
 
-int ControlNode::configure(const std::string &node_name, int hz) {
+int ControlNode::configure(int hz) {
   std::string config_path;
 
   // ros node
-  if (ROSNode::configure(node_name, hz) != 0) {
+  if (ROSNode::configure(hz) != 0) {
     return -1;
   }
 
@@ -278,8 +278,7 @@ void ControlNode::px4PoseCallback(const geometry_msgs::PoseStamped &msg) {
   this->quadrotor.setPose(pose);
 }
 
-void ControlNode::px4VelocityCallback(
-  const geometry_msgs::TwistStamped &msg) {
+void ControlNode::px4VelocityCallback(const geometry_msgs::TwistStamped &msg) {
   Vec3 vel_nwu, vel_ned, vel_enu;
 
   if (this->quad_frame == "NWU") {
@@ -334,8 +333,7 @@ void ControlNode::djiGPSPositionCallback(const dji_sdk::GlobalPosition &msg) {
   }
 }
 
-void ControlNode::djiLocalPositionCallback(
-  const dji_sdk::LocalPosition &msg) {
+void ControlNode::djiLocalPositionCallback(const dji_sdk::LocalPosition &msg) {
   Vec3 pos_ned, pos_enu;
 
   pos_ned(0) = msg.x;
@@ -346,8 +344,7 @@ void ControlNode::djiLocalPositionCallback(
   this->quadrotor.pose.position = pos_enu;
 }
 
-void ControlNode::djiAttitudeCallback(
-  const dji_sdk::AttitudeQuaternion &msg) {
+void ControlNode::djiAttitudeCallback(const dji_sdk::AttitudeQuaternion &msg) {
   Quaternion orientation_ned, orientation_nwu;
 
   orientation_ned.w() = msg.q0;
@@ -469,41 +466,33 @@ void ControlNode::hoverHeightSetCallback(const std_msgs::Float64 &msg) {
 }
 
 void ControlNode::positionControllerSetCallback(
-  const atl_msgs::PCtrlSettings &msg) {
+    const atl_msgs::PCtrlSettings &msg) {
   convertMsg(msg, this->quadrotor.position_controller);
 }
 
 void ControlNode::trackingControllerSetCallback(
-  const atl_msgs::TCtrlSettings &msg) {
+    const atl_msgs::TCtrlSettings &msg) {
   convertMsg(msg, this->quadrotor.tracking_controller);
 }
 
 void ControlNode::landingControllerSetCallback(
-  const atl_msgs::LCtrlSettings &msg) {
+    const atl_msgs::LCtrlSettings &msg) {
   // convertMsg(msg, this->quadrotor.landing_controller);
 }
 
 void ControlNode::publishAttitudeSetpoint() {
-  // setup
-  int seq = this->ros_seq;
   AttitudeCommand att_cmd = this->quadrotor.att_cmd;
 
   if (this->fcu_type == "PX4") {
     std_msgs::Float64 thr_msg;
     geometry_msgs::PoseStamped att_msg;
-    buildMsg(seq, ros::Time::now(), att_cmd, att_msg, thr_msg);
+    buildMsg(this->ros_seq, ros::Time::now(), att_cmd, att_msg, thr_msg);
 
     this->ros_pubs[PX4_SETPOINT_ATTITUDE_TOPIC].publish(att_msg);
     this->ros_pubs[PX4_SETPOINT_THROTTLE_TOPIC].publish(thr_msg);
 
   } else if (this->fcu_type == "DJI") {
-    // transform orientation from NWU to NED
-    Quaternion q_ned;
-    nwu2ned(att_cmd.orientation, q_ned);
-
-    // convert to euler
-    Vec3 euler;
-    quat2euler(q_ned, 321, euler);
+    Vec3 euler = att_cmd.toEuler("NED");
 
     //  DJI Control Mode Byte
     //
@@ -534,19 +523,15 @@ void ControlNode::publishAttitudeSetpoint() {
     //
     //  ends up being: 0b00100000 -> 0x20
 
-    // clang-format off
-    this->dji->attitude_control(
-      0x20,                    // control mode byte (see above comment)
-      rad2deg(euler(0)),       // roll (deg)
-      rad2deg(euler(1)),       // pitch (deg)
-      att_cmd.throttle * 100,  // throttle (0 - 100)
-      rad2deg(euler(2))        // yaw (deg)
-    );
-    // clang-format on
+    this->dji->attitude_control(0x20, // control mode byte (see above comment)
+                                rad2deg(euler(0)),      // roll (deg)
+                                rad2deg(euler(1)),      // pitch (deg)
+                                att_cmd.throttle * 100, // throttle (0 - 100)
+                                rad2deg(euler(2)));     // yaw (deg)
 
   } else {
     ROS_ERROR("Invalid [fcu_type]: %s", this->fcu_type.c_str());
-    exit(-1);  // dangerous but necessary
+    exit(-1); // dangerous but necessary
   }
 }
 
@@ -629,6 +614,6 @@ int ControlNode::loopCallback() {
   return 0;
 }
 
-}  // namespace atl
+} // namespace atl
 
-RUN_ROS_NODE(atl::ControlNode, NODE_NAME, NODE_RATE);
+RUN_ROS_NODE(atl::ControlNode, NODE_RATE);

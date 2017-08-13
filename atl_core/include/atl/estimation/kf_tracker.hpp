@@ -82,5 +82,5 @@ public:
   int estimate(MatX A, VecX y);
 };
 
-}  // namespace atl
+} // namespace atl
 #endif

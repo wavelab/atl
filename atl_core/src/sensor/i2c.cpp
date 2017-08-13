@@ -2,13 +2,9 @@
 
 namespace atl {
 
-I2C::I2C() {
-  this->fd = -1;
-}
+I2C::I2C() { this->fd = -1; }
 
-I2C::~I2C() {
-  close(this->fd);
-}
+I2C::~I2C() { close(this->fd); }
 
 int I2C::setup() {
   int fd;
@@ -104,4 +100,4 @@ int I2C::writeBytes(char reg_addr, char *data, size_t length) {
   return 0;
 }
 
-}  // namespace atl
+} // namespace atl

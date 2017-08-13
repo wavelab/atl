@@ -6,7 +6,6 @@
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/gazebo.hh>
 #include <gazebo/rendering/Camera.hh>
-#include <gazebo/rendering/Camera.hh>
 #include <gazebo/sensors/CameraSensor.hh>
 #include <gazebo/sensors/DepthCameraSensor.hh>
 
@@ -47,6 +46,6 @@ public:
                   const std::string &format);
 };
 
-}  // namespace gaz
-}  // namespace atl
+} // namespace gaz
+} // namespace atl
 #endif

@@ -176,4 +176,4 @@ int KFTracker::estimate(MatX A, VecX y) {
   return 0;
 }
 
-}  // namespace atl
+} // namespace atl

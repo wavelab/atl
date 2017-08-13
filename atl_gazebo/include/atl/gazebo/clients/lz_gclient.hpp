@@ -31,6 +31,6 @@ public:
   void setAngularVelocity(double ang_vel);
 };
 
-}  // namespace gaz
-}  // namespace atl
+} // namespace gaz
+} // namespace atl
 #endif

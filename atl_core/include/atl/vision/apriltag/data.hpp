@@ -47,5 +47,5 @@ public:
   }
 };
 
-}  // namespace atl
+} // namespace atl
 #endif

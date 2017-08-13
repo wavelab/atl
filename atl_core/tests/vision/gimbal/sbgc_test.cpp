@@ -108,4 +108,4 @@ TEST(SBGC, setSpeedAngle) {
   sbgc.off();
 }
 
-}  // namespace atl
+} // namespace atl

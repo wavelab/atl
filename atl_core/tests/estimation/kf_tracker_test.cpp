@@ -29,10 +29,8 @@ static int prepareOutputFile(std::ofstream &output_file,
   return 0;
 }
 
-static void recordTimeStep(std::ofstream &output_file,
-                           int i,
-                           Vec3 mea,
-                           Vec3 est) {
+static void
+recordTimeStep(std::ofstream &output_file, int i, Vec3 mea, Vec3 est) {
   // record true state x, y, z
   output_file << i << ",";
   output_file << mea(0) << ",";
@@ -117,4 +115,4 @@ TEST(KFTracker, estimate) {
   output_file.close();
 }
 
-}  // namespace atl
+} // namespace atl

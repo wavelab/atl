@@ -1,8 +1,8 @@
 #ifndef ATL_UTILS_GPS_HPP
 #define ATL_UTILS_GPS_HPP
 
-#include <cmath>
 #include "atl/utils/math.hpp"
+#include <cmath>
 
 namespace atl {
 
@@ -55,5 +55,5 @@ void latlon_diff(double lat_ref,
  */
 double latlon_dist(double lat_ref, double lon_ref, double lat, double lon);
 
-}  // namepsace atl
+} // namepsace atl
 #endif

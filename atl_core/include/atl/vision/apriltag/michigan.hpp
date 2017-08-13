@@ -1,12 +1,12 @@
 #ifndef ATL_VISION_APRILTAG_MICHIGAN_HPP
 #define ATL_VISION_APRILTAG_MICHIGAN_HPP
 
-#include <libgen.h>
-#include <math.h>
-#include <sys/time.h>
 #include <cmath>
 #include <fstream>
 #include <iostream>
+#include <libgen.h>
+#include <math.h>
+#include <sys/time.h>
 
 #include <opencv2/calib3d/calib3d.hpp>
 #include <opencv2/core/core.hpp>
@@ -23,17 +23,23 @@
 
 namespace atl {
 
-/** Michigan Apriltag Detector **/
+/**
+ * Michigan Apriltag Detector
+ */
 class MichiganDetector : public BaseDetector {
 public:
-  apriltag_detector_t *detector;
-  apriltag_family_t *family;
+  apriltag_detector_t *detector = nullptr;
+  apriltag_family_t *family = nullptr;
 
-  MichiganDetector();
-  ~MichiganDetector();
+  MichiganDetector() {}
+  ~MichiganDetector() {
+    apriltag_detector_destroy(this->detector);
+    tag16h5_destroy(this->family);
+  }
 
   /**
    * Configure
+   *
    * @param config_file Path to configuration file (YAML)
    * @returns 0 for success, -1 for failure
    */
@@ -41,6 +47,7 @@ public:
 
   /**
    * Extract AprilTags
+   *
    * @param image
    * @param tags
    * @returns 0 for success else failure
@@ -49,6 +56,7 @@ public:
 
   /**
    * Obtain pose
+   *
    * @param tag Tag detected
    * @param tag_pose Tag Pose
    * @returns 0 for success and -1 for failure
@@ -56,5 +64,5 @@ public:
   int obtainPose(apriltag_detection_t *tag, TagPose &tag_pose);
 };
 
-}  // namespace atl
+} // namespace atl
 #endif

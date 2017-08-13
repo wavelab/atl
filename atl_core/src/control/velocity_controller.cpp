@@ -2,27 +2,7 @@
 
 namespace atl {
 
-VelocityController::VelocityController() {
-  this->configured = false;
-
-  this->dt = 0.0;
-  this->vx_controller = PID(0.0, 0.0, 0.0);
-  this->vy_controller = PID(0.0, 0.0, 0.0);
-  this->vz_controller = PID(0.0, 0.0, 0.0);
-
-  this->roll_limit[0] = 0.0;
-  this->roll_limit[1] = 0.0;
-  this->pitch_limit[0] = 0.0;
-  this->pitch_limit[1] = 0.0;
-  this->throttle_limit[0] = 0.0;
-  this->throttle_limit[1] = 0.0;
-
-  this->setpoints << 0.0, 0.0, 0.0;
-  this->outputs << 0.0, 0.0, 0.0, 0.0;
-  this->att_cmd = AttitudeCommand();
-}
-
-int VelocityController::configure(std::string config_file) {
+int VelocityController::configure(const std::string &config_file) {
   ConfigParser parser;
 
   // load config
@@ -60,7 +40,9 @@ int VelocityController::configure(std::string config_file) {
   return 0;
 }
 
-Vec4 VelocityController::calculate(Vec3 setpoints, Vec3 actual, double dt) {
+Vec4 VelocityController::calculate(const Vec3 &setpoints,
+                                   const Vec3 &actual,
+                                   const double dt) {
   // check rate
   this->dt += dt;
   if (this->dt < 0.01) {

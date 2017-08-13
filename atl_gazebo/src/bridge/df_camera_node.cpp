@@ -3,9 +3,9 @@
 namespace atl {
 namespace gazebo_bridge {
 
-int DFCameraNode::configure(const std::string &node_name, int hz) {
+int DFCameraNode::configure(int hz) {
   // ros node
-  if (ROSNode::configure(node_name, hz) != 0) {
+  if (ROSNode::configure(hz) != 0) {
     return -1;
   }
 
@@ -40,7 +40,7 @@ void DFCameraNode::imageCallback(ConstImagePtr &msg) {
   // clang-format on
 
   // publish image
-  this->img_pub.publish(img_msg);
+  this->img_pubs[CAMERA_IMAGE_RTOPIC].publish(img_msg);
 
   // debug
   if (this->debug_mode) {
@@ -49,7 +49,7 @@ void DFCameraNode::imageCallback(ConstImagePtr &msg) {
   }
 }
 
-}  // namespace gazebo_bridge
-}  // namespace atl
+} // namespace gazebo_bridge
+} // namespace atl
 
-RUN_ROS_NODE(atl::gazebo_bridge::DFCameraNode, NODE_NAME, NODE_RATE);
+RUN_ROS_NODE(atl::gazebo_bridge::DFCameraNode, NODE_RATE);

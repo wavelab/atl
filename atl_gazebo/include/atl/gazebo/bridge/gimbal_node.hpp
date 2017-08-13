@@ -38,7 +38,7 @@ public:
   bool enable_tracking;
 
   GimbalNode(int argc, char **argv) : ROSNode(argc, argv) {}
-  int configure(const std::string &node_name, int hz);
+  int configure(int hz);
   void frameOrientationCallback(ConstQuaternionPtr &msg);
   void jointOrientationCallback(ConstQuaternionPtr &msg);
   void quadPoseCallback(const geometry_msgs::PoseStamped &msg);
@@ -46,6 +46,6 @@ public:
   void trackTargetCallback(const geometry_msgs::Vector3 msg);
 };
 
-}  // namespace gazebo_bridge
-}  // namespace atl
+} // namespace gazebo_bridge
+} // namespace atl
 #endif

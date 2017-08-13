@@ -1,5 +1,5 @@
-#include "atl/atl_test.hpp"
 #include "atl/control/waypoint_controller.hpp"
+#include "atl/atl_test.hpp"
 
 #define TEST_CONFIG "tests/configs/control/waypoint_controller.yaml"
 
@@ -92,5 +92,4 @@ TEST(WaypointController, update) {
   // controller.update(mission, pose3, vel, dt);
 }
 
-
-}  // end of atl namepsace
+} // end of atl namepsace

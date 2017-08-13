@@ -2,9 +2,7 @@
 
 namespace atl {
 
-double PID::update(const double setpoint,
-                   const double input,
-                   const double dt) {
+double PID::update(const double setpoint, const double input, const double dt) {
   // calculate errors
   double error = setpoint - input;
   this->error_sum += error * dt;
@@ -34,4 +32,4 @@ void PID::reset() {
   this->error_d = 0.0;
 }
 
-}  // end of atl_control namespace
+} // end of atl_control namespace

@@ -2,8 +2,8 @@
 #define ATL_CONTROL_PID_CONTROLLER_HPP
 
 #include <float.h>
-#include <math.h>
 #include <iostream>
+#include <math.h>
 
 namespace atl {
 
@@ -24,7 +24,8 @@ public:
   double k_d = 0.0;
 
   PID() {}
-  PID(double k_p, double k_i, double k_d) : k_p(k_p), k_i(k_i), k_d(k_d) {}
+  PID(const double k_p, const double k_i, const double k_d)
+      : k_p(k_p), k_i(k_i), k_d(k_d) {}
 
   /**
    * Update controller
@@ -32,16 +33,20 @@ public:
    * @param setpoint Setpoint
    * @param actual Actual
    * @param dt Difference in time
+   *
+   * @return Controller command
    */
-  double update(double setpoint, double actual, double dt);
+  double update(const double setpoint, const double actual, const double dt);
 
   /**
    * Update controller
    *
    * @param error
    * @param dt Difference in time
+   *
+   * @return Controller command
    */
-  double update(double error, double dt);
+  double update(const double error, const double dt);
 
   /**
    * Reset controller
@@ -49,5 +54,5 @@ public:
   void reset();
 };
 
-}  // namespace atl
+} // namespace atl
 #endif

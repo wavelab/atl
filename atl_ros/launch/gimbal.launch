@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- settings -->
+  <param name="sim_mode" value="false" />
+  <param name="debug_mode" value="false" />
+  <param name="gimbal_imu" value="SBGC" />
+
+  <param name="/gimbal/config" value="$(find atl_configs)/configs/gimbal/config.yaml" />
+  <node pkg="atl_ros" name="atl_gimbal" type="atl_gimbal_node" output="screen" required="true" />
+</launch>

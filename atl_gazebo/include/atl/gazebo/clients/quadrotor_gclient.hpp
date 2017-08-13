@@ -48,11 +48,9 @@ public:
   Vec3 velocity_setpoints;
 
   QuadrotorGClient()
-      : position{Vec3::Zero()},
-        orientation{1.0, 0.0, 0.0, 0.0},
+      : position{Vec3::Zero()}, orientation{1.0, 0.0, 0.0, 0.0},
         attitude_setpoints{0.0, 0.0, 0.0, 0.0},
-        position_setpoints{0.0, 0.0, 0.0},
-        velocity_setpoints{0.0, 0.0, 0.0} {}
+        position_setpoints{0.0, 0.0, 0.0}, velocity_setpoints{0.0, 0.0, 0.0} {}
 
   ~QuadrotorGClient() {
     if (this->connected) {
@@ -68,6 +66,6 @@ public:
   int setVelocity(double vx, double vy, double vz);
 };
 
-}  // namespace gaz
-}  // namespace atl
+} // namespace gaz
+} // namespace atl
 #endif

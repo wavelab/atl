@@ -2,17 +2,11 @@
 
 namespace atl {
 
-void buildMsg(bool b, std_msgs::Bool &msg) {
-  msg.data = b;
-}
+void buildMsg(bool b, std_msgs::Bool &msg) { msg.data = b; }
 
-void buildMsg(std::string s, std_msgs::String &msg) {
-  msg.data = s;
-}
+void buildMsg(std::string s, std_msgs::String &msg) { msg.data = s; }
 
-void buildMsg(double d, std_msgs::Float64 &msg) {
-  msg.data = d;
-}
+void buildMsg(double d, std_msgs::Float64 &msg) { msg.data = d; }
 
 void buildMsg(Vec3 vec, geometry_msgs::Vector3 &msg) {
   msg.x = vec(0);
@@ -161,17 +155,11 @@ void buildMsg(TrackingController tc, atl_msgs::TCtrlSettings &msg) {
 //   msg.throttle_controller.max = lc.throttle_limit[1];
 // }
 
-void convertMsg(std_msgs::Bool msg, bool &b) {
-  b = msg.data;
-}
+void convertMsg(std_msgs::Bool msg, bool &b) { b = msg.data; }
 
-void convertMsg(std_msgs::String msg, std::string &s) {
-  s = msg.data;
-}
+void convertMsg(std_msgs::String msg, std::string &s) { s = msg.data; }
 
-void convertMsg(std_msgs::Float64 msg, double &d) {
-  d = msg.data;
-}
+void convertMsg(std_msgs::Float64 msg, double &d) { d = msg.data; }
 
 void convertMsg(geometry_msgs::Vector3 msg, Vec3 &v) {
   v << msg.x, msg.y, msg.z;
@@ -181,9 +169,7 @@ void convertMsg(geometry_msgs::Vector3Stamped msg, Vec3 &v) {
   v << msg.vector.x, msg.vector.y, msg.vector.z;
 }
 
-void convertMsg(geometry_msgs::Point msg, Vec3 &v) {
-  v << msg.x, msg.y, msg.z;
-}
+void convertMsg(geometry_msgs::Point msg, Vec3 &v) { v << msg.x, msg.y, msg.z; }
 
 void convertMsg(geometry_msgs::Quaternion msg, Quaternion &q) {
   q.w() = msg.w;
@@ -290,4 +276,4 @@ void convertMsg(atl_msgs::TCtrlSettings msg, TrackingController &tc) {
 //   lc.throttle_limit[1] = msg.throttle_controller.max;
 // }
 
-}  // namespace atl
+} // namespace atl

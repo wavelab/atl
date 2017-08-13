@@ -2,16 +2,16 @@
 
 namespace atl {
 
-int GimbalNode::configure(std::string node_name, int hz) {
+int GimbalNode::configure(int hz) {
   std::string config_file;
 
   // ros node
-  if (ROSNode::configure(node_name, hz) != 0) {
+  if (ROSNode::configure(hz) != 0) {
     return -1;
   }
 
   // gimbal
-  ROS_GET_PARAM("//gimbal/config", config_file);
+  ROS_GET_PARAM("/gimbal/config", config_file);
   ROS_GET_PARAM("/gimbal_imu", this->gimbal_imu);
   if (this->gimbal.configure(config_file) != 0) {
     ROS_ERROR("Failed to configure Gimbal!");
@@ -33,6 +33,7 @@ int GimbalNode::configure(std::string node_name, int hz) {
     return -3;
   }
 
+  this->registerSubscriber(ACTIVATE_TOPIC, &GimbalNode::activateCallback, this);
   this->registerSubscriber(QUAD_POSE_TOPIC, &GimbalNode::quadPoseCallback, this);
   this->registerSubscriber(TRACK_TOPIC, &GimbalNode::trackTargetCallback, this);
   this->registerSubscriber(SETPOINT_TOPIC, &GimbalNode::setAttitudeCallback, this);
@@ -48,9 +49,7 @@ int GimbalNode::configure(std::string node_name, int hz) {
   return 0;
 }
 
-GimbalNode::~GimbalNode() {
-  this->gimbal.off();
-}
+GimbalNode::~GimbalNode() { this->gimbal.off(); }
 
 int GimbalNode::publishIMU(Vec3 euler) {
   geometry_msgs::Vector3 msg;
@@ -92,6 +91,17 @@ int GimbalNode::publishEncoderOrientation(Quaternion q) {
   buildMsg(q, msg);
   this->ros_pubs[ENCODER_ORIENTATION_TOPIC].publish(msg);
   return 0;
+}
+
+void GimbalNode::activateCallback(const std_msgs::Bool &msg) {
+  bool activate;
+  convertMsg(msg, activate);
+
+  if (activate) {
+    this->gimbal.on();
+  } else {
+    this->gimbal.off();
+  }
 }
 
 void GimbalNode::quadPoseCallback(const geometry_msgs::PoseStamped &msg) {
@@ -143,7 +153,7 @@ int GimbalNode::loopCallback() {
     // encoder reading
     encoder_euler(0) = this->gimbal.encoder_angles(0);
     encoder_euler(1) = this->gimbal.encoder_angles(1);
-    encoder_euler(2) = 0.0;  // There is no yaw encoder (yet)
+    encoder_euler(2) = 0.0; // There is no yaw encoder (yet)
     euler2quat(encoder_euler, 321, encoder_q);
 
     // publish imu and encoder readings
@@ -154,6 +164,6 @@ int GimbalNode::loopCallback() {
   return 0;
 }
 
-}  // namespace atl
+} // namespace atl
 
-RUN_ROS_NODE(atl::GimbalNode, NODE_NAME, NODE_RATE);
+RUN_ROS_NODE(atl::GimbalNode, NODE_RATE);

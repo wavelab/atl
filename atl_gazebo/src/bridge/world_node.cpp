@@ -3,10 +3,10 @@
 namespace atl {
 namespace gazebo_bridge {
 
-int WorldNode::configure(const std::string &node_name, int hz) {
+int WorldNode::configure(int hz) {
   // setup ros node
   // clang-format off
-  ROSNode::configure(node_name, hz);
+  ROSNode::configure(hz);
   ROSNode::registerPublisher<rosgraph_msgs::Clock>(CLOCK_RTOPIC);
   ROSNode::registerSubscriber(SHUTDOWN_RTOPIC, &WorldNode::shutdownCallback, this);
   ROSNode::registerSubscriber(PAUSE_RTOPIC, &WorldNode::pauseCallback, this);
@@ -36,7 +36,7 @@ void WorldNode::clockCallback(ConstTimePtr &gaz_msg) {
   // publish simulation time
   sim_time = this->time.sim_time;
   ros_msg.clock =
-    ::ros::Time((uint32_t) sim_time.sec(), (uint32_t) sim_time.nsec());
+      ::ros::Time((uint32_t) sim_time.sec(), (uint32_t) sim_time.nsec());
   this->ros_pubs[CLOCK_RTOPIC].publish(ros_msg);
 }
 
@@ -90,7 +90,7 @@ void WorldNode::clearWorldCallback(const std_msgs::Bool &msg) {
   }
 }
 
-}  // namespace gazebo_bridge
-}  // namespace atl
+} // namespace gazebo_bridge
+} // namespace atl
 
-RUN_ROS_NODE(atl::gazebo_bridge::WorldNode, NODE_NAME, NODE_RATE);
+RUN_ROS_NODE(atl::gazebo_bridge::WorldNode, NODE_RATE);

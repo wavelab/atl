@@ -22,8 +22,7 @@ int SwathmoreDetector::configure(const std::string &config_file) {
   return 0;
 }
 
-int SwathmoreDetector::extractTags(cv::Mat &image,
-                                   std::vector<TagPose> &tags) {
+int SwathmoreDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
   int retval;
   TagPose pose;
   cv::Mat image_gray;
@@ -86,8 +85,7 @@ int SwathmoreDetector::extractTags(cv::Mat &image,
   return 0;
 }
 
-int SwathmoreDetector::obtainPose(const TagDetection &tag,
-                                  TagPose &tag_pose) {
+int SwathmoreDetector::obtainPose(const TagDetection &tag, TagPose &tag_pose) {
   Vec3 t;
   Mat3 R;
   cv::Mat cv_R, cv_T;
@@ -109,15 +107,14 @@ int SwathmoreDetector::obtainPose(const TagDetection &tag,
   }
 
   // caculate pose
-  CameraUtil::homographyToPoseCV(
-    fx, fy, tag_size, tag.homography, cv_R, cv_T);
+  CameraUtil::homographyToPoseCV(fx, fy, tag_size, tag.homography, cv_R, cv_T);
 
   // sanity check - calculate euclidean distance between prev and current tag
   // clang-format on
   t << cv_T.at<double>(0), cv_T.at<double>(1), cv_T.at<double>(2);
   R << cv_R.at<double>(0, 0), cv_R.at<double>(0, 1), cv_R.at<double>(0, 2),
-    cv_R.at<double>(1, 0), cv_R.at<double>(1, 1), cv_R.at<double>(1, 2),
-    cv_R.at<double>(2, 0), cv_R.at<double>(2, 1), cv_R.at<double>(2, 2);
+      cv_R.at<double>(1, 0), cv_R.at<double>(1, 1), cv_R.at<double>(1, 2),
+      cv_R.at<double>(2, 0), cv_R.at<double>(2, 1), cv_R.at<double>(2, 2);
   // clang-format off
   if ((t - this->prev_tag.position).norm() > this->tag_sanity_check) {
     return -1;

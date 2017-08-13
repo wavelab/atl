@@ -70,6 +70,6 @@ public:
   virtual void worldStatsCallback(ConstWorldStatisticsPtr &msg);
 };
 
-}  // namespace gaz
-}  // namespace atl
+} // namespace gaz
+} // namespace atl
 #endif

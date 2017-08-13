@@ -2,11 +2,11 @@
 
 namespace atl {
 
-int CameraNode::configure(const std::string &node_name, int hz) {
+int CameraNode::configure(int hz) {
   std::string config_path;
 
   // ros node
-  if (ROSNode::configure(node_name, hz) != 0) {
+  if (ROSNode::configure(hz) != 0) {
     return -1;
   }
 
@@ -61,7 +61,7 @@ int CameraNode::publishImage() {
     "bgr8",
     this->image
   ).toImageMsg();
-  this->img_pub.publish(img_msg);
+  this->img_pubs[CAMERA_IMAGE_TOPIC].publish(img_msg);
   // clang-format on
 
   return 0;
@@ -108,6 +108,6 @@ int CameraNode::loopCallback() {
   return 0;
 }
 
-}  // namespace atl
+} // namespace atl
 
-RUN_ROS_NODE(atl::CameraNode, NODE_NAME, NODE_RATE);
+RUN_ROS_NODE(atl::CameraNode, NODE_RATE);

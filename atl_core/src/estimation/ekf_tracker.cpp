@@ -2,27 +2,7 @@
 
 namespace atl {
 
-EKFTracker::EKFTracker() {
-  this->configured = false;
-  this->initialized = false;
-
-  this->nb_states = 0;
-  this->config_file = "";
-
-  this->mu = VecX::Zero(1);
-
-  this->R = MatX::Zero(1, 1);
-  this->Q = MatX::Zero(1, 1);
-
-  this->S = MatX::Zero(1, 1);
-  this->I = MatX::Zero(1, 1);
-  this->K = MatX::Zero(1, 1);
-
-  this->mu_p = VecX::Zero(1);
-  this->S_p = MatX::Zero(1, 1);
-}
-
-int EKFTracker::configure(std::string config_file) {
+int EKFTracker::configure(const std::string &config_file) {
   ConfigParser parser;
   std::string mode;
 
@@ -39,7 +19,7 @@ int EKFTracker::configure(std::string config_file) {
   return 0;
 }
 
-int EKFTracker::initialize(VecX mu) {
+int EKFTracker::initialize(const VecX &mu) {
   // pre-check
   if (this->configured == false) {
     return -1;
@@ -62,7 +42,7 @@ int EKFTracker::initialize(VecX mu) {
   return 0;
 }
 
-int EKFTracker::reset(VecX mu) {
+int EKFTracker::reset(const VecX &mu) {
   // configure
   if (this->configure(this->config_file) != 0) {
     this->configured = false;
@@ -78,7 +58,7 @@ int EKFTracker::reset(VecX mu) {
   return 0;
 }
 
-int EKFTracker::predictionUpdate(VecX g, MatX G) {
+int EKFTracker::predictionUpdate(const VecX &g, const MatX &G) {
   // pre-check
   if (this->initialized == false) {
     return -1;
@@ -91,7 +71,7 @@ int EKFTracker::predictionUpdate(VecX g, MatX G) {
   return 0;
 }
 
-int EKFTracker::measurementUpdate(VecX h, MatX H, VecX y) {
+int EKFTracker::measurementUpdate(const VecX &h, const MatX &H, const VecX &y) {
   // pre-check
   if (this->initialized == false) {
     return -1;
@@ -142,11 +122,11 @@ void two_wheel_process_model(EKFTracker &ekf, MatX &G, VecX &g, double dt) {
 }
 
 void two_wheel_measurement_model(EKFTracker &ekf, MatX &H, VecX &h) {
-  H(0, 0) = 1.0; /* x */
-  H(1, 1) = 1.0; /* y */
-  H(2, 2) = 1.0; /* z */
-  H(3, 3) = 1.0; /* theta */
+  H(0, 0) = 1.0; // x
+  H(1, 1) = 1.0; // y
+  H(2, 2) = 1.0; // z
+  H(3, 3) = 1.0; // theta
   h = H * ekf.mu_p;
 }
 
-}  // namespace atl
+} // namespace atl

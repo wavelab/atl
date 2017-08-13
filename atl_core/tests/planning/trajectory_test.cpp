@@ -1,6 +1,6 @@
 #include "atl/planning/trajectory.hpp"
-#include <nlopt.hpp>
 #include "atl/atl_test.hpp"
+#include <nlopt.hpp>
 
 #define TEST_TRAJECTORY_OUTPUT_FILE "/tmp/trajectory.output"
 #define TEST_OPTIMIZED_OUTPUT_FILE "/tmp/trajectory_optimized.output"
@@ -27,8 +27,7 @@ static void record_time_step(std::ofstream &output_file, int i, VecX x) {
   output_file << x(4) << "\n";
 }
 
-static int path_file_init(std::ofstream &output_file,
-                          std::string output_path) {
+static int path_file_init(std::ofstream &output_file, std::string output_path) {
   // clang-format off
   output_file.open(output_path);
   output_file << "x" << ",";
@@ -231,4 +230,4 @@ TEST(Trajectory, trajectory_calculate_desired_states) {
 //   trajectory_record_optimization(TEST_OPTIMIZED_OUTPUT_FILE, x, 100);
 // }
 
-}  // namespace atl
+} // namespace atl

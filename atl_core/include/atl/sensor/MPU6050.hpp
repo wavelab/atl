@@ -12,8 +12,8 @@ namespace atl {
 
 // GENERAL
 #define MPU6050_ADDRESS 0x68
-#define MPU6050_ADDRESS_AD0_LOW 0x68   // addr pin low (GND) [default]
-#define MPU6050_ADDRESS_AD0_HIGH 0x69  // addr pin high (VCC)
+#define MPU6050_ADDRESS_AD0_LOW 0x68  // addr pin low (GND) [default]
+#define MPU6050_ADDRESS_AD0_HIGH 0x69 // addr pin high (VCC)
 
 // REGISTER ADDRESSES
 #define MPU6050_RA_XG_OFFS_TC 0x00
@@ -207,5 +207,5 @@ public:
   int8_t record(std::string output_path, int nb_samples);
 };
 
-}  // namespace atl
+} // namespace atl
 #endif

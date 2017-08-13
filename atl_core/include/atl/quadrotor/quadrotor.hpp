@@ -4,8 +4,8 @@
 #include <iostream>
 
 #include "atl/control/control.hpp"
+#include "atl/data/data.hpp"
 #include "atl/estimation/estimation.hpp"
-#include "atl/quadrotor/landing_target.hpp"
 #include "atl/utils/utils.hpp"
 
 namespace atl {
@@ -26,16 +26,16 @@ namespace atl {
 #define FCONFDMODE "Failed to configure discover mode!"
 #define FCONFTMODE "Failed to configure tracking mode!"
 
-#define CONFIGURE_CONTROLLER(X, CONF_FILE, ERR_MSG) \
-  if (X.configure(CONF_FILE) != 0) {                \
-    LOG_ERROR(ERR_MSG);                             \
-    goto error;                                     \
+#define CONFIGURE_CONTROLLER(X, CONF_FILE, ERR_MSG)                            \
+  if (X.configure(CONF_FILE) != 0) {                                           \
+    LOG_ERROR(ERR_MSG);                                                        \
+    goto error;                                                                \
   }
 
-#define CONFIGURE_MODE(X, CONF_FILE, ERR_MSG) \
-  if (X.configure(CONF_FILE) != 0) {          \
-    LOG_ERROR(ERR_MSG);                       \
-    goto error;                               \
+#define CONFIGURE_MODE(X, CONF_FILE, ERR_MSG)                                  \
+  if (X.configure(CONF_FILE) != 0) {                                           \
+    LOG_ERROR(ERR_MSG);                                                        \
+    goto error;                                                                \
   }
 
 enum Mode {
@@ -51,6 +51,7 @@ enum Mode {
 class Quadrotor {
 public:
   bool configured = false;
+  bool wp_mission_ready = false;
 
   PositionController position_controller;
   TrackingController tracking_controller;
@@ -69,6 +70,8 @@ public:
   struct timespec discover_tic = {0, 0};
   struct timespec tracking_tic = {0, 0};
   struct timespec landing_tic = {0, 0};
+  struct timespec waypoint_tic = {0, 0};
+  bool waypoint_countdown[4] = {false, false, false, false};
 
   bool home_set = false;
   double home_lat = 0.0;
@@ -278,5 +281,5 @@ public:
   int step(const double dt);
 };
 
-}  // namespace atl
+} // namespace atl
 #endif

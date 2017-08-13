@@ -2,9 +2,7 @@
 
 namespace atl {
 
-XimeaCamera::XimeaCamera() {
-  this->ximea = NULL;
-}
+XimeaCamera::XimeaCamera() { this->ximea = NULL; }
 
 int XimeaCamera::initialize() {
   int ds_type;
@@ -139,7 +137,7 @@ int XimeaCamera::getFrame(cv::Mat &image) {
     // cv::Mat(ximea_img.height, ximea_img.width, CV_8UC3, ximea_img.bp)
     //   .copyTo(image);
     cv::Mat(ximea_img.height, ximea_img.width, CV_8U, ximea_img.bp)
-      .copyTo(image);
+        .copyTo(image);
 
     // resize the image to reflect camera mode
     cv::resize(image, image, cv::Size(640, 480));
@@ -148,4 +146,4 @@ int XimeaCamera::getFrame(cv::Mat &image) {
   }
 }
 
-}  // namespace atl
+} // namespace atl

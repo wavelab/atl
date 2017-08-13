@@ -21,9 +21,7 @@ Gimbal::Gimbal() {
   encoder_angles = Vec3();
 }
 
-Gimbal::~Gimbal() {
-  this->off();
-}
+Gimbal::~Gimbal() { this->off(); }
 
 int Gimbal::configure(std::string config_file) {
   std::string device_path;
@@ -69,13 +67,9 @@ int Gimbal::configure(std::string config_file) {
   return 0;
 }
 
-int Gimbal::on() {
-  return this->sbgc.on();
-}
+int Gimbal::on() { return this->sbgc.on(); }
 
-int Gimbal::off() {
-  return this->sbgc.off();
-}
+int Gimbal::off() { return this->sbgc.off(); }
 
 Vec3 Gimbal::getTargetInBF(Pose camera_offset, Vec3 target_cf) {
   Vec3 target_nwu;
@@ -177,9 +171,9 @@ int Gimbal::trackTarget(Vec3 target_bpf) {
   // Note: setpoints are assuming Gimbal are in NWU frame
   // NWU frame: (x - forward, y - left, z - up)
   dist = target_bpf.norm();
-  this->setpoints(0) = asin(target_bpf(1) / dist);  // roll setpoint
-  this->setpoints(1) = asin(target_bpf(0) / dist);  // pitch setpoint
-  this->setpoints(2) = 0.0;  // yaw setpoint - unsupported at the moment
+  this->setpoints(0) = asin(target_bpf(1) / dist); // roll setpoint
+  this->setpoints(1) = asin(target_bpf(0) / dist); // pitch setpoint
+  this->setpoints(2) = 0.0; // yaw setpoint - unsupported at the moment
 
   return 0;
 }
@@ -236,8 +230,9 @@ int Gimbal::setAngle(double roll, double pitch) {
   this->setpoints(1) = pitch * 180 / M_PI;
   this->setpoints(2) = 0.0 * 180 / M_PI;
 
-  return this->sbgc.setAngle(
-    this->setpoints(0), this->setpoints(1), this->setpoints(2));
+  return this->sbgc.setAngle(this->setpoints(0),
+                             this->setpoints(1),
+                             this->setpoints(2));
 }
 
 void Gimbal::printSetpoints() {
@@ -250,4 +245,4 @@ void Gimbal::printSetpoints() {
   std::cout << "]" << std::endl;
 }
 
-}  // namespace atl
+} // namespace atl

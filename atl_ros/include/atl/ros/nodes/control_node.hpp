@@ -12,9 +12,9 @@
 
 #include <dji_sdk/dji_drone.h>
 
-#include <atl/atl_core.hpp>
 #include "atl/ros/utils/msgs.hpp"
 #include "atl/ros/utils/node.hpp"
+#include <atl/atl_core.hpp>
 
 namespace atl {
 
@@ -90,7 +90,7 @@ public:
    * @param hz ROS node rate
    * @return 0 for success, -1 for failure
    */
-  int configure(const std::string &node_name, int hz);
+  int configure(int hz);
 
   /**
    * Configure PX4 ROS topics
@@ -357,5 +357,5 @@ public:
   int loopCallback();
 };
 
-}  // namespace atl
+} // namespace atl
 #endif

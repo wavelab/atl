@@ -2,10 +2,6 @@
 
 namespace atl {
 
-MITDetector::MITDetector() {
-  this->detector = NULL;
-}
-
 int MITDetector::configure(const std::string &config_file) {
   if (BaseDetector::configure(config_file) != 0) {
     return -1;
@@ -144,4 +140,4 @@ int MITDetector::obtainPose(const AprilTags::TagDetection &tag,
   return 0;
 }
 
-}  // namespace atl
+} // namespace atl

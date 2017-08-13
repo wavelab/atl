@@ -5,8 +5,9 @@
 #include <iomanip>
 #include <iostream>
 
-#include "atl/utils/utils.hpp"
 #include "atl/control/pid.hpp"
+#include "atl/data/data.hpp"
+#include "atl/utils/utils.hpp"
 
 namespace atl {
 
@@ -22,10 +23,8 @@ public:
   Vec2 outputs;
 
   Gimbal2AxisController()
-      : roll_controller{0.3, 0.0, 0.2},
-        pitch_controller{0.3, 0.0, 0.2},
-        dt{0.0},
-        outputs{0.0, 0.0} {}
+      : roll_controller{0.3, 0.0, 0.2}, pitch_controller{0.3, 0.0, 0.2},
+        dt{0.0}, outputs{0.0, 0.0} {}
 
   /**
    * Update gimbal attitude controller.
@@ -72,26 +71,16 @@ public:
   Vec2 target_attitude_if;
 
   Gimbal2AxisModel()
-      : states{0.0, 0.0, 0.0, 0.0},
-        Ix{0.01},
-        Iy{0.01},
+      : states{0.0, 0.0, 0.0, 0.0}, Ix{0.01}, Iy{0.01},
         camera_offset{0.0, deg2rad(90.0), 0.0, 0.0, 0.0, 0.0},
-        joint_setpoints{0.0, 0.0},
-        joint_controller{},
-        frame_orientation{},
-        joint_orientation{},
-        target_attitude_if{0.0, 0.0} {}
+        joint_setpoints{0.0, 0.0}, joint_controller{}, frame_orientation{},
+        joint_orientation{}, target_attitude_if{0.0, 0.0} {}
 
   Gimbal2AxisModel(Vec4 pose)
-      : states{pose},
-        Ix{0.01},
-        Iy{0.01},
+      : states{pose}, Ix{0.01}, Iy{0.01},
         camera_offset{0.0, deg2rad(90.0), 0.0, 0.0, 0.0, 0.0},
-        joint_setpoints{0.0, 0.0},
-        joint_controller{},
-        frame_orientation{},
-        joint_orientation{},
-        target_attitude_if{0.0, 0.0} {}
+        joint_setpoints{0.0, 0.0}, joint_controller{}, frame_orientation{},
+        joint_orientation{}, target_attitude_if{0.0, 0.0} {}
 
   /**
    * Update gimbal model
@@ -138,9 +127,7 @@ public:
    * @param body_if Gimbal body in inertial frame (NWU coordinate system)
    * @param joint_bf Gimbal body in body frame (NWU coordinate system)
    */
-  Vec3 getTargetInBPF(Vec3 target_cf,
-                      Quaternion body_if,
-                      Quaternion joint_bf);
+  Vec3 getTargetInBPF(Vec3 target_cf, Quaternion body_if, Quaternion joint_bf);
 
   /**
    * Track target
@@ -167,6 +154,6 @@ public:
   void printState();
 };
 
-}  // namespace atl
+} // namespace atl
 
-#endif  // ATL_GAZEBO_KINEMATICS_GIMBAL_HPP
+#endif // ATL_GAZEBO_KINEMATICS_GIMBAL_HPP

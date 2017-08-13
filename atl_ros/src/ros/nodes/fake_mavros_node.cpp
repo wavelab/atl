@@ -2,9 +2,9 @@
 
 namespace atl {
 
-int FakeMavrosNode::configure(std::string node_name, int hz) {
+int FakeMavrosNode::configure(int hz) {
   // ros node
-  if (ROSNode::configure(node_name, hz) != 0) {
+  if (ROSNode::configure(hz) != 0) {
     return -1;
   }
 
@@ -51,6 +51,6 @@ int FakeMavrosNode::loopCallback() {
   return 0;
 }
 
-}  // namespace atl
+} // namespace atl
 
-RUN_ROS_NODE(atl::FakeMavrosNode, NODE_NAME, NODE_RATE);
+RUN_ROS_NODE(atl::FakeMavrosNode, NODE_RATE);

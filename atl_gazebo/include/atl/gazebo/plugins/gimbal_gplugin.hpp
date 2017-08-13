@@ -3,19 +3,19 @@
 
 #include <boost/bind.hpp>
 
-#include <gazebo/msgs/server_control.pb.h>
-#include <gazebo/msgs/vector3d.pb.h>
 #include <gazebo/common/common.hh>
 #include <gazebo/gazebo.hh>
+#include <gazebo/msgs/server_control.pb.h>
+#include <gazebo/msgs/vector3d.pb.h>
 #include <gazebo/physics/physics.hh>
 
 #include <gazebo/sensors/ImuSensor.hh>
 #include <gazebo/sensors/SensorManager.hh>
 
-#include "atl/utils/utils.hpp"
-#include "atl/models/gimbal.hpp"
 #include "atl/gazebo/gazebo_node.hpp"
 #include "atl/gazebo/msgs/atl_msgs.hpp"
+#include "atl/models/gimbal.hpp"
+#include "atl/utils/utils.hpp"
 
 namespace atl {
 namespace gaz {
@@ -53,6 +53,6 @@ public:
   void trackTargetCallback(ConstVector3dPtr &msg);
 };
 
-}  // namespace gaz
-}  // namespace atl
+} // namespace gaz
+} // namespace atl
 #endif

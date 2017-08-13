@@ -37,5 +37,5 @@ public:
   int simulate(double dt, double tend, MatX U, MatX &X);
 };
 
-}  // namespace atl
+} // namespace atl
 #endif

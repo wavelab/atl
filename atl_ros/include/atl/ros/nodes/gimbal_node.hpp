@@ -16,7 +16,7 @@ namespace atl {
 
 // NODE SETTINGS
 #define NODE_NAME "atl_gimbal"
-#define NODE_RATE 40
+#define NODE_RATE 30
 
 // PUBLISH TOPICS
 #define SBGC_IMU_TOPIC "/atl/sbgc/imu"
@@ -27,6 +27,7 @@ namespace atl {
 #define ENCODER_ORIENTATION_TOPIC "atl/gimbal/joint/orientation/body"
 
 // SUBSCRIBE TOPICS
+#define ACTIVATE_TOPIC "/atl/gimbal/activate"
 #define QUAD_POSE_TOPIC "/atl/quadrotor/pose/local"
 #define SETPOINT_TOPIC "/atl/gimbal/setpoint/attitude"
 #define TRACK_TOPIC "/atl/gimbal/target/track"
@@ -41,18 +42,19 @@ public:
 
   GimbalNode(int argc, char **argv) : ROSNode(argc, argv) {}
   ~GimbalNode();
-  int configure(std::string node_name, int hz);
+  int configure(int hz);
   int publishIMU(Vec3 euler);
   int publishRawEncoder(Vec3 encoder_euler);
   int publishPosition(Vec3 pos);
   int publishFrameOrientation(Quaternion q);
   int publishJointOrientation(Quaternion q);
   int publishEncoderOrientation(Quaternion q);
+  void activateCallback(const std_msgs::Bool &msg);
   void quadPoseCallback(const geometry_msgs::PoseStamped &msg);
   void setAttitudeCallback(const geometry_msgs::Vector3 &msg);
   void trackTargetCallback(const geometry_msgs::Vector3 &msg);
   int loopCallback();
 };
 
-}  // namespace atl
+} // namespace atl
 #endif
