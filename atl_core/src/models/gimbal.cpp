@@ -47,8 +47,9 @@ void Gimbal2AxisModel::update(Vec2 motor_inputs, double dt) {
 
 Vec2 Gimbal2AxisModel::attitudeControllerControl(double dt) {
   Vec2 actual_attitude{this->states(0), this->states(2)};
-  return this->joint_controller.update(
-      this->joint_setpoints, actual_attitude, dt);
+  return this->joint_controller.update(this->joint_setpoints,
+                                       actual_attitude,
+                                       dt);
 }
 
 void Gimbal2AxisModel::setFrameOrientation(Quaternion frame_if) {
@@ -113,8 +114,9 @@ void Gimbal2AxisModel::trackTarget(Vec3 target_cf) {
   Vec3 target;
 
   // obtain target in body planar frame
-  target = this->getTargetInBPF(
-      target_cf, this->frame_orientation, this->joint_orientation);
+  target = this->getTargetInBPF(target_cf,
+                                this->frame_orientation,
+                                this->joint_orientation);
 
   // update gimbal setpoints
   dist = target.norm();

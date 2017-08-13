@@ -4,5 +4,6 @@ BinPackArguments: false
 BinPackParameters: false
 IndentCaseLabels: true
 PenaltyReturnTypeOnItsOwnLine: 100
+PenaltyBreakBeforeFirstCallParameter: 10000
 SortIncludes: false
 SpaceAfterCStyleCast: true

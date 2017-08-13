@@ -28,8 +28,9 @@ int XimeaCameraNode::configure(int hz) {
   this->registerSubscriber(GIMBAL_JOINT_ORIENTATION_TOPIC,
                            &XimeaCameraNode::gimbalJointCallback,
                            this);
-  this->registerSubscriber(
-      APRILTAG_TOPIC, &XimeaCameraNode::aprilTagCallback, this);
+  this->registerSubscriber(APRILTAG_TOPIC,
+                           &XimeaCameraNode::aprilTagCallback,
+                           this);
   this->registerShutdown(SHUTDOWN_TOPIC);
 
   // register loop callback

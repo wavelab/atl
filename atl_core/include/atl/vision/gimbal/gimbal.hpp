@@ -7,8 +7,8 @@
 #include <unistd.h>
 #include <yaml-cpp/yaml.h>
 
-#include "atl/utils/utils.hpp"
 #include "atl/data/data.hpp"
+#include "atl/utils/utils.hpp"
 #include "atl/vision/gimbal/sbgc.hpp"
 
 namespace atl {

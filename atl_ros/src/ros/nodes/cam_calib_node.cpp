@@ -114,13 +114,19 @@ bool CamCalibNode::chessboardDetected() {
 
   // check first camera
   this->corners_1.clear();
-  this->chessboard_detected[0] = cv::findChessboardCorners(
-      this->static_camera_image, this->chessboard_size, this->corners_1, flags);
+  this->chessboard_detected[0] =
+      cv::findChessboardCorners(this->static_camera_image,
+                                this->chessboard_size,
+                                this->corners_1,
+                                flags);
 
   // check second camera
   this->corners_2.clear();
-  this->chessboard_detected[1] = cv::findChessboardCorners(
-      this->gimbal_camera_image, this->chessboard_size, this->corners_2, flags);
+  this->chessboard_detected[1] =
+      cv::findChessboardCorners(this->gimbal_camera_image,
+                                this->chessboard_size,
+                                this->corners_2,
+                                flags);
 
   // check results
   if (this->chessboard_detected[0] && this->chessboard_detected[1]) {
@@ -139,8 +145,10 @@ void CamCalibNode::showImages() {
   // show static camera image
   if (this->chessboard_detected[0]) {
     cv::Mat img_1 = this->static_camera_image.clone();
-    cv::drawChessboardCorners(
-        img_1, this->chessboard_size, this->corners_1, true);
+    cv::drawChessboardCorners(img_1,
+                              this->chessboard_size,
+                              this->corners_1,
+                              true);
     cv::imshow("Camera 1", img_1);
   } else {
     cv::imshow("Camera 1", this->static_camera_image);
@@ -149,8 +157,10 @@ void CamCalibNode::showImages() {
   // show gimbal camera image
   if (this->chessboard_detected[1]) {
     cv::Mat img_2 = this->gimbal_camera_image.clone();
-    cv::drawChessboardCorners(
-        img_2, this->chessboard_size, this->corners_2, true);
+    cv::drawChessboardCorners(img_2,
+                              this->chessboard_size,
+                              this->corners_2,
+                              true);
     cv::imshow("Camera 2", img_2);
   } else {
     cv::imshow("Camera 2", this->gimbal_camera_image);

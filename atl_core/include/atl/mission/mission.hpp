@@ -3,8 +3,8 @@
 
 #include <vector>
 
-#include "atl/utils/utils.hpp"
 #include "atl/mission/waypoint.hpp"
+#include "atl/utils/utils.hpp"
 
 namespace atl {
 

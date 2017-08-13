@@ -1,5 +1,5 @@
-#include "atl/atl_test.hpp"
 #include "atl/data/pose.hpp"
+#include "atl/atl_test.hpp"
 
 namespace atl {
 

@@ -3,10 +3,10 @@
 
 #include <iostream>
 
-#include "atl/utils/utils.hpp"
-#include "atl/data/data.hpp"
 #include "atl/control/control.hpp"
+#include "atl/data/data.hpp"
 #include "atl/estimation/estimation.hpp"
+#include "atl/utils/utils.hpp"
 
 namespace atl {
 
@@ -51,6 +51,7 @@ enum Mode {
 class Quadrotor {
 public:
   bool configured = false;
+  bool wp_mission_ready = false;
 
   PositionController position_controller;
   TrackingController tracking_controller;
@@ -69,6 +70,8 @@ public:
   struct timespec discover_tic = {0, 0};
   struct timespec tracking_tic = {0, 0};
   struct timespec landing_tic = {0, 0};
+  struct timespec waypoint_tic = {0, 0};
+  bool waypoint_countdown[4] = {false, false, false, false};
 
   bool home_set = false;
   double home_lat = 0.0;

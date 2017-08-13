@@ -177,13 +177,15 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
   joint_encoder_rpy_if(2) = 0.0;
 
   euler2quat(joint_encoder_rpy_if, 321, joint_encoder_quat_if);
-  target_bpf_encoder = Gimbal::getTargetInBPF(
-      this->camera_offset, target_cf, joint_encoder_quat_if);
+  target_bpf_encoder = Gimbal::getTargetInBPF(this->camera_offset,
+                                              target_cf,
+                                              joint_encoder_quat_if);
 
   // publish tag pose
   this->publishTagPoseMsg(tags[0]);
-  this->publishTargetInertialPositionMsg(
-      gimbal_position, gimbal_frame, target_bpf);
+  this->publishTargetInertialPositionMsg(gimbal_position,
+                                         gimbal_frame,
+                                         target_bpf);
   this->publishTargetInertialYawMsg(tags[0], gimbal_frame);
   this->publishTargetBodyPositionMsg(target_bpf);
   this->publishTargetBodyPositionEncoderMsg(target_bpf_encoder);
