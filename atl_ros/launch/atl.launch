@@ -21,6 +21,7 @@
 
   <!-- controller node -->
   <param name="/control/config_dir" value="$(find atl_configs)/configs/quadrotor_anaroid" />
+  <!-- <param name="/control/config_dir" value="$(find atl_configs)/configs/quadrotor_anastasia" /> -->
   <node pkg="atl_ros" name="atl_control" type="atl_control_node" output="screen" required="true" />
 
   <!-- <!&#45;&#45; camera node &#45;&#45;> -->

@@ -523,6 +523,7 @@ void ControlNode::publishAttitudeSetpoint() {
     //
     //  ends up being: 0b00100000 -> 0x20
 
+    //  attitude is in NWU
     this->dji->attitude_control(0x20, // control mode byte (see above comment)
                                 rad2deg(euler(0)),      // roll (deg)
                                 rad2deg(euler(1)),      // pitch (deg)
