@@ -357,13 +357,13 @@ int DC1394Camera::changeMode(const std::string &mode) {
 }
 
 int DC1394Camera::getFrame(cv::Mat &image) {
-  dc1394error_t error;
+  dc1394error_t err;
 
   // capture frame
   dc1394video_frame_t *frame = nullptr;
-  error =
+  err =
       dc1394_capture_dequeue(this->capture, DC1394_CAPTURE_POLICY_WAIT, &frame);
-  DC1394_ERR_RTN(error, "Failed to obtain frame from camera!");
+  DC1394_ERR_RTN(err, "Failed to obtain frame from camera!");
 
   // convert mono 8 to colour
   size_t channels = 3;
@@ -386,7 +386,7 @@ int DC1394Camera::getFrame(cv::Mat &image) {
   cv::Mat(img_rows, img_cols, CV_8UC3, this->buffer, row_bytes).copyTo(image);
 
   // release frame
-  error = dc1394_capture_enqueue(this->capture, frame);
+  err = dc1394_capture_enqueue(this->capture, frame);
   DC1394_ERR_RTN(err, "Failed to release frame buffer!");
 
   return 0;
