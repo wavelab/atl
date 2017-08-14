@@ -88,10 +88,10 @@ def init_svo(lz):
 
 
 def hover_side_to_side():
-    for i in range(3):
-        quad.set_hover_point([0, 2, 5.0])
+    for i in range(10):
+        quad.set_hover_point([5, 0, 5.0])
         sleep(5)
-        quad.set_hover_point([0, -2, 5.0])
+        quad.set_hover_point([-5, 0, 5.0])
         sleep(5)
 
 
@@ -99,7 +99,7 @@ def up_and_down():
     for i in range(3):
         quad.set_hover_point([0, 0, 5.0])
         sleep(5)
-        quad.set_hover_point([0, 0, 3.0])
+        quad.set_hover_point([0, 0, 4.0])
         sleep(5)
 
 
@@ -116,31 +116,32 @@ if __name__ == "__main__":
     quad.set_arm(True)
     quad.set_mode("WAYPOINT_MODE")
 
-    # up_and_down()
-    # hover_side_to_side()
-
     # quad.set_pctrl_settings({
     #     "roll": {
     #         "min": -30,
     #         "max": 30,
-    #         "k_p": 0.2,
+    #         "k_p": 0.08,
     #         "k_i": 0.0,
-    #         "k_d": 0.15
+    #         "k_d": 0.04
     #     },
     #     "pitch": {
     #         "min": -30,
     #         "max": 30,
-    #         "k_p": 0.2,
+    #         "k_p": 0.08,
     #         "k_i": 0.0,
-    #         "k_d": 0.15
+    #         "k_d": 0.04
     #     },
     #     "throttle": {
-    #         "hover": 0.5,
+    #         "hover": 0.45,
     #         "k_p": 0.1,
     #         "k_i": 0.0,
     #         "k_d": 0.05
     #     }
     # })
+
+    # up_and_down()
+    # hover_side_to_side()
+
 
     # gimbal.set_attitude([0.0, 0.0, 0])
     # gimbal.activate(False)
@@ -151,7 +152,7 @@ if __name__ == "__main__":
 
     # quad.set_mode("HOVER")
     # quad.set_hover_point([1.0, 1.0, 5.0])
-    # quad.set_yaw(-20)
+    quad.set_yaw(-20)
 
     # square(quad, 3, 1)
 

@@ -522,11 +522,13 @@ void ControlNode::publishAttitudeSetpoint() {
     //    non-stable mode
     //
     //  ends up being: 0b00100000 -> 0x20
+
+    //  attitude is in NWU
     this->dji->attitude_control(0x20, // control mode byte (see above comment)
-                                rad2deg(rpy_ned(0)),      // roll (deg)
-                                rad2deg(rpy_ned(1)),      // pitch (deg)
+                                rad2deg(rpy_ned(0)),    // roll (deg)
+                                rad2deg(rpy_ned(1)),    // pitch (deg)
                                 att_cmd.throttle * 100, // throttle (0 - 100)
-                                rad2deg(rpy_ned(2)));     // yaw (deg)
+                                rad2deg(rpy_ned(2)));   // yaw (deg)
 
   } else {
     ROS_ERROR("Invalid [fcu_type]: %s", this->fcu_type.c_str());

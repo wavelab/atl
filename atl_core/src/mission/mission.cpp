@@ -102,7 +102,8 @@ int Mission::setHomePoint(double home_lat, double home_lon) {
 
     // add to waypoints
     Vec3 enu{dist_E, dist_N, alt};
-    std::cout << "Adding local waypoint (ENU): " << enu.transpose() << std::endl;
+    std::cout << "Adding local waypoint (ENU): " << enu.transpose()
+              << std::endl;
     this->local_waypoints.push_back(enu);
   }
 
