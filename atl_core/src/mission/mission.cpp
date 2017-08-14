@@ -94,14 +94,14 @@ int Mission::setHomePoint(double home_lat, double home_lon) {
   // convert
   for (auto gps : this->gps_waypoints) {
     // convert lat lon to local frame
-    double lat = gps(0);
-    double lon = gps(1);
-    double alt = gps(2);
+    const double lat = gps(0);
+    const double lon = gps(1);
+    const double alt = gps(2);
     double dist_N, dist_E;
     latlon_diff(home_lat, home_lon, lat, lon, &dist_N, &dist_E);
 
     // add to waypoints
-    Vec3 enu{dist_E, dist_N, alt};
+    const Vec3 enu{dist_E, dist_N, alt};
     std::cout << "Adding local waypoint (ENU): " << enu.transpose()
               << std::endl;
     this->local_waypoints.push_back(enu);
@@ -116,9 +116,9 @@ int Mission::setHomePoint(double home_lat, double home_lon) {
 
 Vec3 Mission::closestPoint(const Vec3 &position) {
   // calculate closest point
-  Vec3 v1 = position - this->wp_start;
-  Vec3 v2 = this->wp_end - this->wp_start;
-  double t = v1.dot(v2) / v2.squaredNorm();
+  const Vec3 v1 = position - this->wp_start;
+  const Vec3 v2 = this->wp_end - this->wp_start;
+  const double t = v1.dot(v2) / v2.squaredNorm();
 
   // make sure the point is between wp_start and wp_end
   if (t < 0) {

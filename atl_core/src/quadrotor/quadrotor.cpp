@@ -383,19 +383,19 @@ int Quadrotor::stepWaypointMode(const double dt) {
     // first go to first waypoint
 
     // get first waypoint
-    Vec3 wp_start = this->mission.local_waypoints[0];
-    Vec3 wp_end = this->mission.local_waypoints[1];
-    double dx = wp_end(0) - wp_start(0);
-    double dy = wp_end(1) - wp_start(1);
+    const Vec3 wp_start = this->mission.local_waypoints[0];
+    const Vec3 wp_end = this->mission.local_waypoints[1];
+    const double dx = wp_end(0) - wp_start(0);
+    const double dy = wp_end(1) - wp_start(1);
 
     // calculate waypoint heading between first two waypoints
     // offset by -90 deg because ENU's 0 yaw is East rather than North
-    double wp_heading = atan2(dy, dx) - deg2rad(90.0);
-    this->yaw = -wp_heading;
+    const double wp_heading = atan2(dy, dx) - deg2rad(90.0);
+    this->yaw = wp_heading;
 
     // transition to first waypoint with position controller
-    this->position_controller.update(wp_start, this->pose, this->yaw, dt);
-    this->att_cmd = AttitudeCommand(this->position_controller.outputs);
+    this->setHoverPosition(wp_start);
+    this->stepHoverMode(dt);
 
     // check if quadrotor is at first waypoint
     if ((this->pose.position - wp_start).norm() < 0.1) {
@@ -410,20 +410,23 @@ int Quadrotor::stepWaypointMode(const double dt) {
     // of the waypoints
 
     // hover at first waypoint
+    const Vec3 wp_start = this->mission.local_waypoints[0];
+    this->setHoverPosition(wp_start);
     this->stepHoverMode(dt);
 
     // count down
     float wp_clock = toc(&this->waypoint_tic);
     if (wp_clock > 1.0 && this->waypoint_countdown[0] == false) {
-      LOG_INFO("... 3s");
+      LOG_INFO("... 4s");
       this->waypoint_countdown[0] = true;
     } else if (wp_clock > 2.0 && this->waypoint_countdown[1] == false) {
-      LOG_INFO("... 2s");
+      LOG_INFO("... 3s");
       this->waypoint_countdown[1] = true;
     } else if (wp_clock > 3.0 && this->waypoint_countdown[2] == false) {
-      LOG_INFO("... 1s");
+      LOG_INFO("... 2s");
       this->waypoint_countdown[2] = true;
     } else if (wp_clock > 4.0 && this->waypoint_countdown[3] == false) {
+      LOG_INFO("... 1s");
       LOG_INFO("Executing waypoint mission!");
       this->waypoint_countdown[3] = true;
     }
@@ -435,6 +438,8 @@ int Quadrotor::stepWaypointMode(const double dt) {
                                               this->velocity,
                                               dt);
     this->att_cmd = this->waypoint_controller.att_cmd;
+  } else {
+    this->setMode(HOVER_MODE);
   }
 
   // update hover position

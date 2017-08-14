@@ -113,7 +113,7 @@ if __name__ == "__main__":
     # world = World()
     rospy.sleep(1.0)
 
-    quad.set_arm(True)
+    # quad.set_arm(True)
     quad.set_mode("WAYPOINT_MODE")
 
     # quad.set_pctrl_settings({
@@ -148,11 +148,11 @@ if __name__ == "__main__":
     # lz.set_position([1, 0, 0])
     # quad.set_hover_point([1, 0, 5.0])
 
-    # quad.set_hover_point([0.0, 0.0, 2.0])
+    # quad.set_hover_point([0.0, 0.0, 5.0])
 
     # quad.set_mode("HOVER")
     # quad.set_hover_point([1.0, 1.0, 5.0])
-    quad.set_yaw(-20)
+    # quad.set_yaw(-20)
 
     # square(quad, 3, 1)
 
