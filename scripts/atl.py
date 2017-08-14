@@ -106,7 +106,7 @@ class Quadrotor(ROSNode):
         super(Quadrotor, self).__init__()
         self.arm_topic = "/atl/control/arm"
         self.mode_topic = "/atl/control/mode"
-        self.heading_topic = "/atl/control/heading/set"
+        self.heading_topic = "/atl/control/yaw/set"
         self.hover_point_topic = "/atl/control/hover/set"
         self.hover_height_topic = "/atl/control/hover/height/set"
         self.pctrl_set_topic = "/atl/control/position_controller/set"

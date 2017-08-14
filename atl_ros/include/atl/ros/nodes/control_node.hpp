@@ -12,24 +12,20 @@
 // NODE SETTINGS
 static const double NODE_RATE = 50;
 
+// clang-format off
 // PUBLISH TOPICS
-static const std::string PX4_SETPOINT_ATTITUDE_TOPIC =
-    "/mavros/setpoint_attitude/attitude";
-static const std::string PX4_SETPOINT_THROTTLE_TOPIC =
-    "/mavros/setpoint_attitude/att_throttle";
-static const std::string PX4_SETPOINT_POSITION_TOPIC =
-    "/mavros/setpoint_position/local";
+static const std::string PX4_SETPOINT_ATTITUDE_TOPIC = "/mavros/setpoint_attitude/attitude";
+static const std::string PX4_SETPOINT_THROTTLE_TOPIC = "/mavros/setpoint_attitude/att_throttle";
+static const std::string PX4_SETPOINT_POSITION_TOPIC = "/mavros/setpoint_position/local";
 
 static const std::string PCTRL_STATS_TOPIC = "/atl/position_controller/stats";
-static const std::string PCTRL_GET_TOPIC =
-    "/atl/control/position_controller/get";
+static const std::string PCTRL_GET_TOPIC = "/atl/control/position_controller/get";
 static const std::string QUADROTOR_POSE = "/atl/quadrotor/pose/local";
 static const std::string QUADROTOR_VELOCITY = "/atl/quadrotor/velocity/local";
 static const std::string ESTIMATOR_ON_TOPIC = "/atl/estimator/on";
 static const std::string ESTIMATOR_OFF_TOPIC = "/atl/estimator/off";
 
 // SUBSCRIBE TOPICS
-// clang-format off
 static const std::string DJI_GPS_POSITION_TOPIC = "/dji_sdk/global_position";
 static const std::string DJI_LOCAL_POSITION_TOPIC = "/dji_sdk/local_position";
 static const std::string DJI_ATTITUDE_TOPIC = "/dji_sdk/attitude_quaternion";

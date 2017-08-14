@@ -75,7 +75,7 @@ void load_matrix(MatX A, std::vector<double> &x) {
   }
 }
 
-int euler2quat(Vec3 euler, int euler_seq, Quaternion &q) {
+int euler2quat(const Vec3 &euler, const int euler_seq, Quaternion &q) {
   double alpha, beta, gamma;
   double c1, c2, c3, s1, s2, s3;
   double w, x, y, z;
@@ -109,7 +109,7 @@ int euler2quat(Vec3 euler, int euler_seq, Quaternion &q) {
       break;
 
     default:
-      printf("Error! Invalid euler sequence [%d]\n", euler_seq);
+      LOG_ERROR("Error! Invalid euler sequence [%d]\n", euler_seq);
       return -1;
       break;
   }
@@ -122,7 +122,7 @@ int euler2quat(Vec3 euler, int euler_seq, Quaternion &q) {
   return 0;
 }
 
-int euler2rot(Vec3 euler, int euler_seq, Mat3 &R) {
+int euler2rot(const Vec3 &euler, const int euler_seq, Mat3 &R) {
   double R11, R12, R13, R21, R22, R23, R31, R32, R33;
   double phi, theta, psi;
 
@@ -167,7 +167,7 @@ int euler2rot(Vec3 euler, int euler_seq, Mat3 &R) {
   return 0;
 }
 
-int quat2euler(Quaternion q, int euler_seq, Vec3 &euler) {
+int quat2euler(const Quaternion &q, const int euler_seq, Vec3 &euler) {
   double qw, qx, qy, qz;
   double qw2, qx2, qy2, qz2;
   double phi, theta, psi;
@@ -202,29 +202,29 @@ int quat2euler(Quaternion q, int euler_seq, Vec3 &euler) {
   return 0;
 }
 
-int quat2rot(Quaternion q, Mat3 &R) {
-  double qw = q.w();
-  double qx = q.x();
-  double qy = q.y();
-  double qz = q.z();
+Mat3 quat2rot(const Quaternion &q) {
+  const double qw = q.w();
+  const double qx = q.x();
+  const double qy = q.y();
+  const double qz = q.z();
 
   // double qw2 = pow(qw, 2);
-  double qx2 = pow(qx, 2);
-  double qy2 = pow(qy, 2);
-  double qz2 = pow(qz, 2);
+  const double qx2 = pow(qx, 2);
+  const double qy2 = pow(qy, 2);
+  const double qz2 = pow(qz, 2);
 
   // inhomogeneous form
-  double R11 = 1 - 2 * qy2 - 2 * qz2;
-  double R12 = 2 * qx * qy + 2 * qz * qw;
-  double R13 = 2 * qx * qz - 2 * qy * qw;
+  const double R11 = 1 - 2 * qy2 - 2 * qz2;
+  const double R12 = 2 * qx * qy + 2 * qz * qw;
+  const double R13 = 2 * qx * qz - 2 * qy * qw;
 
-  double R21 = 2 * qx * qy - 2 * qz * qw;
-  double R22 = 1 - 2 * qx2 - 2 * qz2;
-  double R23 = 2 * qy * qz + 2 * qx * qw;
+  const double R21 = 2 * qx * qy - 2 * qz * qw;
+  const double R22 = 1 - 2 * qx2 - 2 * qz2;
+  const double R23 = 2 * qy * qz + 2 * qx * qw;
 
-  double R31 = 2 * qx * qz + 2 * qy * qw;
-  double R32 = 2 * qy * qz - 2 * qx * qw;
-  double R33 = 1 - 2 * qx2 - 2 * qy2;
+  const double R31 = 2 * qx * qz + 2 * qy * qw;
+  const double R32 = 2 * qy * qz - 2 * qx * qw;
+  const double R33 = 1 - 2 * qx2 - 2 * qy2;
 
   // // homogeneous form
   // R11 = qx2 + qx2 - qy2 - qz2;
@@ -239,9 +239,9 @@ int quat2rot(Quaternion q, Mat3 &R) {
   // R32 = 2 * (qw * qx + qy * qz);
   // R33 = qw2 - qx2 - qy2 + qz2;
 
+  Mat3 R;
   R << R11, R12, R13, R21, R22, R23, R31, R32, R33;
-
-  return 0;
+  return R;
 }
 
 Vec3 enu2nwu(const Vec3 &enu) {
@@ -420,45 +420,48 @@ void inertial2body(Vec3 enu_if, Vec3 orientation_if, Vec3 &nwu_bf) {
   nwu_bf = R * nwu_if;
 }
 
-double wrapTo180(double euler_angle) {
+double wrapTo180(const double euler_angle) {
   return fmod((euler_angle + 180.0), 360.0) - 180.0;
 }
 
-double wrapTo360(double euler_angle) {
+double wrapTo360(const double euler_angle) {
   if (euler_angle > 0) {
     return fmod(euler_angle, 360.0);
   } else {
-    euler_angle += 360.0;
-    return fmod(euler_angle, 360.0);
+    return fmod(euler_angle + 360, 360.0);
   }
 }
 
-double cross_track_error(Vec2 p1, Vec2 p2, Vec2 pos) {
-  double x0, y0;
-  double x1, y1;
-  double x2, y2;
-  double numerator, denominator;
+double wrapToPi(const double r) { return deg2rad(wrapTo180(rad2deg(r))); }
 
-  // setup
-  x0 = pos(0);
-  y0 = pos(1);
+double wrapTo2Pi(const double r) { return deg2rad(wrapTo360(rad2deg(r))); }
 
-  x1 = p1(0);
-  y1 = p1(0);
+double cross_track_error(const Vec2 &p1, const Vec2 &p2, const Vec2 &pos) {
+  const double x0 = pos(0);
+  const double y0 = pos(1);
 
-  x2 = p2(0);
-  y2 = p2(0);
+  const double x1 = p1(0);
+  const double y1 = p1(0);
+
+  const double x2 = p2(0);
+  const double y2 = p2(0);
 
   // calculate perpendicular distance between line (p1, p2) and point (pos)
-  numerator = ((y2 - y1) * x0 - (x2 - x1) * y0 + x2 * y1 - y2 * x1);
-  denominator = sqrt(pow(y2 - y1, 2) + pow(x2 - x1, 2));
-  return fabs(numerator) / denominator;
+  const double n = ((y2 - y1) * x0 - (x2 - x1) * y0 + x2 * y1 - y2 * x1);
+  const double d = sqrt(pow(y2 - y1, 2) + pow(x2 - x1, 2));
+
+  return fabs(n) / d;
 }
 
-int point_left_right(Vec2 a, Vec2 b, Vec2 c) {
-  double x;
+int point_left_right(const Vec2 &a, const Vec2 &b, const Vec2 &c) {
+  const double a0 = a(0);
+  const double a1 = a(1);
+  const double b0 = b(0);
+  const double b1 = b(1);
+  const double c0 = c(0);
+  const double c1 = c(1);
+  const double x = (b0 - a0) * (c1 - a1) - (b1 - a1) * (c0 - a0);
 
-  x = (b(0) - a(0)) * (c(1) - a(1)) - (b(1) - a(1)) * (c(0) - a(0));
   if (x > 0) {
     return 1; // left
   } else if (x < 0) {
@@ -501,10 +504,8 @@ int point_left_right(Vec2 a, Vec2 b, Vec2 c) {
 //   }
 // }
 
-double closest_point(Vec2 a, Vec2 b, Vec2 p, Vec2 &closest) {
-  double t;
-  Vec2 v1, v2;
-
+double
+closest_point(const Vec2 &a, const Vec2 &b, const Vec2 &p, Vec2 &closest) {
   // pre-check
   if ((a - b).norm() == 0) {
     closest = a;
@@ -512,15 +513,15 @@ double closest_point(Vec2 a, Vec2 b, Vec2 p, Vec2 &closest) {
   }
 
   // calculate closest point
-  v1 = p - a;
-  v2 = b - a;
-  t = v1.dot(v2) / v2.squaredNorm();
+  const Vec2 v1 = p - a;
+  const Vec2 v2 = b - a;
+  const double t = v1.dot(v2) / v2.squaredNorm();
   closest = a + t * v2;
 
   return t;
 }
 
-Vec2 linear_interpolation(Vec2 a, Vec2 b, double mu) {
+Vec2 linear_interpolation(const Vec2 &a, const Vec2 &b, const double mu) {
   return a * (1 - mu) + b * mu;
 }
 

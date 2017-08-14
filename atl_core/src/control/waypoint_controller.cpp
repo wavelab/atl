@@ -125,20 +125,21 @@ int WaypointController::update(Mission &mission,
   Mat3 R;
   Vec3 yaw_only{0.0, 0.0, euler(2)};
   euler2rot(yaw_only, 123, R);
-  Vec3 vel_bf = R * vel;
+  const Vec3 vel_bf = R * vel;
 
   // roll
   double r = -this->ct_controller.update(errors(1), this->dt);
 
   // pitch
-  double error_forward = mission.desired_velocity - vel_bf(0);
-  double p = this->at_controller.update(error_forward, this->dt);
+  // double error_forward = mission.desired_velocity - vel_bf(0);
+  // double p = this->at_controller.update(error_forward, this->dt);
+  double p = this->at_controller.update(errors(0), this->dt);
 
   // yaw
-  double y = wrapTo180(mission.waypointHeading());
+  double y = wrapToPi(mission.waypointHeading());
 
   // throttle
-  double error_z = waypoint(2) - pose.position(2);
+  const double error_z = waypoint(2) - pose.position(2);
   double t = this->hover_throttle;
   t += this->z_controller.update(error_z, this->dt);
   t /= fabs(cos(r) * cos(p)); // adjust throttle for roll and pitch

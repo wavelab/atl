@@ -6,6 +6,8 @@
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 
+#include "atl/utils/log.hpp"
+
 namespace atl {
 
 #ifndef __EIGEN_TYPEDEF__
@@ -101,9 +103,9 @@ void load_matrix(MatX A, std::vector<double> &x);
  * Convert Euler angles to rotation matrix
  * @param euler Input Euler angles
  * @param euler_seq Euler angle sequence
- * @param R Output rotation matrix
+ * @return R Output rotation matrix
  */
-int euler2rot(Vec3 euler, int euler_seq, Mat3 &R);
+int euler2rot(const Vec3 &euler, const int euler_seq, Mat3 &R);
 
 /**
  * Convert Euler angles to quaternion
@@ -111,7 +113,7 @@ int euler2rot(Vec3 euler, int euler_seq, Mat3 &R);
  * @param euler_seq Euler angle sequence
  * @param q Output quaternion
  */
-int euler2quat(Vec3 euler, int euler_seq, Quaternion &q);
+int euler2quat(const Vec3 &euler, const int euler_seq, Quaternion &q);
 
 /**
  * Convert quanternion to Euler angles
@@ -119,14 +121,14 @@ int euler2quat(Vec3 euler, int euler_seq, Quaternion &q);
  * @param euler_seq Euler angle sequence
  * @param euler Output Euler angles
  */
-int quat2euler(Quaternion q, int euler_seq, Vec3 &euler);
+int quat2euler(const Quaternion &q, const int euler_seq, Vec3 &euler);
 
 /**
  * Convert Quaternion to rotation matrix
  * @param q Input quaternion
  * @param R Output rotation matrix
  */
-int quat2rot(Quaternion q, Mat3 &R);
+Mat3 quat2rot(const Quaternion &q);
 
 /**
  * Convert from ENU to NWU
@@ -217,7 +219,7 @@ void inertial2body(Vec3 enu_if, Vec3 orientation_if, Vec3 &nwu_bf);
  * @param d Degrees
  * @return Angle wraped to 180
  */
-double wrapTo180(double d);
+double wrapTo180(const double d);
 
 /**
  * Wrap angle in degrees to 360
@@ -225,14 +227,31 @@ double wrapTo180(double d);
  * @param d Degrees
  * @return Angle wraped to 360
  */
-double wrapTo360(double d);
+double wrapTo360(const double d);
 
-double cross_track_error(Vec2 p1, Vec2 p2, Vec2 pos);
-int point_left_right(Vec2 p1, Vec2 p2, Vec2 pos);
+/**
+ * Wrap angle in radians to PI
+ *
+ * @param r Radians
+ * @return Angle wraped to PI
+ */
+double wrapToPi(const double r);
+
+/**
+ * Wrap angle in radians to 2 PI
+ *
+ * @param r Radians
+ * @return Angle wraped to 2 PI
+ */
+double wrapTo2Pi(const double r);
+
+double cross_track_error(const Vec2 &p1, const Vec2 &p2, const Vec2 &pos);
+int point_left_right(const Vec2 &p1, const Vec2 &p2, const Vec2 &pos);
 // int closest_point(Vec2 p1, Vec2 p2, Vec2 p3, Vec2 &closest, bool
 // limit=false);
-double closest_point(Vec2 p1, Vec2 p2, Vec2 p3, Vec2 &closest);
-Vec2 linear_interpolation(Vec2 a, Vec2 b, double mu);
+double
+closest_point(const Vec2 &p1, const Vec2 &p2, const Vec2 &p3, Vec2 &closest);
+Vec2 linear_interpolation(const Vec2 &a, const Vec2 &b, const double mu);
 
 } // namespace atl
 #endif
