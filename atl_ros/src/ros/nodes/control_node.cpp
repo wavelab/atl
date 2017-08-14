@@ -492,7 +492,7 @@ void ControlNode::publishAttitudeSetpoint() {
     this->ros_pubs[PX4_SETPOINT_THROTTLE_TOPIC].publish(thr_msg);
 
   } else if (this->fcu_type == "DJI") {
-    Vec3 euler = att_cmd.toEuler("NED");
+    Vec3 rpy_ned = att_cmd.toEuler("NED");
 
     //  DJI Control Mode Byte
     //
@@ -522,12 +522,11 @@ void ControlNode::publishAttitudeSetpoint() {
     //    non-stable mode
     //
     //  ends up being: 0b00100000 -> 0x20
-
     this->dji->attitude_control(0x20, // control mode byte (see above comment)
-                                rad2deg(euler(0)),      // roll (deg)
-                                rad2deg(euler(1)),      // pitch (deg)
+                                rad2deg(rpy_ned(0)),      // roll (deg)
+                                rad2deg(rpy_ned(1)),      // pitch (deg)
                                 att_cmd.throttle * 100, // throttle (0 - 100)
-                                rad2deg(euler(2)));     // yaw (deg)
+                                rad2deg(rpy_ned(2)));     // yaw (deg)
 
   } else {
     ROS_ERROR("Invalid [fcu_type]: %s", this->fcu_type.c_str());

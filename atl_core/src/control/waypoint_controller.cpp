@@ -136,10 +136,6 @@ int WaypointController::update(Mission &mission,
 
   // yaw
   double y = mission.waypointHeading();
-  // if (fabs(euler(2) - y) > 0.1) {
-  //   r = 0;
-  //   y = 0;
-  // }
 
   // throttle
   double error_z = waypoint(2) - pose.position(2);

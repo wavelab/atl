@@ -102,7 +102,7 @@ int Mission::setHomePoint(double home_lat, double home_lon) {
 
     // add to waypoints
     Vec3 enu{dist_E, dist_N, alt};
-    std::cout << "Adding local waypoint: " << enu.transpose() << std::endl;
+    std::cout << "Adding local waypoint (ENU): " << enu.transpose() << std::endl;
     this->local_waypoints.push_back(enu);
   }
 
@@ -230,9 +230,9 @@ int Mission::update(const Vec3 &position, Vec3 &waypoint) {
       return -2;
 
     } else {
+      this->wp_start = this->local_waypoints[this->waypoint_index + 1];
+      this->wp_end = this->local_waypoints[this->waypoint_index + 2];
       this->waypoint_index++;
-      this->wp_start = this->local_waypoints[this->waypoint_index];
-      this->wp_end = this->local_waypoints[this->waypoint_index + 1];
     }
   }
 
