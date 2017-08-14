@@ -3,13 +3,6 @@
 
 #include <ros/ros.h>
 
-#define MAVLINK_DIALECT common
-#include <mavros/mavros.h>
-#include <mavros_msgs/CommandBool.h>
-#include <mavros_msgs/RCIn.h>
-#include <mavros_msgs/SetMode.h>
-#include <mavros_msgs/State.h>
-
 #include <dji_sdk/dji_drone.h>
 
 #include "atl/ros/utils/msgs.hpp"
@@ -19,7 +12,6 @@
 namespace atl {
 
 // NODE SETTINGS
-#define NODE_NAME "atl_control"
 #define NODE_RATE 50
 
 // PUBLISH TOPICS
@@ -36,13 +28,6 @@ namespace atl {
 
 // SUBSCRIBE TOPICS
 // clang-format off
-#define PX4_MODE_TOPIC "/mavros/set_mode"
-#define PX4_ARM_TOPIC "/mavros/cmd/arming"
-#define PX4_STATE_TOPIC "/mavros/state"
-#define PX4_POSE_TOPIC "/mavros/local_position/pose"
-#define PX4_VELOCITY_TOPIC "/mavros/local_position/velocity"
-#define PX4_RADIO_TOPIC "/mavros/rc/in"
-
 #define DJI_GPS_POSITION_TOPIC "/dji_sdk/global_position"
 #define DJI_LOCAL_POSITION_TOPIC "/dji_sdk/local_position"
 #define DJI_ATTITUDE_TOPIC "/dji_sdk/attitude_quaternion"
@@ -66,10 +51,6 @@ class ControlNode : public ROSNode {
 public:
   bool configured = false;
 
-  std::string quad_frame = "";
-  std::string fcu_type = "";
-
-  mavros_msgs::State px4_state;
   DJIDrone *dji = nullptr;
 
   Quadrotor quadrotor;
@@ -83,6 +64,12 @@ public:
 
   ControlNode(int argc, char **argv) : ROSNode(argc, argv) {}
 
+  ~ControlNode() {
+    if (this->dji != nullptr) {
+      delete this->dji;
+    }
+  }
+
   /**
    * Configure ROS node
    *
@@ -93,76 +80,23 @@ public:
   int configure(int hz);
 
   /**
-   * Configure PX4 ROS topics
+   * Disarm
    *
    * @return
    *    - 0: Success
    *    - -1: Failure
    */
-  int configurePX4Topics();
+  int disarm();
 
   /**
-   * Configure DJI ROS topics
+   * SDK control mode
    *
+   * @param mode Switch offboard mode on/off
    * @return
    *    - 0: Success
    *    - -1: Failure
    */
-  int configureDJITopics();
-
-  /**
-   * PX4 connect
-   *
-   * @return
-   *    - 0: Success
-   *    - -1: Failure
-   */
-  int px4Connect();
-
-  /**
-   * PX4 disarm
-   *
-   * @return
-   *    - 0: Success
-   *    - -1: Failure
-   */
-  int px4Disarm();
-
-  /**
-   * PX4 offboard mode on
-   *
-   * @return
-   *    - 0: Success
-   *    - -1: Failure
-   */
-  int px4OffboardModeOn();
-
-  /**
-   * DJI disarm
-   *
-   * @return
-   *    - 0: Success
-   *    - -1: Failure
-   */
-  int djiDisarm();
-
-  /**
-   * DJI offboard mode on
-   *
-   * @return
-   *    - 0: Success
-   *    - -1: Failure
-   */
-  int djiOffboardModeOn();
-
-  /**
-   * DJI offboard mode off
-   *
-   * @return
-   *    - 0: Success
-   *    - -1: Failure
-   */
-  int djiOffboardModeOff();
+  int sdkControlMode(const bool mode);
 
   /**
    * Wait for estimator connection
@@ -193,58 +127,34 @@ public:
   void setEstimatorOff();
 
   /**
-   * PX4 state callback
+   * GPS position callback
    * @param msg ROS message
    */
-  void px4StateCallback(const mavros_msgs::State::ConstPtr &msg);
+  void gpsPositionCallback(const dji_sdk::GlobalPosition &msg);
 
   /**
-   * PX4 pose callback
+   * local position callback
    * @param msg ROS message
    */
-  void px4PoseCallback(const geometry_msgs::PoseStamped &msg);
+  void localPositionCallback(const dji_sdk::LocalPosition &msg);
 
   /**
-   * PX4 velocity callback
+   * attitude callback
    * @param msg ROS message
    */
-  void px4VelocityCallback(const geometry_msgs::TwistStamped &msg);
+  void attitudeCallback(const dji_sdk::AttitudeQuaternion &msg);
 
   /**
-   * PX4 radio callback
+   * velocity callback
    * @param msg ROS message
    */
-  void px4RadioCallback(const mavros_msgs::RCIn &msg);
+  void velocityCallback(const dji_sdk::Velocity &msg);
 
   /**
-   * DJI GPS position callback
+   * Radio callback
    * @param msg ROS message
    */
-  void djiGPSPositionCallback(const dji_sdk::GlobalPosition &msg);
-
-  /**
-   * DJI local position callback
-   * @param msg ROS message
-   */
-  void djiLocalPositionCallback(const dji_sdk::LocalPosition &msg);
-
-  /**
-   * DJI attitude callback
-   * @param msg ROS message
-   */
-  void djiAttitudeCallback(const dji_sdk::AttitudeQuaternion &msg);
-
-  /**
-   * DJI velocity callback
-   * @param msg ROS message
-   */
-  void djiVelocityCallback(const dji_sdk::Velocity &msg);
-
-  /**
-   * DJI Radio callback
-   * @param msg ROS message
-   */
-  void djiRadioCallback(const dji_sdk::RCChannels &msg);
+  void radioCallback(const dji_sdk::RCChannels &msg);
 
   /**
    * Arm callback

@@ -36,17 +36,15 @@ void DJIQuadrotorNode::poseCallback(ConstPosePtr &msg) {
   QuadrotorGClient::poseCallback(msg);
 
   // transform position from NWU to NED
-  Vec3 ros_pos;
-  ros_pos(0) = this->position(0) + x_err(x_gen);
-  ros_pos(1) = -this->position(1) + y_err(y_gen);
-  ros_pos(2) = -this->position(2) + z_err(z_gen);
+  Vec3 ros_pos{this->position(0) + x_err(x_gen),
+               -this->position(1) + y_err(y_gen),
+               -this->position(2) + z_err(z_gen)};
 
   // convert quaternion from NWU to NED
-  Quaternion ros_quat;
-  ros_quat.w() = this->orientation.w();
-  ros_quat.x() = this->orientation.x();
-  ros_quat.y() = -this->orientation.y();
-  ros_quat.z() = -this->orientation.z();
+  Quaternion ros_quat{this->orientation.w(),
+                      this->orientation.x(),
+                      -this->orientation.y(),
+                      -this->orientation.z()};
 
   // convert NWU position to GPS lat lon coordinates
   double lat = 0.0;
