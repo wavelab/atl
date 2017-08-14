@@ -9,14 +9,13 @@
 #include "atl/ros/utils/msgs.hpp"
 #include "atl/ros/utils/node.hpp"
 
-namespace atl {
-
 // NODE SETTINGS
-#define NODE_NAME "example"
-#define NODE_RATE 1
+static const double NODE_RATE = 1.0;
 
 // PUBLISH TOPIC
-#define SAY_TOPIC "/example/say"
+static const std::string SAY_TOPIC = "/example/say";
+
+namespace atl {
 
 class ExampleNode : public ROSNode {
 public:

@@ -11,25 +11,24 @@
 #include "atl/ros/utils/msgs.hpp"
 #include "atl/ros/utils/node.hpp"
 
-namespace atl {
-
 // NODE SETTINGS
-#define NODE_NAME "atl_apriltag"
-#define NODE_RATE 100
+static const double NODE_RATE = 100;
 
 // PUBLISH TOPICS
 // clang-format off
-#define TARGET_POSE_TOPIC "/atl/apriltag/target"
-#define TARGET_IF_POS_TOPIC "/atl/apriltag/target/position/inertial"
-#define TARGET_IF_YAW_TOPIC "/atl/apriltag/target/yaw/inertial"
-#define TARGET_BPF_POS_TOPIC "/atl/apriltag/target/position/body"
-#define TARGET_BPF_POS_ENCODER_TOPIC "/atl/apriltag/target/position/body_encoders"
-#define TARGET_BPF_YAW_TOPIC "/atl/apriltag/target/yaw/body"
+static const std::string TARGET_POSE_TOPIC = "/atl/apriltag/target";
+static const std::string TARGET_IF_POS_TOPIC = "/atl/apriltag/target/position/inertial";
+static const std::string TARGET_IF_YAW_TOPIC = "/atl/apriltag/target/yaw/inertial";
+static const std::string TARGET_BPF_POS_TOPIC = "/atl/apriltag/target/position/body";
+static const std::string TARGET_BPF_POS_ENCODER_TOPIC = "/atl/apriltag/target/position/body_encoders";
+static const std::string TARGET_BPF_YAW_TOPIC = "/atl/apriltag/target/yaw/body";
 // clang-format on
 
 // SUBSCRIBE TOPICS
-#define CAMERA_IMAGE_TOPIC "/atl/camera/image"
-#define SHUTDOWN "/atl/apriltag/shutdown"
+static const std::string CAMERA_IMAGE_TOPIC = "/atl/camera/image";
+static const std::string SHUTDOWN = "/atl/apriltag/shutdown";
+
+namespace atl {
 
 class AprilTagNode : public ROSNode {
 public:

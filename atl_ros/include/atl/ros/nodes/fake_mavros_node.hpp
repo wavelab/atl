@@ -7,15 +7,16 @@
 #include "atl/ros/utils/msgs.hpp"
 #include "atl/ros/utils/node.hpp"
 
-namespace atl {
-
 // NODE SETTINGS
-#define NODE_NAME "atl_fake_mavros"
-#define NODE_RATE 100
+static const double NODE_RATE = 100;
 
 // PUBLISH TOPICS
-#define MAVROS_POSE_TOPIC "/mavros/local_position/pose"
-#define MAVROS_VELOCITY_TOPIC "/mavros/local_position/velocity"
+// clang-format off
+static const std::string MAVROS_POSE_TOPIC = "/mavros/local_position/pose";
+static const std::string MAVROS_VELOCITY_TOPIC = "/mavros/local_position/velocity";
+// clang-format on
+
+namespace atl {
 
 class FakeMavrosNode : public ROSNode {
 public:

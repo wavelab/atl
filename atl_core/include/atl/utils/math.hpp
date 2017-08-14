@@ -131,47 +131,58 @@ int quat2rot(Quaternion q, Mat3 &R);
 /**
  * Convert from ENU to NWU
  * @param enu ENU vector
- * @param nwu NWU vector
+ * @return nwu NWU vector
  */
-void enu2nwu(Vec3 enu, Vec3 &nwu);
+Vec3 enu2nwu(const Vec3 &enu);
 
-void cf2nwu(Vec3 cf, Vec3 &nwu);
-void cf2enu(Vec3 cf, Vec3 &nwu);
+/**
+ * Convert from EDN to NWU
+ * @param enu EDN vector
+ * @return nwu NWU vector
+ */
+Vec3 edn2nwu(const Vec3 &edn);
+
+/**
+ * Convert from EDN to ENU
+ * @param enu EDN vector
+ * @return enu ENU vector
+ */
+Vec3 edn2enu(const Vec3 &edn);
 
 /**
  * Convert from NWU to ENU
  * @param nwu NWU vector
- * @param enu ENU vector
+ * @return enu ENU vector
  */
-void nwu2enu(Vec3 nwu, Vec3 &enu);
+Vec3 nwu2enu(const Vec3 &nwu);
 
 /**
  * Convert from NED to ENU
  * @param ned NED vector
- * @param enu ENU vector
+ * @return enu ENU vector
  */
-void ned2enu(Vec3 ned, Vec3 &enu);
+Vec3 ned2enu(const Vec3 &ned);
 
 /**
  * Convert from NWU to NED
- * @param nwu NWU vector
- * @param ned NED vector
+ * @param nwu NWU quaternion
+ * @return ned NED quaternion
  */
-void nwu2ned(Quaternion nwu, Quaternion &ned);
+Quaternion nwu2ned(const Quaternion &nwu);
 
 /**
  * Conver from NED to NWU
- * @param ned NED vector
- * @param nwu NWU vector
+ * @param ned NED quaternion
+ * @param nwu NWU quaternion
  */
-void ned2nwu(Quaternion ned, Quaternion &enu);
+Quaternion ned2nwu(const Quaternion &ned);
 
 /**
  * Conver from ENU to NWU
- * @param ned ENU vector
- * @param nwu NWU vector
+ * @param ned ENU quaternion
+ * @param nwu NWU quaternion
  */
-void enu2nwu(Quaternion enu, Quaternion &nwu);
+Quaternion enu2nwu(const Quaternion &enu);
 
 void target2body(Vec3 target_pos_if,
                  Vec3 body_pos_if,

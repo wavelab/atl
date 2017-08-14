@@ -14,8 +14,7 @@ AttitudeCommand::AttitudeCommand(Vec4 command) {
 Vec3 AttitudeCommand::toEuler(const std::string &coordinate_system) {
   if (coordinate_system == "NED") {
     // transform orientation from NWU to NED
-    Quaternion q_ned;
-    nwu2ned(this->orientation, q_ned);
+    Quaternion q_ned = nwu2ned(this->orientation);
 
     // convert to euler
     Vec3 euler_ned;

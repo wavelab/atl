@@ -12,26 +12,27 @@
 #include "atl/ros/utils/msgs.hpp"
 #include "atl/ros/utils/node.hpp"
 
-namespace atl {
-
 // NODE SETTINGS
-#define NODE_NAME "atl_gimbal"
-#define NODE_RATE 30
+static const double NODE_RATE = 30;
 
+// clang-format off
 // PUBLISH TOPICS
-#define SBGC_IMU_TOPIC "/atl/sbgc/imu"
-#define SBGC_RAW_ENCODER_TOPIC "atl/sbgc/encoders/rpy"
-#define POSITION_TOPIC "/atl/gimbal/position/inertial"
-#define FRAME_ORIENTATION_TOPIC "/atl/gimbal/frame/orientation/inertial"
-#define JOINT_ORIENTATION_TOPIC "/atl/gimbal/joint/orientation/inertial"
-#define ENCODER_ORIENTATION_TOPIC "atl/gimbal/joint/orientation/body"
+static const std::string SBGC_IMU_TOPIC = "/atl/sbgc/imu";
+static const std::string SBGC_RAW_ENCODER_TOPIC = "atl/sbgc/encoders/rpy";
+static const std::string POSITION_TOPIC = "/atl/gimbal/position/inertial";
+static const std::string FRAME_ORIENTATION_TOPIC = "/atl/gimbal/frame/orientation/inertial";
+static const std::string JOINT_ORIENTATION_TOPIC = "/atl/gimbal/joint/orientation/inertial";
+static const std::string ENCODER_ORIENTATION_TOPIC = "atl/gimbal/joint/orientation/body";
 
 // SUBSCRIBE TOPICS
-#define ACTIVATE_TOPIC "/atl/gimbal/activate"
-#define QUAD_POSE_TOPIC "/atl/quadrotor/pose/local"
-#define SETPOINT_TOPIC "/atl/gimbal/setpoint/attitude"
-#define TRACK_TOPIC "/atl/gimbal/target/track"
-#define SHUTDOWN_TOPIC "/atl/gimbal/shutdown"
+static const std::string ACTIVATE_TOPIC = "/atl/gimbal/activate";
+static const std::string QUAD_POSE_TOPIC = "/atl/quadrotor/pose/local";
+static const std::string SETPOINT_TOPIC = "/atl/gimbal/setpoint/attitude";
+static const std::string TRACK_TOPIC = "/atl/gimbal/target/track";
+static const std::string SHUTDOWN_TOPIC = "/atl/gimbal/shutdown";
+// clang-format on
+
+namespace atl {
 
 class GimbalNode : public ROSNode {
 public:

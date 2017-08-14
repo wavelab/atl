@@ -11,23 +11,21 @@
 #include "atl/ros/utils/msgs.hpp"
 #include "atl/ros/utils/node.hpp"
 
-namespace atl {
-
 // NODE SETTINGS
-#define NODE_NAME "atl_camera"
-#define NODE_RATE 100
+static const double NODE_RATE = 100;
 
+// clang-format off
 // PUBLISH TOPICS
-#define CAMERA_IMAGE_TOPIC "/atl/camera/image"
+static const std::string CAMERA_IMAGE_TOPIC = "/atl/camera/image";
 
 // SUBSCRIBE TOPICS
-// clang-format off
-#define APRILTAG_TOPIC "/atl/apriltag/target"
-#define GIMBAL_FRAME_ORIENTATION_TOPIC "/atl/gimbal/frame/orientation/inertial"
-#define GIMBAL_JOINT_ORIENTATION_TOPIC "/atl/gimbal/joint/orientation/inertial"
-#define APRILTAG_TOPIC "/atl/apriltag/target"
-#define SHUTDOWN_TOPIC "/atl/camera/shutdown"
+static const std::string GIMBAL_FRAME_ORIENTATION_TOPIC = "/atl/gimbal/frame/orientation/inertial";
+static const std::string GIMBAL_JOINT_ORIENTATION_TOPIC = "/atl/gimbal/joint/orientation/inertial";
+static const std::string APRILTAG_TOPIC = "/atl/apriltag/target";
+static const std::string SHUTDOWN_TOPIC = "/atl/camera/shutdown";
 // clang-format on
+
+namespace atl {
 
 class XimeaCameraNode : public ROSNode {
 public:

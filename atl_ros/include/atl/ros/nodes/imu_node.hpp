@@ -8,15 +8,16 @@
 #include "atl/ros/utils/msgs.hpp"
 #include "atl/ros/utils/node.hpp"
 
-namespace atl {
-
 // NODE SETTINGS
-#define NODE_NAME "atl_imu"
-#define NODE_RATE 200
+static const double NODE_RATE = 200;
 
+// clang-format off
 // PUBLISH TOPICS
-#define IMU_TOPIC "/atl/imu"
-#define JOINT_ORIENTATION_TOPIC "/atl/gimbal/joint/orientation/inertial"
+static const std::string IMU_TOPIC = "/atl/imu";
+static const std::string JOINT_ORIENTATION_TOPIC = "/atl/gimbal/joint/orientation/inertial";
+// clang-format on
+
+namespace atl {
 
 class IMUNode : public ROSNode {
 public:

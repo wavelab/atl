@@ -92,7 +92,7 @@ TEST(PositionController, update) {
 
   // CHECK HOVERING PID OUTPUT
   setpoint_nwu << 0, 0, 0;
-  nwu2enu(setpoint_nwu, setpoint_enu);
+  setpoint_enu = nwu2enu(setpoint_nwu);
   actual.position << 0, 0, 0;
   yaw_setpoint = 0;
   dt = 0.1;
@@ -105,7 +105,7 @@ TEST(PositionController, update) {
 
   // CHECK MOVING TOWARDS THE Y LOCATION
   setpoint_nwu << 0, 1, 0;
-  nwu2enu(setpoint_nwu, setpoint_enu);
+  setpoint_enu = nwu2enu(setpoint_nwu);
   actual.position << 0, 0, 0;
   yaw_setpoint = 0;
   dt = 0.1;
@@ -119,7 +119,7 @@ TEST(PositionController, update) {
 
   // CHECK MOVING TOWARDS THE X LOCATION
   setpoint_nwu << 1, 0, 0;
-  nwu2enu(setpoint_nwu, setpoint_enu);
+  setpoint_enu = nwu2enu(setpoint_nwu);
   actual.position << 0, 0, 0;
   yaw_setpoint = 0;
   dt = 0.1;
@@ -133,7 +133,7 @@ TEST(PositionController, update) {
 
   // CHECK MOVING TOWARDS THE X AND Y LOCATION
   setpoint_nwu << 1, 1, 0;
-  nwu2enu(setpoint_nwu, setpoint_enu);
+  setpoint_enu = nwu2enu(setpoint_nwu);
   actual.position << 0, 0, 0;
   yaw_setpoint = 0;
   dt = 0.1;
@@ -147,7 +147,7 @@ TEST(PositionController, update) {
 
   // CHECK MOVING YAW
   setpoint_nwu << 0, 0, 0;
-  nwu2enu(setpoint_nwu, setpoint_enu);
+  setpoint_enu = nwu2enu(setpoint_nwu);
   actual.position << 0, 0, 0;
   yaw_setpoint = deg2rad(90.0);
   dt = 0.1;
@@ -170,7 +170,7 @@ TEST(PositionController, update2) {
 
   // CHECK HEADING AT 90 DEGREE
   setpoint_nwu << 1, 0, 0; // setpoint infront of quad
-  nwu2enu(setpoint_nwu, setpoint_enu);
+  setpoint_enu = nwu2enu(setpoint_nwu);
 
   actual.position << 0, 0, 0;
   euler << 0.0, 0.0, deg2rad(90.0);

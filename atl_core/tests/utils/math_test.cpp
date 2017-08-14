@@ -61,27 +61,24 @@ TEST(Utils_math, euler2quat) {
 }
 
 TEST(Utils_math, sandbox) {
-  double roll, pitch, yaw;
-  Vec3 euler;
-  Quaternion q_nwu, q_ned;
-
-  roll = deg2rad(10.0);
-  pitch = deg2rad(20.0);
-  yaw = deg2rad(30.0);
-  euler << roll, pitch, yaw;
+  double roll = deg2rad(10.0);
+  double pitch = deg2rad(20.0);
+  double yaw = deg2rad(30.0);
+  Vec3 euler{roll, pitch, yaw};
 
   // NWU
+  Quaternion q_nwu;
   euler2quat(euler, 321, q_nwu);
 
   // NWU to NED
-  nwu2ned(q_nwu, q_ned);
+  Quaternion q_ned = nwu2ned(q_nwu);
   quat2euler(q_ned, 321, euler);
   EXPECT_FLOAT_EQ(10, rad2deg(euler(0)));
   EXPECT_FLOAT_EQ(-20, rad2deg(euler(1)));
   EXPECT_FLOAT_EQ(-30, rad2deg(euler(2)));
 
   // NED to NWU
-  ned2nwu(q_ned, q_nwu);
+  q_nwu = ned2nwu(q_ned);
   quat2euler(q_nwu, 321, euler);
   EXPECT_FLOAT_EQ(10, rad2deg(euler(0)));
   EXPECT_FLOAT_EQ(20, rad2deg(euler(1)));
@@ -132,10 +129,8 @@ TEST(Utils_math, euler2rot) {
 }
 
 TEST(Utils_math, enu2nwu) {
-  Vec3 enu, nwu;
-
-  enu << 1.0, 2.0, 3.0;
-  enu2nwu(enu, nwu);
+  Vec3 enu{1.0, 2.0, 3.0};
+  Vec3 nwu = enu2nwu(enu);
 
   EXPECT_FLOAT_EQ(2.0, nwu(0));
   EXPECT_FLOAT_EQ(-1.0, nwu(1));
@@ -143,21 +138,17 @@ TEST(Utils_math, enu2nwu) {
 }
 
 TEST(Utils_math, nwu2enu) {
-  Vec3 enu, nwu;
-
-  nwu << 1.0, 2.0, 3.0;
-  nwu2enu(nwu, enu);
+  Vec3 nwu{1.0, 2.0, 3.0};
+  Vec3 enu = nwu2enu(nwu);
 
   EXPECT_FLOAT_EQ(-2.0, enu(0));
   EXPECT_FLOAT_EQ(1.0, enu(1));
   EXPECT_FLOAT_EQ(3.0, enu(2));
 }
 
-TEST(Utils_math, cf2enu) {
-  Vec3 cf, enu;
-
-  cf << 1.0, 2.0, 3.0;
-  cf2enu(cf, enu);
+TEST(Utils_math, edn2nwu) {
+  Vec3 edn{1.0, 2.0, 3.0};
+  Vec3 enu = edn2nwu(edn);
 
   EXPECT_FLOAT_EQ(1.0, enu(0));
   EXPECT_FLOAT_EQ(3.0, enu(1));

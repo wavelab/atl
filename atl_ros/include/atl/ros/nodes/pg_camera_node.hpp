@@ -12,28 +12,27 @@
 #include "atl/ros/utils/msgs.hpp"
 #include "atl/ros/utils/node.hpp"
 
-namespace atl {
-
 // NODE SETTINGS
-#define NODE_NAME "atl_camera"
-#define NODE_RATE 61
+static const double NODE_RATE = 61;
 
 // SUBSCRIBE TOPICS
 // clang-format off
-#define APRILTAG_TOPIC "/atl/apriltag/target"
-#define GIMBAL_POSITION_TOPIC "/atl/gimbal/position/inertial"
-#define GIMBAL_FRAME_ORIENTATION_TOPIC "/atl/gimbal/frame/orientation/inertial"
-#define GIMBAL_JOINT_ORIENTATION_TOPIC "/atl/gimbal/joint/orientation/inertial"
-#define ENCODER_ORIENTATION_TOPIC "atl/gimbal/joint/orientation/body"
-#define LT_BODY_POSITION_TOPIC "/atl/estimate/landing_target/position/body"
+static const std::string APRILTAG_TOPIC = "/atl/apriltag/target";
+static const std::string GIMBAL_POSITION_TOPIC = "/atl/gimbal/position/inertial";
+static const std::string GIMBAL_FRAME_ORIENTATION_TOPIC = "/atl/gimbal/frame/orientation/inertial";
+static const std::string GIMBAL_JOINT_ORIENTATION_TOPIC = "/atl/gimbal/joint/orientation/inertial";
+static const std::string ENCODER_ORIENTATION_TOPIC = "atl/gimbal/joint/orientation/body";
+static const std::string LT_BODY_POSITION_TOPIC = "/atl/estimate/landing_target/position/body";
+
+static const std::string QUAD_POSE_TOPIC = "/atl/quadrotor/pose/local";
+static const std::string QUAD_POSITION_TOPIC = "/dji_sdk/local_position";
+static const std::string QUAD_ORIENTATION_TOPIC = "/dji_sdk/attitude_quaternion";
+
+static const std::string LT_DETECTED_TOPIC = "/atl/estimate/landing_target/detected";
+static const std::string SHUTDOWN_TOPIC = "/atl/camera/shutdown";
 // clang-format on
 
-#define QUAD_POSE_TOPIC "/atl/quadrotor/pose/local"
-#define QUAD_POSITION_TOPIC "/dji_sdk/local_position"
-#define QUAD_ORIENTATION_TOPIC "/dji_sdk/attitude_quaternion"
-
-#define LT_DETECTED_TOPIC "/atl/estimate/landing_target/detected"
-#define SHUTDOWN_TOPIC "/atl/camera/shutdown"
+namespace atl {
 
 class PGCameraNode : public ROSNode {
 public:

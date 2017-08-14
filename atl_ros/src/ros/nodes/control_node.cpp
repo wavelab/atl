@@ -27,7 +27,7 @@ int ControlNode::configure(int hz) {
 
   // subscribers
   // clang-format off
-  this->registerSubscriber(DJI_GPS_POSITION_TOPIC, &ControlNode::gpsPositionCallback, this);
+  this->registerSubscriber(DJI_GPS_POSITION_TOPIC, &ControlNode::globalPositionCallback, this);
   this->registerSubscriber(DJI_LOCAL_POSITION_TOPIC, &ControlNode::localPositionCallback, this);
   this->registerSubscriber(DJI_ATTITUDE_TOPIC, &ControlNode::attitudeCallback, this);
   this->registerSubscriber(DJI_VELOCITY_TOPIC, &ControlNode::velocityCallback, this);
@@ -140,7 +140,7 @@ void ControlNode::setEstimatorOff() {
   this->ros_pubs[ESTIMATOR_OFF_TOPIC].publish(msg);
 }
 
-void ControlNode::gpsPositionCallback(const dji_sdk::GlobalPosition &msg) {
+void ControlNode::globalPositionCallback(const dji_sdk::GlobalPosition &msg) {
   this->latitude = msg.latitude;
   this->longitude = msg.longitude;
 
@@ -155,18 +155,14 @@ void ControlNode::gpsPositionCallback(const dji_sdk::GlobalPosition &msg) {
 }
 
 void ControlNode::localPositionCallback(const dji_sdk::LocalPosition &msg) {
-  Vec3 pos_ned, pos_enu;
-
-  pos_ned(0) = msg.x;
-  pos_ned(1) = msg.y;
-  pos_ned(2) = msg.z;
-  ned2enu(pos_ned, pos_enu);
-
+  // convert msg from NED to ENU
+  Vec3 pos_ned{msg.x, msg.y, msg.z};
+  Vec3 pos_enu = ned2enu(pos_ned);
   this->quadrotor.pose.position = pos_enu;
 }
 
 void ControlNode::attitudeCallback(const dji_sdk::AttitudeQuaternion &msg) {
-  Quaternion orientation_ned, orientation_nwu;
+  Quaternion orientation_ned;
 
   orientation_ned.w() = msg.q0;
   orientation_ned.x() = msg.q1;
@@ -175,23 +171,15 @@ void ControlNode::attitudeCallback(const dji_sdk::AttitudeQuaternion &msg) {
 
   // transform pose position and orientation
   // from NED to NWU
-  ned2nwu(orientation_ned, orientation_nwu);
+  Quaternion orientation_nwu = ned2nwu(orientation_ned);
 
   this->quadrotor.pose.orientation = orientation_nwu;
 }
 
 void ControlNode::velocityCallback(const dji_sdk::Velocity &msg) {
-  Vec3 vel_ned, vel_enu;
-
-  // convert DJI msg to Eigen vector
-  vel_ned(0) = msg.vx;
-  vel_ned(1) = msg.vy;
-  vel_ned(2) = msg.vz;
-
-  // transform velocity in NED to ENU
-  ned2enu(vel_ned, vel_enu);
-
-  // update
+  // convert msg from NED to ENU
+  Vec3 vel_ned{msg.vx, msg.vy, msg.vz};
+  Vec3 vel_enu = ned2enu(vel_ned);
   this->quadrotor.setVelocity(vel_enu);
 }
 

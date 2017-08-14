@@ -77,7 +77,7 @@ Vec3 Gimbal::getTargetInBF(Pose camera_offset, Vec3 target_cf) {
   Vec3 t;
 
   // transform camera frame to gimbal joint frame (NWU)
-  cf2nwu(target_cf, target_nwu);
+  target_nwu = edn2nwu(target_cf);
 
   // camera mount offset
   R = camera_offset.rotationMatrix();
@@ -118,7 +118,7 @@ Vec3 Gimbal::getTargetInIF(Vec3 target_bpf,
   target = R * target_bpf;
 
   // convert target from NWU to ENU
-  nwu2enu(target, target_enu);
+  target_enu = nwu2enu(target);
 
   // transform target from body to inertial frame
   target_if = gimbal_position + target_enu;

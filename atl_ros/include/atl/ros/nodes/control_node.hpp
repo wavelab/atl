@@ -9,43 +9,47 @@
 #include "atl/ros/utils/node.hpp"
 #include <atl/atl_core.hpp>
 
-namespace atl {
-
 // NODE SETTINGS
-#define NODE_RATE 50
+static const double NODE_RATE = 50;
 
 // PUBLISH TOPICS
-#define PX4_SETPOINT_ATTITUDE_TOPIC "/mavros/setpoint_attitude/attitude"
-#define PX4_SETPOINT_THROTTLE_TOPIC "/mavros/setpoint_attitude/att_throttle"
-#define PX4_SETPOINT_POSITION_TOPIC "/mavros/setpoint_position/local"
+static const std::string PX4_SETPOINT_ATTITUDE_TOPIC =
+    "/mavros/setpoint_attitude/attitude";
+static const std::string PX4_SETPOINT_THROTTLE_TOPIC =
+    "/mavros/setpoint_attitude/att_throttle";
+static const std::string PX4_SETPOINT_POSITION_TOPIC =
+    "/mavros/setpoint_position/local";
 
-#define PCTRL_STATS_TOPIC "/atl/position_controller/stats"
-#define PCTRL_GET_TOPIC "/atl/control/position_controller/get"
-#define QUADROTOR_POSE "/atl/quadrotor/pose/local"
-#define QUADROTOR_VELOCITY "/atl/quadrotor/velocity/local"
-#define ESTIMATOR_ON_TOPIC "/atl/estimator/on"
-#define ESTIMATOR_OFF_TOPIC "/atl/estimator/off"
+static const std::string PCTRL_STATS_TOPIC = "/atl/position_controller/stats";
+static const std::string PCTRL_GET_TOPIC =
+    "/atl/control/position_controller/get";
+static const std::string QUADROTOR_POSE = "/atl/quadrotor/pose/local";
+static const std::string QUADROTOR_VELOCITY = "/atl/quadrotor/velocity/local";
+static const std::string ESTIMATOR_ON_TOPIC = "/atl/estimator/on";
+static const std::string ESTIMATOR_OFF_TOPIC = "/atl/estimator/off";
 
 // SUBSCRIBE TOPICS
 // clang-format off
-#define DJI_GPS_POSITION_TOPIC "/dji_sdk/global_position"
-#define DJI_LOCAL_POSITION_TOPIC "/dji_sdk/local_position"
-#define DJI_ATTITUDE_TOPIC "/dji_sdk/attitude_quaternion"
-#define DJI_VELOCITY_TOPIC "/dji_sdk/velocity"
-#define DJI_RADIO_TOPIC "/dji_sdk/rc_channels"
+static const std::string DJI_GPS_POSITION_TOPIC = "/dji_sdk/global_position";
+static const std::string DJI_LOCAL_POSITION_TOPIC = "/dji_sdk/local_position";
+static const std::string DJI_ATTITUDE_TOPIC = "/dji_sdk/attitude_quaternion";
+static const std::string DJI_VELOCITY_TOPIC = "/dji_sdk/velocity";
+static const std::string DJI_RADIO_TOPIC = "/dji_sdk/rc_channels";
 
-#define ARM_TOPIC "/atl/control/arm"
-#define MODE_TOPIC "/atl/control/mode"
-#define YAW_TOPIC "/atl/control/yaw/set"
-#define TARGET_BODY_POSITION_TOPIC "/atl/estimate/landing_target/position/body"
-#define TARGET_BODY_VELOCITY_TOPIC "/atl/estimate/landing_target/velocity/body"
-#define TARGET_DETECTED_TOPIC "/atl/estimate/landing_target/detected"
-#define HOVER_SET_TOPIC "/atl/control/hover/set"
-#define HOVER_HEIGHT_SET_TOPIC "/atl/control/hover/height/set"
-#define PCTRL_SET_TOPIC "/atl/control/position_controller/set"
-#define TCTRL_SET_TOPIC "/atl/control/tracking_controller/set"
-#define LCTRL_SET_TOPIC "/atl/control/landing_controller/set"
+static const std::string ARM_TOPIC = "/atl/control/arm";
+static const std::string MODE_TOPIC = "/atl/control/mode";
+static const std::string YAW_TOPIC = "/atl/control/yaw/set";
+static const std::string TARGET_BODY_POSITION_TOPIC = "/atl/estimate/landing_target/position/body";
+static const std::string TARGET_BODY_VELOCITY_TOPIC = "/atl/estimate/landing_target/velocity/body";
+static const std::string TARGET_DETECTED_TOPIC = "/atl/estimate/landing_target/detected";
+static const std::string HOVER_SET_TOPIC = "/atl/control/hover/set";
+static const std::string HOVER_HEIGHT_SET_TOPIC = "/atl/control/hover/height/set";
+static const std::string PCTRL_SET_TOPIC = "/atl/control/position_controller/set";
+static const std::string TCTRL_SET_TOPIC = "/atl/control/tracking_controller/set";
+static const std::string LCTRL_SET_TOPIC = "/atl/control/landing_controller/set";
 // clang-format on
+
+namespace atl {
 
 class ControlNode : public ROSNode {
 public:
@@ -127,10 +131,10 @@ public:
   void setEstimatorOff();
 
   /**
-   * GPS position callback
+   * Global position callback
    * @param msg ROS message
    */
-  void gpsPositionCallback(const dji_sdk::GlobalPosition &msg);
+  void globalPositionCallback(const dji_sdk::GlobalPosition &msg);
 
   /**
    * local position callback

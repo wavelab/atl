@@ -12,19 +12,18 @@
 #include "atl/ros/utils/msgs.hpp"
 #include "atl/ros/utils/node.hpp"
 
-namespace atl {
-
 // NODE SETTINGS
-#define NODE_RATE 60
+static const double NODE_RATE = 60;
 
 // SUBSCRIBE TOPICS
 // clang-format off
-#define GIMBAL_FRAME_ORIENTATION_TOPIC "/atl/gimbal/frame/orientation/inertial"
-#define GIMBAL_JOINT_ORIENTATION_TOPIC "/atl/gimbal/joint/orientation/inertial"
-#define GIMBAL_ENCODER_ORIENTATION_TOPIC "atl/gimbal/joint/orientation/body"
+static const std::string GIMBAL_FRAME_ORIENTATION_TOPIC = "/atl/gimbal/frame/orientation/inertial";
+static const std::string GIMBAL_JOINT_ORIENTATION_TOPIC = "/atl/gimbal/joint/orientation/inertial";
+static const std::string GIMBAL_ENCODER_ORIENTATION_TOPIC = "atl/gimbal/joint/orientation/body";
+static const std::string SHUTDOWN_TOPIC = "/atl/camera/shutdown";
 // clang-format on
 
-#define SHUTDOWN_TOPIC "/atl/camera/shutdown"
+namespace atl {
 
 class CamCalibNode : public ROSNode {
 public:

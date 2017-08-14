@@ -244,65 +244,54 @@ int quat2rot(Quaternion q, Mat3 &R) {
   return 0;
 }
 
-void enu2nwu(Vec3 enu, Vec3 &nwu) {
+Vec3 enu2nwu(const Vec3 &enu) {
   // ENU frame:  (x - right, y - forward, z - up)
   // NWU frame:  (x - forward, y - left, z - up)
-  nwu(0) = enu(1);
-  nwu(1) = -enu(0);
-  nwu(2) = enu(2);
+  Vec3 nwu{enu(1), -enu(0), enu(2)};
+  return nwu;
 }
 
-void cf2nwu(Vec3 cf, Vec3 &nwu) {
+Vec3 edn2nwu(const Vec3 &cf) {
   // camera frame:  (x - right, y - down, z - forward)
   // NWU frame:  (x - forward, y - left, z - up)
-  nwu(0) = cf(2);
-  nwu(1) = -cf(0);
-  nwu(2) = -cf(1);
+  Vec3 nwu{cf(2), -cf(0), -cf(1)};
+  return nwu;
 }
 
-void cf2enu(Vec3 cf, Vec3 &enu) {
+Vec3 cf2enu(const Vec3 &cf) {
   // camera frame:  (x - right, y - down, z - forward)
   // ENU frame:  (x - right, y - forward, z - up)
-  enu(0) = cf(0);
-  enu(1) = cf(2);
-  enu(2) = -cf(1);
+  Vec3 enu{cf(0), cf(2), -cf(1)};
+  return enu;
 }
 
-void nwu2enu(Vec3 nwu, Vec3 &enu) {
+Vec3 nwu2enu(const Vec3 &nwu) {
   // NWU frame:  (x - forward, y - left, z - up)
   // ENU frame:  (x - right, y - forward, z - up)
-  enu(0) = -nwu(1);
-  enu(1) = nwu(0);
-  enu(2) = nwu(2);
+  Vec3 enu{-nwu(1), nwu(0), nwu(2)};
+  return enu;
 }
 
-void ned2enu(Vec3 ned, Vec3 &enu) {
+Vec3 ned2enu(const Vec3 &ned) {
   // NED frame:  (x - forward, y - right, z - down)
   // ENU frame:  (x - right, y - forward, z - up)
-  enu(0) = ned(1);
-  enu(1) = ned(0);
-  enu(2) = -ned(2);
+  Vec3 enu{ned(1), ned(0), -ned(2)};
+  return enu;
 }
 
-void nwu2ned(Quaternion nwu, Quaternion &ned) {
-  ned.w() = nwu.w();
-  ned.x() = nwu.x();
-  ned.y() = -nwu.y();
-  ned.z() = -nwu.z();
+Quaternion nwu2ned(const Quaternion &nwu) {
+  Quaternion ned{nwu.w(), nwu.x(), -nwu.y(), -nwu.z()};
+  return ned;
 }
 
-void ned2nwu(Quaternion ned, Quaternion &nwu) {
-  nwu.w() = ned.w();
-  nwu.x() = ned.x();
-  nwu.y() = -ned.y();
-  nwu.z() = -ned.z();
+Quaternion ned2nwu(const Quaternion &ned) {
+  Quaternion nwu{ned.w(), ned.x(), -ned.y(), -ned.z()};
+  return nwu;
 }
 
-void enu2nwu(Quaternion enu, Quaternion &nwu) {
-  nwu.w() = enu.w();
-  nwu.x() = enu.y();
-  nwu.y() = -enu.x();
-  nwu.z() = enu.z();
+Quaternion enu2nwu(const Quaternion &enu) {
+  Quaternion nwu{enu.w(), enu.y(), -enu.x(), enu.z()};
+  return nwu;
 }
 
 void target2body(Vec3 target_pos_if,
@@ -317,7 +306,7 @@ void target2body(Vec3 target_pos_if,
 
   // calculate position difference and convert to body frame
   pos_enu = target_pos_if - body_pos_if; // assumes inertial frame is ENU
-  enu2nwu(pos_enu, pos_nwu);
+  pos_nwu = enu2nwu(pos_enu);
 
   // compensate for body orientation by rotating
   target_pos_bf = R * pos_nwu;
@@ -335,7 +324,7 @@ void target2body(Vec3 target_pos_if,
 
   // calculate position difference and convert to body frame
   pos_enu = target_pos_if - body_pos_if; // assumes inertial frame is ENU
-  enu2nwu(pos_enu, pos_nwu);
+  pos_nwu = enu2nwu(pos_enu);
 
   // compensate for body orientation by rotating
   target_pos_bf = R * pos_nwu;
@@ -381,7 +370,7 @@ void target2inertial(Vec3 target_pos_bf,
   euler2rot(body_orientation_if, 321, R);
 
   // convert target body position from NWU to ENU
-  nwu2enu(target_pos_bf, target_enu);
+  target_enu = nwu2enu(target_pos_bf);
 
   // transform target from body to inertial frame
   target_pos_if = (R * target_enu) + body_pos_if;
@@ -398,40 +387,34 @@ void target2inertial(Vec3 target_pos_bf,
   R = body_orientation_if.toRotationMatrix();
 
   // convert target body position from NWU to ENU
-  nwu2enu(target_pos_bf, target_enu);
+  target_enu = nwu2enu(target_pos_bf);
 
   // transform target from body to inertial frame
   target_pos_if = (R * target_enu) + body_pos_if;
 }
 
 void inertial2body(Vec3 enu_if, Quaternion orientation_if, Vec3 &nwu_bf) {
-  Mat3 R;
-  Vec3 euler, nwu_if;
-
   // create rotation matrix
-  quat2euler(orientation_if, 321, euler);
-  euler2rot(euler, 123, R);
+  Vec3 rpy;
+  quat2euler(orientation_if, 321, rpy);
+
+  Mat3 R;
+  euler2rot(rpy, 123, R);
 
   // convert inertial ENU to NWU
-  nwu_if(0) = enu_if(1);
-  nwu_if(1) = -enu_if(0);
-  nwu_if(2) = enu_if(2);
+  Vec3 nwu_if = enu2nwu(enu_if);
 
   // transform inertal to body
   nwu_bf = R * nwu_if;
 }
 
 void inertial2body(Vec3 enu_if, Vec3 orientation_if, Vec3 &nwu_bf) {
-  Mat3 R;
-  Vec3 nwu_if;
-
   // create rotation matrix
+  Mat3 R;
   euler2rot(orientation_if, 123, R);
 
   // convert inertial ENU to NWU
-  nwu_if(0) = enu_if(1);
-  nwu_if(1) = -enu_if(0);
-  nwu_if(2) = enu_if(2);
+  Vec3 nwu_if = enu2nwu(enu_if);
 
   // transform inertal to body
   nwu_bf = R * nwu_if;

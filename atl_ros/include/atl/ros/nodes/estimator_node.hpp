@@ -8,8 +8,6 @@
 #include "atl/ros/utils/msgs.hpp"
 #include "atl/ros/utils/node.hpp"
 
-namespace atl {
-
 #define KF_MODE 1
 #define EKF_MODE 2
 
@@ -17,23 +15,26 @@ namespace atl {
 #define ESTIMATOR_OFF -1
 
 // NODE SETTINGS
-#define NODE_NAME "atl_estimator"
-#define NODE_RATE 50
+static const double NODE_RATE = 50;
 
+// clang-format off
 // PUBLISH TOPICS
-#define LT_BODY_POSITION_TOPIC "/atl/estimate/landing_target/position/body"
-#define LT_BODY_VELOCITY_TOPIC "/atl/estimate/landing_target/velocity/body"
-#define LT_DETECTED_TOPIC "/atl/estimate/landing_target/detected"
-#define GIMBAL_SETPOINT_ATTITUDE_TOPIC "/atl/gimbal/setpoint/attitude"
-#define QUAD_YAW_TOPIC "/atl/control/yaw/set"
+static const std::string LT_BODY_POSITION_TOPIC = "/atl/estimate/landing_target/position/body";
+static const std::string LT_BODY_VELOCITY_TOPIC = "/atl/estimate/landing_target/velocity/body";
+static const std::string LT_DETECTED_TOPIC = "/atl/estimate/landing_target/detected";
+static const std::string GIMBAL_SETPOINT_ATTITUDE_TOPIC = "/atl/gimbal/setpoint/attitude";
+static const std::string QUAD_YAW_TOPIC = "/atl/control/yaw/set";
 
 // SUBSCRIBE TOPICS
-#define QUAD_POSE_TOPIC "/atl/quadrotor/pose/local"
-#define QUAD_VELOCITY_TOPIC "/atl/quadrotor/velocity/local"
-#define ESTIMATOR_ON_TOPIC "/atl/estimator/on"
-#define ESTIMATOR_OFF_TOPIC "/atl/estimator/off"
-#define TARGET_BF_POS_TOPIC "/atl/apriltag/target/position/body"
-#define TARGET_IF_YAW_TOPIC "/atl/apriltag/target/yaw/inertial"
+static const std::string QUAD_POSE_TOPIC = "/atl/quadrotor/pose/local";
+static const std::string QUAD_VELOCITY_TOPIC = "/atl/quadrotor/velocity/local";
+static const std::string ESTIMATOR_ON_TOPIC = "/atl/estimator/on";
+static const std::string ESTIMATOR_OFF_TOPIC = "/atl/estimator/off";
+static const std::string TARGET_BF_POS_TOPIC = "/atl/apriltag/target/position/body";
+static const std::string TARGET_IF_YAW_TOPIC = "/atl/apriltag/target/yaw/inertial";
+// clang-format on
+
+namespace atl {
 
 class EstimatorNode : public ROSNode {
 public:
