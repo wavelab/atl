@@ -438,8 +438,6 @@ int Quadrotor::stepWaypointMode(const double dt) {
                                               this->velocity,
                                               dt);
     this->att_cmd = this->waypoint_controller.att_cmd;
-  } else {
-    this->setMode(HOVER_MODE);
   }
 
   // update hover position

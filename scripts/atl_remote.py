@@ -113,7 +113,7 @@ if __name__ == "__main__":
     # world = World()
     rospy.sleep(1.0)
 
-    # quad.set_arm(True)
+    quad.set_arm(True)
     quad.set_mode("WAYPOINT_MODE")
 
     # quad.set_pctrl_settings({
@@ -141,7 +141,6 @@ if __name__ == "__main__":
 
     # up_and_down()
     # hover_side_to_side()
-
 
     # gimbal.set_attitude([0.0, 0.0, 0])
     # gimbal.activate(False)
