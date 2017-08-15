@@ -77,6 +77,36 @@ void load_matrix(const MatX &A, std::vector<double> &x) {
   }
 }
 
+Mat3 rotx(const double angle) {
+  Mat3 R;
+  // clang-format off
+  R << 1.0, 0.0, 0.0,
+       0.0, cos(angle),
+       -sin(angle), 0.0, sin(angle), cos(angle);
+  // clang-format on
+  return R;
+}
+
+Mat3 roty(const double angle) {
+  Mat3 R;
+  // clang-format off
+  R << cos(angle), 0.0, -sin(angle),
+       0.0, 1.0, 0.0,
+       sin(angle), 0.0, cos(angle);
+  // clang-format on
+  return R;
+}
+
+Mat3 rotz(const double angle) {
+  Mat3 R;
+  // clang-format off
+  R << cos(angle), -sin(angle), 0.0,
+       sin(angle), cos(angle), 0.0,
+       0.0, 0.0, 1.0;
+  // clang-format on
+  return R;
+}
+
 int euler2quat(const Vec3 &euler, const int euler_seq, Quaternion &q) {
   const double alpha = euler(0);
   const double beta = euler(1);
@@ -297,15 +327,12 @@ void target2body(Vec3 target_pos_if,
                  Vec3 body_pos_if,
                  Quaternion body_orientation_if,
                  Vec3 &target_pos_bf) {
-  Mat3 R;
-  Vec3 pos_enu, pos_nwu;
-
   // convert quaternion to rotation matrix
-  R = body_orientation_if.toRotationMatrix().inverse();
+  const Mat3 R = body_orientation_if.toRotationMatrix().inverse();
 
   // calculate position difference and convert to body frame
-  pos_enu = target_pos_if - body_pos_if; // assumes inertial frame is ENU
-  pos_nwu = enu2nwu(pos_enu);
+  // assumes inertial frame is ENU
+  const Vec3 pos_nwu = enu2nwu(target_pos_if - body_pos_if);
 
   // compensate for body orientation by rotating
   target_pos_bf = R * pos_nwu;
@@ -315,15 +342,13 @@ void target2body(Vec3 target_pos_if,
                  Vec3 body_pos_if,
                  Vec3 body_orientation_if,
                  Vec3 &target_pos_bf) {
-  Mat3 R;
-  Vec3 pos_enu, pos_nwu;
-
   // convert euler to rotation matrix
+  Mat3 R;
   euler2rot(body_orientation_if, 123, R);
 
   // calculate position difference and convert to body frame
-  pos_enu = target_pos_if - body_pos_if; // assumes inertial frame is ENU
-  pos_nwu = enu2nwu(pos_enu);
+  // assumes inertial frame is ENU
+  Vec3 pos_nwu = enu2nwu(target_pos_if - body_pos_if);
 
   // compensate for body orientation by rotating
   target_pos_bf = R * pos_nwu;
@@ -336,7 +361,7 @@ void target2bodyplanar(Vec3 target_pos_if,
   Vec3 euler;
 
   // convert quaternion to euler
-  quat2euler(body_orientation_if, 321, euler);
+  quat2euler(body_orientation_if, 123, euler);
 
   // filtering out roll and pitch since we are in body planar frame
   euler << 0.0, 0.0, euler(2);

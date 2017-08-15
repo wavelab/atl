@@ -86,6 +86,27 @@ double deg2rad(const double d);
 double rad2deg(const double r);
 
 /**
+ * Right hand rotation Matrix in x-axis
+ * @param angle Rotation angle in radians
+ * @return Rotation matrix
+ */
+Mat3 rotx(const double angle);
+
+/**
+ * Right hand rotation Matrix in y-axis
+ * @param angle Rotation angle in radians
+ * @return Rotation matrix
+ */
+Mat3 roty(const double angle);
+
+/**
+ * Right hand rotation Matrix in z-axis
+ * @param angle Rotation angle in radians
+ * @return Rotation matrix
+ */
+Mat3 rotz(const double angle);
+
+/**
  * Load std::vector of doubles to an Eigen::Matrix
  * @param x Matrix values
  * @param rows Number of matrix rows

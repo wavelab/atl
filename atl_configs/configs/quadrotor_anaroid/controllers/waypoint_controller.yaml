@@ -7,9 +7,9 @@ ct_controller:
     k_i: 0.0
     k_d: 0.15
 z_controller:
-    k_p: 0.1
+    k_p: 0.2
     k_i: 0.0
-    k_d: 0.05
+    k_d: 0.1
 yaw_controller:
     k_p: 0.1
     k_i: 0.0
