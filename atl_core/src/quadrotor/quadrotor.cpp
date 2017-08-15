@@ -391,7 +391,7 @@ int Quadrotor::stepWaypointMode(const double dt) {
     // calculate waypoint heading between first two waypoints
     // offset by -90 deg because ENU's 0 yaw is East rather than North
     const double wp_heading = atan2(dy, dx) - deg2rad(90.0);
-    this->yaw = wp_heading;
+    this->yaw = 0.0;
 
     // transition to first waypoint with position controller
     this->setHoverPosition(wp_start);

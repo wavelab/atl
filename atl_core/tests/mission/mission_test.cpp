@@ -165,6 +165,32 @@ TEST(Mission, waypointHeading) {
   EXPECT_FLOAT_EQ(deg2rad(-135.0), heading);
 }
 
+TEST(Mission, sandbox) {
+  // // assume waypoints are in ENU inertial frame
+  // Vec3 wp_start{0, 0, 10};
+  // Vec3 wp_end{10, 6, 10};
+  // double dx = wp_end(0) - wp_start(0);
+  // double dy = wp_end(1) - wp_start(1);
+  //
+  // // offset by -90 deg because ENU's 0 yaw is East rather than North
+  // double heading = atan2(dy, dx) - deg2rad(90.0);
+  // std::cout << rad2deg(heading) << std::endl;
+
+  // assume waypoints are in ENU inertial frame
+  // Vec3 wp_start{0, 0, 10};
+  // Vec3 wp_end{10, 6, 10};
+  // Vec3 wp_start{10, 6, 10};
+  // Vec3 wp_end{17, -7, 10};
+  Vec3 wp_start{17, -7, 10};
+  Vec3 wp_end{9, -10, 10};
+  Vec3 start = enu2nwu(wp_start);
+  Vec3 end = enu2nwu(wp_end);
+  double dx = end(0) - start(0);
+  double dy = end(1) - start(1);
+  double heading = atan2(dy, dx);
+  std::cout << rad2deg(heading) << std::endl;
+}
+
 TEST(Mission, waypointReached) {
   Mission mission;
 

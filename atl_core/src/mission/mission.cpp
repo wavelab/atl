@@ -161,21 +161,21 @@ double Mission::crossTrackError(const Vec3 &position, int mode) {
   }
 
   // crosstrack error
-  double error = (BA.cross(BC)).norm() / BC.norm();
+  const double error = (BA.cross(BC)).norm() / BC.norm();
 
   // check which side the point is on
-  int side = this->pointLineSide(position);
+  const int side = this->pointLineSide(position);
 
   return error * side;
 }
 
 double Mission::waypointHeading() {
   // assume waypoints are in ENU inertial frame
-  double dx = this->wp_end(0) - this->wp_start(0);
-  double dy = this->wp_end(1) - this->wp_start(1);
+  const double dx = this->wp_end(0) - this->wp_start(0);
+  const double dy = this->wp_end(1) - this->wp_start(1);
 
   // offset by -90 deg because ENU's 0 yaw is East rather than North
-  double heading = atan2(dy, dx) - deg2rad(90.0);
+  const double heading = atan2(dy, dx) - deg2rad(90.0);
 
   return heading;
 }

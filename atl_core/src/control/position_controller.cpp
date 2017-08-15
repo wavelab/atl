@@ -52,14 +52,12 @@ Vec4 PositionController::update(const Vec3 &setpoints,
   target2bodyplanar(setpoints, pose.position, pose.orientation, errors);
 
   // roll, pitch, yaw and throttle (assuming NWU frame)
-  // clang-format off
   double r = -this->y_controller.update(errors(1), this->dt);
   double p = this->x_controller.update(errors(0), this->dt);
   double y = yaw;
   double t = this->hover_throttle;
   t += this->z_controller.update(errors(2), this->dt);
-  t /= fabs(cos(r) * cos(p));  // adjust throttle for roll and pitch
-  // clang-format o
+  t /= fabs(cos(r) * cos(p)); // adjust throttle for roll and pitch
 
   // limit roll, pitch and throttle
   r = (r < this->roll_limit[0]) ? this->roll_limit[0] : r;
@@ -125,4 +123,4 @@ void PositionController::printErrors() {
   std::cout << "\terror_d: " << std::setprecision(2) << d << std::endl;
 }
 
-}  // namespace atl
+} // namespace atl

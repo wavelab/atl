@@ -136,7 +136,8 @@ int WaypointController::update(Mission &mission,
   double p = this->at_controller.update(errors(0), this->dt);
 
   // yaw
-  double y = wrapToPi(mission.waypointHeading());
+  // double y = wrapToPi(mission.waypointHeading());
+  double y = 0.0;
 
   // throttle
   const double error_z = waypoint(2) - pose.position(2);

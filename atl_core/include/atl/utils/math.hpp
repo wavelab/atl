@@ -22,6 +22,8 @@ typedef Eigen::Matrix3d Mat3;
 typedef Eigen::Matrix4d Mat4;
 typedef Eigen::MatrixXd MatX;
 
+typedef Eigen::Matrix<double, 3, 4> Mat34;
+
 typedef Eigen::Quaterniond Quaternion;
 #endif
 
