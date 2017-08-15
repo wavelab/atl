@@ -4,12 +4,12 @@ namespace atl {
 
 int randi(int ub, int lb) { return rand() % lb + ub; }
 
-double randf(double ub, double lb) {
-  double f = (double) rand() / RAND_MAX;
+double randf(const double ub, const double lb) {
+  const double f = (double) rand() / RAND_MAX;
   return lb + f * (ub - lb);
 }
 
-int sign(double x) {
+int sign(const double x) {
   if (fltcmp(x, 0.0) == 0) {
     return 0;
   } else if (x < 0) {
@@ -18,7 +18,7 @@ int sign(double x) {
   return 1;
 }
 
-int fltcmp(double f1, double f2) {
+int fltcmp(const double f1, const double f2) {
   if (fabs(f1 - f2) <= 0.0001) {
     return 0;
   } else if (f1 > f2) {
@@ -28,30 +28,32 @@ int fltcmp(double f1, double f2) {
   }
 }
 
-double median(std::vector<double> v) {
-  double a, b;
-
+double median(const std::vector<double> &v) {
   // sort values
-  std::sort(v.begin(), v.end());
+  std::vector<double> v_copy = v;
+  std::sort(v_copy.begin(), v_copy.end());
 
   // obtain median
-  if (v.size() % 2 == 1) {
+  if (v_copy.size() % 2 == 1) {
     // return middle value
-    return v[v.size() / 2];
+    return v_copy[v_copy.size() / 2];
 
   } else {
     // grab middle two values and calc mean
-    a = v[v.size() / 2];
-    b = v[(v.size() / 2) - 1];
+    const double a = v_copy[v_copy.size() / 2];
+    const double b = v_copy[(v_copy.size() / 2) - 1];
     return (a + b) / 2.0;
   }
 }
 
-double deg2rad(double d) { return d * (M_PI / 180); }
+double deg2rad(const double d) { return d * (M_PI / 180); }
 
-double rad2deg(double r) { return r * (180 / M_PI); }
+double rad2deg(const double r) { return r * (180 / M_PI); }
 
-void load_matrix(std::vector<double> x, int rows, int cols, MatX &y) {
+void load_matrix(const std::vector<double> &x,
+                 const int rows,
+                 const int cols,
+                 MatX &y) {
   int idx;
 
   // setup
@@ -67,7 +69,7 @@ void load_matrix(std::vector<double> x, int rows, int cols, MatX &y) {
   }
 }
 
-void load_matrix(MatX A, std::vector<double> &x) {
+void load_matrix(const MatX &A, std::vector<double> &x) {
   for (int i = 0; i < A.cols(); i++) {
     for (int j = 0; j < A.rows(); j++) {
       x.push_back(A(j, i));
@@ -76,21 +78,18 @@ void load_matrix(MatX A, std::vector<double> &x) {
 }
 
 int euler2quat(const Vec3 &euler, const int euler_seq, Quaternion &q) {
-  double alpha, beta, gamma;
-  double c1, c2, c3, s1, s2, s3;
+  const double alpha = euler(0);
+  const double beta = euler(1);
+  const double gamma = euler(2);
+
+  const double c1 = cos(alpha / 2.0);
+  const double c2 = cos(beta / 2.0);
+  const double c3 = cos(gamma / 2.0);
+  const double s1 = sin(alpha / 2.0);
+  const double s2 = sin(beta / 2.0);
+  const double s3 = sin(gamma / 2.0);
+
   double w, x, y, z;
-
-  alpha = euler(0);
-  beta = euler(1);
-  gamma = euler(2);
-
-  c1 = cos(alpha / 2.0);
-  c2 = cos(beta / 2.0);
-  c3 = cos(gamma / 2.0);
-  s1 = sin(alpha / 2.0);
-  s2 = sin(beta / 2.0);
-  s3 = sin(gamma / 2.0);
-
   switch (euler_seq) {
     case 123:
       // euler 1-2-3 to quaternion

@@ -67,12 +67,9 @@ Vec4 PositionController::update(const Vec3 &setpoints,
   t = (t < 0) ? 0.0 : t;
   t = (t > 1.0) ? 1.0 : t;
 
-  // set outputs
-  Vec4 outputs{r, p, y, t};
-
   // keep track of setpoints and outputs
   this->setpoints = setpoints;
-  this->outputs = outputs;
+  this->outputs << r, p, y, t;
   this->dt = 0.0;
 
   return outputs;

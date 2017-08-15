@@ -33,7 +33,7 @@ typedef Eigen::Quaterniond Quaternion;
  * @param lb Lower bound
  * @return Random integer
  */
-int randi(int ub, int lb);
+int randi(const int ub, const int lb);
 
 /**
  * Create random double
@@ -41,7 +41,7 @@ int randi(int ub, int lb);
  * @param lb Lower bound
  * @return Random floating point
  */
-double randf(double ub, double lb);
+double randf(const double ub, const double lb);
 
 /**
  * Sign of number
@@ -51,7 +51,7 @@ double randf(double ub, double lb);
  *    - 1: Positive number
  *    - -1: Negative number
  */
-int sign(double x);
+int sign(const double x);
 
 /**
  * Floating point comparator
@@ -62,28 +62,28 @@ int sign(double x);
  *    - 1: if f1 > f2
  *    - -1: if f1 < f2
  */
-int fltcmp(double f1, double f2);
+int fltcmp(const double f1, const double f2);
 
 /**
  * Calculate median given an array of numbers
  * @param v Array of numbers
  * @return Median of given array
  */
-double median(std::vector<double> v);
+double median(const std::vector<double> &v);
 
 /**
  * Degrees to radians
  * @param d Degree to be converted
  * @return Degree in radians
  */
-double deg2rad(double d);
+double deg2rad(const double d);
 
 /**
  * Radians to degree
  * @param r Radian to be converted
  * @return Radian in degrees
  */
-double rad2deg(double r);
+double rad2deg(const double r);
 
 /**
  * Load std::vector of doubles to an Eigen::Matrix
@@ -92,14 +92,17 @@ double rad2deg(double r);
  * @param cols Number of matrix colums
  * @param y Output matrix
  */
-void load_matrix(std::vector<double> x, int rows, int cols, MatX &y);
+void load_matrix(const std::vector<double> &x,
+                 const int rows,
+                 const int cols,
+                 MatX &y);
 
 /**
  * Load an Eigen::Matrix into a std::vector of doubles
  * @param A Matrix
  * @param x Output vector of matrix values
  */
-void load_matrix(MatX A, std::vector<double> &x);
+void load_matrix(const MatX A, std::vector<double> &x);
 
 /**
  * Convert Euler angles to rotation matrix

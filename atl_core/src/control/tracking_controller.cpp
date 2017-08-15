@@ -57,13 +57,12 @@ AttitudeCommand TrackingController::update(const Vec3 &pos_errors,
   Vec3 errors = pos_errors + this->track_offset;
 
   // roll, pitch, yaw and throttle (assuming NWU frame)
-  // clang-format off
   double r = -this->y_controller.update(errors(1), 0.0, this->dt);
   double p = this->x_controller.update(errors(0), 0.0, this->dt);
   double y = yaw;
-  double t = this->hover_throttle + this->z_controller.update(errors(2), 0.0, this->dt);
-  t /= fabs(cos(r) * cos(p));  // adjust throttle for roll and pitch
-  // clang-format o
+  double t = this->hover_throttle;
+  t += this->z_controller.update(errors(2), 0.0, this->dt);
+  t /= fabs(cos(r) * cos(p)); // adjust throttle for roll and pitch
 
   // limit roll, pitch
   r = (r < this->roll_limit[0]) ? this->roll_limit[0] : r;
@@ -144,4 +143,4 @@ void TrackingController::printErrors() {
   std::cout << "\terror_d: " << std::setprecision(2) << d << std::endl;
 }
 
-}  // namespace atl
+} // namespace atl

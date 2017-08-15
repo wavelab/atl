@@ -110,9 +110,7 @@ bool DJIQuadrotorNode::controlCallback(
   }
 
   // transform roll pitch yaw from NED to NWU
-  Vec3 euler{deg2rad(request.x),
-             -deg2rad(request.y),
-             wrapTo180(-deg2rad(request.yaw))};
+  Vec3 euler{deg2rad(request.x), -deg2rad(request.y), -deg2rad(request.yaw)};
 
   // set attitude
   this->setAttitude(euler(0), euler(1), euler(2), request.z / 100.0);
