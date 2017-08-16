@@ -11,10 +11,10 @@ int CameraNode::configure(int hz) {
 
   // configure ros node
   // clang-format off
-  this->ros_nh->getParam("/gimbal_mode", this->gimbal_mode);
-  this->ros_nh->getParam("/gimbal_position_topic", this->gimbal_position_topic);
-  this->ros_nh->getParam("/gimbal_frame_orientation_topic", this->gimbal_frame_orientation_topic);
-  this->ros_nh->getParam("/gimbal_joint_orientation_topic", this->gimbal_joint_orientation_topic);
+  ROS_GET_PARAM(this->node_name + "/gimbal_mode", this->gimbal_mode);
+  ROS_GET_PARAM(this->node_name + "/gimbal_position_topic", this->gimbal_position_topic);
+  ROS_GET_PARAM(this->node_name + "/gimbal_frame_orientation_topic", this->gimbal_frame_orientation_topic);
+  ROS_GET_PARAM(this->node_name + "/gimbal_joint_orientation_topic", this->gimbal_joint_orientation_topic);
   // clang-format on
 
   if (this->gimbal_mode) {

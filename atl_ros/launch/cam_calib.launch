@@ -17,9 +17,10 @@
   </node>
 
   <!-- gimbal node -->
-  <param name="gimbal_imu" value="SBGC" />
-  <param name="/gimbal/config" value="$(find atl_configs)/configs/gimbal/config.yaml" />
-  <node pkg="atl_ros" name="atl_gimbal" type="atl_gimbal_node" output="screen" required="true" />
+  <node pkg="atl_ros" name="atl_gimbal" type="atl_gimbal_node" output="screen" required="true" >
+    <param name="gimbal_imu" value="SBGC" />
+    <param name="config" value="$(find atl_configs)/configs/gimbal/config.yaml" />
+  </node>
 
   <!-- cam calib node -->
   <node pkg="atl_ros" name="atl_cam_calib" type="atl_cam_calib_node" output="screen" required="true">

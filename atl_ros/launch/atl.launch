@@ -20,32 +20,8 @@
 	</node>
 
   <!-- controller node -->
-  <param name="/control/config_dir" value="$(find atl_configs)/configs/quadrotor_anaroid" />
-  <!-- <param name="/control/config_dir" value="$(find atl_configs)/configs/quadrotor_anastasia" /> -->
-  <node pkg="atl_ros" name="atl_control" type="atl_control_node" output="screen" required="true" />
-
-  <!-- <!&#45;&#45; camera node &#45;&#45;> -->
-  <!-- <param name="/camera/config_dir" value="$(find atl_configs)/configs/camera/elp_camera" /> -->
-  <!-- <node pkg="atl_ros" name="atl_camera" type="atl_camera_node" output="screen" required="true" /> -->
-
-  <!-- <!&#45;&#45; apriltag node &#45;&#45;> -->
-  <!-- <param name="/apriltag/config" value="$(find atl_configs)/configs/apriltag/config.yaml" /> -->
-  <!-- <node pkg="atl_ros" name="atl_apriltag" type="atl_apriltag_node" output="screen" required="true" /> -->
-  <!--  -->
-  <!-- <!&#45;&#45; estimator node &#45;&#45;> -->
-  <!-- <param name="/estimator/tracker_mode" value="1" /> -->
-  <!-- <param name="/estimator/kf/config" value="$(find atl_configs)/configs/estimator/kf_tracker.yaml" /> -->
-  <!-- <param name="/estimator/ekf/config" value="$(find atl_configs)/configs/estimator/ekf_tracker.yaml" /> -->
-  <!-- <node pkg="atl_ros" name="atl_estimator" type="atl_estimator_node" output="screen" required="true" /> -->
-  <!--  -->
-  <!-- <!&#45;&#45; pg camera node &#45;&#45;> -->
-  <!-- <param name="/camera/config_dir" value="$(find atl_configs)/configs/camera/pointgrey_chameleon" /> -->
-  <!-- <node pkg="atl_ros" name="atl_camera" type="atl_pg_camera_node" output="screen" required="true" /> -->
-  <!--  -->
-  <!-- <!&#45;&#45; gimbal node &#45;&#45;> -->
-  <!-- <param name="/gimbal/config" value="$(find atl_configs)/configs/gimbal/config.yaml" /> -->
-  <!-- <node pkg="atl_ros" name="atl_gimbal" type="atl_gimbal_node" output="screen" required="true" /> -->
-
-  <!-- imu node -->
-  <!-- <node pkg="atl_ros" name="atl_imu" type="imu_node" output="screen" launch&#45;prefix="sudo &#45;E" required="true" /> -->
+  <node pkg="atl_ros" name="atl_control" type="atl_control_node" output="screen" required="true">
+    <param name="config_dir" value="$(find atl_configs)/configs/quadrotor_anaroid" />
+    <!-- <param name="config_dir" value="$(find atl_configs)/configs/quadrotor_anastasia" /> -->
+  </node>
 </launch>

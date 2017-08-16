@@ -11,8 +11,8 @@ int GimbalNode::configure(int hz) {
   }
 
   // gimbal
-  ROS_GET_PARAM("/gimbal/config", config_file);
-  ROS_GET_PARAM("/gimbal_imu", this->gimbal_imu);
+  ROS_GET_PARAM(this->node_name + "/config", config_file);
+  ROS_GET_PARAM(this->node_name + "/gimbal_imu", this->gimbal_imu);
   if (this->gimbal.configure(config_file) != 0) {
     ROS_ERROR("Failed to configure Gimbal!");
     return -2;

@@ -11,7 +11,7 @@ int CameraNode::configure(int hz) {
   }
 
   // camera
-  ROS_GET_PARAM("/camera/config_dir", config_path);
+  ROS_GET_PARAM(this->node_name + "/config_dir", config_path);
   if (this->camera.configure(config_path) != 0) {
     ROS_ERROR("Failed to configure Camera!");
     return -2;

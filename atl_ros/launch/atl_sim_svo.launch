@@ -10,11 +10,6 @@
   <param name="fcu_type" value="DJI" />
   <param name="estimate_frame" value="BODY" />
 
-  <param name="gimbal_mode" value="true" />
-  <param name="gimbal_position_topic" value="/atl/gimbal/position/inertial" />
-  <param name="gimbal_frame_orientation_topic" value="/atl/gimbal/frame/orientation/inertial" />
-  <param name="gimbal_joint_orientation_topic" value="/atl/gimbal/joint/orientation/inertial" />
-
   <!-- gazebo -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="world_name" value="worlds/simulation.world"/>
@@ -34,6 +29,10 @@
   </node>
   <node pkg="atl_gazebo" name="atl_camera" type="atl_bridge_camera_node" output="screen" required="true">
     <remap from="/atl/camera/image" to="/atl/camera/image" />
+    <param name="gimbal_mode" value="true" />
+    <param name="gimbal_position_topic" value="/atl/gimbal/position/inertial" />
+    <param name="gimbal_frame_orientation_topic" value="/atl/gimbal/frame/orientation/inertial" />
+    <param name="gimbal_joint_orientation_topic" value="/atl/gimbal/joint/orientation/inertial" />
   </node>
   <node pkg="atl_gazebo" name="atl_gimbal" type="atl_bridge_gimbal_node" output="screen" required="true" >
     <remap from="/atl/gimbal/position/inertial" to="/atl/gimbal/position/inertial" />
@@ -53,16 +52,20 @@
   </node>
 
   <!-- control node -->
-  <param name="/control/config_dir" value="$(find atl_configs)/configs/quadrotor_gazebosim" />
-  <node pkg="atl_ros" name="atl_control" type="atl_control_node" output="screen" required="true"/>
+  <node pkg="atl_ros" name="atl_control" type="atl_control_node" output="screen" required="true">
+    <param name="config_dir" value="$(find atl_configs)/configs/quadrotor_gazebosim" />
+  </node>
 
   <!-- apriltag node -->
-  <param name="apriltag_config" value="$(find atl_configs)/configs/apriltag/prototype.yaml" />
   <node pkg="atl_ros" name="atl_apriltag" type="atl_apriltag_node" output="screen" required="true"/>
+    <param name="config" value="$(find atl_configs)/configs/apriltag/sim.yaml" />
+  </node>
 
   <!-- estimate node -->
-  <param name="tracker_mode" value="1" />
-  <param name="/estimator/kf/config" value="$(find atl_configs)/configs/estimator/kf_tracker_prototype.yaml" />
-  <param name="/estimator/ekf/config" value="$(find atl_configs)/configs/estimator/ekf_tracker.yaml" />
   <node pkg="atl_ros" name="atl_estimator" type="atl_estimator_node" output="screen" required="true"/>
+    <!-- <param name="tracker_mode" value="KF" /> -->
+    <!-- <param name="config" value="$(find atl_configs)/configs/estimator/kf_tracker_sim.yaml" /> -->
+    <param name="tracker_mode" value="EKF" />
+    <param name="config" value="$(find atl_configs)/configs/estimator/ekf_tracker_sim.yaml" />
+  </node>
 </launch>

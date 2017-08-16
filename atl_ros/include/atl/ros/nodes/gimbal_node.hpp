@@ -22,7 +22,7 @@ static const std::string SBGC_RAW_ENCODER_TOPIC = "atl/sbgc/encoders/rpy";
 static const std::string POSITION_TOPIC = "/atl/gimbal/position/inertial";
 static const std::string FRAME_ORIENTATION_TOPIC = "/atl/gimbal/frame/orientation/inertial";
 static const std::string JOINT_ORIENTATION_TOPIC = "/atl/gimbal/joint/orientation/inertial";
-static const std::string ENCODER_ORIENTATION_TOPIC = "atl/gimbal/joint/orientation/body";
+static const std::string ENCODER_ORIENTATION_TOPIC = "/atl/gimbal/joint/orientation/body";
 
 // SUBSCRIBE TOPICS
 static const std::string ACTIVATE_TOPIC = "/atl/gimbal/activate";

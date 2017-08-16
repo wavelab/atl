@@ -14,31 +14,31 @@ int EstimatorNode::configure(int hz) {
   this->quad_velocity << 0, 0, 0;
 
   // estimator
-  ROS_GET_PARAM("/estimator/tracker_mode", this->mode);
   ROS_GET_PARAM("/quad_frame", this->quad_frame);
+  ROS_GET_PARAM(this->node_name + "/tracker_mode", this->mode);
   this->initialized = false;
   this->state = ESTIMATOR_OFF;
 
-  switch (this->mode) {
-    case KF_MODE:
+  if (this->mode == "KF") {
       LOG_INFO("Estimator running in KF_MODE!");
-      ROS_GET_PARAM("/estimator/kf/config", config_file);
+      ROS_GET_PARAM(this->node_name + "/config", config_file);
       if (this->kf_tracker.configure(config_file) != 0) {
         LOG_ERROR("Failed to configure KalmanFilterTracker!");
         return -2;
       }
-      break;
 
-    case EKF_MODE:
+  } else if (this->mode == "EKF") {
       LOG_INFO("Estimator running in EKF_MODE!");
-      ROS_GET_PARAM("/estimator/ekf/config", config_file);
+      ROS_GET_PARAM(this->node_name + "/config", config_file);
       if (this->ekf_tracker.configure(config_file) != 0) {
         LOG_ERROR("Failed to configure ExtendedKalmanFilterTracker!");
         return -2;
       }
-      break;
 
-    default: LOG_ERROR("Invalid Tracker Mode!"); return -2;
+  } else {
+    LOG_ERROR("Invalid Tracker Mode!");
+    return -2;
+
   }
 
   // publishers and subscribers

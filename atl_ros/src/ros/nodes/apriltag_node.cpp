@@ -11,7 +11,7 @@ int AprilTagNode::configure(int hz) {
   }
 
   // detector
-  ROS_GET_PARAM("/apriltag/config", apriltag_config);
+  ROS_GET_PARAM(this->node_name + "/config", apriltag_config);
   if (this->detector.configure(apriltag_config) != 0) {
     ROS_ERROR("Failed to configure AprilTag Detector!");
     return -2;

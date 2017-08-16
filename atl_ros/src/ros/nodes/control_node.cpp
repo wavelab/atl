@@ -11,7 +11,7 @@ int ControlNode::configure(int hz) {
   }
 
   // quadrotor
-  ROS_GET_PARAM("/control/config_dir", config_path);
+  ROS_GET_PARAM(this->node_name + "/config_dir", config_path);
   this->dji = new DJIDrone(*this->ros_nh);
   if (this->quadrotor.configure(config_path) != 0) {
     ROS_ERROR(FCONFQUAD);

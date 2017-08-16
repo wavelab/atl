@@ -12,12 +12,12 @@ int XimeaCameraNode::configure(int hz) {
   }
 
   // camera
-  this->ros_nh->getParam("/camera_config_dir", config_path);
+  ROS_GET_PARAM(this->node_name + "/camera_config_dir", config_path);
+  ROS_GET_PARAM(this->node_name + "/grey_scale", grey_scale);
   if (this->camera.configure(config_path) != 0) {
     ROS_ERROR("Failed to configure Camera!");
     return -2;
   };
-  this->ros_nh->getParam("/grey_scale", grey_scale);
   this->camera.initialize();
 
   // register publisher and subscribers
