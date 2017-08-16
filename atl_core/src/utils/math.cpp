@@ -276,51 +276,55 @@ Mat3 quat2rot(const Quaternion &q) {
 Vec3 enu2nwu(const Vec3 &enu) {
   // ENU frame:  (x - right, y - forward, z - up)
   // NWU frame:  (x - forward, y - left, z - up)
-  Vec3 nwu{enu(1), -enu(0), enu(2)};
-  return nwu;
+  return Vec3{enu(1), -enu(0), enu(2)};
 }
 
-Vec3 edn2nwu(const Vec3 &cf) {
+Vec3 edn2nwu(const Vec3 &edn) {
   // camera frame:  (x - right, y - down, z - forward)
   // NWU frame:  (x - forward, y - left, z - up)
-  Vec3 nwu{cf(2), -cf(0), -cf(1)};
-  return nwu;
+  return Vec3{edn(2), -edn(0), -edn(1)};
 }
 
-Vec3 cf2enu(const Vec3 &cf) {
+Vec3 edn2enu(const Vec3 &edn) {
   // camera frame:  (x - right, y - down, z - forward)
   // ENU frame:  (x - right, y - forward, z - up)
-  Vec3 enu{cf(0), cf(2), -cf(1)};
-  return enu;
+  return Vec3{edn(0), edn(2), -edn(1)};
 }
 
 Vec3 nwu2enu(const Vec3 &nwu) {
   // NWU frame:  (x - forward, y - left, z - up)
   // ENU frame:  (x - right, y - forward, z - up)
-  Vec3 enu{-nwu(1), nwu(0), nwu(2)};
-  return enu;
+  return Vec3{-nwu(1), nwu(0), nwu(2)};
+}
+
+Vec3 nwu2ned(const Vec3 &nwu) {
+  // NWU frame:  (x - forward, y - left, z - up)
+  // NED frame:  (x - forward, y - right, z - down)
+  return Vec3{nwu(0), -nwu(1), -nwu(2)};
 }
 
 Vec3 ned2enu(const Vec3 &ned) {
   // NED frame:  (x - forward, y - right, z - down)
   // ENU frame:  (x - right, y - forward, z - up)
-  Vec3 enu{ned(1), ned(0), -ned(2)};
-  return enu;
+  return Vec3{ned(1), ned(0), -ned(2)};
+}
+
+Vec3 ned2nwu(const Vec3 &ned) {
+  // NED frame:  (x - forward, y - right, z - down)
+  // NWU frame:  (x - forward, y - left, z - up)
+  return Vec3{ned(0), -ned(1), -ned(2)};
 }
 
 Quaternion nwu2ned(const Quaternion &nwu) {
-  Quaternion ned{nwu.w(), nwu.x(), -nwu.y(), -nwu.z()};
-  return ned;
+  return Quaternion{nwu.w(), nwu.x(), -nwu.y(), -nwu.z()};
 }
 
 Quaternion ned2nwu(const Quaternion &ned) {
-  Quaternion nwu{ned.w(), ned.x(), -ned.y(), -ned.z()};
-  return nwu;
+  return Quaternion{ned.w(), ned.x(), -ned.y(), -ned.z()};
 }
 
 Quaternion enu2nwu(const Quaternion &enu) {
-  Quaternion nwu{enu.w(), enu.y(), -enu.x(), enu.z()};
-  return nwu;
+  return Quaternion{enu.w(), enu.y(), -enu.x(), enu.z()};
 }
 
 void target2body(Vec3 target_pos_if,

@@ -115,7 +115,7 @@ if __name__ == "__main__":
 
     quad.set_arm(True)
     # quad.set_mode("HOVER_MODE")
-    # quad.set_yaw(-110)
+    # quad.set_yaw(90)
     quad.set_mode("WAYPOINT_MODE")
 
     # quad.set_pctrl_settings({
@@ -131,7 +131,6 @@ if __name__ == "__main__":
     #         "max": 30,
     #         "k_p": 0.08,
     #         "k_i": 0.0001,
-    #         "k_d": 0.04
     #     },
     #     "throttle": {
     #         "hover": 0.45,
@@ -147,7 +146,7 @@ if __name__ == "__main__":
     # gimbal.set_attitude([0.0, 0.0, 0])
     # gimbal.activate(False)
     # lz.set_position([1, 0, 0])
-    # quad.set_hover_point([5, 5, 5.0])
+    # quad.set_hover_point([1, 1, 5.0])
 
     # quad.set_hover_point([0.0, 0.0, 10.0])
 

@@ -37,11 +37,6 @@ void buildMsg(int seq,
               ros::Time time,
               Pose pose,
               geometry_msgs::PoseStamped &msg);
-void buildMsg(int seq,
-              ros::Time time,
-              AttitudeCommand att_cmd,
-              geometry_msgs::PoseStamped &msg,
-              std_msgs::Float64 &thr_msg);
 void buildMsg(TagPose tag, atl_msgs::AprilTagPose &msg);
 void buildMsg(TagPose tag, geometry_msgs::Vector3 &msg);
 void buildMsg(PositionController pc, atl_msgs::PCtrlSettings &msg);

@@ -172,7 +172,6 @@ void ControlNode::attitudeCallback(const dji_sdk::AttitudeQuaternion &msg) {
   // transform pose position and orientation
   // from NED to NWU
   Quaternion orientation_nwu = ned2nwu(orientation_ned);
-
   this->quadrotor.pose.orientation = orientation_nwu;
 }
 
@@ -317,11 +316,11 @@ void ControlNode::publishAttitudeSetpoint() {
   //    HORIZ_ATTI_TILT_ANG
   //    VERT_THRUST
   //    YAW_ANG
-  //    ground frame
+  //    body frame
   //    non-stable mode
   //
-  //  ends up being: 0b00100000 -> 0x20
-  this->dji->attitude_control(0x20, // control mode byte (see above comment)
+  //  ends up being: 0b00100010 -> 0x22
+  this->dji->attitude_control(0x22, // control mode byte (see above comment)
                               rad2deg(rpy_ned(0)),    // roll (deg)
                               rad2deg(rpy_ned(1)),    // pitch (deg)
                               att_cmd.throttle * 100, // throttle (0 - 100)

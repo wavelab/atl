@@ -51,9 +51,9 @@ Vec4 PositionController::update(const Vec3 &setpoints,
   Vec3 errors = enu2nwu(setpoints - pose.position);
 
   Vec3 rpy;
-  quat2euler(pose.orientation, 123, rpy);
+  quat2euler(pose.orientation, 321, rpy);
   Mat3 R = rotz(rpy(2));
-  errors = R * errors;
+  errors = R.inverse() * errors;
 
   // roll, pitch, yaw and throttle (assuming NWU frame)
   double r = -this->y_controller.update(errors(1), this->dt);

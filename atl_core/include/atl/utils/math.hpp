@@ -185,11 +185,25 @@ Vec3 edn2enu(const Vec3 &edn);
 Vec3 nwu2enu(const Vec3 &nwu);
 
 /**
+ * Convert from NWU to NED
+ * @param nwu NWU vector
+ * @return enu NED vector
+ */
+Vec3 nwu2ned(const Vec3 &nwu);
+
+/**
  * Convert from NED to ENU
  * @param ned NED vector
  * @return enu ENU vector
  */
 Vec3 ned2enu(const Vec3 &ned);
+
+/**
+ * Convert from NED to NWU
+ * @param ned NED vector
+ * @return enu NWU vector
+ */
+Vec3 ned2nwu(const Vec3 &ned);
 
 /**
  * Convert from NWU to NED

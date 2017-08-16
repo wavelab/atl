@@ -3,9 +3,8 @@
 namespace atl {
 
 AttitudeCommand::AttitudeCommand(Vec4 command) {
-  // quaternion
-  Vec3 euler{command(0), command(1), command(2)}; // roll, pitch, yaw
-  euler2quat(euler, 321, this->orientation);
+  // roll, pitch, yaw
+  this->rpy << command(0), command(1), command(2);
 
   // throttle
   this->throttle = command(3);
@@ -13,29 +12,16 @@ AttitudeCommand::AttitudeCommand(Vec4 command) {
 
 Vec3 AttitudeCommand::toEuler(const std::string &coordinate_system) {
   if (coordinate_system == "NED") {
-    // transform orientation from NWU to NED
-    Quaternion q_ned = nwu2ned(this->orientation);
-
-    // convert to euler
-    Vec3 euler_ned;
-    quat2euler(q_ned, 321, euler_ned);
-    return euler_ned;
-
+    return nwu2ned(this->rpy); // transform NWU to NED
   } else {
-    // convert to euler
-    Vec3 euler_nwu;
-    quat2euler(this->orientation, 321, euler_nwu);
-    return euler_nwu;
+    return this->rpy;
   }
 }
 
 void AttitudeCommand::print() {
-  Vec3 euler;
-  quat2euler(this->orientation, 321, euler);
-
-  printf("roll: %.2f\t", euler(0));
-  printf("pitch: %.2f\t", euler(1));
-  printf("yaw: %.2f\t", euler(2));
+  printf("roll: %.2f\t", this->rpy(0));
+  printf("pitch: %.2f\t", this->rpy(1));
+  printf("yaw: %.2f\t", this->rpy(2));
   printf("throttle: %.2f\n", this->throttle);
 }
 

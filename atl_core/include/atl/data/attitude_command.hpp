@@ -9,7 +9,7 @@ namespace atl {
  * Attitude Command
  */
 struct AttitudeCommand {
-  Quaternion orientation{1.0, 0.0, 0.0, 0.0};
+  Vec3 rpy{0.0, 0.0, 0.0};
   double throttle = 0.0;
 
   AttitudeCommand() {}

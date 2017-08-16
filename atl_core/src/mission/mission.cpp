@@ -175,7 +175,12 @@ double Mission::waypointHeading() {
   const double dy = this->wp_end(1) - this->wp_start(1);
 
   // offset by -90 deg because ENU's 0 yaw is East rather than North
-  const double heading = atan2(dy, dx) - deg2rad(90.0);
+  double heading = atan2(dy, dx) - deg2rad(90.0);
+  if (heading > M_PI) {
+    heading -= 2 * M_PI;
+  } else if (heading < -M_PI) {
+    heading += 2 * M_PI;
+  }
 
   return heading;
 }

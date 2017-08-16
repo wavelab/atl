@@ -103,8 +103,8 @@ bool DJIQuadrotorNode::controlCallback(
     dji_sdk::AttitudeControl::Request &request,
     dji_sdk::AttitudeControl::Response &response) {
   // pre-check
-  if (request.flag != 0x20) {
-    LOG_ERROR("Attitude control byte other than [0x20] is not supported!");
+  if (request.flag != 0x22) {
+    LOG_ERROR("Attitude control byte other than [0x22] is not supported!");
     response.result = false;
     return false;
   }

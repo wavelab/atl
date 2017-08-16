@@ -45,29 +45,6 @@ void buildMsg(int seq,
   msg.pose.orientation.z = pose.orientation.z();
 }
 
-void buildMsg(int seq,
-              ros::Time time,
-              AttitudeCommand att_cmd,
-              geometry_msgs::PoseStamped &msg,
-              std_msgs::Float64 &thr_msg) {
-  // atitude command
-  msg.header.seq = seq;
-  msg.header.stamp = time;
-  msg.header.frame_id = "atl_attitude_cmd";
-
-  msg.pose.position.x = 0;
-  msg.pose.position.y = 0;
-  msg.pose.position.z = 0;
-
-  msg.pose.orientation.w = att_cmd.orientation.w();
-  msg.pose.orientation.x = att_cmd.orientation.x();
-  msg.pose.orientation.y = att_cmd.orientation.y();
-  msg.pose.orientation.z = att_cmd.orientation.z();
-
-  // throttle command
-  thr_msg.data = att_cmd.throttle;
-}
-
 void buildMsg(TagPose tag, atl_msgs::AprilTagPose &msg) {
   msg.id = tag.id;
   msg.detected = tag.detected;

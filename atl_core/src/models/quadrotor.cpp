@@ -135,84 +135,80 @@ Vec4 PositionController::update(const Vec3 &setpoints,
 
 // QUADROTOR MODEL
 int QuadrotorModel::update(const VecX &motor_inputs, double dt) {
-  double ph = this->attitude(0);
-  double th = this->attitude(1);
-  double ps = this->attitude(2);
+  const double ph = this->attitude(0);
+  const double th = this->attitude(1);
+  const double ps = this->attitude(2);
 
-  double p = this->angular_velocity(0);
-  double q = this->angular_velocity(1);
-  double r = this->angular_velocity(2);
+  const double p = this->angular_velocity(0);
+  const double q = this->angular_velocity(1);
+  const double r = this->angular_velocity(2);
 
-  double x = this->position(0);
-  double y = this->position(1);
-  double z = this->position(2);
+  const double x = this->position(0);
+  const double y = this->position(1);
+  const double z = this->position(2);
 
-  double vx = this->linear_velocity(0);
-  double vy = this->linear_velocity(1);
-  double vz = this->linear_velocity(2);
+  const double vx = this->linear_velocity(0);
+  const double vy = this->linear_velocity(1);
+  const double vz = this->linear_velocity(2);
 
-  double Ix = this->Ix;
-  double Iy = this->Iy;
-  double Iz = this->Iz;
+  const double Ix = this->Ix;
+  const double Iy = this->Iy;
+  const double Iz = this->Iz;
 
-  double kr = this->kr;
-  double kt = this->kt;
+  const double kr = this->kr;
+  const double kt = this->kt;
 
-  double m = this->m;
-  double g = this->g;
+  const double m = this->m;
+  const double g = this->g;
 
   // convert motor inputs to angular p, q, r and total thrust
   // clang-format off
-    Mat4 A;
-    A << 1.0, 1.0, 1.0, 1.0,
-         0.0, -this->l, 0.0, this->l,
-         -this->l, 0.0, this->l, 0.0,
-         -this->d, this->d, -this->d, this->d;
+  Mat4 A;
+  A << 1.0, 1.0, 1.0, 1.0,
+        0.0, -this->l, 0.0, this->l,
+        -this->l, 0.0, this->l, 0.0,
+        -this->d, this->d, -this->d, this->d;
   // clang-format on
 
   Vec4 tau = A * motor_inputs;
-  double tauf = tau(0);
-  double taup = tau(1);
-  double tauq = tau(2);
-  double taur = tau(3);
+  const double tauf = tau(0);
+  const double taup = tau(1);
+  const double tauq = tau(2);
+  const double taur = tau(3);
 
   // update
   // clang-format off
-    this->attitude(0) = ph + (p + q * sin(ph) * tan(th) + r * cos(ph) * tan(th)) * dt;
-    this->attitude(1) = th + (q * cos(ph) - r * sin(ph)) * dt;
-    this->attitude(2) = ps + ((1 / cos(th)) * (q * sin(ph) + r * cos(ph))) * dt;
-    this->angular_velocity(0) = p + (-((Iz - Iy) / Ix) * q * r - (kr * p / Ix) + (1 / Ix) * taup) * dt;
-    this->angular_velocity(1) = q + (-((Ix - Iz) / Iy) * p * r - (kr * q / Iy) + (1 / Iy) * tauq) * dt;
-    this->angular_velocity(2) = r + (-((Iy - Ix) / Iz) * p * q - (kr * r / Iz) + (1 / Iz) * taur) * dt;
-    this->position(0) = x + vx * dt;
-    this->position(1) = y + vy * dt;
-    this->position(2) = z + vz * dt;
-    this->linear_velocity(0) = vx + ((-kt * vx / m) + (1 / m) * (cos(ph) * sin(th) * cos(ps) + sin(ph) * sin(ps)) * tauf) * dt;
-    this->linear_velocity(1) = vy + ((-kt * vy / m) + (1 / m) * (cos(ph) * sin(th) * sin(ps) - sin(ph) * cos(ps)) * tauf) * dt;
-    this->linear_velocity(2) = vz + (-(kt * vz / m) + (1 / m) * (cos(ph) * cos(th)) * tauf - g) * dt;
+  this->attitude(0) = ph + (p + q * sin(ph) * tan(th) + r * cos(ph) * tan(th)) * dt;
+  this->attitude(1) = th + (q * cos(ph) - r * sin(ph)) * dt;
+  this->attitude(2) = ps + ((1 / cos(th)) * (q * sin(ph) + r * cos(ph))) * dt;
+  this->angular_velocity(0) = p + (-((Iz - Iy) / Ix) * q * r - (kr * p / Ix) + (1 / Ix) * taup) * dt;
+  this->angular_velocity(1) = q + (-((Ix - Iz) / Iy) * p * r - (kr * q / Iy) + (1 / Iy) * tauq) * dt;
+  this->angular_velocity(2) = r + (-((Iy - Ix) / Iz) * p * q - (kr * r / Iz) + (1 / Iz) * taur) * dt;
+  this->position(0) = x + vx * dt;
+  this->position(1) = y + vy * dt;
+  this->position(2) = z + vz * dt;
+  this->linear_velocity(0) = vx + ((-kt * vx / m) + (1 / m) * (cos(ph) * sin(th) * cos(ps) + sin(ph) * sin(ps)) * tauf) * dt;
+  this->linear_velocity(1) = vy + ((-kt * vy / m) + (1 / m) * (cos(ph) * sin(th) * sin(ps) - sin(ph) * cos(ps)) * tauf) * dt;
+  this->linear_velocity(2) = vz + (-(kt * vz / m) + (1 / m) * (cos(ph) * cos(th)) * tauf - g) * dt;
   // clang-format on
 
   // constrain yaw to be [-180, 180]
-  this->attitude(2) = rad2deg(this->attitude(2));
-  this->attitude(2) = wrapTo180(this->attitude(2));
-  this->attitude(2) = deg2rad(this->attitude(2));
+  this->attitude(2) = wrapToPi(this->attitude(2));
 
   return 0;
 }
 
 Vec4 QuadrotorModel::attitudeControllerControl(double dt) {
-  Vec4 actual_attitude;
-  Vec4 motor_inputs;
-
-  // attitude controller
   // clang-format off
-    actual_attitude << this->attitude(0),  // roll
-                       this->attitude(1),  // pitch
-                       this->attitude(2),  // yaw
-                       this->position(2);  // z
-    motor_inputs = this->attitude_controller.update(this->attitude_setpoints,
-                                                    actual_attitude,
-                                                    dt);
+  const Vec4 actual_attitude{this->attitude(0),   // roll
+                             this->attitude(1),   // pitch
+                             this->attitude(2),   // yaw
+                             this->position(2)};  // z
+
+  const Vec4 motor_inputs =
+      this->attitude_controller.update(this->attitude_setpoints,
+                                       actual_attitude,
+                                       dt);
   // clang-format on
 
   return motor_inputs;
@@ -220,32 +216,29 @@ Vec4 QuadrotorModel::attitudeControllerControl(double dt) {
 
 Vec4 QuadrotorModel::positionControllerControl(double dt) {
   // position controller
-  // clang-format off
-    Vec4 actual_position;
-    actual_position(0) = this->position(0);  // x
-    actual_position(1) = this->position(1);  // y
-    actual_position(2) = this->position(2);  // z
-    actual_position(3) = this->attitude(2);  // yaw
-    this->attitude_setpoints = this->position_controller.update(
-        this->position_setpoints,
-        actual_position,
-        0.0,
-        dt
-    );
+  Vec4 actual_position;
+  actual_position(0) = this->position(0); // x
+  actual_position(1) = this->position(1); // y
+  actual_position(2) = this->position(2); // z
+  actual_position(3) = this->attitude(2); // yaw
 
-    // attitude controller
-    Vec4 actual_attitude;
-    Vec4 motor_inputs;
-    actual_attitude(0) = this->attitude(0);  // roll
-    actual_attitude(1) = this->attitude(1);  // pitch
-    actual_attitude(2) = this->attitude(2);  // yaw
-    actual_attitude(3) = this->position(2);  // z
-    motor_inputs = this->attitude_controller.update(
-        this->attitude_setpoints,
-        actual_attitude,
-        dt
-    );
-  // clang-format on
+  this->attitude_setpoints =
+      this->position_controller.update(this->position_setpoints,
+                                       actual_position,
+                                       0.0,
+                                       dt);
+
+  // attitude controller
+  Vec4 actual_attitude;
+  actual_attitude(0) = this->attitude(0); // roll
+  actual_attitude(1) = this->attitude(1); // pitch
+  actual_attitude(2) = this->attitude(2); // yaw
+  actual_attitude(3) = this->position(2); // z
+
+  const Vec4 motor_inputs =
+      this->attitude_controller.update(this->attitude_setpoints,
+                                       actual_attitude,
+                                       dt);
 
   return motor_inputs;
 }

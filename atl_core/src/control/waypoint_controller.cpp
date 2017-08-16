@@ -114,31 +114,28 @@ int WaypointController::update(Mission &mission,
     return retval;
   }
 
-  // // calculate waypoint relative to quadrotor
-  // Vec3 errors;
-  // target2bodyplanar(waypoint, pose.position, pose.orientation, errors);
-
-  // calculate setpoint relative to quadrotor
+  // calculate waypoint relative to quadrotor
   Vec3 errors = enu2nwu(waypoint - pose.position);
 
   Vec3 rpy;
-  quat2euler(pose.orientation, 123, rpy);
+  quat2euler(pose.orientation, 321, rpy);
   Mat3 R = rotz(rpy(2));
-  errors = R * errors;
-
-  std::cout << errors.transpose() << std::endl;
+  errors = R.inverse() * errors;
 
   // roll
   double r = -this->ct_controller.update(errors(1), this->dt);
 
   // pitch
-  // double error_forward = mission.desired_velocity - vel.norm();
-  // double p = this->at_controller.update(error_forward, this->dt);
-  double p = this->at_controller.update(errors(0), this->dt);
+  double error_forward = mission.desired_velocity - vel.norm();
+  double p = this->at_controller.update(error_forward, this->dt);
+  // double p = this->at_controller.update(errors(0), this->dt);
 
   // yaw
-  double y = wrapToPi(mission.waypointHeading());
-  // double y = 0.0;
+  double y = mission.waypointHeading();
+  if (fabs(y - rpy(2)) > deg2rad(5)) {
+    r = 0.0;
+    p = 0.0;
+  }
 
   // throttle
   const double error_z = waypoint(2) - pose.position(2);

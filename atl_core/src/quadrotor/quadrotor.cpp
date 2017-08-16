@@ -381,8 +381,6 @@ int Quadrotor::stepWaypointMode(const double dt) {
 
   if (this->wp_mission_ready == false) {
     // first go to first waypoint
-
-    // get first waypoint
     const Vec3 wp_start = this->mission.local_waypoints[0];
     const Vec3 wp_end = this->mission.local_waypoints[1];
     const double dx = wp_end(0) - wp_start(0);
@@ -391,7 +389,7 @@ int Quadrotor::stepWaypointMode(const double dt) {
     // calculate waypoint heading between first two waypoints
     // offset by -90 deg because ENU's 0 yaw is East rather than North
     const double wp_heading = atan2(dy, dx) - deg2rad(90.0);
-    this->yaw = 0.0;
+    this->yaw = wp_heading;
 
     // transition to first waypoint with position controller
     this->setHoverPosition(wp_start);
@@ -438,6 +436,7 @@ int Quadrotor::stepWaypointMode(const double dt) {
                                               this->velocity,
                                               dt);
     this->att_cmd = this->waypoint_controller.att_cmd;
+    this->yaw = this->att_cmd.rpy(2);
   }
 
   // update hover position
