@@ -158,14 +158,14 @@ def convert_measurements_to_jason_format(path,
         img_points2 = find_chessboard(img2, chessboard.cb_size, 2)
 
         # output jason format
-        output_jason_format(join(path, "static_%d.txt" % i),
+        output_jason_format(join(path, "%d_static.txt" % i),
                             object_points,
                             img_points1,
                             static_camera_K,
                             static_camera_d,
-                            [0.0, 0.0, 0.0])
+                            encoder_data[i])
 
-        output_jason_format(join(path, "gimbal_%d.txt" % i),
+        output_jason_format(join(path, "%d_gimbal.txt" % i),
                             object_points,
                             img_points2,
                             gimbal_camera_K,
