@@ -114,9 +114,9 @@ if __name__ == "__main__":
     rospy.sleep(1.0)
 
     quad.set_arm(True)
-    # quad.set_mode("HOVER_MODE")
+    quad.set_mode("DISCOVER_MODE")
     # quad.set_yaw(90)
-    quad.set_mode("WAYPOINT_MODE")
+    # quad.set_mode("WAYPOINT_MODE")
 
     # quad.set_pctrl_settings({
     #     "roll": {
@@ -143,7 +143,7 @@ if __name__ == "__main__":
     # up_and_down()
     # hover_side_to_side()
 
-    # gimbal.set_attitude([0.0, 0.0, 0])
+    # gimbal.set_attitude([0.1, 0.0, 0])
     # gimbal.activate(False)
     # lz.set_position([1, 0, 0])
     # quad.set_hover_point([1, 1, 5.0])
@@ -193,7 +193,7 @@ if __name__ == "__main__":
     # sleep(1)
 
     # sleep(1)
-    # lz_straight_line(0.5)
+    lz_straight_line(0.5)
     # sleep(1)
     # lz_straight_line(1.0)
     # sleep(1)

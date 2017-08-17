@@ -98,10 +98,6 @@ ADD_EXECUTABLE(atl_example_node src/ros/nodes/example_node.cpp)
 TARGET_LINK_LIBRARIES(atl_example_node ${ATL_ROS_DEPS})
 ADD_DEPENDENCIES(atl_example_node atl_ros_utils)
 
-ADD_EXECUTABLE(atl_fake_mavros_node src/ros/nodes/fake_mavros_node.cpp)
-TARGET_LINK_LIBRARIES(atl_fake_mavros_node ${ATL_ROS_DEPS})
-ADD_DEPENDENCIES(atl_fake_mavros_node atl_ros_utils)
-
 ADD_EXECUTABLE(atl_gimbal_node src/ros/nodes/gimbal_node.cpp)
 TARGET_LINK_LIBRARIES(atl_gimbal_node ${ATL_ROS_DEPS})
 ADD_DEPENDENCIES(atl_gimbal_node atl_ros_utils)
@@ -109,10 +105,6 @@ ADD_DEPENDENCIES(atl_gimbal_node atl_ros_utils)
 ADD_EXECUTABLE(atl_imu_node src/ros/nodes/imu_node.cpp)
 TARGET_LINK_LIBRARIES(atl_imu_node ${ATL_ROS_DEPS})
 ADD_DEPENDENCIES(atl_imu_node atl_ros_utils)
-
-# ADD_EXECUTABLE(atl_mission_node src/ros/nodes/mission_node.cpp)
-# TARGET_LINK_LIBRARIES(atl_mission_node ${ATL_ROS_DEPS})
-# ADD_DEPENDENCIES(atl_mission_node atl_ros_utils)
 
 ADD_EXECUTABLE(atl_pg_camera_node src/ros/nodes/pg_camera_node.cpp)
 TARGET_LINK_LIBRARIES(atl_pg_camera_node ${ATL_ROS_DEPS})

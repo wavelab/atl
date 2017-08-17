@@ -117,7 +117,7 @@ def output_jason_format(output_path,
 
     # gimbal angles
     jason_file.write("gimbalangles:\n")
-    jason_file.write(" ".join(str(x) for x in encoder_data))
+    jason_file.write(" ".join(str(x) for x in encoder_data[:2]))
     jason_file.write("\n")
 
     # end

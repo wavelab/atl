@@ -36,15 +36,16 @@ public:
   Pose camera_offset;
 
   AprilTagNode(int argc, char **argv) : ROSNode(argc, argv) {}
-  int configure(int hz);
-  void publishTagPoseMsg(TagPose tag);
-  void publishTargetInertialPositionMsg(Vec3 gimbal_position,
-                                        Quaternion gimbal_orientation,
-                                        Vec3 target_bf);
-  void publishTargetInertialYawMsg(TagPose tag, Quaternion gimbal_frame);
-  void publishTargetBodyPositionMsg(Vec3 target_bpf);
-  void publishTargetBodyPositionEncoderMsg(Vec3 target_bpf_encoder);
-  void publishTargetBodyYawMsg(TagPose tag);
+  int configure(const int hz);
+  void publishTagPoseMsg(const TagPose &tag);
+  void publishTargetInertialPositionMsg(const Vec3 &gimbal_position,
+                                        const Quaternion &gimbal_orientation,
+                                        const Vec3 &target_bf);
+  void publishTargetInertialYawMsg(const TagPose &tag,
+                                   const Quaternion &gimbal_frame);
+  void publishTargetBodyPositionMsg(const Vec3 &target_bpf);
+  void publishTargetBodyPositionEncoderMsg(const Vec3 &target_bpf_encoder);
+  void publishTargetBodyYawMsg(const TagPose &tag);
   void imageCallback(const sensor_msgs::ImageConstPtr &msg);
 };
 

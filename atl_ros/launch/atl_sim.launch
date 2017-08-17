@@ -53,10 +53,10 @@
   </node>
 
   <!-- estimate node -->
-  <node pkg="atl_ros" name="atl_estimator" type="atl_estimator_node" output="screen" required="true"/>
-    <!-- <param name="tracker_mode" value="KF" /> -->
+  <node pkg="atl_ros" name="atl_estimator" type="atl_estimator_node" output="screen" required="true">
+    <!-- <param name="type" value="KF" /> -->
     <!-- <param name="config" value="$(find atl_configs)/configs/estimator/kf_tracker_sim.yaml" /> -->
-    <param name="tracker_mode" value="EKF" />
+    <param name="type" value="EKF" />
     <param name="config" value="$(find atl_configs)/configs/estimator/ekf_tracker_sim.yaml" />
   </node>
 </launch>

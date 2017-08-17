@@ -2,7 +2,7 @@
 
 namespace atl {
 
-int AprilTagNode::configure(int hz) {
+int AprilTagNode::configure(const int hz) {
   std::string apriltag_config;
 
   // ros node
@@ -36,15 +36,16 @@ int AprilTagNode::configure(int hz) {
   return 0;
 }
 
-void AprilTagNode::publishTagPoseMsg(TagPose tag) {
+void AprilTagNode::publishTagPoseMsg(const TagPose &tag) {
   atl_msgs::AprilTagPose msg;
   buildMsg(tag, msg);
   this->ros_pubs[TARGET_POSE_TOPIC].publish(msg);
 }
 
-void AprilTagNode::publishTargetInertialPositionMsg(Vec3 gimbal_position,
-                                                    Quaternion gimbal_frame,
-                                                    Vec3 target_bpf) {
+void AprilTagNode::publishTargetInertialPositionMsg(
+    const Vec3 &gimbal_position,
+    const Quaternion &gimbal_frame,
+    const Vec3 &target_bpf) {
   geometry_msgs::Vector3 msg;
   Vec3 target_if;
 
@@ -56,20 +57,20 @@ void AprilTagNode::publishTargetInertialPositionMsg(Vec3 gimbal_position,
   this->ros_pubs[TARGET_IF_POS_TOPIC].publish(msg);
 }
 
-void AprilTagNode::publishTargetBodyPositionMsg(Vec3 target_bpf) {
+void AprilTagNode::publishTargetBodyPositionMsg(const Vec3 &target_bpf) {
   geometry_msgs::Vector3 msg;
   buildMsg(target_bpf, msg);
   this->ros_pubs[TARGET_BPF_POS_TOPIC].publish(msg);
 }
 void AprilTagNode::publishTargetBodyPositionEncoderMsg(
-    Vec3 target_bpf_encoder) {
+    const Vec3 &target_bpf_encoder) {
   geometry_msgs::Vector3 msg;
   buildMsg(target_bpf_encoder, msg);
   this->ros_pubs[TARGET_BPF_POS_ENCODER_TOPIC].publish(msg);
 }
 
-void AprilTagNode::publishTargetInertialYawMsg(TagPose tag,
-                                               Quaternion gimbal_frame) {
+void AprilTagNode::publishTargetInertialYawMsg(const TagPose &tag,
+                                               const Quaternion &gimbal_frame) {
   double yaw_if;
   Vec3 tag_euler, gimbal_frame_euler;
   std_msgs::Float64 msg;
@@ -84,7 +85,7 @@ void AprilTagNode::publishTargetInertialYawMsg(TagPose tag,
   this->ros_pubs[TARGET_IF_YAW_TOPIC].publish(msg);
 }
 
-void AprilTagNode::publishTargetBodyYawMsg(TagPose tag) {
+void AprilTagNode::publishTargetBodyYawMsg(const TagPose &tag) {
   Vec3 euler;
   std_msgs::Float64 msg;
 
@@ -108,6 +109,7 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
   Quaternion gimbal_joint_bf;
   Quaternion quad_orientation;
   Vec3 quad_position;
+
   // parse msg
   image_ptr = cv_bridge::toCvCopy(msg);
 
@@ -158,6 +160,7 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
   } else if (tags.size() == 0) {
     return;
   }
+
   // transform tag in camera frame to body planar frame
   target_cf << tags[0].position(0), tags[0].position(1), tags[0].position(2);
   target_bpf =

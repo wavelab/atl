@@ -8,9 +8,6 @@
 #include "atl/ros/utils/msgs.hpp"
 #include "atl/ros/utils/node.hpp"
 
-#define KF_MODE 1
-#define EKF_MODE 2
-
 #define ESTIMATOR_ON 1
 #define ESTIMATOR_OFF -1
 
@@ -38,54 +35,36 @@ namespace atl {
 
 class EstimatorNode : public ROSNode {
 public:
-  int mode;
-  int state;
-  bool initialized;
-
-  std::string quad_frame;
+  std::string estimator_type;
+  bool running = false;
+  bool initialized = false;
 
   KFTracker kf_tracker;
   EKFTracker ekf_tracker;
 
   Pose quad_pose;
-  Vec3 quad_velocity;
+  Vec3 quad_velocity{0.0, 0.0, 0.0};
 
   std::vector<double> target_pos_x_init;
   std::vector<double> target_pos_y_init;
   std::vector<double> target_pos_z_init;
 
-  bool target_detected;
-  bool target_losted;
-  Vec3 target_pos_bpf;
-  Vec3 target_vel_bpf;
-  double target_yaw_wf;
-  Vec3 target_measured;
-  Vec3 target_last_measured;
+  bool target_detected = false;
+  bool target_losted = true;
+  Vec3 target_pos_bpf{0.0, 0.0, 0.0};
+  Vec3 target_vel_bpf{0.0, 0.0, 0.0};
+  double target_yaw_wf = 0.0;
+  Vec3 target_measured{0.0, 0.0, 0.0};
+  Vec3 target_last_measured{0.0, 0.0, 0.0};
 
-  struct timespec target_last_updated;
-  double target_lost_threshold;
+  struct timespec target_last_updated = (struct timespec){0};
+  double target_lost_threshold = 1000.0;
 
-  EstimatorNode(int argc, char **argv) : ROSNode(argc, argv) {
-    this->quad_frame = "";
-
-    this->kf_tracker = KFTracker();
-    this->ekf_tracker = EKFTracker();
-
-    this->quad_pose = Pose();
-    this->target_detected = false;
-    this->target_losted = true;
-    this->target_pos_bpf << 0.0, 0.0, 0.0;
-    this->target_vel_bpf << 0.0, 0.0, 0.0;
-    this->target_yaw_wf = 0.0;
-    this->target_measured << 0.0, 0.0, 0.0;
-    this->target_last_measured << 0.0, 0.0, 0.0;
-    this->target_last_updated = (struct timespec){0};
-    this->target_lost_threshold = 1000.0;
-  }
+  EstimatorNode(int argc, char **argv) : ROSNode(argc, argv) {}
 
   int configure(int hz);
-  void initLTKF(Vec3 target_measured);
-  void resetLTKF(Vec3 target_measured);
+  void initLTKF(const Vec3 &target_measured);
+  void resetLTKF(const Vec3 &target_measured);
   void quadPoseCallback(const geometry_msgs::PoseStamped &msg);
   void quadVelocityCallback(const geometry_msgs::TwistStamped &msg);
   void onCallback(const std_msgs::Bool &msg);
@@ -100,8 +79,8 @@ public:
   void publishQuadYawMsg();
   void trackTarget();
   void reset();
-  int estimateKF(double dt);
-  int estimateEKF(double dt);
+  int estimateKF(const double dt);
+  int estimateEKF(const double dt);
   int estimate();
   int loopCallback();
 };
