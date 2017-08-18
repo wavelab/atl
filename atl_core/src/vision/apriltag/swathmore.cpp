@@ -26,12 +26,11 @@ int SwathmoreDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
   int retval;
   TagPose pose;
   cv::Mat image_gray;
-  cv::Point2d optical_center;
   TagDetectionArray detections;
-  CameraConfig camera_config;
 
   // setup
-  camera_config = this->camera_configs[this->camera_mode];
+  const CameraConfig camera_config = this->camera_configs[this->camera_mode];
+  cv::Point2d optical_center;
   optical_center.x = camera_config.camera_matrix.at<double>(0, 2);
   optical_center.y = camera_config.camera_matrix.at<double>(1, 2);
 

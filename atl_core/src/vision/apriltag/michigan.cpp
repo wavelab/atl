@@ -71,20 +71,7 @@ int MichiganDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
 }
 
 int MichiganDetector::obtainPose(apriltag_detection_t *tag, TagPose &tag_pose) {
-  Mat4 transform;
-  Vec3 t;
-  Mat3 R;
-  // double fx, fy, cx, cy, s;
-  std::vector<cv::Point3f> obj_pts;
-  std::vector<cv::Point2f> img_pts;
-
-  // setup
-  CameraConfig camera_config = this->camera_configs[this->camera_mode];
-  // fx = camera_config.camera_matrix.at<double>(0, 0);
-  // fy = camera_config.camera_matrix.at<double>(1, 1);
-  // cx = camera_config.camera_matrix.at<double>(0, 2);
-  // cy = camera_config.camera_matrix.at<double>(1, 2);
-  double tag_size = 0.0;
+  const double tag_size = 0.5;
 
   // get tag size according to tag id
   // if (this->tag_configs.find(tag.id) == this->tag_configs.end()) {
@@ -93,28 +80,31 @@ int MichiganDetector::obtainPose(apriltag_detection_t *tag, TagPose &tag_pose) {
   // } else {
   //   tag_size = this->tag_configs[tag.id] / 2;
   // }
-  //
-  tag_size = 0.5;
 
+  // object points
+  std::vector<cv::Point3f> obj_pts;
   obj_pts.push_back(cv::Point3f(-tag_size, -tag_size, 0));
   obj_pts.push_back(cv::Point3f(tag_size, -tag_size, 0));
   obj_pts.push_back(cv::Point3f(tag_size, tag_size, 0));
   obj_pts.push_back(cv::Point3f(-tag_size, tag_size, 0));
 
+  // image points
+  std::vector<cv::Point2f> img_pts;
   img_pts.push_back(cv::Point2f(tag->p[0][0], tag->p[0][1]));
   img_pts.push_back(cv::Point2f(tag->p[1][0], tag->p[1][1]));
   img_pts.push_back(cv::Point2f(tag->p[2][0], tag->p[2][1]));
   img_pts.push_back(cv::Point2f(tag->p[3][0], tag->p[3][1]));
 
   // distortion parameters
-  cv::Vec4f distParam(0, 0, 0, 0);
+  cv::Vec4f distortion_params(0.0, 0.0, 0.0, 0.0);
 
   // recovering the relative transform of a tag:
   cv::Mat rvec, tvec;
+  CameraConfig camera_config = this->camera_configs[this->camera_mode];
   cv::solvePnP(obj_pts,
                img_pts,
                camera_config.camera_matrix,
-               distParam,
+               distortion_params,
                rvec,
                tvec,
                false,
@@ -123,10 +113,16 @@ int MichiganDetector::obtainPose(apriltag_detection_t *tag, TagPose &tag_pose) {
   cv::Rodrigues(rvec, r);
 
   // Eigen::Matrix3d wRo;
-  R << r(0, 0), r(0, 1), r(0, 2), r(1, 0), r(1, 1), r(1, 2), r(2, 0), r(2, 1),
-      r(2, 2);
+  // rotation matrix
+  // clang-format off
+  Mat3 R;
+  R << r(0, 0), r(0, 1), r(0, 2),
+       r(1, 0), r(1, 1), r(1, 2),
+       r(2, 0), r(2, 1), r(2, 2);
+  // clang-format on
 
   // translational component
+  Vec3 t;
   t << tvec.at<double>(0), tvec.at<double>(1), tvec.at<double>(2);
 
   // sanity check - calculate euclidean distance between prev and current tag
@@ -139,7 +135,7 @@ int MichiganDetector::obtainPose(apriltag_detection_t *tag, TagPose &tag_pose) {
   // tag_pose.id = tag.id;
   tag_pose.detected = true;
   tag_pose.position = t;
-  tag_pose.orientation = Quaternion(R);
+  tag_pose.orientation = Quaternion{R};
 
   return 0;
 }
