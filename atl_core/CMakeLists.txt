@@ -45,6 +45,7 @@ ADD_LIBRARY(
     # data
     src/data/attitude_command.cpp
     src/data/landing_target.cpp
+    src/data/transform.cpp
     src/data/pose.cpp
     # estimation
     src/estimation/ekf.cpp
@@ -118,9 +119,10 @@ ADD_EXECUTABLE(
     tests/control/trajectory_test.cpp
     tests/control/velocity_controller_test.cpp
     tests/control/waypoint_controller_test.cpp
-    # control
+    # data
     tests/data/landing_target_test.cpp
     tests/data/pose_test.cpp
+    tests/data/transform_test.cpp
     # estimation
     tests/estimation/ekf_test.cpp
     tests/estimation/ekf_tracker_test.cpp
