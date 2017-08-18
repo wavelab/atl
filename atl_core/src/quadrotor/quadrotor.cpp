@@ -117,7 +117,7 @@ int Quadrotor::setYaw(const double yaw) {
   }
 
   // set yaw
-  this->yaw = yaw;
+  this->yaw_setpoint = yaw;
 
   return 0;
 }
@@ -187,7 +187,7 @@ int Quadrotor::setHoverPosition(const Vec3 &position) {
   return 0;
 }
 
-bool Quadrotor::conditionsMet(bool *conditions, int nb_conditions) {
+bool Quadrotor::conditionsMet(const bool *conditions, int nb_conditions) {
   for (int i = 0; i < nb_conditions; i++) {
     if (conditions[i] == false) {
       return false;
@@ -206,7 +206,7 @@ int Quadrotor::stepHoverMode(const double dt) {
   // hover
   this->position_controller.update(this->hover_position,
                                    this->pose,
-                                   this->yaw,
+                                   this->yaw_setpoint,
                                    dt);
   this->att_cmd = AttitudeCommand(this->position_controller.outputs);
 
@@ -214,8 +214,6 @@ int Quadrotor::stepHoverMode(const double dt) {
 }
 
 int Quadrotor::stepDiscoverMode(const double dt) {
-  bool conditions[3];
-
   // pre-check
   if (this->configured == false) {
     return -1;
@@ -228,9 +226,10 @@ int Quadrotor::stepDiscoverMode(const double dt) {
   }
 
   // transition
-  conditions[0] = this->landing_target.detected;
-  conditions[1] = this->landing_target.losted == false;
-  conditions[2] = mtoc(&this->discover_tic) > this->min_discover_time;
+  const bool conditions[3] = {this->landing_target.detected,
+                              this->landing_target.losted == false,
+                              mtoc(&this->discover_tic) >
+                                  this->min_discover_time};
 
   if (this->conditionsMet(conditions, 3) && this->auto_track) {
     // transition to tracking mode
@@ -243,27 +242,17 @@ int Quadrotor::stepDiscoverMode(const double dt) {
 }
 
 int Quadrotor::stepTrackingMode(const double dt) {
-  int retval;
-  bool conditions[3];
-  Quaternion q;
-  Vec3 euler, vel_bf;
-
   // pre-check
   if (this->configured == false) {
     return -1;
   }
-
-  // transform velocity from inertial to body frame
-  euler << 0, 0, this->yaw;
-  euler2quat(euler, 321, q);
-  inertial2body(this->velocity, q, vel_bf);
 
   // track target
   this->att_cmd =
       this->tracking_controller.update(this->landing_target.position_bf,
                                        this->pose.position,
                                        this->hover_position,
-                                       this->yaw,
+                                       this->yaw_setpoint,
                                        dt);
 
   // update hover position and tracking timer
@@ -273,17 +262,27 @@ int Quadrotor::stepTrackingMode(const double dt) {
   }
 
   // transition
-  conditions[0] = this->landing_target.detected;
-  conditions[1] = this->landing_target.losted == false;
-  conditions[2] = mtoc(&this->tracking_tic) > this->min_tracking_time;
+  const bool conditions[3] = {this->landing_target.detected,
+                              this->landing_target.losted == false,
+                              mtoc(&this->tracking_tic) >
+                                  this->min_tracking_time};
 
   // check conditions
   if (this->conditionsMet(conditions, 3) && this->auto_land) {
+    // transform velocity from inertial to body frame
+    const Vec3 euler{0, 0, this->yaw_setpoint};
+
+    Quaternion q;
+    euler2quat(euler, 321, q);
+
+    Vec3 vel_bf;
+    inertial2body(this->velocity, q, vel_bf);
+
     // load trajectory
-    retval = this->landing_controller
-                 .loadTrajectory(this->pose.position,
-                                 this->landing_target.position_bf,
-                                 vel_bf(0));
+    const int retval = this->landing_controller
+                           .loadTrajectory(this->pose.position,
+                                           this->landing_target.position_bf,
+                                           vel_bf(0));
 
     // transition to landing mode
     if (retval == 0) {
@@ -306,22 +305,19 @@ int Quadrotor::stepTrackingMode(const double dt) {
 }
 
 int Quadrotor::stepLandingMode(const double dt) {
-  int retval;
-  bool conditions[3];
-
   // pre-check
   if (this->configured == false) {
     return -1;
   }
 
   // land on target
-  retval = this->landing_controller.update(this->landing_target.position_bf,
-                                           this->landing_target.velocity_bf,
-                                           this->pose.position,
-                                           this->velocity,
-                                           this->pose.orientation,
-                                           this->yaw,
-                                           dt);
+  int retval = this->landing_controller.update(this->landing_target.position_bf,
+                                               this->landing_target.velocity_bf,
+                                               this->pose.position,
+                                               this->velocity,
+                                               this->pose.orientation,
+                                               this->yaw_setpoint,
+                                               dt);
   this->att_cmd = this->landing_controller.att_cmd;
 
   // update hover position and tracking timer
@@ -331,9 +327,9 @@ int Quadrotor::stepLandingMode(const double dt) {
   }
 
   // transition
-  conditions[0] = this->landing_target.detected;
-  conditions[1] = this->landing_target.losted == false;
-  conditions[2] = this->landing_target.position_bf.norm() < 0.1;
+  const bool conditions[3] = {this->landing_target.detected,
+                              this->landing_target.losted == false,
+                              this->landing_target.position_bf.norm() < 0.1};
 
   // check conditions
   if (this->conditionsMet(conditions, 3) && this->auto_disarm) {
@@ -380,23 +376,15 @@ int Quadrotor::stepWaypointMode(const double dt) {
   }
 
   if (this->wp_mission_ready == false) {
-    // first go to first waypoint
+    // hover at first waypoint
     const Vec3 wp_start = this->mission.local_waypoints[0];
-    const Vec3 wp_end = this->mission.local_waypoints[1];
-    const double dx = wp_end(0) - wp_start(0);
-    const double dy = wp_end(1) - wp_start(1);
-
-    // calculate waypoint heading between first two waypoints
-    // offset by -90 deg because ENU's 0 yaw is East rather than North
-    const double wp_heading = atan2(dy, dx) - deg2rad(90.0);
-    this->yaw = wp_heading;
-
-    // transition to first waypoint with position controller
     this->setHoverPosition(wp_start);
     this->stepHoverMode(dt);
+    this->yaw_setpoint = this->mission.waypointHeading();
 
     // check if quadrotor is at first waypoint
-    if ((this->pose.position - wp_start).norm() < 0.1) {
+    const double wp_threshold = this->mission.threshold_waypoint_reached;
+    if ((this->pose.position - wp_start).norm() < wp_threshold) {
       LOG_INFO("Quadrotor arrived at first waypoint!");
       LOG_INFO("Waypoing mission in 5s!");
       this->wp_mission_ready = true;
@@ -404,13 +392,11 @@ int Quadrotor::stepWaypointMode(const double dt) {
     }
 
   } else if (this->wp_mission_ready && toc(&this->waypoint_tic) <= 5.0) {
-    // hover at first waypoint for 5 seconds and then traverse through the rest
-    // of the waypoints
-
     // hover at first waypoint
     const Vec3 wp_start = this->mission.local_waypoints[0];
     this->setHoverPosition(wp_start);
     this->stepHoverMode(dt);
+    this->yaw_setpoint = this->mission.waypointHeading();
 
     // count down
     float wp_clock = toc(&this->waypoint_tic);
@@ -436,7 +422,7 @@ int Quadrotor::stepWaypointMode(const double dt) {
                                               this->velocity,
                                               dt);
     this->att_cmd = this->waypoint_controller.att_cmd;
-    this->yaw = this->att_cmd.rpy(2);
+    this->yaw_setpoint = this->att_cmd.rpy(2);
   }
 
   // update hover position

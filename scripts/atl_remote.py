@@ -114,7 +114,8 @@ if __name__ == "__main__":
     rospy.sleep(1.0)
 
     quad.set_arm(True)
-    quad.set_mode("DISCOVER_MODE")
+    # quad.set_mode("DISCOVER_MODE")
+    # lz.set_velocity(1.0)
     # quad.set_yaw(90)
     # quad.set_mode("WAYPOINT_MODE")
 
@@ -193,7 +194,7 @@ if __name__ == "__main__":
     # sleep(1)
 
     # sleep(1)
-    lz_straight_line(0.5)
+    # lz_straight_line(0.5)
     # sleep(1)
     # lz_straight_line(1.0)
     # sleep(1)

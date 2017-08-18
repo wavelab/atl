@@ -115,7 +115,7 @@ int WaypointController::update(Mission &mission,
   }
 
   // calculate waypoint relative to quadrotor
-  Vec3 errors = enu2nwu(waypoint - pose.position);
+  Vec3 errors = waypoint - pose.position;
 
   Vec3 rpy;
   quat2euler(pose.orientation, 321, rpy);
@@ -128,7 +128,6 @@ int WaypointController::update(Mission &mission,
   // pitch
   double error_forward = mission.desired_velocity - vel.norm();
   double p = this->at_controller.update(error_forward, this->dt);
-  // double p = this->at_controller.update(errors(0), this->dt);
 
   // yaw
   double y = mission.waypointHeading();

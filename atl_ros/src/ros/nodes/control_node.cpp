@@ -155,9 +155,9 @@ void ControlNode::globalPositionCallback(const dji_sdk::GlobalPosition &msg) {
 }
 
 void ControlNode::localPositionCallback(const dji_sdk::LocalPosition &msg) {
-  // convert msg from NED to ENU
+  // convert msg from NED to NWU
   Vec3 pos_ned{msg.x, msg.y, msg.z};
-  Vec3 pos_enu = ned2enu(pos_ned);
+  Vec3 pos_enu = T_nwu_ned * pos_ned;
   this->quadrotor.pose.position = pos_enu;
 }
 
@@ -171,15 +171,15 @@ void ControlNode::attitudeCallback(const dji_sdk::AttitudeQuaternion &msg) {
 
   // transform pose position and orientation
   // from NED to NWU
-  Quaternion orientation_nwu = ned2nwu(orientation_ned);
+  Quaternion orientation_nwu = T_nwu_ned * orientation_ned;
   this->quadrotor.pose.orientation = orientation_nwu;
 }
 
 void ControlNode::velocityCallback(const dji_sdk::Velocity &msg) {
-  // convert msg from NED to ENU
+  // convert msg from NED to NWU
   Vec3 vel_ned{msg.vx, msg.vy, msg.vz};
-  Vec3 vel_enu = ned2enu(vel_ned);
-  this->quadrotor.setVelocity(vel_enu);
+  Vec3 vel_nwu = T_nwu_ned * vel_ned;
+  this->quadrotor.setVelocity(vel_nwu);
 }
 
 void ControlNode::radioCallback(const dji_sdk::RCChannels &msg) {

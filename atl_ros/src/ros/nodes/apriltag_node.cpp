@@ -71,47 +71,34 @@ void AprilTagNode::publishTargetBodyPositionEncoderMsg(
 
 void AprilTagNode::publishTargetInertialYawMsg(const TagPose &tag,
                                                const Quaternion &gimbal_frame) {
-  double yaw_if;
-  Vec3 tag_euler, gimbal_frame_euler;
-  std_msgs::Float64 msg;
-
   // convert orientation in quaternion to euler angles
+  Vec3 tag_euler, gimbal_frame_euler;
   quat2euler(gimbal_frame, 321, gimbal_frame_euler);
   quat2euler(tag.orientation, 321, tag_euler);
 
   // build and publish msg
-  yaw_if = wrapTo180(rad2deg(gimbal_frame_euler(2) - tag_euler(2)));
+  const double yaw_if =
+      wrapTo180(rad2deg(gimbal_frame_euler(2) - tag_euler(2)));
+
+  std_msgs::Float64 msg;
   msg.data = deg2rad(yaw_if);
   this->ros_pubs[TARGET_IF_YAW_TOPIC].publish(msg);
 }
 
 void AprilTagNode::publishTargetBodyYawMsg(const TagPose &tag) {
-  Vec3 euler;
-  std_msgs::Float64 msg;
-
   // convert orientation in quaternion to euler angles
+  Vec3 euler;
   quat2euler(tag.orientation, 321, euler);
 
   // build and publish msg
+  std_msgs::Float64 msg;
   msg.data = euler(2);
   this->ros_pubs[TARGET_BPF_YAW_TOPIC].publish(msg);
 }
 
 void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
-  int retval;
-  Vec3 target_cf, target_bpf, gimbal_position;
-  Vec3 target_bpf_encoder;
-  Quaternion gimbal_frame;
-  Quaternion gimbal_joint;
-  cv_bridge::CvImagePtr image_ptr;
-  std::vector<TagPose> tags;
-
-  Quaternion gimbal_joint_bf;
-  Quaternion quad_orientation;
-  Vec3 quad_position;
-
   // parse msg
-  image_ptr = cv_bridge::toCvCopy(msg);
+  const cv_bridge::CvImagePtr image_ptr = cv_bridge::toCvCopy(msg);
 
   // debug
   if (this->debug_mode) {
@@ -120,33 +107,33 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
   }
 
   // extract gimbal stats from image
-  gimbal_position(0) = image_ptr->image.at<double>(0, 0);
-  gimbal_position(1) = image_ptr->image.at<double>(0, 1);
-  gimbal_position(2) = image_ptr->image.at<double>(0, 2);
+  const Vec3 gimbal_position{image_ptr->image.at<double>(0, 0),
+                             image_ptr->image.at<double>(0, 1),
+                             image_ptr->image.at<double>(0, 2)};
 
-  gimbal_frame.w() = image_ptr->image.at<double>(0, 3);
-  gimbal_frame.x() = image_ptr->image.at<double>(0, 4);
-  gimbal_frame.y() = image_ptr->image.at<double>(0, 5);
-  gimbal_frame.z() = image_ptr->image.at<double>(0, 6);
+  const Quaternion gimbal_frame{image_ptr->image.at<double>(0, 3),
+                                image_ptr->image.at<double>(0, 4),
+                                image_ptr->image.at<double>(0, 5),
+                                image_ptr->image.at<double>(0, 6)};
 
-  gimbal_joint.w() = image_ptr->image.at<double>(0, 7);
-  gimbal_joint.x() = image_ptr->image.at<double>(0, 8);
-  gimbal_joint.y() = image_ptr->image.at<double>(0, 9);
-  gimbal_joint.z() = image_ptr->image.at<double>(0, 10);
+  const Quaternion gimbal_joint{image_ptr->image.at<double>(0, 7),
+                                image_ptr->image.at<double>(0, 8),
+                                image_ptr->image.at<double>(0, 9),
+                                image_ptr->image.at<double>(0, 10)};
 
-  gimbal_joint_bf.w() = image_ptr->image.at<double>(0, 11);
-  gimbal_joint_bf.x() = image_ptr->image.at<double>(0, 12);
-  gimbal_joint_bf.y() = image_ptr->image.at<double>(0, 13);
-  gimbal_joint_bf.z() = image_ptr->image.at<double>(0, 14);
+  const Quaternion gimbal_joint_bf{image_ptr->image.at<double>(0, 11),
+                                   image_ptr->image.at<double>(0, 12),
+                                   image_ptr->image.at<double>(0, 13),
+                                   image_ptr->image.at<double>(0, 14)};
 
-  quad_position(0) = image_ptr->image.at<double>(0, 15);
-  quad_position(1) = image_ptr->image.at<double>(0, 16);
-  quad_position(2) = image_ptr->image.at<double>(0, 17);
+  const Vec3 quad_position{image_ptr->image.at<double>(0, 15),
+                           image_ptr->image.at<double>(0, 16),
+                           image_ptr->image.at<double>(0, 17)};
 
-  quad_orientation.w() = image_ptr->image.at<double>(0, 18);
-  quad_orientation.x() = image_ptr->image.at<double>(0, 19);
-  quad_orientation.y() = image_ptr->image.at<double>(0, 20);
-  quad_orientation.z() = image_ptr->image.at<double>(0, 21);
+  const Quaternion quad_orientation{image_ptr->image.at<double>(0, 18),
+                                    image_ptr->image.at<double>(0, 19),
+                                    image_ptr->image.at<double>(0, 20),
+                                    image_ptr->image.at<double>(0, 21)};
 
   // remove the gimbal states from image
   for (int i = 0; i < 22; i++) {
@@ -154,7 +141,8 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
   }
 
   // detect tags
-  retval = this->detector.extractTags(image_ptr->image, tags);
+  std::vector<TagPose> tags;
+  int retval = this->detector.extractTags(image_ptr->image, tags);
   if (retval == -1) {
     exit(-1); // dangerous but necessary
   } else if (tags.size() == 0) {
@@ -162,27 +150,29 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
   }
 
   // transform tag in camera frame to body planar frame
-  target_cf << tags[0].position(0), tags[0].position(1), tags[0].position(2);
-  target_bpf =
+  const Vec3 target_cf{tags[0].position(0),
+                       tags[0].position(1),
+                       tags[0].position(2)};
+  const Vec3 target_bpf =
       Gimbal::getTargetInBPF(this->camera_offset, target_cf, gimbal_joint);
 
   // Calculate target frame in bpf from encoders
   Vec3 encoder_rpy_bf;
-  Vec3 quad_rpy_if;
-  Vec3 joint_encoder_rpy_if;
-  Quaternion joint_encoder_quat_if;
-
   quat2euler(gimbal_joint_bf, 321, encoder_rpy_bf);
+
+  Vec3 quad_rpy_if;
   quat2euler(quad_orientation, 321, quad_rpy_if);
 
-  joint_encoder_rpy_if(0) = encoder_rpy_bf(0) + quad_rpy_if(0);
-  joint_encoder_rpy_if(1) = encoder_rpy_bf(1) + quad_rpy_if(1);
-  joint_encoder_rpy_if(2) = 0.0;
+  const Vec3 joint_encoder_rpy_if{encoder_rpy_bf(0) + quad_rpy_if(0),
+                                  encoder_rpy_bf(1) + quad_rpy_if(1),
+                                  0.0};
 
+  Quaternion joint_encoder_quat_if;
   euler2quat(joint_encoder_rpy_if, 321, joint_encoder_quat_if);
-  target_bpf_encoder = Gimbal::getTargetInBPF(this->camera_offset,
-                                              target_cf,
-                                              joint_encoder_quat_if);
+
+  const Vec3 target_bpf_encoder = Gimbal::getTargetInBPF(this->camera_offset,
+                                                         target_cf,
+                                                         joint_encoder_quat_if);
 
   // publish tag pose
   this->publishTagPoseMsg(tags[0]);

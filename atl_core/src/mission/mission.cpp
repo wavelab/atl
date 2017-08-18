@@ -101,10 +101,10 @@ int Mission::setHomePoint(double home_lat, double home_lon) {
     latlon_diff(home_lat, home_lon, lat, lon, &dist_N, &dist_E);
 
     // add to waypoints
-    const Vec3 enu{dist_E, dist_N, alt};
-    std::cout << "Adding local waypoint (ENU): " << enu.transpose()
-              << std::endl;
-    this->local_waypoints.push_back(enu);
+    const Vec3 nwu{dist_N, -1.0 * dist_E, alt};
+    std::cout << "Adding local waypoint (nwu): " << nwu.transpose();
+    std::cout << std::endl;
+    this->local_waypoints.push_back(nwu);
   }
 
   // set first pair of waypoints
@@ -170,12 +170,12 @@ double Mission::crossTrackError(const Vec3 &position, int mode) {
 }
 
 double Mission::waypointHeading() {
-  // assume waypoints are in ENU inertial frame
+  // assume waypoints are in NWU inertial frame
   const double dx = this->wp_end(0) - this->wp_start(0);
   const double dy = this->wp_end(1) - this->wp_start(1);
 
-  // offset by -90 deg because ENU's 0 yaw is East rather than North
-  double heading = atan2(dy, dx) - deg2rad(90.0);
+  // calculate heading
+  double heading = atan2(dy, dx);
   if (heading > M_PI) {
     heading -= 2 * M_PI;
   } else if (heading < -M_PI) {

@@ -48,7 +48,7 @@ Vec4 PositionController::update(const Vec3 &setpoints,
   }
 
   // calculate setpoint relative to quadrotor
-  Vec3 errors = enu2nwu(setpoints - pose.position);
+  Vec3 errors = setpoints - pose.position;
 
   Vec3 rpy;
   quat2euler(pose.orientation, 321, rpy);

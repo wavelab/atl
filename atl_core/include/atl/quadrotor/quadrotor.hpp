@@ -80,7 +80,7 @@ public:
   Mission mission;
 
   enum Mode current_mode = NOT_SET;
-  double yaw = 0.0;
+  double yaw_setpoint = 0.0;
   Pose pose;
   Vec3 velocity = Vec3::Zero();
   Vec3 hover_position = Vec3::Zero();
@@ -208,7 +208,7 @@ public:
    *    - 0: All conditions have been met
    *    - -1: Not all conditions have been met
    */
-  bool conditionsMet(bool *conditions, int nb_conditions);
+  bool conditionsMet(const bool *conditions, int nb_conditions);
 
   /**
    * Step hover mode

@@ -108,10 +108,10 @@ TEST(Quadrotor, setYaw) {
   Quadrotor quadrotor;
 
   quadrotor.configure(TEST_CONFIG_PATH);
-  EXPECT_FLOAT_EQ(0, quadrotor.yaw);
+  EXPECT_FLOAT_EQ(0, quadrotor.yaw_setpoint);
 
   quadrotor.setYaw(1);
-  EXPECT_FLOAT_EQ(1, quadrotor.yaw);
+  EXPECT_FLOAT_EQ(1, quadrotor.yaw_setpoint);
 }
 
 TEST(Quadrotor, setTargetPosition) {

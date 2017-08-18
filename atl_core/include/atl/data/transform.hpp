@@ -11,7 +11,15 @@ public:
   Transform(Mat4 mat) : Mat4(mat) {}
 };
 
+/**
+ * Transform position or velocity vector of size 3
+ */
 Vec3 operator*(const Transform &T, const Vec3 &x);
+
+/**
+ * Transform quaternion
+ */
+Quaternion operator*(const Transform &T, const Quaternion &x);
 
 /**
  * Transform from NED to NWU
