@@ -87,8 +87,8 @@ int Trajectory::update(const Vec3 &pos,
 
   // find next waypoint position, velocity and inputs
   double wp_percent = closest_point(wp_pos_start, wp_pos_end, q_pos, wp_pos);
-  wp_vel = linear_interpolation(wp_vel_start, wp_vel_end, wp_percent);
-  wp_inputs = linear_interpolation(wp_inputs_start, wp_inputs_end, wp_percent);
+  wp_vel = lerp(wp_vel_start, wp_vel_end, wp_percent);
+  wp_inputs = lerp(wp_inputs_start, wp_inputs_end, wp_percent);
 
   // update trajectory waypoints
   if (wp_percent > 1.0) {

@@ -39,6 +39,7 @@ ADD_LIBRARY(
     src/control/position_controller.cpp
     src/control/tracking_controller.cpp
     src/control/trajectory.cpp
+    src/control/trajectory_controller.cpp
     src/control/trajectory_index.cpp
     src/control/velocity_controller.cpp
     src/control/waypoint_controller.cpp

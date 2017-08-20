@@ -2,6 +2,7 @@
 #define ATL_DATA_ATTITUDE_COMMAND_HPP
 
 #include "atl/utils/utils.hpp"
+#include "atl/data/transform.hpp"
 
 namespace atl {
 

@@ -1,24 +1,19 @@
 at_controller:
-    k_p: 0.1
-    k_i: 0.2
-    k_d: 0.3
-ct_controller:
-    k_p: 0.1
-    k_i: 0.0
-    k_d: 0.0
-z_controller:
-    k_p: 0.1
-    k_i: 0.2
-    k_d: 0.3
-yaw_controller:
-    k_p: 0.1
-    k_i: 0.2
-    k_d: 0.3
+  min: -20.0
+  max: 20.0
+  k_p: 0.1
+  k_i: 0.2
+  k_d: 0.3
 
-roll_limit:
-    min: -20.0
-    max: 20.0
-pitch_limit:
-    min: -20.0
-    max: 20.0
-hover_throttle: 0.5
+ct_controller:
+  min: -20.0
+  max: 20.0
+  k_p: 0.1
+  k_i: 0.0
+  k_d: 0.0
+
+z_controller:
+  hover_throttle: 0.5
+  k_p: 0.1
+  k_i: 0.2
+  k_d: 0.3

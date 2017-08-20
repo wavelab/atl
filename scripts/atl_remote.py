@@ -115,9 +115,9 @@ if __name__ == "__main__":
 
     quad.set_arm(True)
     # quad.set_mode("DISCOVER_MODE")
-    lz.set_velocity(1.0)
+    # lz.set_velocity(1.0)
     # quad.set_yaw(90)
-    # quad.set_mode("WAYPOINT_MODE")
+    quad.set_mode("WAYPOINT_MODE")
 
     # quad.set_pctrl_settings({
     #     "roll": {

@@ -29,7 +29,6 @@ public:
 
   Vec3 setpoints{0.0, 0.0, 0.0};
   Vec4 outputs{0.0, 0.0, 0.0, 0.0};
-  AttitudeCommand att_cmd;
 
   VelocityController() {}
 

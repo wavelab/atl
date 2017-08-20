@@ -1,25 +1,21 @@
 roll_controller:
-    k_p: 0.3
-    k_i: 0.0
-    k_d: 0.15
+  min: -60.0
+  max: 60.0
+  k_p: 0.3
+  k_i: 0.0
+  k_d: 0.15
 
 pitch_controller:
-    k_p: 0.3
-    k_i: 0.0
-    k_d: 0.15
+  min: -60.0
+  max: 60.0
+  k_p: 0.3
+  k_i: 0.0
+  k_d: 0.15
 
 throttle_controller:
-    hover_throttle: 0.5
-    k_p: 0.4
-    k_i: 0.0
-    k_d: 0.2
-
-roll_limit:
-    min: -60.0
-    max: 60.0
-
-pitch_limit:
-    min: -60.0
-    max: 60.0
+  hover_throttle: 0.5
+  k_p: 0.4
+  k_i: 0.0
+  k_d: 0.2
 
 track_offset: [0.0, 0.0, 0.0]

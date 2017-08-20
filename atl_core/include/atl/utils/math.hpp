@@ -105,171 +105,6 @@ void load_matrix(const std::vector<double> &x,
 void load_matrix(const MatX A, std::vector<double> &x);
 
 /**
- * Right hand rotation Matrix in x-axis
- * @param angle Rotation angle in radians
- * @return Rotation matrix
- */
-Mat3 rotx(const double angle);
-
-/**
- * Right hand rotation Matrix in y-axis
- * @param angle Rotation angle in radians
- * @return Rotation matrix
- */
-Mat3 roty(const double angle);
-
-/**
- * Right hand rotation Matrix in z-axis
- * @param angle Rotation angle in radians
- * @return Rotation matrix
- */
-Mat3 rotz(const double angle);
-
-/**
- * Convert Euler 1-2-3 angles to quaternion
- * @param euler Input Euler angles
- * @return Output quaternion
- */
-Quaternion euler123ToQuat(const Vec3 &euler);
-
-/**
- * Convert Euler 3-2-1 angles to quaternion
- * @param euler Input Euler angles
- * @return Output quaternion
- */
-Quaternion euler321ToQuat(const Vec3 &euler);
-
-/**
- * Convert Euler 1-2-3 angles to rotation matrix
- * @param euler Input Euler angles
- * @return R Output rotation matrix
- */
-Mat3 euler123ToRot(const Vec3 &euler);
-
-/**
- * Convert Euler 3-2-1 angles to rotation matrix
- * @param euler Input Euler angles
- * @return R Output rotation matrix
- */
-Mat3 euler321ToRot(const Vec3 &euler);
-
-/**
- * Convert quanternion to Euler 1-2-3 angles
- * @param q Input quaternion
- * @return euler Output Euler angles
- */
-Vec3 quatToEuler123(const Quaternion &q);
-
-/**
- * Convert quanternion to Euler 3-2-1 angles
- * @param q Input quaternion
- * @return euler Output Euler angles
- */
-Vec3 quatToEuler321(const Quaternion &q);
-
-/**
- * Convert Quaternion to rotation matrix
- * @param q Input quaternion
- * @param R Output rotation matrix
- */
-Mat3 quat2rot(const Quaternion &q);
-
-/**
- * Convert from ENU to NWU
- * @param enu ENU vector
- * @return nwu NWU vector
- */
-Vec3 enu2nwu(const Vec3 &enu);
-
-/**
- * Convert from EDN to NWU
- * @param enu EDN vector
- * @return nwu NWU vector
- */
-Vec3 edn2nwu(const Vec3 &edn);
-
-/**
- * Convert from EDN to ENU
- * @param enu EDN vector
- * @return enu ENU vector
- */
-Vec3 edn2enu(const Vec3 &edn);
-
-/**
- * Convert from NWU to ENU
- * @param nwu NWU vector
- * @return enu ENU vector
- */
-Vec3 nwu2enu(const Vec3 &nwu);
-
-/**
- * Convert from NWU to NED
- * @param nwu NWU vector
- * @return enu NED vector
- */
-Vec3 nwu2ned(const Vec3 &nwu);
-
-/**
- * Convert from NED to ENU
- * @param ned NED vector
- * @return enu ENU vector
- */
-Vec3 ned2enu(const Vec3 &ned);
-
-/**
- * Convert from NED to NWU
- * @param ned NED vector
- * @return enu NWU vector
- */
-Vec3 ned2nwu(const Vec3 &ned);
-
-/**
- * Convert from NWU to NED
- * @param nwu NWU quaternion
- * @return ned NED quaternion
- */
-Quaternion nwu2ned(const Quaternion &nwu);
-
-/**
- * Conver from NED to NWU
- * @param ned NED quaternion
- * @param nwu NWU quaternion
- */
-Quaternion ned2nwu(const Quaternion &ned);
-
-/**
- * Conver from ENU to NWU
- * @param ned ENU quaternion
- * @param nwu NWU quaternion
- */
-Quaternion enu2nwu(const Quaternion &enu);
-
-void target2body(Vec3 target_pos_if,
-                 Vec3 body_pos_if,
-                 Quaternion body_orientation_if,
-                 Vec3 &target_pos_bf);
-void target2body(Vec3 target_pos_if,
-                 Vec3 body_pos_if,
-                 Vec3 body_euler_if,
-                 Vec3 &target_pos_bf);
-void target2bodyplanar(Vec3 target_pos_if,
-                       Vec3 body_pos_if,
-                       Quaternion body_orientation_if,
-                       Vec3 &target_pos_bf);
-void target2bodyplanar(Vec3 target_pos_if,
-                       Vec3 body_pos_if,
-                       Vec3 body_euler_if,
-                       Vec3 &target_pos_bf);
-void target2inertial(Vec3 target_pos_bf,
-                     Vec3 body_pos_if,
-                     Vec3 body_euler_if,
-                     Vec3 &target_pos_if);
-void target2inertial(Vec3 target_pos_bf,
-                     Vec3 body_pos_if,
-                     Quaternion body_orientation_if,
-                     Vec3 &target_pos_if);
-
-/**
  * Wrap angle in degrees to 180
  *
  * @param d Degrees
@@ -301,13 +136,54 @@ double wrapToPi(const double r);
  */
 double wrapTo2Pi(const double r);
 
+/**
+ * Cross-Track error based on waypoint line between p1, p2, and robot position
+ *
+ * @param p1 Waypoint 1
+ * @param p2 Waypoint 2
+ * @param pos Robot position
+ * @return Cross track error
+ */
 double cross_track_error(const Vec2 &p1, const Vec2 &p2, const Vec2 &pos);
+
+/**
+ * Check if point `pos` is left or right of line formed by `p1` and `p2`
+ *
+ * @param p1 Waypoint 1
+ * @param p2 Waypoint 2
+ * @param pos Robot position
+ * @return
+ *    - 1: Point is left of waypoint line formed by `p1` and `p2`
+ *    - 2: Point is right of waypoint line formed by `p1` and `p2`
+ *    - 0: Point is colinear with waypoint line formed by `p1` and `p2`
+ */
 int point_left_right(const Vec2 &p1, const Vec2 &p2, const Vec2 &pos);
-// int closest_point(Vec2 p1, Vec2 p2, Vec2 p3, Vec2 &closest, bool
-// limit=false);
+
+/**
+ * Calculate closest point given waypoint line between `p1`, `p2` and robot
+ * position
+ *
+ * @param p1 Waypoint 1
+ * @param p2 Waypoint 2
+ * @param pos Robot position
+ * @param cloest Closest point
+ * @return
+ *    Unit number denoting where the closest point is on waypoint line. For
+ *    example, a return value of 0.5 denotes the closest point is half-way
+ *    (50%) of the waypoint line, alternatively a negative number denotes the
+ *    closest point is behind the first waypoint.
+ */
 double
 closest_point(const Vec2 &p1, const Vec2 &p2, const Vec2 &p3, Vec2 &closest);
-Vec2 linear_interpolation(const Vec2 &a, const Vec2 &b, const double mu);
+
+/**
+ * Linear interpolation between two points
+ *
+ * @param a First point
+ * @param b Second point
+ * @param mu Unit number
+ */
+Vec2 lerp(const Vec2 &a, const Vec2 &b, const double mu);
 
 } // namespace atl
 #endif

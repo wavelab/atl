@@ -226,13 +226,13 @@ int Quadrotor::stepDiscoverMode(const double dt) {
   }
 
   // transition
-  const bool conditions[3] = {this->landing_target.detected,
-                              this->landing_target.losted == false,
-                              mtoc(&this->discover_tic) >
-                                  this->min_discover_time};
+  bool conditions[3] = {false, false, false};
+  conditions[0] = this->landing_target.detected;
+  conditions[1] = this->landing_target.losted == false;
+  conditions[2] = mtoc(&this->discover_tic) > this->min_discover_time;
 
+  // transition to tracking mode
   if (this->conditionsMet(conditions, 3) && this->auto_track) {
-    // transition to tracking mode
     LOG_INFO("Transitioning to [TRACKING MODE]!");
     this->setMode(TRACKING_MODE);
     this->discover_tic = (struct timespec){0, 0};
@@ -248,12 +248,12 @@ int Quadrotor::stepTrackingMode(const double dt) {
   }
 
   // track target
-  this->att_cmd =
-      this->tracking_controller.update(this->landing_target.position_bf,
-                                       this->pose.position,
-                                       this->hover_position,
-                                       this->yaw_setpoint,
-                                       dt);
+  this->tracking_controller.update(this->landing_target.position_bf,
+                                   this->pose.position,
+                                   this->hover_position,
+                                   this->yaw_setpoint,
+                                   dt);
+  this->att_cmd = AttitudeCommand(this->tracking_controller.outputs);
 
   // update hover position and tracking timer
   this->setHoverXYPosition(this->pose.position);
@@ -261,34 +261,21 @@ int Quadrotor::stepTrackingMode(const double dt) {
     tic(&this->tracking_tic);
   }
 
-  // transition
-  const bool conditions[3] = {this->landing_target.detected,
-                              this->landing_target.losted == false,
-                              mtoc(&this->tracking_tic) >
-                                  this->min_tracking_time};
-
   // check conditions
+  bool conditions[3] = {false, false, false};
+  conditions[0] = this->landing_target.detected;
+  conditions[1] = this->landing_target.losted == false;
+  conditions[2] = mtoc(&this->tracking_tic) > this->min_tracking_time;
+
+  // transition to landing mode
   if (this->conditionsMet(conditions, 3) && this->auto_land) {
-    // transform velocity from inertial to body frame
-    Vec3 vel_bf = T_bf_if{this->pose.orientation} * this->velocity;
+    LOG_INFO("Transitioning to [LANDING MODE]!");
+    this->setMode(LANDING_MODE);
+    this->tracking_tic = (struct timespec){0, 0};
 
-    // load trajectory
-    const int retval = this->landing_controller
-                           .loadTrajectory(this->pose.position,
-                                           this->landing_target.position_bf,
-                                           vel_bf(0));
-
-    // transition to landing mode
-    if (retval == 0) {
-      LOG_INFO("Transitioning to [LANDING MODE]!");
-      // this->landing_controller.recordTrajectoryIndex();
-      this->setMode(LANDING_MODE);
-      this->tracking_tic = (struct timespec){0, 0};
-    }
-
-  } else if (this->landing_target.isTargetLosted()) {
     // transition back to discover mode
-    LOG_INFO("Landing Target is losted!");
+  } else if (this->landing_target.isTargetLosted()) {
+    LOG_INFO("Landing Target is lost!");
     LOG_INFO("Transitioning back to [DISCOVER_MODE]!");
     this->setMode(DISCOVER_MODE);
     this->tracking_tic = (struct timespec){0, 0};
@@ -305,14 +292,11 @@ int Quadrotor::stepLandingMode(const double dt) {
   }
 
   // land on target
-  int retval = this->landing_controller.update(this->landing_target.position_bf,
-                                               this->landing_target.velocity_bf,
-                                               this->pose.position,
-                                               this->velocity,
-                                               this->pose.orientation,
-                                               this->yaw_setpoint,
-                                               dt);
-  this->att_cmd = this->landing_controller.att_cmd;
+  this->landing_controller.update(this->landing_target.position_bf,
+                                  this->velocity,
+                                  this->yaw_setpoint,
+                                  dt);
+  this->att_cmd = AttitudeCommand(this->landing_controller.outputs);
 
   // update hover position and tracking timer
   this->setHoverPosition(this->pose.position);
@@ -320,28 +304,20 @@ int Quadrotor::stepLandingMode(const double dt) {
     tic(&this->landing_tic);
   }
 
-  // transition
-  const bool conditions[3] = {this->landing_target.detected,
-                              this->landing_target.losted == false,
-                              this->landing_target.position_bf.norm() < 0.1};
-
   // check conditions
+  bool conditions[3] = {false, false, false};
+  conditions[0] = this->landing_target.detected;
+  conditions[1] = this->landing_target.losted == false;
+  conditions[2] = this->landing_target.position_bf.norm() < 0.1;
+
+  // transition to disarm mode
   if (this->conditionsMet(conditions, 3) && this->auto_disarm) {
-    // transition to disarm mode
     this->setMode(DISARM_MODE);
     this->landing_tic = (struct timespec){0, 0};
 
+    // transition back to discovery mode
   } else if (this->landing_target.isTargetLosted()) {
-    // transition back to discovery mode
     LOG_INFO("Landing Target is losted!");
-    LOG_INFO("Transitioning back to [DISCOVER_MODE]!");
-    this->setMode(DISCOVER_MODE);
-    this->landing_tic = (struct timespec){0, 0};
-    this->hover_position(2) = this->recover_height;
-
-  } else if (retval != 0) {
-    // transition back to discovery mode
-    LOG_INFO("Failed to follow landing trajectory!");
     LOG_INFO("Transitioning back to [DISCOVER_MODE]!");
     this->setMode(DISCOVER_MODE);
     this->landing_tic = (struct timespec){0, 0};
@@ -369,8 +345,8 @@ int Quadrotor::stepWaypointMode(const double dt) {
     }
   }
 
+  // hover at first waypoint
   if (this->wp_mission_ready == false) {
-    // hover at first waypoint
     const Vec3 wp_start = this->mission.local_waypoints[0];
     this->setHoverPosition(wp_start);
     this->stepHoverMode(dt);
@@ -385,8 +361,8 @@ int Quadrotor::stepWaypointMode(const double dt) {
       tic(&this->waypoint_tic);
     }
 
+    // hover at first waypoint and do a 5 second count down
   } else if (this->wp_mission_ready && toc(&this->waypoint_tic) <= 5.0) {
-    // hover at first waypoint
     const Vec3 wp_start = this->mission.local_waypoints[0];
     this->setHoverPosition(wp_start);
     this->stepHoverMode(dt);
@@ -409,13 +385,13 @@ int Quadrotor::stepWaypointMode(const double dt) {
       this->waypoint_countdown[3] = true;
     }
 
-  } else if (this->wp_mission_ready && toc(&this->waypoint_tic) > 5.0) {
     // travel through waypoints
+  } else if (this->wp_mission_ready && toc(&this->waypoint_tic) > 5.0) {
     retval = this->waypoint_controller.update(this->mission,
                                               this->pose,
                                               this->velocity,
                                               dt);
-    this->att_cmd = this->waypoint_controller.att_cmd;
+    this->att_cmd = AttitudeCommand(this->waypoint_controller.outputs);
     this->yaw_setpoint = this->att_cmd.rpy(2);
   }
 

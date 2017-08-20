@@ -27,16 +27,12 @@ ROSNode::ROSNode(int argc, char **argv) {
 ROSNode::~ROSNode() { ros::shutdown(); }
 
 int ROSNode::configure(int hz) {
-  // clang-format off
   if (ros::isInitialized() == false) {
-    ros::init(
-      this->argc,
-      this->argv,
-      this->node_name,
-      ros::init_options::NoSigintHandler
-    );
+    ros::init(this->argc,
+              this->argv,
+              this->node_name,
+              ros::init_options::NoSigintHandler);
   }
-  // clang-format on
 
   // initialize
   this->ros_nh = new ros::NodeHandle();

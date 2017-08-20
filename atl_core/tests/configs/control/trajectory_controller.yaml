@@ -1,17 +1,11 @@
 roll_controller:
-    min: -50
-    max: 50
     k_p: 0.1
     k_i: 0.2
     k_d: 0.3
-
 pitch_controller:
-    min: -50
-    max: 50
     k_p: 0.1
     k_i: 0.2
     k_d: 0.3
-
 throttle_controller:
     hover_throttle: 0.6
     k_p: 0.1
@@ -43,4 +37,9 @@ throttle_limit:
     min: -1.0
     max: 1.0
 
-track_offset: [0.0, 0.0, 0.0]
+trajectory_index: "../trajectory/index.csv"
+trajectory_threshold: [0.5, 0.5, 0.5]
+
+blackbox_enable: true
+blackbox_rate: 0.2
+blackbox_file: "/tmp/landing_blackbox.csv"

@@ -9,6 +9,7 @@
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
 
+#include "atl/atl_core.hpp"
 #include "atl/gazebo/gazebo_node.hpp"
 #include "atl/models/two_wheel.hpp"
 

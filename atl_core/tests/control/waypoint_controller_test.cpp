@@ -29,7 +29,7 @@ TEST(WaypointController, constructor) {
   EXPECT_FLOAT_EQ(0.0, controller.roll_limit[1]);
   EXPECT_FLOAT_EQ(0.0, controller.pitch_limit[0]);
   EXPECT_FLOAT_EQ(0.0, controller.pitch_limit[1]);
-  EXPECT_FLOAT_EQ(0.5, controller.hover_throttle);
+  EXPECT_FLOAT_EQ(0.0, controller.hover_throttle);
 
   EXPECT_FLOAT_EQ(0.0, controller.outputs(0));
   EXPECT_FLOAT_EQ(0.0, controller.outputs(1));

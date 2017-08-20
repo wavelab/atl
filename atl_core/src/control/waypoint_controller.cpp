@@ -9,21 +9,19 @@ int WaypointController::configure(const std::string &config_file) {
   parser.addParam("at_controller.k_p", &this->at_controller.k_p);
   parser.addParam("at_controller.k_i", &this->at_controller.k_i);
   parser.addParam("at_controller.k_d", &this->at_controller.k_d);
+  parser.addParam("at_controller.min", &this->pitch_limit[0]);
+  parser.addParam("at_controller.max", &this->pitch_limit[1]);
+
   parser.addParam("ct_controller.k_p", &this->ct_controller.k_p);
   parser.addParam("ct_controller.k_i", &this->ct_controller.k_i);
   parser.addParam("ct_controller.k_d", &this->ct_controller.k_d);
+  parser.addParam("ct_controller.min", &this->roll_limit[0]);
+  parser.addParam("ct_controller.max", &this->roll_limit[1]);
+
   parser.addParam("z_controller.k_p", &this->z_controller.k_p);
   parser.addParam("z_controller.k_i", &this->z_controller.k_i);
   parser.addParam("z_controller.k_d", &this->z_controller.k_d);
-  parser.addParam("yaw_controller.k_p", &this->yaw_controller.k_p);
-  parser.addParam("yaw_controller.k_i", &this->yaw_controller.k_i);
-  parser.addParam("yaw_controller.k_d", &this->yaw_controller.k_d);
-
-  parser.addParam("roll_limit.min", &this->roll_limit[0]);
-  parser.addParam("roll_limit.max", &this->roll_limit[1]);
-  parser.addParam("pitch_limit.min", &this->pitch_limit[0]);
-  parser.addParam("pitch_limit.max", &this->pitch_limit[1]);
-  parser.addParam("hover_throttle", &this->hover_throttle);
+  parser.addParam("z_controller.hover_throttle", &this->hover_throttle);
   if (parser.load(config_file) != 0) {
     return -1;
   }
@@ -116,10 +114,7 @@ int WaypointController::update(Mission &mission,
 
   // calculate waypoint relative to quadrotor
   Vec3 errors = waypoint - pose.position;
-
-  Vec3 rpy = quatToEuler321(pose.orientation);
-  Mat3 R = rotz(rpy(2));
-  errors = R.inverse() * errors;
+  errors = T_bpf_if{pose.orientation} * errors;
 
   // roll
   double r = -this->ct_controller.update(errors(1), this->dt);
@@ -130,10 +125,6 @@ int WaypointController::update(Mission &mission,
 
   // yaw
   double y = mission.waypointHeading();
-  if (fabs(y - rpy(2)) > deg2rad(5)) {
-    r = 0.0;
-    p = 0.0;
-  }
 
   // throttle
   const double error_z = waypoint(2) - pose.position(2);
@@ -150,10 +141,10 @@ int WaypointController::update(Mission &mission,
   t = (t > 1.0) ? 1.0 : t;
 
   // keep track of setpoints and outputs
+  this->setpoints = waypoint;
   this->outputs << r, p, y, t;
-  this->att_cmd = AttitudeCommand{this->outputs};
-  this->dt = 0.0;
   this->record(pose.position, waypoint);
+  this->dt = 0.0;
 
   return 0;
 }

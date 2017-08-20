@@ -495,7 +495,7 @@ int ConfigParser::load(const std::string &config_file) {
       default: return -6;
     }
 
-    if (retval == -1) {
+    if (retval == -1 || retval == -2) {
       return retval;
     }
   }

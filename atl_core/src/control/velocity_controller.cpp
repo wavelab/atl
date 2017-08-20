@@ -7,23 +7,23 @@ int VelocityController::configure(const std::string &config_file) {
 
   // load config
   // clang-format off
-  parser.addParam("vx_controller.pitch_min", &this->pitch_limit[0]);
-  parser.addParam("vx_controller.pitch_max", &this->pitch_limit[1]);
   parser.addParam("vx_controller.k_p", &this->vx_controller.k_p);
   parser.addParam("vx_controller.k_i", &this->vx_controller.k_i);
   parser.addParam("vx_controller.k_d", &this->vx_controller.k_d);
+  parser.addParam("vx_controller.pitch_min", &this->pitch_limit[0]);
+  parser.addParam("vx_controller.pitch_max", &this->pitch_limit[1]);
 
-  parser.addParam("vy_controller.roll_min", &this->roll_limit[0]);
-  parser.addParam("vy_controller.roll_max", &this->roll_limit[1]);
   parser.addParam("vy_controller.k_p", &this->vy_controller.k_p);
   parser.addParam("vy_controller.k_i", &this->vy_controller.k_i);
   parser.addParam("vy_controller.k_d", &this->vy_controller.k_d);
+  parser.addParam("vy_controller.roll_min", &this->roll_limit[0]);
+  parser.addParam("vy_controller.roll_max", &this->roll_limit[1]);
 
-  parser.addParam("vz_controller.throttle_min", &this->throttle_limit[0]);
-  parser.addParam("vz_controller.throttle_max", &this->throttle_limit[1]);
   parser.addParam("vz_controller.k_p", &this->vz_controller.k_p);
   parser.addParam("vz_controller.k_i", &this->vz_controller.k_i);
   parser.addParam("vz_controller.k_d", &this->vz_controller.k_d);
+  parser.addParam("vz_controller.throttle_min", &this->throttle_limit[0]);
+  parser.addParam("vz_controller.throttle_max", &this->throttle_limit[1]);
   // clang-format on
 
   // convert roll and pitch limits from degrees to radians
@@ -74,12 +74,9 @@ Vec4 VelocityController::calculate(const Vec3 &setpoints,
   t = (t < 0) ? 0.0 : t;
   t = (t > 1.0) ? 1.0 : t;
 
-  // set outputs
-  Vec4 outputs{r, p, y, t};
-
   // keep track of setpoints and outputs
   this->setpoints = setpoints;
-  this->outputs = outputs;
+  this->outputs << r, p, y, t;
   this->dt = 0.0;
 
   return outputs;

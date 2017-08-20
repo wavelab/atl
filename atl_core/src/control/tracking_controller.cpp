@@ -9,21 +9,19 @@ int TrackingController::configure(const std::string &config_file) {
   parser.addParam("roll_controller.k_p", &this->y_controller.k_p);
   parser.addParam("roll_controller.k_i", &this->y_controller.k_i);
   parser.addParam("roll_controller.k_d", &this->y_controller.k_d);
+  parser.addParam("roll_controller.min", &this->roll_limit[0]);
+  parser.addParam("roll_controller.max", &this->roll_limit[1]);
 
   parser.addParam("pitch_controller.k_p", &this->x_controller.k_p);
   parser.addParam("pitch_controller.k_i", &this->x_controller.k_i);
   parser.addParam("pitch_controller.k_d", &this->x_controller.k_d);
+  parser.addParam("pitch_controller.min", &this->pitch_limit[0]);
+  parser.addParam("pitch_controller.max", &this->pitch_limit[1]);
 
   parser.addParam("throttle_controller.k_p", &this->z_controller.k_p);
   parser.addParam("throttle_controller.k_i", &this->z_controller.k_i);
   parser.addParam("throttle_controller.k_d", &this->z_controller.k_d);
   parser.addParam("throttle_controller.hover_throttle", &this->hover_throttle);
-
-  parser.addParam("roll_limit.min", &this->roll_limit[0]);
-  parser.addParam("roll_limit.max", &this->roll_limit[1]);
-
-  parser.addParam("pitch_limit.min", &this->pitch_limit[0]);
-  parser.addParam("pitch_limit.max", &this->pitch_limit[1]);
 
   parser.addParam("track_offset", &this->track_offset);
   if (parser.load(config_file) != 0) {

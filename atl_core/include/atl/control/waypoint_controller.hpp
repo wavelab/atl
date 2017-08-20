@@ -33,10 +33,10 @@ public:
 
   double roll_limit[2] = {0.0, 0.0};
   double pitch_limit[2] = {0.0, 0.0};
-  double hover_throttle = 0.5;
+  double hover_throttle = 0.0;
 
+  Vec3 setpoints{0.0, 0.0, 0.0};
   Vec4 outputs{0.0, 0.0, 0.0, 0.0};
-  AttitudeCommand att_cmd;
 
   bool blackbox_enable = true;
   double blackbox_rate = 1.0;
