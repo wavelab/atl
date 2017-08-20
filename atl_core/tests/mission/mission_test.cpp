@@ -34,16 +34,16 @@ TEST(Mission, configure) {
   EXPECT_NEAR(0.0, mission.local_waypoints[0](1), 0.001);
   EXPECT_NEAR(10.0, mission.local_waypoints[0](2), 0.001);
 
-  EXPECT_NEAR(10.1787, mission.local_waypoints[1](0), 0.001);
-  EXPECT_NEAR(6.01125, mission.local_waypoints[1](1), 0.001);
+  EXPECT_NEAR(6.01125, mission.local_waypoints[1](0), 0.001);
+  EXPECT_NEAR(-10.1787, mission.local_waypoints[1](1), 0.001);
   EXPECT_NEAR(10.0, mission.local_waypoints[1](2), 0.001);
 
-  EXPECT_NEAR(17.2876, mission.local_waypoints[2](0), 0.001);
-  EXPECT_NEAR(-7.45841, mission.local_waypoints[2](1), 0.001);
+  EXPECT_NEAR(-7.45841, mission.local_waypoints[2](0), 0.001);
+  EXPECT_NEAR(-17.2876, mission.local_waypoints[2](1), 0.001);
   EXPECT_NEAR(10.0, mission.local_waypoints[2](2), 0.001);
 
-  EXPECT_NEAR(9.20928, mission.local_waypoints[3](0), 0.001);
-  EXPECT_NEAR(-10.5754, mission.local_waypoints[3](1), 0.001);
+  EXPECT_NEAR(-10.5754, mission.local_waypoints[3](0), 0.001);
+  EXPECT_NEAR(-9.20928, mission.local_waypoints[3](1), 0.001);
   EXPECT_NEAR(10.0, mission.local_waypoints[3](2), 0.001);
 }
 
@@ -163,32 +163,6 @@ TEST(Mission, waypointHeading) {
   mission.wp_end = Vec3{-1.0, -1.0, 0.0};
   heading = mission.waypointHeading();
   EXPECT_FLOAT_EQ(deg2rad(-135.0), heading);
-}
-
-TEST(Mission, sandbox) {
-  // // assume waypoints are in ENU inertial frame
-  // Vec3 wp_start{0, 0, 10};
-  // Vec3 wp_end{10, 6, 10};
-  // double dx = wp_end(0) - wp_start(0);
-  // double dy = wp_end(1) - wp_start(1);
-  //
-  // // offset by -90 deg because ENU's 0 yaw is East rather than North
-  // double heading = atan2(dy, dx) - deg2rad(90.0);
-  // std::cout << rad2deg(heading) << std::endl;
-
-  // assume waypoints are in ENU inertial frame
-  // Vec3 wp_start{0, 0, 10};
-  // Vec3 wp_end{10, 6, 10};
-  // Vec3 wp_start{10, 6, 10};
-  // Vec3 wp_end{17, -7, 10};
-  Vec3 wp_start{17, -7, 10};
-  Vec3 wp_end{9, -10, 10};
-  Vec3 start = enu2nwu(wp_start);
-  Vec3 end = enu2nwu(wp_end);
-  double dx = end(0) - start(0);
-  double dy = end(1) - start(1);
-  double heading = atan2(dy, dx);
-  std::cout << rad2deg(heading) << std::endl;
 }
 
 TEST(Mission, waypointReached) {

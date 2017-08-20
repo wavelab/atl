@@ -82,7 +82,7 @@ TEST(PositionController, configure) {
 }
 
 TEST(PositionController, update) {
-  Vec3 setpoint_nwu, setpoint_enu;
+  Vec3 setpoint_nwu;
   Pose actual;
   float yaw_setpoint, dt;
   PositionController controller;
@@ -92,11 +92,10 @@ TEST(PositionController, update) {
 
   // CHECK HOVERING PID OUTPUT
   setpoint_nwu << 0, 0, 0;
-  setpoint_enu = nwu2enu(setpoint_nwu);
   actual.position << 0, 0, 0;
   yaw_setpoint = 0;
   dt = 0.1;
-  controller.update(setpoint_enu, actual, yaw_setpoint, dt);
+  controller.update(setpoint_nwu, actual, yaw_setpoint, dt);
   controller.printOutputs();
 
   EXPECT_FLOAT_EQ(0.0, controller.outputs(0));
@@ -105,13 +104,12 @@ TEST(PositionController, update) {
 
   // CHECK MOVING TOWARDS THE Y LOCATION
   setpoint_nwu << 0, 1, 0;
-  setpoint_enu = nwu2enu(setpoint_nwu);
   actual.position << 0, 0, 0;
   yaw_setpoint = 0;
   dt = 0.1;
 
   controller.reset();
-  controller.update(setpoint_enu, actual, yaw_setpoint, dt);
+  controller.update(setpoint_nwu, actual, yaw_setpoint, dt);
   controller.printOutputs();
 
   EXPECT_TRUE(controller.outputs(0) < 0.0);
@@ -119,13 +117,12 @@ TEST(PositionController, update) {
 
   // CHECK MOVING TOWARDS THE X LOCATION
   setpoint_nwu << 1, 0, 0;
-  setpoint_enu = nwu2enu(setpoint_nwu);
   actual.position << 0, 0, 0;
   yaw_setpoint = 0;
   dt = 0.1;
 
   controller.reset();
-  controller.update(setpoint_enu, actual, yaw_setpoint, dt);
+  controller.update(setpoint_nwu, actual, yaw_setpoint, dt);
   controller.printOutputs();
 
   EXPECT_FLOAT_EQ(0.0, controller.outputs(0));
@@ -133,13 +130,12 @@ TEST(PositionController, update) {
 
   // CHECK MOVING TOWARDS THE X AND Y LOCATION
   setpoint_nwu << 1, 1, 0;
-  setpoint_enu = nwu2enu(setpoint_nwu);
   actual.position << 0, 0, 0;
   yaw_setpoint = 0;
   dt = 0.1;
 
   controller.reset();
-  controller.update(setpoint_enu, actual, yaw_setpoint, dt);
+  controller.update(setpoint_nwu, actual, yaw_setpoint, dt);
   controller.printOutputs();
 
   EXPECT_TRUE(controller.outputs(0) < 0.0);
@@ -147,20 +143,19 @@ TEST(PositionController, update) {
 
   // CHECK MOVING YAW
   setpoint_nwu << 0, 0, 0;
-  setpoint_enu = nwu2enu(setpoint_nwu);
   actual.position << 0, 0, 0;
   yaw_setpoint = deg2rad(90.0);
   dt = 0.1;
 
   controller.reset();
-  controller.update(setpoint_enu, actual, yaw_setpoint, dt);
+  controller.update(setpoint_nwu, actual, yaw_setpoint, dt);
   controller.printOutputs();
 
   EXPECT_FLOAT_EQ(yaw_setpoint, controller.outputs(2));
 }
 
 TEST(PositionController, update2) {
-  Vec3 setpoint_nwu, setpoint_enu, euler;
+  Vec3 setpoint_nwu, euler;
   Pose actual;
   float yaw_setpoint, dt;
   PositionController controller;
@@ -170,16 +165,14 @@ TEST(PositionController, update2) {
 
   // CHECK HEADING AT 90 DEGREE
   setpoint_nwu << 1, 0, 0; // setpoint infront of quad
-  setpoint_enu = nwu2enu(setpoint_nwu);
-
   actual.position << 0, 0, 0;
   euler << 0.0, 0.0, deg2rad(90.0);
-  euler2quat(euler, 321, actual.orientation);
+  actual.orientation = euler321ToQuat(euler);
 
   yaw_setpoint = 0;
   dt = 0.1;
 
-  controller.update(setpoint_enu, actual, yaw_setpoint, dt);
+  controller.update(setpoint_nwu, actual, yaw_setpoint, dt);
   controller.printOutputs();
 
   EXPECT_TRUE(controller.outputs(0) > 0);

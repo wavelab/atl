@@ -146,7 +146,7 @@ int GimbalNode::loopCallback() {
     euler(0) = this->gimbal.camera_angles(0);
     euler(1) = this->gimbal.camera_angles(1);
     euler(2) = 0;
-    euler2quat(euler, 321, q);
+    q = euler321ToQuat(euler);
     this->publishIMU(euler);
     this->publishJointOrientation(q);
 
@@ -154,7 +154,7 @@ int GimbalNode::loopCallback() {
     encoder_euler(0) = this->gimbal.encoder_angles(0);
     encoder_euler(1) = this->gimbal.encoder_angles(1);
     encoder_euler(2) = 0.0; // There is no yaw encoder (yet)
-    euler2quat(encoder_euler, 321, encoder_q);
+    encoder_q = euler321ToQuat(encoder_euler);
 
     // publish imu and encoder readings
     this->publishRawEncoder(encoder_euler);

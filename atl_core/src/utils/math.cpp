@@ -107,7 +107,7 @@ Mat3 rotz(const double angle) {
   return R;
 }
 
-int euler2quat(const Vec3 &euler, const int euler_seq, Quaternion &q) {
+Quaternion euler123ToQuat(const Vec3 &euler) {
   const double alpha = euler(0);
   const double beta = euler(1);
   const double gamma = euler(2);
@@ -119,116 +119,126 @@ int euler2quat(const Vec3 &euler, const int euler_seq, Quaternion &q) {
   const double s2 = sin(beta / 2.0);
   const double s3 = sin(gamma / 2.0);
 
-  double w, x, y, z;
-  switch (euler_seq) {
-    case 123:
-      // euler 1-2-3 to quaternion
-      w = c1 * c2 * c3 - s1 * s2 * s3;
-      x = s1 * c2 * c3 + c1 * s2 * s3;
-      y = c1 * s2 * c3 - s1 * c2 * s3;
-      z = c1 * c2 * s3 + s1 * s2 * c3;
-      break;
+  // euler 1-2-3 to quaternion
+  const double w = c1 * c2 * c3 - s1 * s2 * s3;
+  const double x = s1 * c2 * c3 + c1 * s2 * s3;
+  const double y = c1 * s2 * c3 - s1 * c2 * s3;
+  const double z = c1 * c2 * s3 + s1 * s2 * c3;
 
-    case 321:
-      // euler 3-2-1 to quaternion
-      w = c1 * c2 * c3 + s1 * s2 * s3;
-      x = s1 * c2 * c3 - c1 * s2 * s3;
-      y = c1 * s2 * c3 + s1 * c2 * s3;
-      z = c1 * c2 * s3 - s1 * s2 * c3;
-      break;
-
-    default:
-      LOG_ERROR("Error! Invalid euler sequence [%d]\n", euler_seq);
-      return -1;
-      break;
-  }
-
-  q.w() = w;
-  q.x() = x;
-  q.y() = y;
-  q.z() = z;
-
-  return 0;
+  return Quaternion{w, x, y, z};
 }
 
-int euler2rot(const Vec3 &euler, const int euler_seq, Mat3 &R) {
-  double R11, R12, R13, R21, R22, R23, R31, R32, R33;
-  double phi, theta, psi;
+Quaternion euler321ToQuat(const Vec3 &euler) {
+  const double alpha = euler(0);
+  const double beta = euler(1);
+  const double gamma = euler(2);
 
-  phi = euler(0);
-  theta = euler(1);
-  psi = euler(2);
+  const double c1 = cos(alpha / 2.0);
+  const double c2 = cos(beta / 2.0);
+  const double c3 = cos(gamma / 2.0);
+  const double s1 = sin(alpha / 2.0);
+  const double s2 = sin(beta / 2.0);
+  const double s3 = sin(gamma / 2.0);
 
-  if (euler_seq == 321) {
-    // euler 3-2-1
-    R11 = cos(theta) * cos(psi);
-    R12 = sin(phi) * sin(theta) * cos(psi) - cos(phi) * sin(psi);
-    R13 = cos(phi) * sin(theta) * cos(psi) + sin(phi) * sin(psi);
+  // euler 3-2-1 to quaternion
+  const double w = c1 * c2 * c3 + s1 * s2 * s3;
+  const double x = s1 * c2 * c3 - c1 * s2 * s3;
+  const double y = c1 * s2 * c3 + s1 * c2 * s3;
+  const double z = c1 * c2 * s3 - s1 * s2 * c3;
 
-    R21 = cos(theta) * sin(psi);
-    R22 = sin(phi) * sin(theta) * sin(psi) + cos(phi) * cos(psi);
-    R23 = cos(phi) * sin(theta) * sin(psi) - sin(phi) * cos(psi);
-
-    R31 = -sin(theta);
-    R32 = sin(phi) * cos(theta);
-    R33 = cos(phi) * cos(theta);
-
-  } else if (euler_seq == 123) {
-    // euler 1-2-3
-    R11 = cos(theta) * cos(psi);
-    R12 = cos(theta) * sin(psi);
-    R13 = -sin(theta);
-
-    R21 = sin(phi) * sin(theta) * cos(psi) - cos(phi) * sin(psi);
-    R22 = sin(phi) * sin(theta) * sin(psi) + cos(phi) * cos(psi);
-    R23 = sin(phi) * cos(theta);
-
-    R31 = cos(phi) * sin(theta) * cos(psi) + sin(phi) * sin(psi);
-    R32 = cos(phi) * sin(theta) * sin(psi) - sin(phi) * cos(psi);
-    R33 = cos(phi) * cos(theta);
-
-  } else {
-    return -1;
-  }
-
-  R << R11, R12, R13, R21, R22, R23, R31, R32, R33;
-
-  return 0;
+  return Quaternion{w, x, y, z};
 }
 
-int quat2euler(const Quaternion &q, const int euler_seq, Vec3 &euler) {
-  double qw, qx, qy, qz;
-  double qw2, qx2, qy2, qz2;
-  double phi, theta, psi;
+Mat3 euler321ToRot(const Vec3 &euler) {
+  const double phi = euler(0);
+  const double theta = euler(1);
+  const double psi = euler(2);
 
-  qw = q.w();
-  qx = q.x();
-  qy = q.y();
-  qz = q.z();
+  // euler 3-2-1
+  const double R11 = cos(theta) * cos(psi);
+  const double R12 = sin(phi) * sin(theta) * cos(psi) - cos(phi) * sin(psi);
+  const double R13 = cos(phi) * sin(theta) * cos(psi) + sin(phi) * sin(psi);
 
-  qw2 = pow(qw, 2);
-  qx2 = pow(qx, 2);
-  qy2 = pow(qy, 2);
-  qz2 = pow(qz, 2);
+  const double R21 = cos(theta) * sin(psi);
+  const double R22 = sin(phi) * sin(theta) * sin(psi) + cos(phi) * cos(psi);
+  const double R23 = cos(phi) * sin(theta) * sin(psi) - sin(phi) * cos(psi);
 
-  if (euler_seq == 123) {
-    // euler 1-2-3
-    phi = atan2(2 * (qz * qw - qx * qy), (qw2 + qx2 - qy2 - qz2));
-    theta = asin(2 * (qx * qz + qy * qw));
-    psi = atan2(2 * (qx * qw - qy * qz), (qw2 - qx2 - qy2 + qz2));
+  const double R31 = -sin(theta);
+  const double R32 = sin(phi) * cos(theta);
+  const double R33 = cos(phi) * cos(theta);
 
-  } else if (euler_seq == 321) {
-    // euler 3-2-1
-    phi = atan2(2 * (qx * qw + qz * qy), (qw2 - qx2 - qy2 + qz2));
-    theta = asin(2 * (qy * qw - qx * qz));
-    psi = atan2(2 * (qx * qy + qz * qw), (qw2 + qx2 - qy2 - qz2));
+  // clang-format off
+  Mat3 R;
+  R << R11, R12, R13,
+       R21, R22, R23,
+       R31, R32, R33;
+  // clang-format on
 
-  } else {
-    return -1;
-  }
+  return R;
+}
 
-  euler << phi, theta, psi;
-  return 0;
+Mat3 euler123ToRot(const Vec3 &euler) {
+  const double phi = euler(0);
+  const double theta = euler(1);
+  const double psi = euler(2);
+
+  // euler 1-2-3
+  const double R11 = cos(theta) * cos(psi);
+  const double R12 = cos(theta) * sin(psi);
+  const double R13 = -sin(theta);
+
+  const double R21 = sin(phi) * sin(theta) * cos(psi) - cos(phi) * sin(psi);
+  const double R22 = sin(phi) * sin(theta) * sin(psi) + cos(phi) * cos(psi);
+  const double R23 = sin(phi) * cos(theta);
+
+  const double R31 = cos(phi) * sin(theta) * cos(psi) + sin(phi) * sin(psi);
+  const double R32 = cos(phi) * sin(theta) * sin(psi) - sin(phi) * cos(psi);
+  const double R33 = cos(phi) * cos(theta);
+
+  // clang-format off
+  Mat3 R;
+  R << R11, R12, R13,
+       R21, R22, R23,
+       R31, R32, R33;
+  // clang-format on
+
+  return R;
+}
+
+Vec3 quatToEuler123(const Quaternion &q) {
+  const double qw = q.w();
+  const double qx = q.x();
+  const double qy = q.y();
+  const double qz = q.z();
+
+  const double qw2 = pow(qw, 2);
+  const double qx2 = pow(qx, 2);
+  const double qy2 = pow(qy, 2);
+  const double qz2 = pow(qz, 2);
+
+  const double phi = atan2(2 * (qz * qw - qx * qy), (qw2 + qx2 - qy2 - qz2));
+  const double theta = asin(2 * (qx * qz + qy * qw));
+  const double psi = atan2(2 * (qx * qw - qy * qz), (qw2 - qx2 - qy2 + qz2));
+
+  return Vec3{phi, theta, psi};
+}
+
+Vec3 quatToEuler321(const Quaternion &q) {
+  const double qw = q.w();
+  const double qx = q.x();
+  const double qy = q.y();
+  const double qz = q.z();
+
+  const double qw2 = pow(qw, 2);
+  const double qx2 = pow(qx, 2);
+  const double qy2 = pow(qy, 2);
+  const double qz2 = pow(qz, 2);
+
+  const double phi = atan2(2 * (qx * qw + qz * qy), (qw2 - qx2 - qy2 + qz2));
+  const double theta = asin(2 * (qy * qw - qx * qz));
+  const double psi = atan2(2 * (qx * qy + qz * qw), (qw2 + qx2 - qy2 - qz2));
+
+  return Vec3{phi, theta, psi};
 }
 
 Mat3 quat2rot(const Quaternion &q) {
@@ -268,8 +278,12 @@ Mat3 quat2rot(const Quaternion &q) {
   // R32 = 2 * (qw * qx + qy * qz);
   // R33 = qw2 - qx2 - qy2 + qz2;
 
+  // clang-format off
   Mat3 R;
-  R << R11, R12, R13, R21, R22, R23, R31, R32, R33;
+  R << R11, R12, R13,
+       R21, R22, R23,
+       R31, R32, R33;
+  // clang-format on
   return R;
 }
 
@@ -347,12 +361,11 @@ void target2body(Vec3 target_pos_if,
                  Vec3 body_orientation_if,
                  Vec3 &target_pos_bf) {
   // convert euler to rotation matrix
-  Mat3 R;
-  euler2rot(body_orientation_if, 123, R);
+  const Mat3 R = euler123ToRot(body_orientation_if);
 
   // calculate position difference and convert to body frame
   // assumes inertial frame is NWU
-  Vec3 pos_nwu = target_pos_if - body_pos_if;
+  const Vec3 pos_nwu = target_pos_if - body_pos_if;
 
   // compensate for body orientation by rotating
   target_pos_bf = R * pos_nwu;
@@ -362,10 +375,8 @@ void target2bodyplanar(Vec3 target_pos_if,
                        Vec3 body_pos_if,
                        Quaternion body_orientation_if,
                        Vec3 &target_pos_bf) {
-  Vec3 euler;
-
   // convert quaternion to euler
-  quat2euler(body_orientation_if, 123, euler);
+  Vec3 euler = quatToEuler123(body_orientation_if);
 
   // filtering out roll and pitch since we are in body planar frame
   euler << 0.0, 0.0, euler(2);
@@ -378,10 +389,8 @@ void target2bodyplanar(Vec3 target_pos_if,
                        Vec3 body_pos_if,
                        Vec3 body_orientation_if,
                        Vec3 &target_pos_bf) {
-  Vec3 euler;
-
   // filtering out roll and pitch since we are in body planar frame
-  euler << 0.0, 0.0, body_orientation_if(2);
+  const Vec3 euler{0.0, 0.0, body_orientation_if(2)};
 
   // calculate setpoint relative to quadrotor
   target2body(target_pos_if, body_pos_if, euler, target_pos_bf);
@@ -391,10 +400,8 @@ void target2inertial(Vec3 target_pos_bf,
                      Vec3 body_pos_if,
                      Vec3 body_orientation_if,
                      Vec3 &target_pos_if) {
-  Mat3 R;
-
   // construct rotation matrix from euler
-  euler2rot(body_orientation_if, 321, R);
+  const Mat3 R = euler321ToRot(body_orientation_if);
 
   // transform target from body to inertial frame
   target_pos_if = (R * target_pos_bf) + body_pos_if;
@@ -409,27 +416,6 @@ void target2inertial(Vec3 target_pos_bf,
 
   // transform target from body to inertial frame
   target_pos_if = (R * target_pos_bf) + body_pos_if;
-}
-
-void inertial2body(Vec3 nwu_if, Quaternion orientation_if, Vec3 &nwu_bf) {
-  // create rotation matrix
-  Vec3 rpy;
-  quat2euler(orientation_if, 321, rpy);
-
-  Mat3 R;
-  euler2rot(rpy, 123, R);
-
-  // transform inertal to body
-  nwu_bf = R * nwu_if;
-}
-
-void inertial2body(Vec3 nwu_if, Vec3 orientation_if, Vec3 &nwu_bf) {
-  // create rotation matrix
-  Mat3 R;
-  euler2rot(orientation_if, 123, R);
-
-  // transform inertal to body
-  nwu_bf = R * nwu_if;
 }
 
 double wrapTo180(const double euler_angle) {

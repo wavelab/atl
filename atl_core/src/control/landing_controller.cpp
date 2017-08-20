@@ -258,10 +258,7 @@ int LandingController::update(const Vec3 &target_pos_bf,
   // Vec2 wp_rel_vel = this->trajectory.rel_vel.at(0);
 
   // calculate velocity in body frame
-  Vec3 euler{0.0, 0.0, yaw}, vel_bf;
-  Quaternion q;
-  euler2quat(euler, 321, q);
-  inertial2body(vel, q, vel_bf);
+  const Vec3 vel_bf = T_bf_if{orientation} * vel;
 
   // calculate velocity errors (inertial version)
   Vec3 v_errors;
@@ -286,7 +283,7 @@ int LandingController::update(const Vec3 &target_pos_bf,
   this->att_cmd = AttitudeCommand(this->outputs);
 
   // record
-  quat2euler(orientation, 321, euler);
+  const Vec3 rpy = quatToEuler321(orientation);
   this->record(pos,
                vel,
                wp_pos,
@@ -294,7 +291,7 @@ int LandingController::update(const Vec3 &target_pos_bf,
                wp_inputs,
                target_pos_bf,
                target_vel_bf,
-               euler,
+               rpy,
                this->outputs(3),
                dt);
 

@@ -66,7 +66,7 @@ int IMUNode::loopCallback() {
 
   if (this->imu.getData() == 0) {
     euler << -1 * deg2rad(this->imu.roll), deg2rad(this->imu.pitch), 0.0;
-    euler2quat(euler, 321, q);
+    q = euler321ToQuat(euler);
     this->publishIMU(euler);
     if (this->gimbal_imu == "HACK") {
       this->publishJointOrientation(q);

@@ -48,7 +48,7 @@ TEST(Utils_data_Pose, checkPose) {
   yaw = -90.0;
 
   euler << roll, pitch, yaw;
-  euler2quat(euler, 321, q_test);
+  q_test = euler321ToQuat(euler);
   testPose = Pose(roll, pitch, yaw, x, y, z);
 
   EXPECT_FLOAT_EQ(q_test.x(), testPose.orientation.x());
@@ -79,7 +79,7 @@ TEST(Utils_data_Pose, checkPose) {
   testPose = Pose(roll, pitch, yaw, x, y, z);
   rotation_mtx = testPose.rotationMatrix();
   euler << roll, pitch, yaw;
-  euler2quat(euler, 321, q_test);
+  q_test = euler321ToQuat(euler);
   EXPECT_TRUE(rotation_mtx == q_test.toRotationMatrix());
 }
 

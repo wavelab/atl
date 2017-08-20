@@ -86,6 +86,25 @@ double deg2rad(const double d);
 double rad2deg(const double r);
 
 /**
+ * Load std::vector of doubles to an Eigen::Matrix
+ * @param x Matrix values
+ * @param rows Number of matrix rows
+ * @param cols Number of matrix colums
+ * @param y Output matrix
+ */
+void load_matrix(const std::vector<double> &x,
+                 const int rows,
+                 const int cols,
+                 MatX &y);
+
+/**
+ * Load an Eigen::Matrix into a std::vector of doubles
+ * @param A Matrix
+ * @param x Output vector of matrix values
+ */
+void load_matrix(const MatX A, std::vector<double> &x);
+
+/**
  * Right hand rotation Matrix in x-axis
  * @param angle Rotation angle in radians
  * @return Rotation matrix
@@ -107,47 +126,46 @@ Mat3 roty(const double angle);
 Mat3 rotz(const double angle);
 
 /**
- * Load std::vector of doubles to an Eigen::Matrix
- * @param x Matrix values
- * @param rows Number of matrix rows
- * @param cols Number of matrix colums
- * @param y Output matrix
- */
-void load_matrix(const std::vector<double> &x,
-                 const int rows,
-                 const int cols,
-                 MatX &y);
-
-/**
- * Load an Eigen::Matrix into a std::vector of doubles
- * @param A Matrix
- * @param x Output vector of matrix values
- */
-void load_matrix(const MatX A, std::vector<double> &x);
-
-/**
- * Convert Euler angles to rotation matrix
+ * Convert Euler 1-2-3 angles to quaternion
  * @param euler Input Euler angles
- * @param euler_seq Euler angle sequence
+ * @return Output quaternion
+ */
+Quaternion euler123ToQuat(const Vec3 &euler);
+
+/**
+ * Convert Euler 3-2-1 angles to quaternion
+ * @param euler Input Euler angles
+ * @return Output quaternion
+ */
+Quaternion euler321ToQuat(const Vec3 &euler);
+
+/**
+ * Convert Euler 1-2-3 angles to rotation matrix
+ * @param euler Input Euler angles
  * @return R Output rotation matrix
  */
-int euler2rot(const Vec3 &euler, const int euler_seq, Mat3 &R);
+Mat3 euler123ToRot(const Vec3 &euler);
 
 /**
- * Convert Euler angles to quaternion
+ * Convert Euler 3-2-1 angles to rotation matrix
  * @param euler Input Euler angles
- * @param euler_seq Euler angle sequence
- * @param q Output quaternion
+ * @return R Output rotation matrix
  */
-int euler2quat(const Vec3 &euler, const int euler_seq, Quaternion &q);
+Mat3 euler321ToRot(const Vec3 &euler);
 
 /**
- * Convert quanternion to Euler angles
+ * Convert quanternion to Euler 1-2-3 angles
  * @param q Input quaternion
- * @param euler_seq Euler angle sequence
- * @param euler Output Euler angles
+ * @return euler Output Euler angles
  */
-int quat2euler(const Quaternion &q, const int euler_seq, Vec3 &euler);
+Vec3 quatToEuler123(const Quaternion &q);
+
+/**
+ * Convert quanternion to Euler 3-2-1 angles
+ * @param q Input quaternion
+ * @return euler Output Euler angles
+ */
+Vec3 quatToEuler321(const Quaternion &q);
 
 /**
  * Convert Quaternion to rotation matrix
@@ -250,8 +268,6 @@ void target2inertial(Vec3 target_pos_bf,
                      Vec3 body_pos_if,
                      Quaternion body_orientation_if,
                      Vec3 &target_pos_if);
-void inertial2body(Vec3 enu_if, Quaternion orientation_if, Vec3 &nwu_bf);
-void inertial2body(Vec3 enu_if, Vec3 orientation_if, Vec3 &nwu_bf);
 
 /**
  * Wrap angle in degrees to 180

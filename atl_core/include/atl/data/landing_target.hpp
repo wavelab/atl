@@ -9,7 +9,7 @@ struct LandingTarget {
   Vec3 position_bf{0.0, 0.0, 0.0};
   Vec3 velocity_bf{0.0, 0.0, 0.0};
   bool detected = false;
-  bool losted = false;
+  bool losted = true;
   struct timespec first_seen = {0, 0};
   struct timespec last_seen = {0, 0};
 

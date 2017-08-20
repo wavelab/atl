@@ -185,20 +185,17 @@ void CamCalibNode::saveImages() {
 
 void CamCalibNode::saveGimbalMeasurements() {
   // convert measurements in quaternion to euler angles
-  Vec3 gimbal_joint_euler;
-  Vec3 gimbal_encoder_euler;
-
-  quat2euler(this->gimbal_joint_orientation, 321, gimbal_joint_euler);
-  quat2euler(this->gimbal_joint_body_orientation, 321, gimbal_encoder_euler);
+  Vec3 gimbal_joint_rpy = quatToEuler321(this->gimbal_joint_orientation);
+  Vec3 gimbal_encoder_rpy = quatToEuler321(this->gimbal_joint_body_orientation);
 
   // write to file
-  this->gimbal_joint_file << gimbal_joint_euler(0) << ",";
-  this->gimbal_joint_file << gimbal_joint_euler(1) << ",";
-  this->gimbal_joint_file << gimbal_joint_euler(2) << std::endl;
+  this->gimbal_joint_file << gimbal_joint_rpy(0) << ",";
+  this->gimbal_joint_file << gimbal_joint_rpy(1) << ",";
+  this->gimbal_joint_file << gimbal_joint_rpy(2) << std::endl;
 
-  this->gimbal_encoder_file << gimbal_encoder_euler(0) << ",";
-  this->gimbal_encoder_file << gimbal_encoder_euler(1) << ",";
-  this->gimbal_encoder_file << gimbal_encoder_euler(2) << std::endl;
+  this->gimbal_encoder_file << gimbal_encoder_rpy(0) << ",";
+  this->gimbal_encoder_file << gimbal_encoder_rpy(1) << ",";
+  this->gimbal_encoder_file << gimbal_encoder_rpy(2) << std::endl;
 }
 
 int CamCalibNode::loopCallback() {

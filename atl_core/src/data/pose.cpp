@@ -5,7 +5,7 @@ namespace atl {
 Pose::Pose(
     double roll, double pitch, double yaw, double x, double y, double z) {
   Vec3 euler{roll, pitch, yaw};
-  euler2quat(euler, 321, this->orientation);
+  this->orientation = euler321ToQuat(euler);
   this->position << x, y, z;
 }
 

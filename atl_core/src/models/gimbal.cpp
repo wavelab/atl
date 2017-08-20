@@ -37,10 +37,10 @@ void Gimbal2AxisModel::update(Vec2 motor_inputs, double dt) {
   // update joint orientation
   Vec3 euler, target;
   euler << this->states(0), this->states(2), 0.0;
-  euler2quat(euler, 321, this->joint_orientation);
+  this->joint_orientation = euler321ToQuat(euler);
 
   // track target attitude
-  quat2euler(this->frame_orientation, 321, euler);
+  euler = quatToEuler321(this->frame_orientation);
   this->joint_setpoints(0) = target_attitude_if(0) - euler(0);
   this->joint_setpoints(1) = target_attitude_if(1) - euler(1);
 }
@@ -53,14 +53,12 @@ Vec2 Gimbal2AxisModel::attitudeControllerControl(double dt) {
 }
 
 void Gimbal2AxisModel::setFrameOrientation(Quaternion frame_if) {
-  Vec3 euler;
-
   // filter out yaw - we do not need it
-  quat2euler(frame_if, 321, euler);
+  Vec3 euler = quatToEuler321(frame_if);
   euler(2) = 0.0;
 
   // set gimbal frame orientation
-  euler2quat(euler, 321, this->frame_orientation);
+  this->frame_orientation = euler321ToQuat(euler);
 }
 
 void Gimbal2AxisModel::setAttitude(Vec2 euler_if) {

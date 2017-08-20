@@ -66,8 +66,7 @@ void LZGPlugin::onUpdate(const gazebo::common::UpdateInfo &info) {
   euler(2) = fmod(euler(2) + deg2rad(180.0), deg2rad(360.0)) - deg2rad(180.0);
 
   // convert to quaternion
-  Quaternion q;
-  euler2quat(euler, 321, q);
+  Quaternion q = euler321ToQuat(euler);
   pose.Rot().Z() = q.z();
 
   this->model->SetWorldPose(pose);

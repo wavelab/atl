@@ -108,7 +108,7 @@ void PX4QuadrotorNode::attitudeSetpointCallback(
   q.x() = msg.pose.orientation.x;
   q.y() = msg.pose.orientation.y;
   q.z() = msg.pose.orientation.z;
-  quat2euler(q, 321, euler);
+  quatToEuler(q, 321, euler);
 
   // obtain throttle from message
   throttle = this->attitude_setpoints(3);

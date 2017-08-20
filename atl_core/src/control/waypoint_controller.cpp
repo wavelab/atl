@@ -117,8 +117,7 @@ int WaypointController::update(Mission &mission,
   // calculate waypoint relative to quadrotor
   Vec3 errors = waypoint - pose.position;
 
-  Vec3 rpy;
-  quat2euler(pose.orientation, 321, rpy);
+  Vec3 rpy = quatToEuler321(pose.orientation);
   Mat3 R = rotz(rpy(2));
   errors = R.inverse() * errors;
 

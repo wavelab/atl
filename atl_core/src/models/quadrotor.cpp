@@ -83,10 +83,8 @@ Vec4 PositionController::update(const Vec3 &setpoints,
   errors(1) = setpoints(1) - actual(1);
   errors(2) = setpoints(2) - actual(2);
 
-  Vec3 euler;
-  Mat3 R;
-  euler << 0.0, 0.0, actual(3);
-  euler2rot(euler, 123, R);
+  Vec3 euler{0.0, 0.0, actual(3)};
+  Mat3 R = euler123ToRot(euler);
   errors = R * errors;
 
   // roll, pitch, yaw and thrust

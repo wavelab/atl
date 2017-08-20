@@ -270,13 +270,7 @@ int Quadrotor::stepTrackingMode(const double dt) {
   // check conditions
   if (this->conditionsMet(conditions, 3) && this->auto_land) {
     // transform velocity from inertial to body frame
-    const Vec3 euler{0, 0, this->yaw_setpoint};
-
-    Quaternion q;
-    euler2quat(euler, 321, q);
-
-    Vec3 vel_bf;
-    inertial2body(this->velocity, q, vel_bf);
+    Vec3 vel_bf = T_bf_if{this->pose.orientation} * this->velocity;
 
     // load trajectory
     const int retval = this->landing_controller

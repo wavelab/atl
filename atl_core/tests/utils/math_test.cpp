@@ -28,7 +28,7 @@ TEST(Math, deg2radAndrad2deg) {
   EXPECT_FLOAT_EQ(d_deg, rad2deg(d_rad));
 }
 
-TEST(Math, euler2quat) {
+TEST(Math, euler321ToQuat) {
   float roll;
   float pitch;
   float yaw;
@@ -41,7 +41,7 @@ TEST(Math, euler2quat) {
   yaw = 0;
 
   euler << roll, pitch, yaw;
-  euler2quat(euler, 321, q);
+  q = euler321ToQuat(euler);
   EXPECT_FLOAT_EQ(0.0, q.x());
   EXPECT_FLOAT_EQ(0.0, q.y());
   EXPECT_FLOAT_EQ(0.0, q.z());
@@ -53,7 +53,7 @@ TEST(Math, euler2quat) {
   yaw = -M_PI / 2;
 
   euler << roll, pitch, yaw;
-  euler2quat(euler, 321, q);
+  q = euler321ToQuat(euler);
   EXPECT_FLOAT_EQ(0.5, q.x());
   EXPECT_FLOAT_EQ(0.5, q.y());
   EXPECT_FLOAT_EQ(-0.5, q.z());
@@ -68,52 +68,42 @@ TEST(Math, sandbox) {
 
   // NWU
   Quaternion q_nwu;
-  euler2quat(euler, 321, q_nwu);
+  q_nwu = euler321ToQuat(euler);
 
   // NWU to NED
   Quaternion q_ned = nwu2ned(q_nwu);
-  quat2euler(q_ned, 321, euler);
+  euler = quatToEuler321(q_ned);
   EXPECT_FLOAT_EQ(10, rad2deg(euler(0)));
   EXPECT_FLOAT_EQ(-20, rad2deg(euler(1)));
   EXPECT_FLOAT_EQ(-30, rad2deg(euler(2)));
 
   // NED to NWU
   q_nwu = ned2nwu(q_ned);
-  quat2euler(q_nwu, 321, euler);
+  euler = quatToEuler321(q_nwu);
   EXPECT_FLOAT_EQ(10, rad2deg(euler(0)));
   EXPECT_FLOAT_EQ(20, rad2deg(euler(1)));
   EXPECT_FLOAT_EQ(30, rad2deg(euler(2)));
 }
 
-TEST(Math, euler2rot) {
-  double roll;
-  double pitch;
-  double yaw;
-  Vec3 euler;
-  Mat3 rot;
-
-  double r01, r02, r03;
-  double r11, r12, r13;
-  double r21, r22, r23;
-
+TEST(Math, euler321ToRot) {
   // test roll, pitch, yaw set to 0
-  roll = 0.0;
-  pitch = 0.0;
-  yaw = 0.0;
-  euler << roll, pitch, yaw;
-  euler2rot(euler, 321, rot);
+  const double roll = 0.0;
+  const double pitch = 0.0;
+  const double yaw = 0.0;
+  const Vec3 euler{roll, pitch, yaw};
+  const Mat3 rot = euler321ToRot(euler);
 
-  r01 = 1.0;
-  r02 = 0.0;
-  r03 = 0.0;
+  const double r01 = 1.0;
+  const double r02 = 0.0;
+  const double r03 = 0.0;
 
-  r11 = 0.0;
-  r12 = 1.0;
-  r13 = 0.0;
+  const double r11 = 0.0;
+  const double r12 = 1.0;
+  const double r13 = 0.0;
 
-  r21 = 0.0;
-  r22 = 0.0;
-  r23 = 1.0;
+  const double r21 = 0.0;
+  const double r22 = 0.0;
+  const double r23 = 1.0;
 
   EXPECT_FLOAT_EQ(r01, rot(0, 0));
   EXPECT_FLOAT_EQ(r02, rot(0, 1));
@@ -150,8 +140,8 @@ TEST(Math, edn2nwu) {
   Vec3 edn{1.0, 2.0, 3.0};
   Vec3 enu = edn2nwu(edn);
 
-  EXPECT_FLOAT_EQ(1.0, enu(0));
-  EXPECT_FLOAT_EQ(3.0, enu(1));
+  EXPECT_FLOAT_EQ(3.0, enu(0));
+  EXPECT_FLOAT_EQ(-1.0, enu(1));
   EXPECT_FLOAT_EQ(-2.0, enu(2));
 }
 
@@ -172,7 +162,7 @@ TEST(Math, target2body) {
   target2body(target_pos_if, body_pos_if, euler, target_pos_bf);
   std::cout << target_pos_bf.transpose() << std::endl;
 
-  EXPECT_FLOAT_EQ(-1.0, target_pos_bf(0));
+  EXPECT_FLOAT_EQ(1.0, target_pos_bf(0));
   EXPECT_FLOAT_EQ(-1.0, target_pos_bf(1));
   EXPECT_FLOAT_EQ(0.0, target_pos_bf(2));
 
@@ -182,7 +172,7 @@ TEST(Math, target2body) {
   std::cout << target_pos_bf.transpose() << std::endl;
 
   EXPECT_FLOAT_EQ(-1.0, target_pos_bf(0));
-  EXPECT_FLOAT_EQ(1.0, target_pos_bf(1));
+  EXPECT_FLOAT_EQ(-1.0, target_pos_bf(1));
   EXPECT_FLOAT_EQ(0.0, target_pos_bf(2));
 
   // test 180 degree
@@ -190,7 +180,7 @@ TEST(Math, target2body) {
   target2body(target_pos_if, body_pos_if, euler, target_pos_bf);
   std::cout << target_pos_bf.transpose() << std::endl;
 
-  EXPECT_FLOAT_EQ(1.0, target_pos_bf(0));
+  EXPECT_FLOAT_EQ(-1.0, target_pos_bf(0));
   EXPECT_FLOAT_EQ(1.0, target_pos_bf(1));
   EXPECT_FLOAT_EQ(0.0, target_pos_bf(2));
 
@@ -200,44 +190,44 @@ TEST(Math, target2body) {
   std::cout << target_pos_bf.transpose() << std::endl;
 
   EXPECT_FLOAT_EQ(1.0, target_pos_bf(0));
-  EXPECT_FLOAT_EQ(-1.0, target_pos_bf(1));
+  EXPECT_FLOAT_EQ(1.0, target_pos_bf(1));
   EXPECT_FLOAT_EQ(0.0, target_pos_bf(2));
 
   // TEST QUATERNION VERSION OF target2body()
   // test 0 degree
   euler << 0.0, 0.0, deg2rad(0.0);
-  euler2quat(euler, 123, quat);
+  quat = euler123ToQuat(euler);
   target2body(target_pos_if, body_pos_if, quat, target_pos_bf);
 
-  EXPECT_FLOAT_EQ(-1.0, target_pos_bf(0));
+  EXPECT_FLOAT_EQ(1.0, target_pos_bf(0));
   EXPECT_FLOAT_EQ(-1.0, target_pos_bf(1));
   EXPECT_FLOAT_EQ(0.0, target_pos_bf(2));
 
   // test 90 degree
   euler << 0.0, 0.0, deg2rad(90.0);
-  euler2quat(euler, 123, quat);
+  quat = euler123ToQuat(euler);
+  target2body(target_pos_if, body_pos_if, quat, target_pos_bf);
+
+  EXPECT_FLOAT_EQ(-1.0, target_pos_bf(0));
+  EXPECT_FLOAT_EQ(-1.0, target_pos_bf(1));
+  EXPECT_FLOAT_EQ(0.0, target_pos_bf(2));
+
+  // test 180 degree
+  euler << 0.0, 0.0, deg2rad(180.0);
+  quat = euler123ToQuat(euler);
   target2body(target_pos_if, body_pos_if, quat, target_pos_bf);
 
   EXPECT_FLOAT_EQ(-1.0, target_pos_bf(0));
   EXPECT_FLOAT_EQ(1.0, target_pos_bf(1));
   EXPECT_FLOAT_EQ(0.0, target_pos_bf(2));
 
-  // test 180 degree
-  euler << 0.0, 0.0, deg2rad(180.0);
-  euler2quat(euler, 321, quat);
+  // test 270 degree
+  euler << 0.0, 0.0, deg2rad(270.0);
+  quat = euler123ToQuat(euler);
   target2body(target_pos_if, body_pos_if, quat, target_pos_bf);
 
   EXPECT_FLOAT_EQ(1.0, target_pos_bf(0));
   EXPECT_FLOAT_EQ(1.0, target_pos_bf(1));
-  EXPECT_FLOAT_EQ(0.0, target_pos_bf(2));
-
-  // test 270 degree
-  euler << 0.0, 0.0, deg2rad(270.0);
-  euler2quat(euler, 321, quat);
-  target2body(target_pos_if, body_pos_if, quat, target_pos_bf);
-
-  EXPECT_FLOAT_EQ(1.0, target_pos_bf(0));
-  EXPECT_FLOAT_EQ(-1.0, target_pos_bf(1));
   EXPECT_FLOAT_EQ(0.0, target_pos_bf(2));
 }
 
@@ -290,7 +280,7 @@ TEST(Math, target2bodyplanar) {
   // // TEST QUATERNION VERSION OF target2bodyplanar()
   // // test 0 degree
   // rpy << 0.0, 0.0, deg2rad(0.0);
-  // euler2quat(rpy, 123, quat);
+  // quat = euler123ToQuat(rpy);
   // target2bodyplanar(target_if, pos_if, quat, target_pos_bpf);
   // std::cout << target_pos_bpf.transpose() << std::endl;
   //
@@ -300,7 +290,7 @@ TEST(Math, target2bodyplanar) {
   //
   // // test 90 degree
   // rpy << 0.0, 0.0, deg2rad(90.0);
-  // euler2quat(rpy, 123, quat);
+  // quat = euler123ToQuat(rpy);
   // target2bodyplanar(target_if, pos_if, quat, target_pos_bpf);
   //
   // EXPECT_FLOAT_EQ(-1.0, target_pos_bpf(0));
@@ -309,8 +299,8 @@ TEST(Math, target2bodyplanar) {
 
   // test -90 degree
   rpy << 0.0, 0.0, deg2rad(-180.0);
-  euler2quat(rpy, 123, quat);
-  // quat2euler(quat, 321, rpy);
+  quat = euler123ToQuat(rpy);
+  // quatToEuler(quat, 321, rpy);
   std::cout << rad2deg(rpy(2)) << std::endl;
   std::cout << quat.w() << std::endl;
   std::cout << quat.x() << std::endl;
@@ -325,7 +315,7 @@ TEST(Math, target2bodyplanar) {
 
   // // test 270 degree
   // rpy << 0.0, 0.0, deg2rad(270.0);
-  // euler2quat(rpy, 321, quat);
+  // quat = euler123ToQuat(rpy);
   // target2bodyplanar(target_if, pos_if, quat, target_pos_bpf);
   //
   // EXPECT_FLOAT_EQ(1.0, target_pos_bpf(0));
@@ -347,122 +337,77 @@ TEST(Math, target2inertial) {
   target2inertial(target_pos_bf, body_pos_if, euler, target_pos_if);
   std::cout << target_pos_if.transpose() << std::endl;
 
-  EXPECT_FLOAT_EQ(0.0, target_pos_if(0));
-  EXPECT_FLOAT_EQ(4.0, target_pos_if(1));
-  EXPECT_FLOAT_EQ(0.0, target_pos_if(2));
+  EXPECT_NEAR(3.0, target_pos_if(0), 0.001);
+  EXPECT_NEAR(3.0, target_pos_if(1), 0.001);
+  EXPECT_NEAR(0.0, target_pos_if(2), 0.001);
 
   // test 90 degree
   euler << 0.0, 0.0, deg2rad(90.0);
   target2inertial(target_pos_bf, body_pos_if, euler, target_pos_if);
   std::cout << target_pos_if.transpose() << std::endl;
 
-  EXPECT_FLOAT_EQ(-1.0, target_pos_if(0));
-  EXPECT_FLOAT_EQ(1.0, target_pos_if(1));
-  EXPECT_FLOAT_EQ(0.0, target_pos_if(2));
+  EXPECT_NEAR(0.0, target_pos_if(0), 0.001);
+  EXPECT_NEAR(4.0, target_pos_if(1), 0.001);
+  EXPECT_NEAR(0.0, target_pos_if(2), 0.001);
 
   // test 180 degree
   euler << 0.0, 0.0, deg2rad(180.0);
   target2inertial(target_pos_bf, body_pos_if, euler, target_pos_if);
   std::cout << target_pos_if.transpose() << std::endl;
 
-  EXPECT_FLOAT_EQ(2.0, target_pos_if(0));
-  EXPECT_FLOAT_EQ(0.0, target_pos_if(1));
-  EXPECT_FLOAT_EQ(0.0, target_pos_if(2));
+  EXPECT_NEAR(-1.0, target_pos_if(0), 0.001);
+  EXPECT_NEAR(1.0, target_pos_if(1), 0.001);
+  EXPECT_NEAR(0.0, target_pos_if(2), 0.001);
 
-  // test 270 degree
-  euler << 0.0, 0.0, deg2rad(270.0);
+  // test -90 degree
+  euler << 0.0, 0.0, deg2rad(-90.0);
   target2inertial(target_pos_bf, body_pos_if, euler, target_pos_if);
   std::cout << target_pos_if.transpose() << std::endl;
 
-  EXPECT_FLOAT_EQ(3.0, target_pos_if(0));
-  EXPECT_FLOAT_EQ(3.0, target_pos_if(1));
-  EXPECT_FLOAT_EQ(0.0, target_pos_if(2));
+  EXPECT_NEAR(2.0, target_pos_if(0), 0.001);
+  EXPECT_NEAR(0.0, target_pos_if(1), 0.001);
+  EXPECT_NEAR(0.0, target_pos_if(2), 0.001);
 
   // TEST QUATERNION VERSION OF target2inertial()
   // test 0 degree
   euler << 0.0, 0.0, deg2rad(0.0);
-  euler2quat(euler, 321, quat);
+  quat = euler321ToQuat(euler);
   target2inertial(target_pos_bf, body_pos_if, quat, target_pos_if);
   std::cout << target_pos_if.transpose() << std::endl;
 
-  EXPECT_FLOAT_EQ(0.0, target_pos_if(0));
-  EXPECT_FLOAT_EQ(4.0, target_pos_if(1));
-  EXPECT_FLOAT_EQ(0.0, target_pos_if(2));
+  EXPECT_NEAR(3.0, target_pos_if(0), 0.001);
+  EXPECT_NEAR(3.0, target_pos_if(1), 0.001);
+  EXPECT_NEAR(0.0, target_pos_if(2), 0.001);
 
   // test 90 degree
   euler << 0.0, 0.0, deg2rad(90.0);
-  euler2quat(euler, 321, quat);
+  quat = euler321ToQuat(euler);
   target2inertial(target_pos_bf, body_pos_if, quat, target_pos_if);
   std::cout << target_pos_if.transpose() << std::endl;
 
-  EXPECT_FLOAT_EQ(-1.0, target_pos_if(0));
-  EXPECT_FLOAT_EQ(1.0, target_pos_if(1));
-  EXPECT_FLOAT_EQ(0.0, target_pos_if(2));
+  EXPECT_NEAR(0.0, target_pos_if(0), 0.001);
+  EXPECT_NEAR(4.0, target_pos_if(1), 0.001);
+  EXPECT_NEAR(0.0, target_pos_if(2), 0.001);
 
   // test 180 degree
   euler << 0.0, 0.0, deg2rad(180.0);
-  euler2quat(euler, 321, quat);
+  quat = euler321ToQuat(euler);
   target2inertial(target_pos_bf, body_pos_if, quat, target_pos_if);
   std::cout << target_pos_if.transpose() << std::endl;
 
-  EXPECT_FLOAT_EQ(2.0, target_pos_if(0));
-  EXPECT_FLOAT_EQ(0.0, target_pos_if(1));
-  EXPECT_FLOAT_EQ(0.0, target_pos_if(2));
+  EXPECT_NEAR(-1.0, target_pos_if(0), 0.001);
+  EXPECT_NEAR(1.0, target_pos_if(1), 0.001);
+  EXPECT_NEAR(0.0, target_pos_if(2), 0.001);
 
   // test 270 degree
   euler << 0.0, 0.0, deg2rad(270.0);
-  euler2quat(euler, 321, quat);
+  quat = euler321ToQuat(euler);
   target2inertial(target_pos_bf, body_pos_if, quat, target_pos_if);
   std::cout << target_pos_if.transpose() << std::endl;
 
-  EXPECT_FLOAT_EQ(3.0, target_pos_if(0));
-  EXPECT_FLOAT_EQ(3.0, target_pos_if(1));
-  EXPECT_FLOAT_EQ(0.0, target_pos_if(2));
-}
-
-TEST(Math, inertial2body) {
-  Vec3 enu_if, nwu_bf, euler;
-  Quaternion orientation_if;
-
-  // test 0 yaw
-  euler << 0, 0, deg2rad(0);
-  euler2quat(euler, 321, orientation_if);
-  enu_if << 1, 0, 0;
-  inertial2body(enu_if, orientation_if, nwu_bf);
-
-  EXPECT_FLOAT_EQ(0, round(nwu_bf(0)));
-  EXPECT_FLOAT_EQ(-1, round(nwu_bf(1)));
-  EXPECT_FLOAT_EQ(0, round(nwu_bf(2)));
-
-  // test 90 deg yaw
-  euler << 0, 0, deg2rad(90);
-  euler2quat(euler, 321, orientation_if);
-  enu_if << 1, 0, 0;
-  inertial2body(enu_if, orientation_if, nwu_bf);
-
-  EXPECT_FLOAT_EQ(-1, round(nwu_bf(0)));
-  EXPECT_FLOAT_EQ(0, round(nwu_bf(1)));
-  EXPECT_FLOAT_EQ(0, round(nwu_bf(2)));
-
-  // test 180 deg yaw
-  euler << 0, 0, deg2rad(180);
-  euler2quat(euler, 321, orientation_if);
-  enu_if << 1, 0, 0;
-  inertial2body(enu_if, orientation_if, nwu_bf);
-
-  EXPECT_FLOAT_EQ(0, round(nwu_bf(0)));
-  EXPECT_FLOAT_EQ(1, round(nwu_bf(1)));
-  EXPECT_FLOAT_EQ(0, round(nwu_bf(2)));
-
-  // test -90 deg yaw
-  euler << 0, 0, deg2rad(-90);
-  euler2quat(euler, 321, orientation_if);
-  enu_if << 1, 0, 0;
-  inertial2body(enu_if, orientation_if, nwu_bf);
-
-  EXPECT_FLOAT_EQ(1, round(nwu_bf(0)));
-  EXPECT_FLOAT_EQ(0, round(nwu_bf(1)));
-  EXPECT_FLOAT_EQ(0, round(nwu_bf(2)));
+  EXPECT_NEAR(2.0, target_pos_if(0), 0.001);
+  EXPECT_NEAR(0.0, target_pos_if(1), 0.001);
+  EXPECT_NEAR(0.0, target_pos_if(2), 0.001);
 }
 
 TEST(Math, wrapTo180) {

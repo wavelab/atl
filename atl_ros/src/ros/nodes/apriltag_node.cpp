@@ -72,9 +72,8 @@ void AprilTagNode::publishTargetBodyPositionEncoderMsg(
 void AprilTagNode::publishTargetInertialYawMsg(const TagPose &tag,
                                                const Quaternion &gimbal_frame) {
   // convert orientation in quaternion to euler angles
-  Vec3 tag_euler, gimbal_frame_euler;
-  quat2euler(gimbal_frame, 321, gimbal_frame_euler);
-  quat2euler(tag.orientation, 321, tag_euler);
+  const Vec3 gimbal_frame_euler = quatToEuler321(gimbal_frame);
+  const Vec3 tag_euler = quatToEuler321(tag.orientation);
 
   // build and publish msg
   const double yaw_if =
@@ -87,8 +86,7 @@ void AprilTagNode::publishTargetInertialYawMsg(const TagPose &tag,
 
 void AprilTagNode::publishTargetBodyYawMsg(const TagPose &tag) {
   // convert orientation in quaternion to euler angles
-  Vec3 euler;
-  quat2euler(tag.orientation, 321, euler);
+  const Vec3 euler = quatToEuler321(tag.orientation);
 
   // build and publish msg
   std_msgs::Float64 msg;
@@ -157,19 +155,13 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
       Gimbal::getTargetInBPF(this->camera_offset, target_cf, gimbal_joint);
 
   // Calculate target frame in bpf from encoders
-  Vec3 encoder_rpy_bf;
-  quat2euler(gimbal_joint_bf, 321, encoder_rpy_bf);
-
-  Vec3 quad_rpy_if;
-  quat2euler(quad_orientation, 321, quad_rpy_if);
-
+  const Vec3 encoder_rpy_bf = quatToEuler321(gimbal_joint_bf);
+  const Vec3 quad_rpy_if = quatToEuler321(quad_orientation);
   const Vec3 joint_encoder_rpy_if{encoder_rpy_bf(0) + quad_rpy_if(0),
                                   encoder_rpy_bf(1) + quad_rpy_if(1),
                                   0.0};
 
-  Quaternion joint_encoder_quat_if;
-  euler2quat(joint_encoder_rpy_if, 321, joint_encoder_quat_if);
-
+  Quaternion joint_encoder_quat_if = euler321ToQuat(joint_encoder_rpy_if);
   const Vec3 target_bpf_encoder = Gimbal::getTargetInBPF(this->camera_offset,
                                                          target_cf,
                                                          joint_encoder_quat_if);

@@ -55,7 +55,7 @@ def parse_trajectory(traj_file):
 
 
 
-def quat2euler(quat, euler_seq):
+def quatToEuler(quat, euler_seq):
     qw = quat[0]
     qx = quat[1]
     qy = quat[2]
@@ -112,7 +112,7 @@ class PoseData:
             ros_msg.orientation.y,
             ros_msg.orientation.z
         ]
-        roll, pitch, yaw = quat2euler(quat, 321)
+        roll, pitch, yaw = quatToEuler(quat, 321)
         self.roll.append(roll * 180 / pi)
         self.pitch.append(pitch * 180 / pi)
         self.yaw.append(yaw * 180 / pi)
@@ -149,7 +149,7 @@ class PoseStampedData:
             ros_msg.pose.orientation.y,
             ros_msg.pose.orientation.z
         ]
-        roll, pitch, yaw = quat2euler(quat, 321)
+        roll, pitch, yaw = quatToEuler(quat, 321)
         self.roll.append(roll * 180 / pi)
         self.pitch.append(pitch * 180 / pi)
         self.yaw.append(yaw * 180 / pi)

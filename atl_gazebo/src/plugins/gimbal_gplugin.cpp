@@ -89,27 +89,24 @@ void GimbalGPlugin::publishFrameOrientation() {
 }
 
 void GimbalGPlugin::publishJointOrientation() {
-  Vec3 frame_euler_if, joint_euler_bf, joint_euler_if;
-  Quaternion q;
-  QUATERNION_MSG msg;
-
   // obtain frame orientation
-  quat2euler(this->gimbal.frame_orientation, 321, frame_euler_if);
+  const Vec3 frame_euler_if = quatToEuler321(this->gimbal.frame_orientation);
 
   // obtain joint orientation
-  joint_euler_bf(0) = this->roll_joint->Position(0);
-  joint_euler_bf(1) = this->pitch_joint->Position(0);
-  joint_euler_bf(2) = 0.0;
+  const Vec3 joint_euler_bf{this->roll_joint->Position(0),
+                            this->pitch_joint->Position(0),
+                            0.0};
 
   // convert joint orientation from body frame to inertial frame
-  joint_euler_if(0) = frame_euler_if(0) + joint_euler_bf(0);
-  joint_euler_if(1) = frame_euler_if(1) + joint_euler_bf(1);
-  joint_euler_if(2) = 0.0;
+  const Vec3 joint_euler_if{frame_euler_if(0) + joint_euler_bf(0),
+                            frame_euler_if(1) + joint_euler_bf(1),
+                            0.0};
 
   // convert quaternion
-  euler2quat(joint_euler_if, 321, q);
+  Quaternion q = euler321ToQuat(joint_euler_if);
 
   // build msg
+  QUATERNION_MSG msg;
   msg.set_w(q.w());
   msg.set_x(q.x());
   msg.set_y(q.y());
@@ -120,12 +117,12 @@ void GimbalGPlugin::publishJointOrientation() {
 }
 
 void GimbalGPlugin::setAttitudeCallback(ConstVector3dPtr &msg) {
-  Vec2 euler_if(msg->x(), msg->y());
+  const Vec2 euler_if(msg->x(), msg->y());
   this->gimbal.setAttitude(euler_if);
 }
 
 void GimbalGPlugin::trackTargetCallback(ConstVector3dPtr &msg) {
-  Vec3 target_cf(msg->x(), msg->y(), msg->z());
+  const Vec3 target_cf(msg->x(), msg->y(), msg->z());
   this->gimbal.trackTarget(target_cf);
 }
 
