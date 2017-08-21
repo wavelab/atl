@@ -27,3 +27,5 @@ octave-workspace
 .ropeproject
 
 *.pyc
+*.idea
+cmake-build-debug/
