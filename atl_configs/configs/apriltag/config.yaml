@@ -2,8 +2,11 @@ tag_family: "Tag16h5"
 
 tag_sanity_check: 10  # euclidean distance in meters
 
-tag_ids: [0, 5]
-tag_sizes: [0.07, 0.6] # Blue and Green Tag
+tag_ids: [0]
+tag_sizes: [0.16]
+
+# tag_ids: [0, 5]
+# tag_sizes: [0.07, 0.6] # Blue and Green Tag
 # tag_sizes: [0.045, 0.342] # Tag made of tape
 
 # tag_ids: [0]
@@ -18,9 +21,9 @@ tag_sizes: [0.07, 0.6] # Blue and Green Tag
 # tag_ids: [0]
 # tag_sizes: [0.07]
 
-camera_config: "../camera/pointgrey_chameleon"
+camera_config: "../camera/pointgrey_firefly"
 windowing: true
 window_padding: 0.1
 illum_invar: false
-imshow: false
-# imshow: true
+# imshow: false
+imshow: true

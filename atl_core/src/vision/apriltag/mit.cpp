@@ -15,10 +15,6 @@ int MITDetector::configure(const std::string &config_file) {
 
 int MITDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
   int retval;
-  TagPose pose;
-  cv::Mat image_gray;
-  std::vector<AprilTags::TagDetection> detections;
-  std::vector<AprilTags::TagDetection> detections_undistorted;
 
   // change mode based on image size
   this->changeMode(image);
@@ -29,40 +25,47 @@ int MITDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
   }
 
   // mask image if tag was last detected
+  cv::Mat cropped_image;
   if (this->prev_tag.detected && this->windowing) {
-    retval = this->maskImage(this->prev_tag, image, this->window_padding);
-    if (retval == -4) {
-      return -1;
-    }
+    this->cropImage(this->prev_tag, image, cropped_image, this->window_padding);
+  } else {
+    this->crop_x = 0;
+    this->crop_y = 0;
+    this->crop_width = 0;
+    this->crop_height = 0;
+    cropped_image = image;
   }
+  this->prev_tag.detected = false; // reset previous tag
 
   // convert image to gray-scale
+  cv::Mat image_gray;
   if (image.channels() == 3) {
-    cv::cvtColor(image, image_gray, cv::COLOR_BGR2GRAY);
+    cv::cvtColor(cropped_image, image_gray, cv::COLOR_BGR2GRAY);
   } else {
-    image_gray = image;
+    image_gray = cropped_image;
   }
 
-  cv::Mat undistorted;
-  CameraConfig camera_config;
-  cv::Vec4d distortion_params;
-
-  camera_config = this->camera_configs[this->camera_mode];
-  // distortion_params = cv::Vec4d(-0.234490, 0.197606, -0.000956, -0.001423);
-  // distortion_params = cv::Vec4d(-0.322520, 0.102037, 0.000097, 0.003677);
-  // cv::undistort(image_gray, undistorted, camera_config.camera_matrix,
-  // distortion_params);
   // extract tags
+  std::vector<AprilTags::TagDetection> detections;
   detections = this->detector->extractTags(image_gray);
-  // detections_undistorted = this->detector->extractTags(undistorted);
 
   // calculate tag pose
   for (size_t i = 0; i < detections.size(); i++) {
-    if (this->obtainPose(detections[i], pose) == 0) {
-      tags.push_back(pose);
+    TagPose tag_pose;
+    tag_pose.id = detections[i].id;
+
+    std::pair<float, float> p[4] = detections[i].p;
+    const Vec2 p1{p[0].first, p[0].second};
+    const Vec2 p2{p[1].first, p[1].second};
+    const Vec2 p3{p[2].first, p[2].second};
+    const Vec2 p4{p[3].first, p[3].second};
+
+    if (this->getRelativePose(p1, p2, p3, p4, tag_pose) == 0) {
+      // add to tags poses
+      tags.push_back(tag_pose);
 
       // keep track of last tag
-      this->prev_tag = pose;
+      this->prev_tag = tag_pose;
       this->prev_tag_image_width = image.cols;
       this->prev_tag_image_height = image.rows;
 
@@ -70,63 +73,12 @@ int MITDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
       break;
     }
   }
-  // for (int i = 0; i < detections_undistorted.size(); i++) {
-  //   if (this->obtainPose(detections_undistorted[i], pose) == 0) {
-  //     tags.push_back(pose);
-  //     std::cout << "un distorted pose " <<  pose.position.transpose() <<
-  //     std::endl;
-  //
-  //     // keep track of last tag
-  //     this->prev_tag = pose;
-  //     this->prev_tag_image_width = image.cols;
-  //     this->prev_tag_image_height = image.rows;
-  //
-  //     // only need 1 tag
-  //     break;
-  //   }
-  // }
 
   // imshow
-  if (this->imshow) {
-    cv::imshow("MITDetectorOriginal", image_gray);
-    // cv::imshow("MITDetector", undistorted);
+  if (this->imshow && image_gray.rows && image_gray.cols) {
+    cv::imshow("MITDetector", image_gray);
     cv::waitKey(1);
   }
-
-  return 0;
-}
-
-int MITDetector::obtainPose(const AprilTags::TagDetection &tag,
-                            TagPose &tag_pose) {
-  const CameraConfig camera_config = this->camera_configs[this->camera_mode];
-  const double fx = camera_config.camera_matrix.at<double>(0, 0);
-  const double fy = camera_config.camera_matrix.at<double>(1, 1);
-  const double cx = camera_config.camera_matrix.at<double>(0, 2);
-  const double cy = camera_config.camera_matrix.at<double>(1, 2);
-
-  // get tag size according to tag id
-  if (this->tag_configs.find(tag.id) == this->tag_configs.end()) {
-    LOG_ERROR("ERROR! Tag size for [%d] not configured!", (int) tag.id);
-    return -2;
-  }
-
-  // recovering the relative transform of a tag:
-  const double tag_size = this->tag_configs[tag.id];
-  const Mat4 transform = tag.getRelativeTransform(tag_size, fx, fy, cx, cy);
-  const Vec3 t = transform.col(3).head(3);
-  const Mat3 R = transform.block(0, 0, 3, 3);
-
-  // sanity check - calculate euclidean distance between prev and current tag
-  if ((t - this->prev_tag.position).norm() > this->tag_sanity_check) {
-    return -1;
-  }
-
-  // tag is in camera frame
-  // camera frame:  (z - forward, x - right, y - down)
-  tag_pose.id = tag.id;
-  tag_pose.detected = true;
-  tag_pose.position = t;
-  tag_pose.orientation = Quaternion(R);
 
   return 0;
 }

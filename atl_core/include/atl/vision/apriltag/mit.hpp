@@ -49,15 +49,6 @@ public:
    * @returns 0 for success else failure
    */
   int extractTags(cv::Mat &image, std::vector<TagPose> &tags);
-
-  /**
-   * Obtain pose
-   *
-   * @param tag Tag detected
-   * @param tag_pose Tag Pose
-   * @returns 0 for success and -1 for failure
-   */
-  int obtainPose(const AprilTags::TagDetection &tag, TagPose &tag_pose);
 };
 
 } // namespace atl

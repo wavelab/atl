@@ -33,8 +33,15 @@ public:
 
   MichiganDetector() {}
   ~MichiganDetector() {
-    apriltag_detector_destroy(this->detector);
-    tag16h5_destroy(this->family);
+    // detector
+    if (this->detector != nullptr) {
+      apriltag_detector_destroy(this->detector);
+    }
+
+    // family
+    if (this->family != nullptr) {
+      tag16h5_destroy(this->family);
+    }
   }
 
   /**

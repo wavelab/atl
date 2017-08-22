@@ -54,6 +54,7 @@ GimbalNode::~GimbalNode() { this->gimbal.off(); }
 int GimbalNode::publishIMU(Vec3 euler) {
   geometry_msgs::Vector3 msg;
   buildMsg(euler, msg);
+  this->imu_rpy = euler;
   this->ros_pubs[SBGC_IMU_TOPIC].publish(msg);
   return 0;
 }
@@ -61,6 +62,7 @@ int GimbalNode::publishIMU(Vec3 euler) {
 int GimbalNode::publishRawEncoder(Vec3 encoder_euler) {
   geometry_msgs::Vector3 msg;
   buildMsg(encoder_euler, msg);
+  this->encoder_rpy = encoder_euler;
   this->ros_pubs[SBGC_RAW_ENCODER_TOPIC].publish(msg);
   return 0;
 }
@@ -136,6 +138,10 @@ int GimbalNode::loopCallback() {
   Quaternion q;
   Vec3 encoder_euler;
   Quaternion encoder_q;
+
+  std::cout << "IMU RPY: " << this->imu_rpy.transpose() << std::endl;
+  std::cout << "Encoder RPY: " << this->encoder_rpy.transpose() << std::endl;
+  std::cout << std::endl;
 
   // set gimbal attitude
   this->gimbal.setAngle(this->set_points(0), this->set_points(1));
