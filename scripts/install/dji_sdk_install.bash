@@ -35,7 +35,7 @@ ROS_SDK_REPO_URL="https://github.com/dji-sdk/Onboard-SDK-ROS"
 install_ros_sdk()
 {
     if [ ! -d $CATKIN_PATH/src/Onboard-SDK-ROS ]; then
-      if [ ! -d $DONWLOAD_PATH/Onboard-SDK-ROS ]; then
+      if [ ! -d $DOWNLOAD_PATH/Onboard-SDK-ROS ]; then
         cd $DOWNLOAD_PATH
         sudo git clone https://github.com/wavelab/Onboard-SDK-ROS
       fi
