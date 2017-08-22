@@ -95,6 +95,23 @@ int WaypointController::record(const Vec3 &pos, const Vec3 &waypoint) {
   return 0;
 }
 
+double WaypointController::calcYawToWaypoint(const Vec3 &waypoint,
+                                             const Vec3 &position) {
+  // assume waypoints are in NWU inertial frame
+  const double dx = waypoint(0) - position(0);
+  const double dy = waypoint(1) - position(1);
+
+  // calculate heading
+  double heading = atan2(dy, dx);
+  if (heading > M_PI) {
+    heading -= 2 * M_PI;
+  } else if (heading < -M_PI) {
+    heading += 2 * M_PI;
+  }
+
+  return heading;
+}
+
 int WaypointController::update(Mission &mission,
                                const Pose &pose,
                                const Vec3 &vel,

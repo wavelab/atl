@@ -254,41 +254,6 @@ int BaseDetector::cropImage(const TagPose &prev_tag,
   return 0;
 }
 
-int BaseDetector::preprocessImage(const cv::Mat &image, cv::Mat &image_processed) {
-  // change mode based on image size
-  this->changeMode(image);
-
-  // tranform illumination invariant tag
-  if (this->illum_invar) {
-    this->illuminationInvariantTransform(image);
-  }
-
-  // mask image if tag was last detected
-  cv::Mat cropped_image;
-  if (this->prev_tag.detected && this->windowing) {
-    // this->maskImage(this->prev_tag, image, this->window_padding);
-    this->cropImage(this->prev_tag, image, cropped_image, this->window_padding);
-  } else {
-    this->crop_x = 0;
-    this->crop_y = 0;
-    this->crop_width = 0;
-    this->crop_height = 0;
-    cropped_image = image;
-  }
-  this->prev_tag.detected = false; // reset previous tag
-
-  // convert image to gray-scale
-  cv::Mat image_gray;
-  if (image.channels() == 3) {
-    cv::cvtColor(cropped_image, image_gray, cv::COLOR_BGR2GRAY);
-  } else {
-    image_gray = cropped_image;
-  }
-
-
-	return 0;
-}
-
 int BaseDetector::getRelativePose(const Vec2 &p1,
                                   const Vec2 &p2,
                                   const Vec2 &p3,
