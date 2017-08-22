@@ -52,7 +52,7 @@ void DFCameraGPlugin::Load(gazebo::sensors::SensorPtr sptr,
   // clang-format on
 
   // setup publisher
-  this->registerPublisher<gazebo::msgs::Image>(IMAGE_PUB_TOPIC);
+  this->addPublisher<gazebo::msgs::Image>(IMAGE_PUB_TOPIC);
 }
 
 void DFCameraGPlugin::onNewFrame(const unsigned char *image,

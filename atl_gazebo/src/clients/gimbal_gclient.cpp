@@ -25,10 +25,10 @@ int GimbalGClient::configure() {
   // setup gazebo node
   // clang-format off
   GazeboNode::configure();
-  this->registerPublisher<VEC3_MSG>(SETPOINT_GTOPIC);
-  this->registerPublisher<VEC3_MSG>(TRACK_GTOPIC);
-  this->registerSubscriber(FRAME_ORIENTATION_GTOPIC, &GimbalGClient::frameOrientationCallback, this);
-  this->registerSubscriber(JOINT_ORIENTATION_GTOPIC, &GimbalGClient::jointOrientationCallback, this);
+  this->addPublisher<VEC3_MSG>(SETPOINT_GTOPIC);
+  this->addPublisher<VEC3_MSG>(TRACK_GTOPIC);
+  this->addSubscriber(FRAME_ORIENTATION_GTOPIC, &GimbalGClient::frameOrientationCallback, this);
+  this->addSubscriber(JOINT_ORIENTATION_GTOPIC, &GimbalGClient::jointOrientationCallback, this);
   this->waitForConnection();
   // clang-format on
 

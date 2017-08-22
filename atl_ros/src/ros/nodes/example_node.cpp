@@ -6,9 +6,9 @@ int ExampleNode::configure(int hz) {
   ROSNode::configure(hz);
 
   // clang-format off
-  this->registerPublisher<std_msgs::String>(SAY_TOPIC);
-  this->registerSubscriber(SAY_TOPIC, &ExampleNode::sayCallback, this);
-  this->registerLoopCallback(std::bind(&ExampleNode::loopCallback, this));
+  this->addPublisher<std_msgs::String>(SAY_TOPIC);
+  this->addSubscriber(SAY_TOPIC, &ExampleNode::sayCallback, this);
+  this->addLoopCallback(std::bind(&ExampleNode::loopCallback, this));
   // clang-format on
 
   return 0;

@@ -30,20 +30,20 @@ int WorldGClient::configure() {
 
   // publishers
   // clang-format off
-  this->registerPublisher<FACTORY_MSG>(FACTORY_TOPIC);
-  this->registerPublisher<REQUEST_MSG>(MODEL_REMOVE_TOPIC);
-  this->registerPublisher<MODEL_POSE_MSG>(MODEL_POSE_TOPIC);
-  this->registerPublisher<WORLD_CONTROL_MSG>(WORLD_CONTROL_TOPIC);
-  this->registerPublisher<REQUEST_MSG>(WORLD_LOAD_TOPIC);
-  this->registerPublisher<REQUEST_MSG>(WORLD_CLEAR_TOPIC);
-  this->registerPublisher<SERVER_CONTROL_MSG>(SERVER_CONTROL_TOPIC);
+  this->addPublisher<FACTORY_MSG>(FACTORY_TOPIC);
+  this->addPublisher<REQUEST_MSG>(MODEL_REMOVE_TOPIC);
+  this->addPublisher<MODEL_POSE_MSG>(MODEL_POSE_TOPIC);
+  this->addPublisher<WORLD_CONTROL_MSG>(WORLD_CONTROL_TOPIC);
+  this->addPublisher<REQUEST_MSG>(WORLD_LOAD_TOPIC);
+  this->addPublisher<REQUEST_MSG>(WORLD_CLEAR_TOPIC);
+  this->addPublisher<SERVER_CONTROL_MSG>(SERVER_CONTROL_TOPIC);
   this->waitForConnection();
   // clang-format on
 
   // subscribers
   // clang-format off
-  this->registerSubscriber(WORLD_CLOCK_TOPIC, &WorldGClient::clockCallback, this);
-  this->registerSubscriber(WORLD_STATS_TOPIC, &WorldGClient::worldStatsCallback, this);
+  this->addSubscriber(WORLD_CLOCK_TOPIC, &WorldGClient::clockCallback, this);
+  this->addSubscriber(WORLD_STATS_TOPIC, &WorldGClient::worldStatsCallback, this);
   // clang-format on
 
   return 0;

@@ -77,7 +77,7 @@ public:
    * @param hz ROS node rate
    * @return 0 for success, -1 for failure
    */
-  int configure(int hz);
+  int configure(const int hz);
 
   /**
    * Disarm

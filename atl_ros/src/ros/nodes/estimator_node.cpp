@@ -34,18 +34,18 @@ int EstimatorNode::configure(int hz) {
 
   // publishers and subscribers
   // clang-format off
-  this->registerPublisher<geometry_msgs::Vector3>(LT_BODY_POSITION_TOPIC);
-  this->registerPublisher<geometry_msgs::Vector3>(LT_BODY_VELOCITY_TOPIC);
-  this->registerPublisher<std_msgs::Bool>(LT_DETECTED_TOPIC);
-  this->registerPublisher<geometry_msgs::Vector3>(GIMBAL_SETPOINT_ATTITUDE_TOPIC);
-  this->registerPublisher<std_msgs::Float64>(QUAD_YAW_TOPIC);
-  this->registerSubscriber(ESTIMATOR_ON_TOPIC, &EstimatorNode::onCallback, this);
-  this->registerSubscriber(ESTIMATOR_OFF_TOPIC, &EstimatorNode::offCallback, this);
-  this->registerSubscriber(QUAD_POSE_TOPIC, &EstimatorNode::quadPoseCallback, this);
-  this->registerSubscriber(QUAD_VELOCITY_TOPIC, &EstimatorNode::quadVelocityCallback, this);
-  this->registerSubscriber(TARGET_BF_POS_TOPIC, &EstimatorNode::targetBodyPosCallback, this);
-  this->registerSubscriber(TARGET_IF_YAW_TOPIC, &EstimatorNode::targetInertialYawCallback, this);
-  this->registerLoopCallback(std::bind(&EstimatorNode::loopCallback, this));
+  this->addPublisher<geometry_msgs::Vector3>(LT_BODY_POSITION_TOPIC);
+  this->addPublisher<geometry_msgs::Vector3>(LT_BODY_VELOCITY_TOPIC);
+  this->addPublisher<std_msgs::Bool>(LT_DETECTED_TOPIC);
+  this->addPublisher<geometry_msgs::Vector3>(GIMBAL_SETPOINT_ATTITUDE_TOPIC);
+  this->addPublisher<std_msgs::Float64>(QUAD_YAW_TOPIC);
+  this->addSubscriber(ESTIMATOR_ON_TOPIC, &EstimatorNode::onCallback, this);
+  this->addSubscriber(ESTIMATOR_OFF_TOPIC, &EstimatorNode::offCallback, this);
+  this->addSubscriber(QUAD_POSE_TOPIC, &EstimatorNode::quadPoseCallback, this);
+  this->addSubscriber(QUAD_VELOCITY_TOPIC, &EstimatorNode::quadVelocityCallback, this);
+  this->addSubscriber(TARGET_BF_POS_TOPIC, &EstimatorNode::targetBodyPosCallback, this);
+  this->addSubscriber(TARGET_IF_YAW_TOPIC, &EstimatorNode::targetInertialYawCallback, this);
+  this->addLoopCallback(std::bind(&EstimatorNode::loopCallback, this));
   // clang-format on
 
   this->configured = true;

@@ -7,10 +7,10 @@ int LZNode::configure(int hz) {
   // setup ros node
   // clang-format off
   ROSNode::configure(hz);
-  ROSNode::registerPublisher<geometry_msgs::Pose>(POSE_RTOPIC);
-  ROSNode::registerSubscriber(POSITION_SET_RTOPIC, &LZNode::positionCallback, this);
-  ROSNode::registerSubscriber(VELOCITY_SET_RTOPIC, &LZNode::velocityCallback, this);
-  ROSNode::registerSubscriber(ANGULAR_VEL_SET_RTOPIC, &LZNode::angularVelocityCallback, this);
+  ROSNode::addPublisher<geometry_msgs::Pose>(POSE_RTOPIC);
+  ROSNode::addSubscriber(POSITION_SET_RTOPIC, &LZNode::positionCallback, this);
+  ROSNode::addSubscriber(VELOCITY_SET_RTOPIC, &LZNode::velocityCallback, this);
+  ROSNode::addSubscriber(ANGULAR_VEL_SET_RTOPIC, &LZNode::angularVelocityCallback, this);
   // clang-format on
 
   // connect gazebo client

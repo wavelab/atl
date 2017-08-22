@@ -20,7 +20,7 @@ int CameraGClient::configure() {
 
   // setup gazebo node
   GazeboNode::configure();
-  this->registerSubscriber(IMAGE_TOPIC, &CameraGClient::imageCallback, this);
+  this->addSubscriber(IMAGE_TOPIC, &CameraGClient::imageCallback, this);
   this->waitForConnection();
   return 0;
 }

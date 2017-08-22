@@ -19,14 +19,14 @@ int QuadrotorGClient::configure() {
 
   // subscribers
   // clang-format off
-  this->registerSubscriber(POSE_GTOPIC, &QuadrotorGClient::poseCallback, this);
-  this->registerSubscriber(VELOCITY_GTOPIC, &QuadrotorGClient::velocityCallback, this);
+  this->addSubscriber(POSE_GTOPIC, &QuadrotorGClient::poseCallback, this);
+  this->addSubscriber(VELOCITY_GTOPIC, &QuadrotorGClient::velocityCallback, this);
   // clang-format on
 
   // publishers
-  this->registerPublisher<ATT_SETPOINT_MSG>(ATT_SETPOINT_GTOPIC);
-  this->registerPublisher<POS_SETPOINT_MSG>(POS_SETPOINT_GTOPIC);
-  this->registerPublisher<VEL_SETPOINT_MSG>(VEL_SETPOINT_GTOPIC);
+  this->addPublisher<ATT_SETPOINT_MSG>(ATT_SETPOINT_GTOPIC);
+  this->addPublisher<POS_SETPOINT_MSG>(POS_SETPOINT_GTOPIC);
+  this->addPublisher<VEL_SETPOINT_MSG>(VEL_SETPOINT_GTOPIC);
   this->waitForConnection();
 
   return 0;

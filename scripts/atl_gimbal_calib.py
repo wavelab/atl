@@ -43,7 +43,10 @@ def move_gimbal():
 def find_chessboard(img, cb_size, camera_id):
     # find chessboard
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    ret, img_points = cv2.findChessboardCorners(gray, cb_size, None)
+    flags = cv2.CALIB_CB_ADAPTIVE_THRESH
+    flags += cv2.CALIB_CB_NORMALIZE_IMAGE
+    flags += cv2.CALIB_CB_FAST_CHECK
+    ret, img_points = cv2.findChessboardCorners(gray, cb_size, None, flags)
 
     # draw chessboard
     if ret is True:
@@ -186,21 +189,22 @@ if __name__ == "__main__":
     # gimbal.activate(False)
 
     # chessboard settings
-    chessboard = Chessboard(6,  # rows
-                            9,  # cols
-                            0.022)  # square size
+    chessboard = Chessboard(8,  # rows
+                            8,  # cols
+                            0.083)  # square size
 
     # static camera
-    static_camera_K = np.array([[384.925033, 0.000000, 315.661209],
-                               [0.000000, 385.784337, 261.723252],
+    static_camera_K = np.array([[368.083519, 0.000000, 323.059860],
+                               [0.000000, 368.380343, 254.482050],
                                [0.000000, 0.000000, 1.000000]])
-    static_camera_d = np.array([-0.318282, 0.082325, -0.002069, 0.003112])
+
+    static_camera_d = np.array([-0.317398, 0.084401, -0.000403, 0.001252])
 
     # gimbal camera
-    gimbal_camera_K = np.array([[397.421473, 0.000000, 315.368745],
-                               [0.000000, 397.690562, 236.920557],
+    gimbal_camera_K = np.array([[386.468175, 0.000000, 326.873225],
+                               [0.000000, 386.641069, 235.500697],
                                [0.000000, 0.000000, 1.000000]])
-    gimbal_camera_d = np.array([-0.313239, 0.080298, -0.000414, 0.002292])
+    gimbal_camera_d = np.array([-0.299881, 0.073809, -0.001179, 0.001184])
 
     # convert collected data
     convert_measurements_to_jason_format("/tmp/calibration",

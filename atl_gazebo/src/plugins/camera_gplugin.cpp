@@ -48,7 +48,7 @@ void CameraGPlugin::Load(gazebo::sensors::SensorPtr sptr, sdf::ElementPtr sdf) {
   // clang-format on
 
   // setup publisher
-  this->registerPublisher<gazebo::msgs::Image>(IMAGE_PUB_TOPIC);
+  this->addPublisher<gazebo::msgs::Image>(IMAGE_PUB_TOPIC);
 }
 
 void CameraGPlugin::onNewFrame(const unsigned char *image_raw,

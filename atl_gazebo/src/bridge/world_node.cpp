@@ -7,14 +7,14 @@ int WorldNode::configure(int hz) {
   // setup ros node
   // clang-format off
   ROSNode::configure(hz);
-  ROSNode::registerPublisher<rosgraph_msgs::Clock>(CLOCK_RTOPIC);
-  ROSNode::registerSubscriber(SHUTDOWN_RTOPIC, &WorldNode::shutdownCallback, this);
-  ROSNode::registerSubscriber(PAUSE_RTOPIC, &WorldNode::pauseCallback, this);
-  ROSNode::registerSubscriber(UNPAUSE_RTOPIC, &WorldNode::unPauseCallback, this);
-  ROSNode::registerSubscriber(RESET_RTOPIC, &WorldNode::resetCallback, this);
-  ROSNode::registerSubscriber(MODEL_POSE_RTOPIC, &WorldNode::modelPoseCallback, this);
-  ROSNode::registerSubscriber(LOAD_WORLD_RTOPIC, &WorldNode::loadWorldCallback, this);
-  ROSNode::registerSubscriber(CLEAR_WORLD_RTOPIC, &WorldNode::clearWorldCallback, this);
+  ROSNode::addPublisher<rosgraph_msgs::Clock>(CLOCK_RTOPIC);
+  ROSNode::addSubscriber(SHUTDOWN_RTOPIC, &WorldNode::shutdownCallback, this);
+  ROSNode::addSubscriber(PAUSE_RTOPIC, &WorldNode::pauseCallback, this);
+  ROSNode::addSubscriber(UNPAUSE_RTOPIC, &WorldNode::unPauseCallback, this);
+  ROSNode::addSubscriber(RESET_RTOPIC, &WorldNode::resetCallback, this);
+  ROSNode::addSubscriber(MODEL_POSE_RTOPIC, &WorldNode::modelPoseCallback, this);
+  ROSNode::addSubscriber(LOAD_WORLD_RTOPIC, &WorldNode::loadWorldCallback, this);
+  ROSNode::addSubscriber(CLEAR_WORLD_RTOPIC, &WorldNode::clearWorldCallback, this);
   // clang-format on
 
   // setup gazebo client

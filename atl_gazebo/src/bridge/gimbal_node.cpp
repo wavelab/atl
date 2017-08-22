@@ -10,12 +10,12 @@ int GimbalNode::configure(int hz) {
   // setup ros node
   // clang-format off
   ROSNode::configure(hz);
-  ROSNode::registerPublisher<geometry_msgs::Quaternion>(FRAME_ORIENTATION_RTOPIC);
-  ROSNode::registerPublisher<geometry_msgs::Quaternion>(JOINT_ORIENTATION_RTOPIC);
-  ROSNode::registerPublisher<geometry_msgs::Vector3>(POSITION_RTOPIC);
-  ROSNode::registerSubscriber(POSE_RTOPIC, &GimbalNode::quadPoseCallback, this);
-  ROSNode::registerSubscriber(SETPOINT_RTOPIC, &GimbalNode::setAttitudeCallback, this);
-  ROSNode::registerSubscriber(TRACK_RTOPIC, &GimbalNode::trackTargetCallback, this);
+  ROSNode::addPublisher<geometry_msgs::Quaternion>(FRAME_ORIENTATION_RTOPIC);
+  ROSNode::addPublisher<geometry_msgs::Quaternion>(JOINT_ORIENTATION_RTOPIC);
+  ROSNode::addPublisher<geometry_msgs::Vector3>(POSITION_RTOPIC);
+  ROSNode::addSubscriber(POSE_RTOPIC, &GimbalNode::quadPoseCallback, this);
+  ROSNode::addSubscriber(SETPOINT_RTOPIC, &GimbalNode::setAttitudeCallback, this);
+  ROSNode::addSubscriber(TRACK_RTOPIC, &GimbalNode::trackTargetCallback, this);
   // clang-format on
 
   // connect gazebo client

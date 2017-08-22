@@ -10,7 +10,7 @@ int DFCameraNode::configure(int hz) {
   }
 
   // clang-format off
-  ROSNode::registerImagePublisher(CAMERA_IMAGE_RTOPIC);
+  ROSNode::addImagePublisher(CAMERA_IMAGE_RTOPIC);
 
   // setup gazebo client
   if (DFCameraGClient::configure() != 0) {

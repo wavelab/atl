@@ -103,6 +103,14 @@ def up_and_down():
         sleep(5)
 
 
+def deg2rad(d):
+    return d * pi / 180.0
+
+
+def rad2deg(r):
+    return r * 180.0 / pi
+
+
 if __name__ == "__main__":
     rospy.init_node("atl_remote")
     lz = LandingZone()
@@ -114,10 +122,10 @@ if __name__ == "__main__":
     rospy.sleep(1.0)
 
     # gimbal.activate(True)
-    # gimbal.set_attitude([-0.349, -0.2617, 0])
-    # gimbal.activate(False)
+    # gimbal.set_attitude([0, deg2rad(-90.0), 0])
+    gimbal.activate(False)
 
-    quad.set_arm(True)
+    # quad.set_arm(True)
     # quad.set_mode("DISCOVER_MODE")
     # quad.set_yaw(90)
-    quad.set_mode("WAYPOINT_MODE")
+    # quad.set_mode("WAYPOINT_MODE")

@@ -62,14 +62,14 @@ public:
   ~ROSNode();
   int configure(int hz);
   void shutdownCallback(const std_msgs::Bool &msg);
-  int registerShutdown(const std::string &topic);
-  int registerImagePublisher(const std::string &topic);
+  int addShutdownListener(const std::string &topic);
+  int addImagePublisher(const std::string &topic);
 
   template <typename M, typename T>
-  int registerImageSubscriber(const std::string &topic,
-                              void (T::*fp)(M),
-                              T *obj,
-                              uint32_t queue_size = 1) {
+  int addImageSubscriber(const std::string &topic,
+                         void (T::*fp)(M),
+                         T *obj,
+                         uint32_t queue_size = 1) {
     // pre-check
     if (this->configured == false) {
       return -1;
@@ -83,9 +83,9 @@ public:
   }
 
   template <typename M>
-  int registerPublisher(const std::string &topic,
-                        uint32_t queue_size = 1,
-                        bool latch = false) {
+  int addPublisher(const std::string &topic,
+                   uint32_t queue_size = 1,
+                   bool latch = false) {
     ros::Publisher publisher;
 
     // pre-check
@@ -93,7 +93,7 @@ public:
       return -1;
     }
 
-    // register publisher
+    // add publisher
     publisher = this->ros_nh->advertise<M>(topic, queue_size, latch);
     this->ros_pubs[topic] = publisher;
 
@@ -101,10 +101,10 @@ public:
   }
 
   template <typename M, typename T>
-  int registerSubscriber(const std::string &topic,
-                         void (T::*fp)(M),
-                         T *obj,
-                         uint32_t queue_size = 1) {
+  int addSubscriber(const std::string &topic,
+                    void (T::*fp)(M),
+                    T *obj,
+                    uint32_t queue_size = 1) {
     ros::Subscriber subscriber;
 
     // pre-check
@@ -112,7 +112,7 @@ public:
       return -1;
     }
 
-    // register subscriber
+    // add subscriber
     subscriber = this->ros_nh->subscribe(topic, queue_size, fp, obj);
     this->ros_subs[topic] = subscriber;
 
@@ -120,9 +120,9 @@ public:
   }
 
   template <class T, class MReq, class MRes>
-  int registerServer(const std::string &service_topic,
-                     bool (T::*fp)(MReq &, MRes &),
-                     T *obj) {
+  int addService(const std::string &service_topic,
+                 bool (T::*fp)(MReq &, MRes &),
+                 T *obj) {
     ros::ServiceServer server;
 
     // pre-check
@@ -138,8 +138,7 @@ public:
   }
 
   template <typename M>
-  int registerClient(const std::string &service_topic,
-                     bool persistent = false) {
+  int addClient(const std::string &service_topic, bool persistent = false) {
     ros::ServiceClient client;
 
     // pre-check
@@ -154,7 +153,7 @@ public:
     return 0;
   }
 
-  int registerLoopCallback(std::function<int()> cb);
+  int addLoopCallback(std::function<int()> cb);
   int loop();
 };
 
