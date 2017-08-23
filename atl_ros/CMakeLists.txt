@@ -17,6 +17,7 @@ FIND_PACKAGE(
     std_msgs
     geometry_msgs
     sensor_msgs
+    nodelet
     message_generation
     image_transport
     cv_bridge
@@ -55,6 +56,7 @@ CATKIN_PACKAGE(
     atl_core
     atl_msgs
   LIBRARIES
+    atl_camera_nodelet
     atl_ros_utils
 )
 
@@ -74,6 +76,7 @@ SET(
     CGAL
     yaml-cpp
 )
+
 ADD_EXECUTABLE(atl_apriltag_node src/ros/nodes/apriltag_node.cpp)
 TARGET_LINK_LIBRARIES(atl_apriltag_node ${ATL_ROS_DEPS})
 ADD_DEPENDENCIES(atl_apriltag_node atl_ros_utils)
@@ -82,8 +85,11 @@ ADD_EXECUTABLE(atl_cam_calib_node src/ros/nodes/cam_calib_node.cpp)
 TARGET_LINK_LIBRARIES(atl_cam_calib_node ${ATL_ROS_DEPS})
 ADD_DEPENDENCIES(atl_cam_calib_node atl_ros_utils)
 
+# Camera Nodelet
+ADD_LIBRARY(atl_camera_nodelet src/ros/nodes/camera_nodelet.cpp)
+TARGET_LINK_LIBRARIES(atl_camera_nodelet ${catkin_LIBRARIES})
 ADD_EXECUTABLE(atl_camera_node src/ros/nodes/camera_node.cpp)
-TARGET_LINK_LIBRARIES(atl_camera_node ${ATL_ROS_DEPS})
+TARGET_LINK_LIBRARIES(atl_camera_node ${ATL_ROS_DEPS} atl_camera_nodelet)
 ADD_DEPENDENCIES(atl_camera_node atl_ros_utils)
 
 ADD_EXECUTABLE(atl_control_node src/ros/nodes/control_node.cpp)
@@ -121,6 +127,12 @@ ADD_LIBRARY(
     src/ros/utils/node.cpp
     src/ros/utils/utils.cpp
 )
+
+## Need to explicitly list nodelet.xml for installation
+install(FILES
+    atl_camera_nodelet.xml
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+    )
 
 # TESTS
 # SET(ATL_ROS_TEST_DEPS ${catkin_LIBRARIES} ${GTEST_LIBRARIES})

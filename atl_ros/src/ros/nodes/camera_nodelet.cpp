@@ -1,8 +1,8 @@
-#include "atl/ros/nodes/camera_node.hpp"
+#include "atl/ros/nodes/camera_nodelet.hpp"
 
 namespace atl {
 
-int CameraNode::configure(int hz) {
+int CameraNodelet::configure(int hz) {
   std::string config_path;
 
   // ros node
@@ -35,7 +35,7 @@ int CameraNode::configure(int hz) {
   return 0;
 }
 
-int CameraNode::publishImage() {
+int CameraNodelet::publishImage() {
   sensor_msgs::ImageConstPtr img_msg;
 
   // encode position and orientation into image (first 11 pixels in first row)
@@ -67,23 +67,23 @@ int CameraNode::publishImage() {
   return 0;
 }
 
-void CameraNode::gimbalPositionCallback(const geometry_msgs::Vector3 &msg) {
+void CameraNodelet::gimbalPositionCallback(const geometry_msgs::Vector3 &msg) {
   convertMsg(msg, this->gimbal_position);
 }
 
-void CameraNode::gimbalFrameCallback(const geometry_msgs::Quaternion &msg) {
+void CameraNodelet::gimbalFrameCallback(const geometry_msgs::Quaternion &msg) {
   convertMsg(msg, this->gimbal_frame_orientation);
 }
 
-void CameraNode::gimbalJointCallback(const geometry_msgs::Quaternion &msg) {
+void CameraNodelet::gimbalJointCallback(const geometry_msgs::Quaternion &msg) {
   convertMsg(msg, this->gimbal_joint_orientation);
 }
 
-void CameraNode::aprilTagCallback(const atl_msgs::AprilTagPose &msg) {
+void CameraNodelet::aprilTagCallback(const atl_msgs::AprilTagPose &msg) {
   convertMsg(msg, this->tag);
 }
 
-int CameraNode::loopCallback() {
+int CameraNodelet::loopCallback() {
   double dist;
 
   // change mode depending on apriltag distance
@@ -107,7 +107,6 @@ int CameraNode::loopCallback() {
 
   return 0;
 }
+}  // namespace atl
 
-} // namespace atl
-
-RUN_ROS_NODE(atl::CameraNode, NODE_RATE);
+RUN_ROS_NODE(atl::CameraNodelet, NODE_RATE);

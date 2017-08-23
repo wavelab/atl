@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
 
   nodelet.load(nodelet_name, "atl/camera_nodelet", remap, nargv);
 
-  rost::spin();
+  ros::spin();
 
   return 0;
 }

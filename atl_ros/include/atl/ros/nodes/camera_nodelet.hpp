@@ -1,13 +1,15 @@
 #ifndef ATL_ROS_NODES_CAMERA_NODE_HPP
 #define ATL_ROS_NODES_CAMERA_NODE_HPP
 
+#include <nodelet/nodelet.h>
+#include <ros/ros.h>
+
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
-#include <ros/ros.h>
+
 #include <sensor_msgs/CameraInfo.h>
 
-#include <atl/atl_core.hpp>
-
+#include "atl/atl_core.hpp"
 #include "atl/ros/utils/msgs.hpp"
 #include "atl/ros/utils/node.hpp"
 
@@ -28,7 +30,7 @@ static const std::string SHUTDOWN_TOPIC = "/atl/camera/shutdown";
 
 namespace atl {
 
-class CameraNode : public ROSNode {
+class CameraNodelet : public Nodelet::nodelet {
 public:
   Camera camera;
   cv::Mat image;
