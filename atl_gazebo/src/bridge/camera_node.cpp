@@ -3,7 +3,7 @@
 namespace atl {
 namespace gazebo_bridge {
 
-int CameraNode::configure(int hz) {
+int CameraNode::configure(const int hz) {
   // ros node
   if (ROSNode::configure(hz) != 0) {
     return -1;
@@ -19,14 +19,14 @@ int CameraNode::configure(int hz) {
 
   if (this->gimbal_mode) {
     // clang-format off
-    ROSNode::registerImagePublisher(CAMERA_IMAGE_RTOPIC);
-    ROSNode::registerSubscriber(this->gimbal_position_topic, &CameraNode::gimbalPositionCallback, this);
-    ROSNode::registerSubscriber(this->gimbal_frame_orientation_topic, &CameraNode::gimbalFrameOrientationCallback, this);
-    ROSNode::registerSubscriber(this->gimbal_joint_orientation_topic, &CameraNode::gimbalJointOrientationCallback, this);
-    ROSNode::registerSubscriber(CAMERA_MODE_RTOPIC, &CameraNode::modeCallback, this);
+    ROSNode::addImagePublisher(CAMERA_IMAGE_RTOPIC);
+    ROSNode::addSubscriber(this->gimbal_position_topic, &CameraNode::gimbalPositionCallback, this);
+    ROSNode::addSubscriber(this->gimbal_frame_orientation_topic, &CameraNode::gimbalFrameOrientationCallback, this);
+    ROSNode::addSubscriber(this->gimbal_joint_orientation_topic, &CameraNode::gimbalJointOrientationCallback, this);
+    ROSNode::addSubscriber(CAMERA_MODE_RTOPIC, &CameraNode::modeCallback, this);
     // clang-format on
   } else {
-    ROSNode::registerImagePublisher(CAMERA_IMAGE_RTOPIC);
+    ROSNode::addImagePublisher(CAMERA_IMAGE_RTOPIC);
   }
 
   // setup gazebo client

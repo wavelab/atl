@@ -2,7 +2,7 @@
 
 namespace atl {
 
-int CameraNode::configure(int hz) {
+int CameraNode::configure(const int hz) {
   std::string config_path;
 
   // ros node
@@ -20,16 +20,16 @@ int CameraNode::configure(int hz) {
 
   // register publisher and subscribers
   // clang-format off
-  this->registerImagePublisher(CAMERA_IMAGE_TOPIC);
-  // this->registerSubscriber(GIMBAL_POSITION_TOPIC, &CameraNode::gimbalPositionCallback, this);
-  // this->registerSubscriber(GIMBAL_FRAME_ORIENTATION_TOPIC, &CameraNode::gimbalFrameCallback, this);
-  // this->registerSubscriber(GIMBAL_JOINT_ORIENTATION_TOPIC, &CameraNode::gimbalJointCallback, this);
-  // this->registerSubscriber(APRILTAG_TOPIC, &CameraNode::aprilTagCallback, this);
+  this->addImagePublisher(CAMERA_IMAGE_TOPIC);
+  // this->addSubscriber(GIMBAL_POSITION_TOPIC, &CameraNode::gimbalPositionCallback, this);
+  // this->addSubscriber(GIMBAL_FRAME_ORIENTATION_TOPIC, &CameraNode::gimbalFrameCallback, this);
+  // this->addSubscriber(GIMBAL_JOINT_ORIENTATION_TOPIC, &CameraNode::gimbalJointCallback, this);
+  // this->addSubscriber(APRILTAG_TOPIC, &CameraNode::aprilTagCallback, this);
   // clang-format on
-  this->registerShutdown(SHUTDOWN_TOPIC);
+  this->addShutdownListener(SHUTDOWN_TOPIC);
 
   // register loop callback
-  this->registerLoopCallback(std::bind(&CameraNode::loopCallback, this));
+  this->addLoopCallback(std::bind(&CameraNode::loopCallback, this));
 
   this->configured = true;
   return 0;

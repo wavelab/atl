@@ -3,15 +3,15 @@
 namespace atl {
 namespace gazebo_bridge {
 
-int DJIQuadrotorNode::configure(int hz) {
+int DJIQuadrotorNode::configure(const int hz) {
   // setup ros node
   // clang-format off
   ROSNode::configure(hz);
-  ROSNode::registerPublisher<dji_sdk::GlobalPosition>(DJI_GLOBAL_POSITION_RTOPIC);
-  ROSNode::registerPublisher<dji_sdk::LocalPosition>(DJI_LOCAL_POSITION_RTOPIC);
-  ROSNode::registerPublisher<dji_sdk::AttitudeQuaternion>(DJI_ATTITUDE_RTOPIC);
-  ROSNode::registerPublisher<dji_sdk::Velocity>(DJI_VELOCITY_RTOPIC);
-  ROSNode::registerServer(DJI_CONTROL_RTOPIC, &DJIQuadrotorNode::controlCallback, this);
+  ROSNode::addPublisher<dji_sdk::GlobalPosition>(DJI_GLOBAL_POSITION_RTOPIC);
+  ROSNode::addPublisher<dji_sdk::LocalPosition>(DJI_LOCAL_POSITION_RTOPIC);
+  ROSNode::addPublisher<dji_sdk::AttitudeQuaternion>(DJI_ATTITUDE_RTOPIC);
+  ROSNode::addPublisher<dji_sdk::Velocity>(DJI_VELOCITY_RTOPIC);
+  ROSNode::addService(DJI_CONTROL_RTOPIC, &DJIQuadrotorNode::controlCallback, this);
   // clang-format on
 
   // setup gazebo client

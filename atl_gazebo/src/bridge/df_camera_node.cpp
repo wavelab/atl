@@ -3,14 +3,14 @@
 namespace atl {
 namespace gazebo_bridge {
 
-int DFCameraNode::configure(int hz) {
+int DFCameraNode::configure(const int hz) {
   // ros node
   if (ROSNode::configure(hz) != 0) {
     return -1;
   }
 
   // clang-format off
-  ROSNode::registerImagePublisher(CAMERA_IMAGE_RTOPIC);
+  ROSNode::addImagePublisher(CAMERA_IMAGE_RTOPIC);
 
   // setup gazebo client
   if (DFCameraGClient::configure() != 0) {

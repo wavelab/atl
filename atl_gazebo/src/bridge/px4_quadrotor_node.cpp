@@ -3,18 +3,18 @@
 namespace atl {
 namespace gazebo_bridge {
 
-int PX4QuadrotorNode::configure(int hz) {
+int PX4QuadrotorNode::configure(const int hz) {
   this->quad_frame = "NWU";
 
   // setup ros node
   // clang-format off
   ROSNode::configure(hz);
-  ROSNode::registerPublisher<geometry_msgs::PoseStamped>(PX4_POSE_RTOPIC);
-  ROSNode::registerPublisher<geometry_msgs::TwistStamped>(PX4_VELOCITY_RTOPIC);
-  ROSNode::registerSubscriber(PX4_ATTITUDE_SETPOINT_RTOPIC, &PX4QuadrotorNode::attitudeSetpointCallback, this, 1);
-  ROSNode::registerSubscriber(PX4_THROTTLE_SETPOINT_RTOPIC, &PX4QuadrotorNode::throttleSetpointCallback, this, 1);
-  ROSNode::registerSubscriber(PX4_POSITION_SETPOINT_RTOPIC, &PX4QuadrotorNode::positionSetpointCallback, this, 1);
-  ROSNode::registerSubscriber(PX4_VELOCITY_SETPOINT_RTOPIC, &PX4QuadrotorNode::velocitySetpointCallback, this, 1);
+  ROSNode::addPublisher<geometry_msgs::PoseStamped>(PX4_POSE_RTOPIC);
+  ROSNode::addPublisher<geometry_msgs::TwistStamped>(PX4_VELOCITY_RTOPIC);
+  ROSNode::addSubscriber(PX4_ATTITUDE_SETPOINT_RTOPIC, &PX4QuadrotorNode::attitudeSetpointCallback, this, 1);
+  ROSNode::addSubscriber(PX4_THROTTLE_SETPOINT_RTOPIC, &PX4QuadrotorNode::throttleSetpointCallback, this, 1);
+  ROSNode::addSubscriber(PX4_POSITION_SETPOINT_RTOPIC, &PX4QuadrotorNode::positionSetpointCallback, this, 1);
+  ROSNode::addSubscriber(PX4_VELOCITY_SETPOINT_RTOPIC, &PX4QuadrotorNode::velocitySetpointCallback, this, 1);
   // clang-format on
 
   // setup gazebo client

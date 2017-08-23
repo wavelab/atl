@@ -52,11 +52,11 @@ void QuadrotorGPlugin::Load(gazebo::physics::ModelPtr model,
   // gazebo node
   // clang-format off
   GazeboNode::configure();
-  this->registerPublisher<POSE_MSG>(POSE_GTOPIC);
-  this->registerPublisher<VELOCITY_MSG>(VELOCITY_GTOPIC);
-  this->registerSubscriber(ATT_SETPOINT_GTOPIC, &QuadrotorGPlugin::setAttitudeCallback, this);
-  this->registerSubscriber(POS_SETPOINT_GTOPIC, &QuadrotorGPlugin::setPositionCallback, this);
-  this->registerSubscriber(VEL_SETPOINT_GTOPIC, &QuadrotorGPlugin::setVelocityCallback, this);
+  this->addPublisher<POSE_MSG>(POSE_GTOPIC);
+  this->addPublisher<VELOCITY_MSG>(VELOCITY_GTOPIC);
+  this->addSubscriber(ATT_SETPOINT_GTOPIC, &QuadrotorGPlugin::setAttitudeCallback, this);
+  this->addSubscriber(POS_SETPOINT_GTOPIC, &QuadrotorGPlugin::setPositionCallback, this);
+  this->addSubscriber(VEL_SETPOINT_GTOPIC, &QuadrotorGPlugin::setVelocityCallback, this);
   // clang-format on
 }
 

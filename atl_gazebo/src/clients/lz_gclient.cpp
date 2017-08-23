@@ -21,10 +21,10 @@ int LZGClient::configure() {
   // setup gazebo node
   // clang-format off
   GazeboNode::configure();
-  this->registerSubscriber(POSE_GTOPIC, &LZGClient::poseCallback, this);
-  this->registerPublisher<gazebo::msgs::Vector3d>(POSITION_SET_GTOPIC);
-  this->registerPublisher<gazebo::msgs::Any>(VELOCITY_SET_GTOPIC);
-  this->registerPublisher<gazebo::msgs::Any>(ANGULAR_VEL_SET_GTOPIC);
+  this->addSubscriber(POSE_GTOPIC, &LZGClient::poseCallback, this);
+  this->addPublisher<gazebo::msgs::Vector3d>(POSITION_SET_GTOPIC);
+  this->addPublisher<gazebo::msgs::Any>(VELOCITY_SET_GTOPIC);
+  this->addPublisher<gazebo::msgs::Any>(ANGULAR_VEL_SET_GTOPIC);
   this->waitForConnection();
   // clang-format on
 

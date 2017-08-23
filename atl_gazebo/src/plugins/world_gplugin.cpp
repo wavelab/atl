@@ -16,11 +16,11 @@ void WorldGPlugin::Load(gazebo::physics::WorldPtr parent, sdf::ElementPtr sdf) {
   // setup gazebo node
   // clang-format off
   GazeboNode::configure();
-  this->registerPublisher<gazebo::msgs::Time>(WORLD_CLOCK_TOPIC);
-  this->registerSubscriber(MODEL_REMOVE_TOPIC, &WorldGPlugin::modelRemoveCallback, this);
-  this->registerSubscriber(MODEL_POSE_TOPIC, &WorldGPlugin::modelPoseCallback, this);
-  this->registerSubscriber(WORLD_LOAD_TOPIC, &WorldGPlugin::worldLoadCallback, this);
-  this->registerSubscriber(WORLD_CLEAR_TOPIC, &WorldGPlugin::worldClearCallback, this);
+  this->addPublisher<gazebo::msgs::Time>(WORLD_CLOCK_TOPIC);
+  this->addSubscriber(MODEL_REMOVE_TOPIC, &WorldGPlugin::modelRemoveCallback, this);
+  this->addSubscriber(MODEL_POSE_TOPIC, &WorldGPlugin::modelPoseCallback, this);
+  this->addSubscriber(WORLD_LOAD_TOPIC, &WorldGPlugin::worldLoadCallback, this);
+  this->addSubscriber(WORLD_CLEAR_TOPIC, &WorldGPlugin::worldClearCallback, this);
   // clang-format on
 }
 

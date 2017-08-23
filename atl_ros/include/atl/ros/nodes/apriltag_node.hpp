@@ -36,16 +36,69 @@ public:
   Pose camera_offset;
 
   AprilTagNode(int argc, char **argv) : ROSNode(argc, argv) {}
+
+  /**
+   * Configure ROS node
+   *
+   * @param node_name ROS node name
+   * @param hz ROS node rate
+   * @return 0 for success, -1 for failure
+   */
   int configure(const int hz);
+
+  /**
+   * Publish TagPose message
+   *
+   * @param tag Tag Pose
+   */
   void publishTagPoseMsg(const TagPose &tag);
+
+  /**
+   * Publish target position in inertial frame
+   *
+   * @param gimbal_position Gimbal position in inertial frame
+   * @param gimbal_orientation Gimbal orientation in inertial frame
+   * @param target_bf Detected target in body frame
+   */
   void publishTargetInertialPositionMsg(const Vec3 &gimbal_position,
                                         const Quaternion &gimbal_orientation,
                                         const Vec3 &target_bf);
+
+  /**
+   * Publish target yaw in inertial frame
+   *
+   * @param tag Tag pose in inertial frame
+   * @param gimbal_frame Gimbal frame orientation in inertial frame
+   */
   void publishTargetInertialYawMsg(const TagPose &tag,
                                    const Quaternion &gimbal_frame);
+
+  /**
+   * Publish target position in body frame
+   *
+   * @param target_bpf Target position in body planar frame
+   */
   void publishTargetBodyPositionMsg(const Vec3 &target_bpf);
+
+  /**
+   * Publish target position in body frame (Encoder-version)
+   *
+   * @param target_bpf Target position in body planar frame
+   */
   void publishTargetBodyPositionEncoderMsg(const Vec3 &target_bpf_encoder);
+
+  /**
+   * Publish target yaw in body frame
+   *
+   * @param tag Tag pose
+   */
   void publishTargetBodyYawMsg(const TagPose &tag);
+
+  /**
+   * Image callback
+   *
+   * @param msg Image message
+   */
   void imageCallback(const sensor_msgs::ImageConstPtr &msg);
 };
 

@@ -20,7 +20,7 @@ int DFCameraGClient::configure() {
 
   // setup gazebo node
   GazeboNode::configure();
-  this->registerSubscriber(IMAGE_TOPIC, &DFCameraGClient::imageCallback, this);
+  this->addSubscriber(IMAGE_TOPIC, &DFCameraGClient::imageCallback, this);
   this->waitForConnection();
   return 0;
 }

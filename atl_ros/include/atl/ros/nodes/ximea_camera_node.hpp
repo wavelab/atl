@@ -39,7 +39,7 @@ public:
   TagPose tag;
 
   XimeaCameraNode(int argc, char **argv) : ROSNode(argc, argv) {}
-  int configure(int hz);
+  int configure(const int hz);
   int publishImage();
   void imageCallback(const sensor_msgs::ImageConstPtr &msg);
   void gimbalFrameCallback(const geometry_msgs::Quaternion &msg);

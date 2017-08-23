@@ -2,7 +2,7 @@
 
 namespace atl {
 
-int CamCalibNode::configure(int hz) {
+int CamCalibNode::configure(const int hz) {
   std::string config_path;
 
   // ros node
@@ -54,15 +54,15 @@ int CamCalibNode::configure(int hz) {
 
   // register publisher and subscribers
   // clang-format off
-  this->registerImageSubscriber(this->static_camera_topic, &CamCalibNode::staticCameraCallback, this);
-  this->registerImageSubscriber(this->gimbal_camera_topic, &CamCalibNode::gimbalCameraCallback, this);
-  this->registerSubscriber(GIMBAL_JOINT_ORIENTATION_TOPIC, &CamCalibNode::gimbalJointCallback, this);
-  this->registerSubscriber(GIMBAL_ENCODER_ORIENTATION_TOPIC, &CamCalibNode::gimbalJointBodyCallback, this);
-  this->registerShutdown(SHUTDOWN_TOPIC);
+  this->addImageSubscriber(this->static_camera_topic, &CamCalibNode::staticCameraCallback, this);
+  this->addImageSubscriber(this->gimbal_camera_topic, &CamCalibNode::gimbalCameraCallback, this);
+  this->addSubscriber(GIMBAL_JOINT_ORIENTATION_TOPIC, &CamCalibNode::gimbalJointCallback, this);
+  this->addSubscriber(GIMBAL_ENCODER_ORIENTATION_TOPIC, &CamCalibNode::gimbalJointEncoderCallback, this);
+  this->addShutdownListener(SHUTDOWN_TOPIC);
   // clang-format on
 
   // register loop callback
-  this->registerLoopCallback(std::bind(&CamCalibNode::loopCallback, this));
+  this->addLoopCallback(std::bind(&CamCalibNode::loopCallback, this));
 
   this->configured = true;
   return 0;
@@ -92,7 +92,7 @@ void CamCalibNode::gimbalJointCallback(const geometry_msgs::Quaternion &msg) {
   convertMsg(msg, this->gimbal_joint_orientation);
 }
 
-void CamCalibNode::gimbalJointBodyCallback(
+void CamCalibNode::gimbalJointEncoderCallback(
     const geometry_msgs::Quaternion &msg) {
   convertMsg(msg, this->gimbal_joint_body_orientation);
 }

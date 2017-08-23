@@ -44,7 +44,7 @@ public:
    * Configure
    * @param hz ROS node rate in hertz
    */
-  int configure(int hz);
+  int configure(const int hz);
 
   /**
    * Quadrotor pose Gazebo callback

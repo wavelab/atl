@@ -2,7 +2,7 @@
 
 namespace atl {
 
-int GimbalNode::configure(int hz) {
+int GimbalNode::configure(const int hz) {
   std::string config_file;
 
   // ros node
@@ -20,28 +20,28 @@ int GimbalNode::configure(int hz) {
 
   // register publisher and subscribers
   // clang-format off
-  this->registerPublisher<geometry_msgs::Vector3>(SBGC_IMU_TOPIC);
-  this->registerPublisher<geometry_msgs::Vector3>(SBGC_RAW_ENCODER_TOPIC);
-  this->registerPublisher<geometry_msgs::Vector3>(POSITION_TOPIC);
-  this->registerPublisher<geometry_msgs::Quaternion>(FRAME_ORIENTATION_TOPIC);
-  this->registerPublisher<geometry_msgs::Quaternion>(ENCODER_ORIENTATION_TOPIC);
+  this->addPublisher<geometry_msgs::Vector3>(SBGC_IMU_TOPIC);
+  this->addPublisher<geometry_msgs::Vector3>(SBGC_RAW_ENCODER_TOPIC);
+  this->addPublisher<geometry_msgs::Vector3>(POSITION_TOPIC);
+  this->addPublisher<geometry_msgs::Quaternion>(FRAME_ORIENTATION_TOPIC);
+  this->addPublisher<geometry_msgs::Quaternion>(ENCODER_ORIENTATION_TOPIC);
 
   if (this->gimbal_imu == "SBGC") {
-    this->registerPublisher<geometry_msgs::Quaternion>(JOINT_ORIENTATION_TOPIC);
+    this->addPublisher<geometry_msgs::Quaternion>(JOINT_ORIENTATION_TOPIC);
   } else if (this->gimbal_imu != "HACK") {
     LOG_ERROR("Invalid gimbal imu mode [%s]", this->gimbal_imu.c_str());
     return -3;
   }
 
-  this->registerSubscriber(ACTIVATE_TOPIC, &GimbalNode::activateCallback, this);
-  this->registerSubscriber(QUAD_POSE_TOPIC, &GimbalNode::quadPoseCallback, this);
-  this->registerSubscriber(TRACK_TOPIC, &GimbalNode::trackTargetCallback, this);
-  this->registerSubscriber(SETPOINT_TOPIC, &GimbalNode::setAttitudeCallback, this);
-  this->registerShutdown(SHUTDOWN_TOPIC);
+  this->addSubscriber(ACTIVATE_TOPIC, &GimbalNode::activateCallback, this);
+  this->addSubscriber(QUAD_POSE_TOPIC, &GimbalNode::quadPoseCallback, this);
+  this->addSubscriber(TRACK_TOPIC, &GimbalNode::trackTargetCallback, this);
+  this->addSubscriber(SETPOINT_TOPIC, &GimbalNode::setAttitudeCallback, this);
+  this->addShutdownListener(SHUTDOWN_TOPIC);
   // clang-format on
 
   // register loop callback
-  this->registerLoopCallback(std::bind(&GimbalNode::loopCallback, this));
+  this->addLoopCallback(std::bind(&GimbalNode::loopCallback, this));
 
   // intialize setpoints
   this->gimbal.setAngle(0.0, 0.0);
@@ -139,8 +139,18 @@ int GimbalNode::loopCallback() {
   Vec3 encoder_euler;
   Quaternion encoder_q;
 
+<<<<<<< HEAD
   // std::cout << "IMU RPY: " << this->imu_rpy.transpose() << std::endl;
   // std::cout << "Encoder RPY: " << this->encoder_rpy.transpose() << std::endl;
+=======
+  // std::cout << "IMU RPY: " << rad2deg(this->imu_rpy(0));
+  // std::cout << " " << rad2deg(this->imu_rpy(1));
+  // std::cout << " " << rad2deg(this->imu_rpy(2)) << std::endl;
+  //
+  // std::cout << "ENCODER RPY: " << rad2deg(this->encoder_rpy(0));
+  // std::cout << " " << rad2deg(this->encoder_rpy(1));
+  // std::cout << " " << rad2deg(this->encoder_rpy(2)) << std::endl;
+>>>>>>> 0e3ad6e2a4cdc1313da9d1bb371854c78e64ee0a
   // std::cout << std::endl;
 
   // set gimbal attitude
