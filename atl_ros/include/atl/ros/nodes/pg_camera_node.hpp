@@ -62,7 +62,7 @@ public:
     this->target_pos_bf = Vec3();
   }
 
-  int configure(int hz);
+  int configure(const int hz);
   int publishImage();
   void gimbalPositionCallback(const geometry_msgs::Vector3 &msg);
   void gimbalFrameCallback(const geometry_msgs::Quaternion &msg);

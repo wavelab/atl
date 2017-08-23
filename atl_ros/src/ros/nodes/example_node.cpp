@@ -2,7 +2,7 @@
 
 namespace atl {
 
-int ExampleNode::configure(int hz) {
+int ExampleNode::configure(const int hz) {
   ROSNode::configure(hz);
 
   // clang-format off

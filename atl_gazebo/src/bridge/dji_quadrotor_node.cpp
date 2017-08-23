@@ -3,7 +3,7 @@
 namespace atl {
 namespace gazebo_bridge {
 
-int DJIQuadrotorNode::configure(int hz) {
+int DJIQuadrotorNode::configure(const int hz) {
   // setup ros node
   // clang-format off
   ROSNode::configure(hz);

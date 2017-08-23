@@ -2,7 +2,7 @@
 
 namespace atl {
 
-int EstimatorNode::configure(int hz) {
+int EstimatorNode::configure(const int hz) {
   std::string config_file;
 
   // ros node

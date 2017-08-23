@@ -2,7 +2,7 @@
 
 namespace atl {
 
-int XimeaCameraNode::configure(int hz) {
+int XimeaCameraNode::configure(const int hz) {
   std::string config_path;
   grey_scale = false;
 

@@ -2,7 +2,7 @@
 
 namespace atl {
 
-int PGCameraNode::configure(int hz) {
+int PGCameraNode::configure(const int hz) {
   std::string config_path;
   std::string guid_str;
 

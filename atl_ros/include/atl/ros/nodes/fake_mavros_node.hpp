@@ -21,7 +21,7 @@ namespace atl {
 class FakeMavrosNode : public ROSNode {
 public:
   FakeMavrosNode(int argc, char **argv) : ROSNode(argc, argv) {}
-  int configure(int hz);
+  int configure(const int hz);
   int publishPose();
   int publishVelocity();
   int loopCallback();

@@ -2,7 +2,7 @@
 
 namespace atl {
 
-int CameraNode::configure(int hz) {
+int CameraNode::configure(const int hz) {
   std::string config_path;
 
   // ros node

@@ -2,7 +2,7 @@
 
 namespace atl {
 
-int GimbalNode::configure(int hz) {
+int GimbalNode::configure(const int hz) {
   std::string config_file;
 
   // ros node

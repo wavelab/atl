@@ -3,7 +3,7 @@
 namespace atl {
 namespace gazebo_bridge {
 
-int GimbalNode::configure(int hz) {
+int GimbalNode::configure(const int hz) {
   this->quad_frame = "NWU";
   this->enable_tracking = true;
 

@@ -3,7 +3,7 @@
 namespace atl {
 namespace gazebo_bridge {
 
-int DFCameraNode::configure(int hz) {
+int DFCameraNode::configure(const int hz) {
   // ros node
   if (ROSNode::configure(hz) != 0) {
     return -1;

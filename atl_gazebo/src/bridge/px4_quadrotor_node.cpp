@@ -3,7 +3,7 @@
 namespace atl {
 namespace gazebo_bridge {
 
-int PX4QuadrotorNode::configure(int hz) {
+int PX4QuadrotorNode::configure(const int hz) {
   this->quad_frame = "NWU";
 
   // setup ros node

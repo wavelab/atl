@@ -2,7 +2,7 @@
 
 namespace atl {
 
-int IMUNode::configure(int hz) {
+int IMUNode::configure(const int hz) {
   std::string config_path;
 
   // ros node

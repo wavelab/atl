@@ -26,7 +26,7 @@ ROSNode::ROSNode(int argc, char **argv) {
 
 ROSNode::~ROSNode() { ros::shutdown(); }
 
-int ROSNode::configure(int hz) {
+int ROSNode::configure(const int hz) {
   if (ros::isInitialized() == false) {
     ros::init(this->argc,
               this->argv,

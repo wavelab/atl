@@ -315,8 +315,8 @@ int Quadrotor::stepLandingMode(const double dt) {
     this->setMode(DISARM_MODE);
     this->landing_tic = (struct timespec){0, 0};
 
-    // transition back to discovery mode
   } else if (this->landing_target.isTargetLosted()) {
+    // transition back to discovery mode
     LOG_INFO("Landing Target is losted!");
     LOG_INFO("Transitioning back to [DISCOVER_MODE]!");
     this->setMode(DISCOVER_MODE);
@@ -361,8 +361,8 @@ int Quadrotor::stepWaypointMode(const double dt) {
       tic(&this->waypoint_tic);
     }
 
-    // hover at first waypoint and do a 5 second count down
   } else if (this->wp_mission_ready && toc(&this->waypoint_tic) <= 5.0) {
+    // hover at first waypoint and do a 5 second count down
     const Vec3 wp_start = this->mission.local_waypoints[0];
     this->setHoverPosition(wp_start);
     this->stepHoverMode(dt);
@@ -385,8 +385,8 @@ int Quadrotor::stepWaypointMode(const double dt) {
       this->waypoint_countdown[3] = true;
     }
 
-    // travel through waypoints
   } else if (this->wp_mission_ready && toc(&this->waypoint_tic) > 5.0) {
+    // travel through waypoints
     retval = this->waypoint_controller.update(this->mission,
                                               this->pose,
                                               this->velocity,

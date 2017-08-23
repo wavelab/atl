@@ -3,7 +3,7 @@
 namespace atl {
 namespace gazebo_bridge {
 
-int WorldNode::configure(int hz) {
+int WorldNode::configure(const int hz) {
   // setup ros node
   // clang-format off
   ROSNode::configure(hz);

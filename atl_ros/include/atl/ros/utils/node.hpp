@@ -60,7 +60,7 @@ public:
   ROSNode() {}
   ROSNode(int argc, char **argv);
   ~ROSNode();
-  int configure(int hz);
+  int configure(const int hz);
   void shutdownCallback(const std_msgs::Bool &msg);
   int addShutdownListener(const std::string &topic);
   int addImagePublisher(const std::string &topic);

@@ -2,7 +2,7 @@
 
 namespace atl {
 
-int CamCalibNode::configure(int hz) {
+int CamCalibNode::configure(const int hz) {
   std::string config_path;
 
   // ros node
@@ -57,7 +57,7 @@ int CamCalibNode::configure(int hz) {
   this->addImageSubscriber(this->static_camera_topic, &CamCalibNode::staticCameraCallback, this);
   this->addImageSubscriber(this->gimbal_camera_topic, &CamCalibNode::gimbalCameraCallback, this);
   this->addSubscriber(GIMBAL_JOINT_ORIENTATION_TOPIC, &CamCalibNode::gimbalJointCallback, this);
-  this->addSubscriber(GIMBAL_ENCODER_ORIENTATION_TOPIC, &CamCalibNode::gimbalJointBodyCallback, this);
+  this->addSubscriber(GIMBAL_ENCODER_ORIENTATION_TOPIC, &CamCalibNode::gimbalJointEncoderCallback, this);
   this->addShutdownListener(SHUTDOWN_TOPIC);
   // clang-format on
 
@@ -92,7 +92,7 @@ void CamCalibNode::gimbalJointCallback(const geometry_msgs::Quaternion &msg) {
   convertMsg(msg, this->gimbal_joint_orientation);
 }
 
-void CamCalibNode::gimbalJointBodyCallback(
+void CamCalibNode::gimbalJointEncoderCallback(
     const geometry_msgs::Quaternion &msg) {
   convertMsg(msg, this->gimbal_joint_body_orientation);
 }

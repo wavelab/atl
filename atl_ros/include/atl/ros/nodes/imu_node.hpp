@@ -26,7 +26,7 @@ public:
   std::string gimbal_imu;
 
   IMUNode(int argc, char **argv) : ROSNode(argc, argv) {}
-  int configure(int hz);
+  int configure(const int hz);
   int publishIMU(const Vec3 &euler);
   int publishJointOrientation(const Quaternion &q);
   int loopCallback();
