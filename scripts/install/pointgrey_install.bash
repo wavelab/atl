@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e  # halt on first error
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-REPO_DIR=$(dirname "$SCRIPT_DIR")
-PACKAGE_DIR="${REPO_DIR}/../atl_deps"
+REPO_DIR=$(dirname "$(dirname "$SCRIPT_DIR")")  # this script is in repo/scripts/install/
+PACKAGE_DIR="${REPO_DIR}/atl_deps"
 
 install_pointgrey_x86_drivers()
 {
