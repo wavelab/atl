@@ -31,7 +31,7 @@ public:
 
   bool configured = false;
 
-  int configureNodelet(int hz);
+  void configureNodelet(int hz);
 
   int registerShutdown(const std::string &topic);
   int registerImagePublisher(const std::string &topic);
@@ -127,6 +127,12 @@ public:
 
   int registerLoopCallback(std::function<int()> cb);
   std::function<int()> loop_cb;
+
+  void shutdownCallback(const std_msgs::BoolConstPtr &msg) {
+    if (msg->data) {
+      ros::shutdown();
+    }
+  }
 };
 } // namespace atl
 

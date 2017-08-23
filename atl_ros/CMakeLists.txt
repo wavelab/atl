@@ -86,7 +86,9 @@ TARGET_LINK_LIBRARIES(atl_cam_calib_node ${ATL_ROS_DEPS})
 ADD_DEPENDENCIES(atl_cam_calib_node atl_ros_utils)
 
 # Camera Nodelet
-ADD_LIBRARY(atl_camera_nodelet src/ros/nodes/camera_nodelet.cpp)
+ADD_LIBRARY(atl_camera_nodelet
+    src/ros/nodes/camera_nodelet.cpp
+    src/ros/utils/nodelet.cpp)
 TARGET_LINK_LIBRARIES(atl_camera_nodelet ${catkin_LIBRARIES})
 ADD_EXECUTABLE(atl_camera_node src/ros/nodes/camera_node.cpp)
 TARGET_LINK_LIBRARIES(atl_camera_node ${ATL_ROS_DEPS} atl_camera_nodelet)

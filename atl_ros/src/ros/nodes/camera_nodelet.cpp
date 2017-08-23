@@ -1,4 +1,5 @@
 #include "atl/ros/nodes/camera_nodelet.hpp"
+#include <pluginlib/class_list_macros.h>
 
 namespace atl {
 
@@ -111,3 +112,8 @@ int CameraNodelet::loopCallback() {
   return 0;
 }
 } // namespace atl
+
+PLUGINLIB_DECLARE_CLASS(atl,
+                        CameraNodelet,
+                        atl::CameraNodelet,
+                        atl::ROSNodelet);

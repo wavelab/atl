@@ -1,4 +1,5 @@
 #include "atl/ros/utils/nodelet.hpp"
+#include <pluginlib/class_list_macros.h>
 
 namespace atl {
 
@@ -17,18 +18,18 @@ int ROSNodelet::registerShutdown(const std::string &topic) {
   ros::Subscriber sub;
 
   // pre-check
-  if (this->configured == false) {
+  if (!this->configured) {
     return -1;
   }
 
   // register subscriber
-  sub = this->ros_nh->subscribe(topic, 1, &ROSNode::shutdownCallback, this);
+  sub = this->nh.subscribe(topic, 1, &ROSNodelet::shutdownCallback, this);
   this->ros_subs[topic] = sub;
 }
 
 int ROSNodelet::registerImagePublisher(const std::string &topic) {
   // pre-check
-  if (this->configured == false) {
+  if (!this->configured) {
     return -1;
   }
 
@@ -43,4 +44,6 @@ int ROSNodelet::registerLoopCallback(std::function<int()> cb) {
   this->loop_cb = cb;
   return 0;
 }
-}
+} // namespace atl
+
+PLUGINLIB_DECLARE_CLASS(atl, ROSNodelet, atl::ROSNodelet, nodelet::Nodelet);
