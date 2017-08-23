@@ -3,9 +3,16 @@
   <!-- settings -->
   <param name="sim_mode" value="false" />
   <param name="debug_mode" value="false" />
-  <param name="gimbal_imu" value="SBGC" />
 
   <node pkg="atl_ros" name="atl_gimbal" type="atl_gimbal_node" output="screen" required="true" >
     <param name="config" value="$(find atl_configs)/configs/gimbal/config.yaml" />
+    <param name="gimbal_imu" value="SBGC" />
+  </node>
+
+  <node pkg="atl_ros" name="atl_camera" type="atl_pg_camera_node" output="screen" required="true">
+    <param name="guid" type="str" value="49712223533992369" /> <!-- gimbal camera -->
+    <param name="stamp_image" value="false" />
+    <param name="image_topic" value="/atl/camera/image" />
+    <param name="config_dir" value="$(find atl_configs)/configs/camera/pointgrey_firefly" />
   </node>
 </launch>

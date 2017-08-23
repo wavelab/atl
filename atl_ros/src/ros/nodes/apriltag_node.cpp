@@ -25,7 +25,8 @@ int AprilTagNode::configure(const int hz) {
   this->registerPublisher<geometry_msgs::Vector3>(TARGET_BPF_POS_TOPIC);
   this->registerPublisher<geometry_msgs::Vector3>(TARGET_BPF_POS_ENCODER_TOPIC);
   this->registerPublisher<std_msgs::Float64>(TARGET_BPF_YAW_TOPIC);
-  this->registerImageSubscriber(CAMERA_IMAGE_TOPIC, &AprilTagNode::imageCallback, this);
+  this->registerImageSubscriber(CAMERA_IMAGE_TOPIC,
+  &AprilTagNode::imageCallback, this);
   this->registerShutdown(SHUTDOWN);
   // clang-format on
 

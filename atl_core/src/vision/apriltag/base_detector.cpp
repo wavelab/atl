@@ -81,33 +81,18 @@ int BaseDetector::illuminationInvariantTransform(cv::Mat &image) {
   image.setTo(1, image > 1);
   cv::normalize(image, image, 0, 255, cv::NORM_MINMAX, CV_8UC1);
 
-  // double min, max;
-  // min = 0;
-  // max = 1;
-  // cv::minMaxLoc(image, &min, &max);
-  // std::cout << "min: " << min << std::endl;
-  // std::cout << "max: " << max << std::endl;
-  // image = (image - min) / (max - min) ;
-
   return 0;
 }
 
 int BaseDetector::changeMode(const cv::Mat &image) {
-  int image_width;
-  int image_height;
-  bool widths_equal;
-  bool heights_equal;
-  CameraConfig config;
-
-  // setup
-  image_width = image.cols;
-  image_height = image.rows;
+  const int image_width = image.cols;
+  const int image_height = image.rows;
 
   // traverse all camera modes and change mode based on image size
   for (size_t i = 0; i < this->camera_modes.size(); i++) {
-    config = this->camera_configs[this->camera_modes[i]];
-    widths_equal = (config.image_width == image_width);
-    heights_equal = (config.image_height == image_height);
+    const CameraConfig config = this->camera_configs[this->camera_modes[i]];
+    const bool widths_equal = (config.image_width == image_width);
+    const bool heights_equal = (config.image_height == image_height);
 
     if (widths_equal && heights_equal) {
       this->camera_mode = this->camera_modes[i];
@@ -118,18 +103,95 @@ int BaseDetector::changeMode(const cv::Mat &image) {
   return 0;
 }
 
-int BaseDetector::maskImage(const TagPose &tag_pose,
+int BaseDetector::getCameraIntrinsics(double *fx,
+                                      double *fy,
+                                      double *px,
+                                      double *py,
+                                      double *image_width,
+                                      double *image_height) {
+  const std::string camera_mode = this->camera_mode;
+  const CameraConfig camera_config = this->camera_configs.at(camera_mode);
+
+  *fx = camera_config.camera_matrix.at<double>(0, 0);
+  *fy = camera_config.camera_matrix.at<double>(1, 1);
+  *px = camera_config.camera_matrix.at<double>(0, 2);
+  *py = camera_config.camera_matrix.at<double>(1, 2);
+  *image_width = this->camera_configs[camera_mode].image_width;
+  *image_height = this->camera_configs[camera_mode].image_height;
+
+  return 0;
+}
+
+int BaseDetector::getTagSize(const TagPose &tag_pose, double *tag_size) {
+  if (this->tag_configs.find(tag_pose.id) == this->tag_configs.end()) {
+    return -1;
+  }
+  *tag_size = this->tag_configs[tag_pose.id];
+
+  return 0;
+}
+
+int BaseDetector::calculateTagCorners(const cv::Mat &image,
+                                      const TagPose &tag_pose,
+                                      const double padding,
+                                      Vec2 &top_left,
+                                      Vec2 &btm_right) {
+  // get tag size according to tag id
+  double tag_size;
+  if (this->getTagSize(prev_tag, &tag_size) != 0) {
+    return -1;
+  }
+
+  // camera intrinsics
+  double fx, fy, px, py, image_width, image_height;
+  if (this->getCameraIntrinsics(&fx,
+                                &fy,
+                                &px,
+                                &py,
+                                &image_width,
+                                &image_height) != 0) {
+    return -2;
+  }
+
+  // check input image dimensions against configuration file's
+  if (image_width != image.cols || image_height != image.rows) {
+    LOG_ERROR("Expected image vs input image mismatch!");
+    return -3;
+  }
+
+  // tag pose is in camera frame
+  // camera frame:  (z - forward, x - right, y - down)
+  const double x = tag_pose.position(0);
+  const double y = tag_pose.position(1);
+  const double z = tag_pose.position(2);
+
+  // calculate top left and bottom right corners of tag in inertial frame
+  top_left(0) = x - (tag_size / 2.0) - padding;
+  top_left(1) = y - (tag_size / 2.0) - padding;
+  btm_right(0) = x + (tag_size / 2.0) + padding;
+  btm_right(1) = y + (tag_size / 2.0) + padding;
+
+  // project back to image frame (what it would look like in image)
+  top_left(0) = (fx * top_left(0) / z) + px;
+  top_left(1) = (fy * top_left(1) / z) + py;
+  btm_right(0) = (fx * btm_right(0) / z) + px;
+  btm_right(1) = (fy * btm_right(1) / z) + py;
+
+  // check corner bounds
+  top_left(0) = (top_left(0) > image.cols) ? image.cols : top_left(0);
+  top_left(1) = (top_left(1) > image.rows) ? image.rows : top_left(1);
+  top_left(0) = (top_left(0) < 0) ? 0 : top_left(0);
+  top_left(1) = (top_left(1) < 0) ? 0 : top_left(1);
+
+  btm_right(0) = (btm_right(0) > image.cols) ? image.cols : btm_right(0);
+  btm_right(1) = (btm_right(1) > image.rows) ? image.rows : btm_right(1);
+
+  return 0;
+}
+
+int BaseDetector::maskImage(const TagPose &prev_tag,
                             const cv::Mat &image,
                             const double padding) {
-  std::string camera_mode;
-  int image_width, image_height;
-  double x, y, z;
-  double fx, fy, px, py;
-  double tag_size;
-  Vec2 top_left, bottom_right;
-  cv::Point p1, p2;
-  cv::Mat mask, masked;
-
   // pre-check
   if (image.cols != this->prev_tag_image_width) {
     this->prev_tag.detected = false;
@@ -139,65 +201,126 @@ int BaseDetector::maskImage(const TagPose &tag_pose,
     return -1;
   }
 
-  // position is in camera frame
-  // camera frame:  (z - forward, x - right, y - down)
-  x = tag_pose.position(0);
-  y = tag_pose.position(1);
-  z = tag_pose.position(2);
-
-  // get tag size according to tag id
-  if (this->tag_configs.find(tag_pose.id) == this->tag_configs.end()) {
-    return -2;
-  } else {
-    tag_size = this->tag_configs[tag_pose.id];
+  // calculate tag corners
+  Vec2 p1, p2;
+  int retval = this->calculateTagCorners(image, prev_tag, padding, p1, p2);
+  if (retval != 0) {
+    LOG_ERROR("Failed to calculate tag corners!");
+    return retval;
   }
-
-  // camera intrinsics
-  camera_mode = this->camera_mode;
-  fx = this->camera_configs[camera_mode].camera_matrix.at<double>(0, 0);
-  fy = this->camera_configs[camera_mode].camera_matrix.at<double>(1, 1);
-  px = this->camera_configs[camera_mode].camera_matrix.at<double>(0, 2);
-  py = this->camera_configs[camera_mode].camera_matrix.at<double>(1, 2);
-  image_width = this->camera_configs[camera_mode].image_width;
-  image_height = this->camera_configs[camera_mode].image_height;
-
-  // check input image dimensions against configuration file's
-  if (image_width != image.cols) {
-    LOG_ERROR("config image width does not match input image's!");
-    return -3;
-  } else if (image_height != image.rows) {
-    LOG_ERROR("config image height does not match input image's!");
-    return -3;
-  }
-
-  // calculate 2 corners of tag in inertial frame to be used to create mask
-  top_left(0) = x - (tag_size / 2.0) - padding;
-  top_left(1) = y - (tag_size / 2.0) - padding;
-  bottom_right(0) = x + (tag_size / 2.0) + padding;
-  bottom_right(1) = y + (tag_size / 2.0) + padding;
-
-  // project back to image frame (what it would look like in image)
-  top_left(0) = (fx * top_left(0) / z) + px;
-  top_left(1) = (fy * top_left(1) / z) + py;
-  bottom_right(0) = (fx * bottom_right(0) / z) + px;
-  bottom_right(1) = (fy * bottom_right(1) / z) + py;
-
-  // create and check mask coordinates
-  p1 = cv::Point(top_left(0), top_left(1));
-  p2 = cv::Point(bottom_right(0), bottom_right(1));
-  p1.x = (p1.x > image.cols) ? image.cols : p1.x;
-  p1.y = (p1.y > image.rows) ? image.rows : p1.y;
-  p2.x = (p2.x > image.cols) ? image.cols : p2.x;
-  p2.y = (p2.y > image.rows) ? image.rows : p2.y;
 
   // create mask
-  mask = cv::Mat::zeros(image_height, image_width, CV_8U);
-  cv::rectangle(mask, p1, p2, cv::Scalar(255, 255, 255), CV_FILLED);
+  cv::Point top_left(p1(0), p1(1));
+  cv::Point bottom_right(p2(0), p2(1));
+  cv::Mat mask = cv::Mat::zeros(image.rows, image.cols, CV_8U);
+  cv::rectangle(mask,
+                top_left,
+                bottom_right,
+                cv::Scalar(255, 255, 255),
+                CV_FILLED);
 
   // mask image
+  cv::Mat masked;
   image.copyTo(masked, mask);
   masked.copyTo(image);
-  this->prev_tag.detected = false;
+  this->prev_tag.detected = false; // reset previous tag
+
+  return 0;
+}
+
+int BaseDetector::cropImage(const TagPose &prev_tag,
+                            const cv::Mat &image,
+                            cv::Mat &cropped_image,
+                            const double padding) {
+  // calculate tag corners
+  Vec2 p1, p2;
+  int retval = this->calculateTagCorners(image, prev_tag, padding, p1, p2);
+  if (retval != 0) {
+    LOG_ERROR("Failed to calculate tag corners!");
+    return retval;
+  }
+
+  // crop image
+  this->crop_x = p1(0);
+  this->crop_y = p1(1);
+  this->crop_width = p2(0) - p1(0);
+  this->crop_height = p2(1) - p1(1);
+  cropped_image = image(cv::Rect(this->crop_x,
+                                 this->crop_y,
+                                 this->crop_width,
+                                 this->crop_height));
+  this->image_cropped = true;
+
+  return 0;
+}
+
+int BaseDetector::getRelativePose(const Vec2 &p1,
+                                  const Vec2 &p2,
+                                  const Vec2 &p3,
+                                  const Vec2 &p4,
+                                  TagPose &tag_pose) {
+  // get tag size
+  double tag_size = 0.0;
+  if (this->getTagSize(tag_pose, &tag_size) != 0) {
+    return -1;
+  }
+
+  // object points
+  std::vector<cv::Point3f> obj_pts;
+  tag_size = tag_size / 2.0;
+  obj_pts.emplace_back(-tag_size, -tag_size, 0);
+  obj_pts.emplace_back(tag_size, -tag_size, 0);
+  obj_pts.emplace_back(tag_size, tag_size, 0);
+  obj_pts.emplace_back(-tag_size, tag_size, 0);
+
+  // image points
+  std::vector<cv::Point2f> img_pts;
+  if (this->image_cropped) {
+    img_pts.emplace_back(p1(0) + this->crop_x, p1(1) + this->crop_y);
+    img_pts.emplace_back(p2(0) + this->crop_x, p2(1) + this->crop_y);
+    img_pts.emplace_back(p3(0) + this->crop_x, p3(1) + this->crop_y);
+    img_pts.emplace_back(p4(0) + this->crop_x, p4(1) + this->crop_y);
+    this->image_cropped = false;
+  } else {
+    img_pts.emplace_back(p1(0), p1(1));
+    img_pts.emplace_back(p2(0), p2(1));
+    img_pts.emplace_back(p3(0), p3(1));
+    img_pts.emplace_back(p4(0), p4(1));
+  }
+
+  // solve pnp
+  cv::Mat rvec, tvec;
+  cv::Vec4f distortion_params(0, 0, 0, 0); // all 0?
+  const CameraConfig camera_config = this->camera_configs[this->camera_mode];
+  cv::solvePnP(obj_pts,
+               img_pts,
+               camera_config.camera_matrix,
+               distortion_params,
+               rvec,
+               tvec,
+               false,
+               CV_ITERATIVE);
+
+  // convert Rodrigues rotation vector to rotation matrix
+  cv::Matx33d r;
+  cv::Rodrigues(rvec, r);
+
+  // rotation matrix
+  // clang-format off
+  Mat3 R;
+  R << r(0,0), r(0,1), r(0,2),
+       r(1,0), r(1,1), r(1,2),
+       r(2,0), r(2,1), r(2,2);
+  // clang-format on
+
+  // translation
+  Vec3 t{tvec.at<double>(0), tvec.at<double>(1), tvec.at<double>(2)};
+
+  // tag pose in camera frame
+  // camera frame:  (z - forward, x - right, y - down)
+  tag_pose.detected = true;
+  tag_pose.position = t;
+  tag_pose.orientation = Quaternion{R};
 
   return 0;
 }
