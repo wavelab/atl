@@ -1,12 +1,12 @@
-desired_velocity: 0.5
+desired_velocity: 1.0
 look_ahead_dist: 0.5
 threshold_waypoint_gap: 20.0
-threshold_waypoint_reached: 0.2
+threshold_waypoint_reached: 1.0
 
 waypoints: [
   # latitude, longitude, altitude
-  43.474024, -80.540287, 5.0,
-  43.474070, -80.540161, 5.0,
-  43.473980, -80.540090, 5.0,
-  43.473940, -80.540220, 5.0
+  43.474024, -80.540287, 10.0,
+  43.474070, -80.540161, 10.0,
+  43.473980, -80.540090, 10.0,
+  43.473940, -80.540220, 10.0
 ]
