@@ -2,9 +2,16 @@ index: 0
 image_width: 640
 image_height: 480
 
+# before sun down
+# shutter_speed: 50.0
+# exposure_value: 550
+# gain_value: 300.0
+
+# after sun down
 shutter_speed: 350.0
-exposure_value: 4.5
-gain_value: 3000.0
+exposure_value: 600
+gain_value: 1000.0
+
 lambda: [0.0, 0.0, 0.0]
 alpha: 4.0
 
