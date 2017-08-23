@@ -139,9 +139,9 @@ int GimbalNode::loopCallback() {
   Vec3 encoder_euler;
   Quaternion encoder_q;
 
-  std::cout << "IMU RPY: " << this->imu_rpy.transpose() << std::endl;
-  std::cout << "Encoder RPY: " << this->encoder_rpy.transpose() << std::endl;
-  std::cout << std::endl;
+  // std::cout << "IMU RPY: " << this->imu_rpy.transpose() << std::endl;
+  // std::cout << "Encoder RPY: " << this->encoder_rpy.transpose() << std::endl;
+  // std::cout << std::endl;
 
   // set gimbal attitude
   this->gimbal.setAngle(this->set_points(0), this->set_points(1));

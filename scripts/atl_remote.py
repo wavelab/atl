@@ -113,11 +113,11 @@ if __name__ == "__main__":
     # world = World()
     rospy.sleep(1.0)
 
-    # gimbal.activate(True)
-    # gimbal.set_attitude([-0.349, -0.2617, 0])
+    gimbal.activate(True)
+    gimbal.set_attitude([0.0, -1.0, 0])
     # gimbal.activate(False)
 
-    quad.set_arm(True)
+    # quad.set_arm(True)
     # quad.set_mode("DISCOVER_MODE")
     # quad.set_yaw(90)
-    quad.set_mode("WAYPOINT_MODE")
+    # quad.set_mode("WAYPOINT_MODE")
