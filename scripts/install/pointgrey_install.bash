@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e  # halt on first error
-PACKAGE_DIR="$(git rev-parse --show-toplevel)/atl_deps"
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+REPO_DIR=$(dirname "$SCRIPT_DIR")
+PACKAGE_DIR="${REPO_DIR}/../atl_deps"
 
 install_pointgrey_x86_drivers()
 {
