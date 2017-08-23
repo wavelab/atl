@@ -146,6 +146,10 @@ void convertMsg(geometry_msgs::Vector3Stamped msg, Vec3 &v) {
   v << msg.vector.x, msg.vector.y, msg.vector.z;
 }
 
+void convertMsg(geometry_msgs::Vector3ConstPtr msg, Vec3 &v) {
+  v << msg->x, msg->y, msg->z;
+}
+
 void convertMsg(geometry_msgs::Point msg, Vec3 &v) { v << msg.x, msg.y, msg.z; }
 
 void convertMsg(geometry_msgs::Quaternion msg, Quaternion &q) {
@@ -160,6 +164,13 @@ void convertMsg(geometry_msgs::QuaternionStamped msg, Quaternion &q) {
   q.x() = msg.quaternion.x;
   q.y() = msg.quaternion.y;
   q.z() = msg.quaternion.z;
+}
+
+void convertMsg(geometry_msgs::QuaternionConstPtr msg, Quaternion &q) {
+  q.w() = msg->w;
+  q.x() = msg->x;
+  q.y() = msg->y;
+  q.z() = msg->z;
 }
 
 void convertMsg(geometry_msgs::PoseStamped msg, Pose &p) {
@@ -182,6 +193,13 @@ void convertMsg(atl_msgs::AprilTagPose msg, TagPose &tag) {
   tag.detected = msg.detected;
   convertMsg(msg.position, tag.position);
   convertMsg(msg.orientation, tag.orientation);
+}
+
+void convertMsg(atl_msgs::AprilTagPoseConstPtr msg, TagPose &tag) {
+  tag.id = msg->id;
+  tag.detected = msg->detected;
+  convertMsg(msg->position, tag.position);
+  convertMsg(msg->orientation, tag.orientation);
 }
 
 void convertMsg(atl_msgs::PCtrlSettings msg, PositionController &pc) {

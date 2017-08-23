@@ -11,10 +11,10 @@
 
 #include "atl/atl_core.hpp"
 #include "atl/ros/utils/msgs.hpp"
-#include "atl/ros/utils/node.hpp"
+#include "atl/ros/utils/nodelet.hpp"
 
 // NODE SETTINGS
-static const double NODE_RATE = 100;
+static const int NODE_RATE = 100;
 
 // PUBLISH TOPICS
 static const std::string CAMERA_IMAGE_TOPIC = "/atl/camera/image";
@@ -28,10 +28,13 @@ static const std::string APRILTAG_TOPIC = "/atl/apriltag/target";
 static const std::string SHUTDOWN_TOPIC = "/atl/camera/shutdown";
 // clang-format on
 
+
 namespace atl {
 
-class CameraNodelet : public Nodelet::nodelet {
+class CameraNodelet : public ROSNodelet {
 public:
+  CameraNodelet() {}
+
   Camera camera;
   cv::Mat image;
 
@@ -40,15 +43,18 @@ public:
   Vec3 gimbal_position;
   TagPose tag;
 
-  CameraNode(int argc, char **argv) : ROSNode(argc, argv) {}
-  int configure(int hz);
+  bool configured = false;
+
   int publishImage();
   void imageCallback(const sensor_msgs::ImageConstPtr &msg);
-  void gimbalPositionCallback(const geometry_msgs::Vector3 &msg);
-  void gimbalFrameCallback(const geometry_msgs::Quaternion &msg);
-  void gimbalJointCallback(const geometry_msgs::Quaternion &msg);
-  void aprilTagCallback(const atl_msgs::AprilTagPose &msg);
+  void gimbalPositionCallback(const geometry_msgs::Vector3ConstPtr &msg);
+  void gimbalFrameCallback(const geometry_msgs::QuaternionConstPtr &msg);
+  void gimbalJointCallback(const geometry_msgs::QuaternionConstPtr &msg);
+  void aprilTagCallback(const atl_msgs::AprilTagPoseConstPtr &msg);
   int loopCallback();
+
+private:
+  void onInit() override;
 };
 
 } // namespace atl

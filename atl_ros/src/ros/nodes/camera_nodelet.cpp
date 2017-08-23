@@ -2,20 +2,21 @@
 
 namespace atl {
 
-int CameraNodelet::configure(int hz) {
-  std::string config_path;
+void CameraNodelet::onInit() override {
+  ROS_INFO("atl/camera_nodelet onInit");
 
-  // ros node
-  if (ROSNode::configure(hz) != 0) {
-    return -1;
-  }
+  // Initialize all subscribers and publishers
+  this->configureNodelet(NODE_RATE);
+
+  // Get parameters
+  std::string cam_config_path;
+  this->nh.getParam("config_dir", cam_config_path);
 
   // camera
-  ROS_GET_PARAM(this->node_name + "/config_dir", config_path);
-  if (this->camera.configure(config_path) != 0) {
+  if (this->camera.configure(cam_config_path) != 0) {
     ROS_ERROR("Failed to configure Camera!");
-    return -2;
-  };
+  }
+
   this->camera.initialize();
 
   // register publisher and subscribers
@@ -29,10 +30,9 @@ int CameraNodelet::configure(int hz) {
   this->registerShutdown(SHUTDOWN_TOPIC);
 
   // register loop callback
-  this->registerLoopCallback(std::bind(&CameraNode::loopCallback, this));
+  this->registerLoopCallback(std::bind(&CameraNodelet::loopCallback, this));
 
   this->configured = true;
-  return 0;
 }
 
 int CameraNodelet::publishImage() {
@@ -67,19 +67,23 @@ int CameraNodelet::publishImage() {
   return 0;
 }
 
-void CameraNodelet::gimbalPositionCallback(const geometry_msgs::Vector3 &msg) {
+void CameraNodelet::gimbalPositionCallback(
+    const geometry_msgs::Vector3ConstPtr &msg) {
   convertMsg(msg, this->gimbal_position);
 }
 
-void CameraNodelet::gimbalFrameCallback(const geometry_msgs::Quaternion &msg) {
+void CameraNodelet::gimbalFrameCallback(
+    const geometry_msgs::QuaternionConstPtr &msg) {
   convertMsg(msg, this->gimbal_frame_orientation);
 }
 
-void CameraNodelet::gimbalJointCallback(const geometry_msgs::Quaternion &msg) {
+void CameraNodelet::gimbalJointCallback(
+    const geometry_msgs::QuaternionConstPtr &msg) {
   convertMsg(msg, this->gimbal_joint_orientation);
 }
 
-void CameraNodelet::aprilTagCallback(const atl_msgs::AprilTagPose &msg) {
+void CameraNodelet::aprilTagCallback(
+    const atl_msgs::AprilTagPoseConstPtr &msg) {
   convertMsg(msg, this->tag);
 }
 
@@ -87,9 +91,8 @@ int CameraNodelet::loopCallback() {
   double dist;
 
   // change mode depending on apriltag distance
-  if (this->tag.detected == false) {
+  if (!this->tag.detected) {
     this->camera.changeMode("640x640");
-
   } else {
     dist = this->tag.position(2);
     if (dist > 8.0) {
@@ -107,6 +110,4 @@ int CameraNodelet::loopCallback() {
 
   return 0;
 }
-}  // namespace atl
-
-RUN_ROS_NODE(atl::CameraNodelet, NODE_RATE);
+} // namespace atl
