@@ -24,13 +24,13 @@ sudo apt-get install -qq -y \
 
 # setup catkin workspace
 if [ ! -d $CATKIN_PATH ]; then
-    mkdir -p $CATKIN_PATH
+    mkdir -p $CATKIN_PATH/src
     cd $CATKIN_PATH
     catkin init
     cd -
 fi
 
-# intall dependencies
+# install dependencies
 sudo bash $SCRIPT_PATH/gazebo8_install.bash
 sudo bash $SCRIPT_PATH/opencv3_install.bash
 sudo bash $SCRIPT_PATH/apriltags_michigan_install.bash

@@ -4,6 +4,7 @@ UBUNTU_NAME=`lsb_release -cs`
 APT_SRC_URL=http://packages.osrfoundation.org/gazebo/ubuntu-stable
 APT_SRC_LIST=/etc/apt/sources.list.d
 GAZEBO_SRC_LIST=$APT_SRC_LIST/gazebo-stable.list
+ROS_VERSION="kinetic"
 
 install_gazebo8()
 {
@@ -14,8 +15,7 @@ install_gazebo8()
   wget http://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
 
   # install gazebo
-  sudo apt-get update
-  sudo apt-get install gazebo8
+  sudo apt-get update && apt-get install -qq -y ros-$ROS_VERSION-gazebo8-ros-pkgs
 }
 
 

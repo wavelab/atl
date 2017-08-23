@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e  # halt on first error
-PACKAGE_DIR=$PWD/atl_deps
+PACKAGE_DIR="$(git rev-parse --show-toplevel)/atl_deps"
 
 install_pointgrey_x86_drivers()
 {
