@@ -2,7 +2,7 @@
 
 namespace atl {
 
-void CameraNodelet::onInit() override {
+void CameraNodelet::onInit() {
   ROS_INFO("atl/camera_nodelet onInit");
 
   // Initialize all subscribers and publishers

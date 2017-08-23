@@ -29,6 +29,8 @@ public:
   std::map<std::string, image_transport::Publisher> img_pubs;
   std::map<std::string, image_transport::Subscriber> img_subs;
 
+  bool configured = false;
+
   int configureNodelet(int hz);
 
   int registerShutdown(const std::string &topic);
@@ -45,7 +47,7 @@ public:
     }
 
     // image transport
-    image_transport::ImageTransport it(*this->ros_nh);
+    image_transport::ImageTransport it(this->nh);
     this->img_subs[topic] = it.subscribe(topic, queue_size, fp, obj);
 
     return 0;
@@ -63,7 +65,7 @@ public:
     }
 
     // register publisher
-    publisher = this->ros_nh->advertise<M>(topic, queue_size, latch);
+    publisher = this->nh.advertise<M>(topic, queue_size, latch);
     this->ros_pubs[topic] = publisher;
 
     return 0;
@@ -82,7 +84,7 @@ public:
     }
 
     // register subscriber
-    subscriber = this->ros_nh->subscribe(topic, queue_size, fp, obj);
+    subscriber = this->nh.subscribe(topic, queue_size, fp, obj);
     this->ros_subs[topic] = subscriber;
 
     return 0;
@@ -100,7 +102,7 @@ public:
     }
 
     // register service server
-    server = this->ros_nh->advertiseService(service_topic, fp, obj);
+    server = this->nh.advertiseService(service_topic, fp, obj);
     this->ros_servers[service_topic] = server;
 
     return 0;
@@ -117,7 +119,7 @@ public:
     }
 
     // register service server
-    client = this->ros_nh->serviceClient<M>(service_topic);
+    client = this->nh.serviceClient<M>(service_topic);
     this->ros_clients[service_topic] = client;
 
     return 0;

@@ -43,10 +43,7 @@ public:
   Vec3 gimbal_position;
   TagPose tag;
 
-  bool configured = false;
-
   int publishImage();
-  void imageCallback(const sensor_msgs::ImageConstPtr &msg);
   void gimbalPositionCallback(const geometry_msgs::Vector3ConstPtr &msg);
   void gimbalFrameCallback(const geometry_msgs::QuaternionConstPtr &msg);
   void gimbalJointCallback(const geometry_msgs::QuaternionConstPtr &msg);
@@ -54,7 +51,7 @@ public:
   int loopCallback();
 
 private:
-  void onInit() override;
+  virtual void onInit();
 };
 
 } // namespace atl

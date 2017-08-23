@@ -1,7 +1,7 @@
 <library path="lib/libatl_camera_nodelet">
     <class name="atl/camera_nodelet"
            type="atl::CameraNodelet"
-           base_class_type="nodelet::Nodelet">
+           base_class_type="atl::ROSNodelet">
         <description>
             atl camera nodelet
         </description>
