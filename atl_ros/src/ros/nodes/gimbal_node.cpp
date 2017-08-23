@@ -139,10 +139,6 @@ int GimbalNode::loopCallback() {
   Vec3 encoder_euler;
   Quaternion encoder_q;
 
-<<<<<<< HEAD
-  // std::cout << "IMU RPY: " << this->imu_rpy.transpose() << std::endl;
-  // std::cout << "Encoder RPY: " << this->encoder_rpy.transpose() << std::endl;
-=======
   // std::cout << "IMU RPY: " << rad2deg(this->imu_rpy(0));
   // std::cout << " " << rad2deg(this->imu_rpy(1));
   // std::cout << " " << rad2deg(this->imu_rpy(2)) << std::endl;
@@ -150,7 +146,6 @@ int GimbalNode::loopCallback() {
   // std::cout << "ENCODER RPY: " << rad2deg(this->encoder_rpy(0));
   // std::cout << " " << rad2deg(this->encoder_rpy(1));
   // std::cout << " " << rad2deg(this->encoder_rpy(2)) << std::endl;
->>>>>>> 0e3ad6e2a4cdc1313da9d1bb371854c78e64ee0a
   // std::cout << std::endl;
 
   // set gimbal attitude

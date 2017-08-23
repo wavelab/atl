@@ -25,11 +25,11 @@
     <!-- <param name="config_dir" value="$(find atl_configs)/configs/quadrotor_anastasia" /> -->
   </node>
 
-  <!-- gimbal node -->
-  <node pkg="atl_ros" name="atl_gimbal" type="atl_gimbal_node" output="screen" required="true" >
-    <param name="config" value="$(find atl_configs)/configs/gimbal/config.yaml" />
-    <param name="gimbal_imu" value="SBGC" />
-  </node>
+  <!-- <!&#45;&#45; gimbal node &#45;&#45;> -->
+  <!-- <node pkg="atl_ros" name="atl_gimbal" type="atl_gimbal_node" output="screen" required="true" > -->
+  <!--   <param name="config" value="$(find atl_configs)/configs/gimbal/config.yaml" /> -->
+  <!--   <param name="gimbal_imu" value="SBGC" /> -->
+  <!-- </node> -->
 
   <!-- gimbal camera node -->
   <node pkg="atl_ros" name="atl_camera" type="atl_pg_camera_node" output="screen" required="true">
