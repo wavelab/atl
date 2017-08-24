@@ -18,6 +18,7 @@ FIND_PACKAGE(
     geometry_msgs
     sensor_msgs
     nodelet
+    pluginlib
     message_generation
     image_transport
     cv_bridge
@@ -51,7 +52,9 @@ CATKIN_PACKAGE(
     rospy
     std_msgs
     geometry_msgs
+    nodelet
     sensor_msgs
+    pluginlib
     message_runtime
     atl_core
     atl_msgs
@@ -87,11 +90,19 @@ ADD_DEPENDENCIES(atl_cam_calib_node atl_ros_utils)
 
 # Camera Nodelet
 ADD_LIBRARY(atl_camera_nodelet
-    src/ros/nodes/camera_nodelet.cpp
-    src/ros/utils/nodelet.cpp)
-TARGET_LINK_LIBRARIES(atl_camera_nodelet ${catkin_LIBRARIES})
-ADD_EXECUTABLE(atl_camera_node src/ros/nodes/camera_node.cpp)
-TARGET_LINK_LIBRARIES(atl_camera_node ${ATL_ROS_DEPS} atl_camera_nodelet)
+    src/ros/nodes/camera_nodelet.cpp)
+TARGET_LINK_LIBRARIES(atl_camera_nodelet
+    ${catkin_LIBRARIES}
+    ${Boost_LIBRARIES}
+    yaml-cpp
+    atl_ros_utils
+    )
+ADD_EXECUTABLE(atl_camera_node
+    src/ros/nodes/camera_node.cpp)
+TARGET_LINK_LIBRARIES(atl_camera_node
+    ${ATL_ROS_DEPS}
+    atl_camera_nodelet
+    )
 ADD_DEPENDENCIES(atl_camera_node atl_ros_utils)
 
 ADD_EXECUTABLE(atl_control_node src/ros/nodes/control_node.cpp)
@@ -127,7 +138,14 @@ ADD_LIBRARY(
     atl_ros_utils
     src/ros/utils/msgs.cpp
     src/ros/utils/node.cpp
+    src/ros/utils/nodelet_helper.cpp
     src/ros/utils/utils.cpp
+)
+
+install(TARGETS atl_camera_nodelet atl_camera_node
+    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
 ## Need to explicitly list nodelet.xml for installation

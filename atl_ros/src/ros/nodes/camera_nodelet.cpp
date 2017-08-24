@@ -4,14 +4,15 @@
 namespace atl {
 
 void CameraNodelet::onInit() {
-  ROS_INFO("atl/camera_nodelet onInit");
+  ROS_INFO("atl/atl_camera_nodelet onInit");
+  // Create node handle
+  ros::NodeHandle nh = getNodeHandle();
 
-  // Initialize all subscribers and publishers
-  this->configureNodelet(NODE_RATE);
+  this->nodelet_helper.configure(NODE_RATE, nh);
 
   // Get parameters
   std::string cam_config_path;
-  this->nh.getParam("config_dir", cam_config_path);
+  nh.getParam("config_dir", cam_config_path);
 
   // camera
   if (this->camera.configure(cam_config_path) != 0) {
@@ -22,18 +23,17 @@ void CameraNodelet::onInit() {
 
   // register publisher and subscribers
   // clang-format off
-  this->registerImagePublisher(CAMERA_IMAGE_TOPIC);
-  // this->registerSubscriber(GIMBAL_POSITION_TOPIC, &CameraNode::gimbalPositionCallback, this);
-  // this->registerSubscriber(GIMBAL_FRAME_ORIENTATION_TOPIC, &CameraNode::gimbalFrameCallback, this);
-  // this->registerSubscriber(GIMBAL_JOINT_ORIENTATION_TOPIC, &CameraNode::gimbalJointCallback, this);
-  // this->registerSubscriber(APRILTAG_TOPIC, &CameraNode::aprilTagCallback, this);
+  this->nodelet_helper.registerImagePublisher(CAMERA_IMAGE_TOPIC);
+  this->nodelet_helper.registerSubscriber(GIMBAL_POSITION_TOPIC, &CameraNodelet::gimbalPositionCallback, this);
+  this->nodelet_helper.registerSubscriber(GIMBAL_FRAME_ORIENTATION_TOPIC, &CameraNodelet::gimbalFrameCallback, this);
+  this->nodelet_helper.registerSubscriber(GIMBAL_JOINT_ORIENTATION_TOPIC, &CameraNodelet::gimbalJointCallback, this);
+  this->nodelet_helper.registerSubscriber(APRILTAG_TOPIC, &CameraNodelet::aprilTagCallback, this);
   // clang-format on
-  this->registerShutdown(SHUTDOWN_TOPIC);
+  this->nodelet_helper.registerShutdown(SHUTDOWN_TOPIC);
 
   // register loop callback
-  this->registerLoopCallback(std::bind(&CameraNodelet::loopCallback, this));
-
-  this->configured = true;
+  this->nodelet_helper.registerLoopCallback(
+      std::bind(&CameraNodelet::loopCallback, this));
 }
 
 int CameraNodelet::publishImage() {
@@ -62,7 +62,7 @@ int CameraNodelet::publishImage() {
     "bgr8",
     this->image
   ).toImageMsg();
-  this->img_pubs[CAMERA_IMAGE_TOPIC].publish(img_msg);
+  this->nodelet_helper.img_pubs[CAMERA_IMAGE_TOPIC].publish(img_msg);
   // clang-format on
 
   return 0;
@@ -113,7 +113,7 @@ int CameraNodelet::loopCallback() {
 }
 } // namespace atl
 
-PLUGINLIB_DECLARE_CLASS(atl,
+PLUGINLIB_DECLARE_CLASS(atl_ros,
                         CameraNodelet,
                         atl::CameraNodelet,
-                        atl::ROSNodelet);
+                        nodelet::Nodelet);

@@ -1,5 +1,5 @@
-#ifndef ATL_ROS_NODES_CAMERA_NODE_HPP
-#define ATL_ROS_NODES_CAMERA_NODE_HPP
+#ifndef ATL_ROS_NODES_CAMERA_NODELET_HPP
+#define ATL_ROS_NODES_CAMERA_NODELET_HPP
 
 #include <nodelet/nodelet.h>
 #include <ros/ros.h>
@@ -11,7 +11,7 @@
 
 #include "atl/atl_core.hpp"
 #include "atl/ros/utils/msgs.hpp"
-#include "atl/ros/utils/nodelet.hpp"
+#include "atl/ros/utils/nodelet_helper.hpp"
 
 // NODE SETTINGS
 static const int NODE_RATE = 100;
@@ -28,10 +28,9 @@ static const std::string APRILTAG_TOPIC = "/atl/apriltag/target";
 static const std::string SHUTDOWN_TOPIC = "/atl/camera/shutdown";
 // clang-format on
 
-
 namespace atl {
 
-class CameraNodelet : public ROSNodelet {
+class CameraNodelet : public nodelet::Nodelet {
 public:
   CameraNodelet() {}
 
@@ -52,7 +51,9 @@ public:
 
 private:
   virtual void onInit();
-};
 
+  NodeletHelper nodelet_helper;
+};
 } // namespace atl
-#endif
+
+#endif // ATL_ROS_NODES_CAMERA_NODELET_HPP

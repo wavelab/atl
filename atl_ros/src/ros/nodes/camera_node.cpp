@@ -11,7 +11,7 @@ int main(int argc, char **argv) {
   std::string nodelet_name = ros::this_node::getName();
   std::cout << nodelet_name << std::endl;
 
-  nodelet.load(nodelet_name, "atl/camera_nodelet", remap, nargv);
+  nodelet.load(nodelet_name, "atl_ros/atl_camera_nodelet", remap, nargv);
 
   ros::spin();
 

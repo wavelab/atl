@@ -12,15 +12,11 @@
 
 namespace atl {
 
-class ROSNodelet : public nodelet::Nodelet {
+class NodeletHelper {
 public:
-  ROSNodelet() {}
+  NodeletHelper() = default;
 
-  ros::NodeHandle nh;
-  ros::NodeHandle pnh;
-  ros::Timer timer;
-
-  ros::Time ros_last_updated;
+  ~NodeletHelper() = default;
 
   std::map<std::string, ros::Publisher> ros_pubs;
   std::map<std::string, ros::Subscriber> ros_subs;
@@ -29,9 +25,7 @@ public:
   std::map<std::string, image_transport::Publisher> img_pubs;
   std::map<std::string, image_transport::Subscriber> img_subs;
 
-  bool configured = false;
-
-  void configureNodelet(int hz);
+  void configure(int hz, ros::NodeHandle nh);
 
   int registerShutdown(const std::string &topic);
   int registerImagePublisher(const std::string &topic);
@@ -42,7 +36,7 @@ public:
                               T *obj,
                               uint32_t queue_size = 1) {
     // pre-check
-    if (this->configured == false) {
+    if (!this->configured) {
       return -1;
     }
 
@@ -60,7 +54,7 @@ public:
     ros::Publisher publisher;
 
     // pre-check
-    if (this->configured == false) {
+    if (!this->configured) {
       return -1;
     }
 
@@ -79,7 +73,7 @@ public:
     ros::Subscriber subscriber;
 
     // pre-check
-    if (this->configured == false) {
+    if (!this->configured) {
       return -1;
     }
 
@@ -97,7 +91,7 @@ public:
     ros::ServiceServer server;
 
     // pre-check
-    if (this->configured == false) {
+    if (!this->configured) {
       return -1;
     }
 
@@ -114,7 +108,7 @@ public:
     ros::ServiceClient client;
 
     // pre-check
-    if (this->configured == false) {
+    if (!this->configured) {
       return -1;
     }
 
@@ -133,6 +127,12 @@ public:
       ros::shutdown();
     }
   }
+
+private:
+  ros::NodeHandle nh;
+  ros::Timer timer;
+
+  bool configured = false;
 };
 } // namespace atl
 
