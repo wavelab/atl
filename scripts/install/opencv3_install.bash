@@ -69,6 +69,6 @@ install_opencv() {
 }
 
 # MAIN
-# install_dependencies
-# download_opencv
+install_dependencies
+download_opencv
 install_opencv
