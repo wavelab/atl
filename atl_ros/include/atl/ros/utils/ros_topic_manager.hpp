@@ -12,11 +12,11 @@
 
 namespace atl {
 
-class NodeletHelper {
+class ROSTopicManager {
 public:
-  NodeletHelper() = default;
+  ROSTopicManager() = default;
 
-  ~NodeletHelper() = default;
+  ~ROSTopicManager() = default;
 
   std::map<std::string, ros::Publisher> ros_pubs;
   std::map<std::string, ros::Subscriber> ros_subs;
@@ -25,7 +25,7 @@ public:
   std::map<std::string, image_transport::Publisher> img_pubs;
   std::map<std::string, image_transport::Subscriber> img_subs;
 
-  void configure(int hz, ros::NodeHandle nh);
+  void configure(ros::NodeHandle nh);
 
   int registerShutdown(const std::string &topic);
   int registerImagePublisher(const std::string &topic);
@@ -130,7 +130,6 @@ public:
 
 private:
   ros::NodeHandle nh;
-  ros::Timer timer;
 
   bool configured = false;
 };

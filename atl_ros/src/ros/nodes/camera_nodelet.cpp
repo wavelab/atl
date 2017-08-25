@@ -8,32 +8,41 @@ void CameraNodelet::onInit() {
   // Create node handle
   ros::NodeHandle nh = getNodeHandle();
 
-  this->nodelet_helper.configure(NODE_RATE, nh);
+  this->ros_topic_manager.configure(nh);
 
   // Get parameters
   std::string cam_config_path;
-  nh.getParam("config_dir", cam_config_path);
+
+  if (nh.getParam("config_dir", cam_config_path)) {
+    ROS_INFO("Loaded camera config directory.");
+  } else {
+    ROS_ERROR("Could not load camera config directory.");
+    ros::shutdown();
+  }
 
   // camera
   if (this->camera.configure(cam_config_path) != 0) {
     ROS_ERROR("Failed to configure Camera!");
+    ros::shutdown();
   }
 
   this->camera.initialize();
 
+  double period = 1.0 / NODE_RATE;
+
+  this->timer =
+      nh.createTimer(ros::Duration(period),
+                     boost::bind(&CameraNodelet::timerCallback, this));
+
   // register publisher and subscribers
   // clang-format off
-  this->nodelet_helper.registerImagePublisher(CAMERA_IMAGE_TOPIC);
-  this->nodelet_helper.registerSubscriber(GIMBAL_POSITION_TOPIC, &CameraNodelet::gimbalPositionCallback, this);
-  this->nodelet_helper.registerSubscriber(GIMBAL_FRAME_ORIENTATION_TOPIC, &CameraNodelet::gimbalFrameCallback, this);
-  this->nodelet_helper.registerSubscriber(GIMBAL_JOINT_ORIENTATION_TOPIC, &CameraNodelet::gimbalJointCallback, this);
-  this->nodelet_helper.registerSubscriber(APRILTAG_TOPIC, &CameraNodelet::aprilTagCallback, this);
+  this->ros_topic_manager.registerImagePublisher(CAMERA_IMAGE_TOPIC);
+  // this->ros_topic_manager.registerSubscriber(GIMBAL_POSITION_TOPIC, &CameraNodelet::gimbalPositionCallback, this);
+  // this->ros_topic_manager.registerSubscriber(GIMBAL_FRAME_ORIENTATION_TOPIC, &CameraNodelet::gimbalFrameCallback, this);
+  // this->ros_topic_manager.registerSubscriber(GIMBAL_JOINT_ORIENTATION_TOPIC, &CameraNodelet::gimbalJointCallback, this);
+  // this->ros_topic_manager.registerSubscriber(APRILTAG_TOPIC, &CameraNodelet::aprilTagCallback, this);
   // clang-format on
-  this->nodelet_helper.registerShutdown(SHUTDOWN_TOPIC);
-
-  // register loop callback
-  this->nodelet_helper.registerLoopCallback(
-      std::bind(&CameraNodelet::loopCallback, this));
+  this->ros_topic_manager.registerShutdown(SHUTDOWN_TOPIC);
 }
 
 int CameraNodelet::publishImage() {
@@ -62,7 +71,7 @@ int CameraNodelet::publishImage() {
     "bgr8",
     this->image
   ).toImageMsg();
-  this->nodelet_helper.img_pubs[CAMERA_IMAGE_TOPIC].publish(img_msg);
+  this->ros_topic_manager.img_pubs[CAMERA_IMAGE_TOPIC].publish(img_msg);
   // clang-format on
 
   return 0;
@@ -88,7 +97,7 @@ void CameraNodelet::aprilTagCallback(
   convertMsg(msg, this->tag);
 }
 
-int CameraNodelet::loopCallback() {
+int CameraNodelet::timerCallback() {
   double dist;
 
   // change mode depending on apriltag distance

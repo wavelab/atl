@@ -92,8 +92,8 @@ ADD_DEPENDENCIES(atl_cam_calib_node atl_ros_utils)
 ADD_LIBRARY(atl_camera_nodelet
     src/ros/nodes/camera_nodelet.cpp)
 TARGET_LINK_LIBRARIES(atl_camera_nodelet
-    ${catkin_LIBRARIES}
     ${Boost_LIBRARIES}
+    ${ATL_ROS_DEPS}
     yaml-cpp
     atl_ros_utils
     )
@@ -138,7 +138,7 @@ ADD_LIBRARY(
     atl_ros_utils
     src/ros/utils/msgs.cpp
     src/ros/utils/node.cpp
-    src/ros/utils/nodelet_helper.cpp
+    src/ros/utils/ros_topic_manager.cpp
     src/ros/utils/utils.cpp
 )
 

@@ -4,9 +4,9 @@
   <param name="use_sim_time" value="false" />
   <param name="sim_mode" value="false" />
   <param name="debug_mode" value="false" />
+  <param name="config_dir" value="$(find atl_configs)/configs/camera/elp_camera" />
 
   <!-- ros node -->
-  <node pkg="atl_ros" name="atl_camera" type="atl_camera_node" output="screen" required="true">
-    <param name="config_dir" value="$(find atl_configs)/configs/camera/elp_camera" />
-  </node>
+  <node pkg="atl_ros" name="atl_camera" type="atl_camera_node" output="screen" required="true"> </node>
+
 </launch>

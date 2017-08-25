@@ -11,7 +11,7 @@
 
 #include "atl/atl_core.hpp"
 #include "atl/ros/utils/msgs.hpp"
-#include "atl/ros/utils/nodelet_helper.hpp"
+#include "atl/ros/utils/ros_topic_manager.hpp"
 
 // NODE SETTINGS
 static const int NODE_RATE = 100;
@@ -47,12 +47,13 @@ public:
   void gimbalFrameCallback(const geometry_msgs::QuaternionConstPtr &msg);
   void gimbalJointCallback(const geometry_msgs::QuaternionConstPtr &msg);
   void aprilTagCallback(const atl_msgs::AprilTagPoseConstPtr &msg);
-  int loopCallback();
+  int timerCallback();
 
 private:
   virtual void onInit();
 
-  NodeletHelper nodelet_helper;
+  ROSTopicManager ros_topic_manager;
+  ros::Timer timer;
 };
 } // namespace atl
 
