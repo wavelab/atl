@@ -18,109 +18,78 @@ public:
 
   ~ROSTopicManager() = default;
 
-  std::map<std::string, ros::Publisher> ros_pubs;
-  std::map<std::string, ros::Subscriber> ros_subs;
-  std::map<std::string, ros::ServiceServer> ros_servers;
-  std::map<std::string, ros::ServiceClient> ros_clients;
-  std::map<std::string, image_transport::Publisher> img_pubs;
-  std::map<std::string, image_transport::Subscriber> img_subs;
-
-  void configure(ros::NodeHandle nh);
-
-  int registerShutdown(const std::string &topic);
-  int registerImagePublisher(const std::string &topic);
+  int registerShutdown(ros::NodeHandle &nh, const std::string &topic);
+  int registerImagePublisher(ros::NodeHandle &nh, const std::string &topic);
 
   template <typename M, typename T>
-  int registerImageSubscriber(const std::string &topic,
+  int registerImageSubscriber(ros::NodeHandle &nh,
+                              const std::string &topic,
                               void (T::*fp)(M),
                               T *obj,
                               uint32_t queue_size = 1) {
-    // pre-check
-    if (!this->configured) {
-      return -1;
-    }
 
     // image transport
-    image_transport::ImageTransport it(this->nh);
+    image_transport::ImageTransport it(nh);
     this->img_subs[topic] = it.subscribe(topic, queue_size, fp, obj);
 
     return 0;
   }
 
   template <typename M>
-  int registerPublisher(const std::string &topic,
+  int registerPublisher(ros::NodeHandle &nh,
+                        const std::string &topic,
                         uint32_t queue_size = 1,
                         bool latch = false) {
     ros::Publisher publisher;
 
-    // pre-check
-    if (!this->configured) {
-      return -1;
-    }
-
     // register publisher
-    publisher = this->nh.advertise<M>(topic, queue_size, latch);
+    publisher = nh.advertise<M>(topic, queue_size, latch);
     this->ros_pubs[topic] = publisher;
 
     return 0;
   }
 
   template <typename M, typename T>
-  int registerSubscriber(const std::string &topic,
+  int registerSubscriber(ros::NodeHandle &nh,
+                         const std::string &topic,
                          void (T::*fp)(M),
                          T *obj,
                          uint32_t queue_size = 1) {
     ros::Subscriber subscriber;
 
-    // pre-check
-    if (!this->configured) {
-      return -1;
-    }
-
     // register subscriber
-    subscriber = this->nh.subscribe(topic, queue_size, fp, obj);
+    subscriber = nh.subscribe(topic, queue_size, fp, obj);
     this->ros_subs[topic] = subscriber;
 
     return 0;
   }
 
   template <class T, class MReq, class MRes>
-  int registerServer(const std::string &service_topic,
+  int registerServer(ros::NodeHandle &nh,
+                     const std::string &service_topic,
                      bool (T::*fp)(MReq &, MRes &),
                      T *obj) {
     ros::ServiceServer server;
 
-    // pre-check
-    if (!this->configured) {
-      return -1;
-    }
-
     // register service server
-    server = this->nh.advertiseService(service_topic, fp, obj);
+    server = nh.advertiseService(service_topic, fp, obj);
     this->ros_servers[service_topic] = server;
 
     return 0;
   }
 
   template <typename M>
-  int registerClient(const std::string &service_topic,
+  int registerClient(ros::NodeHandle &nh,
+                     const std::string &service_topic,
                      bool persistent = false) {
     ros::ServiceClient client;
 
-    // pre-check
-    if (!this->configured) {
-      return -1;
-    }
-
     // register service server
-    client = this->nh.serviceClient<M>(service_topic);
+    client = nh.serviceClient<M>(service_topic);
     this->ros_clients[service_topic] = client;
 
     return 0;
   }
-
-  int registerLoopCallback(std::function<int()> cb);
-  std::function<int()> loop_cb;
 
   void shutdownCallback(const std_msgs::BoolConstPtr &msg) {
     if (msg->data) {
@@ -128,10 +97,12 @@ public:
     }
   }
 
-private:
-  ros::NodeHandle nh;
-
-  bool configured = false;
+  std::map<std::string, ros::Publisher> ros_pubs;
+  std::map<std::string, ros::Subscriber> ros_subs;
+  std::map<std::string, ros::ServiceServer> ros_servers;
+  std::map<std::string, ros::ServiceClient> ros_clients;
+  std::map<std::string, image_transport::Publisher> img_pubs;
+  std::map<std::string, image_transport::Subscriber> img_subs;
 };
 } // namespace atl
 

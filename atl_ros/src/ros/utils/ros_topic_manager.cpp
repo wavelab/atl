@@ -2,40 +2,21 @@
 
 namespace atl {
 
-void ROSTopicManager::configure(ros::NodeHandle nh) {
-  this->nh = nh;
-  this->configured = true;
-}
-
-int ROSTopicManager::registerShutdown(const std::string &topic) {
+int ROSTopicManager::registerShutdown(ros::NodeHandle &nh,
+                                      const std::string &topic) {
   bool retval;
   ros::Subscriber sub;
 
-  // pre-check
-  if (!this->configured) {
-    return -1;
-  }
-
   // register subscriber
-  sub = this->nh.subscribe(topic, 1, &ROSTopicManager::shutdownCallback, this);
+  sub = nh.subscribe(topic, 1, &ROSTopicManager::shutdownCallback, this);
   this->ros_subs[topic] = sub;
 }
 
-int ROSTopicManager::registerImagePublisher(const std::string &topic) {
-  // pre-check
-  if (!this->configured) {
-    return -1;
-  }
-
+int ROSTopicManager::registerImagePublisher(ros::NodeHandle &nh,
+                                            const std::string &topic) {
   // image transport
-  image_transport::ImageTransport it(this->nh);
+  image_transport::ImageTransport it(nh);
   this->img_pubs[topic] = it.advertise(topic, 1);
-
-  return 0;
-}
-
-int ROSTopicManager::registerLoopCallback(std::function<int()> cb) {
-  this->loop_cb = cb;
 
   return 0;
 }

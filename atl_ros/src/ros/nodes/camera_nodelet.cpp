@@ -6,14 +6,12 @@ namespace atl {
 void CameraNodelet::onInit() {
   ROS_INFO("atl/atl_camera_nodelet onInit");
   // Create node handle
-  ros::NodeHandle nh = getNodeHandle();
-
-  this->ros_topic_manager.configure(nh);
+  this->nh = getNodeHandle();
 
   // Get parameters
   std::string cam_config_path;
 
-  if (nh.getParam("config_dir", cam_config_path)) {
+  if (this->nh.getParam("config_dir", cam_config_path)) {
     ROS_INFO("Loaded camera config directory.");
   } else {
     ROS_ERROR("Could not load camera config directory.");
@@ -28,21 +26,20 @@ void CameraNodelet::onInit() {
 
   this->camera.initialize();
 
-  double period = 1.0 / NODE_RATE;
-
-  this->timer =
-      nh.createTimer(ros::Duration(period),
-                     boost::bind(&CameraNodelet::timerCallback, this));
-
   // register publisher and subscribers
   // clang-format off
-  this->ros_topic_manager.registerImagePublisher(CAMERA_IMAGE_TOPIC);
-  // this->ros_topic_manager.registerSubscriber(GIMBAL_POSITION_TOPIC, &CameraNodelet::gimbalPositionCallback, this);
-  // this->ros_topic_manager.registerSubscriber(GIMBAL_FRAME_ORIENTATION_TOPIC, &CameraNodelet::gimbalFrameCallback, this);
-  // this->ros_topic_manager.registerSubscriber(GIMBAL_JOINT_ORIENTATION_TOPIC, &CameraNodelet::gimbalJointCallback, this);
-  // this->ros_topic_manager.registerSubscriber(APRILTAG_TOPIC, &CameraNodelet::aprilTagCallback, this);
+  this->ros_topic_manager.registerImagePublisher(this->nh, CAMERA_IMAGE_TOPIC);
+  // this->ros_topic_manager.registerSubscriber(nh, GIMBAL_POSITION_TOPIC, &CameraNodelet::gimbalPositionCallback, this);
+  // this->ros_topic_manager.registerSubscriber(nh, GIMBAL_FRAME_ORIENTATION_TOPIC, &CameraNodelet::gimbalFrameCallback, this);
+  // this->ros_topic_manager.registerSubscriber(nh, GIMBAL_JOINT_ORIENTATION_TOPIC, &CameraNodelet::gimbalJointCallback, this);
+  // this->ros_topic_manager.registerSubscriber(nh, APRILTAG_TOPIC, &CameraNodelet::aprilTagCallback, this);
   // clang-format on
-  this->ros_topic_manager.registerShutdown(SHUTDOWN_TOPIC);
+  this->ros_topic_manager.registerShutdown(this->nh, SHUTDOWN_TOPIC);
+
+  double period = 1.0 / NODE_RATE;
+  this->timer =
+      this->nh.createTimer(ros::Duration(period),
+                           boost::bind(&CameraNodelet::timerCallback, this));
 }
 
 int CameraNodelet::publishImage() {

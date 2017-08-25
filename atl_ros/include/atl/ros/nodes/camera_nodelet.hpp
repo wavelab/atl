@@ -34,6 +34,13 @@ class CameraNodelet : public nodelet::Nodelet {
 public:
   CameraNodelet() {}
 
+  int publishImage();
+  void gimbalPositionCallback(const geometry_msgs::Vector3ConstPtr &msg);
+  void gimbalFrameCallback(const geometry_msgs::QuaternionConstPtr &msg);
+  void gimbalJointCallback(const geometry_msgs::QuaternionConstPtr &msg);
+  void aprilTagCallback(const atl_msgs::AprilTagPoseConstPtr &msg);
+  int timerCallback();
+
   Camera camera;
   cv::Mat image;
 
@@ -42,17 +49,11 @@ public:
   Vec3 gimbal_position;
   TagPose tag;
 
-  int publishImage();
-  void gimbalPositionCallback(const geometry_msgs::Vector3ConstPtr &msg);
-  void gimbalFrameCallback(const geometry_msgs::QuaternionConstPtr &msg);
-  void gimbalJointCallback(const geometry_msgs::QuaternionConstPtr &msg);
-  void aprilTagCallback(const atl_msgs::AprilTagPoseConstPtr &msg);
-  int timerCallback();
-
 private:
   virtual void onInit();
 
   ROSTopicManager ros_topic_manager;
+  ros::NodeHandle nh;
   ros::Timer timer;
 };
 } // namespace atl

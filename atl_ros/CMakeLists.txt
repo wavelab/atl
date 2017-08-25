@@ -137,8 +137,8 @@ ADD_DEPENDENCIES(atl_ximea_camera_node atl_ros_utils)
 ADD_LIBRARY(
     atl_ros_utils
     src/ros/utils/msgs.cpp
-    src/ros/utils/node.cpp
     src/ros/utils/ros_topic_manager.cpp
+    src/ros/utils/node.cpp
     src/ros/utils/utils.cpp
 )
 
