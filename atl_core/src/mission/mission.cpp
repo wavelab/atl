@@ -170,7 +170,6 @@ double Mission::crossTrackError(const Vec3 &position, int mode) {
 }
 
 double Mission::waypointHeading() {
-  // assume waypoints are in NWU inertial frame
   const double dx = this->wp_end(0) - this->wp_start(0);
   const double dy = this->wp_end(1) - this->wp_start(1);
 

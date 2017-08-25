@@ -2,7 +2,7 @@
 
 namespace atl {
 
-int IMUNode::configure(int hz) {
+int IMUNode::configure(const int hz) {
   std::string config_path;
 
   // ros node
@@ -30,9 +30,9 @@ int IMUNode::configure(int hz) {
 
   // register publisher and subscribers
   // clang-format off
-  this->registerPublisher<geometry_msgs::Vector3>(IMU_TOPIC);
+  this->addPublisher<geometry_msgs::Vector3>(IMU_TOPIC);
   if (this->gimbal_imu == "HACK") {
-    this->registerPublisher<geometry_msgs::Quaternion>(JOINT_ORIENTATION_TOPIC);
+    this->addPublisher<geometry_msgs::Quaternion>(JOINT_ORIENTATION_TOPIC);
   } else if (this->gimbal_imu != "SBGC") {
     LOG_ERROR("Invalid gimbal imu mode [%s]", this->gimbal_imu.c_str());
     return -3;
@@ -40,7 +40,7 @@ int IMUNode::configure(int hz) {
   // clang-format on
 
   // loop callback
-  this->registerLoopCallback(std::bind(&IMUNode::loopCallback, this));
+  this->addLoopCallback(std::bind(&IMUNode::loopCallback, this));
 
   this->configured = true;
   return 0;

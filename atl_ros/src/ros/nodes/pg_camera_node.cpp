@@ -2,7 +2,7 @@
 
 namespace atl {
 
-int PGCameraNode::configure(int hz) {
+int PGCameraNode::configure(const int hz) {
   std::string config_path;
   std::string guid_str;
 
@@ -25,26 +25,24 @@ int PGCameraNode::configure(int hz) {
 
   // register publisher and subscribers
   // clang-format off
-  this->registerImagePublisher(this->image_topic);
+  this->addImagePublisher(this->image_topic);
   if (this->stamp_image) {
-    this->registerSubscriber(GIMBAL_POSITION_TOPIC, &PGCameraNode::gimbalPositionCallback, this);
-    this->registerSubscriber(GIMBAL_FRAME_ORIENTATION_TOPIC, &PGCameraNode::gimbalFrameCallback, this);
-    this->registerSubscriber(GIMBAL_JOINT_ORIENTATION_TOPIC, &PGCameraNode::gimbalJointCallback, this);
-    this->registerSubscriber(ENCODER_ORIENTATION_TOPIC, &PGCameraNode::gimbalJointBodyCallback, this);
-    this->registerSubscriber(LT_BODY_POSITION_TOPIC , &PGCameraNode::targetPositionCallback, this);
-    this->registerSubscriber(LT_DETECTED_TOPIC , &PGCameraNode::targetDetectedCallback, this);
+    this->addSubscriber(GIMBAL_POSITION_TOPIC, &PGCameraNode::gimbalPositionCallback, this);
+    this->addSubscriber(GIMBAL_FRAME_ORIENTATION_TOPIC, &PGCameraNode::gimbalFrameCallback, this);
+    this->addSubscriber(GIMBAL_JOINT_ORIENTATION_TOPIC, &PGCameraNode::gimbalJointCallback, this);
+    this->addSubscriber(ENCODER_ORIENTATION_TOPIC, &PGCameraNode::gimbalJointBodyCallback, this);
+    this->addSubscriber(LT_BODY_POSITION_TOPIC , &PGCameraNode::targetPositionCallback, this);
+    this->addSubscriber(LT_DETECTED_TOPIC , &PGCameraNode::targetDetectedCallback, this);
 
-    // DJI SUBSCRIBER
-    // this->registerSubscriber(QUAD_POSITION_TOPIC, &PGCameraNode::quadPositionCallback, this);
-    // this->registerSubscriber(QUAD_ORIENTATION_TOPIC, &PGCameraNode::quadOrientationCallback, this);
-    this->registerSubscriber(QUAD_POSE_TOPIC, &PGCameraNode::quadPoseCallback, this);
+    this->addSubscriber(QUAD_POSITION_TOPIC, &PGCameraNode::quadPositionCallback, this);
+    this->addSubscriber(QUAD_ORIENTATION_TOPIC, &PGCameraNode::quadOrientationCallback, this);
   }
 
-  this->registerShutdown(SHUTDOWN_TOPIC);
+  this->addShutdownListener(SHUTDOWN_TOPIC);
   // clang-format on
 
   // register loop callback
-  this->registerLoopCallback(std::bind(&PGCameraNode::loopCallback, this));
+  this->addLoopCallback(std::bind(&PGCameraNode::loopCallback, this));
 
   this->configured = true;
   return 0;
@@ -121,11 +119,26 @@ void PGCameraNode::targetDetectedCallback(const std_msgs::Bool &msg) {
   convertMsg(msg, this->target_detected);
 }
 
-void PGCameraNode::quadPoseCallback(const geometry_msgs::PoseStamped &msg) {
-  Pose pose;
-  convertMsg(msg, pose);
-  this->quadrotor_position = pose.position;
-  this->quadrotor_orientation = pose.orientation;
+void PGCameraNode::quadPositionCallback(const dji_sdk::LocalPosition &msg) {
+  Vec3 pos_ned;
+  pos_ned(0) = msg.x;
+  pos_ned(1) = msg.y;
+  pos_ned(2) = msg.z;
+  this->quadrotor_position = ned2nwu(pos_ned);
+}
+
+void PGCameraNode::quadOrientationCallback(
+    const dji_sdk::AttitudeQuaternion &msg) {
+  Quaternion orientation_ned;
+
+  orientation_ned.w() = msg.q0;
+  orientation_ned.x() = msg.q1;
+  orientation_ned.y() = msg.q2;
+  orientation_ned.z() = msg.q3;
+
+  // transform pose position and orientation
+  // from NED to ENU and NWU
+  this->quadrotor_orientation = ned2nwu(orientation_ned);
 }
 
 int PGCameraNode::loopCallback() {

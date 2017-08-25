@@ -26,15 +26,15 @@ void CameraNodelet::onInit() {
 
   this->camera.initialize();
 
-  // register publisher and subscribers
+  // add publisher and subscribers
   // clang-format off
-  this->ros_topic_manager.registerImagePublisher(this->nh, CAMERA_IMAGE_TOPIC);
-  // this->ros_topic_manager.registerSubscriber(nh, GIMBAL_POSITION_TOPIC, &CameraNodelet::gimbalPositionCallback, this);
-  // this->ros_topic_manager.registerSubscriber(nh, GIMBAL_FRAME_ORIENTATION_TOPIC, &CameraNodelet::gimbalFrameCallback, this);
-  // this->ros_topic_manager.registerSubscriber(nh, GIMBAL_JOINT_ORIENTATION_TOPIC, &CameraNodelet::gimbalJointCallback, this);
-  // this->ros_topic_manager.registerSubscriber(nh, APRILTAG_TOPIC, &CameraNodelet::aprilTagCallback, this);
+  this->ros_topic_manager.addImagePublisher(this->nh, CAMERA_IMAGE_TOPIC);
+  // this->ros_topic_manager.addSubscriber(nh, GIMBAL_POSITION_TOPIC, &CameraNodelet::gimbalPositionCallback, this);
+  // this->ros_topic_manager.addSubscriber(nh, GIMBAL_FRAME_ORIENTATION_TOPIC, &CameraNodelet::gimbalFrameCallback, this);
+  // this->ros_topic_manager.addSubscriber(nh, GIMBAL_JOINT_ORIENTATION_TOPIC, &CameraNodelet::gimbalJointCallback, this);
+  // this->ros_topic_manager.addSubscriber(nh, APRILTAG_TOPIC, &CameraNodelet::aprilTagCallback, this);
   // clang-format on
-  this->ros_topic_manager.registerShutdown(this->nh, SHUTDOWN_TOPIC);
+  this->ros_topic_manager.addShutdownListener(this->nh, SHUTDOWN_TOPIC);
 
   double period = 1.0 / NODE_RATE;
   this->timer =

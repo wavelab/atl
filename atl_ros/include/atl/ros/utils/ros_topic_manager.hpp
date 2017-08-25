@@ -18,11 +18,11 @@ public:
 
   ~ROSTopicManager() = default;
 
-  int registerShutdown(ros::NodeHandle &nh, const std::string &topic);
-  int registerImagePublisher(ros::NodeHandle &nh, const std::string &topic);
+  int addShutdownListener(ros::NodeHandle &nh, const std::string &topic);
+  int addImagePublisher(ros::NodeHandle &nh, const std::string &topic);
 
   template <typename M, typename T>
-  int registerImageSubscriber(ros::NodeHandle &nh,
+  int addImageSubscriber(ros::NodeHandle &nh,
                               const std::string &topic,
                               void (T::*fp)(M),
                               T *obj,
@@ -36,13 +36,13 @@ public:
   }
 
   template <typename M>
-  int registerPublisher(ros::NodeHandle &nh,
+  int addPublisher(ros::NodeHandle &nh,
                         const std::string &topic,
                         uint32_t queue_size = 1,
                         bool latch = false) {
     ros::Publisher publisher;
 
-    // register publisher
+    // add publisher
     publisher = nh.advertise<M>(topic, queue_size, latch);
     this->ros_pubs[topic] = publisher;
 
@@ -50,14 +50,14 @@ public:
   }
 
   template <typename M, typename T>
-  int registerSubscriber(ros::NodeHandle &nh,
+  int addSubscriber(ros::NodeHandle &nh,
                          const std::string &topic,
                          void (T::*fp)(M),
                          T *obj,
                          uint32_t queue_size = 1) {
     ros::Subscriber subscriber;
 
-    // register subscriber
+    // add subscriber
     subscriber = nh.subscribe(topic, queue_size, fp, obj);
     this->ros_subs[topic] = subscriber;
 
@@ -65,7 +65,7 @@ public:
   }
 
   template <class T, class MReq, class MRes>
-  int registerServer(ros::NodeHandle &nh,
+  int addService(ros::NodeHandle &nh,
                      const std::string &service_topic,
                      bool (T::*fp)(MReq &, MRes &),
                      T *obj) {
@@ -79,7 +79,7 @@ public:
   }
 
   template <typename M>
-  int registerClient(ros::NodeHandle &nh,
+  int addClient(ros::NodeHandle &nh,
                      const std::string &service_topic,
                      bool persistent = false) {
     ros::ServiceClient client;

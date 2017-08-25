@@ -1,7 +1,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.3)
 PROJECT(atl_core)
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -fPIC")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -fPIC -g")
 IF (CMAKE_COMPILER_IS_GNUCXX)
     ADD_DEFINITIONS(-std=gnu++0x)
 ENDIF()
@@ -141,6 +141,7 @@ ADD_EXECUTABLE(
     # sensor
     tests/sensor/MPU6050_test.cpp
     # vision
+    tests/vision/apriltag/michigan_test.cpp
     tests/vision/apriltag/mit_test.cpp
     tests/vision/camera/camera_test.cpp
     tests/vision/camera/config_test.cpp

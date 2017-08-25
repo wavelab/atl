@@ -19,14 +19,14 @@ int AprilTagNode::configure(const int hz) {
 
   // subscribers and publishers
   // clang-format off
-  this->registerPublisher<atl_msgs::AprilTagPose>(TARGET_POSE_TOPIC);
-  this->registerPublisher<geometry_msgs::Vector3>(TARGET_IF_POS_TOPIC);
-  this->registerPublisher<std_msgs::Float64>(TARGET_IF_YAW_TOPIC);
-  this->registerPublisher<geometry_msgs::Vector3>(TARGET_BPF_POS_TOPIC);
-  this->registerPublisher<geometry_msgs::Vector3>(TARGET_BPF_POS_ENCODER_TOPIC);
-  this->registerPublisher<std_msgs::Float64>(TARGET_BPF_YAW_TOPIC);
-  this->registerImageSubscriber(CAMERA_IMAGE_TOPIC, &AprilTagNode::imageCallback, this);
-  this->registerShutdown(SHUTDOWN);
+  this->addPublisher<atl_msgs::AprilTagPose>(TARGET_POSE_TOPIC);
+  this->addPublisher<geometry_msgs::Vector3>(TARGET_IF_POS_TOPIC);
+  this->addPublisher<std_msgs::Float64>(TARGET_IF_YAW_TOPIC);
+  this->addPublisher<geometry_msgs::Vector3>(TARGET_BPF_POS_TOPIC);
+  this->addPublisher<geometry_msgs::Vector3>(TARGET_BPF_POS_ENCODER_TOPIC);
+  this->addPublisher<std_msgs::Float64>(TARGET_BPF_YAW_TOPIC);
+  this->addImageSubscriber(CAMERA_IMAGE_TOPIC, &AprilTagNode::imageCallback, this);
+  this->addShutdownListener(SHUTDOWN);
   // clang-format on
 
   // downward facing camera (gimbal is NWU frame)

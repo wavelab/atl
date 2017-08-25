@@ -26,10 +26,10 @@ void LZGPlugin::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
   // gazebo node
   // clang-format off
   GazeboNode::configure();
-  this->registerPublisher<gazebo::msgs::Pose>(POSE_GTOPIC);
-  this->registerSubscriber(POSITION_SET_GTOPIC, &LZGPlugin::positionCallback, this);
-  this->registerSubscriber(VELOCITY_SET_GTOPIC, &LZGPlugin::velocityCallback, this);
-  this->registerSubscriber(ANGULAR_VEL_SET_GTOPIC, &LZGPlugin::angularVelocityCallback, this);
+  this->addPublisher<gazebo::msgs::Pose>(POSE_GTOPIC);
+  this->addSubscriber(POSITION_SET_GTOPIC, &LZGPlugin::positionCallback, this);
+  this->addSubscriber(VELOCITY_SET_GTOPIC, &LZGPlugin::velocityCallback, this);
+  this->addSubscriber(ANGULAR_VEL_SET_GTOPIC, &LZGPlugin::angularVelocityCallback, this);
   // clang-format on
 }
 

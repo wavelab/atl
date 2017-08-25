@@ -31,7 +31,7 @@ public:
   DFCameraNode(int argc, char **argv) : ROSNode(argc, argv) {
     this->configured = false;
   }
-  int configure(int hz);
+  int configure(const int hz);
   void imageCallback(ConstImagePtr &msg);
 };
 

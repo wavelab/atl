@@ -26,7 +26,7 @@ ROSNode::ROSNode(int argc, char **argv) {
 
 ROSNode::~ROSNode() { ros::shutdown(); }
 
-int ROSNode::configure(int hz) {
+int ROSNode::configure(const int hz) {
   if (ros::isInitialized() == false) {
     ros::init(this->argc,
               this->argv,
@@ -50,7 +50,7 @@ void ROSNode::shutdownCallback(const std_msgs::Bool &msg) {
   }
 }
 
-int ROSNode::registerShutdown(const std::string &topic) {
+int ROSNode::addShutdownListener(const std::string &topic) {
   bool retval;
   ros::Subscriber sub;
 
@@ -64,7 +64,7 @@ int ROSNode::registerShutdown(const std::string &topic) {
   this->ros_subs[topic] = sub;
 }
 
-int ROSNode::registerImagePublisher(const std::string &topic) {
+int ROSNode::addImagePublisher(const std::string &topic) {
   // pre-check
   if (this->configured == false) {
     return -1;
@@ -77,7 +77,7 @@ int ROSNode::registerImagePublisher(const std::string &topic) {
   return 0;
 }
 
-int ROSNode::registerLoopCallback(std::function<int()> cb) {
+int ROSNode::addLoopCallback(std::function<int()> cb) {
   this->loop_cb = cb;
   return 0;
 }

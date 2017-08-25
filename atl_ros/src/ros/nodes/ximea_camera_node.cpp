@@ -2,7 +2,7 @@
 
 namespace atl {
 
-int XimeaCameraNode::configure(int hz) {
+int XimeaCameraNode::configure(const int hz) {
   std::string config_path;
   grey_scale = false;
 
@@ -21,20 +21,16 @@ int XimeaCameraNode::configure(int hz) {
   this->camera.initialize();
 
   // register publisher and subscribers
-  this->registerImagePublisher(CAMERA_IMAGE_TOPIC);
-  this->registerSubscriber(GIMBAL_FRAME_ORIENTATION_TOPIC,
-                           &XimeaCameraNode::gimbalFrameCallback,
-                           this);
-  this->registerSubscriber(GIMBAL_JOINT_ORIENTATION_TOPIC,
-                           &XimeaCameraNode::gimbalJointCallback,
-                           this);
-  this->registerSubscriber(APRILTAG_TOPIC,
-                           &XimeaCameraNode::aprilTagCallback,
-                           this);
-  this->registerShutdown(SHUTDOWN_TOPIC);
+  // clang-format off
+  this->addImagePublisher(CAMERA_IMAGE_TOPIC);
+  this->addSubscriber(GIMBAL_FRAME_ORIENTATION_TOPIC, &XimeaCameraNode::gimbalFrameCallback, this);
+  this->addSubscriber(GIMBAL_JOINT_ORIENTATION_TOPIC, &XimeaCameraNode::gimbalJointCallback, this);
+  this->addSubscriber(APRILTAG_TOPIC, &XimeaCameraNode::aprilTagCallback, this);
+  this->addShutdownListener(SHUTDOWN_TOPIC);
+  // clang-format on
 
   // register loop callback
-  this->registerLoopCallback(std::bind(&XimeaCameraNode::loopCallback, this));
+  this->addLoopCallback(std::bind(&XimeaCameraNode::loopCallback, this));
 
   this->configured = true;
   return 0;

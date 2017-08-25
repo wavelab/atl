@@ -1,5 +1,5 @@
 sim_mode: false
-device_path: /dev/ttyUSB0
+device_path: /dev/ttyUSB1
 enable_tracking: true
 camera_offset:
     x: 0.0

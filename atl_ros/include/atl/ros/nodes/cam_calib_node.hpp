@@ -53,16 +53,70 @@ public:
     this->gimbal_encoder_file.close();
   }
 
-  int configure(int hz);
+  /**
+   * Configure ROS node
+   *
+   * @param node_name ROS node name
+   * @param hz ROS node rate
+   * @return 0 for success, -1 for failure
+   */
+  int configure(const int hz);
+
+  /**
+   * Convert image message to cv::Mat
+   * @param msg Image message
+   * @param img OpenCV cv::Mat
+   */
   void imageMsgToCvMat(const sensor_msgs::ImageConstPtr &msg, cv::Mat &img);
+
+  /**
+   * Static camera callback
+   * @param msg Image message
+   */
   void staticCameraCallback(const sensor_msgs::ImageConstPtr &msg);
+
+  /**
+   * Gimbal camera callback
+   * @param msg Image message
+   */
   void gimbalCameraCallback(const sensor_msgs::ImageConstPtr &msg);
+
+  /**
+   * Gimbal joint callback
+   * @param msg Gimbal joint orientation message
+   */
   void gimbalJointCallback(const geometry_msgs::Quaternion &msg);
-  void gimbalJointBodyCallback(const geometry_msgs::Quaternion &msg);
+
+  /**
+   * Gimbal joint encoder callback
+   * @param msg Gimbal joint orientation message
+   */
+  void gimbalJointEncoderCallback(const geometry_msgs::Quaternion &msg);
+
+  /**
+   * Check if chessboard is detected
+   * @return Boolean to denote success or failure
+   */
   bool chessboardDetected();
+
+  /**
+   * Show images
+   */
   void showImages();
+
+  /**
+   * Save images
+   */
   void saveImages();
+
+  /**
+   * Save gimbal measurements
+   */
   void saveGimbalMeasurements();
+
+  /**
+   * Loop callback
+   */
   int loopCallback();
 };
 

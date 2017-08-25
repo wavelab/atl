@@ -80,6 +80,16 @@ public:
   int record(const Vec3 &pos, const Vec3 &waypoint);
 
   /**
+   * Calculate yaw to waypoint based on position
+   *
+   * @param pos Position
+   * @param waypoint Waypoint
+   *
+   * @return Yaw to waypoint
+   */
+  double calcYawToWaypoint(const Vec3 &waypoint, const Vec3 &position);
+
+  /**
    * Update controller
    *
    * @param pose Actual pose

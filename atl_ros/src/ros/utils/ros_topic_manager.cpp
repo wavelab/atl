@@ -2,7 +2,7 @@
 
 namespace atl {
 
-int ROSTopicManager::registerShutdown(ros::NodeHandle &nh,
+int ROSTopicManager::addShutdownListener(ros::NodeHandle &nh,
                                       const std::string &topic) {
   bool retval;
   ros::Subscriber sub;
@@ -12,7 +12,7 @@ int ROSTopicManager::registerShutdown(ros::NodeHandle &nh,
   this->ros_subs[topic] = sub;
 }
 
-int ROSTopicManager::registerImagePublisher(ros::NodeHandle &nh,
+int ROSTopicManager::addImagePublisher(ros::NodeHandle &nh,
                                             const std::string &topic) {
   // image transport
   image_transport::ImageTransport it(nh);

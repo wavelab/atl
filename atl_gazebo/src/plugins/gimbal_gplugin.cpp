@@ -30,10 +30,10 @@ void GimbalGPlugin::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
   // gazebo node
   // clang-format off
   GazeboNode::configure();
-  this->registerPublisher<QUATERNION_MSG>(FRAME_ORIENTATION_GTOPIC);
-  this->registerPublisher<QUATERNION_MSG>(JOINT_ORIENTATION_GTOPIC);
-  this->registerSubscriber(SETPOINT_GTOPIC, &GimbalGPlugin::setAttitudeCallback, this);
-  this->registerSubscriber(TRACK_GTOPIC, &GimbalGPlugin::trackTargetCallback, this);
+  this->addPublisher<QUATERNION_MSG>(FRAME_ORIENTATION_GTOPIC);
+  this->addPublisher<QUATERNION_MSG>(JOINT_ORIENTATION_GTOPIC);
+  this->addSubscriber(SETPOINT_GTOPIC, &GimbalGPlugin::setAttitudeCallback, this);
+  this->addSubscriber(TRACK_GTOPIC, &GimbalGPlugin::trackTargetCallback, this);
   // clang-format on
 }
 

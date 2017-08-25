@@ -1,19 +1,19 @@
 at_controller:
-  min: -20.0
-  max: 20.0
-  k_p: 0.1
+  min: -35.0
+  max: 35.0
+  k_p: 0.3
   k_i: 0.0
-  k_d: 0.01
+  k_d: 0.08
 
 ct_controller:
-  min: -20.0
-  max: 20.0
-  k_p: 0.2
+  min: -30.0
+  max: 30.0
+  k_p: 0.08
   k_i: 0.0
-  k_d: 0.15
+  k_d: 0.04
 
 z_controller:
-  hover_throttle: 0.5
+  hover_throttle: 0.4
   k_p: 0.2
   k_i: 0.0
   k_d: 0.1

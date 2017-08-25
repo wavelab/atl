@@ -62,26 +62,82 @@ public:
 
   EstimatorNode(int argc, char **argv) : ROSNode(argc, argv) {}
 
-  int configure(int hz);
+  int configure(const int hz);
   void initLTKF(const Vec3 &target_measured);
   void resetLTKF(const Vec3 &target_measured);
   void quadPoseCallback(const geometry_msgs::PoseStamped &msg);
   void quadVelocityCallback(const geometry_msgs::TwistStamped &msg);
   void onCallback(const std_msgs::Bool &msg);
   void offCallback(const std_msgs::Bool &msg);
+
+  /**
+   * Landing target position (body frame) callback
+   */
   void targetBodyPosCallback(const geometry_msgs::Vector3 &msg);
+
+  /**
+   * Landing target position (inertial frame) callback
+   */
   void targetInertialPosCallback(const geometry_msgs::Vector3 &msg);
+
+  /**
+   * Landing target yaw (inertial frame) callback
+   */
   void targetInertialYawCallback(const std_msgs::Float64 &msg);
+
+  /**
+   * Publish landing target position relative to quadrotor (body frame)
+   */
   void publishLTKFBodyPositionEstimate();
+
+  /**
+   * Publish landing target velocity relative to quadrotor (body frame)
+   */
   void publishLTKFBodyVelocityEstimate();
+
+  /**
+   * Publish detected landing target
+   */
   void publishLTDetected();
+
+  /**
+   * Publish gimbal attitude setpoints
+   */
   void publishGimbalSetpointAttitudeMsg(Vec3 setpoints);
+
+  /**
+   * Publish quadrotor yaw in inertial frame
+   */
   void publishQuadYawMsg();
+
+  /**
+   * Track target
+   */
   void trackTarget();
+
+  /**
+   * Reset estimator
+   */
   void reset();
+
+  /**
+   * Estimate with Kalman Filter
+   */
   int estimateKF(const double dt);
+
+  /**
+   * Estimate with Extended Kalman Filter
+   */
   int estimateEKF(const double dt);
+
+  /**
+   * Estimate
+   */
   int estimate();
+
+  /**
+   * Loop callback
+   */
   int loopCallback();
 };
 

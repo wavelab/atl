@@ -41,9 +41,12 @@ public:
   Gimbal gimbal;
   Vec3 set_points;
 
+  Vec3 encoder_rpy;
+  Vec3 imu_rpy;
+
   GimbalNode(int argc, char **argv) : ROSNode(argc, argv) {}
   ~GimbalNode();
-  int configure(int hz);
+  int configure(const int hz);
   int publishIMU(Vec3 euler);
   int publishRawEncoder(Vec3 encoder_euler);
   int publishPosition(Vec3 pos);

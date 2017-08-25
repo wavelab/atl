@@ -1,6 +1,8 @@
-#include "atl/vision/apriltag/mit.hpp"
 #include "atl/atl_test.hpp"
 #include "atl/vision/camera/camera.hpp"
+#include "atl/vision/apriltag/michigan.hpp"
+
+namespace atl {
 
 #define TEST_CONFIG "tests/configs/apriltag/config.yaml"
 #define TEST_IMAGE_CENTER "tests/data/apriltag/center.png"
@@ -14,14 +16,13 @@
 #define TEST_IMAGE_BOTTOM_RIGHT "tests/data/apriltag/bottom_right.png"
 #define TEST_ILLUM_INVAR "tests/data/apriltag/illum_invar.png"
 
-namespace atl {
-
-TEST(MITDetector, constructor) {
-  MITDetector detector;
+TEST(MichiganDetector, constructor) {
+  MichiganDetector detector;
 
   EXPECT_FALSE(detector.configured);
 
-  EXPECT_EQ(NULL, detector.detector);
+  EXPECT_EQ(nullptr, detector.detector);
+  EXPECT_EQ(nullptr, detector.family);
 
   EXPECT_EQ(0, detector.tag_configs.size());
   EXPECT_EQ("", detector.camera_mode);
@@ -30,13 +31,14 @@ TEST(MITDetector, constructor) {
   EXPECT_FALSE(detector.imshow);
 }
 
-TEST(MITDetector, configure) {
-  MITDetector detector;
+TEST(MichiganDetector, configure) {
+  MichiganDetector detector;
 
   detector.configure(TEST_CONFIG);
+
   EXPECT_TRUE(detector.configured);
 
-  EXPECT_FALSE(detector.detector == NULL);
+  EXPECT_FALSE(detector.detector == nullptr);
 
   EXPECT_EQ(2, detector.tag_configs.size());
   EXPECT_EQ(detector.camera_modes[0], detector.camera_mode);
@@ -45,27 +47,8 @@ TEST(MITDetector, configure) {
   EXPECT_FALSE(detector.imshow);
 }
 
-TEST(MITDetector, illuminationInvarientTransform) {
-  cv::Mat image;
-  MITDetector detector;
-  std::vector<AprilTags::TagDetection> tags;
-
-  // setup
-  detector.configure(TEST_CONFIG);
-  image = cv::imread(TEST_ILLUM_INVAR, CV_LOAD_IMAGE_COLOR);
-
-  // test and assert
-  detector.illuminationInvariantTransform(image);
-  // cv::imshow("image", image);
-  // cv::waitKey(1000000);
-
-  tags = detector.detector->extractTags(image);
-  EXPECT_EQ(2, tags.size());
-}
-
-TEST(MITDetector, extractTags) {
-  // setup
-  MITDetector detector;
+TEST(MichiganDetector, extractTags) {
+  MichiganDetector detector;
   detector.configure(TEST_CONFIG);
 
   // CENTER
@@ -73,7 +56,9 @@ TEST(MITDetector, extractTags) {
   std::vector<TagPose> tags;
   int retval = detector.extractTags(image, tags);
   detector.prev_tag.detected = false;
-  // tags[0].print();
+
+  // cv::imshow("image", image);
+  // cv::waitKey(10000);
 
   EXPECT_EQ(0, retval);
   EXPECT_EQ(1, tags.size());
@@ -86,7 +71,6 @@ TEST(MITDetector, extractTags) {
   image = cv::imread(TEST_IMAGE_TOP, CV_LOAD_IMAGE_COLOR);
   retval = detector.extractTags(image, tags);
   detector.prev_tag.detected = false;
-  // tags[0].print();
 
   EXPECT_EQ(0, retval);
   EXPECT_EQ(1, tags.size());
@@ -99,7 +83,6 @@ TEST(MITDetector, extractTags) {
   image = cv::imread(TEST_IMAGE_RIGHT, CV_LOAD_IMAGE_COLOR);
   retval = detector.extractTags(image, tags);
   detector.prev_tag.detected = false;
-  // tags[0].print();
 
   EXPECT_EQ(0, retval);
   EXPECT_EQ(1, tags.size());
@@ -109,63 +92,19 @@ TEST(MITDetector, extractTags) {
   tags.clear();
 }
 
-TEST(MITDetector, changeMode) {
-  MITDetector detector;
-  cv::Mat image1, image2, image3;
-
-  // setup
-  detector.configure(TEST_CONFIG);
-
-  image1 = cv::Mat(480, 640, CV_64F, double(0));
-  detector.changeMode(image1);
-  EXPECT_EQ("640x480", detector.camera_mode);
-
-  image2 = cv::Mat(240, 320, CV_64F, double(0));
-  detector.changeMode(image2);
-  EXPECT_EQ("320x240", detector.camera_mode);
-
-  image3 = cv::Mat(120, 160, CV_64F, double(0));
-  detector.changeMode(image3);
-  EXPECT_EQ("160x120", detector.camera_mode);
-}
-
-TEST(MITDetector, maskImage) {
-  // setup
-  MITDetector detector;
-  detector.configure(TEST_CONFIG);
-
-  // CENTER
-  cv::Mat image = cv::imread(TEST_IMAGE_CENTER, CV_LOAD_IMAGE_COLOR);
+TEST(MichiganDetector, sandbox) {
+  MichiganDetector detector;
   std::vector<TagPose> tags;
-  detector.extractTags(image, tags);
-  detector.maskImage(tags[0], image);
 
-  // cv::imshow("test", image);
-  // cv::waitKey(100000);
-}
-
-TEST(MITDetector, cropImage) {
-  // setup
-  MITDetector detector;
   detector.configure(TEST_CONFIG);
 
-  // CENTER
   cv::Mat image = cv::imread(TEST_IMAGE_CENTER, CV_LOAD_IMAGE_COLOR);
-  std::vector<TagPose> tags;
   detector.extractTags(image, tags);
   tags[0].print();
+  tags.clear();
 
-  image = cv::imread(TEST_IMAGE_CENTER, CV_LOAD_IMAGE_COLOR);
   detector.extractTags(image, tags);
   tags[0].print();
-  cv::waitKey(100000);
-
-  image = cv::imread(TEST_IMAGE_CENTER, CV_LOAD_IMAGE_COLOR);
-  detector.extractTags(image, tags);
-  tags[0].print();
-  cv::waitKey(100000);
-
-  // cv::imshow("test", image);
 }
 
 } // namespace atl

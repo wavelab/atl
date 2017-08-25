@@ -2,7 +2,7 @@
 
 namespace atl {
 
-int ControlNode::configure(int hz) {
+int ControlNode::configure(const int hz) {
   std::string config_path;
 
   // ros node
@@ -19,35 +19,35 @@ int ControlNode::configure(int hz) {
   }
 
   // publishers
-  this->registerPublisher<atl_msgs::PCtrlSettings>(PCTRL_GET_TOPIC);
-  this->registerPublisher<geometry_msgs::PoseStamped>(QUADROTOR_POSE);
-  this->registerPublisher<geometry_msgs::TwistStamped>(QUADROTOR_VELOCITY);
-  this->registerPublisher<std_msgs::Bool>(ESTIMATOR_ON_TOPIC);
-  this->registerPublisher<std_msgs::Bool>(ESTIMATOR_OFF_TOPIC);
+  this->addPublisher<atl_msgs::PCtrlSettings>(PCTRL_GET_TOPIC);
+  this->addPublisher<geometry_msgs::PoseStamped>(QUADROTOR_POSE);
+  this->addPublisher<geometry_msgs::TwistStamped>(QUADROTOR_VELOCITY);
+  this->addPublisher<std_msgs::Bool>(ESTIMATOR_ON_TOPIC);
+  this->addPublisher<std_msgs::Bool>(ESTIMATOR_OFF_TOPIC);
 
   // subscribers
   // clang-format off
-  this->registerSubscriber(DJI_GPS_POSITION_TOPIC, &ControlNode::globalPositionCallback, this);
-  this->registerSubscriber(DJI_LOCAL_POSITION_TOPIC, &ControlNode::localPositionCallback, this);
-  this->registerSubscriber(DJI_ATTITUDE_TOPIC, &ControlNode::attitudeCallback, this);
-  this->registerSubscriber(DJI_VELOCITY_TOPIC, &ControlNode::velocityCallback, this);
-  this->registerSubscriber(DJI_RADIO_TOPIC, &ControlNode::radioCallback, this);
+  this->addSubscriber(DJI_GPS_POSITION_TOPIC, &ControlNode::globalPositionCallback, this);
+  this->addSubscriber(DJI_LOCAL_POSITION_TOPIC, &ControlNode::localPositionCallback, this);
+  this->addSubscriber(DJI_ATTITUDE_TOPIC, &ControlNode::attitudeCallback, this);
+  this->addSubscriber(DJI_VELOCITY_TOPIC, &ControlNode::velocityCallback, this);
+  this->addSubscriber(DJI_RADIO_TOPIC, &ControlNode::radioCallback, this);
 
-  this->registerSubscriber(ARM_TOPIC, &ControlNode::armCallback, this);
-  this->registerSubscriber(MODE_TOPIC, &ControlNode::modeCallback, this);
-  this->registerSubscriber(YAW_TOPIC, &ControlNode::yawCallback, this);
-  this->registerSubscriber(TARGET_BODY_POSITION_TOPIC, &ControlNode::targetPositionCallback, this);
-  this->registerSubscriber(TARGET_BODY_VELOCITY_TOPIC, &ControlNode::targetVelocityCallback, this);
-  this->registerSubscriber(TARGET_DETECTED_TOPIC, &ControlNode::targetDetectedCallback, this);
-  this->registerSubscriber(HOVER_SET_TOPIC, &ControlNode::hoverSetCallback, this);
-  this->registerSubscriber(HOVER_HEIGHT_SET_TOPIC, &ControlNode::hoverHeightSetCallback, this);
-  this->registerSubscriber(PCTRL_SET_TOPIC, &ControlNode::positionControllerSetCallback, this);
-  this->registerSubscriber(TCTRL_SET_TOPIC, &ControlNode::trackingControllerSetCallback, this);
-  this->registerSubscriber(LCTRL_SET_TOPIC, &ControlNode::landingControllerSetCallback, this);
+  this->addSubscriber(ARM_TOPIC, &ControlNode::armCallback, this);
+  this->addSubscriber(MODE_TOPIC, &ControlNode::modeCallback, this);
+  this->addSubscriber(YAW_TOPIC, &ControlNode::yawCallback, this);
+  this->addSubscriber(TARGET_BODY_POSITION_TOPIC, &ControlNode::targetPositionCallback, this);
+  this->addSubscriber(TARGET_BODY_VELOCITY_TOPIC, &ControlNode::targetVelocityCallback, this);
+  this->addSubscriber(TARGET_DETECTED_TOPIC, &ControlNode::targetDetectedCallback, this);
+  this->addSubscriber(HOVER_SET_TOPIC, &ControlNode::hoverSetCallback, this);
+  this->addSubscriber(HOVER_HEIGHT_SET_TOPIC, &ControlNode::hoverHeightSetCallback, this);
+  this->addSubscriber(PCTRL_SET_TOPIC, &ControlNode::positionControllerSetCallback, this);
+  this->addSubscriber(TCTRL_SET_TOPIC, &ControlNode::trackingControllerSetCallback, this);
+  this->addSubscriber(LCTRL_SET_TOPIC, &ControlNode::landingControllerSetCallback, this);
   // clang-format on
 
   // loop callback
-  this->registerLoopCallback(std::bind(&ControlNode::loopCallback, this));
+  this->addLoopCallback(std::bind(&ControlNode::loopCallback, this));
 
   // connect to estimator
   // this->waitForEstimator();
