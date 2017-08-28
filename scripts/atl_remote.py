@@ -121,15 +121,9 @@ if __name__ == "__main__":
     # world = World()
     rospy.sleep(1.0)
 
-<<<<<<< HEAD
-    gimbal.activate(True)
-    gimbal.set_attitude([0.0, -1.0, 0])
-    # gimbal.activate(False)
-=======
     # gimbal.activate(True)
-    # gimbal.set_attitude([0, deg2rad(-90.0), 0])
+    # gimbal.set_attitude([0.0, -1.0, 0])
     gimbal.activate(False)
->>>>>>> 0e3ad6e2a4cdc1313da9d1bb371854c78e64ee0a
 
     # quad.set_arm(True)
     # quad.set_mode("DISCOVER_MODE")
