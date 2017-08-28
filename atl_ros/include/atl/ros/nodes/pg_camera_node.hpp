@@ -14,7 +14,7 @@
 #include "atl/ros/utils/node.hpp"
 
 // NODE SETTINGS
-static const double NODE_RATE = 61;
+static const double NODE_RATE = 60;
 
 // SUBSCRIBE TOPICS
 // clang-format off
