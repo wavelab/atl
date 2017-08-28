@@ -3,6 +3,7 @@
 
 #include <inttypes.h>
 #include <stdio.h>
+#include <poll.h>
 
 #include <dc1394/dc1394.h>
 
@@ -39,6 +40,15 @@ public:
   }
 
   /**
+   * Connect to camera
+   *
+   * @param guid Global Unique ID (default = 0; initialize first available
+   * camera)
+   * @return 0 for success, -1 for failure
+   */
+  int connect(uint64_t guid = 0);
+
+  /**
    * Initialize camera
    *
    * @param guid Global Unique ID (default = 0; initialize first available
@@ -48,10 +58,72 @@ public:
   int initialize(uint64_t guid = 0);
 
   /**
+   * Change mode
+   *
+   * @param mode Mode
+   * @return 0 for success, -1 for failure
+   */
+  int changeMode(const std::string &mode);
+
+  /**
    * Print frame information
    * @param frame Camera frame data
    */
   void printFrameInfo(dc1394video_frame_t *frame);
+
+  /**
+   * Set camera trigger mode
+   *
+   * Mode 0: Exposure starts with a falling edge and stops when the the
+   * exposure specified by the SHUTTER feature is elapsed.
+   *
+   * Mode 1: Exposure starts with a falling edge and stops with the next rising
+   * edge.
+   *
+   * Mode 2: The camera starts the exposure at the first falling edge and stops
+   * the integration at the nth falling edge. The parameter n is a prameter of
+   * the trigger that can be set with dc1394_feature_set_value().
+   *
+   * Mode 3: This is an internal trigger mode. The trigger is generated every
+   * n * (period of fastest framerate). Once again, the parameter n can be set
+   * with dc1394_feature_set_value().
+   *
+   * Mode 4: A multiple exposure mode. N exposures are performed each time a
+   * falling edge is observed on the trigger signal.  Each exposure is as long
+   * as defined by the SHUTTER feature.
+   *
+   * Mode 5: Another multiple exposure mode. Same as Mode 4 except that the
+   * exposure is is defined by the length of the trigger pulse instead of the
+   * SHUTTER feature.
+   *
+   * Mode 14 and 15: vendor specified trigger mode.
+   *
+   * @param trigger_mode Trigger mode
+   * @return 0 for success, -1 for failure
+   */
+  int setTriggerMode(const int trigger_mode);
+
+  /**
+   * Set camera trigger source
+   *
+   * @param trigger_source Trigger source
+   *    - 0: Trigger source 0
+   *    - 1: Trigger source 1
+   *    - 2: Trigger source 2
+   *    - 3: Trigger source 3
+   *    - 4: Trigger software trigger
+   *
+   * @return 0 for success, -1 for failure
+   */
+  int setTriggerSource(const int trigger_mode);
+
+  /**
+   * Set camera external triggering state
+   *
+   * @param activate Activate
+   * @return 0 for success, -1 for failure
+   */
+  int setExternalTriggering(const bool activate);
 
   /**
    * Set brightness
@@ -59,7 +131,7 @@ public:
    * @param brightness
    * @return 0 for success, -1 for failure
    */
-  int setBrightness(double brightness);
+  int setBrightness(const double brightness);
 
   /**
    * Set frame rate
@@ -67,7 +139,7 @@ public:
    * @param frame rate
    * @return 0 for success, -1 for failure
    */
-  int setFrameRate(double fps);
+  int setFrameRate(const double fps);
 
   /**
    * Set exposure
@@ -75,7 +147,7 @@ public:
    * @param exposure
    * @return 0 for success, -1 for failure
    */
-  int setExposure(double exposure);
+  int setExposure(const double exposure);
 
   /**
    * Set shutter
@@ -83,7 +155,7 @@ public:
    * @param shutter
    * @return 0 for success, -1 for failure
    */
-  int setShutter(double shutter_ms);
+  int setShutter(const double shutter_ms);
 
   /**
    * Set gain
@@ -91,7 +163,61 @@ public:
    * @param gain
    * @return 0 for success, -1 for failure
    */
-  int setGain(double gain_db);
+  int setGain(const double gain_db);
+
+  /**
+   * Get camera trigger mode
+   *
+   * Mode 0: Exposure starts with a falling edge and stops when the the
+   * exposure specified by the SHUTTER feature is elapsed.
+   *
+   * Mode 1: Exposure starts with a falling edge and stops with the next rising
+   * edge.
+   *
+   * Mode 2: The camera starts the exposure at the first falling edge and stops
+   * the integration at the nth falling edge. The parameter n is a prameter of
+   * the trigger that can be set with dc1394_feature_set_value().
+   *
+   * Mode 3: This is an internal trigger mode. The trigger is generated every
+   * n * (period of fastest framerate). Once again, the parameter n can be set
+   * with dc1394_feature_set_value().
+   *
+   * Mode 4: A multiple exposure mode. N exposures are performed each time a
+   * falling edge is observed on the trigger signal.  Each exposure is as long
+   * as defined by the SHUTTER feature.
+   *
+   * Mode 5: Another multiple exposure mode. Same as Mode 4 except that the
+   * exposure is is defined by the length of the trigger pulse instead of the
+   * SHUTTER feature.
+   *
+   * Mode 14 and 15: vendor specified trigger mode.
+   *
+   * @param trigger_mode Trigger mode
+   * @return 0 for success, -1 for failure
+   */
+  int getTriggerMode(int &trigger_mode);
+
+  /**
+   * Get camera trigger source
+   *
+   * @param trigger_source Trigger source
+   *    - 0: Trigger source 0
+   *    - 1: Trigger source 1
+   *    - 2: Trigger source 2
+   *    - 3: Trigger source 3
+   *    - 4: Trigger software trigger
+   *
+   * @return 0 for success, -1 for failure
+   */
+  int getTriggerSource(int &trigger_source);
+
+  /**
+   * Get camera external triggering state
+   *
+   * @param activate Activate
+   * @return 0 for success, -1 for failure
+   */
+  int getExternalTriggering(bool &activate);
 
   /**
    * Get brightness
@@ -134,33 +260,33 @@ public:
   int getGain(double &gain_db);
 
   /**
-   * Calculate center ROI
-   *
-   * @param size
-   * @param max_size
-   * @param step
-   *
-   * @return Center of ROI
-   */
-  std::pair<int, int> centerROI(const int size,
-                                const int max_size,
-                                const int step);
-
-  /**
-   * Change mode
-   *
-   * @param mode Mode
-   * @return 0 for success, -1 for failure
-   */
-  int changeMode(const std::string &mode);
-
-  /**
    * Get frame
    *
    * @param image Image
    * @return 0 for success, -1 for failure
    */
   int getFrame(cv::Mat &image);
+
+  /**
+   * Activate software triggering mode
+   *
+   * @return 0 for success, -1 for failure
+   */
+  int activateSoftwareTriggeringMode();
+
+  /**
+   * Activate default triggering mode
+   *
+   * @return 0 for success, -1 for failure
+   */
+  int activateDefaultTriggeringMode();
+
+  /**
+   * Software trigger
+   *
+   * @return 0 for success, -1 for failure
+   */
+  int trigger();
 
   /**
    * Run

@@ -8,4 +8,11 @@
     <param name="image_topic" value="/atl/camera/image" />
     <param name="config_dir" value="$(find atl_configs)/configs/camera/pointgrey_firefly" />
   </node>
+
+  <!-- <node pkg="atl_ros" name="atl_camera_trigger" type="atl_pg_camera_trigger_node" output="screen" required="true"> -->
+  <!--   <!&#45;&#45; <param name="guid" type="str" value="0" />  <!&#38;#45;&#38;#45; first available camera &#38;#45;&#38;#45;> &#45;&#45;> -->
+  <!--   <param name="guid" type="str" value="49712223533654158" /> <!&#45;&#45; static camera &#45;&#45;> -->
+  <!--   <!&#45;&#45; <param name="guid" type="str" value="49712223533992369" /> <!&#38;#45;&#38;#45; gimbal camera &#38;#45;&#38;#45;> &#45;&#45;> -->
+  <!--   <param name="config_dir" value="$(find atl_configs)/configs/camera/pointgrey_firefly" /> -->
+  <!-- </node> -->
 </launch>

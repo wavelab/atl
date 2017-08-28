@@ -27,6 +27,75 @@ TEST(DC1394Camera, configure) {
   ASSERT_EQ(0, retval);
 }
 
+TEST(DC1394Camera, triggerMode) {
+  DC1394Camera camera;
+
+  int retval = camera.configure(TEST_CONFIG_PATH);
+  ASSERT_EQ(0, retval);
+
+  retval = camera.initialize();
+  EXPECT_EQ(0, retval);
+
+  int trigger_mode_expected = 0;
+  retval = camera.setTriggerMode(trigger_mode_expected);
+  EXPECT_EQ(0, retval);
+
+  int trigger_mode = -1;
+  retval = camera.getTriggerMode(trigger_mode);
+  EXPECT_EQ(trigger_mode_expected, trigger_mode);
+  EXPECT_EQ(0, retval);
+
+  // revert back to internal trigger
+  retval = camera.setTriggerMode(3);
+  EXPECT_EQ(0, retval);
+}
+
+TEST(DC1394Camera, triggerSource) {
+  DC1394Camera camera;
+
+  int retval = camera.configure(TEST_CONFIG_PATH);
+  ASSERT_EQ(0, retval);
+
+  retval = camera.initialize();
+  EXPECT_EQ(0, retval);
+
+  int trigger_source_expected = 4;
+  retval = camera.setTriggerSource(trigger_source_expected);
+  EXPECT_EQ(0, retval);
+
+  int trigger_source = -1;
+  retval = camera.getTriggerSource(trigger_source);
+  EXPECT_EQ(trigger_source_expected, trigger_source);
+  EXPECT_EQ(0, retval);
+
+  // revert back to trigger source 0
+  retval = camera.setTriggerSource(0);
+  EXPECT_EQ(0, retval);
+}
+
+TEST(DC1394Camera, externalTrigger) {
+  DC1394Camera camera;
+
+  int retval = camera.configure(TEST_CONFIG_PATH);
+  ASSERT_EQ(0, retval);
+
+  retval = camera.initialize();
+  EXPECT_EQ(0, retval);
+
+  bool activate_expected = true;
+  retval = camera.setExternalTriggering(activate_expected);
+  EXPECT_EQ(0, retval);
+
+  bool activate = false;
+  retval = camera.getExternalTriggering(activate);
+  EXPECT_EQ(activate_expected, activate);
+  EXPECT_EQ(0, retval);
+
+  // revert back to no external triggering
+  retval = camera.setExternalTriggering(false);
+  EXPECT_EQ(0, retval);
+}
+
 TEST(DC1394Camera, brightness) {
   DC1394Camera camera;
 
@@ -120,6 +189,49 @@ TEST(DC1394Camera, gain) {
   retval = camera.getShutter(gain);
   EXPECT_EQ(gain_expected, gain);
   EXPECT_EQ(0, retval);
+}
+
+TEST(DC1394Camera, activateSoftwareTriggeringMode) {
+  DC1394Camera camera;
+
+  int retval = camera.configure(TEST_CONFIG_PATH);
+  ASSERT_EQ(0, retval);
+
+  retval = camera.initialize();
+  ASSERT_EQ(0, retval);
+
+  retval = camera.activateSoftwareTriggeringMode();
+  ASSERT_EQ(0, retval);
+
+  // revert back to default triggering mode
+  retval = camera.activateDefaultTriggeringMode();
+  ASSERT_EQ(0, retval);
+}
+
+TEST(DC1394Camera, activateDefaultTriggeringMode) {
+  DC1394Camera camera;
+
+  int retval = camera.configure(TEST_CONFIG_PATH);
+  ASSERT_EQ(0, retval);
+
+  retval = camera.initialize();
+  ASSERT_EQ(0, retval);
+
+  retval = camera.activateDefaultTriggeringMode();
+  ASSERT_EQ(0, retval);
+}
+
+TEST(DC1394Camera, trigger) {
+  DC1394Camera camera;
+
+  int retval = camera.configure(TEST_CONFIG_PATH);
+  ASSERT_EQ(0, retval);
+
+  retval = camera.initialize();
+  ASSERT_EQ(0, retval);
+
+  retval = camera.trigger();
+  ASSERT_EQ(0, retval);
 }
 
 // TEST(DC1394Camera, run) {

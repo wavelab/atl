@@ -39,20 +39,20 @@ public:
   std::string quad_frame;
   std::string gimbal_imu;
   Gimbal gimbal;
-  Vec3 set_points;
+  Vec3 set_points{0.0, 0.0, 0.0};
 
-  Vec3 encoder_rpy;
-  Vec3 imu_rpy;
+  Vec3 encoder_rpy{0.0, 0.0, 0.0};
+  Vec3 imu_rpy{0.0, 0.0, 0.0};
 
   GimbalNode(int argc, char **argv) : ROSNode(argc, argv) {}
   ~GimbalNode();
   int configure(const int hz);
-  int publishIMU(Vec3 euler);
-  int publishRawEncoder(Vec3 encoder_euler);
-  int publishPosition(Vec3 pos);
-  int publishFrameOrientation(Quaternion q);
-  int publishJointOrientation(Quaternion q);
-  int publishEncoderOrientation(Quaternion q);
+  int publishIMU(const Vec3 &euler);
+  int publishRawEncoder(const Vec3 &encoder_rpy);
+  int publishPosition(const Vec3 &pos);
+  int publishFrameOrientation(const Quaternion &q);
+  int publishJointOrientation(const Quaternion &q);
+  int publishEncoderOrientation(const Quaternion &q);
   void activateCallback(const std_msgs::Bool &msg);
   void quadPoseCallback(const geometry_msgs::PoseStamped &msg);
   void setAttitudeCallback(const geometry_msgs::Vector3 &msg);

@@ -110,6 +110,10 @@ ADD_EXECUTABLE(atl_pg_camera_node src/ros/nodes/pg_camera_node.cpp)
 TARGET_LINK_LIBRARIES(atl_pg_camera_node ${ATL_ROS_DEPS})
 ADD_DEPENDENCIES(atl_pg_camera_node atl_ros_utils)
 
+ADD_EXECUTABLE(atl_pg_camera_trigger_node src/ros/nodes/pg_camera_trigger_node.cpp)
+TARGET_LINK_LIBRARIES(atl_pg_camera_trigger_node ${ATL_ROS_DEPS})
+ADD_DEPENDENCIES(atl_pg_camera_trigger_node atl_ros_utils)
+
 ADD_EXECUTABLE(atl_ximea_camera_node src/ros/nodes/ximea_camera_node.cpp)
 TARGET_LINK_LIBRARIES(atl_ximea_camera_node ${ATL_ROS_DEPS})
 ADD_DEPENDENCIES(atl_ximea_camera_node atl_ros_utils)

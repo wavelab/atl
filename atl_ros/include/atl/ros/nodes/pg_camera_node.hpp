@@ -36,31 +36,23 @@ namespace atl {
 
 class PGCameraNode : public ROSNode {
 public:
-  // PointGreyCamera camera;
   DC1394Camera camera;
   bool stamp_image = false;
   uint64_t guid = 0;
   std::string image_topic;
 
   cv::Mat image;
-  Vec3 gimbal_position;
-  Vec3 quadrotor_position;
-  Quaternion gimbal_frame_orientation;
-  Quaternion gimbal_joint_orientation;
-  Quaternion gimbal_joint_body_orientation;
-  Quaternion quadrotor_orientation;
+  Vec3 gimbal_position{0.0, 0.0, 0.0};
+  Vec3 quadrotor_position{0.0, 0.0, 0.0};
+  Quaternion gimbal_frame_orientation{1.0, 0.0, 0.0, 0.0};
+  Quaternion gimbal_joint_orientation{1.0, 0.0, 0.0, 0.0};
+  Quaternion gimbal_joint_body_orientation{1.0, 0.0, 0.0, 0.0};
+  Quaternion quadrotor_orientation{1.0, 0.0, 0.0, 0.0};
 
-  bool target_detected;
-  Vec3 target_pos_bf;
+  bool target_detected = false;
+  Vec3 target_pos_bf{0.0, 0.0, 0.0};
 
-  PGCameraNode(int argc, char **argv) : ROSNode(argc, argv) {
-    this->gimbal_position = Vec3();
-    this->gimbal_frame_orientation = Quaternion();
-    this->gimbal_joint_orientation = Quaternion();
-
-    this->target_detected = false;
-    this->target_pos_bf = Vec3();
-  }
+  PGCameraNode(int argc, char **argv) : ROSNode(argc, argv) {}
 
   int configure(const int hz);
   int publishImage();
