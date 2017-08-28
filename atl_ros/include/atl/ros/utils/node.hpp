@@ -8,6 +8,7 @@
 #include <ros/ros.h>
 #include <sensor_msgs/CameraInfo.h>
 #include <std_msgs/Bool.h>
+#include <tf2_ros/transform_broadcaster.h>
 
 namespace atl {
 
@@ -55,6 +56,7 @@ public:
 
   std::map<std::string, image_transport::Publisher> img_pubs;
   std::map<std::string, image_transport::Subscriber> img_subs;
+
   std::function<int()> loop_cb;
 
   ROSNode() {}

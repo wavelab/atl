@@ -1,5 +1,8 @@
 #include "atl/ros/nodes/gimbal_node.hpp"
 
+#include <geometry_msgs/TransformStamped.h>
+#include <eigen_conversions/eigen_msg.h>
+
 namespace atl {
 
 int GimbalNode::configure(const int hz) {
@@ -95,6 +98,19 @@ int GimbalNode::publishEncoderOrientation(Quaternion q) {
   return 0;
 }
 
+int GimbalNode::broadcastTransform(Vec3 pos, Quaternion q) {
+  static tf2_ros::TransformBroadcaster tf_broadcaster;
+  geometry_msgs::TransformStamped msg;
+  msg.header.frame_id = "imu";
+  msg.child_frame_id = "gimbal";
+
+  tf::quaternionEigenToMsg(q, msg.transform.rotation);
+  tf::vectorEigenToMsg(pos, msg.transform.translation);
+
+  tf_broadcaster.sendTransform(msg);
+  return 0;
+}
+
 void GimbalNode::activateCallback(const std_msgs::Bool &msg) {
   bool activate;
   convertMsg(msg, activate);
@@ -121,6 +137,7 @@ void GimbalNode::quadPoseCallback(const geometry_msgs::PoseStamped &msg) {
 
   this->publishPosition(pos);
   this->publishFrameOrientation(q);
+  this->broadcastTransform(pos, q);
 }
 
 void GimbalNode::setAttitudeCallback(const geometry_msgs::Vector3 &msg) {

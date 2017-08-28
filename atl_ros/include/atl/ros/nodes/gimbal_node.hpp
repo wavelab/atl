@@ -53,6 +53,7 @@ public:
   int publishFrameOrientation(Quaternion q);
   int publishJointOrientation(Quaternion q);
   int publishEncoderOrientation(Quaternion q);
+  int broadcastTransform(Vec3 pos, Quaternion q);
   void activateCallback(const std_msgs::Bool &msg);
   void quadPoseCallback(const geometry_msgs::PoseStamped &msg);
   void setAttitudeCallback(const geometry_msgs::Vector3 &msg);

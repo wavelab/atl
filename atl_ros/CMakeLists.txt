@@ -20,7 +20,8 @@ FIND_PACKAGE(
     message_generation
     image_transport
     cv_bridge
-    tf
+    tf2_ros
+    eigen_conversions
     dji_sdk
     atl_core
     atl_msgs
@@ -121,6 +122,7 @@ ADD_LIBRARY(
     src/ros/utils/node.cpp
     src/ros/utils/utils.cpp
 )
+TARGET_LINK_LIBRARIES(atl_ros_utils ${catkin_LIBRARIES})
 
 # TESTS
 # SET(ATL_ROS_TEST_DEPS ${catkin_LIBRARIES} ${GTEST_LIBRARIES})
