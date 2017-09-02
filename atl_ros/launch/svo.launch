@@ -1,13 +1,17 @@
 <?xml version="1.0"?>
 <launch>
-  <node pkg="svo_ros" type="vo" name="svo" clear_params="true" output="screen">
+  <node pkg="atl_ros" name="atl_camera" type="atl_camera_node" output="screen" required="true">
+    <param name="config_dir" value="$(find atl_configs)/configs/camera/elp_camera" />
+  </node>
+
+  <node pkg="svo_ros" type="vo" name="svo" clear_params="true" output="screen" launch-prefix="gdb">
     <!-- camera topic to subscribe to -->
-    <param name="cam_topic" value="/atl/camera/image" />
+    <param name="cam_topic" value="/atl/static_camera/image" />
 
     <!-- camera calibration file -->
-    <rosparam file="$(find atl_configs)/configs/svo/camera_pinhole.yaml" />
+    <rosparam file="$(find atl_configs)/configs/svo/elp_camera.yaml" />
 
     <!-- default parameter settings: choose between vo_fast and vo_accurate -->
-    <rosparam file="$(find atl_configs)/configs/svo/vo_fast.yaml" />
+    <rosparam file="$(find atl_configs)/configs/svo/vo_accurate.yaml" />
   </node>
 </launch>

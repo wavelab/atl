@@ -147,7 +147,7 @@ int GimbalNode::loopCallback() {
   // std::cout << "IMU RPY: " << rad2deg(this->imu_rpy(0));
   // std::cout << " " << rad2deg(this->imu_rpy(1));
   // std::cout << " " << rad2deg(this->imu_rpy(2)) << std::endl;
-
+  //
   // std::cout << "ENCODER RPY: " << rad2deg(this->encoder_rpy(0));
   // std::cout << " " << rad2deg(this->encoder_rpy(1));
   // std::cout << " " << rad2deg(this->encoder_rpy(2)) << std::endl;

@@ -1,7 +1,15 @@
 #!/bin/sh
 set -e
-ROS_DISTRO="kinetic"
+ROS_VERSION="kinetic"
 CATKIN_WS=$HOME/catkin_ws/
+
+check_user()
+{
+    if [[ $EUID -eq 0 ]]; then
+        echo "Do not run this script as root!"
+        exit 1
+    fi
+}
 
 install_sophus()
 {
@@ -59,15 +67,15 @@ install_dependencies()
         cmake \
         libeigen3-dev
 
-	install_sophus
-	install_fast
-	install_g2o
+    sudo bash -c "$(declare -f install_sophus); install_sophus"
+    sudo bash -c "$(declare -f install_fast); install_fast"
+    sudo bash -c "$(declare -f install_g2o); g2o"
 	install_vikit
 }
 
 install_svo()
 {
-    sudo apt-get install ros-$ROS_DISTRO-cmake-modules
+    sudo apt-get install ros-$ROS_VERSION-cmake-modules
     cd $CATKIN_WS/src
     if [ ! -d rpg_svo ]; then
         git clone https://github.com/uzh-rpg/rpg_svo.git
@@ -75,11 +83,11 @@ install_svo()
 
     # build svo
     cd $CATKIN_WS
-    source /opt/ros/kinetic/setup.bash
-    catkin_make
+    source /opt/ros/$ROS_VERSION/setup.bash
+    catkin build
 }
 
-
 # RUN
+check_user
 install_dependencies
 install_svo

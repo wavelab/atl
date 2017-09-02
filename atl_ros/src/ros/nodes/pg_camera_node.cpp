@@ -22,6 +22,7 @@ int PGCameraNode::configure(const int hz) {
     return -2;
   };
   this->camera.initialize(this->guid);
+  // this->camera.initialize();
 
   // register publisher and subscribers
   // clang-format off
@@ -49,7 +50,6 @@ int PGCameraNode::configure(const int hz) {
 }
 
 int PGCameraNode::publishImage() {
-  sensor_msgs::ImageConstPtr img_msg;
 
   // encode position and orientation into image (first 11 pixels in first row)
   if (this->stamp_image) {
@@ -82,14 +82,18 @@ int PGCameraNode::publishImage() {
     this->image.at<double>(0, 21) = this->quadrotor_orientation.z();
   }
 
-  // clang-format off
-  img_msg = cv_bridge::CvImage(
-    std_msgs::Header(),
-    "bgr8",
-    this->image
-  ).toImageMsg();
+  // publish image
+  std_msgs::Header header;
+  header.seq = this->ros_seq;
+  header.stamp = ros::Time::now();
+  header.frame_id = this->node_name;
+
+  sensor_msgs::ImageConstPtr img_msg = cv_bridge::CvImage(header,
+                                                          // "bgr8",
+                                                          "mono8",
+                                                          this->image)
+                                           .toImageMsg();
   this->img_pubs[this->image_topic].publish(img_msg);
-  // clang-format on
 
   return 0;
 }

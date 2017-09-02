@@ -646,24 +646,33 @@ int DC1394Camera::getFrame(cv::Mat &image) {
   }
 
   // convert mono 8 to colour
-  const size_t channels = 3;
+  bool debayer = false;
+  const size_t channels = (debayer) ? 3 : 1;
   const size_t img_size = frame->image_bytes * channels;
   const size_t img_rows = frame->size[1];
   const size_t img_cols = frame->size[0];
   const size_t row_bytes = img_size / img_rows;
 
+  // allocate memory for buffer
   if (this->buffer == nullptr) {
     this->buffer = (uint8_t *) malloc(img_size);
   }
-  dc1394_bayer_decoding_8bit(frame->image,
-                             this->buffer,
-                             img_cols,
-                             img_rows,
-                             DC1394_COLOR_FILTER_BGGR,
-                             DC1394_BAYER_METHOD_SIMPLE);
 
-  // convert to opencv mat
-  cv::Mat(img_rows, img_cols, CV_8UC3, this->buffer, row_bytes).copyTo(image);
+  // decode bayer image
+  if (debayer) {
+    dc1394_bayer_decoding_8bit(frame->image,
+                               this->buffer,
+                               img_cols,
+                               img_rows,
+                               DC1394_COLOR_FILTER_BGGR,
+                               DC1394_BAYER_METHOD_SIMPLE);
+    // convert to opencv mat
+    cv::Mat(img_rows, img_cols, CV_8UC3, this->buffer, row_bytes).copyTo(image);
+
+  } else {
+    // convert to opencv mat
+    cv::Mat(img_rows, img_cols, CV_8UC1, frame->image, row_bytes).copyTo(image);
+  }
 
   // release frame
   err = dc1394_capture_enqueue(this->capture, frame);

@@ -12,10 +12,11 @@
 #include "atl/ros/utils/node.hpp"
 
 // NODE SETTINGS
-static const double NODE_RATE = 100;
+static const double NODE_RATE = 20;
+// static const double NODE_RATE = 4;
 
 // PUBLISH TOPICS
-static const std::string CAMERA_IMAGE_TOPIC = "/atl/camera/image";
+static const std::string CAMERA_IMAGE_TOPIC = "/atl/static_camera/image";
 
 // SUBSCRIBE TOPICS
 // clang-format off

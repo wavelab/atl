@@ -56,10 +56,20 @@ int CameraNode::publishImage() {
   // }
 
   // clang-format off
+  cv::Mat gray_image;
+  cv::cvtColor(this->image, gray_image, CV_BGR2GRAY);
+
+  std_msgs::Header header;
+  header.seq = this->ros_seq;
+  header.stamp = ros::Time::now();
+  header.frame_id = this->node_name;
+
   img_msg = cv_bridge::CvImage(
-    std_msgs::Header(),
-    "bgr8",
-    this->image
+    header,
+    // "bgr8",
+    // this->image
+    "mono8",
+    gray_image
   ).toImageMsg();
   this->img_pubs[CAMERA_IMAGE_TOPIC].publish(img_msg);
   // clang-format on

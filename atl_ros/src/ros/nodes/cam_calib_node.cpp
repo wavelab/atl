@@ -76,7 +76,13 @@ void CamCalibNode::imageMsgToCvMat(const sensor_msgs::ImageConstPtr &msg,
   size_t img_rows = image_ptr->image.rows;
   size_t img_cols = image_ptr->image.cols;
   size_t row_bytes = img_size / img_rows;
-  cv::Mat(img_rows, img_cols, CV_8UC3, image_ptr->image.data, row_bytes)
+
+  // BGR8
+  // cv::Mat(img_rows, img_cols, CV_8UC3, image_ptr->image.data, row_bytes)
+  //     .copyTo(img);
+
+  // MONO8
+  cv::Mat(img_rows, img_cols, CV_8UC1, image_ptr->image.data, row_bytes)
       .copyTo(img);
 }
 
