@@ -3,11 +3,16 @@ image_width: 640
 image_height: 480
 
 # indoors
-shutter_speed: 300.0
+shutter_speed: 400.0
 exposure_value: 500
-gain_value: 3500.0
+gain_value: 3800.0
 
-# before sun down
+# # sunny
+# shutter_speed: 10.0
+# exposure_value: 200
+# gain_value: 100.0
+
+# # before sun down
 # shutter_speed: 50.0
 # exposure_value: 550
 # gain_value: 300.0

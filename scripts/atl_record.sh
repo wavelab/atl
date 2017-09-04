@@ -29,9 +29,14 @@
 rosbag record \
     /atl/quadrotor/pose/local \
     /atl/quadrotor/velocity/local \
-    /atl/camera/image/compressed \
+    /atl/gimbal_camera/image/compressed \
+    /dji_sdk/flight_control_info \
+    /dji_sdk/flight_status \
+    /dji_sdk/rc_channels \
+    /dji_sdk/time_stamp \
     /dji_sdk/local_position \
     /dji_sdk/global_position \
     /dji_sdk/attitude_quaternion \
     /dji_sdk/compass \
-    /dji_sdk/velocity
+    /dji_sdk/velocity \
+    /dji_sdk/acceleration
