@@ -5,14 +5,14 @@ namespace atl {
 int DC1394Camera::connect(uint64_t guid) {
   dc1394error_t error;
 
-  // connect to DC1394
+  // Connect to DC1394
   this->dc1394 = dc1394_new();
   if (!this->dc1394) {
     LOG_ERROR("Failed to initialize DC1394 interface!");
     return -1;
   }
 
-  // enumerate camera
+  // Enumerate camera
   dc1394camera_list_t *list;
   error = dc1394_camera_enumerate(this->dc1394, &list);
   if (error != DC1394_SUCCESS) {
@@ -34,7 +34,7 @@ int DC1394Camera::connect(uint64_t guid) {
     std::cout << std::endl;
   }
 
-  // connect to camera
+  // Connect to camera
   guid = (guid == 0) ? list->ids[0].guid : guid;
   this->capture = dc1394_camera_new(this->dc1394, guid);
   if (!this->capture) {
@@ -50,12 +50,12 @@ int DC1394Camera::connect(uint64_t guid) {
 int DC1394Camera::initialize(uint64_t guid) {
   dc1394error_t error;
 
-  // connect
+  // Connect
   if (this->connect(guid) != 0) {
     return -1;
   }
 
-  // operation mode - FireWire IEEE 1394a or 1394b
+  // Operation mode - FireWire IEEE 1394a or 1394b
   error = dc1394_video_set_operation_mode(this->capture,
                                           DC1394_OPERATION_MODE_LEGACY);
   if (error != DC1394_SUCCESS) {
@@ -63,14 +63,14 @@ int DC1394Camera::initialize(uint64_t guid) {
     return -1;
   }
 
-  // capture settings
+  // Capture settings
   error = dc1394_capture_setup(this->capture, 4, DC1394_CAPTURE_FLAGS_DEFAULT);
   if (error != DC1394_SUCCESS) {
     LOG_ERROR("Failed to configure camera!");
     return -1;
   }
 
-  // trigger mode
+  // Trigger mode
   // if (this->activateSoftwareTriggeringMode() != 0) {
   //   LOG_ERROR("Failed to activate software trigging!");
   //   return -1;
@@ -80,40 +80,40 @@ int DC1394Camera::initialize(uint64_t guid) {
     return -1;
   }
 
-  // video mode
+  // Video mode
   error = dc1394_video_set_mode(this->capture, DC1394_VIDEO_MODE_640x480_MONO8);
   if (error != DC1394_SUCCESS) {
     LOG_ERROR("Failed to set video mode!");
     return -1;
   }
 
-  // iso speed
+  // ISO speed
   error = dc1394_video_set_iso_speed(this->capture, DC1394_ISO_SPEED_400);
   if (error != DC1394_SUCCESS) {
     LOG_ERROR("Failed to set iso speed!");
     return -1;
   }
 
-  // frame rate
+  // Frame rate
   this->setFrameRate(60);
 
-  // exposure
+  // Exposure
   this->setExposure(this->config.exposure_value);
 
-  // shutter
+  // Shutter
   this->setShutter(this->config.shutter_speed);
 
-  // gain
+  // Gain
   this->setGain(this->config.gain_value);
 
-  // start transmission
+  // Start transmission
   error = dc1394_video_set_transmission(this->capture, DC1394_ON);
   if (error != DC1394_SUCCESS) {
     LOG_ERROR("Failed to start camera transmission!");
     return -1;
   }
 
-  // update
+  // Update
   LOG_INFO("Camera initialized!");
   this->initialized = true;
 
@@ -121,12 +121,12 @@ int DC1394Camera::initialize(uint64_t guid) {
 }
 
 int DC1394Camera::changeMode(const std::string &mode) {
-  // pre-check
+  // Pre-check
   if (this->configs.find(mode) == this->configs.end()) {
     return -1;
   }
 
-  // update camera settings
+  // Update camera settings
   this->config = this->configs[mode];
 
   return 0;
@@ -157,7 +157,7 @@ void DC1394Camera::printFrameInfo(dc1394video_frame_t *frame) {
 int DC1394Camera::setTriggerMode(const int trigger_mode) {
   dc1394error_t err;
 
-  // convert trigger mode from int to dc1394trigger_mode_t
+  // Convert trigger mode from int to dc1394trigger_mode_t
   dc1394trigger_mode_t mode_value;
   if (trigger_mode == 0) {
     mode_value = DC1394_TRIGGER_MODE_0;
@@ -180,7 +180,7 @@ int DC1394Camera::setTriggerMode(const int trigger_mode) {
     return -1;
   }
 
-  // set trigger mode
+  // Set trigger mode
   err = dc1394_external_trigger_set_mode(this->capture, mode_value);
   if (err != DC1394_SUCCESS) {
     LOG_ERROR("Could not set trigger mode!");
@@ -193,7 +193,7 @@ int DC1394Camera::setTriggerMode(const int trigger_mode) {
 int DC1394Camera::setTriggerSource(const int trigger_source) {
   dc1394trigger_source_t source_value;
 
-  // convert trigger source from int to dc1394trigger_source_t
+  // Convert trigger source from int to dc1394trigger_source_t
   if (trigger_source == 0) {
     source_value = DC1394_TRIGGER_SOURCE_0;
   } else if (trigger_source == 1) {
@@ -206,7 +206,7 @@ int DC1394Camera::setTriggerSource(const int trigger_source) {
     source_value = DC1394_TRIGGER_SOURCE_SOFTWARE;
   }
 
-  // set trigger source
+  // Set trigger source
   dc1394error_t err;
   err = dc1394_external_trigger_set_source(this->capture, source_value);
   if (err != DC1394_SUCCESS) {
@@ -218,7 +218,7 @@ int DC1394Camera::setTriggerSource(const int trigger_source) {
 }
 
 int DC1394Camera::setExternalTriggering(const bool activate) {
-  // set external trigger
+  // Set external trigger
   const dc1394switch_t state = (activate) ? DC1394_ON : DC1394_OFF;
 
   dc1394error_t err;
@@ -237,7 +237,7 @@ int DC1394Camera::setExternalTriggering(const bool activate) {
 int DC1394Camera::setBrightness(const double brightness) {
   dc1394error_t err;
 
-  // turn on the feature - dont know what this means??
+  // Turn on the feature - dont know what this means??
   err = dc1394_feature_set_power(this->capture,
                                  DC1394_FEATURE_BRIGHTNESS,
                                  DC1394_ON);
@@ -246,7 +246,7 @@ int DC1394Camera::setBrightness(const double brightness) {
     return -1;
   }
 
-  // turn off auto exposure
+  // Turn off auto exposure
   err = dc1394_feature_set_mode(this->capture,
                                 DC1394_FEATURE_BRIGHTNESS,
                                 DC1394_FEATURE_MODE_MANUAL);
@@ -255,7 +255,7 @@ int DC1394Camera::setBrightness(const double brightness) {
     return -1;
   }
 
-  // set brightness
+  // Set brightness
   err = dc1394_feature_set_value(this->capture,
                                  DC1394_FEATURE_BRIGHTNESS,
                                  brightness);
@@ -270,7 +270,7 @@ int DC1394Camera::setBrightness(const double brightness) {
 int DC1394Camera::setFrameRate(const double fps) {
   dc1394framerate_t framerate;
 
-  // convert fps to dc1394 framerate type
+  // Convert fps to dc1394 framerate type
   if (fltcmp(fps, 1.875) == 0) {
     framerate = DC1394_FRAMERATE_1_875;
   } else if (fltcmp(fps, 3.75) == 0) {
@@ -292,7 +292,7 @@ int DC1394Camera::setFrameRate(const double fps) {
     return -1;
   }
 
-  // set camera frame rate
+  // Set camera frame rate
   dc1394error_t err = dc1394_video_set_framerate(this->capture, framerate);
   if (err != DC1394_SUCCESS) {
     LOG_ERROR("Failed to set frame rate!");
@@ -305,7 +305,7 @@ int DC1394Camera::setFrameRate(const double fps) {
 int DC1394Camera::setExposure(const double exposure) {
   dc1394error_t err;
 
-  // turn on the exposure feature
+  // Turn on the exposure feature
   err = dc1394_feature_set_power(this->capture,
                                  DC1394_FEATURE_EXPOSURE,
                                  DC1394_ON);
@@ -314,7 +314,7 @@ int DC1394Camera::setExposure(const double exposure) {
     return -1;
   }
 
-  // turn off auto exposure
+  // Turn off auto exposure
   err = dc1394_feature_set_mode(this->capture,
                                 DC1394_FEATURE_EXPOSURE,
                                 DC1394_FEATURE_MODE_MANUAL);
@@ -323,7 +323,7 @@ int DC1394Camera::setExposure(const double exposure) {
     return -1;
   }
 
-  // set exposure
+  // Set exposure
   err = dc1394_feature_set_value(this->capture,
                                  DC1394_FEATURE_EXPOSURE,
                                  exposure);
@@ -338,7 +338,7 @@ int DC1394Camera::setExposure(const double exposure) {
 int DC1394Camera::setShutter(const double shutter_ms) {
   dc1394error_t err;
 
-  // turn on the shutter feature
+  // Turn on the shutter feature
   err = dc1394_feature_set_power(this->capture,
                                  DC1394_FEATURE_SHUTTER,
                                  DC1394_ON);
@@ -347,7 +347,7 @@ int DC1394Camera::setShutter(const double shutter_ms) {
     return -1;
   }
 
-  // turn off auto shutter
+  // Turn off auto shutter
   err = dc1394_feature_set_mode(this->capture,
                                 DC1394_FEATURE_SHUTTER,
                                 DC1394_FEATURE_MODE_MANUAL);
@@ -356,7 +356,7 @@ int DC1394Camera::setShutter(const double shutter_ms) {
     return -1;
   }
 
-  // set shutter
+  // Set shutter
   err = dc1394_feature_set_value(this->capture,
                                  DC1394_FEATURE_SHUTTER,
                                  shutter_ms);
@@ -371,14 +371,14 @@ int DC1394Camera::setShutter(const double shutter_ms) {
 int DC1394Camera::setGain(const double gain_db) {
   dc1394error_t err;
 
-  // turn on the gain feature
+  // Turn on the gain feature
   err = dc1394_feature_set_power(this->capture, DC1394_FEATURE_GAIN, DC1394_ON);
   if (err != DC1394_SUCCESS) {
     LOG_ERROR("Could not turn on the gain feature!");
     return -1;
   }
 
-  // turn off auto gain
+  // Turn off auto gain
   err = dc1394_feature_set_mode(this->capture,
                                 DC1394_FEATURE_GAIN,
                                 DC1394_FEATURE_MODE_MANUAL);
@@ -387,7 +387,7 @@ int DC1394Camera::setGain(const double gain_db) {
     return -1;
   }
 
-  // set gain
+  // Set gain
   err = dc1394_feature_set_value(this->capture, DC1394_FEATURE_GAIN, gain_db);
   if (err != DC1394_SUCCESS) {
     LOG_ERROR("Could not set gain!");
@@ -400,7 +400,7 @@ int DC1394Camera::setGain(const double gain_db) {
 int DC1394Camera::getTriggerMode(int &trigger_mode) {
   dc1394error_t err;
 
-  // get trigger mode
+  // Get trigger mode
   dc1394trigger_mode_t mode_value;
   err = dc1394_external_trigger_get_mode(this->capture, &mode_value);
   if (err != DC1394_SUCCESS) {
@@ -430,7 +430,7 @@ int DC1394Camera::getTriggerMode(int &trigger_mode) {
 }
 
 int DC1394Camera::getTriggerSource(int &trigger_source) {
-  // get trigger source
+  // Get trigger source
   dc1394error_t err;
   dc1394trigger_source_t source_value;
   err = dc1394_external_trigger_get_source(this->capture, &source_value);
@@ -439,7 +439,7 @@ int DC1394Camera::getTriggerSource(int &trigger_source) {
     return -1;
   }
 
-  // convert trigger source from dc1394trigger_source_t to int
+  // Convert trigger source from dc1394trigger_source_t to int
   if (source_value == DC1394_TRIGGER_SOURCE_0) {
     trigger_source = 0;
   } else if (source_value == DC1394_TRIGGER_SOURCE_1) {
@@ -456,7 +456,7 @@ int DC1394Camera::getTriggerSource(int &trigger_source) {
 }
 
 int DC1394Camera::getExternalTriggering(bool &activate) {
-  // get external triggering state
+  // Get external triggering state
   dc1394switch_t state;
   dc1394error_t err;
 
@@ -466,7 +466,7 @@ int DC1394Camera::getExternalTriggering(bool &activate) {
     return -1;
   }
 
-  // convert external triggering state to bool
+  // Convert external triggering state to bool
   activate = (state == DC1394_ON) ? true : false;
 
   return 0;
@@ -475,7 +475,7 @@ int DC1394Camera::getExternalTriggering(bool &activate) {
 int DC1394Camera::getBrightness(double &brightness) {
   dc1394error_t err;
 
-  // turn on the brightness feature
+  // Turn on the brightness feature
   err = dc1394_feature_set_power(this->capture,
                                  DC1394_FEATURE_BRIGHTNESS,
                                  DC1394_ON);
@@ -484,7 +484,7 @@ int DC1394Camera::getBrightness(double &brightness) {
     return -1;
   }
 
-  // get brightness value
+  // Get brightness value
   uint32_t value;
   err = dc1394_feature_get_value(this->capture,
                                  DC1394_FEATURE_BRIGHTNESS,
@@ -501,14 +501,14 @@ int DC1394Camera::getBrightness(double &brightness) {
 int DC1394Camera::getFrameRate(double &fps) {
   dc1394framerate_t framerate;
 
-  // get camera frame rate
+  // Get camera frame rate
   dc1394error_t err = dc1394_video_get_framerate(this->capture, &framerate);
   if (err != DC1394_SUCCESS) {
     LOG_ERROR("Failed to get frame rate!");
     return -1;
   }
 
-  // convert fps to dc1394 framerate type
+  // Convert fps to dc1394 framerate type
   if (framerate == DC1394_FRAMERATE_1_875) {
     fps = 1.875;
   } else if (framerate == DC1394_FRAMERATE_3_75) {
@@ -536,7 +536,7 @@ int DC1394Camera::getFrameRate(double &fps) {
 int DC1394Camera::getExposure(double &exposure) {
   dc1394error_t err;
 
-  // turn on the exposure feature
+  // Turn on the exposure feature
   err = dc1394_feature_set_power(this->capture,
                                  DC1394_FEATURE_EXPOSURE,
                                  DC1394_ON);
@@ -545,7 +545,7 @@ int DC1394Camera::getExposure(double &exposure) {
     return -1;
   }
 
-  // get exposure value
+  // Get exposure value
   uint32_t value;
   err =
       dc1394_feature_get_value(this->capture, DC1394_FEATURE_EXPOSURE, &value);
@@ -561,7 +561,7 @@ int DC1394Camera::getExposure(double &exposure) {
 int DC1394Camera::getShutter(double &shutter_ms) {
   dc1394error_t err;
 
-  // turn on the exposure feature
+  // Turn on the exposure feature
   err = dc1394_feature_set_power(this->capture,
                                  DC1394_FEATURE_SHUTTER,
                                  DC1394_ON);
@@ -570,7 +570,7 @@ int DC1394Camera::getShutter(double &shutter_ms) {
     return -1;
   }
 
-  // get shutter value
+  // Get shutter value
   uint32_t value;
   err = dc1394_feature_get_value(this->capture, DC1394_FEATURE_SHUTTER, &value);
   if (err != DC1394_SUCCESS) {
@@ -585,13 +585,13 @@ int DC1394Camera::getShutter(double &shutter_ms) {
 int DC1394Camera::getGain(double &gain_db) {
   dc1394error_t err;
 
-  // turn on the gain feature
+  // Turn on the gain feature
   err = dc1394_feature_set_power(this->capture, DC1394_FEATURE_GAIN, DC1394_ON);
   if (err != DC1394_SUCCESS) {
     LOG_ERROR("Could not turn on gain feature!");
   }
 
-  // get shutter value
+  // Get shutter value
   uint32_t value;
   err = dc1394_feature_get_value(this->capture, DC1394_FEATURE_GAIN, &value);
   if (err != DC1394_SUCCESS) {
@@ -602,22 +602,54 @@ int DC1394Camera::getGain(double &gain_db) {
   return 0;
 }
 
+int DC1394Camera::postprocessImage(cv::Mat &image,
+                                   const dc1394video_frame_t *frame) {
+  const size_t channels = (this->config.image_type == "bgr8") ? 3 : 1;
+  const size_t img_size = frame->image_bytes * channels;
+  const size_t img_rows = frame->size[1];
+  const size_t img_cols = frame->size[0];
+  const size_t row_bytes = img_size / img_rows;
+
+  // Allocate memory for buffer
+  if (this->buffer == nullptr) {
+    this->buffer = (uint8_t *) malloc(img_size);
+  }
+
+  // Decode bayer image
+  if (this->config.image_type == "bgr8") {
+    dc1394_bayer_decoding_8bit(frame->image,
+                               this->buffer,
+                               img_cols,
+                               img_rows,
+                               DC1394_COLOR_FILTER_BGGR,
+                               DC1394_BAYER_METHOD_SIMPLE);
+    // Convert to opencv mat
+    cv::Mat(img_rows, img_cols, CV_8UC3, this->buffer, row_bytes).copyTo(image);
+
+  } else {
+    // Convert to opencv mat
+    cv::Mat(img_rows, img_cols, CV_8UC1, frame->image, row_bytes).copyTo(image);
+  }
+
+  return 0;
+}
+
 int DC1394Camera::getFrame(cv::Mat &image) {
   dc1394error_t err;
 
-  // before calling dc1394_capture_dequeue(), wait for data to be available
+  // Before calling dc1394_capture_dequeue(), wait for data to be available
   // using poll() since the former does not block. This allows a timeout so the
   // process does not hang forever if the capture is not ready (e.g. in
   // external trigger mode).
   //
-  // tldr: block until ready to capture, timeout, or error
+  // TLDR: block until ready to capture, timeout, or error
   pollfd poll_info;
   poll_info.fd = dc1394_capture_get_fileno(this->capture);
   poll_info.events = POLLIN;
   const int timeout_milliseconds = 10000;
   const int poll_result = poll(&poll_info, 1, timeout_milliseconds);
 
-  // capture frame
+  // Capture frame
   dc1394video_frame_t *frame = nullptr;
   if (poll_result > 0 && poll_info.revents == POLLIN) {
     err = dc1394_capture_dequeue(this->capture,
@@ -645,36 +677,19 @@ int DC1394Camera::getFrame(cv::Mat &image) {
     return -1;
   }
 
-  // convert mono 8 to colour
-  bool debayer = false;
-  const size_t channels = (debayer) ? 3 : 1;
-  const size_t img_size = frame->image_bytes * channels;
-  const size_t img_rows = frame->size[1];
-  const size_t img_cols = frame->size[0];
-  const size_t row_bytes = img_size / img_rows;
-
-  // allocate memory for buffer
-  if (this->buffer == nullptr) {
-    this->buffer = (uint8_t *) malloc(img_size);
+  // Postprocess image
+  if (this->postprocessImage(image, frame) != 0) {
+    LOG_ERROR("Failed to postprocess image!");
+    return -1;
   }
 
-  // decode bayer image
-  if (debayer) {
-    dc1394_bayer_decoding_8bit(frame->image,
-                               this->buffer,
-                               img_cols,
-                               img_rows,
-                               DC1394_COLOR_FILTER_BGGR,
-                               DC1394_BAYER_METHOD_SIMPLE);
-    // convert to opencv mat
-    cv::Mat(img_rows, img_cols, CV_8UC3, this->buffer, row_bytes).copyTo(image);
-
-  } else {
-    // convert to opencv mat
-    cv::Mat(img_rows, img_cols, CV_8UC1, frame->image, row_bytes).copyTo(image);
+  // Crop image to ROI
+  if (this->roiImage(image) != 0) {
+    LOG_ERROR("Failed to ROI image!");
+    return -1;
   }
 
-  // release frame
+  // Release frame
   err = dc1394_capture_enqueue(this->capture, frame);
   if (err != DC1394_SUCCESS) {
     LOG_ERROR("Failed to release frame buffer!");
@@ -687,19 +702,19 @@ int DC1394Camera::getFrame(cv::Mat &image) {
 int DC1394Camera::activateSoftwareTriggeringMode() {
   int retval = 0;
 
-  // trigger mode
+  // Trigger mode
   retval = this->setTriggerMode(0);
   if (retval != 0) {
     return -1;
   }
 
-  // trigger source
+  // Trigger source
   retval = this->setTriggerSource(4);
   if (retval != 0) {
     return -1;
   }
 
-  // activate external triggering
+  // Activate external triggering
   retval = this->setExternalTriggering(true);
   if (retval != 0) {
     return -1;
@@ -711,19 +726,19 @@ int DC1394Camera::activateSoftwareTriggeringMode() {
 int DC1394Camera::activateDefaultTriggeringMode() {
   int retval = 0;
 
-  // trigger mode
+  // Trigger mode
   retval = this->setTriggerMode(3);
   if (retval != 0) {
     return -1;
   }
 
-  // trigger source
+  // Trigger source
   retval = this->setTriggerSource(0);
   if (retval != 0) {
     return -1;
   }
 
-  // activate external triggering
+  // Activate external triggering
   retval = this->setExternalTriggering(false);
   if (retval != 0) {
     return -1;
@@ -747,14 +762,14 @@ int DC1394Camera::run() {
   int frame_count;
   double last_tic;
 
-  // pre-check
+  // Pre-check
   if (this->configured == false) {
     return -1;
   } else if (this->initialized == false) {
     return -2;
   }
 
-  // setup
+  // Setup
   frame_count = 0;
   last_tic = time_now();
 

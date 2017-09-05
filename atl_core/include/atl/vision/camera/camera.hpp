@@ -66,6 +66,14 @@ public:
   virtual int changeMode(const std::string &mode);
 
   /**
+   * ROI Image
+   * @returns
+   *    - 0 for success
+   *    - -1 for failure
+   */
+  virtual int roiImage(cv::Mat &image);
+
+  /**
    * Get camera frame
    *
    *

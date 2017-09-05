@@ -1,5 +1,5 @@
-#include "atl/atl_test.hpp"
 #include "atl/control/landing_controller.hpp"
+#include "atl/atl_test.hpp"
 
 #define TEST_CONFIG "tests/configs/control/landing_controller.yaml"
 

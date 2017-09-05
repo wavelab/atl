@@ -1,6 +1,6 @@
+#include "atl/vision/apriltag/michigan.hpp"
 #include "atl/atl_test.hpp"
 #include "atl/vision/camera/camera.hpp"
-#include "atl/vision/apriltag/michigan.hpp"
 
 namespace atl {
 

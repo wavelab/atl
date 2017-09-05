@@ -1,6 +1,7 @@
 index: 0
 image_width: 160
 image_height: 120
+image_type: "bgr8"
 
 shutter_speed: 350
 exposure_value: 1.0

@@ -1,11 +1,17 @@
 index: 0
 image_width: 640
 image_height: 480
+image_type: "mono8"
+
+# roi
+roi: true
+roi_width: 500
+roi_height: 400
 
 # indoors
-shutter_speed: 300.0
-exposure_value: 500
-gain_value: 3500.0
+shutter_speed: 500.0
+exposure_value: 500.0
+gain_value: 3600.0
 
 # before sun down
 # shutter_speed: 50.0

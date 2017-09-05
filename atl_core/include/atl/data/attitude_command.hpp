@@ -1,8 +1,8 @@
 #ifndef ATL_DATA_ATTITUDE_COMMAND_HPP
 #define ATL_DATA_ATTITUDE_COMMAND_HPP
 
-#include "atl/utils/utils.hpp"
 #include "atl/data/transform.hpp"
+#include "atl/utils/utils.hpp"
 
 namespace atl {
 

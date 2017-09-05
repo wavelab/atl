@@ -10,6 +10,11 @@ int CameraConfig::load(const std::string &config_file) {
   parser.addParam("index", &this->index);
   parser.addParam("image_width", &this->image_width);
   parser.addParam("image_height", &this->image_height);
+  parser.addParam("image_type", &this->image_type, true);
+
+  parser.addParam("roi", &this->roi, true);
+  parser.addParam("roi_width", &this->roi_width, true);
+  parser.addParam("roi_height", &this->roi_height, true);
 
   parser.addParam("shutter_speed", &this->shutter_speed, true);
   parser.addParam("exposure_value", &this->exposure_value, true);

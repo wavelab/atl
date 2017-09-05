@@ -113,6 +113,28 @@ int Camera::changeMode(const std::string &mode) {
   return 0;
 }
 
+int Camera::roiImage(cv::Mat &image) {
+  if (this->config.roi == false) {
+    return 0;
+  }
+
+  // Crop image to ROI
+  const int roi_width = this->config.roi_width;
+  const int roi_height = this->config.roi_height;
+  const int cx = this->config.camera_matrix.at<double>(0, 2);
+  const int cy = this->config.camera_matrix.at<double>(1, 2);
+  const Vec2 top_left{cx - roi_width / 2.0, cy - roi_height / 2.0};
+  cv::Rect roi(top_left(0), top_left(1), roi_width, roi_height);
+
+  if (roi_width <= 0 || roi_height <= 0) {
+    return -1;
+  } else {
+    image = image(roi);
+  }
+
+  return 0;
+}
+
 int Camera::getFrame(cv::Mat &image) {
   // pre-check
   if (this->configured == false) {

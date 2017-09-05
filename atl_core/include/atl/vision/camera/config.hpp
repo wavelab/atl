@@ -18,6 +18,11 @@ public:
   int index = 0;
   int image_width = 0;
   int image_height = 0;
+  std::string image_type = "bgr8";
+
+  bool roi = false;
+  int roi_width = 0;
+  int roi_height = 0;
 
   float shutter_speed = 0.0;
   float exposure_value = 0.0;

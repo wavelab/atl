@@ -8,10 +8,10 @@
 #include <math.h>
 #include <sys/time.h>
 
+#include <opencv2/calib3d/calib3d.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/calib3d/calib3d.hpp>
 
 #include "atl/utils/utils.hpp"
 #include "atl/vision/apriltag/data.hpp"

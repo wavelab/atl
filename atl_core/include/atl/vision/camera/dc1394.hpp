@@ -2,8 +2,8 @@
 #define ATL_CORE_VISION_CAMERA_DC1394_HPP
 
 #include <inttypes.h>
-#include <stdio.h>
 #include <poll.h>
+#include <stdio.h>
 
 #include <dc1394/dc1394.h>
 
@@ -258,6 +258,14 @@ public:
    * @return 0 for success, -1 for failure
    */
   int getGain(double &gain_db);
+
+  /**
+   * Postprocess image
+   *
+   * @param image Image
+   * @return 0 for success, -1 for failure
+   */
+  int postprocessImage(cv::Mat &image, const dc1394video_frame_t *frame);
 
   /**
    * Get frame

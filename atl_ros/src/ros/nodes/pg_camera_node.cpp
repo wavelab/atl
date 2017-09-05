@@ -88,11 +88,9 @@ int PGCameraNode::publishImage() {
   header.stamp = ros::Time::now();
   header.frame_id = this->node_name;
 
-  sensor_msgs::ImageConstPtr img_msg = cv_bridge::CvImage(header,
-                                                          // "bgr8",
-                                                          "mono8",
-                                                          this->image)
-                                           .toImageMsg();
+  const std::string image_type = this->camera.config.image_type;
+  const sensor_msgs::ImageConstPtr img_msg =
+      cv_bridge::CvImage(header, image_type, this->image).toImageMsg();
   this->img_pubs[this->image_topic].publish(img_msg);
 
   return 0;
