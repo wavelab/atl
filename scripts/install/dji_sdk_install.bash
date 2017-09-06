@@ -28,7 +28,7 @@ install_ros_sdk()
     mkdir -p $CATKIN_PATH/src
     cd $CATKIN_PATH/src
     if [ ! -d $CATKIN_PATH/src/Onboard-SDK-ROS ]; then
-        sudo git clone $ROS_SDK_REPO_URL
+        git clone $ROS_SDK_REPO_URL
     fi
 }
 
