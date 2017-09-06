@@ -604,7 +604,7 @@ int DC1394Camera::getGain(double &gain_db) {
 
 int DC1394Camera::postprocessImage(cv::Mat &image,
                                    const dc1394video_frame_t *frame) {
-  const size_t channels = (this->config.image_type == "bgr8") ? 3 : 1;
+  const size_t channels = 3;
   const size_t img_size = frame->image_bytes * channels;
   const size_t img_rows = frame->size[1];
   const size_t img_cols = frame->size[0];
@@ -616,19 +616,19 @@ int DC1394Camera::postprocessImage(cv::Mat &image,
   }
 
   // Decode bayer image
-  if (this->config.image_type == "bgr8") {
-    dc1394_bayer_decoding_8bit(frame->image,
-                               this->buffer,
-                               img_cols,
-                               img_rows,
-                               DC1394_COLOR_FILTER_BGGR,
-                               DC1394_BAYER_METHOD_SIMPLE);
-    // Convert to opencv mat
-    cv::Mat(img_rows, img_cols, CV_8UC3, this->buffer, row_bytes).copyTo(image);
+  dc1394_bayer_decoding_8bit(frame->image,
+                             this->buffer,
+                             img_cols,
+                             img_rows,
+                             DC1394_COLOR_FILTER_BGGR,
+                             DC1394_BAYER_METHOD_SIMPLE);
+  cv::Mat(img_rows, img_cols, CV_8UC3, this->buffer, row_bytes).copyTo(image);
 
-  } else {
-    // Convert to opencv mat
-    cv::Mat(img_rows, img_cols, CV_8UC1, frame->image, row_bytes).copyTo(image);
+  // Convert to grayscale
+  if (this->config.image_type == "mono8") {
+    cv::Mat gray_image;
+    cv::cvtColor(image, gray_image, CV_BGR2GRAY);
+    gray_image.copyTo(image);
   }
 
   return 0;

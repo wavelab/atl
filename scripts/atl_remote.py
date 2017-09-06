@@ -121,6 +121,9 @@ if __name__ == "__main__":
     # world = World()
     rospy.sleep(1.0)
 
+    # quad.set_arm(True)
+    quad.set_mode("WAYPOINT_MODE")
+
     # # gimbal.activate(True)
     # # gimbal.set_attitude([0, deg2rad(-90.0), 0])
     # gimbal.activate(False)
