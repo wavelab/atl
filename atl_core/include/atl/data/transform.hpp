@@ -197,6 +197,15 @@ public:
 };
 
 /**
+ * Transform from ENU to NWU
+ */
+// clang-format off
+const Transform T_nwu_enu{(Mat4() << 0.0, 1.0, 0.0, 0.0,
+                                     -1.0, 0.0, 0.0, 0.0,
+                                     0.0, 0.0, 1.0, 0.0,
+                                     0.0, 0.0, 0.0, 1.0).finished()};
+
+/**
  * Transform from NED to NWU
  */
 // clang-format off
