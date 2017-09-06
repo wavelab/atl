@@ -27,6 +27,7 @@ FIND_PACKAGE(
 )
 FIND_PACKAGE(OpenCV REQUIRED)
 FIND_PACKAGE(Boost REQUIRED)
+FIND_PACKAGE(DJIOSDK REQUIRED)
 
 # INCLUDES
 INCLUDE_DIRECTORIES(include)
@@ -63,6 +64,7 @@ SET(
     ATL_ROS_DEPS
     atl_ros_utils
     atl_core
+    ${DJIOSDK_LIBRARIES}
     m3api
     flycapture
     dc1394
@@ -86,9 +88,9 @@ ADD_EXECUTABLE(atl_camera_node src/ros/nodes/camera_node.cpp)
 TARGET_LINK_LIBRARIES(atl_camera_node ${ATL_ROS_DEPS})
 ADD_DEPENDENCIES(atl_camera_node atl_ros_utils)
 
-# ADD_EXECUTABLE(atl_control_node src/ros/nodes/control_node.cpp)
-# TARGET_LINK_LIBRARIES(atl_control_node ${ATL_ROS_DEPS})
-# ADD_DEPENDENCIES(atl_control_node atl_ros_utils)
+ADD_EXECUTABLE(atl_control_node src/ros/nodes/control_node.cpp)
+TARGET_LINK_LIBRARIES(atl_control_node ${ATL_ROS_DEPS})
+ADD_DEPENDENCIES(atl_control_node atl_ros_utils)
 
 ADD_EXECUTABLE(atl_estimator_node src/ros/nodes/estimator_node.cpp)
 TARGET_LINK_LIBRARIES(atl_estimator_node ${ATL_ROS_DEPS})

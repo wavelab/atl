@@ -12,7 +12,6 @@ int ControlNode::configure(const int hz) {
 
   // quadrotor
   ROS_GET_PARAM(this->node_name + "/config_dir", config_path);
-  this->dji = new DJIDrone(*this->ros_nh);
   if (this->quadrotor.configure(config_path) != 0) {
     ROS_ERROR(FCONFQUAD);
     return -2;
@@ -27,14 +26,14 @@ int ControlNode::configure(const int hz) {
 
   // subscribers
   // clang-format off
-  this->addSubscriber(DJI_GPS_POSITION_TOPIC, &ControlNode::globalPositionCallback, this);
-  this->addSubscriber(DJI_LOCAL_POSITION_TOPIC, &ControlNode::localPositionCallback, this);
-  this->addSubscriber(DJI_ATTITUDE_TOPIC, &ControlNode::attitudeCallback, this);
-  this->addSubscriber(DJI_VELOCITY_TOPIC, &ControlNode::velocityCallback, this);
-  this->addSubscriber(DJI_RADIO_TOPIC, &ControlNode::radioCallback, this);
+  // this->addSubscriber(DJI_GPS_POSITION_TOPIC, &ControlNode::globalPositionCallback, this);
+  // this->addSubscriber(DJI_LOCAL_POSITION_TOPIC, &ControlNode::localPositionCallback, this);
+  // this->addSubscriber(DJI_ATTITUDE_TOPIC, &ControlNode::attitudeCallback, this);
+  // this->addSubscriber(DJI_VELOCITY_TOPIC, &ControlNode::velocityCallback, this);
+  // this->addSubscriber(DJI_RADIO_TOPIC, &ControlNode::radioCallback, this);
 
-  this->addSubscriber(ARM_TOPIC, &ControlNode::armCallback, this);
-  this->addSubscriber(MODE_TOPIC, &ControlNode::modeCallback, this);
+  // this->addSubscriber(ARM_TOPIC, &ControlNode::armCallback, this);
+  // this->addSubscriber(MODE_TOPIC, &ControlNode::modeCallback, this);
   this->addSubscriber(YAW_TOPIC, &ControlNode::yawCallback, this);
   this->addSubscriber(TARGET_BODY_POSITION_TOPIC, &ControlNode::targetPositionCallback, this);
   this->addSubscriber(TARGET_BODY_VELOCITY_TOPIC, &ControlNode::targetVelocityCallback, this);
@@ -56,32 +55,32 @@ int ControlNode::configure(const int hz) {
   return 0;
 }
 
-int ControlNode::disarm() {
-  if (this->dji->drone_disarm() != true) {
-    return -1;
-  }
+// int ControlNode::disarm() {
+//   if (this->dji->drone_disarm() != true) {
+//     return -1;
+//   }
+//
+//   return 0;
+// }
 
-  return 0;
-}
-
-int ControlNode::sdkControlMode(const bool mode) {
-  if (mode) {
-    if (this->dji->request_sdk_permission_control() != true) {
-      LOG_ERROR("Failed to request DJI SDK control!");
-      return -1;
-    }
-    LOG_INFO("Obtained DJI SDK control!");
-
-  } else {
-    if (this->dji->release_sdk_permission_control() != true) {
-      LOG_ERROR("Failed to release DJI SDK control!");
-      return -1;
-    }
-    LOG_INFO("Released DJI SDK control!");
-  }
-
-  return 0;
-}
+// int ControlNode::sdkControlMode(const bool mode) {
+//   if (mode) {
+//     if (this->dji->request_sdk_permission_control() != true) {
+//       LOG_ERROR("Failed to request DJI SDK control!");
+//       return -1;
+//     }
+//     LOG_INFO("Obtained DJI SDK control!");
+//
+//   } else {
+//     if (this->dji->release_sdk_permission_control() != true) {
+//       LOG_ERROR("Failed to release DJI SDK control!");
+//       return -1;
+//     }
+//     LOG_INFO("Released DJI SDK control!");
+//   }
+//
+//   return 0;
+// }
 
 int ControlNode::waitForEstimator() {
   int attempts;
@@ -140,81 +139,82 @@ void ControlNode::setEstimatorOff() {
   this->ros_pubs[ESTIMATOR_OFF_TOPIC].publish(msg);
 }
 
-void ControlNode::globalPositionCallback(const dji_sdk::GlobalPosition &msg) {
-  this->latitude = msg.latitude;
-  this->longitude = msg.longitude;
+// void ControlNode::globalPositionCallback(const dji_sdk::GlobalPosition &msg)
+// {
+//   this->latitude = msg.latitude;
+//   this->longitude = msg.longitude;
+//
+//   if (this->home_set == false) {
+//     this->home_latitude = msg.latitude;
+//     this->home_longitude = msg.longitude;
+//     this->home_altitude = msg.altitude;
+//     this->home_set = true;
+//
+//     this->quadrotor.setHomePoint(this->home_latitude, this->home_longitude);
+//   }
+// }
+//
+// void ControlNode::localPositionCallback(const dji_sdk::LocalPosition &msg) {
+//   // convert msg from NED to NWU
+//   Vec3 pos_ned{msg.x, msg.y, msg.z};
+//   Vec3 pos_enu = T_nwu_ned * pos_ned;
+//   this->quadrotor.pose.position = pos_enu;
+// }
 
-  if (this->home_set == false) {
-    this->home_latitude = msg.latitude;
-    this->home_longitude = msg.longitude;
-    this->home_altitude = msg.altitude;
-    this->home_set = true;
+// void ControlNode::attitudeCallback(const dji_sdk::AttitudeQuaternion &msg) {
+//   Quaternion orientation_ned;
+//
+//   orientation_ned.w() = msg.q0;
+//   orientation_ned.x() = msg.q1;
+//   orientation_ned.y() = msg.q2;
+//   orientation_ned.z() = msg.q3;
+//
+//   // transform pose position and orientation
+//   // from NED to NWU
+//   Quaternion orientation_nwu = T_nwu_ned * orientation_ned;
+//   this->quadrotor.pose.orientation = orientation_nwu;
+// }
 
-    this->quadrotor.setHomePoint(this->home_latitude, this->home_longitude);
-  }
-}
+// void ControlNode::velocityCallback(const dji_sdk::Velocity &msg) {
+//   // convert msg from NED to NWU
+//   Vec3 vel_ned{msg.vx, msg.vy, msg.vz};
+//   Vec3 vel_nwu = T_nwu_ned * vel_ned;
+//   this->quadrotor.setVelocity(vel_nwu);
+// }
+//
+// void ControlNode::radioCallback(const dji_sdk::RCChannels &msg) {
+//   if (msg.mode > 0 && this->armed == true) {
+//     this->armed = false;
+//     this->sdkControlMode(false);
+//     this->setEstimatorOff();
+//
+//   } else if (msg.mode < 0 && this->armed == false) {
+//     this->armed = true;
+//     this->quadrotor.setMode(DISCOVER_MODE);
+//     this->sdkControlMode(true);
+//     this->setEstimatorOn();
+//   }
+// }
 
-void ControlNode::localPositionCallback(const dji_sdk::LocalPosition &msg) {
-  // convert msg from NED to NWU
-  Vec3 pos_ned{msg.x, msg.y, msg.z};
-  Vec3 pos_enu = T_nwu_ned * pos_ned;
-  this->quadrotor.pose.position = pos_enu;
-}
-
-void ControlNode::attitudeCallback(const dji_sdk::AttitudeQuaternion &msg) {
-  Quaternion orientation_ned;
-
-  orientation_ned.w() = msg.q0;
-  orientation_ned.x() = msg.q1;
-  orientation_ned.y() = msg.q2;
-  orientation_ned.z() = msg.q3;
-
-  // transform pose position and orientation
-  // from NED to NWU
-  Quaternion orientation_nwu = T_nwu_ned * orientation_ned;
-  this->quadrotor.pose.orientation = orientation_nwu;
-}
-
-void ControlNode::velocityCallback(const dji_sdk::Velocity &msg) {
-  // convert msg from NED to NWU
-  Vec3 vel_ned{msg.vx, msg.vy, msg.vz};
-  Vec3 vel_nwu = T_nwu_ned * vel_ned;
-  this->quadrotor.setVelocity(vel_nwu);
-}
-
-void ControlNode::radioCallback(const dji_sdk::RCChannels &msg) {
-  if (msg.mode > 0 && this->armed == true) {
-    this->armed = false;
-    this->sdkControlMode(false);
-    this->setEstimatorOff();
-
-  } else if (msg.mode < 0 && this->armed == false) {
-    this->armed = true;
-    this->quadrotor.setMode(DISCOVER_MODE);
-    this->sdkControlMode(true);
-    this->setEstimatorOn();
-  }
-}
-
-void ControlNode::armCallback(const std_msgs::Bool &msg) {
-  if (msg.data == true) {
-    this->armed = true;
-    this->setEstimatorOn();
-
-    if (this->sim_mode == false) {
-      this->sdkControlMode(true);
-      this->quadrotor.setMode(HOVER_MODE);
-    }
-
-  } else {
-    this->armed = false;
-    this->setEstimatorOff();
-
-    if (this->sim_mode == false) {
-      this->sdkControlMode(false);
-    }
-  }
-}
+// void ControlNode::armCallback(const std_msgs::Bool &msg) {
+//   if (msg.data == true) {
+//     this->armed = true;
+//     this->setEstimatorOn();
+//
+//     if (this->sim_mode == false) {
+//       this->sdkControlMode(true);
+//       this->quadrotor.setMode(HOVER_MODE);
+//     }
+//
+//   } else {
+//     this->armed = false;
+//     this->setEstimatorOff();
+//
+//     if (this->sim_mode == false) {
+//       this->sdkControlMode(false);
+//     }
+//   }
+// }
 
 void ControlNode::modeCallback(const std_msgs::String &msg) {
   std::string mode;
@@ -320,11 +320,11 @@ void ControlNode::publishAttitudeSetpoint() {
   //    non-stable mode
   //
   //  ends up being: 0b00100010 -> 0x22
-  this->dji->attitude_control(0x22, // control mode byte (see above comment)
-                              rad2deg(rpy_ned(0)),    // roll (deg)
-                              rad2deg(rpy_ned(1)),    // pitch (deg)
-                              att_cmd.throttle * 100, // throttle (0 - 100)
-                              rad2deg(rpy_ned(2)));   // yaw (deg)
+  // this->dji->attitude_control(0x22, // control mode byte (see above comment)
+  //                             rad2deg(rpy_ned(0)),    // roll (deg)
+  //                             rad2deg(rpy_ned(1)),    // pitch (deg)
+  //                             att_cmd.throttle * 100, // throttle (0 - 100)
+  //                             rad2deg(rpy_ned(2)));   // yaw (deg)
 }
 
 void ControlNode::publishQuadrotorPose() {
@@ -341,38 +341,6 @@ void ControlNode::publishQuadrotorVelocity() {
   msg.twist.linear.z = this->quadrotor.velocity(2);
 
   this->ros_pubs[QUADROTOR_VELOCITY].publish(msg);
-}
-
-int ControlNode::takeoff() {
-  // pre-check
-  if (this->configured == false) {
-    return -1;
-  } else if (this->armed == false) {
-    return -2;
-  }
-
-  // takeoff
-  double z = this->quadrotor.hover_position(2);
-  this->quadrotor.hover_position = Vec3{0.0, 0.0, z};
-  this->sdkControlMode(true);
-
-  return 0;
-}
-
-int ControlNode::land() {
-  // pre-check
-  if (this->configured == false) {
-    return -1;
-  } else if (this->armed == false) {
-    return -2;
-  }
-
-  // land
-  double x = this->quadrotor.pose.position(0);
-  double y = this->quadrotor.pose.position(1);
-  this->quadrotor.hover_position = Vec3{x, y, 0.0};
-
-  return 0;
 }
 
 int ControlNode::loopCallback() {

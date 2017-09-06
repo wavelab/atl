@@ -3,7 +3,7 @@
 
 #include <ros/ros.h>
 
-#include <dji_sdk/dji_drone.h>
+#include <dji_sdk/dji_sdk.h>
 
 #include "atl/ros/utils/msgs.hpp"
 #include "atl/ros/utils/node.hpp"
@@ -51,8 +51,6 @@ class ControlNode : public ROSNode {
 public:
   bool configured = false;
 
-  DJIDrone *dji = nullptr;
-
   Quadrotor quadrotor;
   bool armed = false;
   double latitude = 0.0;
@@ -63,12 +61,7 @@ public:
   double home_altitude = 0.0;
 
   ControlNode(int argc, char **argv) : ROSNode(argc, argv) {}
-
-  ~ControlNode() {
-    if (this->dji != nullptr) {
-      delete this->dji;
-    }
-  }
+  ~ControlNode() {}
 
   /**
    * Configure ROS node
@@ -126,35 +119,35 @@ public:
    */
   void setEstimatorOff();
 
-  /**
-   * Global position callback
-   * @param msg ROS message
-   */
-  void globalPositionCallback(const dji_sdk::GlobalPosition &msg);
-
-  /**
-   * local position callback
-   * @param msg ROS message
-   */
-  void localPositionCallback(const dji_sdk::LocalPosition &msg);
-
-  /**
-   * attitude callback
-   * @param msg ROS message
-   */
-  void attitudeCallback(const dji_sdk::AttitudeQuaternion &msg);
-
-  /**
-   * velocity callback
-   * @param msg ROS message
-   */
-  void velocityCallback(const dji_sdk::Velocity &msg);
-
-  /**
-   * Radio callback
-   * @param msg ROS message
-   */
-  void radioCallback(const dji_sdk::RCChannels &msg);
+  // #<{(|*
+  //  * Global position callback
+  //  * @param msg ROS message
+  //  |)}>#
+  // void globalPositionCallback(const dji_sdk::GlobalPosition &msg);
+  //
+  // #<{(|*
+  //  * local position callback
+  //  * @param msg ROS message
+  //  |)}>#
+  // void localPositionCallback(const dji_sdk::LocalPosition &msg);
+  //
+  // #<{(|*
+  //  * attitude callback
+  //  * @param msg ROS message
+  //  |)}>#
+  // void attitudeCallback(const dji_sdk::AttitudeQuaternion &msg);
+  //
+  // #<{(|*
+  //  * velocity callback
+  //  * @param msg ROS message
+  //  |)}>#
+  // void velocityCallback(const dji_sdk::Velocity &msg);
+  //
+  // #<{(|*
+  //  * Radio callback
+  //  * @param msg ROS message
+  //  |)}>#
+  // void radioCallback(const dji_sdk::RCChannels &msg);
 
   /**
    * Arm callback
@@ -236,26 +229,6 @@ public:
    * Publish quadrotor velocity
    */
   void publishQuadrotorVelocity();
-
-  /**
-   * Takeoff
-   *
-   * @return
-   *    - 0: Success
-   *    - -1: ROS node not configured
-   *    - -2: Not in offboard mode
-   */
-  int takeoff();
-
-  /**
-   * Land
-   *
-   * @return
-   *    - 0: Success
-   *    - -1: ROS node not configured
-   *    - -2: Not in offboard mode
-   */
-  int land();
 
   /**
    * ROS node loop function
