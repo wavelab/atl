@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-  <!-- settings -->
+  <!-- Settings -->
   <param name="sim_mode" value="false" />
   <param name="debug_mode" value="false" />
   <param name="quad_frame" value="NED" />
@@ -8,7 +8,7 @@
   <param name="estimate_frame" value="BODY" />
   <param name="gimbal_imu" value="SBGC" />
 
-  <!-- dji sdk -->
+  <!-- DJI SDK -->
 	<node pkg="dji_sdk" type="dji_sdk_node" name="dji_sdk" output="screen">
 		<param name="serial_name" type="string" value="/dev/ttyUSB0"/>
 		<param name="baud_rate" type="int" value="230400"/>
@@ -19,32 +19,37 @@
 		<param name="groundstation_enable" type="int" value="1"/>
 	</node>
 
-  <!-- controller node -->
+  <!-- Controller node -->
   <node pkg="atl_ros" name="atl_control" type="atl_control_node" output="screen" required="true">
     <param name="config_dir" value="$(find atl_configs)/configs/quadrotor_anaroid" />
     <!-- <param name="config_dir" value="$(find atl_configs)/configs/quadrotor_anastasia" /> -->
   </node>
 
-  <!-- gimbal node -->
-  <node pkg="atl_ros" name="atl_gimbal" type="atl_gimbal_node" output="screen" required="true" >
-    <param name="config" value="$(find atl_configs)/configs/gimbal/config.yaml" />
-    <param name="gimbal_imu" value="SBGC" />
-  </node>
-
-  <!-- gimbal camera node -->
-  <node pkg="atl_ros" name="atl_gimbal_camera" type="atl_pg_camera_node" output="screen" required="true">
-    <param name="guid" type="str" value="49712223533992369" /> <!-- gimbal camera -->
-    <param name="stamp_image" value="false" />
-    <param name="image_topic" value="/atl/gimbal_camera/image" />
-    <param name="config_dir" value="$(find atl_configs)/configs/camera/pointgrey_firefly" />
-  </node>
-
-  <!-- <node pkg="atl_ros" name="atl_static_camera" type="atl_pg_camera_node" output="screen" required="true"> -->
-  <!--   <!&#45;&#45; <param name="guid" type="str" value="0" />  <!&#38;#45;&#38;#45; first available camera &#38;#45;&#38;#45;> &#45;&#45;> -->
-  <!--   <param name="guid" type="str" value="49712223533654158" /> <!&#45;&#45; static camera &#45;&#45;> -->
-  <!--   <!&#45;&#45; <param name="guid" type="str" value="49712223533992369" /> <!&#38;#45;&#38;#45; gimbal camera &#38;#45;&#38;#45;> &#45;&#45;> -->
-  <!--   <param name="stamp_image" value="false" /> -->
-  <!--   <param name="image_topic" value="/atl/scamera/image" /> -->
-  <!--   <param name="config_dir" value="$(find atl_configs)/configs/camera/pointgrey_firefly" /> -->
+  <!-- <!&#45;&#45; gimbal node &#45;&#45;> -->
+  <!-- <node pkg="atl_ros" name="atl_gimbal" type="atl_gimbal_node" output="screen" required="true" > -->
+  <!--   <param name="config" value="$(find atl_configs)/configs/gimbal/config.yaml" /> -->
+  <!--   <param name="gimbal_imu" value="SBGC" /> -->
   <!-- </node> -->
+
+  <!-- Gimbal camera -->
+  <remap from="/atl/gimbal_camera/image_mono" to="/atl/gimbal_camera/image" />
+  <include file="$(find atl_ros)/launch/firefly.launch">
+    <arg name="ns" value="/atl/gimbal_camera" />
+    <arg name="guid" value="00b09d0100bd09b1" />
+    <arg name="software_trigger" value="true" />
+  </include>
+
+  <!-- Static camera -->
+  <remap from="/atl/static_camera/image_mono" to="/atl/static_camera/image" />
+  <include file="$(find atl_ros)/launch/firefly.launch">
+    <arg name="ns" value="/atl/static_camera" />
+    <arg name="guid" value="00b09d0100b7e092" />
+    <arg name="software_trigger" value="true" />
+  </include>
+
+  <!-- Camera trigger -->
+  <arg name="rate" default="20.0" />
+  <include file="$(find atl_ros)/launch/firefly_trigger.launch">
+    <arg name="rate" value="$(arg rate)" />
+  </include>
 </launch>
