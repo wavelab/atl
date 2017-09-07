@@ -33,12 +33,6 @@ int MissionNode::configure(const int hz) {
     return -1;
   }
 
-  // Upload mission
-  if (this->uploadMission() != 0) {
-    LOG_ERROR(EMISSIONUP);
-    return -1;
-  }
-
   return 0;
 }
 
@@ -78,6 +72,7 @@ void MissionNode::radioCallback(const sensor_msgs::Joy &msg) {
   } else if (mode_switch < 0 && this->state == MISSION_IDEL) {
     this->state = MISSION_RUNNING;
     this->sdkControlMode(true);
+    this->uploadMission();
     this->startMission();
   }
 }
@@ -88,6 +83,7 @@ int MissionNode::loadMission(const std::string &config_file) {
 
   // Load config
   parser.addParam("desired_velocity", &this->desired_velocity);
+  parser.addParam("threshold_waypoint_gap", &this->threshold_waypoint_gap);
   parser.addParam("waypoints", &waypoint_data);
   if (parser.load(config_file) != 0) {
     return -1;
@@ -130,7 +126,7 @@ int MissionNode::loadMission(const std::string &config_file) {
     double dist = latlon_dist(last_lat, last_lon, lat, lon);
     if (dist > this->threshold_waypoint_gap) {
       LOG_ERROR(EDISTLATLON,
-                (int) i + 1,
+                (int) (i / 3) + 1,
                 lat,
                 lon,
                 this->threshold_waypoint_gap);
@@ -151,7 +147,7 @@ int MissionNode::uploadMission() {
   task.action_on_finish = dji_sdk::MissionWaypointTask::FINISH_NO_ACTION;
   task.mission_exec_times = 1;
   task.yaw_mode = dji_sdk::MissionWaypointTask::YAW_MODE_AUTO;
-  task.trace_mode = dji_sdk::MissionWaypointTask::TRACE_POINT;
+  task.trace_mode = 0;  // 0: point to point, 1: coordinated turn mode, smooth transition
   task.action_on_rc_lost = dji_sdk::MissionWaypointTask::ACTION_AUTO;
   task.gimbal_pitch_mode = dji_sdk::MissionWaypointTask::GIMBAL_PITCH_FREE;
 

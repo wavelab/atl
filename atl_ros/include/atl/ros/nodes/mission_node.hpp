@@ -60,7 +60,7 @@ public:
   int state = MISSION_IDEL;
   std::vector<Vec3> gps_waypoints;
   double desired_velocity = 5.0;
-  double threshold_waypoint_gap = 20.0;
+  double threshold_waypoint_gap = 30.0;
 
   MissionNode(int argc, char **argv) : ROSNode(argc, argv) {}
 
