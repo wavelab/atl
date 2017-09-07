@@ -50,7 +50,7 @@ public:
 
   std::map<std::string, ros::Publisher> ros_pubs;
   std::map<std::string, ros::Subscriber> ros_subs;
-  std::map<std::string, ros::ServiceServer> ros_servers;
+  std::map<std::string, ros::ServiceServer> ros_services;
   std::map<std::string, ros::ServiceClient> ros_clients;
 
   std::map<std::string, image_transport::Publisher> img_pubs;
@@ -132,7 +132,7 @@ public:
 
     // register service server
     server = this->ros_nh->advertiseService(service_topic, fp, obj);
-    this->ros_servers[service_topic] = server;
+    this->ros_services[service_topic] = server;
 
     return 0;
   }

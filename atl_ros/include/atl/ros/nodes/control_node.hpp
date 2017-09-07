@@ -3,34 +3,32 @@
 
 #include <ros/ros.h>
 
-#include <dji_sdk/dji_drone.h>
+#include <dji_sdk/dji_sdk.h>
+#include <dji_sdk/SDKControlAuthority.h>
+#include <dji_sdk/DroneArmControl.h>
 
+#include "atl/atl_core.hpp"
 #include "atl/ros/utils/msgs.hpp"
 #include "atl/ros/utils/node.hpp"
-#include <atl/atl_core.hpp>
 
 // NODE SETTINGS
 static const double NODE_RATE = 50;
 
 // clang-format off
 // PUBLISH TOPICS
-static const std::string PX4_SETPOINT_ATTITUDE_TOPIC = "/mavros/setpoint_attitude/attitude";
-static const std::string PX4_SETPOINT_THROTTLE_TOPIC = "/mavros/setpoint_attitude/att_throttle";
-static const std::string PX4_SETPOINT_POSITION_TOPIC = "/mavros/setpoint_position/local";
-
 static const std::string PCTRL_STATS_TOPIC = "/atl/position_controller/stats";
 static const std::string PCTRL_GET_TOPIC = "/atl/control/position_controller/get";
-static const std::string QUADROTOR_POSE = "/atl/quadrotor/pose/local";
-static const std::string QUADROTOR_VELOCITY = "/atl/quadrotor/velocity/local";
+static const std::string QUADROTOR_POSE_TOPIC = "/atl/quadrotor/pose/local";
+static const std::string QUADROTOR_VELOCITY_TOPIC = "/atl/quadrotor/velocity/local";
 static const std::string ESTIMATOR_ON_TOPIC = "/atl/estimator/on";
 static const std::string ESTIMATOR_OFF_TOPIC = "/atl/estimator/off";
+static const std::string DJI_CONTROL_TOPIC = "/dji_sdk/flight_control_setpoint_generic";
 
 // SUBSCRIBE TOPICS
-static const std::string DJI_GPS_POSITION_TOPIC = "/dji_sdk/global_position";
-static const std::string DJI_LOCAL_POSITION_TOPIC = "/dji_sdk/local_position";
-static const std::string DJI_ATTITUDE_TOPIC = "/dji_sdk/attitude_quaternion";
+static const std::string DJI_GPS_POSITION_TOPIC = "/dji_sdk/gps_position";
+static const std::string DJI_ATTITUDE_TOPIC = "/dji_sdk/attitude";
 static const std::string DJI_VELOCITY_TOPIC = "/dji_sdk/velocity";
-static const std::string DJI_RADIO_TOPIC = "/dji_sdk/rc_channels";
+static const std::string DJI_RADIO_TOPIC = "/dji_sdk/rc";
 
 static const std::string ARM_TOPIC = "/atl/control/arm";
 static const std::string MODE_TOPIC = "/atl/control/mode";
@@ -45,16 +43,20 @@ static const std::string TCTRL_SET_TOPIC = "/atl/control/tracking_controller/set
 static const std::string LCTRL_SET_TOPIC = "/atl/control/landing_controller/set";
 // clang-format on
 
+// SERVICE TOPICS
+static const std::string DJI_SDK_SERVICE = "/dji_sdk/sdk_control_authority";
+static const std::string DJI_ARM_SERVICE = "/dji_sdk/drone_arm_service";
+
 namespace atl {
 
 class ControlNode : public ROSNode {
 public:
   bool configured = false;
 
-  DJIDrone *dji = nullptr;
-
   Quadrotor quadrotor;
   bool armed = false;
+  int gps_status = -1;
+  int gps_service = 0;
   double latitude = 0.0;
   double longitude = 0.0;
   bool home_set = false;
@@ -63,12 +65,7 @@ public:
   double home_altitude = 0.0;
 
   ControlNode(int argc, char **argv) : ROSNode(argc, argv) {}
-
-  ~ControlNode() {
-    if (this->dji != nullptr) {
-      delete this->dji;
-    }
-  }
+  ~ControlNode() {}
 
   /**
    * Configure ROS node
@@ -130,31 +127,25 @@ public:
    * Global position callback
    * @param msg ROS message
    */
-  void globalPositionCallback(const dji_sdk::GlobalPosition &msg);
-
-  /**
-   * local position callback
-   * @param msg ROS message
-   */
-  void localPositionCallback(const dji_sdk::LocalPosition &msg);
+  void globalPositionCallback(const sensor_msgs::NavSatFix &msg);
 
   /**
    * attitude callback
    * @param msg ROS message
    */
-  void attitudeCallback(const dji_sdk::AttitudeQuaternion &msg);
+  void attitudeCallback(const geometry_msgs::QuaternionStamped &msg);
 
   /**
    * velocity callback
    * @param msg ROS message
    */
-  void velocityCallback(const dji_sdk::Velocity &msg);
+  void velocityCallback(const geometry_msgs::Vector3Stamped &msg);
 
   /**
    * Radio callback
    * @param msg ROS message
    */
-  void radioCallback(const dji_sdk::RCChannels &msg);
+  void radioCallback(const sensor_msgs::Joy &msg);
 
   /**
    * Arm callback
@@ -236,26 +227,6 @@ public:
    * Publish quadrotor velocity
    */
   void publishQuadrotorVelocity();
-
-  /**
-   * Takeoff
-   *
-   * @return
-   *    - 0: Success
-   *    - -1: ROS node not configured
-   *    - -2: Not in offboard mode
-   */
-  int takeoff();
-
-  /**
-   * Land
-   *
-   * @return
-   *    - 0: Success
-   *    - -1: ROS node not configured
-   *    - -2: Not in offboard mode
-   */
-  int land();
 
   /**
    * ROS node loop function
