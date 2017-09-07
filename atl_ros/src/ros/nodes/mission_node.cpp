@@ -8,10 +8,68 @@ int MissionNode::configure(const int hz) {
     return -1;
   }
 
+  // Get path to config file
+  std::string config_file;
+  ROS_GET_PARAM(this->node_name + "/config", config_file);
+
+  // Subscribers
+  this->addSubscriber(DJI_RADIO_TOPIC, &MissionNode::radioCallback, this);
+
+  // Clients
+  this->addClient<dji_sdk::SDKControlAuthority>(DJI_SDK_SERVICE);
+  this->addClient<dji_sdk::MissionWpUpload>(DJI_WAYPOINT_UPLOAD_SERVICE);
+  this->addClient<dji_sdk::MissionWpAction>(DJI_WAYPOINT_ACTION_SERVICE);
+
+  // Load mission
+  if (this->loadMission(config_file) != 0) {
+    LOG_ERROR(EMISSIONLOAD);
+    return -1;
+  }
+
   return 0;
 }
 
-int MissionNode::loadMission() {
+int MissionNode::sdkControlMode(const bool mode) {
+  dji_sdk::SDKControlAuthority msg;
+  msg.request.control_enable = mode;
+
+  if (mode) {
+    this->ros_clients[DJI_SDK_SERVICE].call(msg);
+    if (msg.response.result == false) {
+      LOG_ERROR(EDJISDKREQ);
+      return -1;
+    }
+    LOG_INFO(INFO_DJI_SDK_OBTAINED);
+
+  } else {
+    this->ros_clients[DJI_SDK_SERVICE].call(msg);
+    if (msg.response.result == false) {
+      LOG_ERROR(EDJISDKREL);
+      return -1;
+    }
+    LOG_INFO(INFO_DJI_SDK_RELEASED);
+  }
+
+  return 0;
+}
+
+void MissionNode::radioCallback(const sensor_msgs::Joy &msg) {
+  const int mode_switch = msg.axes[4];
+
+  // Arm or disarm SDK mode
+  if (mode_switch > 0 && this->state == MISSION_RUNNING) {
+    this->state = MISSION_IDEL;
+    this->sdkControlMode(false);
+    this->stopMission();
+
+  } else if (mode_switch < 0 && this->state == MISSION_IDEL) {
+    this->state = MISSION_RUNNING;
+    this->sdkControlMode(true);
+    this->startMission();
+  }
+}
+
+int MissionNode::loadMission(const std::string &config_file) {
   ConfigParser parser;
   std::vector<double> waypoint_data;
 
@@ -23,8 +81,8 @@ int MissionNode::loadMission() {
   }
 
   // Check number of waypoint data
-  if (waypoint_data.size() % 3 != 0 || waypoint_data <= 3) {
-    LOG_ERROR("Invalid number of waypoint data!");
+  if (waypoint_data.size() % 3 != 0 || waypoint_data.size() <= 3) {
+    LOG_ERROR(EINVWPDATA);
     return -1;
   }
 
@@ -72,91 +130,90 @@ int MissionNode::loadMission() {
   return 0;
 }
 
-int MissionNode::uploadMission(dji_sdk::MissionWaypointTask& task) {
-//   for (auto wp : wp_list) {
-//     ROS_INFO("Waypoint created at [lat:lon:alt]: [%f \t%f \t%f]\n ",
-//              wp.latitude,
-//              wp.longitude,
-//              wp.altitude);
-//
-//     dji_sdk::MissionWaypoint mission_waypoint;
-//     mission_waypoint.latitude= wp->latitude;
-//     mission_waypoint.longitude = wp->longitude;
-//     mission_waypoint.altitude = wp->altitude;
-//     mission_waypoint.damping_distance = 0;
-//     mission_waypoint.target_yaw = 0;
-//     mission_waypoint.target_gimbal_pitch = 0;
-//     mission_waypoint.turn_mode = 0;
-//     mission_waypoint.has_action = 0;
-//     waypointTask.mission_waypoint.push_back(mission_waypoint);
-//   }
+int MissionNode::uploadMission() {
+  // Create mission task
+  dji_sdk::MissionWaypointTask task;
+  task.velocity_range = 10;
+  task.idle_velocity = this->desired_velocity;
+  task.action_on_finish = dji_sdk::MissionWaypointTask::FINISH_NO_ACTION;
+  task.mission_exec_times = 1;
+  task.yaw_mode = dji_sdk::MissionWaypointTask::YAW_MODE_AUTO;
+  task.trace_mode = dji_sdk::MissionWaypointTask::TRACE_POINT;
+  task.action_on_rc_lost = dji_sdk::MissionWaypointTask::ACTION_AUTO;
+  task.gimbal_pitch_mode = dji_sdk::MissionWaypointTask::GIMBAL_PITCH_FREE;
+
+  for (auto gps_wp : this->gps_waypoints) {
+    const double lat = gps_wp(0);
+    const double lon = gps_wp(1);
+    const double alt = gps_wp(2);
+
+    dji_sdk::MissionWaypoint wp;
+    wp.latitude = lat;
+    wp.longitude = lon;
+    wp.altitude = alt;
+    wp.damping_distance = 0;
+    wp.target_yaw = 0;
+    wp.target_gimbal_pitch = 0;
+    wp.turn_mode = 0;
+    wp.has_action = 0;
+    task.mission_waypoint.push_back(wp);
+
+    LOG_INFO("Waypoint created at [lat:lon:alt]: [%f \t%f \t%f]",
+             lat,
+             lon,
+             alt);
+  }
 
   // Upload mission
   dji_sdk::MissionWpUpload msg;
   msg.request.waypoint_task = task;
-  waypoint_upload_service.call(msg);
+  this->ros_clients[DJI_WAYPOINT_UPLOAD_SERVICE].call(msg);
 
   // Check response
   if (msg.response.result == false) {
-    ROS_ERROR("Failed to upload mission!\n");
+    LOG_ERROR(EMISSIONUP);
     return -1;
   }
 
   return 0;
 }
 
-bool MissionNode::createMission() {
-  // Initialize waypoint task
-  dji_sdk::MissionWaypointTask wp_task;
+int MissionNode::startMission() {
+  // Start mission
+  dji_sdk::MissionWpAction wp_action;
+  wp_action.request.action = DJI::OSDK::MISSION_ACTION::START;
+  this->ros_clients[DJI_WAYPOINT_ACTION_SERVICE].call(wp_action);
 
-  wp_task.damping = 0;
-  wp_task.yaw = 0;
-  wp_task.gimbalPitch = 0;
-  wp_task.turnMode = 0;
-  wp_task.hasAction = 0;
-  wp_task.actionTimeLimit = 100;
-  wp_task.actionNumber = 0;
-  wp_task.actionRepeat = 0;
-
-  for (int i = 0; i < 16; i++) {
-    wp.commandList[i] = 0;
-    wp.commandParameter[i] = 0;
+  // Check response
+  if (wp_action.response.result == false) {
+    LOG_ERROR(EMISSIONSTART);
+    return -1;
   }
 
-  // Create Waypoints
-  // const float64_t increment = 0.000001 / 180;
-  // const float32_t start_alt = 10;
-  // ROS_INFO("Creating Waypoints..\n");
-  // std::vector<WayPointSettings> generatedWaypts =
-  //   createWaypoints(numWaypoints, increment, start_alt);
-
-  // Upload waypoints
-  ROS_INFO("Uploading Waypoints..\n");
-  uploadWaypoints(generatedWaypts, responseTimeout, waypointTask);
-
-  // Init mission
-  // ROS_INFO("Initializing Waypoint Mission..\n");
-  // if (initWaypointMission(waypointTask).result) {
-  //   ROS_INFO("Waypoint upload command sent successfully");
-  // } else {
-  //   ROS_WARN("Failed sending waypoint upload command");
-  //   return false;
-  // }
-  //
-  // // Waypoint Mission: Start
-  // if (missionAction(DJI_MISSION_TYPE::WAYPOINT,
-  //                   MISSION_ACTION::START)
-  //       .result)
-  // {
-  //   ROS_INFO("Mission start command sent successfully");
-  // } else {
-  //   ROS_WARN("Failed sending mission start command");
-  //   return false;
-  // }
-
-  return true;
+  LOG_INFO("Starting mission!");
+  this->state = MISSION_RUNNING;
+  return 0;
 }
 
-} // eof atl namespace
+int MissionNode::stopMission() {
+  // Start mission
+  dji_sdk::MissionWpAction wp_action;
+  wp_action.request.action = DJI::OSDK::MISSION_ACTION::STOP;
+  this->ros_clients[DJI_WAYPOINT_ACTION_SERVICE].call(wp_action);
 
-RUN_ROS_NODE(atl::IMUNode, NODE_RATE);
+  // Check response
+  if (wp_action.response.result == false) {
+    LOG_ERROR(EMISSIONSTOP);
+    return -1;
+  }
+
+  LOG_INFO("Stopping mission!");
+  if (this->state != MISSION_COMPLETED) {
+    this->state = MISSION_IDEL;
+  }
+  return 0;
+}
+
+} // namespace atl
+
+RUN_ROS_NODE(atl::MissionNode, NODE_RATE);

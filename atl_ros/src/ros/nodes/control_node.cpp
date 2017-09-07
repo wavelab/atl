@@ -387,7 +387,7 @@ int ControlNode::loopCallback() {
   this->setEstimatorOn();
 
   // setup
-  double dt = (ros::Time::now() - this->ros_last_updated).toSec();
+  const double dt = (ros::Time::now() - this->ros_last_updated).toSec();
 
   // step
   if (this->quadrotor.step(dt) != 0) {
