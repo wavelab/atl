@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- DJI SDK -->
+	<node pkg="dji_sdk" type="dji_sdk_node" name="dji_sdk" output="screen">
+    <param name="serial_name" type="string" value="/dev/ttyUSB0"/>
+    <param name="baud_rate" type="int" value="921600"/>
+    <param name="app_id" type="int" value="1043630"/>
+    <param name="app_version" type="int" value="1"/>
+    <param name="align_time" type="bool" value="false"/>
+    <param name="enc_key" type="string" value="8bd7f50dc02c5e9343f1dc19afd22b44d7907dba3239ed88e77bf3c78356e8d0"/>
+    <param name="use_broadcast" type="bool" value="false"/>
+	</node>
+
+  <!-- Gimbal camera -->
+  <remap from="/atl/gimbal_camera/image_mono" to="/atl/gimbal_camera/image" />
+  <include file="$(find atl_ros)/launch/firefly.launch">
+    <arg name="ns" value="/atl/gimbal_camera" />
+    <arg name="guid" value="00b09d0100bd09b1" />
+    <arg name="software_trigger" value="true" />
+  </include>
+
+  <!-- Static camera -->
+  <remap from="/atl/static_camera/image_mono" to="/atl/static_camera/image" />
+  <include file="$(find atl_ros)/launch/firefly.launch">
+    <arg name="ns" value="/atl/static_camera" />
+    <arg name="guid" value="00b09d0100b7e092" />
+    <arg name="software_trigger" value="true" />
+  </include>
+
+  <!-- Camera trigger -->
+  <arg name="rate" default="20.0" />
+  <include file="$(find atl_ros)/launch/firefly_trigger.launch">
+    <arg name="rate" value="$(arg rate)" />
+  </include>
+</launch>

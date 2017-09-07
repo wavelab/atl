@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="rate" default="5.0" />
+
+  <node pkg="camera1394" type="camera1394_trigger_node" name="trigger_node">
+    <param name="rate" value="$(arg rate)" />
+  </node>
+
+</launch>
