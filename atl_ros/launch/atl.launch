@@ -9,14 +9,14 @@
   <param name="gimbal_imu" value="SBGC" />
 
   <!-- DJI SDK -->
-	<node pkg="dji_sdk" type="dji_sdk_node" name="dji_sdk" output="screen">
-		<param name="serial_name" type="string" value="/dev/ttyUSB0"/>
-		<param name="baud_rate" type="int" value="230400"/>
+	<node pkg="dji_sdk" type="dji_sdk_node" name="dji_sdk" output="screen" required="true">
+    <param name="serial_name" type="string" value="/dev/ttyUSB0"/>
+    <param name="baud_rate" type="int" value="921600"/>
     <param name="app_id" type="int" value="1043630"/>
     <param name="app_version" type="int" value="1"/>
-		<param name="app_bundle_id" type="string" value="Not required in this SDK version"/>
+    <param name="align_time" type="bool" value="false"/>
     <param name="enc_key" type="string" value="8bd7f50dc02c5e9343f1dc19afd22b44d7907dba3239ed88e77bf3c78356e8d0"/>
-		<param name="groundstation_enable" type="int" value="1"/>
+    <param name="use_broadcast" type="bool" value="false"/>
 	</node>
 
   <!-- Controller node -->

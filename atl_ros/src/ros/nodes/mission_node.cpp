@@ -12,6 +12,8 @@ int MissionNode::configure(const int hz) {
   std::string config_file;
   ROS_GET_PARAM(this->node_name + "/config", config_file);
 
+  sleep(10);
+
   // Subscribers
   this->addSubscriber(DJI_RADIO_TOPIC, &MissionNode::radioCallback, this);
 
@@ -23,6 +25,17 @@ int MissionNode::configure(const int hz) {
   // Load mission
   if (this->loadMission(config_file) != 0) {
     LOG_ERROR(EMISSIONLOAD);
+    return -1;
+  }
+
+  // Obtain SDK control
+  if (this->sdkControlMode(true) != 0) {
+    return -1;
+  }
+
+  // Upload mission
+  if (this->uploadMission() != 0) {
+    LOG_ERROR(EMISSIONUP);
     return -1;
   }
 
@@ -93,13 +106,13 @@ int MissionNode::loadMission(const std::string &config_file) {
   this->gps_waypoints.emplace_back(lat, lon, alt);
 
   // Load GPS waypoints
-  for (size_t i = 1; i < waypoint_data.size(); i += 3) {
+  for (size_t i = 3; i < waypoint_data.size(); i += 3) {
     const double lat = waypoint_data[i];
     const double lon = waypoint_data[i + 1];
     const double alt = waypoint_data[i + 2];
-    const double last_lat = waypoint_data[(i - 1)];
-    const double last_lon = waypoint_data[(i - 1) + 1];
-    const double last_alt = waypoint_data[(i - 1) + 2];
+    const double last_lat = waypoint_data[(i - 3)];
+    const double last_lon = waypoint_data[(i - 3) + 1];
+    const double last_alt = waypoint_data[(i - 3) + 2];
 
     // Check lat, lon
     if (fltcmp(lat, 0.0) == 0.0 || fltcmp(lon, 0.0) == 0.0) {
@@ -171,7 +184,6 @@ int MissionNode::uploadMission() {
 
   // Check response
   if (msg.response.result == false) {
-    LOG_ERROR(EMISSIONUP);
     return -1;
   }
 
