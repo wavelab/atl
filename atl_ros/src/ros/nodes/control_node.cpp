@@ -187,11 +187,13 @@ void ControlNode::globalPositionCallback(const sensor_msgs::NavSatFix &msg) {
 
 void ControlNode::attitudeCallback(
     const geometry_msgs::QuaternionStamped &msg) {
-  Quaternion orientation_nwu{msg.quaternion.w,
-                             msg.quaternion.x,
-                             msg.quaternion.y,
-                             msg.quaternion.z};
-  this->quadrotor.pose.orientation = orientation_nwu;
+  // Convert ENU attitude to NWU attitude by adding 90 degrees to yaw
+  Quaternion quat{msg.quaternion.w, msg.quaternion.x, msg.quaternion.y, msg.quaternion.z};
+  Vec3 rpy = quatToEuler321(quat);
+  rpy(2) -= M_PI / 2.0;
+  quat = euler321ToQuat(rpy);
+
+  this->quadrotor.pose.orientation = quat;
 }
 
 void ControlNode::velocityCallback(const geometry_msgs::Vector3Stamped &msg) {
@@ -341,19 +343,19 @@ void ControlNode::publishAttitudeSetpoint() {
   //  ends up being: 0b00100010 -> 0x22
   const int control_byte = 0x22;
 
-  // Control signal in roll, pitch and yaw (radians) in NWU frame
-  const Vec3 rpy = this->quadrotor.att_cmd.toEuler();
+  // Control signal in roll, pitch and yaw (radians) in ENU frame
+  const Vec3 rpy = this->quadrotor.att_cmd.toEuler("ENU");
 
   // Throttle (0 - 100)
   const double throttle = this->quadrotor.att_cmd.throttle * 100.0;
 
   // Setup and publish control message
   sensor_msgs::Joy msg;
-  msg.axes[0] = rpy(0);       // roll (radians)
-  msg.axes[1] = rpy(1);       // pitch (radians)
-  msg.axes[2] = rpy(2);       // yaw (radians)
-  msg.axes[3] = throttle;     // throttle (0 - 100)
-  msg.axes[4] = control_byte; // control mode
+  msg.axes.push_back(rpy(0));       // roll (radians)
+  msg.axes.push_back(rpy(1));       // pitch (radians)
+  msg.axes.push_back(throttle);     // throttle (0 - 100)
+  msg.axes.push_back(rpy(2));       // yaw (radians)
+  msg.axes.push_back(control_byte); // control mode
   this->ros_pubs[DJI_CONTROL_TOPIC].publish(msg);
 }
 

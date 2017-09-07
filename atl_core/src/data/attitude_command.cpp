@@ -12,8 +12,16 @@ AttitudeCommand::AttitudeCommand(Vec4 command) {
 
 Vec3 AttitudeCommand::toEuler(const std::string &coordinate_system) {
   if (coordinate_system == "NED") {
-    return nwu2ned(this->rpy); // transform NWU to NED
+    // Transform NWU to NED
+    return nwu2ned(this->rpy);
+
+  } else if (coordinate_system == "ENU") {
+    // Transform NWU to ENU
+    this->rpy(2) += M_PI / 2.0;
+    return this->rpy;
+
   } else {
+    // NWU euler angles
     return this->rpy;
   }
 }
