@@ -14,11 +14,18 @@ int MissionNode::configure(const int hz) {
 
   sleep(10);
 
+  // Publisher
+  this->addPublisher<sensor_msgs::Joy>(DJI_PCTRL_TOPIC);
+
   // Subscribers
   this->addSubscriber(DJI_RADIO_TOPIC, &MissionNode::radioCallback, this);
+  this->addSubscriber(DJI_FLIGHT_STATUS_TOPIC, &MissionNode::flightStatusCallback, this);
+  this->addSubscriber(DJI_DISPLAY_MODE_TOPIC, &MissionNode::displayModeCallback, this);
 
   // Clients
   this->addClient<dji_sdk::SDKControlAuthority>(DJI_SDK_SERVICE);
+  this->addClient<dji_sdk::DroneArmControl>(DJI_ARM_SERVICE);
+  this->addClient<dji_sdk::DroneTaskControl>(DJI_TASK_SERVICE);
   this->addClient<dji_sdk::MissionWpUpload>(DJI_WAYPOINT_UPLOAD_SERVICE);
   this->addClient<dji_sdk::MissionWpAction>(DJI_WAYPOINT_ACTION_SERVICE);
 
@@ -77,6 +84,14 @@ void MissionNode::radioCallback(const sensor_msgs::Joy &msg) {
   }
 }
 
+void MissionNode::flightStatusCallback(const std_msgs::UInt8 &msg) {
+  convertMsg(msg, this->flight_status);
+}
+
+void MissionNode::displayModeCallback(const std_msgs::UInt8 &msg) {
+  convertMsg(msg, this->display_mode);
+}
+
 int MissionNode::loadMission(const std::string &config_file) {
   ConfigParser parser;
   std::vector<double> waypoint_data;
@@ -84,6 +99,7 @@ int MissionNode::loadMission(const std::string &config_file) {
   // Load config
   parser.addParam("desired_velocity", &this->desired_velocity);
   parser.addParam("threshold_waypoint_gap", &this->threshold_waypoint_gap);
+  parser.addParam("exec_times", &this->exec_times, true);
   parser.addParam("waypoints", &waypoint_data);
   if (parser.load(config_file) != 0) {
     return -1;
@@ -144,9 +160,9 @@ int MissionNode::uploadMission() {
   dji_sdk::MissionWaypointTask task;
   task.velocity_range = 10;
   task.idle_velocity = this->desired_velocity;
-  task.action_on_finish = dji_sdk::MissionWaypointTask::FINISH_NO_ACTION;
-  task.mission_exec_times = 1;
-  task.yaw_mode = dji_sdk::MissionWaypointTask::YAW_MODE_AUTO;
+  task.action_on_finish = dji_sdk::MissionWaypointTask::FINISH_RETURN_TO_POINT;
+  task.mission_exec_times = this->exec_times;
+  task.yaw_mode = dji_sdk::MissionWaypointTask::YAW_MODE_WAYPOINT;
   task.trace_mode = 0;  // 0: point to point, 1: coordinated turn mode, smooth transition
   task.action_on_rc_lost = dji_sdk::MissionWaypointTask::ACTION_AUTO;
   task.gimbal_pitch_mode = dji_sdk::MissionWaypointTask::GIMBAL_PITCH_FREE;
@@ -161,7 +177,8 @@ int MissionNode::uploadMission() {
     wp.longitude = lon;
     wp.altitude = alt;
     wp.damping_distance = 0;
-    wp.target_yaw = 0;
+    wp.target_yaw = -65.0;  // SPECIFIC TO ICRA2017
+    // wp.target_yaw = 0;
     wp.target_gimbal_pitch = 0;
     wp.turn_mode = 0;
     wp.has_action = 0;

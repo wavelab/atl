@@ -1,6 +1,7 @@
 #ifndef ATL_ROS_UTILS_MSGS_HPP
 #define ATL_ROS_UTILS_MSGS_HPP
 
+#include <std_msgs/UInt8.h>
 #include <std_msgs/Bool.h>
 #include <std_msgs/Float64.h>
 #include <std_msgs/String.h>
@@ -43,6 +44,7 @@ void buildMsg(PositionController pc, atl_msgs::PCtrlSettings &msg);
 void buildMsg(TrackingController tc, atl_msgs::TCtrlSettings &msg);
 void buildMsg(LandingController tc, atl_msgs::LCtrlSettings &msg);
 
+void convertMsg(std_msgs::UInt8 msg, uint8_t &x);
 void convertMsg(std_msgs::Bool msg, bool &b);
 void convertMsg(std_msgs::String msg, std::string &s);
 void convertMsg(std_msgs::Float64 msg, double &d);

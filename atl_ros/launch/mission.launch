@@ -13,7 +13,7 @@
 
   <!-- Mission node -->
   <node pkg="atl_ros" name="atl_mission" type="atl_mission_node" output="screen">
-    <param name="config" value="$(find atl_configs)/configs/missions/car_park_2.yaml" />
+    <param name="config" value="$(find atl_configs)/configs/missions/car_park_1.yaml" />
   </node>
 
   <!-- <!&#45;&#45; Static camera &#45;&#45;> -->

@@ -2,6 +2,7 @@ desired_velocity: 1.0
 look_ahead_dist: 0.5
 threshold_waypoint_gap: 20.0
 threshold_waypoint_reached: 1.0
+exec_times: 2
 
 waypoints: [
   # latitude, longitude, altitude
