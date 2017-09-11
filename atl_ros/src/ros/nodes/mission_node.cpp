@@ -19,8 +19,12 @@ int MissionNode::configure(const int hz) {
 
   // Subscribers
   this->addSubscriber(DJI_RADIO_TOPIC, &MissionNode::radioCallback, this);
-  this->addSubscriber(DJI_FLIGHT_STATUS_TOPIC, &MissionNode::flightStatusCallback, this);
-  this->addSubscriber(DJI_DISPLAY_MODE_TOPIC, &MissionNode::displayModeCallback, this);
+  this->addSubscriber(DJI_FLIGHT_STATUS_TOPIC,
+                      &MissionNode::flightStatusCallback,
+                      this);
+  this->addSubscriber(DJI_DISPLAY_MODE_TOPIC,
+                      &MissionNode::displayModeCallback,
+                      this);
 
   // Clients
   this->addClient<dji_sdk::SDKControlAuthority>(DJI_SDK_SERVICE);
@@ -165,7 +169,8 @@ int MissionNode::uploadMission() {
   task.action_on_finish = dji_sdk::MissionWaypointTask::FINISH_RETURN_TO_POINT;
   task.mission_exec_times = this->exec_times;
   task.yaw_mode = this->yaw_mode;
-  task.trace_mode = 0;  // 0: point to point, 1: coordinated turn mode, smooth transition
+  task.trace_mode =
+      0; // 0: point to point, 1: coordinated turn mode, smooth transition
   task.action_on_rc_lost = dji_sdk::MissionWaypointTask::ACTION_AUTO;
   task.gimbal_pitch_mode = dji_sdk::MissionWaypointTask::GIMBAL_PITCH_FREE;
 
@@ -179,7 +184,7 @@ int MissionNode::uploadMission() {
     wp.longitude = lon;
     wp.altitude = alt;
     wp.damping_distance = 0;
-    wp.target_yaw = this->mission_yaw;  // SPECIFIC TO ICRA2017
+    wp.target_yaw = this->mission_yaw; // SPECIFIC TO ICRA2017
     // wp.target_yaw = 0;
     wp.target_gimbal_pitch = 0;
     wp.turn_mode = 0;

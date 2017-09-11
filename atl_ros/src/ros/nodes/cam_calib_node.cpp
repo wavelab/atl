@@ -49,7 +49,7 @@ int CamCalibNode::configure(const int hz) {
   }
 
   // measurements file
-  this->gimbal_joint_file.open(this->calib_dir + "/gimbal_joint.dat");
+  this->gimbal_imu_file.open(this->calib_dir + "/gimbal_imu.dat");
   this->gimbal_encoder_file.open(this->calib_dir + "/gimbal_encoder.dat");
 
   // register publisher and subscribers
@@ -95,12 +95,12 @@ void CamCalibNode::gimbalCameraCallback(const sensor_msgs::ImageConstPtr &msg) {
 }
 
 void CamCalibNode::gimbalJointCallback(const geometry_msgs::Quaternion &msg) {
-  convertMsg(msg, this->gimbal_joint_orientation);
+  convertMsg(msg, this->gimbal_imu);
 }
 
 void CamCalibNode::gimbalJointEncoderCallback(
     const geometry_msgs::Quaternion &msg) {
-  convertMsg(msg, this->gimbal_joint_body_orientation);
+  convertMsg(msg, this->gimbal_encoder);
 }
 
 bool CamCalibNode::chessboardDetected() {
@@ -191,17 +191,19 @@ void CamCalibNode::saveImages() {
 
 void CamCalibNode::saveGimbalMeasurements() {
   // convert measurements in quaternion to euler angles
-  Vec3 gimbal_joint_rpy = quatToEuler321(this->gimbal_joint_orientation);
-  Vec3 gimbal_encoder_rpy = quatToEuler321(this->gimbal_joint_body_orientation);
+  const Vec3 imu = quatToEuler321(this->gimbal_imu);
+  const Vec3 encoder = quatToEuler321(this->gimbal_encoder);
 
   // write to file
-  this->gimbal_joint_file << gimbal_joint_rpy(0) << ",";
-  this->gimbal_joint_file << gimbal_joint_rpy(1) << ",";
-  this->gimbal_joint_file << gimbal_joint_rpy(2) << std::endl;
+  this->gimbal_imu_file << imu(0) << ",";
+  this->gimbal_imu_file << imu(1) << ",";
+  this->gimbal_imu_file << imu(2) << std::endl;
+  // std::cout << "IMU: " << imu.transpose() << std::endl;
 
-  this->gimbal_encoder_file << gimbal_encoder_rpy(0) << ",";
-  this->gimbal_encoder_file << gimbal_encoder_rpy(1) << ",";
-  this->gimbal_encoder_file << gimbal_encoder_rpy(2) << std::endl;
+  this->gimbal_encoder_file << encoder(0) << ",";
+  this->gimbal_encoder_file << encoder(1) << ",";
+  this->gimbal_encoder_file << encoder(2) << std::endl;
+  // std::cout << "ENCODER: " << encoder.transpose() << std::endl;
 }
 
 int CamCalibNode::loopCallback() {

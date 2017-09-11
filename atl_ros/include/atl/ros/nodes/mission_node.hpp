@@ -39,7 +39,8 @@
 static const double NODE_RATE = 100;
 
 // PUBLISH TOPICS
-static const std::string DJI_PCTRL_TOPIC = "/dji_sdk/flight_control_setpoint_ENUposition_yaw";
+static const std::string DJI_PCTRL_TOPIC =
+    "/dji_sdk/flight_control_setpoint_ENUposition_yaw";
 
 // SUBSCRIBE TOPICS
 static const std::string DJI_RADIO_TOPIC = "/dji_sdk/rc";

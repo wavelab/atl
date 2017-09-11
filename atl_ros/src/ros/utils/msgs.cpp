@@ -132,7 +132,7 @@ void buildMsg(TrackingController tc, atl_msgs::TCtrlSettings &msg) {
 //   msg.throttle_controller.max = lc.throttle_limit[1];
 // }
 
-void convertMsg(std_msgs::UInt8 msg, uint8_t &x) { x = msg.data;}
+void convertMsg(std_msgs::UInt8 msg, uint8_t &x) { x = msg.data; }
 
 void convertMsg(std_msgs::Bool msg, bool &b) { b = msg.data; }
 

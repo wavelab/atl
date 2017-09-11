@@ -188,7 +188,10 @@ void ControlNode::globalPositionCallback(const sensor_msgs::NavSatFix &msg) {
 void ControlNode::attitudeCallback(
     const geometry_msgs::QuaternionStamped &msg) {
   // Convert ENU attitude to NWU attitude by adding 90 degrees to yaw
-  Quaternion quat{msg.quaternion.w, msg.quaternion.x, msg.quaternion.y, msg.quaternion.z};
+  Quaternion quat{msg.quaternion.w,
+                  msg.quaternion.x,
+                  msg.quaternion.y,
+                  msg.quaternion.z};
   Vec3 rpy = quatToEuler321(quat);
   rpy(2) -= M_PI / 2.0;
   quat = euler321ToQuat(rpy);

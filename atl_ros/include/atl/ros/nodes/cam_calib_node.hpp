@@ -30,7 +30,7 @@ public:
   std::string calib_dir;
   std::string static_camera_dir;
   std::string gimbal_camera_dir;
-  std::ofstream gimbal_joint_file;
+  std::ofstream gimbal_imu_file;
   std::ofstream gimbal_encoder_file;
 
   cv::Size chessboard_size;
@@ -44,12 +44,12 @@ public:
   int image_number = 0;
   cv::Mat static_camera_image;
   cv::Mat gimbal_camera_image;
-  Quaternion gimbal_joint_orientation;
-  Quaternion gimbal_joint_body_orientation;
+  Quaternion gimbal_imu;
+  Quaternion gimbal_encoder;
 
   CamCalibNode(int argc, char **argv) : ROSNode(argc, argv) {}
   ~CamCalibNode() {
-    this->gimbal_joint_file.close();
+    this->gimbal_imu_file.close();
     this->gimbal_encoder_file.close();
   }
 
