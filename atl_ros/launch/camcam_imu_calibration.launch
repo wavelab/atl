@@ -15,7 +15,7 @@
   <remap from="/atl/gimbal_camera/image_mono" to="/atl/gimbal_camera/image" />
   <include file="$(find atl_ros)/launch/firefly.launch">
     <arg name="ns" value="/atl/gimbal_camera" />
-    <arg name="guid" value="00b09d0100bd09b1" />
+    <arg name="guid" value="00b09d0100b9be46" />
     <arg name="software_trigger" value="true" />
   </include>
 
@@ -28,7 +28,7 @@
   </include>
 
   <!-- Camera trigger -->
-  <arg name="rate" default="20.0" />
+  <arg name="rate" default="15.0" />
   <include file="$(find atl_ros)/launch/firefly_trigger.launch">
     <arg name="rate" value="$(arg rate)" />
   </include>

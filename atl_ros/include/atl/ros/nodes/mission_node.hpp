@@ -67,6 +67,8 @@ class MissionNode : public ROSNode {
 public:
   double desired_velocity = 5.0;
   double threshold_waypoint_gap = 30.0;
+  double mission_yaw = 0.0;
+  int yaw_mode = 0;
   double exec_times = 1.0;
   std::vector<Vec3> gps_waypoints;
 

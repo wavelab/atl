@@ -19,27 +19,27 @@
         frame_rate: 60
 
         <!-- indoors -->
-        <!-- auto_shutter: 3  # manual -->
-        <!-- shutter: 540 -->
-        <!--  -->
-        <!-- auto_brightness: 3  # manual -->
-        <!-- brightness: 350 -->
-        <!--  -->
-        <!-- auto_gain: 3  # manual -->
-        <!-- gain: 3500  # high gain to make up for fast shutter -->
-        <!--  -->
-        <!-- auto_gamma: 0 # off -->
-        <!-- #gamma: 1024 -->
-
-        <!-- cloudy day -->
         auto_shutter: 3  # manual
-        shutter: 200
+        shutter: 540
 
         auto_brightness: 3  # manual
-        brightness: 100
+        brightness: 350
 
         auto_gain: 3  # manual
-        gain: 100  # high gain to make up for fast shutter
+        gain: 3500  # high gain to make up for fast shutter
+
+        auto_gamma: 0 # off
+        #gamma: 1024
+
+        <!-- cloudy day -->
+        <!-- auto_shutter: 3  # manual -->
+        <!-- shutter: 300 -->
+        <!--  -->
+        <!-- auto_brightness: 3  # manual -->
+        <!-- brightness: 100 -->
+        <!--  -->
+        <!-- auto_gain: 3  # manual -->
+        <!-- gain: 1500 -->
 
         trigger_mode: mode_3  # regular internal trigger
       </rosparam>

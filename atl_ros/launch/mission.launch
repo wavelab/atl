@@ -13,28 +13,34 @@
 
   <!-- Mission node -->
   <node pkg="atl_ros" name="atl_mission" type="atl_mission_node" output="screen">
-    <param name="config" value="$(find atl_configs)/configs/missions/car_park_1.yaml" />
+    <param name="config" value="$(find atl_configs)/configs/missions/lawn2.yaml" />
   </node>
 
-  <!-- <!&#45;&#45; Static camera &#45;&#45;> -->
-  <!-- <remap from="/atl/static_camera/image_mono" to="/atl/static_camera/image" /> -->
-  <!-- <include file="$(find atl_ros)/launch/firefly.launch"> -->
-  <!--   <arg name="ns" value="/atl/static_camera" /> -->
-  <!--   <arg name="guid" value="00b09d0100b7e092" /> -->
-  <!--   <arg name="software_trigger" value="true" /> -->
-  <!-- </include> -->
-  <!--  -->
-  <!-- <!&#45;&#45; Gimbal camera &#45;&#45;> -->
-  <!-- <remap from="/atl/gimbal_camera/image_mono" to="/atl/gimbal_camera/image" /> -->
-  <!-- <include file="$(find atl_ros)/launch/firefly.launch"> -->
-  <!--   <arg name="ns" value="/atl/gimbal_camera" /> -->
-  <!--   <arg name="guid" value="00b09d0100bd09b1" /> -->
-  <!--   <arg name="software_trigger" value="true" /> -->
-  <!-- </include> -->
-  <!--  -->
-  <!-- <!&#45;&#45; Camera trigger &#45;&#45;> -->
-  <!-- <arg name="rate" default="20.0" /> -->
-  <!-- <include file="$(find atl_ros)/launch/firefly_trigger.launch"> -->
-  <!--   <arg name="rate" value="$(arg rate)" /> -->
-  <!-- </include> -->
+  <!-- gimbal node -->
+  <node pkg="atl_ros" name="atl_gimbal" type="atl_gimbal_node" output="screen" required="true" >
+    <param name="config" value="$(find atl_configs)/configs/gimbal/config.yaml" />
+    <param name="gimbal_imu" value="SBGC" />
+  </node>
+
+  <!-- Static camera -->
+  <remap from="/atl/static_camera/image_mono" to="/atl/static_camera/image" />
+  <include file="$(find atl_ros)/launch/firefly.launch">
+    <arg name="ns" value="/atl/static_camera" />
+    <arg name="guid" value="00b09d0100b7e092" />
+    <arg name="software_trigger" value="true" />
+  </include>
+
+  <!-- Gimbal camera -->
+  <remap from="/atl/gimbal_camera/image_mono" to="/atl/gimbal_camera/image" />
+  <include file="$(find atl_ros)/launch/firefly.launch">
+    <arg name="ns" value="/atl/gimbal_camera" />
+    <arg name="guid" value="00b09d0100b9be46" />
+    <arg name="software_trigger" value="true" />
+  </include>
+
+  <!-- Camera trigger -->
+  <arg name="rate" default="4.0" />
+  <include file="$(find atl_ros)/launch/firefly_trigger.launch">
+    <arg name="rate" value="$(arg rate)" />
+  </include>
 </launch>

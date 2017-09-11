@@ -2,6 +2,11 @@ desired_velocity: 1.0
 look_ahead_dist: 0.5
 threshold_waypoint_gap: 40.0
 threshold_waypoint_reached: 0.2
+mission_yaw: 65.0
+yaw_mode: 0  # 0: Auto mode
+             # 1: Lock as an initial value
+             # 2: Controlled by RC
+             # 3: Use waypoint's target yaw
 exec_times: 2
 
 waypoints: [

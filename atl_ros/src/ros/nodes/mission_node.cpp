@@ -100,6 +100,8 @@ int MissionNode::loadMission(const std::string &config_file) {
   parser.addParam("desired_velocity", &this->desired_velocity);
   parser.addParam("threshold_waypoint_gap", &this->threshold_waypoint_gap);
   parser.addParam("exec_times", &this->exec_times, true);
+  parser.addParam("mission_yaw", &this->mission_yaw, true);
+  parser.addParam("yaw_mode", &this->yaw_mode, true);
   parser.addParam("waypoints", &waypoint_data);
   if (parser.load(config_file) != 0) {
     return -1;
@@ -162,7 +164,7 @@ int MissionNode::uploadMission() {
   task.idle_velocity = this->desired_velocity;
   task.action_on_finish = dji_sdk::MissionWaypointTask::FINISH_RETURN_TO_POINT;
   task.mission_exec_times = this->exec_times;
-  task.yaw_mode = dji_sdk::MissionWaypointTask::YAW_MODE_WAYPOINT;
+  task.yaw_mode = this->yaw_mode;
   task.trace_mode = 0;  // 0: point to point, 1: coordinated turn mode, smooth transition
   task.action_on_rc_lost = dji_sdk::MissionWaypointTask::ACTION_AUTO;
   task.gimbal_pitch_mode = dji_sdk::MissionWaypointTask::GIMBAL_PITCH_FREE;
@@ -177,7 +179,7 @@ int MissionNode::uploadMission() {
     wp.longitude = lon;
     wp.altitude = alt;
     wp.damping_distance = 0;
-    wp.target_yaw = -65.0;  // SPECIFIC TO ICRA2017
+    wp.target_yaw = this->mission_yaw;  // SPECIFIC TO ICRA2017
     // wp.target_yaw = 0;
     wp.target_gimbal_pitch = 0;
     wp.turn_mode = 0;
