@@ -119,34 +119,34 @@ def plot_trajectory(mono_data, scc_data, dcc_data):
     dcc = dcc_data["odom_pos"]
 
     fig = plt.figure()
-    plt.plot(mono_gps[:, 0], mono_gps[:, 1], label="GPS", color="r")
-    plt.plot(mono[:, 0], mono[:, 1], label="Mono", color="b")
+    plt.plot(mono_gps[:, 0], mono_gps[:, 1], label="GPS")
+    plt.plot(mono[:, 0], mono[:, 1], label="Mono")
     plt.xlabel("East (m)")
     plt.ylabel("North (m)")
     plt.xlim([-5.0, 40])
     plt.ylim([-11, 15])
     plt.axis('equal')
-    plt.legend()
+    plt.legend(loc=2)
 
     fig = plt.figure()
-    plt.plot(scc_gps[:, 0], scc_gps[:, 1], label="GPS", color="r")
-    plt.plot(scc[:, 0], scc[:, 1], label="SCC", color="b")
+    plt.plot(scc_gps[:, 0], scc_gps[:, 1], label="GPS")
+    plt.plot(scc[:, 0], scc[:, 1], label="SCC")
     plt.xlabel("East (m)")
     plt.ylabel("North (m)")
     plt.xlim([-5.0, 40])
     plt.ylim([-11, 15])
     plt.axis('equal')
-    plt.legend()
+    plt.legend(loc=2)
 
     fig = plt.figure()
-    plt.plot(dcc_gps[:, 0], dcc_gps[:, 1], label="GPS", color="r")
-    plt.plot(dcc[:, 0], dcc[:, 1], label="DCC", color="b")
+    plt.plot(dcc_gps[:, 0], dcc_gps[:, 1], label="GPS")
+    plt.plot(dcc[:, 0], dcc[:, 1], label="DCC")
     plt.xlabel("East (m)")
     plt.ylabel("North (m)")
     plt.xlim([-5.0, 40])
     plt.ylim([-11, 15])
     plt.axis('equal')
-    plt.legend()
+    plt.legend(loc=2)
 
 
 def plot_translation_errors(mono, scc, dcc):
@@ -156,11 +156,11 @@ def plot_translation_errors(mono, scc, dcc):
     mono_vel_time = mono["vel_time"]
     mono_vel = mono["vel"]
     mono_pos = mono["odom_pos"]
-    mono_x_total, mono_y_total, mono_z_total = calc_dist_traveled(mono_vel_time,
+    mono_x_total, mono_y_total, mono_z_total, mono_dist_total = calc_dist_traveled(mono_vel_time,
                                                                   mono_vel)
-    mono_x_error = ((mono_gps[:, 0] - mono_pos[:, 0]) / mono_x_total) * 100.0
-    mono_y_error = ((mono_gps[:, 1] - mono_pos[:, 1]) / mono_y_total) * 100.0
-    mono_z_error = ((mono_gps[:, 2] - mono_pos[:, 2]) / mono_z_total) * 100.0
+    mono_x_error = ((mono_gps[:, 0] - mono_pos[:, 0]) / mono_dist_total) * 100.0
+    mono_y_error = ((mono_gps[:, 1] - mono_pos[:, 1]) / mono_dist_total) * 100.0
+    mono_z_error = ((mono_gps[:, 2] - mono_pos[:, 2]) / mono_dist_total) * 100.0
 
     # mono_error = []
     # for i in range(mono_gps.shape[0]):
@@ -181,11 +181,11 @@ def plot_translation_errors(mono, scc, dcc):
     scc_vel_time = scc["vel_time"]
     scc_vel = scc["vel"]
     scc_pos = scc["odom_pos"]
-    scc_x_total, scc_y_total, scc_z_total = calc_dist_traveled(scc_vel_time,
+    scc_x_total, scc_y_total, scc_z_total, scc_dist_total = calc_dist_traveled(scc_vel_time,
                                                                scc_vel)
-    scc_x_error = ((scc_gps[:, 0] - scc_pos[:, 0]) / scc_x_total) * 100.0
-    scc_y_error = ((scc_gps[:, 1] - scc_pos[:, 1]) / scc_y_total) * 100.0
-    scc_z_error = ((scc_gps[:, 2] - scc_pos[:, 2]) / scc_z_total) * 100.0
+    scc_x_error = ((scc_gps[:, 0] - scc_pos[:, 0]) / scc_dist_total) * 100.0
+    scc_y_error = ((scc_gps[:, 1] - scc_pos[:, 1]) / scc_dist_total) * 100.0
+    scc_z_error = ((scc_gps[:, 2] - scc_pos[:, 2]) / scc_dist_total) * 100.0
 
     # scc_x_rmse_normalized = sqrt(mean_squared_error(scc_gps[:, 0], scc_pos[:, 0])) / scc_x_total
     # scc_y_rmse_normalized = sqrt(mean_squared_error(scc_gps[:, 1], scc_pos[:, 1])) / scc_y_total
@@ -200,13 +200,14 @@ def plot_translation_errors(mono, scc, dcc):
     dcc_vel_time = dcc["vel_time"]
     dcc_vel = dcc["vel"]
     dcc_pos = dcc["odom_pos"]
-    dcc_x_total, dcc_y_total, dcc_z_total = calc_dist_traveled(dcc_vel_time,
+    dcc_x_total, dcc_y_total, dcc_z_total, dcc_dist_total = calc_dist_traveled(dcc_vel_time,
                                                                dcc_vel)
-    dcc_x_error = ((dcc_gps[:, 0] - dcc_pos[:, 0]) / dcc_x_total) * 100.0
-    dcc_y_error = ((dcc_gps[:, 1] - dcc_pos[:, 1]) / dcc_y_total) * 100.0
-    dcc_z_error = ((dcc_gps[:, 2] - dcc_pos[:, 2]) / dcc_z_total) * 100.0
+    dcc_x_error = ((dcc_gps[:, 0] - dcc_pos[:, 0]) / dcc_dist_total) * 100.0
+    dcc_y_error = ((dcc_gps[:, 1] - dcc_pos[:, 1]) / dcc_dist_total) * 100.0
+    dcc_z_error = ((dcc_gps[:, 2] - dcc_pos[:, 2]) / dcc_dist_total) * 100.0
 
-    # print (dcc_x_total, dcc_y_total, dcc_z_total)
+
+# print (dcc_x_total, dcc_y_total, dcc_z_total)
     #
     # dcc_x_rmse_normalized = sqrt(mean_squared_error(dcc_gps[:, 0], dcc_pos[:, 0])) / dcc_x_total
     # dcc_y_rmse_normalized = sqrt(mean_squared_error(dcc_gps[:, 1], dcc_pos[:, 1])) / dcc_y_total
@@ -284,7 +285,7 @@ def plot_rotation_errors(mono, scc):
     # ax.plot(dcc_imu_time, dcc_roll_error, label="DCC")
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("Roll - error (rad)")
-    ax.legend()
+    ax.legend(loc=0)
 
     ax = fig.add_subplot(312)
     ax.plot(mono_imu_time, mono_pitch_error, label="Mono")
@@ -292,7 +293,7 @@ def plot_rotation_errors(mono, scc):
     # ax.plot(dcc_imu_time, dcc_pitch_error, label="DCC")
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("Pitch - error (rad)")
-    ax.legend()
+    ax.legend(loc=0)
 
     ax = fig.add_subplot(313)
     ax.plot(mono_imu_time, mono_yaw_error, label="Mono")
@@ -300,23 +301,35 @@ def plot_rotation_errors(mono, scc):
     # ax.plot(dcc_imu_time, dcc_yaw_error, label="DCC")
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("Yaw - error (rad)")
-    ax.legend()
+    ax.legend(loc=0)
 
 
-def plot_gimbal_angles(gimbal_angles_t,
-                       gimbal_angles,
-                       ref_angles_t,
-                       ref_angles):
+def plot_gimbal_angles(dcc_data):
+    gimbal_angles_t = dcc_data['gimbal_angles_t']
+    gimbal_angles = dcc_data['gimbal_angles']
+    ref_angles_t = dcc_data['ref_angles_t']
+    ref_angles = dcc_data['ref_angles']
+
+    # Plot relative change since zero point is arbitrary
+    ref_angles = ref_angles - ref_angles[0]
+    gimbal_angles = gimbal_angles - gimbal_angles[0]
+
     fig = plt.figure()
     ax = fig.add_subplot(211)
-    ax.plot(gimbal_angles_t, [g[0] for g in gimbal_angles], label="Estimated roll")
-    ax.plot(ref_angles_t, [g[0] for g in ref_angles], label="Measured roll")
-    ax.legend()
+    ax.plot(gimbal_angles_t, [g[0] for g in gimbal_angles], label="Estimated")
+    ax.plot(ref_angles_t, [g[0] for g in ref_angles], label="Measured")
+    ax.legend(loc=0)
+    #ax.set_xlabel("Time (s)")
+    ax.set_ylabel("Roll (rad)")
 
-    ax = fig.add_subplot(212)
-    ax.plot(gimbal_angles_t, [g[1] for g in gimbal_angles], label="Estimated pitch")
-    ax.plot(ref_angles_t, [g[1] for g in ref_angles], label="Measured pitch")
-    ax.legend()
+    ax1 = fig.add_subplot(212, sharex=ax, sharey=ax)
+    ax1.plot(gimbal_angles_t, [g[1] for g in gimbal_angles], label="Estimated")
+    ax1.plot(ref_angles_t, [g[1] for g in ref_angles], label="Measured")
+    #ax1.legend(loc=0)
+    ax1.set_xlabel("Time (s)")
+    ax1.set_ylabel("Pitch (rad)")
+    ax.set_ylim([-0.75, 1.75])
+    ax.set_xlim([0, 180])
 
 
 def parse_imu(bag, time_init):
@@ -330,7 +343,7 @@ def parse_imu(bag, time_init):
                 msg.quaternion.y,
                 msg.quaternion.z]
         imu.append(quat2euler(quat, 321))
-        imu_time.append(float(t.to_sec()) - time_init)
+        imu_time.append(float(msg.header.stamp.to_sec()) - time_init)
     imu = np.array(imu)
 
     return (imu_time, imu)
@@ -361,7 +374,7 @@ def parse_odometry(bag, time_init, yaw_offset):
 
         odom_pos.append(position)
         odom_att.append(rpy)
-        odom_time.append(float(t.to_sec()) - time_init)
+        odom_time.append(float(msg.header.stamp.to_sec()) - time_init)
 
     odom_pos = np.array(odom_pos)
     odom_att = np.array(odom_att)
@@ -378,7 +391,7 @@ def parse_gps(bag, time_init):
         gps.append([msg.pose.pose.position.x,
                     msg.pose.pose.position.y,
                     msg.pose.pose.position.z])
-        gps_time.append(float(t.to_sec()) - time_init)
+        gps_time.append(float(msg.header.stamp.to_sec()) - time_init)
     gps = np.array(gps)
 
     return (gps_time, gps)
@@ -391,7 +404,7 @@ def parse_velocity(bag, time_init):
 
     for topic, msg, t in bag.read_messages(topics=topics):
         vel.append([msg.vector.x, msg.vector.y, msg.vector.z])
-        vel_time.append(float(t.to_sec()) - time_init)
+        vel_time.append(float(msg.header.stamp.to_sec()) - time_init)
     vel = np.array(vel)
 
     return (vel_time, vel)
@@ -405,14 +418,15 @@ def parse_gimbal_angles(bag, time_init):
     topics = ["/okvis_node/gimbal_angles", "/okvis_node/ref_gimbal_angles"]
 
     for topic, msg, t in bag.read_messages(topics=topics):
+        rpy = np.array([msg.vector.x, msg.vector.y, msg.vector.z])
+        t_sec = float(msg.header.stamp.to_sec())
         if topic == "/okvis_node/gimbal_angles":
-            rpy = np.array([msg.vector.x, msg.vector.y, msg.vector.z])
             gimbal_angles.append(rpy)
-            gimbal_angles_t.append(float(t.to_sec()) - time_init)
+            gimbal_angles_t.append(t_sec - time_init)
         elif topic == "/okvis_node/ref_gimbal_angles":
             rpy = np.array([msg.vector.x, msg.vector.y, msg.vector.z])
             ref_angles.append(rpy)
-            ref_angles_t.append(float(t.to_sec()) - time_init)
+            ref_angles_t.append(t_sec - time_init)
 
     gimbal_angles = np.array(gimbal_angles)
     ref_angles = np.array(ref_angles)
@@ -424,6 +438,11 @@ def interpolate_odom_gps_imu(odom_data, gps_data, imu_data):
     odom_time, odom_pos, odom_att = odom_data
     gps_time, gps = gps_data
     imu_time, imu = imu_data
+
+    print("Interpolating data:")
+    print("odom from {} to {}".format(odom_time[1], odom_time[-1]))
+    print("gps from {} to {}".format(gps_time[1], gps_time[-1]))
+    print("imu from {} to {}".format(imu_time[1], imu_time[-1]))
 
     # Interpolate odometry position signal to match up against GPS signal
     f_odom_pos_x = interpolate.interp1d(odom_time, odom_pos[:, 0])
@@ -450,6 +469,7 @@ def calc_dist_traveled(vel_time, vel):
     x = 0.0
     y = 0.0
     z = 0.0
+    total = 0.0
 
     for i in range(1, len(vel) - 1):
         dt = vel_time[i] - t
@@ -465,7 +485,14 @@ def calc_dist_traveled(vel_time, vel):
 
         t = vel_time[i]
 
-    return (x, y, z)
+        total += np.linalg.norm([vx * dt, vy * dt, vz * dt])
+
+    print("x_total = {}".format(x))
+    print("y_total = {}".format(y))
+    print("z_total = {}".format(z))
+    print("dist_total = {}".format(total))
+
+    return (x, y, z, total)
 
 
 def parse_bag(bag_path, **kwargs):
@@ -476,9 +503,11 @@ def parse_bag(bag_path, **kwargs):
 
     # Get first timestamp
     time_init = None
-    for ros_topic, ros_msg, ros_time in bag.read_messages():
-        time_init = float(ros_time.to_sec())
+    for ros_topic, ros_msg, ros_time in bag.read_messages(topics=['/okvis_node/okvis_odometry']):
+        time_init = float(ros_msg.header.stamp.to_sec())
         break
+
+    print("Parsing bag {}, starting at time {}".format(bag_path, time_init))
 
     # Parse data
     gps_time, gps = parse_gps(bag, time_init)
@@ -527,10 +556,12 @@ def parse_bag(bag_path, **kwargs):
     gps = np.array([gps[0:trim_last, 0],
                     gps[0:trim_last, 1],
                     gps[0:trim_last, 2]]).transpose()
-    imu_time = imu_time[0:trim_last]
-    imu = np.array([imu[0:trim_last, 0],
-                    imu[0:trim_last, 1],
-                    imu[0:trim_last, 2]]).transpose()
+
+    trim_imu_first = 30  # Hack to avoid imu starting first
+    imu_time = imu_time[trim_imu_first:trim_last]
+    imu = np.array([imu[trim_imu_first:trim_last, 0],
+                    imu[trim_imu_first:trim_last, 1],
+                    imu[trim_imu_first:trim_last, 2]]).transpose()
 
     # Interpolate odometry data
     odom_data = (odom_time, odom_pos, odom_att)
@@ -550,19 +581,31 @@ def parse_bag(bag_path, **kwargs):
 def plot_data(mono_bag_path, scc_bag_path, dcc_bag_path):
     mono_data = parse_bag(mono_bag_path,
                           trim_last=-100,
-                          yaw_offset=35)
+                          yaw_offset=35.0)
     scc_data = parse_bag(scc_bag_path,
                          trim_last=-100,
-                         yaw_offset=30)
+                         yaw_offset=30.0)
     dcc_data = parse_bag(dcc_bag_path,
                          trim_last=-100,
-                         yaw_offset=35)
+                         yaw_offset=38.0)
 
     # Set plot style
-    plt.style.use("ggplot")
+    #plt.style.use("ggplot")
+    #plt.rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
+    ## for Palatino and other serif fonts use:
+    plt.rc('font',**{'family':'serif','serif':['Palatino'], 'size': 12})
+    plt.rc('text', usetex=True)
+    plt.rcParams['lines.linewidth'] = 1.5
+    plt.rc('axes',
+           labelsize=16,
+           prop_cycle = plt.cycler('color', ['crimson', 'royalblue', 'forestgreen']),
+           grid=True
+           )
+    plt.rc('savefig', bbox='tight')
+
 
     # Figure 1 - trajectory plot
-    # plot_trajectory(mono_data, scc_data, dcc_data)
+    plot_trajectory(mono_data, scc_data, dcc_data)
 
     # Figure 2 - translation errors
     plot_translation_errors(mono_data, scc_data, dcc_data)
@@ -573,10 +616,10 @@ def plot_data(mono_bag_path, scc_bag_path, dcc_bag_path):
     # plt.savefig("plot_rotation_errors.png")
 
     # Figure 4 - Gimbal angles measured vs estimated
-    # plot_gimbal_angles(*gimbal_data)
-    # plt.savefig("plot_gimbal_errors%s.png")
+    plot_gimbal_angles(dcc_data)
+    #plt.savefig("plot_gimbal_errors%s.png")
 
-    # plt.show()
+    plt.show()
 
 
 if __name__ == "__main__":
