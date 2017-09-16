@@ -9,7 +9,9 @@ from math import asin
 import rosbag
 import numpy as np
 import matplotlib.pyplot as plt
+from math import sqrt
 from scipy import interpolate
+from sklearn.metrics import mean_squared_error
 from mpl_toolkits.mplot3d import Axes3D  # NOQA
 
 
@@ -108,51 +110,133 @@ def print_ros_topics(bag_path):
     pprint.pprint(bag_info.topics)
 
 
-def plot_trajectory(scc_data):
-    gps = scc_data["gps"]
+def plot_trajectory(mono_data, scc_data, dcc_data):
+    mono_gps = mono_data["gps"]
+    mono = mono_data["odom_pos"]
+    scc_gps = scc_data["gps"]
     scc = scc_data["odom_pos"]
+    dcc_gps = dcc_data["gps"]
+    dcc = dcc_data["odom_pos"]
 
     fig = plt.figure()
-    ax = fig.add_subplot(111)
-    ax.plot(scc[:, 0], scc[:, 1], label="SCC", color="b")
-    ax.plot(gps[:, 0], gps[:, 1], label="GPS", color="r")
-    ax.set_xlabel("East (m)")
-    ax.set_ylabel("North (m)")
-    ax.set_xlim([-5.0, 50])
-    ax.set_ylim([-10, 10])
-    ax.legend()
+    plt.plot(mono_gps[:, 0], mono_gps[:, 1], label="GPS", color="r")
+    plt.plot(mono[:, 0], mono[:, 1], label="Mono", color="b")
+    plt.xlabel("East (m)")
+    plt.ylabel("North (m)")
+    plt.xlim([-5.0, 40])
+    plt.ylim([-11, 15])
+    plt.axis('equal')
+    plt.legend()
+
+    fig = plt.figure()
+    plt.plot(scc_gps[:, 0], scc_gps[:, 1], label="GPS", color="r")
+    plt.plot(scc[:, 0], scc[:, 1], label="SCC", color="b")
+    plt.xlabel("East (m)")
+    plt.ylabel("North (m)")
+    plt.xlim([-5.0, 40])
+    plt.ylim([-11, 15])
+    plt.axis('equal')
+    plt.legend()
+
+    fig = plt.figure()
+    plt.plot(dcc_gps[:, 0], dcc_gps[:, 1], label="GPS", color="r")
+    plt.plot(dcc[:, 0], dcc[:, 1], label="DCC", color="b")
+    plt.xlabel("East (m)")
+    plt.ylabel("North (m)")
+    plt.xlim([-5.0, 40])
+    plt.ylim([-11, 15])
+    plt.axis('equal')
+    plt.legend()
 
 
-def plot_translation_errors(scc_data):
-    gps_time = scc_data["gps_time"]
-    gps = scc_data["gps"]
-    scc_vel_time = scc_data["vel_time"]
-    scc_vel = scc_data["vel"]
-    scc_pos = scc_data["odom_pos"]
+def plot_translation_errors(mono, scc, dcc):
+    # Mono
+    mono_gps_time = mono["gps_time"]
+    mono_gps = mono["gps"]
+    mono_vel_time = mono["vel_time"]
+    mono_vel = mono["vel"]
+    mono_pos = mono["odom_pos"]
+    mono_x_total, mono_y_total, mono_z_total = calc_dist_traveled(mono_vel_time,
+                                                                  mono_vel)
+    mono_x_error = ((mono_gps[:, 0] - mono_pos[:, 0]) / mono_x_total) * 100.0
+    mono_y_error = ((mono_gps[:, 1] - mono_pos[:, 1]) / mono_y_total) * 100.0
+    mono_z_error = ((mono_gps[:, 2] - mono_pos[:, 2]) / mono_z_total) * 100.0
 
-    # Static stereo camera
+    # mono_error = []
+    # for i in range(mono_gps.shape[0]):
+    #     error = mono_gps[i, :] - mono_pos[i, :]
+    #     np.linalg.norm(error)
+    #     mono_error.append(error)
+
+    # mono_x_rmse_normalized = sqrt(mean_squared_error(mono_gps[:, 0], mono_pos[:, 0])) / mono_x_total
+    # mono_y_rmse_normalized = sqrt(mean_squared_error(mono_gps[:, 1], mono_pos[:, 1])) / mono_y_total
+    # mono_z_rmse_normalized = sqrt(mean_squared_error(mono_gps[:, 2], mono_pos[:, 2])) / mono_z_total
+    # print("Mono normalized error: ", (mono_x_rmse_normalized,
+    #                                   mono_y_rmse_normalized,
+    #                                   mono_z_rmse_normalized))
+
+    # Static camera cluster
+    scc_gps_time = scc["gps_time"]
+    scc_gps = scc["gps"]
+    scc_vel_time = scc["vel_time"]
+    scc_vel = scc["vel"]
+    scc_pos = scc["odom_pos"]
     scc_x_total, scc_y_total, scc_z_total = calc_dist_traveled(scc_vel_time,
                                                                scc_vel)
-    scc_x_error = ((gps[:, 0] - scc_pos[:, 0]) / scc_x_total) * 100.0
-    scc_y_error = ((gps[:, 1] - scc_pos[:, 1]) / scc_y_total) * 100.0
-    scc_z_error = ((gps[:, 2] - scc_pos[:, 2]) / scc_z_total) * 100.0
+    scc_x_error = ((scc_gps[:, 0] - scc_pos[:, 0]) / scc_x_total) * 100.0
+    scc_y_error = ((scc_gps[:, 1] - scc_pos[:, 1]) / scc_y_total) * 100.0
+    scc_z_error = ((scc_gps[:, 2] - scc_pos[:, 2]) / scc_z_total) * 100.0
+
+    # scc_x_rmse_normalized = sqrt(mean_squared_error(scc_gps[:, 0], scc_pos[:, 0])) / scc_x_total
+    # scc_y_rmse_normalized = sqrt(mean_squared_error(scc_gps[:, 1], scc_pos[:, 1])) / scc_y_total
+    # scc_z_rmse_normalized = sqrt(mean_squared_error(scc_gps[:, 2], scc_pos[:, 2])) / scc_z_total
+    # print("SCC normalized error: ", (scc_x_rmse_normalized,
+    #                                  scc_y_rmse_normalized,
+    #                                  scc_z_rmse_normalized))
+
+    # Dynamic camera cluster
+    dcc_gps_time = dcc["gps_time"]
+    dcc_gps = dcc["gps"]
+    dcc_vel_time = dcc["vel_time"]
+    dcc_vel = dcc["vel"]
+    dcc_pos = dcc["odom_pos"]
+    dcc_x_total, dcc_y_total, dcc_z_total = calc_dist_traveled(dcc_vel_time,
+                                                               dcc_vel)
+    dcc_x_error = ((dcc_gps[:, 0] - dcc_pos[:, 0]) / dcc_x_total) * 100.0
+    dcc_y_error = ((dcc_gps[:, 1] - dcc_pos[:, 1]) / dcc_y_total) * 100.0
+    dcc_z_error = ((dcc_gps[:, 2] - dcc_pos[:, 2]) / dcc_z_total) * 100.0
+
+    # print (dcc_x_total, dcc_y_total, dcc_z_total)
+    #
+    # dcc_x_rmse_normalized = sqrt(mean_squared_error(dcc_gps[:, 0], dcc_pos[:, 0])) / dcc_x_total
+    # dcc_y_rmse_normalized = sqrt(mean_squared_error(dcc_gps[:, 1], dcc_pos[:, 1])) / dcc_y_total
+    # dcc_z_rmse_normalized = sqrt(mean_squared_error(dcc_gps[:, 2], dcc_pos[:, 2])) / dcc_z_total
+    # print("DCC normalized error: ", (dcc_x_rmse_normalized,
+    #                                  dcc_y_rmse_normalized,
+    #                                  dcc_z_rmse_normalized))
 
     # Plot translation errors
     fig = plt.figure()
     ax = fig.add_subplot(311)
-    ax.plot(gps_time, scc_x_error, label="SCC")
+    ax.plot(mono_gps_time, mono_x_error, label="Mono")
+    ax.plot(scc_gps_time, scc_x_error, label="SCC")
+    ax.plot(dcc_gps_time, dcc_x_error, label="DCC")
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("x - error (%)")
     ax.legend()
 
     ax = fig.add_subplot(312)
-    ax.plot(gps_time, scc_y_error, label="SCC")
+    ax.plot(mono_gps_time, mono_y_error, label="Mono")
+    ax.plot(scc_gps_time, scc_y_error, label="SCC")
+    ax.plot(dcc_gps_time, dcc_y_error, label="DCC")
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("y - error (%)")
     ax.legend()
 
     ax = fig.add_subplot(313)
-    ax.plot(gps_time, scc_z_error, label="SCC")
+    ax.plot(mono_gps_time, mono_z_error, label="Mono")
+    ax.plot(scc_gps_time, scc_z_error, label="SCC")
+    ax.plot(dcc_gps_time, dcc_z_error, label="DCC")
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("z - error (%)")
     ax.legend()
@@ -173,32 +257,47 @@ def calc_yaw_error(measured, estimated):
     return np.array(yaw_error)
 
 
-def plot_rotation_errors(scc):
-    # Static stereo camera setup
+def plot_rotation_errors(mono, scc):
+    # Mono
+    mono_roll_error = mono["imu"][:, 0] - mono["odom_att"][:, 0]
+    mono_pitch_error = mono["imu"][:, 1] - mono["odom_att"][:, 1]
+    mono_yaw_error = calc_yaw_error(mono["imu"][:, 2], mono["odom_att"][:, 2])
+    mono_imu_time = mono["imu_time"]
+
+    # Static camera cluster
     scc_roll_error = scc["imu"][:, 0] - scc["odom_att"][:, 0]
     scc_pitch_error = scc["imu"][:, 1] - scc["odom_att"][:, 1]
     scc_yaw_error = calc_yaw_error(scc["imu"][:, 2], scc["odom_att"][:, 2])
     scc_imu_time = scc["imu_time"]
 
+    # Dynamic camera cluster
+    # dcc_roll_error = dcc["imu"][:, 0] - dcc["odom_att"][:, 0]
+    # dcc_pitch_error = dcc["imu"][:, 1] - dcc["odom_att"][:, 1]
+    # dcc_yaw_error = calc_yaw_error(dcc["imu"][:, 2], dcc["odom_att"][:, 2])
+    # dcc_imu_time = dcc["imu_time"]
+
     # Plot rotation errors
     fig = plt.figure()
     ax = fig.add_subplot(311)
+    ax.plot(mono_imu_time, mono_roll_error, label="Mono")
     ax.plot(scc_imu_time, scc_roll_error, label="SCC")
-    # ax.plot(mcc_imu_time, mcc_roll_error, label="MCC")
+    # ax.plot(dcc_imu_time, dcc_roll_error, label="DCC")
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("Roll - error (rad)")
     ax.legend()
 
     ax = fig.add_subplot(312)
+    ax.plot(mono_imu_time, mono_pitch_error, label="Mono")
     ax.plot(scc_imu_time, scc_pitch_error, label="SCC")
-    # ax.plot(mcc_imu_time, mcc_pitch_error, label="MCC")
+    # ax.plot(dcc_imu_time, dcc_pitch_error, label="DCC")
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("Pitch - error (rad)")
     ax.legend()
 
     ax = fig.add_subplot(313)
+    ax.plot(mono_imu_time, mono_yaw_error, label="Mono")
     ax.plot(scc_imu_time, scc_yaw_error, label="SCC")
-    # ax.plot(mcc_imu_time, mcc_yaw_error, label="MCC")
+    # ax.plot(dcc_imu_time, dcc_yaw_error, label="DCC")
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("Yaw - error (rad)")
     ax.legend()
@@ -237,7 +336,7 @@ def parse_imu(bag, time_init):
     return (imu_time, imu)
 
 
-def parse_odometry(bag, time_init):
+def parse_odometry(bag, time_init, yaw_offset):
     odom_pos = []
     odom_att = []
     odom_time = []
@@ -253,12 +352,12 @@ def parse_odometry(bag, time_init):
                        msg.pose.pose.orientation.z]
 
         # TRANSFORM ODOMETRY TO WORLD FRAME
-        R = rotz(deg2rad(25))
+        R = rotz(deg2rad(yaw_offset))
         position = np.dot(R, position)
 
         # Convert quaternion to euler angles
         rpy = quat2euler(orientation, 321)
-        rpy[2] += deg2rad(25)
+        rpy[2] += deg2rad(yaw_offset)
 
         odom_pos.append(position)
         odom_att.append(rpy)
@@ -307,11 +406,11 @@ def parse_gimbal_angles(bag, time_init):
 
     for topic, msg, t in bag.read_messages(topics=topics):
         if topic == "/okvis_node/gimbal_angles":
-            rpy = np.array([msg.x, msg.y, msg.z])
+            rpy = np.array([msg.vector.x, msg.vector.y, msg.vector.z])
             gimbal_angles.append(rpy)
             gimbal_angles_t.append(float(t.to_sec()) - time_init)
         elif topic == "/okvis_node/ref_gimbal_angles":
-            rpy = np.array([msg.x, msg.y, msg.z])
+            rpy = np.array([msg.vector.x, msg.vector.y, msg.vector.z])
             ref_angles.append(rpy)
             ref_angles_t.append(float(t.to_sec()) - time_init)
 
@@ -369,7 +468,10 @@ def calc_dist_traveled(vel_time, vel):
     return (x, y, z)
 
 
-def parse_bag(bag_path):
+def parse_bag(bag_path, **kwargs):
+    debug = kwargs.get("debug", False)
+    trim_last = kwargs.get("trim_last", -1)
+    yaw_offset = kwargs.get("yaw_offset", 0)
     bag = rosbag.Bag(bag_path)
 
     # Get first timestamp
@@ -382,16 +484,58 @@ def parse_bag(bag_path):
     gps_time, gps = parse_gps(bag, time_init)
     vel_time, vel = parse_velocity(bag, time_init)
     imu_time, imu = parse_imu(bag, time_init)
-    odom_time, odom_pos, odom_att = parse_odometry(bag, time_init)
+    odom_time, odom_pos, odom_att = parse_odometry(bag,
+                                                   time_init,
+                                                   yaw_offset)
     gimbal_data = parse_gimbal_angles(bag, time_init)
+
+    # Plot data
+    if debug:
+        # Plot odometry position
+        plt.figure()
+        plt.subplot(311)
+        plt.plot(odom_time, odom_pos[:, 0], label="OKVIS")
+        plt.subplot(312)
+        plt.plot(odom_time, odom_pos[:, 1], label="OKVIS")
+        plt.subplot(313)
+        plt.plot(odom_time, odom_pos[:, 2], label="OKVIS")
+
+        # Plot odometry attitude
+        plt.figure()
+        plt.subplot(311)
+        plt.plot(odom_time, odom_att[:, 0], label="OKVIS")
+        plt.subplot(312)
+        plt.plot(odom_time, odom_att[:, 1], label="OKVIS")
+        plt.subplot(313)
+        plt.plot(odom_time, odom_att[:, 2], label="OKVIS")
+
+        # Plot imu attitude
+        plt.figure()
+        plt.subplot(311)
+        plt.plot(imu_time, imu[:, 0], label="OKVIS")
+        plt.subplot(312)
+        plt.plot(imu_time, imu[:, 1], label="OKVIS")
+        plt.subplot(313)
+        plt.plot(imu_time, imu[:, 2], label="OKVIS")
+        plt.show()
 
     # Close ROS bag
     bag.close()
 
+    # Trim GPS and IMU
+    gps_time = gps_time[0:trim_last]
+    gps = np.array([gps[0:trim_last, 0],
+                    gps[0:trim_last, 1],
+                    gps[0:trim_last, 2]]).transpose()
+    imu_time = imu_time[0:trim_last]
+    imu = np.array([imu[0:trim_last, 0],
+                    imu[0:trim_last, 1],
+                    imu[0:trim_last, 2]]).transpose()
+
     # Interpolate odometry data
     odom_data = (odom_time, odom_pos, odom_att)
-    gps_data = (gps_time, gps)
-    imu_data = (imu_time, imu)
+    gps_data = [gps_time, gps]
+    imu_data = [imu_time, imu]
     new_odom_data = interpolate_odom_gps_imu(odom_data, gps_data, imu_data)
     interp_odom_pos = np.array(new_odom_data[0:3]).transpose()
     interp_odom_att = np.array(new_odom_data[3:6]).transpose()
@@ -403,32 +547,41 @@ def parse_bag(bag_path):
             "ref_angles_t": gimbal_data[2], "ref_angles": gimbal_data[3]}
 
 
-def plot_data(scc_bag_path):
-    scc_data = parse_bag(scc_bag_path)
+def plot_data(mono_bag_path, scc_bag_path, dcc_bag_path):
+    mono_data = parse_bag(mono_bag_path,
+                          trim_last=-100,
+                          yaw_offset=35)
+    scc_data = parse_bag(scc_bag_path,
+                         trim_last=-100,
+                         yaw_offset=30)
+    dcc_data = parse_bag(dcc_bag_path,
+                         trim_last=-100,
+                         yaw_offset=35)
 
     # Set plot style
     plt.style.use("ggplot")
 
     # Figure 1 - trajectory plot
-    plot_trajectory(scc_data)
-    plt.savefig("plot_trajectory.png")
+    # plot_trajectory(mono_data, scc_data, dcc_data)
 
     # Figure 2 - translation errors
-    plot_translation_errors(scc_data)
-    plt.savefig("plot_translation_errors.png")
+    plot_translation_errors(mono_data, scc_data, dcc_data)
+    # plt.savefig("plot_translation_errors.png")
 
     # Figure 3 - rotation errors
-    plot_rotation_errors(scc_data)
-    plt.savefig("plot_rotation_errors.png")
+    # plot_rotation_errors(mono_data, scc_data)
+    # plt.savefig("plot_rotation_errors.png")
 
     # Figure 4 - Gimbal angles measured vs estimated
     # plot_gimbal_angles(*gimbal_data)
     # plt.savefig("plot_gimbal_errors%s.png")
 
-    plt.show()
+    # plt.show()
 
 
 if __name__ == "__main__":
-    scc_bag_path = sys.argv[1]
+    mono_bag_path = sys.argv[1]
+    scc_bag_path = sys.argv[2]
+    dcc_bag_path = sys.argv[3]
 
-    plot_data(scc_bag_path)
+    plot_data(mono_bag_path, scc_bag_path, dcc_bag_path)
