@@ -149,6 +149,28 @@ def plot_trajectory(mono_data, scc_data, dcc_data):
     plt.legend(loc=2)
 
 
+def calc_translation_rmse(gps, odom_pos):
+    # Error
+    error = gps - odom_pos
+
+    # Normalize vector to get scalar
+    norm_error = []
+    for i in range(error.shape[0]):
+        norm_error.append(np.linalg.norm(error[i, :]))
+    norm_error = np.array(norm_error)
+
+    # Square error
+    norm_squared_error = norm_error ** 2
+
+    # Mean error
+    mean = sum(norm_squared_error) / float(norm_squared_error.shape[0])
+
+    # Root Mean Square Error
+    rmse = sqrt(mean)
+
+    return rmse
+
+
 def plot_translation_errors(mono, scc, dcc):
     # Mono
     mono_gps_time = mono["gps_time"]
@@ -162,19 +184,6 @@ def plot_translation_errors(mono, scc, dcc):
     mono_y_error = ((mono_gps[:, 1] - mono_pos[:, 1]) / mono_dist_total) * 100.0
     mono_z_error = ((mono_gps[:, 2] - mono_pos[:, 2]) / mono_dist_total) * 100.0
 
-    # mono_error = []
-    # for i in range(mono_gps.shape[0]):
-    #     error = mono_gps[i, :] - mono_pos[i, :]
-    #     np.linalg.norm(error)
-    #     mono_error.append(error)
-
-    # mono_x_rmse_normalized = sqrt(mean_squared_error(mono_gps[:, 0], mono_pos[:, 0])) / mono_x_total
-    # mono_y_rmse_normalized = sqrt(mean_squared_error(mono_gps[:, 1], mono_pos[:, 1])) / mono_y_total
-    # mono_z_rmse_normalized = sqrt(mean_squared_error(mono_gps[:, 2], mono_pos[:, 2])) / mono_z_total
-    # print("Mono normalized error: ", (mono_x_rmse_normalized,
-    #                                   mono_y_rmse_normalized,
-    #                                   mono_z_rmse_normalized))
-
     # Static camera cluster
     scc_gps_time = scc["gps_time"]
     scc_gps = scc["gps"]
@@ -186,13 +195,6 @@ def plot_translation_errors(mono, scc, dcc):
     scc_x_error = ((scc_gps[:, 0] - scc_pos[:, 0]) / scc_dist_total) * 100.0
     scc_y_error = ((scc_gps[:, 1] - scc_pos[:, 1]) / scc_dist_total) * 100.0
     scc_z_error = ((scc_gps[:, 2] - scc_pos[:, 2]) / scc_dist_total) * 100.0
-
-    # scc_x_rmse_normalized = sqrt(mean_squared_error(scc_gps[:, 0], scc_pos[:, 0])) / scc_x_total
-    # scc_y_rmse_normalized = sqrt(mean_squared_error(scc_gps[:, 1], scc_pos[:, 1])) / scc_y_total
-    # scc_z_rmse_normalized = sqrt(mean_squared_error(scc_gps[:, 2], scc_pos[:, 2])) / scc_z_total
-    # print("SCC normalized error: ", (scc_x_rmse_normalized,
-    #                                  scc_y_rmse_normalized,
-    #                                  scc_z_rmse_normalized))
 
     # Dynamic camera cluster
     dcc_gps_time = dcc["gps_time"]
@@ -206,15 +208,13 @@ def plot_translation_errors(mono, scc, dcc):
     dcc_y_error = ((dcc_gps[:, 1] - dcc_pos[:, 1]) / dcc_dist_total) * 100.0
     dcc_z_error = ((dcc_gps[:, 2] - dcc_pos[:, 2]) / dcc_dist_total) * 100.0
 
-
-# print (dcc_x_total, dcc_y_total, dcc_z_total)
-    #
-    # dcc_x_rmse_normalized = sqrt(mean_squared_error(dcc_gps[:, 0], dcc_pos[:, 0])) / dcc_x_total
-    # dcc_y_rmse_normalized = sqrt(mean_squared_error(dcc_gps[:, 1], dcc_pos[:, 1])) / dcc_y_total
-    # dcc_z_rmse_normalized = sqrt(mean_squared_error(dcc_gps[:, 2], dcc_pos[:, 2])) / dcc_z_total
-    # print("DCC normalized error: ", (dcc_x_rmse_normalized,
-    #                                  dcc_y_rmse_normalized,
-    #                                  dcc_z_rmse_normalized))
+    # Print RMSE
+    mono_rmse = calc_translation_rmse(mono_gps, mono_pos)
+    scc_rmse = calc_translation_rmse(scc_gps, scc_pos)
+    dcc_rmse = calc_translation_rmse(dcc_gps, dcc_pos)
+    print("Mono Translation RMSE:", mono_rmse)
+    print("SCC Translation RMSE:", scc_rmse)
+    print("DCC Translation RMSE:", dcc_rmse)
 
     # Plot translation errors
     fig = plt.figure()
@@ -258,7 +258,7 @@ def calc_yaw_error(measured, estimated):
     return np.array(yaw_error)
 
 
-def plot_rotation_errors(mono, scc):
+def plot_rotation_errors(mono, scc, dcc):
     # Mono
     mono_roll_error = mono["imu"][:, 0] - mono["odom_att"][:, 0]
     mono_pitch_error = mono["imu"][:, 1] - mono["odom_att"][:, 1]
@@ -272,17 +272,17 @@ def plot_rotation_errors(mono, scc):
     scc_imu_time = scc["imu_time"]
 
     # Dynamic camera cluster
-    # dcc_roll_error = dcc["imu"][:, 0] - dcc["odom_att"][:, 0]
-    # dcc_pitch_error = dcc["imu"][:, 1] - dcc["odom_att"][:, 1]
-    # dcc_yaw_error = calc_yaw_error(dcc["imu"][:, 2], dcc["odom_att"][:, 2])
-    # dcc_imu_time = dcc["imu_time"]
+    dcc_roll_error = dcc["imu"][:, 0] - dcc["odom_att"][:, 0]
+    dcc_pitch_error = dcc["imu"][:, 1] - dcc["odom_att"][:, 1]
+    dcc_yaw_error = calc_yaw_error(dcc["imu"][:, 2], dcc["odom_att"][:, 2])
+    dcc_imu_time = dcc["imu_time"]
 
     # Plot rotation errors
     fig = plt.figure()
     ax = fig.add_subplot(311)
     ax.plot(mono_imu_time, mono_roll_error, label="Mono")
     ax.plot(scc_imu_time, scc_roll_error, label="SCC")
-    # ax.plot(dcc_imu_time, dcc_roll_error, label="DCC")
+    ax.plot(dcc_imu_time, dcc_roll_error, label="DCC")
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("Roll - error (rad)")
     ax.legend(loc=0)
@@ -290,7 +290,7 @@ def plot_rotation_errors(mono, scc):
     ax = fig.add_subplot(312)
     ax.plot(mono_imu_time, mono_pitch_error, label="Mono")
     ax.plot(scc_imu_time, scc_pitch_error, label="SCC")
-    # ax.plot(dcc_imu_time, dcc_pitch_error, label="DCC")
+    ax.plot(dcc_imu_time, dcc_pitch_error, label="DCC")
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("Pitch - error (rad)")
     ax.legend(loc=0)
@@ -298,7 +298,7 @@ def plot_rotation_errors(mono, scc):
     ax = fig.add_subplot(313)
     ax.plot(mono_imu_time, mono_yaw_error, label="Mono")
     ax.plot(scc_imu_time, scc_yaw_error, label="SCC")
-    # ax.plot(dcc_imu_time, dcc_yaw_error, label="DCC")
+    ax.plot(dcc_imu_time, dcc_yaw_error, label="DCC")
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("Yaw - error (rad)")
     ax.legend(loc=0)
@@ -503,10 +503,10 @@ def parse_bag(bag_path, **kwargs):
 
     # Get first timestamp
     time_init = None
-    for ros_topic, ros_msg, ros_time in bag.read_messages(topics=['/okvis_node/okvis_odometry']):
-        time_init = float(ros_msg.header.stamp.to_sec())
+    topics = ['/okvis_node/okvis_odometry']
+    for topic, msg, time in bag.read_messages(topics=topics):
+        time_init = float(msg.header.stamp.to_sec())
         break
-
     print("Parsing bag {}, starting at time {}".format(bag_path, time_init))
 
     # Parse data
@@ -590,19 +590,18 @@ def plot_data(mono_bag_path, scc_bag_path, dcc_bag_path):
                          yaw_offset=38.0)
 
     # Set plot style
-    #plt.style.use("ggplot")
-    #plt.rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
-    ## for Palatino and other serif fonts use:
-    plt.rc('font',**{'family':'serif','serif':['Palatino'], 'size': 12})
+    # plt.style.use("ggplot")
+    # plt.rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
+    # for Palatino and other serif fonts use:
+    plt.rc('font', **{'family': 'serif', 'serif':['Palatino'], 'size': 12})
     plt.rc('text', usetex=True)
     plt.rcParams['lines.linewidth'] = 1.5
     plt.rc('axes',
            labelsize=16,
-           prop_cycle = plt.cycler('color', ['crimson', 'royalblue', 'forestgreen']),
-           grid=True
-           )
+           prop_cycle=plt.cycler('color',
+                                 ['crimson', 'royalblue', 'forestgreen']),
+           grid=True)
     plt.rc('savefig', bbox='tight')
-
 
     # Figure 1 - trajectory plot
     plot_trajectory(mono_data, scc_data, dcc_data)
