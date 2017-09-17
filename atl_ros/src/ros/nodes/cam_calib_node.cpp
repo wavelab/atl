@@ -208,7 +208,8 @@ void CamCalibNode::saveGimbalMeasurements() {
 
 int CamCalibNode::loopCallback() {
   // detect and show camera images
-  bool data_ok = this->chessboardDetected();
+  // const bool data_ok = this->chessboardDetected();
+  const bool data_ok = true;
   this->showImages();
 
   // parse keyboard input
