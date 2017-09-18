@@ -3,10 +3,10 @@
 
 namespace atl {
 
-#define WORLD 1
-#define BODY 2
-#define CAMERA 3
-#define GIMBAL 4
+#define WORLD_FRAME "W"
+#define BODY_FRAME "B"
+#define CAMERA_FRAME "C"
+#define GIMBAL_FRAME "G"
 
 } // namespace atl
 #endif

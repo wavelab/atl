@@ -12,18 +12,18 @@ bool LandingTarget::isTargetLosted() {
 }
 
 void LandingTarget::setTargetPosition(Vec3 position) {
-  this->position_bf = position;
+  this->position_B = position;
 }
 
 void LandingTarget::setTargetVelocity(Vec3 velocity) {
-  this->velocity_bf = velocity;
+  this->velocity_B = velocity;
 }
 
 double LandingTarget::tracked() { return mtoc(&this->first_seen); }
 
 void LandingTarget::reset() {
-  this->position_bf << 0.0, 0.0, 0.0;
-  this->velocity_bf << 0.0, 0.0, 0.0;
+  this->position_B << 0.0, 0.0, 0.0;
+  this->velocity_B << 0.0, 0.0, 0.0;
   this->detected = false;
   this->losted = true;
   this->first_seen = (struct timespec){0, 0};

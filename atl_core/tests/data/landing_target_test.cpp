@@ -6,9 +6,9 @@ namespace atl {
 TEST(LandingTarget, constructor) {
   LandingTarget landing_target;
 
-  EXPECT_FLOAT_EQ(0.0, landing_target.position_bf(0));
-  EXPECT_FLOAT_EQ(0.0, landing_target.position_bf(1));
-  EXPECT_FLOAT_EQ(0.0, landing_target.position_bf(2));
+  EXPECT_FLOAT_EQ(0.0, landing_target.position_B(0));
+  EXPECT_FLOAT_EQ(0.0, landing_target.position_B(1));
+  EXPECT_FLOAT_EQ(0.0, landing_target.position_B(2));
   EXPECT_FALSE(landing_target.detected);
   EXPECT_TRUE(landing_target.losted);
   EXPECT_FLOAT_EQ(0.0, landing_target.last_seen.tv_sec);
@@ -31,9 +31,9 @@ TEST(LandingTarget, isTargetLosted) {
   sleep(landing_target.lost_threshold / 1000.0);
   EXPECT_TRUE(landing_target.isTargetLosted());
 
-  EXPECT_FLOAT_EQ(0.0, landing_target.position_bf(0));
-  EXPECT_FLOAT_EQ(0.0, landing_target.position_bf(1));
-  EXPECT_FLOAT_EQ(0.0, landing_target.position_bf(2));
+  EXPECT_FLOAT_EQ(0.0, landing_target.position_B(0));
+  EXPECT_FLOAT_EQ(0.0, landing_target.position_B(1));
+  EXPECT_FLOAT_EQ(0.0, landing_target.position_B(2));
   EXPECT_FALSE(landing_target.detected);
   EXPECT_TRUE(landing_target.losted);
   EXPECT_FLOAT_EQ(0.0, landing_target.first_seen.tv_sec);
@@ -49,12 +49,12 @@ TEST(LandingTarget, setTargetPosition) {
   position << 1.0, 2.0, 3.0;
   landing_target.setTargetPosition(position);
 
-  EXPECT_FLOAT_EQ(1.0, landing_target.position_bf(0));
-  EXPECT_FLOAT_EQ(2.0, landing_target.position_bf(1));
-  EXPECT_FLOAT_EQ(3.0, landing_target.position_bf(2));
-  EXPECT_FLOAT_EQ(0.0, landing_target.velocity_bf(0));
-  EXPECT_FLOAT_EQ(0.0, landing_target.velocity_bf(1));
-  EXPECT_FLOAT_EQ(0.0, landing_target.velocity_bf(2));
+  EXPECT_FLOAT_EQ(1.0, landing_target.position_B(0));
+  EXPECT_FLOAT_EQ(2.0, landing_target.position_B(1));
+  EXPECT_FLOAT_EQ(3.0, landing_target.position_B(2));
+  EXPECT_FLOAT_EQ(0.0, landing_target.velocity_B(0));
+  EXPECT_FLOAT_EQ(0.0, landing_target.velocity_B(1));
+  EXPECT_FLOAT_EQ(0.0, landing_target.velocity_B(2));
   EXPECT_FALSE(landing_target.detected);
   EXPECT_TRUE(landing_target.losted);
   EXPECT_EQ(0, landing_target.last_seen.tv_sec);
@@ -68,12 +68,12 @@ TEST(LandingTarget, setTargetVelocity) {
   velocity << 1.0, 2.0, 3.0;
   landing_target.setTargetVelocity(velocity);
 
-  EXPECT_FLOAT_EQ(0.0, landing_target.position_bf(0));
-  EXPECT_FLOAT_EQ(0.0, landing_target.position_bf(1));
-  EXPECT_FLOAT_EQ(0.0, landing_target.position_bf(2));
-  EXPECT_FLOAT_EQ(1.0, landing_target.velocity_bf(0));
-  EXPECT_FLOAT_EQ(2.0, landing_target.velocity_bf(1));
-  EXPECT_FLOAT_EQ(3.0, landing_target.velocity_bf(2));
+  EXPECT_FLOAT_EQ(0.0, landing_target.position_B(0));
+  EXPECT_FLOAT_EQ(0.0, landing_target.position_B(1));
+  EXPECT_FLOAT_EQ(0.0, landing_target.position_B(2));
+  EXPECT_FLOAT_EQ(1.0, landing_target.velocity_B(0));
+  EXPECT_FLOAT_EQ(2.0, landing_target.velocity_B(1));
+  EXPECT_FLOAT_EQ(3.0, landing_target.velocity_B(2));
   EXPECT_FALSE(landing_target.detected);
   EXPECT_TRUE(landing_target.losted);
   EXPECT_EQ(0, landing_target.last_seen.tv_sec);
@@ -100,9 +100,9 @@ TEST(LandingTarget, reset) {
 
   landing_target.reset();
 
-  EXPECT_FLOAT_EQ(0.0, landing_target.position_bf(0));
-  EXPECT_FLOAT_EQ(0.0, landing_target.position_bf(1));
-  EXPECT_FLOAT_EQ(0.0, landing_target.position_bf(2));
+  EXPECT_FLOAT_EQ(0.0, landing_target.position_B(0));
+  EXPECT_FLOAT_EQ(0.0, landing_target.position_B(1));
+  EXPECT_FLOAT_EQ(0.0, landing_target.position_B(2));
   EXPECT_FALSE(landing_target.detected);
   EXPECT_TRUE(landing_target.losted);
   EXPECT_FLOAT_EQ(0.0, landing_target.first_seen.tv_sec);
@@ -119,9 +119,9 @@ TEST(LandingTarget, update) {
   landing_target.lost_threshold = 2000;
   landing_target.update(false);
 
-  EXPECT_FLOAT_EQ(0.0, landing_target.position_bf(0));
-  EXPECT_FLOAT_EQ(0.0, landing_target.position_bf(1));
-  EXPECT_FLOAT_EQ(0.0, landing_target.position_bf(2));
+  EXPECT_FLOAT_EQ(0.0, landing_target.position_B(0));
+  EXPECT_FLOAT_EQ(0.0, landing_target.position_B(1));
+  EXPECT_FLOAT_EQ(0.0, landing_target.position_B(2));
   EXPECT_FALSE(landing_target.detected);
   EXPECT_TRUE(landing_target.losted);
   EXPECT_EQ(0, landing_target.first_seen.tv_sec);
@@ -134,9 +134,9 @@ TEST(LandingTarget, update) {
   landing_target.setTargetPosition(position);
   landing_target.update(true);
 
-  EXPECT_FLOAT_EQ(1.0, landing_target.position_bf(0));
-  EXPECT_FLOAT_EQ(2.0, landing_target.position_bf(1));
-  EXPECT_FLOAT_EQ(3.0, landing_target.position_bf(2));
+  EXPECT_FLOAT_EQ(1.0, landing_target.position_B(0));
+  EXPECT_FLOAT_EQ(2.0, landing_target.position_B(1));
+  EXPECT_FLOAT_EQ(3.0, landing_target.position_B(2));
   EXPECT_TRUE(landing_target.detected);
   EXPECT_FALSE(landing_target.losted);
   ASSERT_NE(0, landing_target.first_seen.tv_sec);
@@ -150,9 +150,9 @@ TEST(LandingTarget, update) {
   landing_target.setTargetPosition(position);
   landing_target.update(false);
 
-  EXPECT_FLOAT_EQ(3.0, landing_target.position_bf(0));
-  EXPECT_FLOAT_EQ(2.0, landing_target.position_bf(1));
-  EXPECT_FLOAT_EQ(1.0, landing_target.position_bf(2));
+  EXPECT_FLOAT_EQ(3.0, landing_target.position_B(0));
+  EXPECT_FLOAT_EQ(2.0, landing_target.position_B(1));
+  EXPECT_FLOAT_EQ(1.0, landing_target.position_B(2));
   EXPECT_FALSE(landing_target.detected);
   EXPECT_FALSE(landing_target.losted);
   ASSERT_NE(0, landing_target.first_seen.tv_sec);
@@ -164,9 +164,9 @@ TEST(LandingTarget, update) {
   sleep(landing_target.lost_threshold / 1000.0);
   landing_target.update(false);
 
-  EXPECT_FLOAT_EQ(0.0, landing_target.position_bf(0));
-  EXPECT_FLOAT_EQ(0.0, landing_target.position_bf(1));
-  EXPECT_FLOAT_EQ(0.0, landing_target.position_bf(2));
+  EXPECT_FLOAT_EQ(0.0, landing_target.position_B(0));
+  EXPECT_FLOAT_EQ(0.0, landing_target.position_B(1));
+  EXPECT_FLOAT_EQ(0.0, landing_target.position_B(2));
   EXPECT_FALSE(landing_target.detected);
   EXPECT_TRUE(landing_target.losted);
   EXPECT_EQ(0, landing_target.first_seen.tv_sec);

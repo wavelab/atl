@@ -243,7 +243,7 @@ void MPU6050::print() {
 
 int8_t MPU6050::setDPLFConfig(int8_t setting) {
   /*
-     DPLF_CFG    Accelerometer
+     DPLF_CG    Accelerometer
      ----------------------------------------
      Bandwidth(Hz) | Delay(ms)
      0           260             0

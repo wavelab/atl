@@ -34,8 +34,8 @@ int EstimatorNode::configure(const int hz) {
 
   // publishers and subscribers
   // clang-format off
-  this->addPublisher<geometry_msgs::Vector3>(LT_BODY_POSITION_TOPIC);
-  this->addPublisher<geometry_msgs::Vector3>(LT_BODY_VELOCITY_TOPIC);
+  this->addPublisher<geometry_msgs::Vector3>(LT_POSITION_B_TOPIC);
+  this->addPublisher<geometry_msgs::Vector3>(LT_VELOCITY_B_TOPIC);
   this->addPublisher<std_msgs::Bool>(LT_DETECTED_TOPIC);
   this->addPublisher<geometry_msgs::Vector3>(GIMBAL_SETPOINT_ATTITUDE_TOPIC);
   this->addPublisher<std_msgs::Float64>(QUAD_YAW_TOPIC);
@@ -43,8 +43,8 @@ int EstimatorNode::configure(const int hz) {
   this->addSubscriber(ESTIMATOR_OFF_TOPIC, &EstimatorNode::offCallback, this);
   this->addSubscriber(QUAD_POSE_TOPIC, &EstimatorNode::quadPoseCallback, this);
   this->addSubscriber(QUAD_VELOCITY_TOPIC, &EstimatorNode::quadVelocityCallback, this);
-  this->addSubscriber(TARGET_BF_POS_TOPIC, &EstimatorNode::targetBodyPosCallback, this);
-  this->addSubscriber(TARGET_IF_YAW_TOPIC, &EstimatorNode::targetInertialYawCallback, this);
+  this->addSubscriber(TARGET_POS_B_TOPIC, &EstimatorNode::targetBodyPosCallback, this);
+  this->addSubscriber(TARGET_YAW_W_TOPIC, &EstimatorNode::targetInertialYawCallback, this);
   this->addLoopCallback(std::bind(&EstimatorNode::loopCallback, this));
   // clang-format on
 
@@ -171,7 +171,7 @@ void EstimatorNode::targetInertialPosCallback(
 }
 
 void EstimatorNode::targetInertialYawCallback(const std_msgs::Float64 &msg) {
-  convertMsg(msg, this->target_yaw_wf);
+  convertMsg(msg, this->target_yaw_W);
 }
 
 void EstimatorNode::publishLTKFBodyPositionEstimate() {
@@ -188,13 +188,13 @@ void EstimatorNode::publishLTKFBodyPositionEstimate() {
   }
 
   // estimate in body planar frame
-  this->target_pos_bpf(0) = est_pos(0);
-  this->target_pos_bpf(1) = est_pos(1);
-  this->target_pos_bpf(2) = est_pos(2);
+  this->target_pos_P(0) = est_pos(0);
+  this->target_pos_P(1) = est_pos(1);
+  this->target_pos_P(2) = est_pos(2);
 
   // build and publish msg
   geometry_msgs::Vector3 msg;
-  buildMsg(this->target_pos_bpf, msg);
+  buildMsg(this->target_pos_P, msg);
   this->ros_pubs[LT_BODY_POSITION_TOPIC].publish(msg);
 }
 
@@ -212,13 +212,13 @@ void EstimatorNode::publishLTKFBodyVelocityEstimate() {
   }
 
   // estimate in body planar frame
-  this->target_vel_bpf(0) = est_vel(0);
-  this->target_vel_bpf(1) = est_vel(1);
-  this->target_vel_bpf(2) = est_vel(2);
+  this->target_vel_P(0) = est_vel(0);
+  this->target_vel_P(1) = est_vel(1);
+  this->target_vel_P(2) = est_vel(2);
 
   // build and publish msg
   geometry_msgs::Vector3 msg;
-  buildMsg(this->target_vel_bpf, msg);
+  buildMsg(this->target_vel_P, msg);
   this->ros_pubs[LT_BODY_VELOCITY_TOPIC].publish(msg);
 }
 
@@ -248,7 +248,7 @@ void EstimatorNode::publishQuadYawMsg() {
   }
 
   // build and publish msg
-  buildMsg(this->target_yaw_wf, msg);
+  buildMsg(this->target_yaw_W, msg);
   this->ros_pubs[QUAD_YAW_TOPIC].publish(msg);
 }
 
@@ -257,10 +257,10 @@ void EstimatorNode::trackTarget() {
   Vec3 setpoints;
 
   // calculate roll pitch yaw setpoints
-  dist = this->target_pos_bpf.norm();
-  setpoints(0) = asin(this->target_pos_bpf(1) / dist);  // roll
-  setpoints(1) = -asin(this->target_pos_bpf(0) / dist); // pitch
-  setpoints(2) = 0.0;                                   // yaw
+  dist = this->target_pos_P.norm();
+  setpoints(0) = asin(this->target_pos_P(1) / dist);  // roll
+  setpoints(1) = -asin(this->target_pos_P(0) / dist); // pitch
+  setpoints(2) = 0.0;                                 // yaw
 
   this->publishGimbalSetpointAttitudeMsg(setpoints);
   this->publishQuadYawMsg();
@@ -331,7 +331,7 @@ int EstimatorNode::estimateEKF(const double dt) {
   y(0) = this->target_measured(0);
   y(1) = this->target_measured(1);
   y(2) = this->target_measured(2);
-  y(3) = deg2rad(wrapTo180(rad2deg(this->target_yaw_wf)));
+  y(3) = deg2rad(wrapTo180(rad2deg(this->target_yaw_W)));
 
   // prediction update
   two_wheel_process_model(this->ekf_tracker, G, g, dt);

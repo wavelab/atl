@@ -35,22 +35,22 @@ int GimbalGClient::configure() {
   return 0;
 }
 
-void GimbalGClient::setAttitude(Vec3 euler_if) {
+void GimbalGClient::setAttitude(Vec3 euler_W) {
   gazebo::msgs::Vector3d msg;
 
-  msg.set_x(euler_if(0));
-  msg.set_y(euler_if(1));
-  msg.set_z(euler_if(2));
+  msg.set_x(euler_W(0));
+  msg.set_y(euler_W(1));
+  msg.set_z(euler_W(2));
 
   this->gaz_pubs[SETPOINT_GTOPIC]->Publish(msg);
 }
 
-void GimbalGClient::trackTarget(Vec3 target_cf) {
+void GimbalGClient::trackTarget(Vec3 target_C) {
   gazebo::msgs::Vector3d msg;
 
-  msg.set_x(target_cf(0));
-  msg.set_y(target_cf(1));
-  msg.set_z(target_cf(2));
+  msg.set_x(target_C(0));
+  msg.set_y(target_C(1));
+  msg.set_z(target_C(2));
 
   this->gaz_pubs[TRACK_GTOPIC]->Publish(msg);
 }

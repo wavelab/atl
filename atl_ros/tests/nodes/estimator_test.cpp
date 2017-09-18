@@ -18,10 +18,10 @@ namespace atl {
 #define TARGET_TOPIC "/atl/apriltag/target/inertial"
 
 // SUBSCRIBE TOPICS
-#define POS_IF_TOPIC "/atl/estimate/landing_target/position/inertial"
-#define VEL_IF_TOPIC "/atl/estimate/landing_target/velocity/inertial"
-#define POS_BF_TOPIC "/atl/estimate/landing_target/position/body"
-#define VEL_BF_TOPIC "/atl/estimate/landing_target/velocity/body"
+#define POS_W_TOPIC "/atl/estimate/landing_target/position/inertial"
+#define VEL_W_TOPIC "/atl/estimate/landing_target/velocity/inertial"
+#define POS_B_TOPIC "/atl/estimate/landing_target/position/body"
+#define VEL_B_TOPIC "/atl/estimate/landing_target/velocity/body"
 #define DETECTED_TOPIC "/atl/estimate/landing_target/detected"
 #define GIMBAL_TOPIC "/atl/gimbal/setpoint/attitude"
 
@@ -29,10 +29,10 @@ class NodeTest : public ::testing::Test {
 protected:
   ros::NodeHandle ros_nh;
 
-  ros::Subscriber pos_if_sub;
-  ros::Subscriber vel_if_sub;
-  ros::Subscriber pos_bf_sub;
-  ros::Subscriber vel_bf_sub;
+  ros::Subscriber pos_W_sub;
+  ros::Subscriber vel_W_sub;
+  ros::Subscriber pos_B_sub;
+  ros::Subscriber vel_B_sub;
   ros::Subscriber detected_sub;
   ros::Subscriber gimbal_sub;
 
@@ -40,19 +40,19 @@ protected:
   ros::Publisher quad_vel_pub;
   ros::Publisher target_pub;
 
-  geometry_msgs::Vector3 pos_if_msg;
-  geometry_msgs::Vector3 vel_if_msg;
-  geometry_msgs::Vector3 pos_bf_msg;
-  geometry_msgs::Vector3 vel_bf_msg;
+  geometry_msgs::Vector3 pos_W_msg;
+  geometry_msgs::Vector3 vel_W_msg;
+  geometry_msgs::Vector3 pos_B_msg;
+  geometry_msgs::Vector3 vel_B_msg;
   bool tag_detected;
   geometry_msgs::Vector3 gimbal_msg;
 
   NodeTest() {
     // clang-format off
-    this->pos_if_sub = this->ros_nh.subscribe(POS_IF_TOPIC, 200, &NodeTest::inertialPositionCallback, this);
-    this->vel_if_sub = this->ros_nh.subscribe(VEL_IF_TOPIC, 200, &NodeTest::inertialVelocityCallback, this);
-    this->pos_bf_sub = this->ros_nh.subscribe(POS_BF_TOPIC, 200, &NodeTest::bodyPositionCallback, this);
-    this->vel_bf_sub = this->ros_nh.subscribe(VEL_BF_TOPIC, 200, &NodeTest::bodyVelocityCallback, this);
+    this->pos_W_sub = this->ros_nh.subscribe(POS_W_TOPIC, 200, &NodeTest::inertialPositionCallback, this);
+    this->vel_W_sub = this->ros_nh.subscribe(VEL_W_TOPIC, 200, &NodeTest::inertialVelocityCallback, this);
+    this->pos_B_sub = this->ros_nh.subscribe(POS_B_TOPIC, 200, &NodeTest::bodyPositionCallback, this);
+    this->vel_B_sub = this->ros_nh.subscribe(VEL_B_TOPIC, 200, &NodeTest::bodyVelocityCallback, this);
     this->detected_sub = this->ros_nh.subscribe(DETECTED_TOPIC, 200, &NodeTest::detectedCallback, this);
     this->gimbal_sub = this->ros_nh.subscribe(GIMBAL_TOPIC, 200, &NodeTest::gimbalCallback, this);
 
@@ -104,19 +104,19 @@ protected:
   }
 
   void inertialPositionCallback(const geometry_msgs::Vector3 &msg) {
-    this->pos_if_msg = msg;
+    this->pos_W_msg = msg;
   }
 
   void inertialVelocityCallback(const geometry_msgs::Vector3 &msg) {
-    this->vel_if_msg = msg;
+    this->vel_W_msg = msg;
   }
 
   void bodyPositionCallback(const geometry_msgs::Vector3 &msg) {
-    this->pos_bf_msg = msg;
+    this->pos_B_msg = msg;
   }
 
   void bodyVelocityCallback(const geometry_msgs::Vector3 &msg) {
-    this->vel_bf_msg = msg;
+    this->vel_B_msg = msg;
   }
 
   void detectedCallback(const std_msgs::Bool &msg) {
@@ -132,31 +132,31 @@ protected:
 };
 
 TEST_F(NodeTest, inertialPosition) {
-  EXPECT_EQ(1, this->pos_if_sub.getNumPublishers());
-  ASSERT_NEAR(0.0, this->pos_if_msg.x, 0.1);
-  ASSERT_NEAR(0.0, this->pos_if_msg.y, 0.1);
-  ASSERT_NEAR(0.0, this->pos_if_msg.z, 0.1);
+  EXPECT_EQ(1, this->pos_W_sub.getNumPublishers());
+  ASSERT_NEAR(0.0, this->pos_W_msg.x, 0.1);
+  ASSERT_NEAR(0.0, this->pos_W_msg.y, 0.1);
+  ASSERT_NEAR(0.0, this->pos_W_msg.z, 0.1);
 }
 
 TEST_F(NodeTest, inertialVelocity) {
-  EXPECT_EQ(1, this->vel_if_sub.getNumPublishers());
-  ASSERT_NEAR(0.0, this->vel_if_msg.x, 0.1);
-  ASSERT_NEAR(0.0, this->vel_if_msg.y, 0.1);
-  ASSERT_NEAR(0.0, this->vel_if_msg.z, 0.1);
+  EXPECT_EQ(1, this->vel_W_sub.getNumPublishers());
+  ASSERT_NEAR(0.0, this->vel_W_msg.x, 0.1);
+  ASSERT_NEAR(0.0, this->vel_W_msg.y, 0.1);
+  ASSERT_NEAR(0.0, this->vel_W_msg.z, 0.1);
 }
 
 TEST_F(NodeTest, bodyPosition) {
-  EXPECT_EQ(1, this->pos_bf_sub.getNumPublishers());
-  ASSERT_NEAR(0.0, this->pos_bf_msg.x, 0.1);
-  ASSERT_NEAR(0.0, this->pos_bf_msg.y, 0.1);
-  ASSERT_NEAR(-3.0, this->pos_bf_msg.z, 0.1);
+  EXPECT_EQ(1, this->pos_B_sub.getNumPublishers());
+  ASSERT_NEAR(0.0, this->pos_B_msg.x, 0.1);
+  ASSERT_NEAR(0.0, this->pos_B_msg.y, 0.1);
+  ASSERT_NEAR(-3.0, this->pos_B_msg.z, 0.1);
 }
 
 TEST_F(NodeTest, bodyVelocity) {
-  EXPECT_EQ(1, this->vel_bf_sub.getNumPublishers());
-  ASSERT_NEAR(0.0, this->vel_bf_msg.x, 0.1);
-  ASSERT_NEAR(0.0, this->vel_bf_msg.y, 0.1);
-  ASSERT_NEAR(0.0, this->vel_bf_msg.z, 0.1);
+  EXPECT_EQ(1, this->vel_B_sub.getNumPublishers());
+  ASSERT_NEAR(0.0, this->vel_B_msg.x, 0.1);
+  ASSERT_NEAR(0.0, this->vel_B_msg.y, 0.1);
+  ASSERT_NEAR(0.0, this->vel_B_msg.z, 0.1);
 }
 
 TEST_F(NodeTest, detected) {

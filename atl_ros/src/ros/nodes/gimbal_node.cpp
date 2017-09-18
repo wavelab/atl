@@ -113,8 +113,8 @@ void GimbalNode::setAttitudeCallback(const geometry_msgs::Vector3 &msg) {
 }
 
 void GimbalNode::trackTargetCallback(const geometry_msgs::Vector3 &msg) {
-  const Vec3 target_cf{msg.x, msg.y, msg.z};
-  this->gimbal.trackTarget(target_cf);
+  const Vec3 target_C{msg.x, msg.y, msg.z};
+  this->gimbal.trackTarget(target_C);
 }
 
 int GimbalNode::loopCallback() {

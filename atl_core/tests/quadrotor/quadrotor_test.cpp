@@ -127,9 +127,9 @@ TEST(Quadrotor, setTargetPosition) {
   // check set target_position
   quadrotor.configure(TEST_CONFIG_PATH);
   EXPECT_EQ(0, quadrotor.setTargetPosition(target_position));
-  EXPECT_FLOAT_EQ(1.0, quadrotor.landing_target.position_bf(0));
-  EXPECT_FLOAT_EQ(2.0, quadrotor.landing_target.position_bf(1));
-  EXPECT_FLOAT_EQ(3.0, quadrotor.landing_target.position_bf(2));
+  EXPECT_FLOAT_EQ(1.0, quadrotor.landing_target.position_B(0));
+  EXPECT_FLOAT_EQ(2.0, quadrotor.landing_target.position_B(1));
+  EXPECT_FLOAT_EQ(3.0, quadrotor.landing_target.position_B(2));
 }
 
 TEST(Quadrotor, setTargetVelocity) {
@@ -145,9 +145,9 @@ TEST(Quadrotor, setTargetVelocity) {
   // check set target_velocity
   quadrotor.configure(TEST_CONFIG_PATH);
   EXPECT_EQ(0, quadrotor.setTargetVelocity(target_velocity));
-  EXPECT_FLOAT_EQ(1.0, quadrotor.landing_target.velocity_bf(0));
-  EXPECT_FLOAT_EQ(2.0, quadrotor.landing_target.velocity_bf(1));
-  EXPECT_FLOAT_EQ(3.0, quadrotor.landing_target.velocity_bf(2));
+  EXPECT_FLOAT_EQ(1.0, quadrotor.landing_target.velocity_B(0));
+  EXPECT_FLOAT_EQ(2.0, quadrotor.landing_target.velocity_B(1));
+  EXPECT_FLOAT_EQ(3.0, quadrotor.landing_target.velocity_B(2));
 }
 
 TEST(Quadrotor, setHoverXYPosition) {

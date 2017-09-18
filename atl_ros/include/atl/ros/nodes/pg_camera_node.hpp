@@ -47,7 +47,7 @@ public:
   Quaternion quadrotor_orientation{1.0, 0.0, 0.0, 0.0};
 
   bool target_detected = false;
-  Vec3 target_pos_bf{0.0, 0.0, 0.0};
+  Vec3 target_pos_B{0.0, 0.0, 0.0};
 
   PGCameraNode(int argc, char **argv) : ROSNode(argc, argv) {}
 

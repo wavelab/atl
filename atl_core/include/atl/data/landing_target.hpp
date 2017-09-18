@@ -6,8 +6,8 @@
 namespace atl {
 
 struct LandingTarget {
-  Vec3 position_bf{0.0, 0.0, 0.0};
-  Vec3 velocity_bf{0.0, 0.0, 0.0};
+  Vec3 position_B{0.0, 0.0, 0.0};
+  Vec3 velocity_B{0.0, 0.0, 0.0};
   bool detected = false;
   bool losted = true;
   struct timespec first_seen = {0, 0};

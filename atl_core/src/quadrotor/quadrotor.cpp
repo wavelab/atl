@@ -129,7 +129,7 @@ int Quadrotor::setTargetPosition(const Vec3 &position) {
   }
 
   // set target position
-  this->landing_target_prev.position_bf = this->landing_target.position_bf;
+  this->landing_target_prev.position_B = this->landing_target.position_B;
   this->landing_target.setTargetPosition(position);
 
   return 0;
@@ -142,7 +142,7 @@ int Quadrotor::setTargetVelocity(const Vec3 &velocity) {
   }
 
   // set target velocity
-  this->landing_target_prev.velocity_bf = this->landing_target.velocity_bf;
+  this->landing_target_prev.velocity_B = this->landing_target.velocity_B;
   this->landing_target.setTargetVelocity(velocity);
 
   return 0;
@@ -248,7 +248,7 @@ int Quadrotor::stepTrackingMode(const double dt) {
   }
 
   // track target
-  this->tracking_controller.update(this->landing_target.position_bf,
+  this->tracking_controller.update(this->landing_target.position_B,
                                    this->pose.position,
                                    this->hover_position,
                                    this->yaw_setpoint,
@@ -292,7 +292,7 @@ int Quadrotor::stepLandingMode(const double dt) {
   }
 
   // land on target
-  this->landing_controller.update(this->landing_target.position_bf,
+  this->landing_controller.update(this->landing_target.position_B,
                                   this->velocity,
                                   this->yaw_setpoint,
                                   dt);
@@ -308,7 +308,7 @@ int Quadrotor::stepLandingMode(const double dt) {
   bool conditions[3] = {false, false, false};
   conditions[0] = this->landing_target.detected;
   conditions[1] = this->landing_target.losted == false;
-  conditions[2] = this->landing_target.position_bf.norm() < 0.1;
+  conditions[2] = this->landing_target.position_B.norm() < 0.1;
 
   // transition to disarm mode
   if (this->conditionsMet(conditions, 3) && this->auto_disarm) {

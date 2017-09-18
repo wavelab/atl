@@ -2,6 +2,7 @@
 #define ATL_DATA_POSE_HPP
 
 #include "atl/utils/utils.hpp"
+#include "atl/data/frames.hpp"
 
 namespace atl {
 

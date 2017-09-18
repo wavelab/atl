@@ -80,7 +80,7 @@ TEST(WaypointController, update) {
   mission.configured = true;
 
   // update controller
-  Pose pose{"W", 0.0, 0.0, deg2rad(-90.0), 0.0, 0.0, 10.0};
+  Pose pose{WORLD_FRAME, 0.0, 0.0, deg2rad(-90.0), 0.0, 0.0, 10.0};
   Vec3 vel{1.0, 0.0, 0.0};
   double dt = 0.011;
   controller.update(mission, pose, vel, dt);

@@ -222,21 +222,22 @@ TEST(Transform, edn2nwu) {
 
 TEST(Transform, transformPose) {
   Vec3 x{1.0, 0.0, 0.0};
-  Pose pose("B", 0.0, 0.0, deg2rad(90.0), 1.0, 0.0, 0.0);
+  Pose pose(BODY_FRAME, 0.0, 0.0, deg2rad(90.0), 1.0, 0.0, 0.0);
 
-  std::cout << Transform{"A", "B", Mat3::Identity(), x} * pose << std::endl;
+  std::cout << Transform{"A", BODY_FRAME, Mat3::Identity(), x} * pose
+            << std::endl;
 }
 
 TEST(Transform, transformPosition) {
   Vec3 x{1.0, 0.0, 0.0};
-  Position p("B", 1.0, 0.0, 0.0);
+  Position p(BODY_FRAME, 1.0, 0.0, 0.0);
 
-  std::cout << Transform{"A", "B", Mat3::Identity(), x} * p << std::endl;
+  std::cout << Transform{"A", BODY_FRAME, Mat3::Identity(), x} * p << std::endl;
 }
 
 TEST(Transform, transformVector3) {
   Vec3 x{1.0, 2.0, 3.0};
-  Pose pose("W", 0.0, 0.0, deg2rad(0.0), 0.0, 0.0, 0.0);
+  Pose pose(WORLD_FRAME, 0.0, 0.0, deg2rad(0.0), 0.0, 0.0, 0.0);
   std::cout << T_P_W{pose.orientation} * x << std::endl;
 }
 

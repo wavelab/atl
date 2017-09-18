@@ -41,8 +41,8 @@ void Gimbal2AxisModel::update(Vec2 motor_inputs, double dt) {
 
   // track target attitude
   euler = quatToEuler321(this->frame_orientation);
-  this->joint_setpoints(0) = target_attitude_if(0) - euler(0);
-  this->joint_setpoints(1) = target_attitude_if(1) - euler(1);
+  this->joint_setpoints(0) = target_attitude_W(0) - euler(0);
+  this->joint_setpoints(1) = target_attitude_W(1) - euler(1);
 }
 
 Vec2 Gimbal2AxisModel::attitudeControllerControl(double dt) {
@@ -52,21 +52,21 @@ Vec2 Gimbal2AxisModel::attitudeControllerControl(double dt) {
                                        dt);
 }
 
-void Gimbal2AxisModel::setFrameOrientation(Quaternion frame_if) {
+void Gimbal2AxisModel::setFrameOrientation(Quaternion frame_W) {
   // filter out yaw - we do not need it
-  Vec3 euler = quatToEuler321(frame_if);
+  Vec3 euler = quatToEuler321(frame_W);
   euler(2) = 0.0;
 
   // set gimbal frame orientation
   this->frame_orientation = euler321ToQuat(euler);
 }
 
-void Gimbal2AxisModel::setAttitude(Vec2 euler_if) {
-  this->target_attitude_if(0) = euler_if(0);
-  this->target_attitude_if(1) = euler_if(1);
+void Gimbal2AxisModel::setAttitude(Vec2 euler_W) {
+  this->target_attitude_W(0) = euler_W(0);
+  this->target_attitude_W(1) = euler_W(1);
 }
 
-Vec3 Gimbal2AxisModel::getTargetInBF(Vec3 target_cf) {
+Vec3 Gimbal2AxisModel::getTargetInBF(Vec3 target_C) {
   Vec3 target_nwu;
   Mat3 R;
   Vec3 t;
@@ -74,9 +74,9 @@ Vec3 Gimbal2AxisModel::getTargetInBF(Vec3 target_cf) {
   // transform camera frame to NWU frame
   // camera frame:  (z - forward, x - right, y - down)
   // NWU frame:  (x - forward, y - left, z - up)
-  target_nwu(0) = target_cf(2);
-  target_nwu(1) = -target_cf(0);
-  target_nwu(2) = -target_cf(1);
+  target_nwu(0) = target_C(2);
+  target_nwu(1) = -target_C(0);
+  target_nwu(2) = -target_C(1);
 
   // camera mount offset
   R = this->camera_offset.rotationMatrix();
@@ -86,40 +86,37 @@ Vec3 Gimbal2AxisModel::getTargetInBF(Vec3 target_cf) {
   return (R * target_nwu + t);
 }
 
-Vec3 Gimbal2AxisModel::getTargetInBPF(Vec3 target_cf,
-                                      Quaternion body_if,
-                                      Quaternion joint_bf) {
-  Vec3 p, target_bpf;
-  Mat3 R_body, R_joint;
-
+Vec3 Gimbal2AxisModel::getTargetInBPF(Vec3 target_C,
+                                      Quaternion body_W,
+                                      Quaternion joint_B) {
   // body is assumed to be NWU frame
-  R_body = body_if.toRotationMatrix();
+  const Mat3 R_W = body_W.toRotationMatrix();
 
   // joint is assumed to be NWU frame
-  R_joint = joint_bf.toRotationMatrix();
+  const Mat3 R_B = joint_B.toRotationMatrix();
 
   // transform target in camera frame to body frame
-  p = this->getTargetInBF(target_cf);
+  const Vec3 p = this->getTargetInBF(target_C);
 
   // transform target in camera frame to body planar frame
-  target_bpf = R_body * R_joint * p;
+  const Vec3 target_P = R_W * R_B * p;
 
-  return target_bpf;
+  return target_P;
 }
 
-void Gimbal2AxisModel::trackTarget(Vec3 target_cf) {
+void Gimbal2AxisModel::trackTarget(Vec3 target_C) {
   double dist;
   Vec3 target;
 
   // obtain target in body planar frame
-  target = this->getTargetInBPF(target_cf,
+  target = this->getTargetInBPF(target_C,
                                 this->frame_orientation,
                                 this->joint_orientation);
 
   // update gimbal setpoints
   dist = target.norm();
-  this->target_attitude_if(0) = asin(target(1) / dist);
-  this->target_attitude_if(1) = -asin(target(0) / dist);
+  this->target_attitude_W(0) = asin(target(1) / dist);
+  this->target_attitude_W(1) = -asin(target(0) / dist);
 }
 
 Vec4 Gimbal2AxisModel::getState() {

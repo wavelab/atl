@@ -57,8 +57,8 @@ public:
    *    Attitude command as a vector of size 4:
    *    (roll, pitch, yaw, throttle)
    */
-  Vec4 update(const Vec3 &pos_errors_bf,
-              const Vec3 &velocity_if,
+  Vec4 update(const Vec3 &pos_errors_B,
+              const Vec3 &velocity_W,
               const double yaw_setpoint,
               const double dt);
 

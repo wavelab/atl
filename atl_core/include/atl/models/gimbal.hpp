@@ -68,19 +68,19 @@ public:
 
   Quaternion frame_orientation;
   Quaternion joint_orientation;
-  Vec2 target_attitude_if;
+  Vec2 target_attitude_W;
 
   Gimbal2AxisModel()
       : states{0.0, 0.0, 0.0, 0.0}, Ix{0.01}, Iy{0.01},
-        camera_offset{"B", 0.0, deg2rad(90.0), 0.0, 0.0, 0.0, 0.0},
+        camera_offset{BODY_FRAME, 0.0, deg2rad(90.0), 0.0, 0.0, 0.0, 0.0},
         joint_setpoints{0.0, 0.0}, joint_controller{}, frame_orientation{},
-        joint_orientation{}, target_attitude_if{0.0, 0.0} {}
+        joint_orientation{}, target_attitude_W{0.0, 0.0} {}
 
   Gimbal2AxisModel(Vec4 pose)
       : states{pose}, Ix{0.01}, Iy{0.01},
-        camera_offset{"B", 0.0, deg2rad(90.0), 0.0, 0.0, 0.0, 0.0},
+        camera_offset{BODY_FRAME, 0.0, deg2rad(90.0), 0.0, 0.0, 0.0, 0.0},
         joint_setpoints{0.0, 0.0}, joint_controller{}, frame_orientation{},
-        joint_orientation{}, target_attitude_if{0.0, 0.0} {}
+        joint_orientation{}, target_attitude_W{0.0, 0.0} {}
 
   /**
    * Update gimbal model
@@ -101,40 +101,40 @@ public:
   /**
    * Set gimbal frame orientation
    *
-   * @param frame_if Frame orientation in inertial frame (NWU coordinate
+   * @param frame_W Frame orientation in inertial frame (NWU coordinate
    * system)
    */
-  void setFrameOrientation(Quaternion frame_if);
+  void setFrameOrientation(Quaternion frame_W);
 
   /**
    * Set gimbal joint attitude
    *
-   * @param euler_if Gimbal attitude in inertial frame (NWU coordinate system)
+   * @param euler_W Gimbal attitude in inertial frame (NWU coordinate system)
    */
-  void setAttitude(Vec2 euler_if);
+  void setAttitude(Vec2 euler_W);
 
   /**
    * Obtain gimbal target in body frame
    *
-   * @param target_cf target in camera frame (EDN coordinate system)
+   * @param target_C target in camera frame (EDN coordinate system)
    */
-  Vec3 getTargetInBF(Vec3 target_cf);
+  Vec3 getTargetInBF(Vec3 target_C);
 
   /**
    * Obtain gimbal target in body planar frame
    *
-   * @param target_cf Target in camera frame (EDN coordinate system)
-   * @param body_if Gimbal body in inertial frame (NWU coordinate system)
-   * @param joint_bf Gimbal body in body frame (NWU coordinate system)
+   * @param target_C Target in camera frame (EDN coordinate system)
+   * @param body_W Gimbal body in inertial frame (NWU coordinate system)
+   * @param joint_B Gimbal body in body frame (NWU coordinate system)
    */
-  Vec3 getTargetInBPF(Vec3 target_cf, Quaternion body_if, Quaternion joint_bf);
+  Vec3 getTargetInBPF(Vec3 target_C, Quaternion body_W, Quaternion joint_B);
 
   /**
    * Track target
    *
-   * @param target_cf Target in camera frame (EDN coordinate system)
+   * @param target_C Target in camera frame (EDN coordinate system)
    */
-  void trackTarget(Vec3 target_cf);
+  void trackTarget(Vec3 target_C);
 
   /**
    * Obtain gimbal state

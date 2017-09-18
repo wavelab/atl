@@ -32,8 +32,8 @@ public:
   GimbalGClient();
   ~GimbalGClient();
   int configure();
-  void setAttitude(Vec3 euler_if);
-  void trackTarget(Vec3 target_cf);
+  void setAttitude(Vec3 euler_W);
+  void trackTarget(Vec3 target_C);
   virtual void frameOrientationCallback(ConstQuaternionPtr &msg);
   virtual void jointOrientationCallback(ConstQuaternionPtr &msg);
 };

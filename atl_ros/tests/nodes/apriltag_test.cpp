@@ -14,8 +14,8 @@ namespace atl {
 
 // SUBSCRIBE TOPICS
 #define TARGET_POSE_TOPIC "/atl/apriltag/target"
-#define TARGET_IF_TOPIC "/atl/apriltag/target/inertial"
-#define TARGET_BPF_TOPIC "/atl/apriltag/target/body"
+#define TARGET_W_TOPIC "/atl/apriltag/target/inertial"
+#define TARGET_P_TOPIC "/atl/apriltag/target/body"
 
 // TEST DATA
 #define TEST_IMAGE "test_data/image.jpg"
@@ -41,8 +41,8 @@ protected:
     // clang-format off
     this->image_pub = it.advertise(IMAGE_TOPIC, 1);
     this->pose_sub = this->ros_nh.subscribe(TARGET_POSE_TOPIC, 1, &NodeTest::poseCallback, this);
-    this->if_sub = this->ros_nh.subscribe(TARGET_IF_TOPIC, 1, &NodeTest::inertialCallback, this);
-    this->bf_sub = this->ros_nh.subscribe(TARGET_BPF_TOPIC, 1, &NodeTest::bodyPlanarCallback, this);
+    this->if_sub = this->ros_nh.subscribe(TARGET_W_TOPIC, 1, &NodeTest::inertialCallback, this);
+    this->bf_sub = this->ros_nh.subscribe(TARGET_P_TOPIC, 1, &NodeTest::bodyPlanarCallback, this);
     // clang-format on
 
     ros::spinOnce();

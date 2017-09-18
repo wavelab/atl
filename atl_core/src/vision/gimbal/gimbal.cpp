@@ -35,7 +35,7 @@ int Gimbal::configure(const std::string &config_file) {
   }
 
   // camera mount offsets
-  this->camera_offset = Pose("B", roll, pitch, yaw, x, y, z);
+  this->camera_offset = Pose(BODY_FRAME, roll, pitch, yaw, x, y, z);
 
   // gimbal limits
   for (int i = 0; i < 6; i++) {

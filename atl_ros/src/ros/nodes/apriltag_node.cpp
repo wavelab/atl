@@ -20,11 +20,11 @@ int AprilTagNode::configure(const int hz) {
   // subscribers and publishers
   // clang-format off
   this->addPublisher<atl_msgs::AprilTagPose>(TARGET_POSE_TOPIC);
-  this->addPublisher<geometry_msgs::Vector3>(TARGET_IF_POS_TOPIC);
-  this->addPublisher<std_msgs::Float64>(TARGET_IF_YAW_TOPIC);
-  this->addPublisher<geometry_msgs::Vector3>(TARGET_BPF_POS_TOPIC);
-  this->addPublisher<geometry_msgs::Vector3>(TARGET_BPF_POS_ENCODER_TOPIC);
-  this->addPublisher<std_msgs::Float64>(TARGET_BPF_YAW_TOPIC);
+  this->addPublisher<geometry_msgs::Vector3>(TARGET_W_POS_TOPIC);
+  this->addPublisher<std_msgs::Float64>(TARGET_W_YAW_TOPIC);
+  this->addPublisher<geometry_msgs::Vector3>(TARGET_P_POS_TOPIC);
+  this->addPublisher<geometry_msgs::Vector3>(TARGET_P_POS_ENCODER_TOPIC);
+  this->addPublisher<std_msgs::Float64>(TARGET_P_YAW_TOPIC);
   this->addImageSubscriber(CAMERA_IMAGE_TOPIC, &AprilTagNode::imageCallback, this);
   this->addShutdownListener(SHUTDOWN);
   // clang-format on
@@ -45,28 +45,28 @@ void AprilTagNode::publishTagPoseMsg(const TagPose &tag) {
 void AprilTagNode::publishTargetInertialPositionMsg(
     const Vec3 &gimbal_position,
     const Quaternion &gimbal_frame,
-    const Vec3 &target_bpf) {
+    const Vec3 &target_P) {
   geometry_msgs::Vector3 msg;
-  Vec3 target_if;
+  Vec3 target_W;
 
   // transform target from body planar to inertial frame
-  target_if = Gimbal::getTargetInIF(target_bpf, gimbal_position, gimbal_frame);
+  target_W = Gimbal::getTargetInIF(target_P, gimbal_position, gimbal_frame);
 
   // build and publish msg
-  buildMsg(target_if, msg);
-  this->ros_pubs[TARGET_IF_POS_TOPIC].publish(msg);
+  buildMsg(target_W, msg);
+  this->ros_pubs[TARGET_W_POS_TOPIC].publish(msg);
 }
 
-void AprilTagNode::publishTargetBodyPositionMsg(const Vec3 &target_bpf) {
+void AprilTagNode::publishTargetBodyPositionMsg(const Vec3 &target_P) {
   geometry_msgs::Vector3 msg;
-  buildMsg(target_bpf, msg);
-  this->ros_pubs[TARGET_BPF_POS_TOPIC].publish(msg);
+  buildMsg(target_P, msg);
+  this->ros_pubs[TARGET_P_POS_TOPIC].publish(msg);
 }
 void AprilTagNode::publishTargetBodyPositionEncoderMsg(
-    const Vec3 &target_bpf_encoder) {
+    const Vec3 &target_P_encoder) {
   geometry_msgs::Vector3 msg;
-  buildMsg(target_bpf_encoder, msg);
-  this->ros_pubs[TARGET_BPF_POS_ENCODER_TOPIC].publish(msg);
+  buildMsg(target_P_encoder, msg);
+  this->ros_pubs[TARGET_P_POS_ENCODER_TOPIC].publish(msg);
 }
 
 void AprilTagNode::publishTargetInertialYawMsg(const TagPose &tag,
@@ -76,12 +76,11 @@ void AprilTagNode::publishTargetInertialYawMsg(const TagPose &tag,
   const Vec3 tag_euler = quatToEuler321(tag.orientation);
 
   // build and publish msg
-  const double yaw_if =
-      wrapTo180(rad2deg(gimbal_frame_euler(2) - tag_euler(2)));
+  const double yaw_W = wrapTo180(rad2deg(gimbal_frame_euler(2) - tag_euler(2)));
 
   std_msgs::Float64 msg;
-  msg.data = deg2rad(yaw_if);
-  this->ros_pubs[TARGET_IF_YAW_TOPIC].publish(msg);
+  msg.data = deg2rad(yaw_W);
+  this->ros_pubs[TARGET_W_YAW_TOPIC].publish(msg);
 }
 
 void AprilTagNode::publishTargetBodyYawMsg(const TagPose &tag) {
@@ -91,7 +90,7 @@ void AprilTagNode::publishTargetBodyYawMsg(const TagPose &tag) {
   // build and publish msg
   std_msgs::Float64 msg;
   msg.data = euler(2);
-  this->ros_pubs[TARGET_BPF_YAW_TOPIC].publish(msg);
+  this->ros_pubs[TARGET_P_YAW_TOPIC].publish(msg);
 }
 
 void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
@@ -119,10 +118,10 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
                                 image_ptr->image.at<double>(0, 9),
                                 image_ptr->image.at<double>(0, 10)};
 
-  const Quaternion gimbal_joint_bf{image_ptr->image.at<double>(0, 11),
-                                   image_ptr->image.at<double>(0, 12),
-                                   image_ptr->image.at<double>(0, 13),
-                                   image_ptr->image.at<double>(0, 14)};
+  const Quaternion gimbal_joint_B{image_ptr->image.at<double>(0, 11),
+                                  image_ptr->image.at<double>(0, 12),
+                                  image_ptr->image.at<double>(0, 13),
+                                  image_ptr->image.at<double>(0, 14)};
 
   const Vec3 quad_position{image_ptr->image.at<double>(0, 15),
                            image_ptr->image.at<double>(0, 16),
@@ -148,32 +147,32 @@ void AprilTagNode::imageCallback(const sensor_msgs::ImageConstPtr &msg) {
   }
 
   // transform tag in camera frame to body planar frame
-  const Vec3 target_cf{tags[0].position(0),
-                       tags[0].position(1),
-                       tags[0].position(2)};
-  const Vec3 target_bpf =
-      Gimbal::getTargetInBPF(this->camera_offset, target_cf, gimbal_joint);
+  const Vec3 target_C{tags[0].position(0),
+                      tags[0].position(1),
+                      tags[0].position(2)};
+  const Vec3 target_P =
+      Gimbal::getTargetInBPF(this->camera_offset, target_C, gimbal_joint);
 
   // Calculate target frame in bpf from encoders
-  const Vec3 encoder_rpy_bf = quatToEuler321(gimbal_joint_bf);
-  const Vec3 quad_rpy_if = quatToEuler321(quad_orientation);
-  const Vec3 joint_encoder_rpy_if{encoder_rpy_bf(0) + quad_rpy_if(0),
-                                  encoder_rpy_bf(1) + quad_rpy_if(1),
-                                  0.0};
+  const Vec3 encoder_rpy_B = quatToEuler321(gimbal_joint_B);
+  const Vec3 quad_rpy_W = quatToEuler321(quad_orientation);
+  const Vec3 joint_encoder_rpy_W{encoder_rpy_B(0) + quad_rpy_W(0),
+                                 encoder_rpy_B(1) + quad_rpy_W(1),
+                                 0.0};
 
-  Quaternion joint_encoder_quat_if = euler321ToQuat(joint_encoder_rpy_if);
-  const Vec3 target_bpf_encoder = Gimbal::getTargetInBPF(this->camera_offset,
-                                                         target_cf,
-                                                         joint_encoder_quat_if);
+  Quaternion joint_encoder_quat_W = euler321ToQuat(joint_encoder_rpy_W);
+  const Vec3 target_P_encoder = Gimbal::getTargetInBPF(this->camera_offset,
+                                                       target_C,
+                                                       joint_encoder_quat_W);
 
   // publish tag pose
   this->publishTagPoseMsg(tags[0]);
   this->publishTargetInertialPositionMsg(gimbal_position,
                                          gimbal_frame,
-                                         target_bpf);
+                                         target_P);
   this->publishTargetInertialYawMsg(tags[0], gimbal_frame);
-  this->publishTargetBodyPositionMsg(target_bpf);
-  this->publishTargetBodyPositionEncoderMsg(target_bpf_encoder);
+  this->publishTargetBodyPositionMsg(target_P);
+  this->publishTargetBodyPositionEncoderMsg(target_P_encoder);
   this->publishTargetBodyYawMsg(tags[0]);
 }
 

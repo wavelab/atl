@@ -40,10 +40,10 @@ class GimbalTest : public ::testing::Test {
 };
 
 TEST_F(GimbalTest, setRollPitch) {
-  atl::Vec3 euler_if;
+  atl::Vec3 euler_W;
 
-  euler_if << 20, 20, 0;
-  this->client->setAttitude(euler_if);
+  euler_W << 20, 20, 0;
+  this->client->setAttitude(euler_W);
 }
 
 } // namespace gaz

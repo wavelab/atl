@@ -20,19 +20,19 @@ class NodeTest : public ::testing::Test {
 protected:
   ros::NodeHandle ros_nh;
 
-  ros::Subscriber joint_if_imu_sub;
-  ros::Subscriber frame_if_orientation_sub;
+  ros::Subscriber joint_W_imu_sub;
+  ros::Subscriber frame_W_orientation_sub;
 
   ros::Publisher setpoint_pub;
 
-  sensor_msgs::Imu joint_if_imu_msg;
-  geometry_msgs::Quaternion frame_if_orien_msg;
+  sensor_msgs::Imu joint_W_imu_msg;
+  geometry_msgs::Quaternion frame_W_orien_msg;
 
   NodeTest() {
     // Subscribers
     // clang-format off
-    this->joint_if_imu_sub = this->ros_nh.subscribe(FRAME_JOINT_TOPIC, 1, &NodeTest::jointImuCallback, this);
-    this->frame_if_orientation_sub = this->ros_nh.subscribe(FRAME_ORIENTATION_TOPIC, 1, &NodeTest::frameOrientationCallback, this);
+    this->joint_W_imu_sub = this->ros_nh.subscribe(FRAME_JOINT_TOPIC, 1, &NodeTest::jointImuCallback, this);
+    this->frame_W_orientation_sub = this->ros_nh.subscribe(FRAME_ORIENTATION_TOPIC, 1, &NodeTest::frameOrientationCallback, this);
     // clang-format on
 
     // Publishers
@@ -57,26 +57,26 @@ protected:
   }
 
   void jointImuCallback(const sensor_msgs::Imu &msg) {
-    this->joint_if_imu_msg = msg;
+    this->joint_W_imu_msg = msg;
   }
 
   void frameOrientationCallback(const geometry_msgs::Quaternion &msg) {
-    this->frame_if_orien_msg = msg;
+    this->frame_W_orien_msg = msg;
   }
 };
 
 TEST_F(NodeTest, jointImuMessage) {
-  EXPECT_EQ(1, this->joint_if_imu_sub.getNumPublishers());
-  // ASSERT_NEAR(0.0, this->pos_if_msg.x, 0.1);
-  // ASSERT_NEAR(0.0, this->pos_if_msg.y, 0.1);
-  // ASSERT_NEAR(0.0, this->pos_if_msg.z, 0.1);
+  EXPECT_EQ(1, this->joint_W_imu_sub.getNumPublishers());
+  // ASSERT_NEAR(0.0, this->pos_W_msg.x, 0.1);
+  // ASSERT_NEAR(0.0, this->pos_W_msg.y, 0.1);
+  // ASSERT_NEAR(0.0, this->pos_W_msg.z, 0.1);
 }
 
 TEST_F(NodeTest, frameOrientationMsg) {
-  EXPECT_EQ(1, this->frame_if_orientation_sub.getNumPublishers());
-  // ASSERT_NEAR(0.0, this->pos_if_msg.x, 0.1);
-  // ASSERT_NEAR(0.0, this->pos_if_msg.y, 0.1);
-  // ASSERT_NEAR(0.0, this->pos_if_msg.z, 0.1);
+  EXPECT_EQ(1, this->frame_W_orientation_sub.getNumPublishers());
+  // ASSERT_NEAR(0.0, this->pos_W_msg.x, 0.1);
+  // ASSERT_NEAR(0.0, this->pos_W_msg.y, 0.1);
+  // ASSERT_NEAR(0.0, this->pos_W_msg.z, 0.1);
 }
 
 } // namespace atl

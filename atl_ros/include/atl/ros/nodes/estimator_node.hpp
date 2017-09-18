@@ -16,8 +16,8 @@ static const double NODE_RATE = 50;
 
 // clang-format off
 // PUBLISH TOPICS
-static const std::string LT_BODY_POSITION_TOPIC = "/atl/estimate/landing_target/position/body";
-static const std::string LT_BODY_VELOCITY_TOPIC = "/atl/estimate/landing_target/velocity/body";
+static const std::string LT_POSITION_B_TOPIC = "/atl/estimate/landing_target/position/body";
+static const std::string LT_VELOCITY_B_TOPIC = "/atl/estimate/landing_target/velocity/body";
 static const std::string LT_DETECTED_TOPIC = "/atl/estimate/landing_target/detected";
 static const std::string GIMBAL_SETPOINT_ATTITUDE_TOPIC = "/atl/gimbal/setpoint/attitude";
 static const std::string QUAD_YAW_TOPIC = "/atl/control/yaw/set";
@@ -27,8 +27,8 @@ static const std::string QUAD_POSE_TOPIC = "/atl/quadrotor/pose/local";
 static const std::string QUAD_VELOCITY_TOPIC = "/atl/quadrotor/velocity/local";
 static const std::string ESTIMATOR_ON_TOPIC = "/atl/estimator/on";
 static const std::string ESTIMATOR_OFF_TOPIC = "/atl/estimator/off";
-static const std::string TARGET_BF_POS_TOPIC = "/atl/apriltag/target/position/body";
-static const std::string TARGET_IF_YAW_TOPIC = "/atl/apriltag/target/yaw/inertial";
+static const std::string TARGET_POS_B_TOPIC = "/atl/apriltag/target/position/body";
+static const std::string TARGET_YAW_W_TOPIC = "/atl/apriltag/target/yaw/inertial";
 // clang-format on
 
 namespace atl {
@@ -51,9 +51,9 @@ public:
 
   bool target_detected = false;
   bool target_losted = true;
-  Vec3 target_pos_bpf{0.0, 0.0, 0.0};
-  Vec3 target_vel_bpf{0.0, 0.0, 0.0};
-  double target_yaw_wf = 0.0;
+  Vec3 target_pos_P{0.0, 0.0, 0.0};
+  Vec3 target_vel_P{0.0, 0.0, 0.0};
+  double target_yaw_W = 0.0;
   Vec3 target_measured{0.0, 0.0, 0.0};
   Vec3 target_last_measured{0.0, 0.0, 0.0};
 

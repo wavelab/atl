@@ -112,7 +112,7 @@ void PGCameraNode::gimbalJointBodyCallback(
 }
 
 void PGCameraNode::targetPositionCallback(const geometry_msgs::Vector3 &msg) {
-  convertMsg(msg, this->target_pos_bf);
+  convertMsg(msg, this->target_pos_B);
 }
 
 void PGCameraNode::targetDetectedCallback(const std_msgs::Bool &msg) {
@@ -139,7 +139,7 @@ int PGCameraNode::loopCallback() {
     this->camera.changeMode("640x480");
 
   } else {
-    dist = -1 * this->target_pos_bf(2);
+    dist = -1 * this->target_pos_B(2);
     if (dist > 10.0) {
       this->camera.changeMode("640x480");
     } else if (dist > 0.3) {

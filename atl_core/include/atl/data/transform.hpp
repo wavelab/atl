@@ -68,6 +68,7 @@ public:
 
   /// Chain transforms
   friend Transform operator*(const Transform &T1, const Transform &T2) {
+    assert(T1.from == T2.into);
     const Mat4 T = T1.data * T2.data;
     return Transform{T1.into, T2.from, T};
   }
@@ -88,10 +89,12 @@ public:
  * - world frame is NWU
  */
 // clang-format off
-const Transform T_W_C{"W", "C", (Mat4() << 0.0, 0.0, 1.0, 0.0,
-                                           -1.0, 0.0, 0.0, 0.0,
-                                           0.0, -1.0, 0.0, 0.0,
-                                           0.0, 0.0, 0.0, 1.0).finished()};
+const Transform T_W_C{WORLD_FRAME,
+                      CAMERA_FRAME,
+                      (Mat4() << 0.0, 0.0, 1.0, 0.0,
+                                 -1.0, 0.0, 0.0, 0.0,
+                                 0.0, -1.0, 0.0, 0.0,
+                                 0.0, 0.0, 0.0, 1.0).finished()};
 // clang-format on
 
 /**
@@ -113,11 +116,14 @@ static inline Vec3 yaw(const Vec3 &rpy) { return Vec3{0.0, 0.0, rpy(2)}; }
 class T_B_W : public Transform {
 public:
   T_B_W(const Quaternion &q_W, const Vec3 &t_W = Vec3::Zero())
-      : Transform{"B", "W", q_W.toRotationMatrix().inverse(), -1.0 * t_W} {}
+      : Transform{BODY_FRAME,
+                  WORLD_FRAME,
+                  q_W.toRotationMatrix().inverse(),
+                  -1.0 * t_W} {}
   T_B_W(const Vec3 &rpy_W, const Vec3 &t_W = Vec3::Zero())
-      : Transform{"B", "W", euler123ToRot(rpy_W), -1.0 * t_W} {}
+      : Transform{BODY_FRAME, WORLD_FRAME, euler123ToRot(rpy_W), -1.0 * t_W} {}
   T_B_W(const Mat3 &R_W, const Vec3 &t_W = Vec3::Zero())
-      : Transform{"B", "W", R_W, -1.0 * t_W} {}
+      : Transform{BODY_FRAME, WORLD_FRAME, R_W, -1.0 * t_W} {}
 };
 
 /**
@@ -126,12 +132,14 @@ public:
 class T_P_W : public Transform {
 public:
   T_P_W(const Quaternion &q_W, const Vec3 &t_W = Vec3::Zero())
-      : Transform{"P", "W", yaw(q_W).toRotationMatrix().inverse(), -1.0 * t_W} {
-  }
+      : Transform{"P",
+                  WORLD_FRAME,
+                  yaw(q_W).toRotationMatrix().inverse(),
+                  -1.0 * t_W} {}
   T_P_W(const Vec3 &rpy_W, const Vec3 &t_W = Vec3::Zero())
-      : Transform{"P", "W", euler123ToRot(yaw(rpy_W)), -1.0 * t_W} {}
+      : Transform{"P", WORLD_FRAME, euler123ToRot(yaw(rpy_W)), -1.0 * t_W} {}
   T_P_W(const Mat3 &R_W, const Vec3 &t_W = Vec3::Zero())
-      : Transform{"P", "W", R_W, -1.0 * t_W} {}
+      : Transform{"P", WORLD_FRAME, R_W, -1.0 * t_W} {}
 };
 
 /**
@@ -140,11 +148,11 @@ public:
 class T_W_B : public Transform {
 public:
   T_W_B(const Quaternion &q_W, const Vec3 &t_W = Vec3::Zero())
-      : Transform{"W", "B", q_W.toRotationMatrix(), t_W} {}
+      : Transform{WORLD_FRAME, BODY_FRAME, q_W.toRotationMatrix(), t_W} {}
   T_W_B(const Vec3 &rpy_W, const Vec3 &t_W = Vec3::Zero())
-      : Transform{"W", "B", euler321ToRot(rpy_W), t_W} {}
+      : Transform{WORLD_FRAME, BODY_FRAME, euler321ToRot(rpy_W), t_W} {}
   T_W_B(const Mat3 &R_W, const Vec3 &t_W = Vec3::Zero())
-      : Transform{"W", "B", R_W, t_W} {}
+      : Transform{WORLD_FRAME, BODY_FRAME, R_W, t_W} {}
 };
 
 } // namespace atl

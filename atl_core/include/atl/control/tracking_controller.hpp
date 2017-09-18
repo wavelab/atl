@@ -57,7 +57,7 @@ public:
   /**
    * Update controller
    *
-   * @param target_pos_bf Target position in body frame
+   * @param target_pos_B Target position in body frame
    * @param pos Robot position in inertial frame
    * @param pos_prev Previous robot position in inertial frame
    * @param yaw Robot yaw
@@ -65,7 +65,7 @@ public:
    *
    * @return controller output
    */
-  AttitudeCommand update(const Vec3 &target_pos_bf,
+  AttitudeCommand update(const Vec3 &target_pos_B,
                          const Vec3 &pos,
                          const Vec3 &pos_prev,
                          const double yaw,

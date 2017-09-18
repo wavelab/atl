@@ -77,14 +77,12 @@ public:
    * Load trajectory
    *
    * @param pos Robot position in inertial frame
-   * @param target_pos_bf Target position in body frame
+   * @param target_pos_B Target position in body frame
    * @param v Robot velocity in inertial frame
    *
    * @return 0 for success, -1 for failure
    */
-  int loadTrajectory(const Vec3 &pos,
-                     const Vec3 &target_pos_bf,
-                     const double v);
+  int loadTrajectory(const Vec3 &pos, const Vec3 &target_pos_B, const double v);
 
   /**
    * Prepare blackbox
@@ -110,8 +108,8 @@ public:
    * @param wp_pos Waypoint position
    * @param wp_vel Waypoint velocity
    * @param wp_inputs Waypoint inputs
-   * @param target_pos_bf Target position in body frame
-   * @param target_vel_bf Target velocity in body frame
+   * @param target_pos_B Target position in body frame
+   * @param target_vel_B Target velocity in body frame
    * @param rpy Roll, pitch, yaw
    * @param thrust Relative thrust (0, 1.0)
    * @param dt Time diffrence in seconds
@@ -123,8 +121,8 @@ public:
              const Vec2 &wp_pos,
              const Vec2 &wp_vel,
              const Vec2 &wp_inputs,
-             const Vec3 &target_pos_bf,
-             const Vec3 &target_vel_bf,
+             const Vec3 &target_pos_B,
+             const Vec3 &target_vel_B,
              const Vec3 &rpy,
              const double thrust,
              const double dt);
@@ -149,8 +147,8 @@ public:
   /**
    * Calculate controller outputs
    *
-   * @param target_pos_bf Target position in body frame
-   * @param target_vel_bf Target velocity in body frame
+   * @param target_pos_B Target position in body frame
+   * @param target_vel_B Target velocity in body frame
    * @param pos Actual robot position
    * @param vel Actual robot velocity
    * @param yaw Actual robot yaw
@@ -158,8 +156,8 @@ public:
    *
    * @return 0 for success, -1 for failure
    */
-  int update(const Vec3 &target_pos_bf,
-             const Vec3 &target_vel_bf,
+  int update(const Vec3 &target_pos_B,
+             const Vec3 &target_vel_B,
              const Vec3 &pos,
              const Vec3 &vel,
              const Quaternion &orientation,

@@ -4,7 +4,7 @@
 namespace atl {
 
 TEST(Utils_data_Pose, checkPose) {
-  Pose testPose;
+  Pose test_pose;
   Quaternion q_test;
   Vec3 euler;
   Vec3 position_test;
@@ -15,14 +15,14 @@ TEST(Utils_data_Pose, checkPose) {
   float x, y, z;
 
   // check Pose with no arguments (q = identity, position = 0);
-  EXPECT_FLOAT_EQ(0.0, testPose.orientation.x());
-  EXPECT_FLOAT_EQ(0.0, testPose.orientation.y());
-  EXPECT_FLOAT_EQ(0.0, testPose.orientation.z());
-  EXPECT_FLOAT_EQ(1.0, testPose.orientation.w());
+  EXPECT_FLOAT_EQ(0.0, test_pose.orientation.x());
+  EXPECT_FLOAT_EQ(0.0, test_pose.orientation.y());
+  EXPECT_FLOAT_EQ(0.0, test_pose.orientation.z());
+  EXPECT_FLOAT_EQ(1.0, test_pose.orientation.w());
 
-  EXPECT_FLOAT_EQ(0.0, testPose.position(0));
-  EXPECT_FLOAT_EQ(0.0, testPose.position(1));
-  EXPECT_FLOAT_EQ(0.0, testPose.position(2));
+  EXPECT_FLOAT_EQ(0.0, test_pose.position(0));
+  EXPECT_FLOAT_EQ(0.0, test_pose.position(1));
+  EXPECT_FLOAT_EQ(0.0, test_pose.position(2));
 
   // test initalizeing with floats,
   roll = 0.0;
@@ -32,15 +32,15 @@ TEST(Utils_data_Pose, checkPose) {
   y = 3.0;
   z = 22.0;
 
-  testPose = Pose("W", roll, pitch, yaw, x, y, z);
-  EXPECT_FLOAT_EQ(0, testPose.orientation.x());
-  EXPECT_FLOAT_EQ(0, testPose.orientation.y());
-  EXPECT_FLOAT_EQ(0, testPose.orientation.z());
-  EXPECT_FLOAT_EQ(1, testPose.orientation.w());
+  test_pose = Pose(WORLD_FRAME, roll, pitch, yaw, x, y, z);
+  EXPECT_FLOAT_EQ(0, test_pose.orientation.x());
+  EXPECT_FLOAT_EQ(0, test_pose.orientation.y());
+  EXPECT_FLOAT_EQ(0, test_pose.orientation.z());
+  EXPECT_FLOAT_EQ(1, test_pose.orientation.w());
 
-  EXPECT_FLOAT_EQ(x, testPose.position(0));
-  EXPECT_FLOAT_EQ(y, testPose.position(1));
-  EXPECT_FLOAT_EQ(z, testPose.position(2));
+  EXPECT_FLOAT_EQ(x, test_pose.position(0));
+  EXPECT_FLOAT_EQ(y, test_pose.position(1));
+  EXPECT_FLOAT_EQ(z, test_pose.position(2));
 
   // test initializing non zero roll, pitch, yaw
   roll = 10.0;
@@ -49,35 +49,35 @@ TEST(Utils_data_Pose, checkPose) {
 
   euler << roll, pitch, yaw;
   q_test = euler321ToQuat(euler);
-  testPose = Pose("W", roll, pitch, yaw, x, y, z);
+  test_pose = Pose(WORLD_FRAME, roll, pitch, yaw, x, y, z);
 
-  EXPECT_FLOAT_EQ(q_test.x(), testPose.orientation.x());
-  EXPECT_FLOAT_EQ(q_test.y(), testPose.orientation.y());
-  EXPECT_FLOAT_EQ(q_test.z(), testPose.orientation.z());
-  EXPECT_FLOAT_EQ(q_test.w(), testPose.orientation.w());
+  EXPECT_FLOAT_EQ(q_test.x(), test_pose.orientation.x());
+  EXPECT_FLOAT_EQ(q_test.y(), test_pose.orientation.y());
+  EXPECT_FLOAT_EQ(q_test.z(), test_pose.orientation.z());
+  EXPECT_FLOAT_EQ(q_test.w(), test_pose.orientation.w());
 
-  EXPECT_FLOAT_EQ(x, testPose.position(0));
-  EXPECT_FLOAT_EQ(y, testPose.position(1));
-  EXPECT_FLOAT_EQ(z, testPose.position(2));
+  EXPECT_FLOAT_EQ(x, test_pose.position(0));
+  EXPECT_FLOAT_EQ(y, test_pose.position(1));
+  EXPECT_FLOAT_EQ(z, test_pose.position(2));
 
   // test inializing with quaterion and a postion vector
-  testPose = Pose("W", Vec3(x, y, z), q_test);
-  EXPECT_FLOAT_EQ(q_test.x(), testPose.orientation.x());
-  EXPECT_FLOAT_EQ(q_test.y(), testPose.orientation.y());
-  EXPECT_FLOAT_EQ(q_test.z(), testPose.orientation.z());
-  EXPECT_FLOAT_EQ(q_test.w(), testPose.orientation.w());
+  test_pose = Pose(WORLD_FRAME, Vec3(x, y, z), q_test);
+  EXPECT_FLOAT_EQ(q_test.x(), test_pose.orientation.x());
+  EXPECT_FLOAT_EQ(q_test.y(), test_pose.orientation.y());
+  EXPECT_FLOAT_EQ(q_test.z(), test_pose.orientation.z());
+  EXPECT_FLOAT_EQ(q_test.w(), test_pose.orientation.w());
 
-  EXPECT_FLOAT_EQ(x, testPose.position(0));
-  EXPECT_FLOAT_EQ(y, testPose.position(1));
-  EXPECT_FLOAT_EQ(z, testPose.position(2));
+  EXPECT_FLOAT_EQ(x, test_pose.position(0));
+  EXPECT_FLOAT_EQ(y, test_pose.position(1));
+  EXPECT_FLOAT_EQ(z, test_pose.position(2));
 
   // test that rotation matrix makes sense
   roll = M_PI / 2;
   pitch = 0.0;
   yaw = M_PI / 2;
 
-  testPose = Pose("W", roll, pitch, yaw, x, y, z);
-  rotation_mtx = testPose.rotationMatrix();
+  test_pose = Pose(WORLD_FRAME, roll, pitch, yaw, x, y, z);
+  rotation_mtx = test_pose.rotationMatrix();
   euler << roll, pitch, yaw;
   q_test = euler321ToQuat(euler);
   EXPECT_TRUE(rotation_mtx == q_test.toRotationMatrix());

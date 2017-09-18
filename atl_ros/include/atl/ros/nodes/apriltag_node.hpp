@@ -17,11 +17,11 @@ static const double NODE_RATE = 100;
 // PUBLISH TOPICS
 // clang-format off
 static const std::string TARGET_POSE_TOPIC = "/atl/apriltag/target";
-static const std::string TARGET_IF_POS_TOPIC = "/atl/apriltag/target/position/inertial";
-static const std::string TARGET_IF_YAW_TOPIC = "/atl/apriltag/target/yaw/inertial";
-static const std::string TARGET_BPF_POS_TOPIC = "/atl/apriltag/target/position/body";
-static const std::string TARGET_BPF_POS_ENCODER_TOPIC = "/atl/apriltag/target/position/body_encoders";
-static const std::string TARGET_BPF_YAW_TOPIC = "/atl/apriltag/target/yaw/body";
+static const std::string TARGET_W_POS_TOPIC = "/atl/apriltag/target/position/inertial";
+static const std::string TARGET_W_YAW_TOPIC = "/atl/apriltag/target/yaw/inertial";
+static const std::string TARGET_P_POS_TOPIC = "/atl/apriltag/target/position/body";
+static const std::string TARGET_P_POS_ENCODER_TOPIC = "/atl/apriltag/target/position/body_encoders";
+static const std::string TARGET_P_YAW_TOPIC = "/atl/apriltag/target/yaw/body";
 // clang-format on
 
 // SUBSCRIBE TOPICS
@@ -58,11 +58,11 @@ public:
    *
    * @param gimbal_position Gimbal position in inertial frame
    * @param gimbal_orientation Gimbal orientation in inertial frame
-   * @param target_bf Detected target in body frame
+   * @param target_B Detected target in body frame
    */
   void publishTargetInertialPositionMsg(const Vec3 &gimbal_position,
                                         const Quaternion &gimbal_orientation,
-                                        const Vec3 &target_bf);
+                                        const Vec3 &target_B);
 
   /**
    * Publish target yaw in inertial frame
@@ -76,16 +76,16 @@ public:
   /**
    * Publish target position in body frame
    *
-   * @param target_bpf Target position in body planar frame
+   * @param target_P Target position in body planar frame
    */
-  void publishTargetBodyPositionMsg(const Vec3 &target_bpf);
+  void publishTargetBodyPositionMsg(const Vec3 &target_P);
 
   /**
    * Publish target position in body frame (Encoder-version)
    *
-   * @param target_bpf Target position in body planar frame
+   * @param target_P Target position in body planar frame
    */
-  void publishTargetBodyPositionEncoderMsg(const Vec3 &target_bpf_encoder);
+  void publishTargetBodyPositionEncoderMsg(const Vec3 &target_P_encoder);
 
   /**
    * Publish target yaw in body frame

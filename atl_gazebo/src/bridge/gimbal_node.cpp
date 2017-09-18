@@ -62,8 +62,8 @@ void GimbalNode::setAttitudeCallback(const geometry_msgs::Vector3 msg) {
 }
 
 void GimbalNode::trackTargetCallback(const geometry_msgs::Vector3 msg) {
-  Vec3 target_cf{msg.x, msg.y, msg.z};
-  GimbalGClient::trackTarget(target_cf);
+  Vec3 target_C{msg.x, msg.y, msg.z};
+  GimbalGClient::trackTarget(target_C);
 }
 
 } // namespace gazebo_bridge
