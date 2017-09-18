@@ -49,7 +49,7 @@ Vec4 PositionController::update(const Vec3 &setpoints,
 
   // calculate setpoint relative to quadrotor
   Vec3 errors = setpoints - pose.position;
-  errors = T_bpf_if{pose.orientation} * errors;
+  errors = T_P_W{pose.orientation} * errors;
 
   // roll, pitch, yaw and throttle (assuming NWU frame)
   double r = -this->y_controller.update(errors(1), this->dt);

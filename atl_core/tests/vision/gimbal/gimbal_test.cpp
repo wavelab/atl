@@ -60,7 +60,7 @@ TEST(Gimbal, getTargetInBF) {
   double dy = 0.0;
   double dz = 0.0;
 
-  gimbal.camera_offset = Pose(roll, pitch, yaw, dx, dy, dz);
+  gimbal.camera_offset = Pose("B", roll, pitch, yaw, dx, dy, dz);
 
   // target is front of camera
   target_cf << 0.0, 0.0, 1.0;
@@ -159,7 +159,7 @@ TEST(Gimbal, getTargetInBPF) {
   double dz = 0.0;
 
   target_cf << 0.0, 0.0, 10.0; // let tag be directly infront of camera
-  gimbal.camera_offset = Pose(roll, pitch, yaw, dx, dy, dz);
+  gimbal.camera_offset = Pose("B", roll, pitch, yaw, dx, dy, dz);
   std::cout << "target is directly infront of camera: ";
   std::cout << "[" << target_cf.transpose() << "]" << std::endl;
 
@@ -312,7 +312,7 @@ TEST(Gimbal, trackTarget) {
   double dz = 0.0;
 
   target_cf << 0.0, 0.0, 10.0; // let tag be directly infront of camera
-  gimbal.camera_offset = Pose(roll, pitch, yaw, dx, dy, dz);
+  gimbal.camera_offset = Pose("B", roll, pitch, yaw, dx, dy, dz);
   std::cout << "target is directly infront of camera: ";
   std::cout << "[" << target_cf.transpose() << "]" << std::endl;
 

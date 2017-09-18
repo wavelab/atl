@@ -46,8 +46,6 @@ ADD_LIBRARY(
     # data
     src/data/attitude_command.cpp
     src/data/landing_target.cpp
-    src/data/transform.cpp
-    src/data/pose.cpp
     # estimation
     src/estimation/ekf.cpp
     src/estimation/ekf_tracker.cpp

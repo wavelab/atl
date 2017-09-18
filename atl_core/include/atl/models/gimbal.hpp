@@ -72,13 +72,13 @@ public:
 
   Gimbal2AxisModel()
       : states{0.0, 0.0, 0.0, 0.0}, Ix{0.01}, Iy{0.01},
-        camera_offset{0.0, deg2rad(90.0), 0.0, 0.0, 0.0, 0.0},
+        camera_offset{"B", 0.0, deg2rad(90.0), 0.0, 0.0, 0.0, 0.0},
         joint_setpoints{0.0, 0.0}, joint_controller{}, frame_orientation{},
         joint_orientation{}, target_attitude_if{0.0, 0.0} {}
 
   Gimbal2AxisModel(Vec4 pose)
       : states{pose}, Ix{0.01}, Iy{0.01},
-        camera_offset{0.0, deg2rad(90.0), 0.0, 0.0, 0.0, 0.0},
+        camera_offset{"B", 0.0, deg2rad(90.0), 0.0, 0.0, 0.0, 0.0},
         joint_setpoints{0.0, 0.0}, joint_controller{}, frame_orientation{},
         joint_orientation{}, target_attitude_if{0.0, 0.0} {}
 

@@ -32,7 +32,7 @@ TEST(Utils_data_Pose, checkPose) {
   y = 3.0;
   z = 22.0;
 
-  testPose = Pose(roll, pitch, yaw, x, y, z);
+  testPose = Pose("W", roll, pitch, yaw, x, y, z);
   EXPECT_FLOAT_EQ(0, testPose.orientation.x());
   EXPECT_FLOAT_EQ(0, testPose.orientation.y());
   EXPECT_FLOAT_EQ(0, testPose.orientation.z());
@@ -49,7 +49,7 @@ TEST(Utils_data_Pose, checkPose) {
 
   euler << roll, pitch, yaw;
   q_test = euler321ToQuat(euler);
-  testPose = Pose(roll, pitch, yaw, x, y, z);
+  testPose = Pose("W", roll, pitch, yaw, x, y, z);
 
   EXPECT_FLOAT_EQ(q_test.x(), testPose.orientation.x());
   EXPECT_FLOAT_EQ(q_test.y(), testPose.orientation.y());
@@ -61,7 +61,7 @@ TEST(Utils_data_Pose, checkPose) {
   EXPECT_FLOAT_EQ(z, testPose.position(2));
 
   // test inializing with quaterion and a postion vector
-  testPose = Pose(Vec3(x, y, z), q_test);
+  testPose = Pose("W", Vec3(x, y, z), q_test);
   EXPECT_FLOAT_EQ(q_test.x(), testPose.orientation.x());
   EXPECT_FLOAT_EQ(q_test.y(), testPose.orientation.y());
   EXPECT_FLOAT_EQ(q_test.z(), testPose.orientation.z());
@@ -76,7 +76,7 @@ TEST(Utils_data_Pose, checkPose) {
   pitch = 0.0;
   yaw = M_PI / 2;
 
-  testPose = Pose(roll, pitch, yaw, x, y, z);
+  testPose = Pose("W", roll, pitch, yaw, x, y, z);
   rotation_mtx = testPose.rotationMatrix();
   euler << roll, pitch, yaw;
   q_test = euler321ToQuat(euler);

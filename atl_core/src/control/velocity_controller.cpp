@@ -50,10 +50,9 @@ Vec4 VelocityController::calculate(const Vec3 &setpoints,
   }
 
   // calculate errors
-  Vec3 errors;
-  errors(0) = setpoints(0) - actual(0);
-  errors(1) = setpoints(1) - actual(1);
-  errors(2) = setpoints(2) - actual(2);
+  const Vec3 errors{setpoints(0) - actual(0),
+                    setpoints(1) - actual(1),
+                    setpoints(2) - actual(2)};
 
   // roll, pitch, yaw and throttle (assuming NWU frame)
   // clang-format off

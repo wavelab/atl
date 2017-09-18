@@ -74,13 +74,13 @@ int TrajectoryController::configure(const std::string &config_file) {
 }
 
 int TrajectoryController::loadTrajectory(const Vec3 &pos,
-                                         const Vec3 &target_pos_bf,
+                                         const Vec3 &target_pos_B,
                                          const double v) {
   int retval;
 
   // find trajectory
   retval = this->traj_index.find(pos, v, this->trajectory);
-  UNUSED(target_pos_bf);
+  UNUSED(target_pos_B);
 
   // check retval
   if (retval == -2) {
@@ -116,12 +116,12 @@ int TrajectoryController::prepBlackbox(const std::string &blackbox_file) {
   this->blackbox << "wp_pos_z" << ",";
   this->blackbox << "wp_vel_x" << ",";
   this->blackbox << "wp_vel_z" << ",";
-  this->blackbox << "target_x_bf" << ",";
-  this->blackbox << "target_y_bf" << ",";
-  this->blackbox << "target_z_bf" << ",";
-  this->blackbox << "target_vx_bf" << ",";
-  this->blackbox << "target_vy_bf" << ",";
-  this->blackbox << "target_vz_bf" << ",";
+  this->blackbox << "target_x_B" << ",";
+  this->blackbox << "target_y_B" << ",";
+  this->blackbox << "target_z_B" << ",";
+  this->blackbox << "target_vx_B" << ",";
+  this->blackbox << "target_vy_B" << ",";
+  this->blackbox << "target_vz_B" << ",";
   this->blackbox << "roll";
   this->blackbox << "pitch";
   this->blackbox << "yaw";
@@ -142,8 +142,8 @@ int TrajectoryController::record(const Vec3 &pos,
                                  const Vec2 &wp_pos,
                                  const Vec2 &wp_vel,
                                  const Vec2 &wp_inputs,
-                                 const Vec3 &target_pos_bf,
-                                 const Vec3 &target_vel_bf,
+                                 const Vec3 &target_pos_B,
+                                 const Vec3 &target_vel_B,
                                  const Vec3 &rpy,
                                  const double thrust,
                                  const double dt) {
@@ -167,12 +167,12 @@ int TrajectoryController::record(const Vec3 &pos,
   this->blackbox << wp_vel(1) << ",";
   this->blackbox << wp_inputs(0) << ",";
   this->blackbox << wp_inputs(1) << ",";
-  this->blackbox << target_pos_bf(0) << ",";
-  this->blackbox << target_pos_bf(1) << ",";
-  this->blackbox << target_pos_bf(2) << ",";
-  this->blackbox << target_vel_bf(0) << ",";
-  this->blackbox << target_vel_bf(1) << ",";
-  this->blackbox << target_vel_bf(2) << ",";
+  this->blackbox << target_pos_B(0) << ",";
+  this->blackbox << target_pos_B(1) << ",";
+  this->blackbox << target_pos_B(2) << ",";
+  this->blackbox << target_vel_B(0) << ",";
+  this->blackbox << target_vel_B(1) << ",";
+  this->blackbox << target_vel_B(2) << ",";
   this->blackbox << rpy(0) << ",";
   this->blackbox << rpy(1) << ",";
   this->blackbox << rpy(2) << ",";
@@ -237,8 +237,8 @@ Vec4 TrajectoryController::calculateVelocityErrors(const Vec3 &v_errors,
   return this->outputs;
 }
 
-int TrajectoryController::update(const Vec3 &target_pos_bf,
-                                 const Vec3 &target_vel_bf,
+int TrajectoryController::update(const Vec3 &target_pos_B,
+                                 const Vec3 &target_vel_B,
                                  const Vec3 &pos,
                                  const Vec3 &vel,
                                  const Quaternion &orientation,
@@ -255,18 +255,18 @@ int TrajectoryController::update(const Vec3 &target_pos_bf,
   // Vec2 wp_rel_vel = this->trajectory.rel_vel.at(0);
 
   // calculate velocity in body frame
-  const Vec3 vel_bf = T_bf_if{orientation} * vel;
+  const Vec3 vel_B = T_B_W{orientation} * vel;
 
   // calculate velocity errors (inertial version)
   Vec3 v_errors;
-  v_errors(0) = wp_vel(0) - vel_bf(0);
-  v_errors(1) = target_vel_bf(1);
+  v_errors(0) = wp_vel(0) - vel_B(0);
+  v_errors(1) = target_vel_B(1);
   v_errors(2) = wp_vel(1) - vel(2);
 
   // calculate position errors
   Vec3 p_errors;
-  p_errors(0) = wp_rel_pos(0) + target_pos_bf(0);
-  p_errors(1) = target_pos_bf(1);
+  p_errors(0) = wp_rel_pos(0) + target_pos_B(0);
+  p_errors(1) = target_pos_B(1);
   p_errors(2) = wp_rel_pos(1) - pos(2);
 
   // calculate feed-back controls
@@ -285,8 +285,8 @@ int TrajectoryController::update(const Vec3 &target_pos_bf,
                wp_pos,
                wp_vel,
                wp_inputs,
-               target_pos_bf,
-               target_vel_bf,
+               target_pos_B,
+               target_vel_B,
                rpy,
                this->outputs(3),
                dt);

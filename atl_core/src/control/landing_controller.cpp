@@ -38,8 +38,8 @@ int LandingController::configure(const std::string &config_file) {
   return 0;
 }
 
-Vec4 LandingController::update(const Vec3 &pos_errors_bf,
-                               const Vec3 &velocity_if,
+Vec4 LandingController::update(const Vec3 &pos_errors_B,
+                               const Vec3 &vel_W,
                                const double yaw_setpoint,
                                const double dt) {
   // check rate
@@ -49,10 +49,10 @@ Vec4 LandingController::update(const Vec3 &pos_errors_bf,
   }
 
   // roll, pitch, yaw and throttle (assuming NWU frame)
-  double r = -this->y_controller.update(pos_errors_bf(1), this->dt);
-  double p = this->x_controller.update(pos_errors_bf(0), this->dt);
+  double r = -this->y_controller.update(pos_errors_B(1), this->dt);
+  double p = this->x_controller.update(pos_errors_B(0), this->dt);
   double y = yaw_setpoint;
-  const double vz_error = this->descent_velocity - velocity_if(2);
+  const double vz_error = this->descent_velocity - vel_W(2);
   double t = this->hover_throttle;
   t += this->vz_controller.update(vz_error, this->dt);
   t /= fabs(cos(r) * cos(p)); // adjust throttle for roll and pitch

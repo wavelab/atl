@@ -2,156 +2,25 @@
 #define ATL_DATA_TRANSFORM_HPP
 
 #include "atl/utils/utils.hpp"
+#include "atl/data/pose.hpp"
+#include "atl/data/position.hpp"
 
 namespace atl {
 
-/**
- * Right hand rotation Matrix in x-axis
- * @param angle Rotation angle in radians
- * @return Rotation matrix
- */
-Mat3 rotx(const double angle);
-
-/**
- * Right hand rotation Matrix in y-axis
- * @param angle Rotation angle in radians
- * @return Rotation matrix
- */
-Mat3 roty(const double angle);
-
-/**
- * Right hand rotation Matrix in z-axis
- * @param angle Rotation angle in radians
- * @return Rotation matrix
- */
-Mat3 rotz(const double angle);
-
-/**
- * Convert Euler 1-2-3 angles to quaternion
- * @param euler Input Euler angles
- * @return Output quaternion
- */
-Quaternion euler123ToQuat(const Vec3 &euler);
-
-/**
- * Convert Euler 3-2-1 angles to quaternion
- * @param euler Input Euler angles
- * @return Output quaternion
- */
-Quaternion euler321ToQuat(const Vec3 &euler);
-
-/**
- * Convert Euler 1-2-3 angles to rotation matrix
- * @param euler Input Euler angles
- * @return R Output rotation matrix
- */
-Mat3 euler123ToRot(const Vec3 &euler);
-
-/**
- * Convert Euler 3-2-1 angles to rotation matrix
- * @param euler Input Euler angles
- * @return R Output rotation matrix
- */
-Mat3 euler321ToRot(const Vec3 &euler);
-
-/**
- * Convert quanternion to Euler 1-2-3 angles
- * @param q Input quaternion
- * @return euler Output Euler angles
- */
-Vec3 quatToEuler123(const Quaternion &q);
-
-/**
- * Convert quanternion to Euler 3-2-1 angles
- * @param q Input quaternion
- * @return euler Output Euler angles
- */
-Vec3 quatToEuler321(const Quaternion &q);
-
-/**
- * Convert Quaternion to rotation matrix
- * @param q Input quaternion
- * @param R Output rotation matrix
- */
-Mat3 quat2rot(const Quaternion &q);
-
-/**
- * Convert from ENU to NWU
- * @param enu ENU vector
- * @return nwu NWU vector
- */
-Vec3 enu2nwu(const Vec3 &enu);
-
-/**
- * Convert from EDN to NWU
- * @param enu EDN vector
- * @return nwu NWU vector
- */
-Vec3 edn2nwu(const Vec3 &edn);
-
-/**
- * Convert from EDN to ENU
- * @param enu EDN vector
- * @return enu ENU vector
- */
-Vec3 edn2enu(const Vec3 &edn);
-
-/**
- * Convert from NWU to ENU
- * @param nwu NWU vector
- * @return enu ENU vector
- */
-Vec3 nwu2enu(const Vec3 &nwu);
-
-/**
- * Convert from NWU to NED
- * @param nwu NWU vector
- * @return enu NED vector
- */
-Vec3 nwu2ned(const Vec3 &nwu);
-
-/**
- * Convert from NED to ENU
- * @param ned NED vector
- * @return enu ENU vector
- */
-Vec3 ned2enu(const Vec3 &ned);
-
-/**
- * Convert from NED to NWU
- * @param ned NED vector
- * @return enu NWU vector
- */
-Vec3 ned2nwu(const Vec3 &ned);
-
-/**
- * Convert from NWU to NED
- * @param nwu NWU quaternion
- * @return ned NED quaternion
- */
-Quaternion nwu2ned(const Quaternion &nwu);
-
-/**
- * Conver from NED to NWU
- * @param ned NED quaternion
- * @param nwu NWU quaternion
- */
-Quaternion ned2nwu(const Quaternion &ned);
-
-/**
- * Conver from ENU to NWU
- * @param ned ENU quaternion
- * @param nwu NWU quaternion
- */
-Quaternion enu2nwu(const Quaternion &enu);
-
 class Transform {
 public:
+  std::string into;
+  std::string from;
   Mat4 data;
 
-  Transform() : data{Mat4::Identity()} {}
-  Transform(const Mat4 &mat) : data(mat) {}
-  Transform(const Mat3 &R, const Vec3 &t = Vec3::Zero()) {
+  Transform(const std::string &into, const std::string &from, const Mat4 &mat)
+      : into{into}, from{from}, data(mat) {}
+
+  Transform(const std::string &into,
+            const std::string &from,
+            const Mat3 &R,
+            const Vec3 &t = Vec3::Zero())
+      : into{into}, from{from} {
     // rotation component
     for (int i = 0; i < 3; i++) {
       this->data(i, 0) = R(i, 0);
@@ -171,24 +40,39 @@ public:
     this->data(3, 3) = 1.0;
   }
 
-  /**
-  * Transform position or velocity vector of size 3
-  */
+  /// Transform pose
+  friend Pose operator*(const Transform &T, const Pose &pose) {
+    assert(T.from == pose.frame);
+    const Mat4 p_transformed = T.data * pose.transformMatrix();
+    const Mat3 R_transformed = p_transformed.block(0, 0, 3, 3);
+    const Vec3 t_transformed = p_transformed.block(0, 3, 3, 1);
+    return Pose{T.into, t_transformed, R_transformed};
+  }
+
+  /// Transform position
+  friend Position operator*(const Transform &T, const Position &x) {
+    assert(T.from == x.frame);
+    return Position{T.into, (T.data * x.homogeneous()).block(0, 0, 3, 1)};
+  }
+
+  /// Transform vector
   friend Vec3 operator*(const Transform &T, const Vec3 &x) {
     const Vec4 x_homo{x(0), x(1), x(2), 1.0};
-    return (T.data * x_homo).block(0, 0, 3, 1);
+    return Vec3{(T.data * x_homo).block(0, 0, 3, 1)};
   }
 
-  /**
-  * Chain transform
-  */
-  friend Mat4 operator*(const Transform &T1, const Transform &T2) {
-    return T1.data * T2.data;
+  /// Transform vector
+  friend Vec4 operator*(const Transform &T, const Vec4 &x) {
+    return T.data * x;
   }
 
-  /**
-  * Transform quaternion
-  */
+  /// Chain transforms
+  friend Transform operator*(const Transform &T1, const Transform &T2) {
+    const Mat4 T = T1.data * T2.data;
+    return Transform{T1.into, T2.from, T};
+  }
+
+  /// Transform quaternion
   friend Quaternion operator*(const Transform &T, const Quaternion &x) {
     const Vec4 x_homo{x.x(), x.y(), x.z(), 1.0};
     const Vec3 result = (T.data * x_homo).block(0, 0, 3, 1);
@@ -197,52 +81,17 @@ public:
 };
 
 /**
- * Transform from ENU to NWU
+ * Transform from camera to world frame
+ *
+ * Assumes:
+ * - camera frame is EDN
+ * - world frame is NWU
  */
 // clang-format off
-const Transform T_nwu_enu{(Mat4() << 0.0, 1.0, 0.0, 0.0,
-                                     -1.0, 0.0, 0.0, 0.0,
-                                     0.0, 0.0, 1.0, 0.0,
-                                     0.0, 0.0, 0.0, 1.0).finished()};
-
-/**
- * Transform from NED to NWU
- */
-// clang-format off
-const Transform T_nwu_ned{(Mat4() << 1.0, 0.0, 0.0, 0.0,
-                                     0.0, -1.0, 0.0, 0.0,
-                                     0.0, 0.0, -1.0, 0.0,
-                                     0.0, 0.0, 0.0, 1.0).finished()};
-// clang-format on
-
-/**
- * Transform from NWU to NED
- */
-// clang-format off
-const Transform T_ned_nwu{(Mat4() << 1.0, 0.0, 0.0, 0.0,
-                                     0.0, -1.0, 0.0, 0.0,
-                                     0.0, 0.0, -1.0, 0.0,
-                                     0.0, 0.0, 0.0, 1.0).finished()};
-// clang-format on
-
-/**
- * Transform from EDN to NWU
- */
-// clang-format off
-const Transform T_nwu_edn{(Mat4() << 0.0, 0.0, 1.0, 0.0,
-                                     -1.0, 0.0, 0.0, 0.0,
-                                     0.0, -1.0, 0.0, 0.0,
-                                     0.0, 0.0, 0.0, 1.0).finished()};
-// clang-format on
-
-/**
- * Transform from NWU to EDN
- */
-// clang-format off
-const Transform T_edn_nwu{(Mat4() << 0.0, -1.0, 0.0, 0.0,
-                                     0.0, 0.0, -1.0, 0.0,
-                                     -1.0, 0.0, 0.0, 0.0,
-                                     0.0, 0.0, 0.0, 1.0).finished()};
+const Transform T_W_C{"W", "C", (Mat4() << 0.0, 0.0, 1.0, 0.0,
+                                           -1.0, 0.0, 0.0, 0.0,
+                                           0.0, -1.0, 0.0, 0.0,
+                                           0.0, 0.0, 0.0, 1.0).finished()};
 // clang-format on
 
 /**
@@ -259,42 +108,43 @@ static inline Quaternion yaw(const Quaternion &q) {
 static inline Vec3 yaw(const Vec3 &rpy) { return Vec3{0.0, 0.0, rpy(2)}; }
 
 /**
- * Transform from inertial to body frame
+ * Transform from world to body frame
  */
-class T_bf_if : public Transform {
+class T_B_W : public Transform {
 public:
-  T_bf_if(const Quaternion &q_if, const Vec3 &pos_if = Vec3::Zero())
-      : Transform{q_if.toRotationMatrix().inverse(), -1.0 * pos_if} {}
-  T_bf_if(const Vec3 &rpy_if, const Vec3 &pos_if = Vec3::Zero())
-      : Transform{euler123ToRot(rpy_if), -1.0 * pos_if} {}
-  T_bf_if(const Mat3 &R, const Vec3 &pos_if = Vec3::Zero())
-      : Transform{R, -1.0 * pos_if} {}
+  T_B_W(const Quaternion &q_W, const Vec3 &t_W = Vec3::Zero())
+      : Transform{"B", "W", q_W.toRotationMatrix().inverse(), -1.0 * t_W} {}
+  T_B_W(const Vec3 &rpy_W, const Vec3 &t_W = Vec3::Zero())
+      : Transform{"B", "W", euler123ToRot(rpy_W), -1.0 * t_W} {}
+  T_B_W(const Mat3 &R_W, const Vec3 &t_W = Vec3::Zero())
+      : Transform{"B", "W", R_W, -1.0 * t_W} {}
 };
 
 /**
  * Transform from inertial to body planar frame
  */
-class T_bpf_if : public Transform {
+class T_P_W : public Transform {
 public:
-  T_bpf_if(const Quaternion &q_if, const Vec3 &pos_if = Vec3::Zero())
-      : Transform{yaw(q_if).toRotationMatrix().inverse(), -1.0 * pos_if} {}
-  T_bpf_if(const Vec3 &rpy_if, const Vec3 &pos_if = Vec3::Zero())
-      : Transform{euler123ToRot(yaw(rpy_if)), -1.0 * pos_if} {}
-  T_bpf_if(const Mat3 &R, const Vec3 &pos_if = Vec3::Zero())
-      : Transform{R, -1.0 * pos_if} {}
+  T_P_W(const Quaternion &q_W, const Vec3 &t_W = Vec3::Zero())
+      : Transform{"P", "W", yaw(q_W).toRotationMatrix().inverse(), -1.0 * t_W} {
+  }
+  T_P_W(const Vec3 &rpy_W, const Vec3 &t_W = Vec3::Zero())
+      : Transform{"P", "W", euler123ToRot(yaw(rpy_W)), -1.0 * t_W} {}
+  T_P_W(const Mat3 &R_W, const Vec3 &t_W = Vec3::Zero())
+      : Transform{"P", "W", R_W, -1.0 * t_W} {}
 };
 
 /**
  * Transform from body to inertial frame
  */
-class T_if_bf : public Transform {
+class T_W_B : public Transform {
 public:
-  T_if_bf(const Quaternion &q_if, const Vec3 &pos_if = Vec3::Zero())
-      : Transform{q_if.toRotationMatrix(), pos_if} {}
-  T_if_bf(const Vec3 &rpy_if, const Vec3 &pos_if = Vec3::Zero())
-      : Transform{euler321ToRot(rpy_if), pos_if} {}
-  T_if_bf(const Mat3 &R, const Vec3 &pos_if = Vec3::Zero())
-      : Transform{R, pos_if} {}
+  T_W_B(const Quaternion &q_W, const Vec3 &t_W = Vec3::Zero())
+      : Transform{"W", "B", q_W.toRotationMatrix(), t_W} {}
+  T_W_B(const Vec3 &rpy_W, const Vec3 &t_W = Vec3::Zero())
+      : Transform{"W", "B", euler321ToRot(rpy_W), t_W} {}
+  T_W_B(const Mat3 &R_W, const Vec3 &t_W = Vec3::Zero())
+      : Transform{"W", "B", R_W, t_W} {}
 };
 
 } // namespace atl

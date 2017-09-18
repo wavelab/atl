@@ -1,105 +1,106 @@
-#include "atl/data/transform.hpp"
 #include "atl/atl_test.hpp"
+#include "atl/data/pose.hpp"
+#include "atl/data/transform.hpp"
 
 namespace atl {
 
-TEST(Transform, nedToNwu) {
-  const Vec3 x_ned{1.0, 2.0, 3.0};
-  const Vec3 x_nwu = T_nwu_ned * x_ned;
-  EXPECT_TRUE(x_nwu.isApprox(Vec3{1.0, -2.0, -3.0}));
-}
+// TEST(Transform, nedToNwu) {
+//   const Vec3 x_ned{1.0, 2.0, 3.0};
+//   const Vec3 x_nwu = T_nwu_ned * x_ned;
+//   EXPECT_TRUE(x_nwu.isApprox(Vec3{1.0, -2.0, -3.0}));
+// }
 
 TEST(Transform, inertialToBody) {
-  const Vec3 x_if{1.0, 2.0, 3.0};
+  const Vec3 x_W{1.0, 2.0, 3.0};
   Vec3 rpy;
-  Vec3 x_bf;
+  Vec3 x_B;
 
   // 0 degree
   rpy << 0.0, 0.0, deg2rad(0.0);
-  x_bf = T_bf_if(rpy) * x_if;
-  EXPECT_TRUE(x_bf.isApprox(Vec3{1.0, 2.0, 3.0}));
+  x_B = T_B_W(rpy) * x_W;
+  EXPECT_TRUE(x_B.isApprox(Vec3{1.0, 2.0, 3.0}));
 
   // 90 degree
   rpy << 0.0, 0.0, deg2rad(90.0);
-  x_bf = T_bf_if(rpy) * x_if;
-  EXPECT_TRUE(x_bf.isApprox(Vec3{2.0, -1.0, 3.0}));
+  x_B = T_B_W(rpy) * x_W;
+  EXPECT_TRUE(x_B.isApprox(Vec3{2.0, -1.0, 3.0}));
 
   // 180 degree
   rpy << 0.0, 0.0, deg2rad(180.0);
-  x_bf = T_bf_if(rpy) * x_if;
-  EXPECT_TRUE(x_bf.isApprox(Vec3{-1.0, -2.0, 3.0}));
+  x_B = T_B_W(rpy) * x_W;
+  EXPECT_TRUE(x_B.isApprox(Vec3{-1.0, -2.0, 3.0}));
 
   // -90 degree
   rpy << 0.0, 0.0, deg2rad(-90.0);
-  x_bf = T_bf_if(rpy) * x_if;
-  EXPECT_TRUE(x_bf.isApprox(Vec3{-2.0, 1.0, 3.0}));
+  x_B = T_B_W(rpy) * x_W;
+  EXPECT_TRUE(x_B.isApprox(Vec3{-2.0, 1.0, 3.0}));
 
   // 0 degree + (1.0, 2.0, 3.0)
   rpy << 0.0, 0.0, deg2rad(0.0);
-  x_bf = T_bf_if(rpy, Vec3{1.0, 2.0, 3.0}) * x_if;
-  EXPECT_TRUE(x_bf.isApprox(Vec3{0.0, 0.0, 0.0}));
+  x_B = T_B_W(rpy, Vec3{1.0, 2.0, 3.0}) * x_W;
+  EXPECT_TRUE(x_B.isApprox(Vec3{0.0, 0.0, 0.0}));
 }
 
 TEST(Transform, inertialToBodyPlanar) {
-  const Vec3 x_if{1.0, 2.0, 3.0};
+  const Vec3 x_W{1.0, 2.0, 3.0};
   Vec3 rpy;
-  Vec3 x_bf;
+  Vec3 x_B;
 
   // 0 degree
   rpy << 0.0, 0.0, deg2rad(0.0);
-  x_bf = T_bpf_if(rpy) * x_if;
-  EXPECT_TRUE(x_bf.isApprox(Vec3{1.0, 2.0, 3.0}));
+  x_B = T_P_W(rpy) * x_W;
+  EXPECT_TRUE(x_B.isApprox(Vec3{1.0, 2.0, 3.0}));
 
   // 90 degree
   rpy << 0.0, 0.0, deg2rad(90.0);
-  x_bf = T_bpf_if(rpy) * x_if;
-  EXPECT_TRUE(x_bf.isApprox(Vec3{2.0, -1.0, 3.0}));
+  x_B = T_P_W(rpy) * x_W;
+  EXPECT_TRUE(x_B.isApprox(Vec3{2.0, -1.0, 3.0}));
 
   // 180 degree
   rpy << 0.0, 0.0, deg2rad(180.0);
-  x_bf = T_bpf_if(rpy) * x_if;
-  EXPECT_TRUE(x_bf.isApprox(Vec3{-1.0, -2.0, 3.0}));
+  x_B = T_P_W(rpy) * x_W;
+  EXPECT_TRUE(x_B.isApprox(Vec3{-1.0, -2.0, 3.0}));
 
   // -90 degree
   rpy << 0.0, 0.0, deg2rad(-90.0);
-  x_bf = T_bpf_if(rpy) * x_if;
-  EXPECT_TRUE(x_bf.isApprox(Vec3{-2.0, 1.0, 3.0}));
+  x_B = T_P_W(rpy) * x_W;
+  EXPECT_TRUE(x_B.isApprox(Vec3{-2.0, 1.0, 3.0}));
 
   // 0 degree + (1.0, 2.0, 3.0)
   rpy << 0.0, 0.0, deg2rad(0.0);
-  x_bf = T_bpf_if(rpy, Vec3{1.0, 2.0, 3.0}) * x_if;
-  EXPECT_TRUE(x_bf.isApprox(Vec3{0.0, 0.0, 0.0}));
+  x_B = T_P_W(rpy, Vec3{1.0, 2.0, 3.0}) * x_W;
+  EXPECT_TRUE(x_B.isApprox(Vec3{0.0, 0.0, 0.0}));
 }
 
 TEST(Transform, bodyToInertial) {
-  const Vec3 x_bf{1.0, 2.0, 3.0};
+  const Vec3 x_B{1.0, 2.0, 3.0};
   Vec3 rpy;
-  Vec3 x_if;
+  Vec3 x_W;
 
   // 0 degree
   rpy << 0.0, 0.0, deg2rad(0.0);
-  x_if = T_if_bf(rpy) * x_bf;
-  EXPECT_TRUE(x_if.isApprox(Vec3{1.0, 2.0, 3.0}));
+  x_W = T_W_B(rpy) * x_B;
+  EXPECT_TRUE(x_W.isApprox(Vec3{1.0, 2.0, 3.0}));
 
   // 90 degree
   rpy << 0.0, 0.0, deg2rad(90.0);
-  x_if = T_if_bf(rpy) * x_bf;
-  EXPECT_TRUE(x_if.isApprox(Vec3{-2.0, 1.0, 3.0}));
+  x_W = T_W_B(rpy) * x_B;
+  EXPECT_TRUE(x_W.isApprox(Vec3{-2.0, 1.0, 3.0}));
 
   // 180 degree
   rpy << 0.0, 0.0, deg2rad(180.0);
-  x_if = T_if_bf(rpy) * x_bf;
-  EXPECT_TRUE(x_if.isApprox(Vec3{-1.0, -2.0, 3.0}));
+  x_W = T_W_B(rpy) * x_B;
+  EXPECT_TRUE(x_W.isApprox(Vec3{-1.0, -2.0, 3.0}));
 
   // -90 degree
   rpy << 0.0, 0.0, deg2rad(-90.0);
-  x_if = T_if_bf(rpy) * x_bf;
-  EXPECT_TRUE(x_if.isApprox(Vec3{2.0, -1.0, 3.0}));
+  x_W = T_W_B(rpy) * x_B;
+  EXPECT_TRUE(x_W.isApprox(Vec3{2.0, -1.0, 3.0}));
 
   // 0 degree + (1.0, 2.0, 3.0)
   rpy << 0.0, 0.0, deg2rad(0.0);
-  x_if = T_if_bf(rpy, Vec3{1.0, 2.0, 3.0}) * x_bf;
-  EXPECT_TRUE(x_if.isApprox(Vec3{2.0, 4.0, 6.0}));
+  x_W = T_W_B(rpy, Vec3{1.0, 2.0, 3.0}) * x_B;
+  EXPECT_TRUE(x_W.isApprox(Vec3{2.0, 4.0, 6.0}));
 }
 
 TEST(Transform, sandbox) {
@@ -217,6 +218,26 @@ TEST(Transform, edn2nwu) {
   EXPECT_FLOAT_EQ(3.0, enu(0));
   EXPECT_FLOAT_EQ(-1.0, enu(1));
   EXPECT_FLOAT_EQ(-2.0, enu(2));
+}
+
+TEST(Transform, transformPose) {
+  Vec3 x{1.0, 0.0, 0.0};
+  Pose pose("B", 0.0, 0.0, deg2rad(90.0), 1.0, 0.0, 0.0);
+
+  std::cout << Transform{"A", "B", Mat3::Identity(), x} * pose << std::endl;
+}
+
+TEST(Transform, transformPosition) {
+  Vec3 x{1.0, 0.0, 0.0};
+  Position p("B", 1.0, 0.0, 0.0);
+
+  std::cout << Transform{"A", "B", Mat3::Identity(), x} * p << std::endl;
+}
+
+TEST(Transform, transformVector3) {
+  Vec3 x{1.0, 2.0, 3.0};
+  Pose pose("W", 0.0, 0.0, deg2rad(0.0), 0.0, 0.0, 0.0);
+  std::cout << T_P_W{pose.orientation} * x << std::endl;
 }
 
 } // namespace atl

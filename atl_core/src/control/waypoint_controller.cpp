@@ -130,17 +130,16 @@ int WaypointController::update(Mission &mission,
   }
 
   // calculate waypoint relative to quadrotor
-  Vec3 errors = waypoint - pose.position;
-  errors = T_bpf_if{pose.orientation} * errors;
+  Vec3 errors = T_P_W{pose.orientation} * Vec3{waypoint - pose.position};
 
   // calculate velocity relative to quadrotor
-  const Vec3 vel_bf = T_bpf_if{pose.orientation} * vel;
+  const Vec3 vel_B = T_P_W{pose.orientation} * vel;
 
   // roll
   double r = -this->ct_controller.update(errors(1), this->dt);
 
   // pitch
-  double error_forward = mission.desired_velocity - vel_bf(0);
+  double error_forward = mission.desired_velocity - vel_B(0);
   double p = this->at_controller.update(error_forward, this->dt);
 
   // yaw

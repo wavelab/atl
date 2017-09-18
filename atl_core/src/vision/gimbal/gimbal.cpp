@@ -2,28 +2,7 @@
 
 namespace atl {
 
-Gimbal::Gimbal() {
-  this->configured = false;
-
-  this->sbgc = SBGC();
-  this->camera_offset = Pose();
-  std::fill_n(this->limits, 6, 0);
-  this->enable_tracking = false;
-
-  this->setpoints = Vec3();
-  this->target_bpf = Vec3();
-
-  imu_accel = Vec3();
-  imu_gyro = Vec3();
-  camera_angles = Vec3();
-  frame_angles = Vec3();
-  rc_angles = Vec3();
-  encoder_angles = Vec3();
-}
-
-Gimbal::~Gimbal() { this->off(); }
-
-int Gimbal::configure(std::string config_file) {
+int Gimbal::configure(const std::string &config_file) {
   std::string device_path;
   ConfigParser parser;
   double roll, pitch, yaw;
@@ -56,7 +35,7 @@ int Gimbal::configure(std::string config_file) {
   }
 
   // camera mount offsets
-  this->camera_offset = Pose(roll, pitch, yaw, x, y, z);
+  this->camera_offset = Pose("B", roll, pitch, yaw, x, y, z);
 
   // gimbal limits
   for (int i = 0; i < 6; i++) {
@@ -71,41 +50,41 @@ int Gimbal::on() { return this->sbgc.on(); }
 
 int Gimbal::off() { return this->sbgc.off(); }
 
-Vec3 Gimbal::getTargetInBF(Pose camera_offset, Vec3 target_cf) {
+Vec3 Gimbal::getTargetInBF(const Pose &camera_offset, const Vec3 &target_C) {
   // camera mount offset
   Mat3 R{camera_offset.rotationMatrix()};
   Vec3 t{camera_offset.position};
 
-  // transform target in camera frame -> NWU -> body frame
-  return T_bf_if{R, t} * (T_nwu_edn * target_cf);
+  // transform target in camera frame -> world frame -> body frame
+  return T_B_W{R, t} * T_W_C * target_C;
 }
 
-Vec3 Gimbal::getTargetInBPF(Pose camera_offset,
-                            Vec3 target_cf,
-                            Quaternion joint_if) {
+Vec3 Gimbal::getTargetInBPF(const Pose &camera_offset,
+                            const Vec3 &target_C,
+                            const Quaternion &joint_W) {
   // joint is assumed to be NWU frame (same as ROS REP-103)
-  Mat3 R = joint_if.toRotationMatrix();
+  Mat3 R = joint_W.toRotationMatrix();
 
   // transform target in camera frame to body frame
-  Vec3 p = Gimbal::getTargetInBF(camera_offset, target_cf);
+  Vec3 p = Gimbal::getTargetInBF(camera_offset, target_C);
 
   // transform target in camera frame to body planar frame
   return R * p;
 }
 
-Vec3 Gimbal::getTargetInIF(Vec3 target_bpf,
-                           Vec3 gimbal_position,
-                           Quaternion gimbal_frame_if) {
+Vec3 Gimbal::getTargetInIF(const Vec3 &target_P,
+                           const Vec3 &gimbal_position,
+                           const Quaternion &gimbal_frame_W) {
   // filter out roll and pitch in quaternion
-  Vec3 euler = quatToEuler321(gimbal_frame_if);
+  Vec3 euler = quatToEuler321(gimbal_frame_W);
   euler << 0.0, 0.0, euler(2);
   Mat3 R = euler321ToRot(euler);
 
   // compensate yaw in target from body planar frame to inertial frame
-  return (R * target_bpf) + gimbal_position;
+  return (R * target_P) + gimbal_position;
 }
 
-int Gimbal::getTargetInBPF(Vec3 target_cf, Vec3 &target_bpf) {
+int Gimbal::getTargetInBPF(const Vec3 &target_C, Vec3 &target_P) {
   Vec3 tmp;
 
   // get data from SimpleBGC
@@ -121,23 +100,21 @@ int Gimbal::getTargetInBPF(Vec3 target_cf, Vec3 &target_bpf) {
   Quaternion gimbal_imu = euler321ToQuat(euler);
 
   // camera frame to camera mount frame
-  tmp = this->camera_offset.rotationMatrix().inverse() * target_cf;
+  tmp = this->camera_offset.rotationMatrix().inverse() * target_C;
   // inverse because we want tag relative to quad
   // without it, results are relative to tag
 
   // camera mount frame to body planar frame
   tmp = gimbal_imu.toRotationMatrix() * tmp;
-  target_bpf(0) = tmp(0);
-  target_bpf(1) = tmp(1);
-  target_bpf(2) = tmp(2);
-  this->target_bpf = target_bpf;
+  target_P(0) = tmp(0);
+  target_P(1) = tmp(1);
+  target_P(2) = tmp(2);
+  this->target_P = target_P;
 
   return 0;
 }
 
-int Gimbal::trackTarget(Vec3 target_bpf) {
-  double dist;
-
+int Gimbal::trackTarget(const Vec3 &target_P) {
   // pre-check
   if (this->enable_tracking == false) {
     return 0;
@@ -146,19 +123,18 @@ int Gimbal::trackTarget(Vec3 target_bpf) {
   // calculate roll pitch yaw setpoints
   // Note: setpoints are assuming Gimbal are in NWU frame
   // NWU frame: (x - forward, y - left, z - up)
-  dist = target_bpf.norm();
-  this->setpoints(0) = asin(target_bpf(1) / dist); // roll setpoint
-  this->setpoints(1) = asin(target_bpf(0) / dist); // pitch setpoint
+  const double dist = target_P.norm();
+  this->setpoints(0) = asin(target_P(1) / dist); // roll setpoint
+  this->setpoints(1) = asin(target_P(0) / dist); // pitch setpoint
   this->setpoints(2) = 0.0; // yaw setpoint - unsupported at the moment
 
   return 0;
 }
 
 int Gimbal::updateGimbalStates() {
-  int retval;
   const double k_gravity = 9.80665;
 
-  retval = this->sbgc.getRealtimeData4();
+  int retval = this->sbgc.getRealtimeData4();
   if (retval != 0) {
     return -1;
   }
@@ -215,9 +191,9 @@ void Gimbal::printSetpoints() {
   std::cout << "roll setpoint: " << this->setpoints(0) << "\t";
   std::cout << "pitch setpoint: " << this->setpoints(1) << "\t";
   std::cout << "target: [";
-  std::cout << "x: " << this->target_bpf(0) << "\t";
-  std::cout << "y: " << this->target_bpf(1) << "\t";
-  std::cout << "z: " << this->target_bpf(2);
+  std::cout << "x: " << this->target_P(0) << "\t";
+  std::cout << "y: " << this->target_P(1) << "\t";
+  std::cout << "z: " << this->target_P(2);
   std::cout << "]" << std::endl;
 }
 
