@@ -1,0 +1,59 @@
+index: 0
+image_width: 640
+image_height: 480
+image_type: "mono8"
+
+# roi
+roi: false
+roi_width: 500
+roi_height: 400
+
+# indoors
+shutter_speed: 200.0
+exposure_value: 500.0
+gain_value: 2000.0
+
+# # sunny
+# shutter_speed: 10.0
+# exposure_value: 200
+# gain_value: 100.0
+
+# # before sun down
+# shutter_speed: 50.0
+# exposure_value: 550
+# gain_value: 300.0
+
+# # after sun down
+# shutter_speed: 350.0
+# exposure_value: 600
+# gain_value: 1000.0
+
+lambda: [0.0, 0.0, 0.0]
+alpha: 4.0
+
+camera_matrix:
+  rows: 3
+  cols: 3
+  data: [441.56684, 0.000000, 334.610234,
+         0.000000, 436.79296, 238.8810,
+         0.000000, 0.000000, 1.000000]
+distortion_coefficients:
+  rows: 1
+  cols: 5
+  data: [-0.322520, 0.102037, 0.000097, 0.003677, 0.00000]
+rectification_matrix:
+  rows: 3
+  cols: 3
+  data: [1.000000, 0.000000, 0.000000,
+         0.000000, 1.000000, 0.000000,
+         0.000000, 0.000000, 1.000000]
+projection_matrix:
+  rows: 3
+  cols: 4
+  data: [395.974701, 0.000000, 351.849285, 0.000000,
+         0.000000, 428.965149, 268.157269, 0.000000,
+         0.000000, 0.000000, 1.000000, 0.000000]
+
+imshow: false
+snapshot: false
+showfps: false
