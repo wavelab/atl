@@ -121,17 +121,18 @@ if __name__ == "__main__":
     # world = World()
     rospy.sleep(1.0)
 
-    # quad.set_arm(True)
-    # quad.set_mode("WAYPOINT_MODE")
+    quad.set_arm(True)
+    quad.set_mode("HOVER_MODE")
+    quad.set_hover_point([0.0, 0.0, 5.0])
 
-    gimbal.activate(True)
-    pitch = -110.0
-    while True:
-        gimbal.set_attitude([0, deg2rad(pitch), 0.0, 0])
-        pitch += 5.0
-        if pitch > -70.0:
-            pitch=-110.0
-        sleep(1.0)
+    # gimbal.activate(True)
+    # pitch = -110.0
+    # while True:
+    #     gimbal.set_attitude([0, deg2rad(pitch), 0.0, 0])
+    #     pitch += 5.0
+    #     if pitch > -70.0:
+    #         pitch=-110.0
+    #     sleep(1.0)
     # gimbal.activate(False)
 
     # quad.set_arm(True)
