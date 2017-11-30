@@ -18,8 +18,10 @@ namespace atl {
 #define EYSIZE "Measurement vector y should be of size %d!"
 
 // clang-format off
-#define MATRIX_A_CONSTANT_ACCELERATION_X(A) \
-  A << 1.0, dt, pow(dt, 2.0) / 2.0, 0.0, 1.0, dt, 0.0, 0.0, 1.0;
+#define MATRIX_A_CONSTANT_ACCELERATION_X(A)                                \
+  A << 1.0, dt, pow(dt, 2.0) / 2.0,                                        \
+       0.0, 1.0, dt,                                                       \
+       0.0, 0.0, 1.0;
 
 #define MATRIX_A_CONSTANT_ACCELERATION_XY(A)                               \
   A << 1.0, 0.0, dt, 0.0, pow(dt, 2.0) / 2.0, 0.0, 0.0, 1.0, 0.0, dt, 0.0, \

@@ -43,15 +43,17 @@ public:
   /**
    * Calculate controller outputs
    *
-   * @param setpoints Velocity setpoints in inertial frame
-   * @param actual Actual velocity in inertial frame
+   * @param setpoints Velocity setpoints in world frame
+   * @param actual Actual velocity in world frame
    * @param dt Time difference in seconds
    *
    * @return
    *    Attitude command as a vector of size 4:
    *    (roll, pitch, yaw, throttle)
    */
-  Vec4 calculate(const Vec3 &setpoints, const Vec3 &actual, const double dt);
+  Vec4 calculate(const Vec3 &setpoints_W,
+                 const Vec3 &actual_W,
+                 const double dt);
 
   /**
    * Reset controller errors to 0

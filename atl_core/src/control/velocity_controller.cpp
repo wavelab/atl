@@ -40,8 +40,8 @@ int VelocityController::configure(const std::string &config_file) {
   return 0;
 }
 
-Vec4 VelocityController::calculate(const Vec3 &setpoints,
-                                   const Vec3 &actual,
+Vec4 VelocityController::calculate(const Vec3 &setpoints_W,
+                                   const Vec3 &actual_W,
                                    const double dt) {
   // check rate
   this->dt += dt;
@@ -50,9 +50,9 @@ Vec4 VelocityController::calculate(const Vec3 &setpoints,
   }
 
   // calculate errors
-  const Vec3 errors{setpoints(0) - actual(0),
-                    setpoints(1) - actual(1),
-                    setpoints(2) - actual(2)};
+  const Vec3 errors{setpoints_W(0) - actual_W(0),
+                    setpoints_W(1) - actual_W(1),
+                    setpoints_W(2) - actual_W(2)};
 
   // roll, pitch, yaw and throttle (assuming NWU frame)
   // clang-format off
@@ -74,7 +74,7 @@ Vec4 VelocityController::calculate(const Vec3 &setpoints,
   t = (t > 1.0) ? 1.0 : t;
 
   // keep track of setpoints and outputs
-  this->setpoints = setpoints;
+  this->setpoints = setpoints_W;
   this->outputs << r, p, y, t;
   this->dt = 0.0;
 

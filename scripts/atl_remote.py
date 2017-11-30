@@ -125,7 +125,13 @@ if __name__ == "__main__":
     # quad.set_mode("WAYPOINT_MODE")
 
     gimbal.activate(True)
-    gimbal.set_attitude([deg2rad(-20.0), 0, 0.0, 0])
+    pitch = -110.0
+    while True:
+        gimbal.set_attitude([0, deg2rad(pitch), 0.0, 0])
+        pitch += 5.0
+        if pitch > -70.0:
+            pitch=-110.0
+        sleep(1.0)
     # gimbal.activate(False)
 
     # quad.set_arm(True)

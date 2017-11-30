@@ -183,11 +183,11 @@ int TrajectoryController::record(const Vec3 &pos,
   return 0;
 }
 
-Vec4 TrajectoryController::calculateVelocityErrors(const Vec3 &v_errors,
-                                                   const Vec3 &p_errors,
-                                                   const double yaw,
+Vec4 TrajectoryController::calculateVelocityErrors(const Vec3 &v_errors_B,
+                                                   const Vec3 &p_errors_B,
+                                                   const double yaw_W,
                                                    const double dt) {
-  UNUSED(yaw);
+  UNUSED(yaw_W);
 
   // check rate
   this->dt += dt;
@@ -196,30 +196,30 @@ Vec4 TrajectoryController::calculateVelocityErrors(const Vec3 &v_errors,
   }
 
   // roll
-  double r = this->vy_k_p * v_errors(1);
-  r += this->vy_k_i * p_errors(1);
-  r += this->vy_k_d * (v_errors(1) - this->vy_error_prev) / this->dt;
+  double r = this->vy_k_p * v_errors_B(1);
+  r += this->vy_k_i * p_errors_B(1);
+  r += this->vy_k_d * (v_errors_B(1) - this->vy_error_prev) / this->dt;
   r = -1 * r;
 
   // pitch
-  this->vx_error_sum += v_errors(0);
-  double p = this->vx_k_p * v_errors(0);
+  this->vx_error_sum += v_errors_B(0);
+  double p = this->vx_k_p * v_errors_B(0);
   p += this->vx_k_i * this->vx_error_sum;
-  p += this->vx_k_d * (v_errors(0) - this->vx_error_prev) / this->dt;
+  p += this->vx_k_d * (v_errors_B(0) - this->vx_error_prev) / this->dt;
 
   // yaw
   double y = 0.0;
 
   // throttle
-  double t = this->vz_k_p * v_errors(2);
-  t += this->vz_k_i * p_errors(2);
-  t += this->vz_k_d * (v_errors(2) - this->vz_error_prev) / this->dt;
+  double t = this->vz_k_p * v_errors_B(2);
+  t += this->vz_k_i * p_errors_B(2);
+  t += this->vz_k_d * (v_errors_B(2) - this->vz_error_prev) / this->dt;
   t /= fabs(cos(r) * cos(p)); // adjust throttle for roll and pitch
 
   // keep track of previous errors
-  this->vx_error_prev = v_errors(0);
-  this->vy_error_prev = v_errors(1);
-  this->vz_error_prev = v_errors(2);
+  this->vx_error_prev = v_errors_B(0);
+  this->vy_error_prev = v_errors_B(1);
+  this->vz_error_prev = v_errors_B(2);
 
   // limit roll, pitch, throttle
   r = (r < this->roll_limit[0]) ? this->roll_limit[0] : r;
@@ -230,7 +230,7 @@ Vec4 TrajectoryController::calculateVelocityErrors(const Vec3 &v_errors,
   t = (t > this->throttle_limit[1]) ? this->throttle_limit[1] : t;
 
   // keep track of setpoints and outputs
-  this->setpoints = v_errors;
+  this->setpoints = v_errors_B;
   this->outputs << r, p, y, t;
   this->dt = 0.0;
 
@@ -239,14 +239,14 @@ Vec4 TrajectoryController::calculateVelocityErrors(const Vec3 &v_errors,
 
 int TrajectoryController::update(const Vec3 &target_pos_B,
                                  const Vec3 &target_vel_B,
-                                 const Vec3 &pos,
-                                 const Vec3 &vel,
-                                 const Quaternion &orientation,
-                                 const double yaw,
+                                 const Vec3 &pos_W,
+                                 const Vec3 &vel_W,
+                                 const Quaternion &orientation_W,
+                                 const double yaw_W,
                                  const double dt) {
   // obtain position and velocity waypoints
   Vec2 wp_pos, wp_vel, wp_inputs;
-  int retval = this->trajectory.update(pos, wp_pos, wp_vel, wp_inputs);
+  int retval = this->trajectory.update(pos_W, wp_pos, wp_vel, wp_inputs);
   if (retval != 0) {
     LOG_ERROR("Trajectory update failed!");
     return -1;
@@ -255,33 +255,34 @@ int TrajectoryController::update(const Vec3 &target_pos_B,
   // Vec2 wp_rel_vel = this->trajectory.rel_vel.at(0);
 
   // calculate velocity in body frame
-  const Vec3 vel_B = T_B_W{orientation} * vel;
+  const Vec3 vel_B = T_B_W{orientation_W} * vel_W;
 
   // calculate velocity errors (inertial version)
-  Vec3 v_errors;
-  v_errors(0) = wp_vel(0) - vel_B(0);
-  v_errors(1) = target_vel_B(1);
-  v_errors(2) = wp_vel(1) - vel(2);
+  Vec3 v_errors_B;
+  v_errors_B(0) = wp_vel(0) - vel_B(0);
+  v_errors_B(1) = target_vel_B(1);
+  v_errors_B(2) = wp_vel(1) - vel_B(2);
 
   // calculate position errors
-  Vec3 p_errors;
-  p_errors(0) = wp_rel_pos(0) + target_pos_B(0);
-  p_errors(1) = target_pos_B(1);
-  p_errors(2) = wp_rel_pos(1) - pos(2);
+  Vec3 p_errors_B;
+  p_errors_B(0) = wp_rel_pos(0) + target_pos_B(0);
+  p_errors_B(1) = target_pos_B(1);
+  p_errors_B(2) = wp_rel_pos(1) - pos_W(2);
 
   // calculate feed-back controls
-  this->outputs = this->calculateVelocityErrors(v_errors, p_errors, yaw, dt);
+  this->outputs =
+      this->calculateVelocityErrors(v_errors_B, p_errors_B, yaw_W, dt);
 
   // add in feed-forward controls
   this->outputs(0) += 0.0;          // roll
   this->outputs(1) += wp_inputs(1); // pitch
-  this->outputs(2) += yaw;          // yaw
+  this->outputs(2) += yaw_W;        // yaw
   this->outputs(3) += wp_inputs(0); // thrust
 
   // record
-  const Vec3 rpy = quatToEuler321(orientation);
-  this->record(pos,
-               vel,
+  const Vec3 rpy = quatToEuler321(orientation_W);
+  this->record(pos_W,
+               vel_W,
                wp_pos,
                wp_vel,
                wp_inputs,
@@ -292,17 +293,17 @@ int TrajectoryController::update(const Vec3 &target_pos_B,
                dt);
 
   // check if we are too far off track with trajectory
-  if (p_errors(0) > this->trajectory_threshold(0)) {
+  if (p_errors_B(0) > this->trajectory_threshold(0)) {
     LOG_ERROR("Trajectory error in the x-axis is too large!");
-    LOG_ERROR("error: %f > %f", p_errors(0), this->trajectory_threshold(0));
+    LOG_ERROR("error: %f > %f", p_errors_B(0), this->trajectory_threshold(0));
     return -1;
-  } else if (p_errors(1) > this->trajectory_threshold(1)) {
+  } else if (p_errors_B(1) > this->trajectory_threshold(1)) {
     LOG_ERROR("Trajectory error in the y-axis is too large!");
-    LOG_ERROR("error: %f > %f", p_errors(1), this->trajectory_threshold(1));
+    LOG_ERROR("error: %f > %f", p_errors_B(1), this->trajectory_threshold(1));
     return -1;
-  } else if (p_errors(2) > this->trajectory_threshold(2)) {
+  } else if (p_errors_B(2) > this->trajectory_threshold(2)) {
     LOG_ERROR("Trajectory error in the z-axis is too large!");
-    LOG_ERROR("error: %f > %f", p_errors(2), this->trajectory_threshold(2));
+    LOG_ERROR("error: %f > %f", p_errors_B(2), this->trajectory_threshold(2));
     return -1;
   }
 

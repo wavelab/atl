@@ -195,7 +195,7 @@ void EstimatorNode::publishLTKFBodyPositionEstimate() {
   // build and publish msg
   geometry_msgs::Vector3 msg;
   buildMsg(this->target_pos_P, msg);
-  this->ros_pubs[LT_BODY_POSITION_TOPIC].publish(msg);
+  this->ros_pubs[LT_POSITION_B_TOPIC].publish(msg);
 }
 
 void EstimatorNode::publishLTKFBodyVelocityEstimate() {
@@ -219,7 +219,7 @@ void EstimatorNode::publishLTKFBodyVelocityEstimate() {
   // build and publish msg
   geometry_msgs::Vector3 msg;
   buildMsg(this->target_vel_P, msg);
-  this->ros_pubs[LT_BODY_VELOCITY_TOPIC].publish(msg);
+  this->ros_pubs[LT_VELOCITY_B_TOPIC].publish(msg);
 }
 
 void EstimatorNode::publishLTDetected() {

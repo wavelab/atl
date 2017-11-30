@@ -44,31 +44,31 @@ public:
   /**
    * Update controller
    *
-   * @param pos_errors Tracking errors in body frame
-   * @param yaw Actual robot yaw
+   * @param errors_B Tracking errors in body frame
+   * @param yaw_W Actual yaw in world frame
    * @param dt Time difference in seconds
    *
    * @return controller output
    */
-  AttitudeCommand update(const Vec3 &pos_errors,
-                         const double yaw,
+  AttitudeCommand update(const Vec3 &errors_B,
+                         const double yaw_W,
                          const double dt);
 
   /**
    * Update controller
    *
    * @param target_pos_B Target position in body frame
-   * @param pos Robot position in inertial frame
-   * @param pos_prev Previous robot position in inertial frame
-   * @param yaw Robot yaw
+   * @param pos Position in world frame
+   * @param pos_prev Previous position in world frame
+   * @param yaw Actual yaw in world frame
    * @param dt Time difference in seconds
    *
    * @return controller output
    */
   AttitudeCommand update(const Vec3 &target_pos_B,
-                         const Vec3 &pos,
-                         const Vec3 &pos_prev,
-                         const double yaw,
+                         const Vec3 &pos_W,
+                         const Vec3 &pos_prev_W,
+                         const double yaw_W,
                          const double dt);
 
   /**

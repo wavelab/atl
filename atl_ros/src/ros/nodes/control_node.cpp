@@ -202,7 +202,7 @@ void ControlNode::attitudeCallback(
 void ControlNode::velocityCallback(const geometry_msgs::Vector3Stamped &msg) {
   // Transform velocity from ENU to NWU
   Vec3 vel_enu{msg.vector.x, msg.vector.y, msg.vector.z};
-  Vec3 vel_nwu = T_nwu_enu * vel_enu;
+  Vec3 vel_nwu = nwu2enu(vel_enu);
   this->quadrotor.setVelocity(vel_nwu);
 }
 

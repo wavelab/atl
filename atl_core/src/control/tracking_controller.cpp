@@ -42,8 +42,8 @@ int TrackingController::configure(const std::string &config_file) {
   return 0;
 }
 
-AttitudeCommand TrackingController::update(const Vec3 &pos_errors,
-                                           const double yaw,
+AttitudeCommand TrackingController::update(const Vec3 &errors_B,
+                                           const double yaw_W,
                                            const double dt) {
   // check rate
   this->dt += dt;
@@ -52,12 +52,12 @@ AttitudeCommand TrackingController::update(const Vec3 &pos_errors,
   }
 
   // add offsets
-  Vec3 errors = pos_errors + this->track_offset;
+  Vec3 errors = errors_B + this->track_offset;
 
   // roll, pitch, yaw and throttle (assuming NWU frame)
   double r = -this->y_controller.update(errors(1), 0.0, this->dt);
   double p = this->x_controller.update(errors(0), 0.0, this->dt);
-  double y = yaw;
+  double y = yaw_W;
   double t = this->hover_throttle;
   t += this->z_controller.update(errors(2), 0.0, this->dt);
   t /= fabs(cos(r) * cos(p)); // adjust throttle for roll and pitch
@@ -81,17 +81,12 @@ AttitudeCommand TrackingController::update(const Vec3 &pos_errors,
 }
 
 AttitudeCommand TrackingController::update(const Vec3 &target_pos_B,
-                                           const Vec3 &pos,
-                                           const Vec3 &pos_prev,
-                                           const double yaw,
+                                           const Vec3 &pos_W,
+                                           const Vec3 &pos_prev_W,
+                                           const double yaw_W,
                                            const double dt) {
-  Vec3 errors;
-
-  errors(0) = target_pos_B(0);
-  errors(1) = target_pos_B(1);
-  errors(2) = pos_prev(2) - pos(2);
-
-  return this->update(errors, yaw, dt);
+  Vec3 errors{target_pos_B(0), target_pos_B(1), pos_prev_W(2) - pos_W(2)};
+  return this->update(errors, yaw_W, dt);
 }
 
 void TrackingController::reset() {

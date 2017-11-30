@@ -130,18 +130,18 @@ public:
   /**
    * Calculate elocity errors
    *
-   * @param v_errors Velocity errors in body frame
-   * @param p_errors Position errors in body frame
-   * @param yaw Actual robot yaw
+   * @param v_errors_B Velocity errors in body frame
+   * @param p_errors_B Position errors in body frame
+   * @param yaw_W Actual yaw in world frame
    * @param dt Time difference in seconds
    *
    * @return
    *    Attitude command as a vector of size 4:
    *    (roll, pitch, yaw, throttle)
    */
-  Vec4 calculateVelocityErrors(const Vec3 &v_errors,
-                               const Vec3 &p_errors,
-                               const double yaw,
+  Vec4 calculateVelocityErrors(const Vec3 &v_errors_B,
+                               const Vec3 &p_errors_B,
+                               const double yaw_W,
                                const double dt);
 
   /**
@@ -149,19 +149,20 @@ public:
    *
    * @param target_pos_B Target position in body frame
    * @param target_vel_B Target velocity in body frame
-   * @param pos Actual robot position
-   * @param vel Actual robot velocity
-   * @param yaw Actual robot yaw
+   * @param pos_W Actual position in world frame
+   * @param vel_W Actual velocity in world frame
+   * @param orientation_W Actual orientation in world frame
+   * @param yaw_W Actual yaw in world frame
    * @param dt Time difference in seconds
    *
    * @return 0 for success, -1 for failure
    */
   int update(const Vec3 &target_pos_B,
              const Vec3 &target_vel_B,
-             const Vec3 &pos,
-             const Vec3 &vel,
-             const Quaternion &orientation,
-             const double yaw,
+             const Vec3 &pos_W,
+             const Vec3 &vel_W,
+             const Quaternion &orientation_W,
+             const double yaw_W,
              const double dt);
 
   /**
