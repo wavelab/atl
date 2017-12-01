@@ -3,6 +3,27 @@
 **A**utonomous **T**racking and **L**anding (ATL) for multi-rotors.
 
 
+## Requirements
+
+- ROS Kinetic
+- Gazebo 8
+- OpenCV 3
+- [DJI OSDK](https://github.com/dji-sdk/Onboard-SDK)
+- [DJI Onboard-SDK ROS](https://github.com/dji-sdk/Onboard-SDK-ROS)
+- PointGrey SDK
+- Ximea SDK
+- [Michael Kaess's AprilTag implementation](http://people.csail.mit.edu/kaess/apriltags/)
+
+Or if you're very lazy like me you can install all dependencies by
+
+    cd <your catkin workspace>/src
+    git clone https://github.com/wavelab/atl
+    cd atl/scripts/install
+    sudo bash install_deps.bash
+
+This will install all depencies required by ATL.
+
+
 ## Install
 
 The following instructions assumes you have installed ROS.
@@ -10,9 +31,7 @@ The following instructions assumes you have installed ROS.
     cd <your catkin workspace>/src
     git clone https://github.com/wavelab/atl
     cd ..
-    catkin_make
-    catkin_make tests
-    catkin_make install
+    catkin build
 
 In short the above navigates to your catkin workspace's `src`, clones `atl`
 and finally runs `catkin_make` to build the project, tests and installs configs
@@ -25,27 +44,13 @@ ATL uses Gazebo simulation to test the control and perception, to launch an
 instance of a Gazebo simulation along with ATL enter the following commands:
 
     # Environment variables to tell Gazebo where to look for 3D models and plugins
-    export CATKIN_WS=<your catkin workspace>
-    export GAZEBO_RESOURCE_PATH=${GAZEBO_RESOURCE_PATH}:${CATKIN_WS}/install/share/atl_gazebo/
-    export GAZEBO_MODEL_PATH=${GAZEBO_MODEL_PATH}:${CATKIN_WS}/install/share/atl_gazebo/models
-    export GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}:${CATKIN_WS}/install/share/atl_gazebo/plugins
+    # The following assumes you're using `catkin build` instead of `catkin make`
+    export GAZEBO_RESOURCE_PATH=${GAZEBO_RESOURCE_PATH}:$HOME/.gazebo
+    export GAZEBO_MODEL_PATH=${GAZEBO_MODEL_PATH}:$HOME/.gazebo/models
+    export GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}:$HOME/.gazebo/plugins
 
     # Launch Gazebo simulation
     roslaunch atl_ros atl_sim.launch
-
-
-## ROS Node Tests
-
-Once you have performed the above instructions you can run ROS node tests via:
-
-    catkin_make run_tests
-
-Or alternatively you can launch individual tests via:
-
-    rostest atl_ros apriltag_test.launch
-    rostest atl_ros camera_test.launch
-    rostest atl_ros estimator_test.launch
-    rostest atl_ros gimbal_test.launch
 
 
 ## License
