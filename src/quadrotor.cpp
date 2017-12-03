@@ -134,7 +134,7 @@ void Quadrotor::runMission(
         // transition to offboard mode
         // this->mission_state = INITIALIZE_MODE;
         this->mission_state = TRACKING_MODE;
-        this->hover_height = robot_pose.z + 5.0;
+        this->hover_height = robot_pose.z + 3.0;
 
         this->landing_zone_world.x = this->pose.x;
         this->landing_zone_world.y = this->pose.y;
@@ -176,9 +176,9 @@ void Quadrotor::runMission(
                 p.z = this->hover_height;
 
             } else {
-                this->landing_zone_world.x = p.x;
-                this->landing_zone_world.y = p.y;
-                this->landing_zone_world.z = p.z;
+                // this->landing_zone_world.x = p.x;
+                // this->landing_zone_world.y = p.y;
+                // this->landing_zone_world.z = p.z;
 
                 p.x = this->pose.x + landing_zone.x;
                 p.y = this->pose.y + landing_zone.y;
@@ -187,8 +187,6 @@ void Quadrotor::runMission(
             }
 
         } else {
-            this->landing_zone_belief = 0; // reset belief
-
             p.x = this->landing_zone_world.x;
             p.y = this->landing_zone_world.y;
             p.z = this->hover_height;
@@ -202,5 +200,6 @@ void Quadrotor::runMission(
     }
 
     // calcualte new attitude using position controller
+    // std::cout << "move to: " << p.x << " " << p.y << std::endl;
     this->positionControllerCalculate(p, dt);
 }

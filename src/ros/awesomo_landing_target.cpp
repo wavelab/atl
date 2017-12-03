@@ -68,12 +68,12 @@ void LandingTarget::cameraRBTCallback(const atim::AtimPoseStamped &msg)
 
     // this->cam_rbt.applyRBTtoPosition(this->position);
         this->cam_rbt.applyRBTtoPosition(this->position);
-        // applyRotationToPosition(
-        //     this->local_pose.roll,
-        //     this->local_pose.pitch,
-        //     this->local_pose.yaw,
-        //     this->position
-        // );
+        applyRotationToPosition(
+            this->local_pose.roll,
+            this->local_pose.pitch,
+            this->local_pose.yaw,
+            this->position
+        );
     }
     else{
         this->position.detected = msg.tag_detected;
