@@ -3,7 +3,9 @@ set -e  # exit on first error
 DOWNLOAD_PATH="/usr/local/src"
 CATKIN_PATH="$HOME/catkin_ws"
 CORE_SDK_REPO_URL="https://github.com/dji-sdk/Onboard-SDK"
+CORE_SDK_VER="3.4"
 ROS_SDK_REPO_URL="https://github.com/dji-sdk/Onboard-SDK-ROS"
+ROS_SDK_VER="3.3"
 
 install_core_sdk()
 {
@@ -11,6 +13,7 @@ install_core_sdk()
     cd $DOWNLOAD_PATH
     if [ ! -d $DOWNLOAD_PATH/Onboard-SDK ]; then
         sudo git clone $CORE_SDK_REPO_URL
+        sudo git checkout $CORE_SDK_VER
     fi
 
     # compile and install
@@ -29,20 +32,9 @@ install_ros_sdk()
     cd $CATKIN_PATH/src
     if [ ! -d $CATKIN_PATH/src/Onboard-SDK-ROS ]; then
         git clone $ROS_SDK_REPO_URL
+        sudo git checkout $ROS_SDK_VER
     fi
 }
-
-# install_ros_sdk()
-# {
-#     if [ ! -d $CATKIN_PATH/src/Onboard-SDK-ROS ]; then
-#       if [ ! -d $DONWLOAD_PATH/Onboard-SDK-ROS ]; then
-#         cd $DOWNLOAD_PATH
-#         sudo git clone https://github.com/wavelab/Onboard-SDK-ROS
-#       fi
-#
-#       ln -s $DOWNLOAD_PATH/Onboard-SDK-ROS  $CATKIN_PATH/src/Onboard-SDK-ROS
-#     fi
-# }
 
 
 # RUN

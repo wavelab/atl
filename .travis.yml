@@ -9,26 +9,17 @@ cache:
 
 install:
     - sudo bash scripts/install/ros_install.bash
-    - sudo bash scripts/install/catkin_setup.bash
-    - sudo bash scripts/install/awesomo_install.bash
-    - sudo bash scripts/install/ximea_install.bash
+    - sudo bash scripts/install/install_deps.bash
 
 script:
-    - cd ~/catkin_ws/src/awesomo/awesomo_core
-    - source ~/catkin_ws/devel/setup.bash
-    - rosrun awesomo_core awesomo_tests --gtest_filter=-Camera.*:SBGC.* --silence-stdcout
-
-after_success:
-   - cd -
-   - sudo pip install mkdocs
-   - mkdocs build
-   - git add site && git commit -m "Update docs"
-   - git subtree push --prefix site origin gh-pages
+    - echo "Skipping tests for now!"
+    # - cd ~/catkin_ws/src/awesomo/awesomo_core
+    # - source ~/catkin_ws/devel/setup.bash
+    # - rosrun awesomo_core awesomo_tests --gtest_filter=-Camera.*:SBGC.* --silence-stdcout
 
 notifications:
     recipients:
         - chutsu@gmail.com
-        - stan.j.brown@gmail.com
     email:
         on_success: change
         on_failure: always
