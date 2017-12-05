@@ -1,5 +1,10 @@
 pipeline {
-  agent none
+  agent {
+    node {
+      label 'Test Environment'
+    }
+    
+  }
   stages {
     stage('Download Repo') {
       steps {
