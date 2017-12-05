@@ -2,6 +2,8 @@
 
 **A**utonomous **T**racking and **L**anding (ATL) for multi-rotors.
 
+![ATL in action](https://media.giphy.com/media/3oxHQr4zLbHZSjAJ0Y/giphy.gif)
+
 
 ## Requirements
 
