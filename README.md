@@ -3,7 +3,7 @@
 **A**utonomous **T**racking and **L**anding (ATL) for multi-rotors.
 
 <p align="center"> 
-    ![ATL in action](https://media.giphy.com/media/3oxHQr4zLbHZSjAJ0Y/giphy.gif)
+    <img src="https://media.giphy.com/media/3oxHQr4zLbHZSjAJ0Y/giphy.gif" />
 </p>
 
 
