@@ -7,18 +7,7 @@
 </p>
 
 
-## Requirements
-
-- ROS Kinetic
-- Gazebo 8
-- OpenCV 3
-- [DJI OSDK](https://github.com/dji-sdk/Onboard-SDK)
-- [DJI Onboard-SDK ROS](https://github.com/dji-sdk/Onboard-SDK-ROS)
-- PointGrey SDK
-- Ximea SDK
-- [Michael Kaess's AprilTag implementation](http://people.csail.mit.edu/kaess/apriltags/)
-
-Or if you're very lazy like me you can install all dependencies by
+## Dependencies
 
     cd <your catkin workspace>/src
     git clone https://github.com/wavelab/atl
