@@ -116,36 +116,36 @@ int WaypointController::update(Mission &mission,
                                const Pose &pose,
                                const Vec3 &vel,
                                const double dt) {
-  // check rate
+  // Check rate
   this->dt += dt;
   if (this->dt < 0.01) {
     return 0;
   }
 
-  // current waypoint
+  // Current waypoint
   Vec3 waypoint = Vec3::Zero();
   int retval = mission.update(pose.position, waypoint);
   if (retval != 0) {
     return retval;
   }
 
-  // calculate waypoint relative to quadrotor
+  // Calculate waypoint relative to quadrotor
   Vec3 errors = T_P_W{pose.orientation} * Vec3{waypoint - pose.position};
 
-  // calculate velocity relative to quadrotor
+  // Calculate velocity relative to quadrotor
   const Vec3 vel_B = T_P_W{pose.orientation} * vel;
 
-  // roll
+  // Roll
   double r = -this->ct_controller.update(errors(1), this->dt);
 
-  // pitch
+  // Pitch
   double error_forward = mission.desired_velocity - vel_B(0);
   double p = this->at_controller.update(error_forward, this->dt);
 
-  // yaw
+  // Yaw
   double y = mission.waypointHeading();
 
-  // throttle
+  // Throttle
   const double error_z = waypoint(2) - pose.position(2);
   double t = this->hover_throttle;
   t += this->z_controller.update(error_z, this->dt);
