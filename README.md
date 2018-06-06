@@ -48,7 +48,7 @@ instance of a Gazebo simulation along with ATL enter the following commands:
 
 ## License
 
-    Copyright (C) <2016>  <Chris Choi>
+    Copyright (C) <2016>  <Chris Choi, Stan Brown>
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
